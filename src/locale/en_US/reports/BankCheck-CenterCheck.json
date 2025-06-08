@@ -1,0 +1,519 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 20,
+        "rows": [
+            {
+                "title": "Data - Payment Detail",
+                "abscissa": "10",
+                "ordinate": "25",
+                "width": "190",
+                "height": "60",
+                "type": "Tbl",
+                "settings": {
+                    "hfont": "helvetica",
+                    "hsize": "10",
+                    "halign": "C",
+                    "hcolor": "0:0:0",
+                    "hbsize": "1",
+                    "hbcolor": "0:0:0",
+                    "hfcolor": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 3,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.trans_code",
+                                "title": "Invoice #",
+                                "font": "helvetica",
+                                "size": "10",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "30"
+                            },
+                            {
+                                "fieldname": "journal_item.description",
+                                "title": "Comments",
+                                "font": "helvetica",
+                                "size": "10",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "100"
+                            },
+                            {
+                                "fieldname": "journal_item.credit_amount + journal_item.debit_amount",
+                                "title": "Amount Paid",
+                                "font": "helvetica",
+                                "size": "10",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "60",
+                                "formatting": "currency"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Detail Duplicate",
+                "abscissa": "11",
+                "ordinate": "205",
+                "type": "TDup"
+            },
+            {
+                "title": "Data - Primary Name",
+                "abscissa": "8",
+                "ordinate": "8",
+                "width": "60",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "journal_main.primary_name_b"
+                }
+            },
+            {
+                "title": "Data - Check Number",
+                "abscissa": "170",
+                "ordinate": "8",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "journal_main.invoice_num"
+                }
+            },
+            {
+                "title": "Data - Check Date",
+                "abscissa": "170",
+                "ordinate": "12",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Check Amount",
+                "abscissa": "170",
+                "ordinate": "16",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Check Date 2",
+                "abscissa": "175",
+                "ordinate": "107",
+                "width": "25",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Chk Amount 2",
+                "abscissa": "163",
+                "ordinate": "120",
+                "width": "25",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Amount Textual",
+                "abscissa": "20",
+                "ordinate": "133",
+                "width": "180",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "n2wrd",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Block - Mail Address",
+                "abscissa": "20",
+                "ordinate": "143",
+                "width": "75",
+                "height": "5",
+                "type": "TBlk",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_b",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_b",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_b",
+                                "separator": "sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_b",
+                                "separator": "nl"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Pri Name Dup",
+                "abscissa": "10",
+                "ordinate": "190",
+                "width": "60",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "journal_main.primary_name_b"
+                }
+            },
+            {
+                "title": "Data - Check Num Dup",
+                "abscissa": "170",
+                "ordinate": "185",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "journal_main.invoice_num"
+                }
+            },
+            {
+                "title": "Data - Chk Date Dup",
+                "abscissa": "170",
+                "ordinate": "190",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Chk  Amt Dup",
+                "abscissa": "170",
+                "ordinate": "195",
+                "width": "30",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Text - Check Number",
+                "abscissa": "130",
+                "ordinate": "8",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Number"
+                }
+            },
+            {
+                "title": "Text - Check Date",
+                "abscissa": "130",
+                "ordinate": "12",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Date"
+                }
+            },
+            {
+                "title": "Text - Check Amount",
+                "abscissa": "130",
+                "ordinate": "16",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Amount"
+                }
+            },
+            {
+                "title": "Text - Chk Num Dup",
+                "abscissa": "130",
+                "ordinate": "185",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Number"
+                }
+            },
+            {
+                "title": "Text - Chk Date Dup",
+                "abscissa": "130",
+                "ordinate": "190",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Date"
+                }
+            },
+            {
+                "title": "Text - Chk Amt Dup",
+                "abscissa": "130",
+                "ordinate": "195",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Check Amount"
+                }
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Check #",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Primary Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Posted Date",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "type": "6",
+                "min": "pmt"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "type": "9",
+                "min": "20,22"
+            }
+        ]
+    },
+    "title": "Bank Check - Center Check",
+    "description": "Bank check. Three part, center check. Format: Letter, Portrait",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "h",
+        "j"
+    ],
+    "datedefault": "c",
+    "datefield": "journal_main.post_date",
+    "contactlog": "journal_main.contact_id_b",
+    "defaultemail": "user",
+    "formbreakfield": "journal_main.id",
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "frm",
+    "group_id": "bnk:j20",
+    "mime_type": "frm",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2024-04-16"
+}

@@ -1,0 +1,139 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "join_type": "JOIN",
+                "tablename": "extTraining"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "extTraining.title",
+                "title": "Title",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "extTraining.notes",
+                "title": "Notes",
+                "break": "1",
+                "width": "150",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "extTraining.train_date",
+                "title": "Training Date",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "formatting": "date",
+                "align": "L"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "extTraining.task_num",
+                "title": "Task #"
+            },
+            {
+                "fieldname": "extTraining.train_date",
+                "title": "Training Date"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "extTraining.task_num",
+                "title": "Task #"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "extTraining.type",
+                "title": "Type",
+                "type": "6",
+                "min": "j"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "Training ledger",
+    "description": "Displays the training ledger complete with notes. Format Letter, Portrait",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "d",
+        "f",
+        "h",
+        "j"
+    ],
+    "datedefault": "h",
+    "datefield": "extTraining.train_date",
+    "headingshow": null,
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": null,
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": null,
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "misc:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2019-09-11",
+    "last_update": "2019-09-11"
+}

@@ -1,0 +1,171 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "join_type": "JOIN",
+                "tablename": "srvBuilder_journal"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "srvBuilder_journal.sb_ref",
+                "title": "WO #",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "srvBuilder_journal.sku_id",
+                "title": "SKU",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "align": "L",
+                "processing": "inv_sku"
+            },
+            {
+                "fieldname": "srvBuilder_journal.qty",
+                "title": "Qty",
+                "break": "1",
+                "width": "15",
+                "visible": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "srvBuilder_journal.title",
+                "break": "1",
+                "width": "80",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "srvBuilder_journal.create_date",
+                "title": "Created",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "formatting": "date",
+                "align": "C"
+            },
+            {
+                "fieldname": "srvBuilder_journal.close_date",
+                "title": "Completed",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "formatting": "date",
+                "align": "C"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "srvBuilder_journal.sku_id",
+                "title": "SKU"
+            },
+            {
+                "fieldname": "srvBuilder_journal.create_date",
+                "title": "Date Created"
+            },
+            {
+                "fieldname": "srvBuilder_journal.close_date",
+                "title": "Date Closed"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "srvBuilder_journal.sku_id",
+                "title": "SKU"
+            },
+            {
+                "fieldname": "srvBuilder_journal.sb_ref",
+                "title": "WO #"
+            },
+            {
+                "fieldname": "srvBuilder_journal.store_id",
+                "title": "Store ID"
+            },
+            {
+                "fieldname": "srvBuilder_journal.create_date",
+                "title": "Date Created",
+                "default": "1"
+            }
+        ]
+    },
+    "title": "Work Order Status",
+    "description": "Report to display work order within a user specified range and their status.",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "l",
+        "f",
+        "h",
+        "j"
+    ],
+    "datedefault": "l",
+    "datefield": "srvBuilder_journal.create_date",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "mfg:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2020-08-29",
+    "last_update": "2021-03-10"
+}

@@ -1,0 +1,25 @@
+/**
+ * @name Bizuno ERP Amazon Interface
+ * @copyright 2014, PhreeSoft LLC, www.PhreeSoft.com
+ * @author Dave Premo, PhreeSoft, LLC
+ * @version 1.0 Last Update: 2020-11-16
+ * @filesource /EXTENSION_PATH/ifAmazon/template.txt
+ */
+
+
+README file for creating Amazon Templates
+
+1. Download the Amazo tmeplate
+2. Open with excel or Apple Numbers, save as .csv file. This will create several files. The two required files are:
+   `Template.csv` and `Data Definitions.csv`
+3. Create folder in ext/ifAmazon/source named after the template 'formal tag name', i.e. ConsumerElectronics
+4. Copy csv files into created folder.
+5. Edit the Data Definitions file with a spreadsheet program and duplicate grouped definitions so they can be 
+   parsed properly. i.e bullet_point1 - bullet_point5 needs to become 5 identical lines with the field names:
+     - bullet_point1
+     - bullet_point2
+     - bullet_point3
+     - bullet_point4
+     - bullet_point5
+   So the parser will load the information help windows as they are mapped to the Template.csv file.
+ 

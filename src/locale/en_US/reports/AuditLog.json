@@ -1,0 +1,157 @@
+{
+    "group_id": "misc:rpt",
+    "mime_type": "rpt",
+    "xChild": null,
+    "type": "rpt",
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "audit_log"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "audit_log.user_id",
+                "title": "User",
+                "visible": "1",
+                "width": "15",
+                "break": "1",
+                "align": "L",
+                "_selected": true,
+                "processing": "contactID",
+                "formatting": "",
+                "total": "",
+                "isNewRecord": false
+            },
+            {
+                "fieldname": "audit_log.date",
+                "title": "Date",
+                "visible": "1",
+                "width": "40",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "audit_log.log_entry",
+                "title": "Log Entry",
+                "visible": "1",
+                "width": "200",
+                "break": "1",
+                "align": "L"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "users.username",
+                "title": "User Name"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "audit_log.date",
+                "title": "Date",
+                "default": "1"
+            },
+            {
+                "fieldname": "audit_log.log_entry",
+                "title": "Action",
+                "default": "0"
+            },
+            {
+                "fieldname": "audit_log.user_id",
+                "title": "Reference",
+                "default": "0"
+            },
+            {
+                "fieldname": "users.username",
+                "title": "User Name",
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "users.username",
+                "title": "User Name",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "title": "Audit Log",
+    "description": "User audit log. Captures all activities by users. format: Letter, Portrait",
+    "emailmessage": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 12,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "l",
+        "f",
+        "h",
+        "j"
+    ],
+    "datefield": "audit_log.date",
+    "datedefault": "c",
+    "filenamefield": "",
+    "filenameprefix": "",
+    "special_class": null,
+    "truncate": "0",
+    "totalonly": "0",
+    "defaultemail": "contact",
+    "headingshow": "0",
+    "headingfont": "helvetica",
+    "headingsize": 12,
+    "headingcolor": "#000000",
+    "headingalign": 0,
+    "title1show": "0",
+    "title1text": 0,
+    "title1font": "helvetica",
+    "title1size": 10,
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "0",
+    "title2text": 0,
+    "title2font": "helvetica",
+    "title2size": 10,
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": 8,
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": 10,
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": "helvetica",
+    "totalsize": 10,
+    "totalcolor": "#000000",
+    "totalalign": "L"
+}

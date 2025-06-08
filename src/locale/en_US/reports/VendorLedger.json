@@ -1,0 +1,266 @@
+{
+    "tables": {
+        "total": 3,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b = contacts.id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 11,
+        "rows": [
+            {
+                "fieldname": "journal_main.period",
+                "title": "Period",
+                "visible": "0",
+                "break": "1",
+                "width": "15",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "formatting": "date"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "1",
+                "break": "1",
+                "width": "32",
+                "align": "L",
+                "formatting": "j_desc"
+            },
+            {
+                "fieldname": "contacts.short_name",
+                "title": "Vendor ID",
+                "visible": "0",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Vendor Name",
+                "visible": "1",
+                "break": "1",
+                "width": "65",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "1",
+                "break": "1",
+                "width": "15",
+                "align": "L",
+                "formatting": "yesBno"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.purch_order_id",
+                "title": "Vendor Ref",
+                "visible": "1",
+                "break": "1",
+                "width": "40",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_item.debit_amount",
+                "title": "Debit Amount",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_item.credit_amount",
+                "title": "Credit Amount",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Branch ID",
+                "visible": "0",
+                "break": "1",
+                "width": "25",
+                "align": "L",
+                "total": "0"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Vendor ID",
+                "default": "1",
+                "processing": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Vendor ID",
+                "default": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Invoice Date",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "contacts.short_name",
+                "description": "Vendor ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Vendor Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "min": "3,4,6,7,17,18,19,20,21,22",
+                "type": "9"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "visible": "0",
+                "min": "ttl",
+                "type": "6"
+            },
+            {
+                "fieldname": "contacts.type",
+                "title": "Contact Type",
+                "visible": "0",
+                "min": "v",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Vendor Ledger",
+    "description": "Shows the vendor ledger, sales, credits, payments. Report size: Letter, Landscape.",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "0:0:0",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "l",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "f",
+    "datefield": "journal_main.post_date",
+    "truncate": "on",
+    "headingshow": "on",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "0:0:0",
+    "headingalign": "C",
+    "title1show": "on",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "0:0:0",
+    "title1align": "C",
+    "title2show": "on",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "0:0:0",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "0:0:0",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "0:0:0",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "vend:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2016-06-22"
+}

@@ -1,0 +1,31 @@
+Image Standards
+
+Every product on Amazon needs one or more product images. Choose images that are clear, straightforward, and easy to understand. They must accurately represent the product and be information-rich and attractively presented. Show only the product that is being offered for sale, with minimal or no propping. Text, logos, and inset images are not allowed. Whenever possible, provide several images, with each one showing different angles and details of the product. This is your opportunity to show your product to your customer, so quality matters.
+We reserve the right to reject images that do not meet our image standards.
+It is your responsibility to ensure that you have all necessary rights to the images you submit.
+
+MAIN Images
+
+*The background for a MAIN image must be pure white (pure white blends in with the Amazon search and item detail pages, which have RGB  values of 255,255,255).
+*A MAIN image must not be a graphic or illustration and must not contain accessories that are not being dispatched with the product, props that may confuse the customer, text that is not part of the product, or any logos, watermarks or inset images.
+*The product must fill 85% or more of the image.
+     
+Additional Images
+
+*MAIN images should be supplemented with additional images showing different sides of a product, the product in use, or details that are not visible in the MAIN image. For media products, this could include the back cover, sample pages, or screenshots. You can add up to eight (8) images.
+*A white background is recommended, but not required. Additional images may not include logos or watermarks, and all props or accessories must be presented in a way that will not cause customer confusion.
+
+Image Size
+
+Images should be 1000 pixels or more in either height or width as this will enable the zoom function on the website (zoom has been proven to enhance sales). Files measuring less than 500 pixels on the longest side will be rejected by our system.
+
+
+
+Naming and formatting
+
+*Amazon accepts JPEG (.jpg), TIFF (.tif), or GIF (.gif) file formats (JPEG files are preferred as they are smaller in size and can therefore be processed and uploaded more quickly).               
+*A suggested way to name an image file is to save the image on your web server using the product SKU as the file name followed by the view type or variant code--MAIN, PT01-PT08 (additional images), SWCH (usually a color swatch only used on products with more than one variation). Examples: 8845013515.MAIN.jpg, 8845013515.PT01.jpg, 8845013515.SWCH.jpg
+
+Uploading your Image files
+
+Once you have named the file and saved it to your web server, enter the URL of the image file in the appropriate cell of your product template.

@@ -1,0 +1,46 @@
+Using your Inventory File Template
+Print this page
+This page contains information you need to create, validate and upload your inventory file to Amazon. We recommend that you print this page so you can refer to it as you go.
+Save a copy of this file as an Excel worksheet on your hard drive. Then proceed to enter your product data into the Template tab, using the guidelines below.
+Data Definitions Tab
+The Data Definitions tab contains the acceptable values that can be used as you fill out the Template tab. We recommend printing the Data Definitions sheet for reference.
+The Data Definitions tab also indicates whether a field is Required, Preferred or Optional:
+Required: Required fields are the minimum values necessary to create your product in the Amazon catalog. Required columns have bold headings in the template. Failure to enter a valid value in a required field will prevent your product from being added to the catalog. Other data may be required as well, depending on the values you enter elsewhere. (For example, you must provide a sale date if you provide a sale price.) 
+Preferred: Preferred fields give customers the basic information they need to make an informed purchasing decision. We recommend that you provide product data for all fields in the Preferred column. Not providing this data can result in inadequate product descriptions or make it difficult for customers to find your listing. For example, you can create a page in the catalog for your product without providing Price and Quantity, but your offer for it will not appear on the site until you provide that data.
+Optional: Optional fields give customers product information that is useful, but not critical, when making purchasing decisions. We recommend that you provide as much Optional product data as possible for your product. In some cases, fields we have labeled Optional may be important to your product or business or required per your seller agreement.
+
+Valid Values and BTGs
+As indicated in the Data Definitions tab, some fields require that you use terms from the Valid Values tab.  These terms are specific to the product attribute and are used for product discoverability and categorization.
+Some cells require that you use valid codes from the Browse Tree Guide (BTG). The BTG is a separate Excel file that can be downloaded from seller Help. BTGs are category-specific and contain the rules that Amazon uses to assign products to categories on our site. In it you will find mappings between browse nodes and Amazon's controlled terms which allow products to surface in those categories. In the BTG for your category, find the category most appropriate for your product, then use the corresponding query to determine what field and value you need to put in your template to place your product in that category.
+Image Tab
+Refer to the Image Info tab for Amazon’s image standards.  Images you upload to Amazon must conform to these standards.
+Example Tab
+See the Example tab for an example on how to enter product information. This information is for reference only.  In order to avoid including invalid product data in your inventory file, do not work on your own items within the Example sheet.
+Template Tab
+The Template tab contains the template from which you will create an inventory file. Column headers in bold indicate required data. For best results, also submit as much preferred and optional data as possible for your products.  If you are not providing data for a particular field, leave the cell blank. Feel free to add color, bold, borders and other formatting (not additional text) to the template if it is helpful to you. Please note that high ASCII characters (such as ®, ©) and HTML tags are not allowed. 
+
+Validation Macros
+This template may contain validation macros that will help you to complete the template correctly. If present in your template, these macros may be turned on or off at your discretion, but we urge you to keep them enabled at least the first few times you create and upload your inventory file. 
+Helpful hints for using the validation macros:
+Enabling the macros: If you disabled the macros when you opened this file, you will need to close this file and open it again to enable them. You can do this two different ways:  
+Option 1 (recommended): Reopen the file and check “Always trust macros from this source” in the security warning that appears.  Next, select “Enable Macros.”  This will enable the macros each time you access the file.  
+Option 2: Before you open the file again, set your security level for Excel to low.  In Excel, from the Tools menu, choose Macro > Security, and select “Low” on the Security Level tab.
+Drop-down menus: Some fields have dropdown menus with lists of valid values to choose from. For some of these fields, you must select a value from the drop-down menu.  You cannot type in your own value, even if it is valid.  If you receive an error, delete the existing value and choose an alternative from the drop-down menu.
+Other fields have dropdown menus with values that are suggested but not required. You can type in your own value if you wish. If the value you enter is not valid for that field, it will cause a validation warning when you validate your data. 
+To make a dropdown disappear, press Escape; press Escape again to make it reappear.
+Amazon.com Toolbar: This “floating” toolbar appears when the macros are enabled.  It provides quick access to Seller Central, a Validate option, and a toggle button for turning the validations on or off. The Validate button allows you to run a validation on the data that has been entered into the template. This feature works regardless of whether the validations are on or off. If you close the Amazon.com Toolbar, it can be reopened; for more information, please see Excel Help for working with toolbars.
+.log File: The macros create a .log file of errors and warnings in the same location as your Product Template. The warnings will indicate which cells still require an entry. The errors are macro failures. You can delete this .log file once you have successfully uploaded your inventory file.
+Importing data: If you have data in an Excel file that is in another format (such as with different field names in a different order), you can use the Import button on the Amazon.com toolbar to import it into this template. Data in columns with headers that are exactly the same will be matched automatically, regardless of where they appear in the imported file. You will be given the opportunity to manually match headers that are not the same.
+Save your Inventory File
+When you have finished entering your product data into the Template tab, save the Template tab (only) as a Text (tab-delimited) (*.txt) file.  (For the China Marketplace, save as Unicode Text (*.txt).)  
+This is your inventory file that you will upload via the Upload Products & Inventory tool in your seller account.
+Validate and Upload your Inventory File
+Validate your data and upload your file to Amazon at the same time by clicking the “Upload file” button on the Amazon.com toolbar. 
+Before your offers are uploaded to the site, our system will automatically validate your data. Data that fails validation will be outlined in red in your file and an explanation will appear in the cell comment. You can read the cell comment by selecting the cell. When the validation process is complete, you can choose to upload whether or not validation was successful; however, if validation was not successful, your upload may be rejected. 
+Any errors in the upload will appear in a Processing Report. This report can be downloaded from the "Review File Status and History" section of the Upload Products & Inventory page in your seller account.
+You can also run validation without uploading the file by clicking the Validate button on the Amazon.com toolbar. Making a change to a cell will automatically remove that cell's red border and cell comment.
+Note: We recommend first uploading 15 or fewer products for testing purposes. You can upload the rest of your inventory once you have completed a successful test.
+Updated Templates
+When Amazon.com updates valid values, data validation rules, or explanatory text for the data validation cell comments, you can get the updated template by clicking the Update Template button on the Amazon.com toolbar. (You will need Internet access.) When done, you should see the new valid values in the drop-down menus, and any new data validation rules will be applied the next time you validate your data.
+Still have questions?
+If you have read the Instructions or Data Definitions tabs of this file and still have questions, please consult seller Help.

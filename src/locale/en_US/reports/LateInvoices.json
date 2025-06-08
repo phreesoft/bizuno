@@ -1,0 +1,225 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b = contacts.id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 11,
+        "rows": [
+            {
+                "fieldname": "primary_name_b",
+                "title": "Customer",
+                "visible": "1",
+                "break": "1",
+                "width": "75",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "telephone1_b",
+                "title": "Telephone",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contact_b",
+                "title": "Contact",
+                "visible": "0",
+                "break": "1",
+                "align": "L",
+                "width": "25",
+                "total": "0"
+            },
+            {
+                "fieldname": "short_name",
+                "title": "Customer ID",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "width": "25",
+                "total": "0"
+            },
+            {
+                "fieldname": "post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "break": "1",
+                "processing": "date",
+                "align": "L",
+                "width": "25",
+                "total": "0"
+            },
+            {
+                "fieldname": "purch_order_id",
+                "title": "PO Number",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "width": "30",
+                "total": "0"
+            },
+            {
+                "fieldname": "invoice_num",
+                "title": "Invoice No",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "width": "20",
+                "total": "0"
+            },
+            {
+                "fieldname": "balance_0",
+                "title": "Current",
+                "visible": "0",
+                "break": "1",
+                "processing": "null_dlr",
+                "align": "R",
+                "width": "25",
+                "total": "1"
+            },
+            {
+                "fieldname": "balance_30",
+                "title": "31-60",
+                "visible": "1",
+                "break": "1",
+                "processing": "null_dlr",
+                "align": "R",
+                "width": "20",
+                "total": "1"
+            },
+            {
+                "fieldname": "balance_60",
+                "title": "61-90",
+                "visible": "1",
+                "break": "1",
+                "processing": "null_dlr",
+                "align": "R",
+                "width": "20",
+                "total": "1"
+            },
+            {
+                "fieldname": "balance_90",
+                "title": "Over 90",
+                "visible": "1",
+                "break": "1",
+                "processing": "null_dlr",
+                "align": "R",
+                "width": "20",
+                "total": "1"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Primary Name",
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "description": "Primary Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "0",
+                "min": "0",
+                "type": "6"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "min": "12",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Late Invoices",
+    "description": "Late Invoices",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "0:0:0",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b"
+    ],
+    "datedefault": "a",
+    "datefield": "journal_main.post_date",
+    "truncate": "on",
+    "special_class": "aged_receivables",
+    "headingshow": "on",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "0:0:0",
+    "headingalign": "C",
+    "title1show": "on",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "0:0:0",
+    "title1align": "C",
+    "title2show": "on",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "0:0:0",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "0:0:0",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "0:0:0",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "cust:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2016-06-22"
+}

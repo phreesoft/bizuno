@@ -1,0 +1,1070 @@
+{
+    "group_id": "cust:j10",
+    "mime_type": "frm",
+    "xChild": null,
+    "type": "frm",
+    "tables": {
+        "total": 3,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b = contacts.id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 45,
+        "rows": [
+            {
+                "title": "Logo",
+                "filename": "Ppslogo.png",
+                "type": "CImg",
+                "abscissa": "8",
+                "ordinate": "4",
+                "width": "32",
+                "settings": {
+                    "img_file": "logos\/battery-store-logo.png"
+                },
+                "_selected": true,
+                "height": "",
+                "isNewRecord": false
+            },
+            {
+                "title": "Company Address",
+                "type": "CBlk",
+                "abscissa": "50",
+                "ordinate": "8",
+                "width": "60",
+                "height": "4.5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "14",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "primary_name",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address1",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address2",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "city",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "state",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "postal_code"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Company Telephone",
+                "type": "CDta",
+                "abscissa": "21",
+                "ordinate": "27",
+                "width": "25",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "telephone1"
+                }
+            },
+            {
+                "title": "Company Email",
+                "type": "CDta",
+                "abscissa": "65",
+                "ordinate": "27",
+                "width": "50",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "email"
+                }
+            },
+            {
+                "title": "Company Website",
+                "type": "CDta",
+                "abscissa": "65",
+                "ordinate": "31",
+                "width": "50",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "website"
+                }
+            },
+            {
+                "title": "Bill To Address",
+                "type": "TBlk",
+                "abscissa": "8",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4.0",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "boxfield": {
+                        "total": 8,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.contact_b",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_b",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_b",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_b",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.country_b"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "ShipTo Address",
+                "type": "TBlk",
+                "abscissa": "120",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 8,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.contact_s",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_s",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_s",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_s",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.country_s"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Bill Phone",
+                "type": "Data",
+                "abscissa": "21",
+                "ordinate": "73",
+                "width": "40",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "contacts.telephone1",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Issue Date",
+                "type": "Data",
+                "abscissa": "155",
+                "ordinate": "33",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Invoice Number",
+                "type": "Data",
+                "abscissa": "155",
+                "ordinate": "23",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "journal_main.invoice_num"
+                }
+            },
+            {
+                "title": "Data - Good Thru",
+                "type": "Data",
+                "abscissa": "9",
+                "ordinate": "89",
+                "width": "30",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.terminal_date",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Ship Via",
+                "type": "Data",
+                "abscissa": "41",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.method_code",
+                    "processing": "",
+                    "formatting": "shipInfo",
+                    "procFld": "",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - PO Num",
+                "type": "Data",
+                "abscissa": "81",
+                "ordinate": "89",
+                "width": "48",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "journal_main.purch_order_id"
+                }
+            },
+            {
+                "title": "Data - Terms",
+                "type": "Data",
+                "abscissa": "131",
+                "ordinate": "89",
+                "width": "42",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "journal_main.terms",
+                    "processing": "terms"
+                }
+            },
+            {
+                "title": "Data - Sales Rep",
+                "type": "Data",
+                "abscissa": "173",
+                "ordinate": "89",
+                "width": "32",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.rep_id",
+                    "processing": "contactID",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data Table - Items",
+                "SpecialFunc": "0",
+                "type": "Tbl",
+                "abscissa": "8",
+                "ordinate": "100",
+                "width": "200",
+                "height": "110",
+                "settings": {
+                    "hfont": "helvetica",
+                    "hsize": "10",
+                    "halign": "C",
+                    "hcolor": "0:0:0",
+                    "hbsize": "1",
+                    "hbcolor": "0:0:0",
+                    "hfcolor": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 5,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.sku",
+                                "title": "SKU",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "30",
+                                "show": "1"
+                            },
+                            {
+                                "fieldname": "journal_item.description",
+                                "title": "Description",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "91",
+                                "show": "1"
+                            },
+                            {
+                                "fieldname": "journal_item.qty",
+                                "title": "Quantity",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "22",
+                                "show": "1"
+                            },
+                            {
+                                "fieldname": "journal_item.credit_amount \/ journal_item.qty",
+                                "title": "Unit Price",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "27",
+                                "show": "1",
+                                "formatting": "currency"
+                            },
+                            {
+                                "fieldname": "journal_item.credit_amount",
+                                "title": "Extension",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "30",
+                                "show": "1",
+                                "formatting": "currency"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Total - Order Subtotal",
+                "type": "Ttl",
+                "abscissa": "178",
+                "ordinate": "210",
+                "width": "30",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 1,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.credit_amount",
+                                "formatting": "currency"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Sales Tax",
+                "type": "Data",
+                "abscissa": "178",
+                "ordinate": "217",
+                "width": "30",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.sales_tax",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Shipping",
+                "type": "Data",
+                "abscissa": "178",
+                "ordinate": "224",
+                "width": "30",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.freight",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Total",
+                "type": "Data",
+                "abscissa": "178",
+                "ordinate": "231",
+                "width": "30",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Ship Store",
+                "abscissa": "8",
+                "ordinate": "242",
+                "width": "120",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.store_id",
+                    "processing": "contactID",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Pro-Forma Invoice",
+                "type": "Text",
+                "abscissa": "153",
+                "ordinate": "8",
+                "width": "50",
+                "height": "8",
+                "truncate": "0",
+                "settings": {
+                    "text": "Pro-Forma Invoice",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Text - SO Number",
+                "type": "Text",
+                "abscissa": "155",
+                "ordinate": "18",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Sales Order Number"
+                }
+            },
+            {
+                "title": "Text - Date Issued",
+                "type": "Text",
+                "abscissa": "155",
+                "ordinate": "28",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Date Issued"
+                }
+            },
+            {
+                "title": "Text - Sold To",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "40",
+                "width": "25",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Sold To:"
+                }
+            },
+            {
+                "title": "Text - Ship To",
+                "type": "Text",
+                "abscissa": "120",
+                "ordinate": "40",
+                "width": "30",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Ship To:"
+                }
+            },
+            {
+                "title": "Text - Co Phone",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "27",
+                "width": "15",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Co Email",
+                "type": "Text",
+                "abscissa": "50",
+                "ordinate": "27",
+                "width": "15",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Email:"
+                }
+            },
+            {
+                "title": "Text - Co Website",
+                "type": "Text",
+                "abscissa": "50",
+                "ordinate": "31",
+                "width": "15",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Web:"
+                }
+            },
+            {
+                "title": "Text - Phone",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "73",
+                "width": "20",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Good Thru",
+                "type": "Text",
+                "abscissa": "9",
+                "ordinate": "81",
+                "width": "30",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Good Thru"
+                }
+            },
+            {
+                "title": "Text - Ship Via",
+                "type": "Text",
+                "abscissa": "41",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Ship Via"
+                }
+            },
+            {
+                "title": "Text - PO Number",
+                "type": "Text",
+                "abscissa": "81",
+                "ordinate": "81",
+                "width": "48",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Purchase Order Number"
+                }
+            },
+            {
+                "title": "Text - Terms",
+                "type": "Text",
+                "abscissa": "131",
+                "ordinate": "81",
+                "width": "42",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Terms"
+                }
+            },
+            {
+                "title": "Text - Sales Rep",
+                "type": "Text",
+                "abscissa": "173",
+                "ordinate": "81",
+                "width": "32",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Sales Rep"
+                }
+            },
+            {
+                "title": "Text - Subtotal",
+                "type": "Text",
+                "abscissa": "151",
+                "ordinate": "210",
+                "width": "27",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "text": "Subtotal"
+                }
+            },
+            {
+                "title": "Text - Sales Tax",
+                "type": "Text",
+                "abscissa": "151",
+                "ordinate": "217",
+                "width": "27",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "text": "Sales Tax"
+                }
+            },
+            {
+                "title": "Text - Shipping",
+                "type": "Text",
+                "abscissa": "151",
+                "ordinate": "224",
+                "width": "27",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "text": "Shipping"
+                }
+            },
+            {
+                "title": "Text - Total",
+                "type": "Text",
+                "abscissa": "151",
+                "ordinate": "231",
+                "width": "27",
+                "height": "7",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "text": "Order Total"
+                }
+            },
+            {
+                "title": "Rect - General Info",
+                "type": "Rect",
+                "abscissa": "8",
+                "ordinate": "80",
+                "width": "200",
+                "height": "16",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Line - Gen Horizontal",
+                "type": "Line",
+                "abscissa": "8",
+                "ordinate": "88",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "H",
+                    "length": "200"
+                }
+            },
+            {
+                "title": "Line - Gen Vert1",
+                "type": "Line",
+                "abscissa": "40",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert2",
+                "type": "Line",
+                "abscissa": "80",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert3",
+                "type": "Line",
+                "abscissa": "130",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert4",
+                "type": "Line",
+                "abscissa": "173",
+                "ordinate": "80",
+                "settings": {
+                    "bsize": "1",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 0,
+        "rows": []
+    },
+    "sortlist": {
+        "total": 0,
+        "rows": []
+    },
+    "filterlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "description": "SO Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "min": "10",
+                "type": "6"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "visible": "0",
+                "min": "itm",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Pro-Forma Invoice",
+    "description": "Pro-Forma Invoice Form. Format: Letter, Portrait",
+    "emailmessage": "<p>Attached is your Pro-Forma Invoice from Battery Store Inc. Please direct any questions to sales@batterystore.com or your respective sales representative. <\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 8,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "h",
+        "j"
+    ],
+    "datefield": "journal_main.post_date",
+    "datedefault": "c",
+    "defaultemail": "user",
+    "filenamefield": "journal_main.invoice_num",
+    "filenameprefix": "SalesOrder-",
+    "special_class": null,
+    "formbreakfield": "journal_main.id",
+    "skipnullfield": null,
+    "contactlog": null,
+    "printedfield": null,
+    "breakfield": null,
+    "serialform": "0"
+}

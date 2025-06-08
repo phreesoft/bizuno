@@ -1,0 +1,77 @@
+<?php
+/*
+ * @name Bizuno ERP - Inventory Images Extension
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
+ *
+ * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
+ * @copyright  2008-2025, PhreeSoft, Inc.
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-04-24
+ * @filesource /controllers/inventory/images.php
+ */
+
+namespace bizuno;
+
+class proInvImages
+{
+    public  $moduleID = 'inventory';
+
+    function __construct()
+    {
+        $this->lang = getExtLang($this->moduleID);
+    }
+
+    /**
+     * Generates the extra images associated with this inventory item
+     * @param array $layout - structure coming in
+     */
+    public function imagesLoad(&$layout=[])
+    {
+        $lastPath = getUserCache('imgMgr', 'lastPath', false , '').'/'; // pull last folder from cache
+        $rID      = clean('rID', 'integer', 'get');
+        $data     = ['fields'=>['invImageAdd'=>['icon'=>'add','label'=>$this->lang['add_image'],'events'=>['onClick'=>"invImagesAdd();"]]]];
+        $imgCnt   = 0;
+        $html = $jsReady = '';
+        if ($rID) {
+            $current = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'invImages', "id='$rID'");
+            $theList = $current ? json_decode($current, true) : [];
+            foreach ($theList as $src) {
+                $html   .= '<div style="float:left;width:150px;height:150px;border:2px solid #a1a1a1;margin:5px">';
+                $html   .= html5('invImg_'.$imgCnt, ['attr'=>  ['type'=>'hidden', 'value'=>$src]]);
+                $jsReady.= "imgManagerInit('invImg_$imgCnt', '$src', '".dirname($src)."/');\n";
+                $html   .= '</div>';
+                $imgCnt++;
+            }
+        }
+        $html .= '
+<div id="divInvImgAdd" style="clear:both">'.html5('', $data['fields']['invImageAdd']).'</div>';
+        $js = "var invImageCnt = $imgCnt;
+var divInvImg = '".str_replace("\n", '', html5('invImg_divTBD', ['attr'=>  ['type'=>'hidden']]))."';
+function invImagesAdd() {
+    var divHTML = '<div style=\"float:left;width:150px;height:150px;border:2px solid #a1a1a1;margin:5px\">';
+    divHTML += divInvImg.replace(/divTBD/g, invImageCnt)+'</div>';
+    jqBiz('#divInvImgAdd').before(divHTML);
+    imgManagerInit('invImg_'+invImageCnt, '', '$lastPath');
+    invImageCnt++;
+}";
+        $layout = array_replace_recursive($layout, ['type'=>'divHTML',
+            'divs'   => ['invImages'=>['order'=>50,'type'=>'html','html'=>$html]],
+            'jsHead' => ['imgHead'=>$js],
+            'jsReady'=> ['imgReady'=>$jsReady]]);
+    }
+}

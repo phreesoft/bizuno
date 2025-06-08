@@ -1,0 +1,947 @@
+{
+    "group_id": "vend:j4",
+    "mime_type": "frm",
+    "xChild": null,
+    "type": "frm",
+    "tables": {
+        "total": 3,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b = contacts.id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 41,
+        "rows": [
+            {
+                "title": "Logo",
+                "abscissa": "8",
+                "ordinate": "9",
+                "width": "38",
+                "type": "CImg",
+                "filename": "Ppslogo.png",
+                "settings": {
+                    "img_file": "logos\/battery-store-logo.png"
+                },
+                "_selected": true,
+                "height": "",
+                "isNewRecord": false
+            },
+            {
+                "title": "Company Address",
+                "abscissa": "50",
+                "ordinate": "12",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Battery Store, Inc.\n2890 Market Loop\nSouthlake, TX 76092",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "14",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Company Telephone",
+                "abscissa": "21",
+                "ordinate": "32",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "817-439-6190",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Bill To Address",
+                "abscissa": "8",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4.5",
+                "type": "TBlk",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_b",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_b",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_b",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_b"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "ShipTo Address",
+                "abscissa": "120",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4.5",
+                "type": "TBlk",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 7,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.contact_s",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_s",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_s",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_s",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_s"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Bill Phone",
+                "abscissa": "21",
+                "ordinate": "73",
+                "width": "40",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "contacts.telephone1",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - PO Number",
+                "abscissa": "155",
+                "ordinate": "19",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "journal_main.invoice_num"
+                }
+            },
+            {
+                "title": "Data - Issue Date",
+                "abscissa": "155",
+                "ordinate": "29",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Page Num",
+                "abscissa": "155",
+                "ordinate": "39",
+                "width": "50",
+                "height": "5",
+                "type": "PgNum",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Good Thru",
+                "abscissa": "9",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.terminal_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Ship Via",
+                "abscissa": "49",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.method_code",
+                    "processing": "",
+                    "formatting": "shipInfo",
+                    "procFld": "",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Account Num",
+                "abscissa": "89",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "type": "Data",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "fieldname": "contacts.account_number"
+                }
+            },
+            {
+                "title": "Data - Terms",
+                "abscissa": "129",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.terms",
+                    "processing": "terms_v",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Buyer",
+                "abscissa": "169",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.rep_id",
+                    "processing": "contactID",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data Table - Items",
+                "abscissa": "8",
+                "ordinate": "100",
+                "width": "200",
+                "height": "160",
+                "type": "Tbl",
+                "settings": {
+                    "hfont": "helvetica",
+                    "hsize": "8",
+                    "halign": "L",
+                    "hcolor": "0:0:0",
+                    "hbsize": "1",
+                    "hbcolor": "0:0:0",
+                    "hfcolor": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 5,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.sku",
+                                "title": "SKU",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "35"
+                            },
+                            {
+                                "fieldname": "journal_item.description",
+                                "title": "Description",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "86"
+                            },
+                            {
+                                "fieldname": "journal_item.qty",
+                                "title": "Quantity",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "C",
+                                "color": "0:0:0",
+                                "width": "22"
+                            },
+                            {
+                                "fieldname": "journal_item.debit_amount \/journal_item.qty",
+                                "title": "Unit Price",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "27",
+                                "formatting": "currency"
+                            },
+                            {
+                                "fieldname": "journal_item.debit_amount",
+                                "title": "Extension",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "R",
+                                "color": "0:0:0",
+                                "width": "30",
+                                "formatting": "currency"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Total - Order Total",
+                "abscissa": "178",
+                "ordinate": "260",
+                "width": "30",
+                "height": "7",
+                "type": "Ttl",
+                "settings": {
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 1,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.debit_amount",
+                                "formatting": "currency"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Text - Ordered By",
+                "abscissa": "8",
+                "ordinate": "4",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "ORDERED BY:"
+                }
+            },
+            {
+                "title": "Text - Co Phone",
+                "abscissa": "8",
+                "ordinate": "32",
+                "width": "15",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Purchase Order",
+                "abscissa": "165",
+                "ordinate": "8",
+                "width": "42",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Purchase Order"
+                }
+            },
+            {
+                "title": "Text - PO Number",
+                "abscissa": "155",
+                "ordinate": "14",
+                "width": "50",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "PO Number"
+                }
+            },
+            {
+                "title": "Text - Date Issued",
+                "abscissa": "155",
+                "ordinate": "24",
+                "width": "50",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Date Issued"
+                }
+            },
+            {
+                "title": "Text - Page Num",
+                "abscissa": "175",
+                "ordinate": "34",
+                "width": "30",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Page Number"
+                }
+            },
+            {
+                "title": "Text - To",
+                "abscissa": "8",
+                "ordinate": "40",
+                "width": "15",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "To:"
+                }
+            },
+            {
+                "title": "Text - Ship To",
+                "abscissa": "120",
+                "ordinate": "40",
+                "width": "30",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Ship To:"
+                }
+            },
+            {
+                "title": "Text - Phone",
+                "abscissa": "8",
+                "ordinate": "73",
+                "width": "20",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Good Thru",
+                "abscissa": "9",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Good Thru"
+                }
+            },
+            {
+                "title": "Text - Ship Via",
+                "abscissa": "49",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Ship Via"
+                }
+            },
+            {
+                "title": "Text - Account Number",
+                "abscissa": "89",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Account Number"
+                }
+            },
+            {
+                "title": "Text - Terms",
+                "abscissa": "129",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Payment Terms"
+                }
+            },
+            {
+                "title": "Text - Buyer",
+                "abscissa": "169",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Buyer"
+                }
+            },
+            {
+                "title": "Text - Total",
+                "abscissa": "151",
+                "ordinate": "260",
+                "width": "27",
+                "height": "7",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "PO Total"
+                }
+            },
+            {
+                "title": "Rect - General Info",
+                "abscissa": "8",
+                "ordinate": "80",
+                "width": "200",
+                "height": "16",
+                "type": "Rect",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Line - Gen Horizontal",
+                "abscissa": "8",
+                "ordinate": "88",
+                "type": "Line",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "H",
+                    "length": "200"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 1",
+                "abscissa": "48",
+                "ordinate": "80",
+                "type": "Line",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 2",
+                "abscissa": "88",
+                "ordinate": "80",
+                "type": "Line",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 3",
+                "abscissa": "128",
+                "ordinate": "80",
+                "type": "Line",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 4",
+                "abscissa": "168",
+                "ordinate": "80",
+                "type": "Line",
+                "settings": {
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Text - Revised",
+                "abscissa": "8",
+                "ordinate": "263",
+                "width": "60",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Revised:"
+                }
+            },
+            {
+                "title": "Text - Rev Date",
+                "abscissa": "50",
+                "ordinate": "263",
+                "width": "60",
+                "height": "6",
+                "type": "Text",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0",
+                    "text": "Revision Date:"
+                }
+            },
+            {
+                "title": "Rect - Rev Chk Box",
+                "abscissa": "37",
+                "ordinate": "263",
+                "width": "5",
+                "height": "5",
+                "type": "Rect",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Line - Rev Date",
+                "abscissa": "90",
+                "ordinate": "269",
+                "type": "Line",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "H",
+                    "length": "50"
+                }
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 0,
+        "rows": []
+    },
+    "sortlist": {
+        "total": 0,
+        "rows": []
+    },
+    "filterlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "PO Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "Entry Type",
+                "visible": "0",
+                "type": "6",
+                "min": "itm"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "type": "6",
+                "min": "4"
+            }
+        ]
+    },
+    "title": "Purchase Order",
+    "description": "Vendor purchase order. Format: Letter, Portrait",
+    "emailmessage": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 8,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datefield": "journal_main.post_date",
+    "datedefault": "c",
+    "defaultemail": "ap",
+    "filenamefield": "journal_main.invoice_num",
+    "filenameprefix": "PO-",
+    "special_class": null,
+    "formbreakfield": "journal_main.id",
+    "skipnullfield": null,
+    "contactlog": "journal_main.contact_id_b",
+    "printedfield": "journal_main.printed",
+    "breakfield": null,
+    "serialform": "0"
+}

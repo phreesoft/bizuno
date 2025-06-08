@@ -1,0 +1,139 @@
+Description: Simple chart for accounts for multiple location manufacturing businesses,,,,,,
+Account ID,Default,Parent,Inactive,Description,Code,Account Type
+id,default,parent,inactive,description,code,
+1000-00,,,,Cash,0,Cash
+1010-00,Y,,,Operating Account,0,Cash
+1020-00,,,,ACH Account,0,Cash
+1030-00,,,,Credit Card Account,0,Cash
+1100-00,Y,,,Accounts Receivable,2,Accounts Receivable
+1120-00,,,,Allowance - Doubtful Accts.,2,Accounts Receivable
+1200-00,Y,,,Inventory - All,4,Inventory
+1200-01,,1200-00,,Inventory - Store 1,4,Inventory
+1200-02,,1200-00,,Inventory - Store 2,4,Inventory
+1420-00,Y,,,Prepaid Expenses,6,Other Current Assets
+1500-00,Y,,,Furniture & Fixture - All,8,Fixed Assets
+1500-01,,1500-00,,Furniture & Fixture - Store 1,8,Fixed Assets
+1500-02,,1500-00,,Furniture & Fixture - Store 2,8,Fixed Assets
+1510-00,,,,Machine & Eqiup. - All,8,Fixed Assets
+1510-01,,1510-00,,Machine & Eqiup. - Store 1,8,Fixed Assets
+1510-02,,1510-00,,Machine & Eqiup. - Store 2,8,Fixed Assets
+1530-00,,,,Leasehold Improv. - All,8,Fixed Assets
+1530-01,,1530-00,,Leasehold Improv. - Store 1,8,Fixed Assets
+1530-02,,1530-00,,Leasehold Improv. - Store 2,8,Fixed Assets
+1600-00,Y,,,Dep. Furn. & Fix. - All,10,Accumulated Depreciation
+1600-01,,1600-00,,Dep. Furn. & Fix. - Store 1,10,Accumulated Depreciation
+1600-02,,1600-00,,Dep. Furn. & Fix. - Strore 2,10,Accumulated Depreciation
+1610-00,,,,Dep. Mach. & Equip. - All,10,Accumulated Depreciation
+1610-01,,1610-00,,Dep. Mach. & Equip. - Store 1,10,Accumulated Depreciation
+1610-02,,1610-00,,Dep. Mach. & Equip. - Store 2,10,Accumulated Depreciation
+1630-00,,,,Dep. Lease Impr. - All,10,Accumulated Depreciation
+1630-01,,1630-00,,Dep. Lease Impr. - Store 1,10,Accumulated Depreciation
+1630-02,,1630-00,,Dep. Lease Impr. - Store 2,10,Accumulated Depreciation
+1900-00,Y,,,Security Deposits,12,Other Assets
+2000-00,Y,,,Accounts Payable,20,Accounts Payable
+2010-00,,,,Credit Card Payable,20,Accounts Payable
+2500-00,Y,,,Sales Tax Payable - All,22,Other Current Liabilities
+2510-00,,,,Customer Deposits,22,Other Current Liabilities
+2530-00,,,,401(k) Deductions Payable,22,Other Current Liabilities
+2540-00,,,,Prepaid Medical Deduction,22,Other Current Liabilities
+2550-00,,,,State Income Tax Payable,22,Other Current Liabilities
+2560-00,,,,Federal Income Tax Payable,22,Other Current Liabilities
+2590-00,,,,Accrued Expenses,22,Other Current Liabilities
+2800-00,Y,,,Notes Payable,24,Long Term Liabilities
+3600-00,Y,,,Paid In Capital,40,Equity - Does Not Close
+3800-00,Y,,,Retained Earnings,44,Equity - Retained Earnings
+3900-00,Y,,,Dividends,42,Equity - Gets Closed
+4000-00,Y,,,Sales - All,30,Income
+4000-01,,4000-00,,Sales - Store 1,30,Income
+4000-02,,4000-00,,Sales - Store 2,30,Income
+4000-03,,4000-00,,Sales - eStore,30,Income
+4000-21,,,,Sales MP - Funnel 1,30,Income
+4000-22,,,,Sales MP - Funnel 2,30,Income
+4010-00,,,,Sales Discounts,30,Income
+4020-00,,,,Freight Reimbursed - All,30,Income
+4020-01,,4020-00,,Freight Reimbursed - Store 1,30,Income
+4020-02,,4020-00,,Freight Reimbursed - Store 2,30,Income
+4080-00,,,,Gain/Loss on Sale of Asset,30,Income
+4090-00,,,,Other Income,30,Income
+5000-00,Y,,,Cost of Goods Sold,32,Cost of Sales
+5010-00,,,,Purchase Discounts,32,Cost of Sales
+5120-00,,,,Engineering - Tooling,32,Cost of Sales
+5150-00,,,,Ins. Health - Prod/WH - All,32,Cost of Sales
+5150-01,,5150-00,,Ins. Health - Prod/WH - Store 1,32,Cost of Sales
+5150-02,,5150-00,,Ins. Health - Prod/WH - Store 2,32,Cost of Sales
+5160-00,,,,Ins. - Liability (Prod/WH),32,Cost of Sales
+5170-00,,,,Ins. - WC (Prod/WH) - All,32,Cost of Sales
+5170-01,,5170-00,,Ins. - WC (Prod/WH) - Store 1,32,Cost of Sales
+5170-02,,5170-00,,Ins. - WC (Prod/WH) - Store 2,32,Cost of Sales
+5200-00,,,,Inventory - Non-Stock Resale,32,Cost of Sales
+5280-00,,,,Logistics - Store Transfers,32,Cost of Sales
+5300-00,,,,Logistics - Freight Inbound,32,Cost of Sales
+5350-00,,,,Maintenance - Production,32,Cost of Sales
+5400-00,,,,Rent - Prod/WH - All,32,Cost of Sales
+5400-01,,5400-00,,Rent - Prod/WH - Store 1,32,Cost of Sales
+5400-02,,5400-00,,Rent - Prod/WH - Store 2,32,Cost of Sales
+5500-00,,,,Salaries/Wages - Prod/WH - All,32,Cost of Sales
+5500-01,,5500-00,,Salaries/Wages - Prod/WH - Store 1,32,Cost of Sales
+5500-02,,5500-00,,Salaries/Wages - Prod/WH - Store 2,32,Cost of Sales
+5520-00,,,,Salaries & Wages - Contract Labor,32,Cost of Sales
+5600-00,,,,Services - Payroll (Prod/Warehouse),32,Cost of Sales
+5700-00,,,,Supplies - Shipping - All,32,Cost of Sales
+5700-01,,5700-00,,Supplies - Shipping - Store 1,32,Cost of Sales
+5700-02,,5700-00,,Supplies - Shipping - Store 2,32,Cost of Sales
+5750-00,,,,Supplies - Production,32,Cost of Sales
+5800-00,,,,Taxes - Payroll (Prod/Warehouse),32,Cost of Sales
+5810-00,,,,Tax on Purchases,32,Cost of Sales
+5900-00,,,,Utilities Prod/WH - All,32,Cost of Sales
+5900-01,,5900-00,,Utilities Prod/WH - Store 1,32,Cost of Sales
+5900-02,,5900-00,,Utilities Prod/WH - Store 2,32,Cost of Sales
+6020-00,,,,Advertising & Marketing,34,Expenses
+6040-00,,,,Bad Debts,34,Expenses
+6060-00,,,,Depreciation - Fixed Asset,34,Expenses
+6080-00,,,,Interest,34,Expenses
+6100-00,,,,Engineering - Equipment & Tooling,34,Expenses
+6120-00,,,,Engineering - Production,34,Expenses
+6140-00,,,,Fees - Bank Charges,34,Expenses
+6160-00,,,,Fees - Membership & Subscription,34,Expenses
+6180-00,,,,Fees - Merchant,34,Expenses
+6200-00,,,,Ins. Health - Office - All,34,Expenses
+6200-01,,6200-00,,Ins. Health - Office - Store 1,34,Expenses
+6200-02,,6200-00,,Ins. Health - Office - Store 2,34,Expenses
+6220-00,,,,Insurance - Health (Officers),34,Expenses
+6240-00,,,,Insurance - Liability (Office),34,Expenses
+6260-00,,,,Insurance - Life (Officers),34,Expenses
+6280-00,,,,Insurance - Workers Comp (Office),34,Expenses
+6300-00,,,,Leasehold Improvements,34,Expenses
+6320-00,,,,Logistics - Freight Outbound,34,Expenses
+6340-00,,,,Logistics - Moving & Transfers,34,Expenses
+6360-00,,,,Logistics - Postage & Stamps,34,Expenses
+6380-00,,,,Maintenance - Computers & Electronics,34,Expenses
+6400-00,,,,Maintenance - Landscape & Pest,34,Expenses
+6420-00,,,,Maintenance - Office,34,Expenses
+6440-00,,,,Rent/Lease - Office - All,34,Expenses
+6440-01,,6440-00,,Rent/Lease - Office - Store 1,34,Expenses
+6440-02,,6440-00,,Rent/Lease - Office - Store 2,34,Expenses
+6460-00,,,,Salaries & Wages - Auto (Office),34,Expenses
+6470-00,,,,Salaries/Wages - 401(k) Match,34,Expenses
+6480-00,,,,Salaries & Wages - Meals & Ent.,34,Expenses
+6500-00,,,,Salaries & Wages - Mfg Reps,34,Expenses
+6520-00,,,,Salaries - Office - All,34,Expenses
+6520-01,,6520-00,,Salaries - Office - Store 1,34,Expenses
+6520-02,,6520-00,,Salaries - Office - Store 2,34,Expenses
+6540-02,,,,Salaries & Wages - Officers,34,Expenses
+6550-02,,,,Salaries & Wages - Owners,34,Expenses
+6560-00,,,,Sales - Employee Reimbursement,34,Expenses
+6580-00,,,,Sales - Travel,34,Expenses
+6600-00,,,,Services - Janitorial,34,Expenses
+6620-00,,,,Services - Legal and Professional,34,Expenses
+6640-00,,,,Services - Payroll,34,Expenses
+6660-00,,,,Services - Software & Cloud,34,Expenses
+6680-00,,,,Supplies - Office - All,34,Expenses
+6680-01,,6680-00,,Supplies - Office - Store 1,34,Expenses
+6680-02,,6680-00,,Supplies - Office - Store 2,34,Expenses
+6700-00,,,,Taxes - Other,34,Expenses
+6720-00,,,,Taxes - Payroll (Office),34,Expenses
+6740-00,,,,Taxes - Sales (Office),34,Expenses
+6760-00,,,,Utilities - All,34,Expenses
+6760-01,,6760-00,,Utilities - Store 1,34,Expenses
+6760-02,,6760-00,,Utilities - Store 2,34,Expenses
+7000-00,Y,,,Other Expense,34,Expenses

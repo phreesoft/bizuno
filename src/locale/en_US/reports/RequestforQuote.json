@@ -1,0 +1,944 @@
+{
+    "group_id": "vend:j3",
+    "mime_type": "frm",
+    "xChild": null,
+    "type": "frm",
+    "tables": {
+        "total": 4,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b = contacts.id",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "address_book",
+                "relationship": "contacts.id = address_book.ref_id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 43,
+        "rows": [
+            {
+                "title": "Logo",
+                "filename": "Ppslogo.png",
+                "type": "CImg",
+                "abscissa": "8",
+                "ordinate": "13",
+                "width": "40",
+                "settings": {
+                    "img_file": "logos\/battery-store-logo.png"
+                },
+                "_selected": true,
+                "height": "",
+                "isNewRecord": false
+            },
+            {
+                "title": "Company Address",
+                "type": "CBlk",
+                "abscissa": "50",
+                "ordinate": "12",
+                "width": "60",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "14",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "primary_name",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address1",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address2",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "city",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "state",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "postal_code"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Company Telephone",
+                "type": "CDta",
+                "abscissa": "21",
+                "ordinate": "32",
+                "width": "25",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "telephone1"
+                }
+            },
+            {
+                "title": "Company Fax",
+                "type": "CDta",
+                "abscissa": "59",
+                "ordinate": "32",
+                "width": "25",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "telephone3"
+                }
+            },
+            {
+                "title": "Bill To Address",
+                "type": "TBlk",
+                "abscissa": "8",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4.5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_b",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_b",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_b",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_b",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_b"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "ShipTo Address",
+                "type": "TBlk",
+                "abscissa": "120",
+                "ordinate": "45",
+                "width": "80",
+                "height": "4.5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 6,
+                        "rows": [
+                            {
+                                "fieldname": "journal_main.primary_name_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address1_s",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "journal_main.address2_s",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "journal_main.city_s",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "journal_main.state_s",
+                                "separator": "2sp"
+                            },
+                            {
+                                "fieldname": "journal_main.postal_code_s"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Bill Phone",
+                "type": "Data",
+                "abscissa": "21",
+                "ordinate": "73",
+                "width": "25",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "address_book.telephone1"
+                }
+            },
+            {
+                "title": "Data - Bill Fax",
+                "type": "Data",
+                "abscissa": "68",
+                "ordinate": "73",
+                "width": "25",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "address_book.telephone3"
+                }
+            },
+            {
+                "title": "Data - Quote Number",
+                "type": "Data",
+                "abscissa": "155",
+                "ordinate": "19",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "journal_main.invoice_num"
+                }
+            },
+            {
+                "title": "Data - Issue Date",
+                "type": "Data",
+                "abscissa": "155",
+                "ordinate": "29",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Page Num",
+                "type": "PgNum",
+                "abscissa": "155",
+                "ordinate": "39",
+                "width": "50",
+                "height": "5",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1"
+                }
+            },
+            {
+                "title": "Data - Good Thru",
+                "type": "Data",
+                "abscissa": "9",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.terminal_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Ship Via",
+                "type": "Data",
+                "abscissa": "49",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.method_code",
+                    "processing": "shipInfo",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data - Account Num",
+                "type": "Data",
+                "abscissa": "89",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "contacts.account_number"
+                }
+            },
+            {
+                "title": "Data - Terms",
+                "type": "Data",
+                "abscissa": "129",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "fieldname": "journal_main.terms",
+                    "processing": "terms"
+                }
+            },
+            {
+                "title": "Data - Buyer",
+                "type": "Data",
+                "abscissa": "169",
+                "ordinate": "89",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "fieldname": "journal_main.admin_id",
+                    "processing": "rep_id",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "fcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Data Table - Items",
+                "SpecialFunc": "0",
+                "type": "Tbl",
+                "abscissa": "8",
+                "ordinate": "100",
+                "width": "200",
+                "height": "160",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "boxfield": {
+                        "total": 3,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.qty",
+                                "title": "Quantity",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "C",
+                                "color": "0:0:0",
+                                "width": "35",
+                                "show": "1"
+                            },
+                            {
+                                "fieldname": "journal_item.sku",
+                                "title": "SKU",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "35",
+                                "show": "1"
+                            },
+                            {
+                                "fieldname": "journal_item.description",
+                                "title": "Description",
+                                "font": "helvetica",
+                                "size": "12",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "130",
+                                "show": "1"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Text - Requested By",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "8",
+                "width": "60",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "REQUESTED BY:"
+                }
+            },
+            {
+                "title": "Text - Co Phone",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "32",
+                "width": "15",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Co Fax",
+                "type": "Text",
+                "abscissa": "50",
+                "ordinate": "32",
+                "width": "15",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Fax:"
+                }
+            },
+            {
+                "title": "Text - RFQ",
+                "type": "Text",
+                "abscissa": "135",
+                "ordinate": "8",
+                "width": "70",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Request For Quote"
+                }
+            },
+            {
+                "title": "Text - Quote Number",
+                "type": "Text",
+                "abscissa": "155",
+                "ordinate": "14",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Quote Number"
+                }
+            },
+            {
+                "title": "Text - Date Issued",
+                "type": "Text",
+                "abscissa": "155",
+                "ordinate": "24",
+                "width": "50",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Date Issued"
+                }
+            },
+            {
+                "title": "Text - Page Num",
+                "type": "Text",
+                "abscissa": "175",
+                "ordinate": "34",
+                "width": "30",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Page Number"
+                }
+            },
+            {
+                "title": "Text - To",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "40",
+                "width": "15",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "To:"
+                }
+            },
+            {
+                "title": "Text - Ship To",
+                "type": "Text",
+                "abscissa": "120",
+                "ordinate": "40",
+                "width": "30",
+                "height": "5",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Ship To:"
+                }
+            },
+            {
+                "title": "Text - Phone",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "73",
+                "width": "20",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Phone:"
+                }
+            },
+            {
+                "title": "Text - Fax",
+                "type": "Text",
+                "abscissa": "60",
+                "ordinate": "73",
+                "width": "20",
+                "height": "4",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Fax:"
+                }
+            },
+            {
+                "title": "Text - Good Thru",
+                "type": "Text",
+                "abscissa": "9",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Good Thru"
+                }
+            },
+            {
+                "title": "Text - Ship Via",
+                "type": "Text",
+                "abscissa": "49",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Ship Via"
+                }
+            },
+            {
+                "title": "Text - Account Number",
+                "type": "Text",
+                "abscissa": "89",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Account Number"
+                }
+            },
+            {
+                "title": "Text - Terms",
+                "type": "Text",
+                "abscissa": "129",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Payment Terms"
+                }
+            },
+            {
+                "title": "Text - Buyer",
+                "type": "Text",
+                "abscissa": "169",
+                "ordinate": "81",
+                "width": "38",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "12",
+                    "align": "C",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Buyer"
+                }
+            },
+            {
+                "title": "Rect - General Info",
+                "type": "Rect",
+                "abscissa": "8",
+                "ordinate": "80",
+                "width": "200",
+                "height": "16",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Line - Gen Horizontal",
+                "type": "Line",
+                "abscissa": "8",
+                "ordinate": "88",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "H",
+                    "length": "200"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 1",
+                "type": "Line",
+                "abscissa": "48",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 2",
+                "type": "Line",
+                "abscissa": "88",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 3",
+                "type": "Line",
+                "abscissa": "128",
+                "ordinate": "80",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Line - Gen Vert 4",
+                "type": "Line",
+                "abscissa": "168",
+                "ordinate": "80",
+                "settings": {
+                    "bsize": "1",
+                    "linetype": "V",
+                    "length": "16"
+                }
+            },
+            {
+                "title": "Text - Revised",
+                "type": "Text",
+                "abscissa": "8",
+                "ordinate": "263",
+                "width": "60",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Revised:"
+                }
+            },
+            {
+                "title": "Text - Rev Date",
+                "type": "Text",
+                "abscissa": "50",
+                "ordinate": "263",
+                "width": "60",
+                "height": "6",
+                "truncate": "0",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "16",
+                    "align": "L",
+                    "color": "0:0:0",
+                    "bsize": "1",
+                    "text": "Revision Date:"
+                }
+            },
+            {
+                "title": "Rect - Rev Chk Box",
+                "type": "Rect",
+                "abscissa": "37",
+                "ordinate": "263",
+                "width": "5",
+                "height": "5",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0"
+                }
+            },
+            {
+                "title": "Line - Rev Date",
+                "type": "Line",
+                "abscissa": "90",
+                "ordinate": "269",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "0:0:0",
+                    "linetype": "H",
+                    "length": "50"
+                }
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 0,
+        "rows": []
+    },
+    "sortlist": {
+        "total": 0,
+        "rows": []
+    },
+    "filterlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "description": "PO Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "Entry Type",
+                "min": "itm",
+                "type": "6"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "min": "3",
+                "type": "6"
+            },
+            {
+                "fieldname": "address_book.type",
+                "title": "Address Type",
+                "min": "m",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Request for Quote",
+    "description": "Request for Quote. Format: Letter, Portrait",
+    "emailmessage": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 8,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datefield": "journal_main.post_date",
+    "datedefault": "c",
+    "defaultemail": "ap",
+    "filenamefield": "journal_main.invoice_num",
+    "filenameprefix": "RFQ-",
+    "special_class": null,
+    "formbreakfield": "journal_main.id",
+    "skipnullfield": null,
+    "contactlog": null,
+    "printedfield": null,
+    "breakfield": null,
+    "serialform": "0"
+}

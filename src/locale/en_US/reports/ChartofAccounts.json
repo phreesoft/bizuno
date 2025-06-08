@@ -1,0 +1,120 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "journal_history",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "DISTINCT journal_history.gl_account",
+                "title": "Account ID",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Description",
+                "visible": "1",
+                "width": "65",
+                "break": "1",
+                "align": "L",
+                "formatting": "glTitle"
+            },
+            {
+                "fieldname": "journal_history.gl_type",
+                "title": "Account Type",
+                "visible": "1",
+                "width": "50",
+                "break": "1",
+                "align": "L",
+                "formatting": "glType"
+            },
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Inactive",
+                "break": "1",
+                "width": "20",
+                "visible": "1",
+                "align": "C",
+                "formatting": "glActive"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Account Id",
+                "default": "1"
+            }
+        ]
+    },
+    "title": "Chart of Accounts",
+    "description": "Lists current chart of accounts. Format: Letter, Portrait",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2022-12-12"
+}

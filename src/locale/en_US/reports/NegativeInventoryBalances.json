@@ -1,0 +1,143 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "isNewRecord": "1",
+                "join_type": "JOIN",
+                "tablename": "inventory"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 4,
+        "rows": [
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.sku",
+                "title": "SKU",
+                "break": "1",
+                "width": "30",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.description_short",
+                "title": "Title",
+                "break": "1",
+                "width": "60",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.qty_stock",
+                "title": "Qty on Hand",
+                "break": "1",
+                "width": "30",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.full_price",
+                "title": "Price",
+                "break": "1",
+                "width": "30",
+                "visible": "1",
+                "formatting": "currency",
+                "align": "R"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.sku",
+                "title": "SKU",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 2,
+        "rows": [
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.inactive",
+                "title": "Inactive",
+                "visible": "1",
+                "type": "3"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "inventory.qty_stock",
+                "title": "Qty on Hand",
+                "type": "10",
+                "min": "0"
+            }
+        ]
+    },
+    "title": "Negative Inventory Balances",
+    "description": "Lists the items that have a negative inventory balance",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2016-08-31",
+    "last_update": "2018-10-23"
+}

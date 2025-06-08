@@ -1,0 +1,826 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            },
+            {
+                "isNewRecord": "1",
+                "join_type": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id=journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 37,
+        "rows": [
+            {
+                "title": "Company Name",
+                "abscissa": "12",
+                "ordinate": "24",
+                "width": "70",
+                "height": "4",
+                "type": "CDta",
+                "settings": {
+                    "fieldname": "primary_name",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Random #",
+                "width": "70",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.id",
+                    "display": "0",
+                    "font": "default",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "abscissa": "12",
+                "ordinate": "28"
+            },
+            {
+                "title": "Text - Date",
+                "abscissa": "17",
+                "ordinate": "36",
+                "width": "20",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "Date:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Post Date",
+                "abscissa": "37",
+                "ordinate": "36",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.date_1",
+                    "formatting": "dateLong",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - CC Sale",
+                "abscissa": "12",
+                "ordinate": "44",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "CREDIT CARD SALE",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Card Type",
+                "abscissa": "12",
+                "ordinate": "52",
+                "width": "70",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkCard",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Card Num",
+                "abscissa": "12",
+                "ordinate": "56",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "CARD NUMBER:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Card Num",
+                "abscissa": "37",
+                "ordinate": "56",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkHint",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Tran Amount",
+                "abscissa": "12",
+                "ordinate": "60",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "TRAN AMOUNT:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Total Amt",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "60"
+            },
+            {
+                "title": "Text - Approval Code",
+                "abscissa": "12",
+                "ordinate": "64",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "APPROVAL CD:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Approval Code",
+                "abscissa": "37",
+                "ordinate": "64",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkCode",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - ECI",
+                "abscissa": "12",
+                "ordinate": "68",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "ECI:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Record #",
+                "abscissa": "12",
+                "ordinate": "72",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "RECORD #:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Record # Val",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "000",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "72"
+            },
+            {
+                "title": "Text - Clerk ID",
+                "abscissa": "12",
+                "ordinate": "76",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "CLERK ID:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Clerk ID Name",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "ordinate": "76",
+                "type": "Text",
+                "settings": {
+                    "text": "portablepower",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Sig Line",
+                "abscissa": "12",
+                "ordinate": "84",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "X________________________________",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Sig Text",
+                "abscissa": "12",
+                "ordinate": "88",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "{CARDHOLDERS'S SIGNATURE}",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Agree Stmt",
+                "abscissa": "12",
+                "ordinate": "96",
+                "width": "70",
+                "height": "12",
+                "type": "Text",
+                "settings": {
+                    "text": "I AGREE TO PAY THE ABOVE TOTAL AMOUNT ACCORDING TO THE CARD ISSUER AGREEMENT (MERCHANT AGREEMENT IF CREDIT VOUCHER)",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Merchant Copy",
+                "abscissa": "12",
+                "ordinate": "112",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "Merchant Copy",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Company Name Dup",
+                "abscissa": "12",
+                "ordinate": "152",
+                "width": "70",
+                "height": "4",
+                "type": "CDta",
+                "settings": {
+                    "fieldname": "primary_name",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Date Dup",
+                "abscissa": "17",
+                "ordinate": "160",
+                "width": "20",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "Date:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Date Dup",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.date_1",
+                    "formatting": "dateLong",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "160"
+            },
+            {
+                "title": "Text - CC Sale Dup",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "CREDIT CARD SALE",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "168"
+            },
+            {
+                "title": "Data - Card Type Du",
+                "abscissa": "12",
+                "width": "70",
+                "height": "4",
+                "type": "Data",
+                "ordinate": "176",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkCard",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Card Num  Dup",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "CARD NUMBER:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "180"
+            },
+            {
+                "title": "Data - Card Num Dup",
+                "abscissa": "37",
+                "ordinate": "180",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkHint",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Tran Amount Dup",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "TRAN AMOUNT:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "184"
+            },
+            {
+                "title": "Data - Trans Amt Dup",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "184"
+            },
+            {
+                "title": "Text - App Cd Dup",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "APPROVAL CD:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "188"
+            },
+            {
+                "title": "Data - Appr Code Dup",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_item.description",
+                    "processing": "bnkCode",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "188"
+            },
+            {
+                "title": "Text - Record # Dup",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "RECORD #",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "192"
+            },
+            {
+                "title": "Text - Record # Val Dup",
+                "abscissa": "37",
+                "width": "33",
+                "height": "4",
+                "type": "Text",
+                "settings": {
+                    "text": "000",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "192"
+            },
+            {
+                "title": "Clerk ID Dup",
+                "width": "25",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "CLERK ID:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "196"
+            },
+            {
+                "title": "Clerk ID Name Dup",
+                "width": "33",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "37",
+                "settings": {
+                    "text": "portablepower",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "196"
+            },
+            {
+                "title": "Text - Cust Copy",
+                "width": "70",
+                "height": "4",
+                "type": "Text",
+                "abscissa": "12",
+                "settings": {
+                    "text": "Customer Copy",
+                    "display": "0",
+                    "font": "default",
+                    "size": "8",
+                    "align": "C",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "ordinate": "204"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Invoice Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "type": "6",
+                "min": "18"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "Journal Line Type",
+                "type": "6",
+                "min": "ttl"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "journal_main.purch_order_id",
+                "title": "PO Reference",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID",
+                "visible": "1",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Credit Card Slip",
+    "description": "Sales\/Invoice form with payments. Format: Letter, Portrait",
+    "emailmessage": "Attached is your Credit Card Slip from Battery Store, Inc. Please direct all invoice related questions to accounting@batterystore.com. \n\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "c",
+    "datefield": "journal_main.post_date",
+    "contactlog": "journal_main.contact_id_b",
+    "defaultemail": "ar",
+    "filenamefield": "journal_main.invoice_num",
+    "formbreakfield": "journal_main.id",
+    "filenameprefix": "Invoice-",
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "frm",
+    "group_id": "cust:j18",
+    "mime_type": "frm",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2019-04-25",
+    "last_update": "2024-02-22"
+}

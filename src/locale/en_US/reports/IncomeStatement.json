@@ -1,0 +1,127 @@
+{
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "xChild": null,
+    "type": "rpt",
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "journal_history"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "GL Account",
+                "break": "1",
+                "width": "35",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Title",
+                "break": "1",
+                "width": "65",
+                "visible": "1",
+                "align": "L",
+                "formatting": "glTitle"
+            },
+            {
+                "fieldname": "current",
+                "title": "Current Period",
+                "visible": "1",
+                "break": "1",
+                "width": "40",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency",
+                "processing": "isCur"
+            },
+            {
+                "fieldname": "current_ytd",
+                "title": "Year to Date",
+                "visible": "1",
+                "break": "1",
+                "width": "40",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency",
+                "processing": "isYtd"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 0,
+        "rows": []
+    },
+    "sortlist": {
+        "total": 0,
+        "rows": []
+    },
+    "filterlist": {
+        "total": 0,
+        "rows": []
+    },
+    "title": "Income Statement",
+    "description": "General ledger Income statement. Format: Letter, Portrait. Requires special report: income_statement.",
+    "emailmessage": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": 10,
+    "marginbottom": 10,
+    "marginleft": 10,
+    "marginright": 10,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "p",
+    "datelist": [
+        "z"
+    ],
+    "datefield": "journal_history.period",
+    "datedefault": "a",
+    "filenamefield": "",
+    "filenameprefix": "",
+    "special_class": "income_statement",
+    "truncate": "0",
+    "totalonly": "0",
+    "defaultemail": "contact",
+    "headingshow": 1,
+    "headingfont": "default",
+    "headingsize": 12,
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": 1,
+    "title1text": "%reportname%",
+    "title1font": "default",
+    "title1size": 10,
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": 1,
+    "title2text": "Report Generated %date%",
+    "title2font": "default",
+    "title2size": 10,
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "default",
+    "filtersize": 8,
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "default",
+    "datasize": 10,
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": "helvetica",
+    "totalsize": 10,
+    "totalcolor": "#000000",
+    "totalalign": "L"
+}

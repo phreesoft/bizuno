@@ -1,0 +1,245 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 11,
+        "rows": [
+            {
+                "fieldname": "journal_main.id",
+                "title": "Record",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.period",
+                "title": "Period",
+                "visible": "0",
+                "width": "14",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "width": "20",
+                "break": "1",
+                "processing": "date",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "visible": "0",
+                "width": "32",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_item.gl_account",
+                "title": "Account",
+                "visible": "1",
+                "width": "20",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_item.description",
+                "title": "Description",
+                "visible": "1",
+                "width": "57",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.id",
+                "title": "Beg Bal",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R"
+            },
+            {
+                "fieldname": "journal_item.debit_amount",
+                "title": "Debit Amount",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_item.credit_amount",
+                "title": "Credit Amount",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_main.id",
+                "title": "Balance",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "formatting": "j_desc"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_item.gl_account",
+                "title": "GL Account",
+                "default": "1",
+                "page_break": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "default": "0"
+            },
+            {
+                "fieldname": "journal_item.debit_amount",
+                "title": "Debit Amount",
+                "default": "0"
+            },
+            {
+                "fieldname": "journal_item.credit_amount",
+                "title": "Credit Amount",
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_item.gl_account",
+                "title": "GL Account",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "type": "9",
+                "min": "2,6,7,12,13,14,16,18,20"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "General Ledger - Running Balance",
+    "description": "Lists general ledger activities with balances. Format: Letter, Portrait",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "l",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "l",
+    "datefield": "journal_main.post_date",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "12",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2012-03-15",
+    "last_update": "2023-05-11"
+}

@@ -1,0 +1,303 @@
+Generic Attributes,Product Name *,Long Description *,Shelf Description *,Short Description *,Main Image-Main Image Url *,Main Image-Alt Text *,Additional Asset-Alt Text (#1) (Optional),Additional Asset-Asset Url (#1) (Optional),Additional Asset-Asset Type (#1) (Optional),Additional Asset-Alt Text (#2) (Optional),Additional Asset-Asset Url (#2) (Optional),Additional Asset-Asset Type (#2) (Optional),Additional Asset-Alt Text (#3) (Optional),Additional Asset-Asset Url (#3) (Optional),Additional Asset-Asset Type (#3) (Optional),Product Identifier-Product Id Type (#1) *,Product Identifier-Product Id (#1) *,Product Identifier-Product Id Type (#2) (Optional),Product Identifier-Product Id (#2) (Optional),Product Identifier-Product Id Type (#3) (Optional),Product Identifier-Product Id (#3) (Optional),Msrp-Unit (Optional),Msrp-Measure (Optional),Units Per Consumer Unit (Optional),Certifications And Claim-Certification And Claim Type (#1) (Optional),Certifications And Claim-Certifying Agent (#1) (Optional),Certifications And Claim-Certification And Claim Type (#2) (Optional),Certifications And Claim-Certifying Agent (#2) (Optional),Certifications And Claim-Certification And Claim Type (#3) (Optional),Certifications And Claim-Certifying Agent (#3) (Optional),Assembled Product Length-Unit (Optional),Assembled Product Length-Measure (Optional),Assembled Product Width-Unit (Optional),Assembled Product Width-Measure (Optional),Assembled Product Height-Unit (Optional),Assembled Product Height-Measure (Optional),Assembled Product Weight-Unit (Optional),Assembled Product Weight-Measure (Optional),Product Tax Code *,Country Of Origin Assembly (Optional),Country Of Origin Components (Optional),Autographed (Optional),Autographed By (Optional),Has Batteries (Optional),Battery Type And Quantity Value-Battery Technology Type (#1) (Optional),Battery Type And Quantity Value-Number Of Batteries (#1) (Optional),Battery Type And Quantity Value-Battery Technology Type (#2) (Optional),Battery Type And Quantity Value-Number Of Batteries (#2) (Optional),Battery Type And Quantity Value-Battery Technology Type (#3) (Optional),Battery Type And Quantity Value-Number Of Batteries (#3) (Optional),Price Per Unit Quantity-Unit (Optional),Price Per Unit Quantity-Measure (Optional),Has Expiration (Optional),Has Warnings (Optional),Warning Text (Optional),Has Warranty (Optional),Warranty URL (Optional),Warranty Text (Optional),Prop65Warning Required? (Optional),Small Parts Warnings-Small Parts Warning (Optional),Controlled Substance? (Optional),Warranty Length (Optional),Prop65Warning Text (Optional),Additional Product Attribute-Product Attribute Name (#1) (Optional),Additional Product Attribute-Product Attribute Value (#1) (Optional),Additional Product Attribute-Product Attribute Name (#2) (Optional),Additional Product Attribute-Product Attribute Value (#2) (Optional),Additional Product Attribute-Product Attribute Name (#3) (Optional),Additional Product Attribute-Product Attribute Value (#3) (Optional),Mart (Optional),Sku *,Wpid (Optional),Launch Date (Optional),Discontinue Date (Optional),Price-Currency *,Price-Amount *,Min Advertised Price-Currency *,Min Advertised Price-Amount *,Must Ship Alone? (Optional),Shipping Weight-Value *,Shipping Weight-Unit *,Shipping Override-Is Shipping Allowed (#1) (Optional),Shipping Override-Ship Region (#1) (Optional),Shipping Override-Ship Method (#1) (Optional),Shipping Override-Ship Price (#1) (Optional),Shipping Override-Is Shipping Allowed (#2) (Optional),Shipping Override-Ship Region (#2) (Optional),Shipping Override-Ship Method (#2) (Optional),Shipping Override-Ship Price (#2) (Optional),Shipping Override-Is Shipping Allowed (#3) (Optional),Shipping Override-Ship Region (#3) (Optional),Shipping Override-Ship Method (#3) (Optional),Shipping Override-Ship Price (#3) (Optional),Shipping Override-Is Shipping Allowed (#4) (Optional),Shipping Override-Ship Region (#4) (Optional),Shipping Override-Ship Method (#4) (Optional),Shipping Override-Ship Price (#4) (Optional),Shipping Override-Is Shipping Allowed (#5) (Optional),Shipping Override-Ship Region (#5) (Optional),Shipping Override-Ship Method (#5) (Optional),Shipping Override-Ship Price (#5) (Optional),Shipping Override-Is Shipping Allowed (#6) (Optional),Shipping Override-Ship Region (#6) (Optional),Shipping Override-Ship Method (#6) (Optional),Shipping Override-Ship Price (#6) (Optional),Shipping Override-Is Shipping Allowed (#7) (Optional),Shipping Override-Ship Region (#7) (Optional),Shipping Override-Ship Method (#7) (Optional),Shipping Override-Ship Price (#7) (Optional),Shipping Override-Is Shipping Allowed (#8) (Optional),Shipping Override-Ship Region (#8) (Optional),Shipping Override-Ship Method (#8) (Optional),Shipping Override-Ship Price (#8) (Optional),Shipping Override-Is Shipping Allowed (#9) (Optional),Shipping Override-Ship Region (#9) (Optional),Shipping Override-Ship Method (#9) (Optional),Shipping Override-Ship Price (#9) (Optional),Shipping Override-Is Shipping Allowed (#10) (Optional),Shipping Override-Ship Region (#10) (Optional),Shipping Override-Ship Method (#10) (Optional),Shipping Override-Ship Price (#10) (Optional),Category Specific Attributes,Swatch Image-Swatch Image Url (#1) (Optional),Swatch Image-Swatch Variant Attribute (#1) (Optional),Swatch Image-Swatch Image Url (#2) (Optional),Swatch Image-Swatch Variant Attribute (#2) (Optional),Swatch Image-Swatch Image Url (#3) (Optional),Swatch Image-Swatch Variant Attribute (#3) (Optional),System Of Measurement (Optional),Variant Attribute Names-Variant Attribute Name (Optional),Variant Group Id (Optional),Primary Variant? (Optional),Fabric Content Value-Material Name (#1) (Optional),Fabric Content Value-Material Percentage (#1) (Optional),Fabric Content Value-Material Name (#2) (Optional),Fabric Content Value-Material Percentage (#2) (Optional),Fabric Content Value-Material Name (#3) (Optional),Fabric Content Value-Material Percentage (#3) (Optional),Finish (Optional),Fabric Care Instructions-Fabric Care Instruction (Optional),Brand (Optional),Manufacturer (Optional),Model Number (Optional),Manufacturer Part Number (Optional),Gender (Optional),Color-Color Value (Optional),Recommended Rooms-Recommended Room (Optional),Connections-Connection (Optional),Material-Material Value (Optional),Pattern-Pattern Value (Optional),Powered? (Optional),Character-Character Value (Optional),Power Type (Optional),Portable? (Optional),Recommended Locations-Recommended Location (Optional),Retractable? (Optional),Foldable? (Optional),Collectible? (Optional),Industrial? (Optional),Assembly Required? (Optional),Assembly Instructions (Optional),Recommended Surfaces-Recommended Surface (Optional),Volts-Unit (Optional),Volts-Measure (Optional),Shape (Optional),Display Technology (Optional)
+2.1,"Title of the product to be displayed on the product details page.
+Brand + Category + Defining Quality + Item Name + Pack Count if
+applicable. Example: George Girls' Short-Sleeve Polo; Hanes Men's
+V-Neck Tees, 3-Pack (Please enter text with 200 character max)","Complete description that will be displayed on the item page as a
+bulleted list. Enter the item's key features, benefits, and other
+notables, each on its own line. Use HTML to create the headings, line
+breaks,  and bulleted list. Example: - Fabric content
+- Features
+and/or attributes related to the product as a whole, such as pattern,
+fabric, etc.)
+- Neckline 
+- Sleeves 
+- Fit 
+- Additional details (any
+info on tag) 
+- Hem details 
+- Bonus item/accessory, if applicable 
+-
+Care instructions (Please enter text with 4000 character max)","Abbreviated list of key item features in no more than three bullet
+points. This is viewable in search, category, and shelf pages. Format
+bullet points with HTML. Example: - V-neck
+- Studded details
+- Loose
+fit (Please enter text with 1000 character max)","Overview of the key selling points of the item, marketing content, and
+highlights in paragraph form. For SEO purposes, repeat the product
+name and relevant keywords here. HTML is supported, and should be
+used only for making paragraph breaks. Plain text is also acceptable;
+it will render as a single paragraph. Example: The George - Girls'
+Short Sleeve Polo Shirt will make a great addition to your daughter's
+uniform wardrobe. This short-sleeved girls' shirt has a flat knit
+collar and cuff for a comfortable fit. Plus, it's tagless, so your
+daughter's skin won't be irritated by a scratchy tag.  This girls'
+short sleeve polo is made from a cotton blend, and treated with
+Scotchgard for stain protection. It has a two-button placket, an
+extended back hem and vents on each side hem. The girls' polo shirt
+is machine washable and very easy to maintain. (Please enter text with 1000 character max)","Location of the image. URLs must begin with http:// or https://
+Example: http://www.walmart.com/main_image.jpg (Please enter text with 2000 character max)","Only complete this field if the following field is also completed: Main Image Url.
+Alternative text of an image, video, or other asset. Use descriptive
+terms to describe the image.","Only complete this field if the following field is also completed: Asset Url.
+Alternative text of an image, video, or other asset. Use descriptive
+terms to describe the image.","Location of the additional assets. Required if additional assets
+beyond the main image are provided. URLs must begin with http:// or
+https:// Example: http://www.walmart.com/video1.jpg (Please enter text with 2000 character max)","Only complete this field if the following field is also completed: Asset Url.
+Provides additional information on the assets. Example: Secondary
+Image; Video; Instruction Manual; Assembly Instructions; Badge;
+Manufacturer Logo","Only complete this field if the following field is also completed: Asset Url.
+Alternative text of an image, video, or other asset. Use descriptive
+terms to describe the image.","Location of the additional assets. Required if additional assets
+beyond the main image are provided. URLs must begin with http:// or
+https:// Example: http://www.walmart.com/video1.jpg (Please enter text with 2000 character max)","Only complete this field if the following field is also completed: Asset Url.
+Provides additional information on the assets. Example: Secondary
+Image; Video; Instruction Manual; Assembly Instructions; Badge;
+Manufacturer Logo","Only complete this field if the following field is also completed: Asset Url.
+Alternative text of an image, video, or other asset. Use descriptive
+terms to describe the image.","Location of the additional assets. Required if additional assets
+beyond the main image are provided. URLs must begin with http:// or
+https:// Example: http://www.walmart.com/video1.jpg (Please enter text with 2000 character max)","Only complete this field if the following field is also completed: Asset Url.
+Provides additional information on the assets. Example: Secondary
+Image; Video; Instruction Manual; Assembly Instructions; Badge;
+Manufacturer Logo","Only complete this field if the following field is also completed: Product Id.
+Type of unique identifier used in the ""Product ID"" field. Example:
+UPC; GTIN; ISBN; ISSN; EAN","Only complete this field if the following field is also completed: Product Id Type.
+Alphanumeric ID that uniquely identifies the product. Example: X12345","Only complete this field if the following field is also completed: Product Id.
+Type of unique identifier used in the ""Product ID"" field. Example:
+UPC; GTIN; ISBN; ISSN; EAN","Only complete this field if the following field is also completed: Product Id Type.
+Alphanumeric ID that uniquely identifies the product. Example: X12345","Only complete this field if the following field is also completed: Product Id.
+Type of unique identifier used in the ""Product ID"" field. Example:
+UPC; GTIN; ISBN; ISSN; EAN","Only complete this field if the following field is also completed: Product Id Type.
+Alphanumeric ID that uniquely identifies the product. Example: X12345","Manufacturer Suggested Retail Price. Enter 2 digits to the right of
+the decimal point. Do not use commas or dollar signs. (Please select a value from the drop-down in the cell)","Manufacturer Suggested Retail Price. Enter 2 digits to the right of
+the decimal point. Do not use commas or dollar signs. (Please enter the value)","Number of subunits contained in the unit.
+
+Example: For a single
+3-pack of T-shirts, where the T-shirts are packaged all together with
+one barcode, enter ""1"" as the quantity. If the item for sale is two
+3-packs of T-shirts, enter ""2."" Example: 1; 2 (Please enter the value)",Type of certification or claim. Example: Organic; BPA-Free; Fair Trade (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Certification And Claim Type.
+Certifying agency for claim. Not all claims have a certifying agent.
+Example: Oregon Tilth; GOTS",Type of certification or claim. Example: Organic; BPA-Free; Fair Trade (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Certification And Claim Type.
+Certifying agency for claim. Not all claims have a certifying agent.
+Example: Oregon Tilth; GOTS",Type of certification or claim. Example: Organic; BPA-Free; Fair Trade (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Certification And Claim Type.
+Certifying agency for claim. Not all claims have a certifying agent.
+Example: Oregon Tilth; GOTS","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please select a value from the drop-down in the cell)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please enter the value)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please select a value from the drop-down in the cell)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please enter the value)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please select a value from the drop-down in the cell)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 in; 2 ft; 2.5 ft (Please enter the value)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 lb (Please select a value from the drop-down in the cell)","Dimensions referring to the item as it is out of the box and
+assembled. Example: 5 lb (Please enter the value)",Code used to identify tax properties of the product. (Please enter text with 10 character max),"2-letter country code for where the item was assembled. Example: CN;
+US (Please select a value from the drop-down in the cell)","Information to be displayed on the item page. If the item originated
+in the USA, documentation authorized by the FTC may be requested.
+Example: USA; Imported; USA and/or Imported (Please select a value from the drop-down in the cell)",Is this product autographed? (Please select a value from the drop-down in the cell),"The full name of the autographer Example: Wayne Gretzky; Bradley
+Wiggins (Please enter text with 4000 character max)","An item has batteries if any component, including reusable packaging,
+contains a battery. Example: Y; N (Please select a value from the drop-down in the cell)","If battery type is lead acid, lead acid (nonspillable), lithium ion,
+or lithium metal, the item requires a hazardous materials risk
+assessment via WERCS. Example: Does Not Contain a Battery; Alkaline;
+Carbon Zinc; Lead Acid; Lead Acid (Nonspillable); Lithium Primary
+(Lithium Metal); Lithium Ion; Magnesium; Mercury; Nickel Cadmium;
+Nickel Metal Hydride; Silver; Thermal; Other; Multiple Types (Please select a value from the drop-down in the cell)","Required if ""Has Batteries = Y"" (Please enter the value)","If battery type is lead acid, lead acid (nonspillable), lithium ion,
+or lithium metal, the item requires a hazardous materials risk
+assessment via WERCS. Example: Does Not Contain a Battery; Alkaline;
+Carbon Zinc; Lead Acid; Lead Acid (Nonspillable); Lithium Primary
+(Lithium Metal); Lithium Ion; Magnesium; Mercury; Nickel Cadmium;
+Nickel Metal Hydride; Silver; Thermal; Other; Multiple Types (Please select a value from the drop-down in the cell)","Required if ""Has Batteries = Y"" (Please enter the value)","If battery type is lead acid, lead acid (nonspillable), lithium ion,
+or lithium metal, the item requires a hazardous materials risk
+assessment via WERCS. Example: Does Not Contain a Battery; Alkaline;
+Carbon Zinc; Lead Acid; Lead Acid (Nonspillable); Lithium Primary
+(Lithium Metal); Lithium Ion; Magnesium; Mercury; Nickel Cadmium;
+Nickel Metal Hydride; Silver; Thermal; Other; Multiple Types (Please select a value from the drop-down in the cell)","Required if ""Has Batteries = Y"" (Please enter the value)","The unit (ounce) and measure (e.g. 0.4) work in tandem with the item's
+price to compute the item's Price Per Unit (PPU), which is displayed
+on the item page. (Please select a value from the drop-down in the cell)","The unit (ounce) and measure (e.g. 0.4) work in tandem with the item's
+price to compute the item's Price Per Unit (PPU), which is displayed
+on the item page. (Please enter the value)","Indicates whether an item has an expiration date, such as for food,
+cleaning supplies, beauty products, etc. Example: Y; N (Please select a value from the drop-down in the cell)","Indicates if any cautionary statements should accompany the item.
+Example: Y; N (Please select a value from the drop-down in the cell)","Text of the warning to accompany the item. Example: You must be 18 or
+over to purchase this product. By purchasing this item you certify
+that your are 18 years or older. (Please enter text with 4000 character max)",Indicates if item comes with a warranty. Example: Y; N (Please select a value from the drop-down in the cell),"URL location of the Image, PDF, or link to the manufacturer's warranty
+page, showing the warranty and its terms. URLs must begin with
+http:// or https:// Example: http://www.walmart.com/warranty_info.pdf (Please enter text with 2000 character max)","Text of the warranty terms, such as what's covered and length of
+warranty. (Please enter text with 50000 character max)","California's Proposition 65 entitles California consumers to special
+warnings for products that contain chemicals known to the state of
+California to cause cancer and birth defects or other reproductive
+harm. http://oehha.ca.gov/prop65.html Example: Y; N (Please select a value from the drop-down in the cell)","Indicates type of choking hazard warning to show on the item
+page.
+
+Code definitions:
+0 - Not Applicable
+1 - Any ball with a
+diameter of 1.75 inches (44.4mm) or less that is intended for use by
+children 3 years or older
+2 - Any toy or game intended for children 3
+years or older but less than 8 years that contains a small ball
+3 -
+Any toy and game with small parts intended for use by children at
+least 3 years old but under 6 years
+4 - Any latex balloon, or toy or
+game that contains a latex balloon
+5 - Any marble intended for
+children 3 years or older
+6 - Any toy and game intended for children
+at least 3 years old but less than 8 years which contains a marble
+Example: 0; 1; 2; 3; 4; 5; 6 (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter the value)","Indicates whether the item is a drug or chemical whose manufacture or
+use is regulated. Example: Y; N (Please select a value from the drop-down in the cell)","The length of the warranty: if there are different lengths for
+different areas of the warranty, state so. Example: 90 Days; 6 months
+parts, twelve months labor (Please enter text with 4000 character max)","There is more than one variation of the Proposition 65 text; we need
+the actual text in order to determine the variation Example: WARNING:
+This product contains chemicals known to the State of California to
+cause cancer andbirth defects or other reproductive harm. (Please enter text with 4000 character max)","Only complete this field if the following field is also completed: Product Attribute Value.
+A name of a single attribute for the additional detail name-value
+pair. Example: isCFLLightBulb","Only complete this field if the following field is also completed: Product Attribute Name.
+A value of a single attribute for the additional detail name-value
+pair. Example: true","Only complete this field if the following field is also completed: Product Attribute Value.
+A name of a single attribute for the additional detail name-value
+pair. Example: isCFLLightBulb","Only complete this field if the following field is also completed: Product Attribute Name.
+A value of a single attribute for the additional detail name-value
+pair. Example: true","Only complete this field if the following field is also completed: Product Attribute Value.
+A name of a single attribute for the additional detail name-value
+pair. Example: isCFLLightBulb","Only complete this field if the following field is also completed: Product Attribute Name.
+A value of a single attribute for the additional detail name-value
+pair. Example: true",Mart where the item would be listed (Please select a value from the drop-down in the cell),"Partner's item identifier, Walmart includes this value in all
+communications regarding item information such as orders (Please enter text with 255 character max)",Walmart's item identifier (Please enter text with 12 character max),Enter the date (MM/DD/YYYY),Enter the date (MM/DD/YYYY),Represents  the Currency of the price (Please select a value from the drop-down in the cell),Represents  the price (Please enter the value),Represents  the Currency of the price (Please select a value from the drop-down in the cell),Represents  the price (Please enter the value),cannot ship with another item in the same box? (Please select a value from the drop-down in the cell),Please provide the value for the weight. (Please enter the value),Please provide the unit of measure for the weight. (Please select a value from the drop-down in the cell),"Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+Shipping may not apply to some items. Is shipping allowed for this
+product?","Only complete this field if the following field is also completed: Ship Method.
+Ship region codes of shipping product.","Only complete this field if the following field is also completed: Ship Region.
+Specifies the ship method for the corresponding region to be
+overridden.","Only complete this field if the following field is also completed: Ship Region,Ship Method.
+The flat rate shipping charge amount for the corresponding item and
+region and 
+            shipping method (item/region/method) in USD",Other,"Only complete this field if the following field is also completed: Swatch Variant Attribute.
+URL of the color or pattern swatch image. This will be shown as a
+small square on the item page. Recommended resolution is 100 x 100
+pixels. URLs must begin with http:// or https:// Example:
+http://www.walmart.com/swatch1.jpg","Only complete this field if the following field is also completed: Swatch Image Url.
+Attribute name corresponding to the swatch. Example: color; pattern","Only complete this field if the following field is also completed: Swatch Variant Attribute.
+URL of the color or pattern swatch image. This will be shown as a
+small square on the item page. Recommended resolution is 100 x 100
+pixels. URLs must begin with http:// or https:// Example:
+http://www.walmart.com/swatch1.jpg","Only complete this field if the following field is also completed: Swatch Image Url.
+Attribute name corresponding to the swatch. Example: color; pattern","Only complete this field if the following field is also completed: Swatch Variant Attribute.
+URL of the color or pattern swatch image. This will be shown as a
+small square on the item page. Recommended resolution is 100 x 100
+pixels. URLs must begin with http:// or https:// Example:
+http://www.walmart.com/swatch1.jpg","Only complete this field if the following field is also completed: Swatch Image Url.
+Attribute name corresponding to the swatch. Example: color; pattern",Example: Metric; Imperial (Please enter text with 4000 character max),"Designate all attributes by which the item is varying. This list may
+include variants that the category spec has not explicitly
+identified. 
+Ex: If partner provides data for ""Collar Size,"" and
+""Collar Size"" is not in the list of valid variants, then input
+""Collar Size"" as a value here. Example: collarSize; color; shirtSize (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","Required if item is a variant.
+ 
+Make up a number for ""Variant Group
+ID,"" and add this to all variations of the same product. Partners
+must ensure uniqueness of their Variant Group IDs. (Please enter text with 20 character max)","Note whether item is intended as the main variant in a variant
+grouping. Example: Y; N (Please select a value from the drop-down in the cell)",Material name. Example: Cotton; Rayon (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Material Name.
+Corresponding material percentage. Example: 98%; 2%",Material name. Example: Cotton; Rayon (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Material Name.
+Corresponding material percentage. Example: 98%; 2%",Material name. Example: Cotton; Rayon (Please enter text with 4000 character max),"Only complete this field if the following field is also completed: Material Name.
+Corresponding material percentage. Example: 98%; 2%","Overall finish of the item. Example: Natural; Unfinished; Brown;
+Espresso; Oak (Please enter text with 4000 character max)","Enter details of the fabric care label. Example: Dry Clean Only;
+Machine Washable; Hand Wash (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","If item does not have a brand, enter ""Unbranded"" Example: HP; Toshiba;
+Unbranded (Please enter text with 4000 character max)","Manufacturer is the maker of the product. This is the name of the
+company that produces the product, not necessarily the brand name of
+the item. (Please enter text with 4000 character max)","Having this information allows customers to search for items on the
+site and informs product matching. (Please enter text with 4000 character max)","MPN uniquely identifies the product to its manufacturer. For many
+products this will be identical to the model number. Some
+manufacturers distinguish part number from model number. (Please enter text with 4000 character max)","To specify target gender of the item. Example: Women; Men; Girls;
+Boys; Unisex (Please select a value from the drop-down in the cell)","Color value as provided by the manufacturer. Example: Aqua; Burgundy;
+Mauve; Fuchsia (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","The rooms recommended for the item's use. Example: Family Room; Home
+Office; Kitchen; Dining Room (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","The standardized connections provided on the item. Example: HDMI;
+S-Video; RCA (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","Material makeup of the item. Fabric materials should be entered using
+the ""Fabric Content"" attribute. Example: Nickel; Metal; Plastic (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","Decorative design or visual ornamentation, often with a thematic,
+recurring motif. Example: Floral; Plaid; Paisley (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",Indicates that an item is powered. Example: Y; N (Please select a value from the drop-down in the cell),"A person or entity portrayed in print or visual media. A character
+might be a fictional personality or an actual living person. Example:
+Dora the Explorer; SpongeBob SquarePants (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","Provides information on the exact type of power used by the item.
+Example: Electric; Batteries (Please enter text with 4000 character max)",Is the item portable? Example: Y; N (Please select a value from the drop-down in the cell),"The primary location recommended for the item's use. Example: Indoor;
+Outdoor; Vehicle (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)","Indicates that the item can be withdrawn into a holder, as in a cord
+or leash. Example: Y; N (Please select a value from the drop-down in the cell)",Indicates that an item can be folded. Example: Y; N (Please select a value from the drop-down in the cell),"Indicates if the item is regarded as being of value or interest to a
+collector. (Please select a value from the drop-down in the cell)","Indicates that an item can be used in an industrial setting or has an
+industrial application. Example: Y; N (Please select a value from the drop-down in the cell)",Is product unassembled and must be put together before use? (Please select a value from the drop-down in the cell),"URL location showing assembly instructions for items requiring
+assembly. (Please enter text with 2000 character max)","Example: Wood; Concrete; Vinyl (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",Example: 220 V (Please select a value from the drop-down in the cell),Example: 220 V,"Physical shape of the item. Example: Aviator; Cateye; Horned; Oval;
+Rectangle; Round; Square; Wayfarer (Please enter text with 4000 character max)","The primary technology used for the item's display. Example: OLED;
+Retina Display; DLP; Plasma; LCD (Please enter text with 4000 character max)"
+,,,,,,"Conditional-Required:Main Image-Main Image Url,","Conditional-Required:Additional Asset-Asset Url (#1),",,"Conditional-Required:Additional Asset-Asset Url (#1),","Conditional-Required:Additional Asset-Asset Url (#2),",,"Conditional-Required:Additional Asset-Asset Url (#2),","Conditional-Required:Additional Asset-Asset Url (#3),",,"Conditional-Required:Additional Asset-Asset Url (#3),","Conditional-Required:Product Identifier-Product Id (#1),","Conditional-Required:Product Identifier-Product Id Type (#1),","Conditional-Required:Product Identifier-Product Id (#2),","Conditional-Required:Product Identifier-Product Id Type (#2),","Conditional-Required:Product Identifier-Product Id (#3),","Conditional-Required:Product Identifier-Product Id Type (#3),",,,,,"Conditional-Required:Certifications And Claim-Certification And Claim Type (#1),",,"Conditional-Required:Certifications And Claim-Certification And Claim Type (#2),",,"Conditional-Required:Certifications And Claim-Certification And Claim Type (#3),",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"Conditional-Required:Additional Product Attribute-Product Attribute Value (#1),","Conditional-Required:Additional Product Attribute-Product Attribute Name (#1),","Conditional-Required:Additional Product Attribute-Product Attribute Value (#2),","Conditional-Required:Additional Product Attribute-Product Attribute Name (#2),","Conditional-Required:Additional Product Attribute-Product Attribute Value (#3),","Conditional-Required:Additional Product Attribute-Product Attribute Name (#3),",,,,,,,,,,,,,"Conditional-Required:Shipping Override-Ship Region (#1),Shipping Override-Ship Method (#1),","Conditional-Required:Shipping Override-Ship Method (#1),","Conditional-Required:Shipping Override-Ship Region (#1),","Conditional-Required:Shipping Override-Ship Region (#1),Shipping Override-Ship Method (#1),","Conditional-Required:Shipping Override-Ship Region (#2),Shipping Override-Ship Method (#2),","Conditional-Required:Shipping Override-Ship Method (#2),","Conditional-Required:Shipping Override-Ship Region (#2),","Conditional-Required:Shipping Override-Ship Region (#2),Shipping Override-Ship Method (#2),","Conditional-Required:Shipping Override-Ship Region (#3),Shipping Override-Ship Method (#3),","Conditional-Required:Shipping Override-Ship Method (#3),","Conditional-Required:Shipping Override-Ship Region (#3),","Conditional-Required:Shipping Override-Ship Region (#3),Shipping Override-Ship Method (#3),","Conditional-Required:Shipping Override-Ship Region (#4),Shipping Override-Ship Method (#4),","Conditional-Required:Shipping Override-Ship Method (#4),","Conditional-Required:Shipping Override-Ship Region (#4),","Conditional-Required:Shipping Override-Ship Region (#4),Shipping Override-Ship Method (#4),","Conditional-Required:Shipping Override-Ship Region (#5),Shipping Override-Ship Method (#5),","Conditional-Required:Shipping Override-Ship Method (#5),","Conditional-Required:Shipping Override-Ship Region (#5),","Conditional-Required:Shipping Override-Ship Region (#5),Shipping Override-Ship Method (#5),","Conditional-Required:Shipping Override-Ship Region (#6),Shipping Override-Ship Method (#6),","Conditional-Required:Shipping Override-Ship Method (#6),","Conditional-Required:Shipping Override-Ship Region (#6),","Conditional-Required:Shipping Override-Ship Region (#6),Shipping Override-Ship Method (#6),","Conditional-Required:Shipping Override-Ship Region (#7),Shipping Override-Ship Method (#7),","Conditional-Required:Shipping Override-Ship Method (#7),","Conditional-Required:Shipping Override-Ship Region (#7),","Conditional-Required:Shipping Override-Ship Region (#7),Shipping Override-Ship Method (#7),","Conditional-Required:Shipping Override-Ship Region (#8),Shipping Override-Ship Method (#8),","Conditional-Required:Shipping Override-Ship Method (#8),","Conditional-Required:Shipping Override-Ship Region (#8),","Conditional-Required:Shipping Override-Ship Region (#8),Shipping Override-Ship Method (#8),","Conditional-Required:Shipping Override-Ship Region (#9),Shipping Override-Ship Method (#9),","Conditional-Required:Shipping Override-Ship Method (#9),","Conditional-Required:Shipping Override-Ship Region (#9),","Conditional-Required:Shipping Override-Ship Region (#9),Shipping Override-Ship Method (#9),","Conditional-Required:Shipping Override-Ship Region (#10),Shipping Override-Ship Method (#10),","Conditional-Required:Shipping Override-Ship Method (#10),","Conditional-Required:Shipping Override-Ship Region (#10),","Conditional-Required:Shipping Override-Ship Region (#10),Shipping Override-Ship Method (#10),","Conditional-Required:Swatch Image-Swatch Variant Attribute (#1),","Conditional-Required:Swatch Image-Swatch Image Url (#1),","Conditional-Required:Swatch Image-Swatch Variant Attribute (#2),","Conditional-Required:Swatch Image-Swatch Image Url (#2),","Conditional-Required:Swatch Image-Swatch Variant Attribute (#3),","Conditional-Required:Swatch Image-Swatch Image Url (#3),",,,,,,"Conditional-Required:Fabric Content Value-Material Name (#1),",,"Conditional-Required:Fabric Content Value-Material Name (#2),",,"Conditional-Required:Fabric Content Value-Material Name (#3),",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

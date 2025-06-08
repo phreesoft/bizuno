@@ -1,0 +1,485 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 15,
+        "rows": [
+            {
+                "title": "Text - Check Remittance",
+                "abscissa": "8",
+                "ordinate": "8",
+                "width": "192",
+                "height": "7",
+                "type": "Text",
+                "settings": {
+                    "text": "ACH Check Remittance",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "20",
+                    "align": "R",
+                    "color": "#0b5394",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#cfe2f3"
+                }
+            },
+            {
+                "title": "Block - Business Address",
+                "abscissa": "20",
+                "ordinate": "18",
+                "width": "75",
+                "height": "4",
+                "type": "CBlk",
+                "settings": {
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000",
+                    "boxfield": {
+                        "total": 7,
+                        "rows": [
+                            {
+                                "fieldname": "primary_name",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address1",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "address2",
+                                "separator": "del-nl"
+                            },
+                            {
+                                "fieldname": "city",
+                                "separator": "com-sp"
+                            },
+                            {
+                                "fieldname": "state",
+                                "separator": "sp"
+                            },
+                            {
+                                "fieldname": "postal_code",
+                                "separator": "nl"
+                            },
+                            {
+                                "fieldname": "telephone1",
+                                "separator": "nl"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Text - Page Number",
+                "abscissa": "140",
+                "ordinate": "18",
+                "width": "20",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Page #",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "R",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Page Number",
+                "abscissa": "160",
+                "ordinate": "18",
+                "width": "40",
+                "height": "5",
+                "type": "PgNum",
+                "settings": {
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Vendor ID",
+                "abscissa": "8",
+                "ordinate": "40",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Vendor ID",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#eeeeee"
+                }
+            },
+            {
+                "title": "Data - VendorID",
+                "abscissa": "8",
+                "ordinate": "45",
+                "width": "40",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.contact_id_b",
+                    "processing": "contactID",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Vendor Name",
+                "abscissa": "48",
+                "ordinate": "40",
+                "width": "80",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Vendor Name",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#eeeeee"
+                }
+            },
+            {
+                "title": "Data - Vendor Name",
+                "abscissa": "48",
+                "ordinate": "45",
+                "width": "80",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.primary_name_b",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Check Number",
+                "abscissa": "128",
+                "ordinate": "40",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Reference Number",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#eeeeee"
+                }
+            },
+            {
+                "title": "Data - Check Number",
+                "abscissa": "128",
+                "ordinate": "45",
+                "width": "40",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.invoice_num",
+                    "display": "0",
+                    "font": "default",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Check Date ",
+                "abscissa": "168",
+                "ordinate": "40",
+                "width": "32",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Check Date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#eeeeee"
+                }
+            },
+            {
+                "title": "Data - Check Date",
+                "abscissa": "168",
+                "ordinate": "45",
+                "width": "32",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.post_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "10",
+                    "align": "C",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Payment Detail",
+                "abscissa": "8",
+                "ordinate": "55",
+                "width": "192",
+                "height": "200",
+                "type": "Tbl",
+                "settings": {
+                    "hfont": "default",
+                    "hsize": "10",
+                    "halign": "C",
+                    "hcolor": "#000000",
+                    "hbshow": "1",
+                    "hbsize": "1",
+                    "hbcolor": "#000000",
+                    "hfshow": "1",
+                    "hfcolor": "#eeeeee",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fshow": "1",
+                    "fcolor": "#ffffff",
+                    "boxfield": {
+                        "total": 5,
+                        "rows": [
+                            {
+                                "fieldname": "journal_item.trans_code",
+                                "title": "Invoice #",
+                                "font": "default",
+                                "size": "10",
+                                "align": "L",
+                                "color": "0:0:0",
+                                "width": "30"
+                            },
+                            {
+                                "fieldname": "journal_item.description",
+                                "title": "Comments",
+                                "font": "default",
+                                "size": "10",
+                                "align": "L",
+                                "color": "#000000",
+                                "width": "70"
+                            },
+                            {
+                                "fieldname": "journal_item.credit_amount + journal_item.debit_amount",
+                                "title": "Invoice Amount",
+                                "font": "default",
+                                "size": "10",
+                                "align": "R",
+                                "color": "#000000",
+                                "width": "30",
+                                "formatting": "currency"
+                            },
+                            {
+                                "fieldname": "journal_item.id",
+                                "title": "Discount",
+                                "formatting": "curNull0",
+                                "font": "default",
+                                "size": "10",
+                                "align": "R",
+                                "color": "#000000",
+                                "width": "30",
+                                "processing": "pmtDisc"
+                            },
+                            {
+                                "fieldname": "journal_item.id",
+                                "title": "Net Amount",
+                                "processing": "pmtNet",
+                                "formatting": "currency",
+                                "font": "default",
+                                "size": "10",
+                                "align": "R",
+                                "color": "#000000",
+                                "width": "30"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Text - Total",
+                "abscissa": "100",
+                "ordinate": "255",
+                "width": "40",
+                "height": "7",
+                "type": "Text",
+                "settings": {
+                    "text": "Total:",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "20",
+                    "align": "R",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Total",
+                "abscissa": "140",
+                "ordinate": "255",
+                "width": "60",
+                "height": "7",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.total_amount",
+                    "formatting": "currency",
+                    "display": "0",
+                    "font": "helvetica",
+                    "size": "20",
+                    "align": "R",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Primary Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Posted Date",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "type": "6",
+                "min": "pmt"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "type": "9",
+                "min": "20,22"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference #",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "title": "ACH Check Remittance",
+    "description": "ACH Remittance to be emailed to customer following a bulk ACH nacha submission to the bank. Format: Letter, Portrait",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "h",
+        "j"
+    ],
+    "datedefault": "c",
+    "datefield": "journal_main.post_date",
+    "contactlog": "journal_main.contact_id_b",
+    "defaultemail": "user",
+    "formbreakfield": "journal_main.id",
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "frm",
+    "group_id": "bnk:j20",
+    "mime_type": "frm",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2022-12-12",
+    "last_update": "2024-04-16"
+}

@@ -1,0 +1,164 @@
+{
+    "tables": {
+        "total": 3,
+        "rows": [
+            {
+                "join_type": "JOIN",
+                "tablename": "journal_cogs_usage"
+            },
+            {
+                "join_type": "JOIN",
+                "tablename": "journal_main",
+                "relationship": "journal_cogs_usage.journal_main_id = journal_main.id"
+            },
+            {
+                "join_type": "JOIN",
+                "tablename": "inventory_history",
+                "relationship": "journal_cogs_usage.inventory_history_id = inventory_history.id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_cogs_usage.qty",
+                "title": "Quantity",
+                "width": "30",
+                "visible": "1",
+                "align": "R"
+            },
+            {
+                "fieldname": "journal_cogs_usage.journal_main_id",
+                "title": "Journal Main ID",
+                "width": "30",
+                "visible": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Date",
+                "width": "30",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "width": "30",
+                "visible": "1",
+                "formatting": "j_desc",
+                "align": "C"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "width": "30",
+                "visible": "1"
+            },
+            {
+                "fieldname": "inventory_history.sku",
+                "title": "SKU",
+                "width": "30",
+                "visible": "1"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal_id",
+                "formatting": "j_desc"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "inventory_history.sku",
+                "title": "SKU",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "title": "Journal History by SKU",
+    "description": "Lists the historical transactions in the journal_cogs_usage table filtered by SKU",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "j",
+        "m"
+    ],
+    "datedefault": "b",
+    "datefield": "journal_main.post_date",
+    "headingshow": null,
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": null,
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": null,
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2021-03-23",
+    "last_update": "2022-12-12"
+}

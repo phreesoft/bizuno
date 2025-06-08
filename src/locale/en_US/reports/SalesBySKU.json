@@ -1,0 +1,345 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 20,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "formatting": "date"
+            },
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal",
+                "visible": "1",
+                "width": "40",
+                "break": "1",
+                "align": "L",
+                "formatting": "j_desc"
+            },
+            {
+                "fieldname": "journal_item.gl_account",
+                "title": "GL Account",
+                "width": "20",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Inv Number",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.purch_order_id",
+                "title": "Customer PO Number",
+                "width": "50",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.method_code",
+                "title": "Ship Method",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.freight",
+                "title": "Freight Charge",
+                "width": "25",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.rep_id",
+                "title": "Sales Rep",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Sold To",
+                "visible": "1",
+                "width": "35",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_item.qty",
+                "title": "Qty",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1"
+            },
+            {
+                "fieldname": "journal_item.credit_amount - journal_item.debit_amount",
+                "title": "SKU Total",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.total_amount",
+                "title": "Invoice Total",
+                "width": "30",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.address1_b",
+                "title": "Address 1",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.address2_b",
+                "title": "Address 2",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.city_b",
+                "title": "City",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.state_b",
+                "title": "State",
+                "width": "25",
+                "align": "L",
+                "visible": "1"
+            },
+            {
+                "fieldname": "journal_main.postal_code_b",
+                "title": "Zip Code",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.country_b",
+                "title": "Country",
+                "width": "25",
+                "align": "L"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_main.rep_id",
+                "title": "Sales Rep ID"
+            },
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date"
+            },
+            {
+                "fieldname": "journal_main.period",
+                "title": "Period"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Account"
+            },
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Invoice Number"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Primary Name"
+            },
+            {
+                "fieldname": "journal_item.qty",
+                "title": "Qty"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 7,
+        "rows": [
+            {
+                "fieldname": "journal_main.store_id",
+                "title": "Store ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.total_amount",
+                "title": "SO Total",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.purch_order_id",
+                "title": "SO Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "title": "Sales Rep",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "type": "9",
+                "min": "12,13"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "type": "6",
+                "min": "itm"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "Sales By SKU",
+    "description": "Lists sales for a given period at the SKU level. Format: Letter, Portrait",
+    "totals": {
+        "font": "default",
+        "size": "10",
+        "color": "0:0:0",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "l",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "c",
+    "datefield": "journal_main.post_date",
+    "truncate": "on",
+    "totalonly": "on",
+    "headingshow": "on",
+    "headingfont": "default",
+    "headingsize": "12",
+    "headingcolor": "0:0:0",
+    "headingalign": "C",
+    "title1show": "on",
+    "title1text": "%reportname%",
+    "title1font": "default",
+    "title1size": "10",
+    "title1color": "0:0:0",
+    "title1align": "C",
+    "title2show": "on",
+    "title2text": "Report Generated %date%",
+    "title2font": "default",
+    "title2size": "10",
+    "title2color": "0:0:0",
+    "title2align": "C",
+    "filterfont": "default",
+    "filtersize": "8",
+    "filtercolor": "0:0:0",
+    "filteralign": "L",
+    "datafont": "default",
+    "datasize": "10",
+    "datacolor": "0:0:0",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "cust:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2017-04-25"
+}

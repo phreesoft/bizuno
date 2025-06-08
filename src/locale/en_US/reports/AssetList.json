@@ -1,0 +1,240 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "extFixedAssets",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 14,
+        "rows": [
+            {
+                "fieldname": "extFixedAssets.asset_num",
+                "description": "ID",
+                "visible": "1",
+                "break": "1",
+                "width": "14",
+                "align": "L",
+                "title": "ID"
+            },
+            {
+                "fieldname": "extFixedAssets.type",
+                "title": "Type",
+                "width": "35",
+                "align": "L",
+                "formatting": "faType",
+                "visible": "1"
+            },
+            {
+                "fieldname": "extFixedAssets.purch_cond",
+                "title": "Cond",
+                "visible": "1",
+                "break": "1",
+                "width": "35",
+                "align": "L",
+                "formatting": "faCond"
+            },
+            {
+                "fieldname": "extFixedAssets.store_id",
+                "title": "Location",
+                "width": "30",
+                "formatting": "storeID",
+                "align": "C",
+                "visible": "1"
+            },
+            {
+                "fieldname": "extFixedAssets.dep_sched",
+                "title": "Dep Schedule",
+                "break": "1",
+                "width": "30",
+                "visible": "1"
+            },
+            {
+                "fieldname": "extFixedAssets.date_acq",
+                "title": "Acq Date",
+                "visible": "1",
+                "width": "25",
+                "align": "C",
+                "formatting": "date"
+            },
+            {
+                "fieldname": "extFixedAssets.date_retire",
+                "title": "Ret Date",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "formatting": "date",
+                "align": "C"
+            },
+            {
+                "fieldname": "extFixedAssets.serial_number",
+                "title": "Model #",
+                "break": "1",
+                "width": "25",
+                "align": "L"
+            },
+            {
+                "fieldname": "extFixedAssets.description",
+                "title": "Description",
+                "visible": "1",
+                "break": "1",
+                "width": "90",
+                "align": "L"
+            },
+            {
+                "fieldname": "extFixedAssets.cost",
+                "title": "Cost",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "extFixedAssets.dep_value",
+                "title": "Current Value",
+                "break": "1",
+                "width": "25",
+                "formatting": "curNull0",
+                "total": "1",
+                "align": "R",
+                "visible": "1"
+            },
+            {
+                "fieldname": "extFixedAssets.date_retire",
+                "title": "Retire Date",
+                "break": "1",
+                "width": "25",
+                "align": "C",
+                "formatting": "date"
+            },
+            {
+                "fieldname": "extFixedAssets.gl_asset",
+                "title": "GL Asset",
+                "break": "1",
+                "width": "25"
+            },
+            {
+                "fieldname": "extFixedAssets.gl_dep",
+                "title": "GL Depreciation",
+                "break": "1",
+                "width": "25"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "extFixedAssets.type",
+                "title": "Asset Type",
+                "default": "1",
+                "formatting": "faType"
+            },
+            {
+                "fieldname": "extFixedAssets.store_id",
+                "title": "Store ID"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "extFixedAssets.asset_num",
+                "title": "Asset ID",
+                "default": "1"
+            },
+            {
+                "fieldname": "extFixedAssets.date_acq",
+                "title": "Acquisition Date"
+            },
+            {
+                "fieldname": "extFixedAssets.date_retire",
+                "title": "Retire Date"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "extFixedAssets.status",
+                "title": "Inactive",
+                "type": "3",
+                "visible": "1"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "extFixedAssets.store_id",
+                "title": "Store ID",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "Asset List",
+    "description": "Lists Fixed Assets",
+    "totals": {
+        "font": "default",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "default",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "default",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "default",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "default",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "default",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "misc:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2024-03-04"
+}

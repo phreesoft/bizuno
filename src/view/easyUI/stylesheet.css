@@ -1,0 +1,98 @@
+/*
+ * Final CSS for Bizuno
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
+ *
+ * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
+ * @copyright  2008-2025, PhreeSoft, Inc.
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-03-23
+ * @filesource /view/easyui/stylesheet.css
+ */
+
+/* a, div, body, html, table{ font:normal normal 16px Verdana; } */
+body, html               { font-family:Verdana; }
+body                     { background-color:#ffffff; margin:0; }
+h1                       { width:auto; clear:both; color:#003080; font-size:16px; font-variant:small-caps; font-weight:bold; background-color:transparent; padding:4px; }
+h2                       { width:auto; clear:both; color:#003080; font-size:14px; font-variant:small-caps; font-weight:bold; background-color:transparent; padding:2px; }
+p                        { line-height: 1.5em; margin: 0px 0px 1em; padding: 0px; }
+form                     { display:inline; margin: 0; padding: 0; }
+input, select, textarea, file, checkbox, radio { font-size:11px; font-family:Verdana; padding:0; }
+fieldset                 { margin:0; padding:10px; border: 1px solid #666; }
+legend                   { font-family:Verdana; font-size:14px; font-weight:bold; margin:0; padding: 0 4px; }
+label                    { margin:0; padding:0; font-weight:bold; display:inline-block; min-width:125px;}
+th                       { text-align:center; font-weight:bold;}
+.modal                   { display:none; position:fixed; z-index:10000; top:0; left:0; height:100%; width:100%;
+						   background: rgba( 255, 255, 255, .8 ) url('https://bizuno.com/view/images/loading.gif') 50% 50% no-repeat; }
+body.loading             { overflow: hidden; }
+body.loading .modal      { display:block; }
+.areaView                { display:block; width:100%; position:relative; }
+.block20                 { width:19%; display:inline-block; position:relative; vertical-align:top; min-width:200px; min-height:50px; margin:3px; }
+.block25                 { width:24%; display:inline-block; position:relative; vertical-align:top; min-width:250px; min-height:50px; margin:3px; }
+.block25R                { width:24%; display:inline-block; position:relative; vertical-align:top; min-width:250px; min-height:50px; margin:3px; text-align:right; }
+.block33                 { width:32%; display:inline-block; position:relative; vertical-align:top; min-width:333px; min-height:50px; margin:3px; }
+.block50                 { width:49%; display:inline-block; position:relative; vertical-align:top; min-width:500px; min-height:50px; margin:3px; }
+.block66                 { width:65%; display:inline-block; position:relative; vertical-align:top; min-width:666px; min-height:50px; margin:3px; }
+.block75                 { width:74%; display:inline-block; position:relative; vertical-align:top; min-width:750px; min-height:50px; margin:3px; }
+.block99                 { width:99%; display:inline-block; position:relative; vertical-align:top; min-width:999px; min-height:50px; margin:3px; }
+.menuHide                { display:none; }
+.fldLabel                { }
+
+.journal-waiting         { background-color:#FFFF00; }
+.row-inactive            { background-color:#6293BB; }
+.row-default             { background-color:#90EE90; }
+
+.row-DarkOrange          { background-color:#FF8C00; }
+.row-DarkRed             { background-color:#8B0000; color:#FFFFFF; }
+.row-BlueViolet          { background-color:#8A2BE2; color:#FFFFFF; }
+.row-LightGreen          { background-color:#90EE90; }
+.row-OrangeRed           { background-color:#FF4500; }
+.row-Pink                { background-color:#FFC0CB; }
+.row-Yellow              { background-color:#FFFF00; }
+.ui-tab-image            { display:inline-block; line-height:12px; padding-top:5px; }
+.ui-tab-image img        { border:0; }
+#list .list-image        { width:32px; height:32px; border:0; margin-right:5px; float:left;}
+#list .list-header       { font-size:16px; font-weight:bold;}
+#list .list-content      { text-overflow:ellipsis; overflow:hidden;}
+.dashHover:hover .dashAction { display:block; }
+/* drag-drop for journal totals */
+.jrnlLeft                { width:250px; float:left; }
+.jrnlLeft table          { background:#E0ECFF; }
+.jrnlLeft td             { background:#EEE; }
+.jrnlRight               { float:right; width:440px; }
+.jrnlRight table         { background:#CCCCCC; width:100%; }
+.jrnlRight td            { background:#FAFAFA; color:#444; text-align:center; padding:2px; }
+.jrnlRight td            { background:#E0ECFF; }
+.jrnlRight td.drop       { background:#FAFAFA; width:230px; }
+.jrnlRight td.over       { background:#FBEC88; }
+.jrnlItem                { text-align:center; border:1px solid #499B33; background:#FAFAFA; color:#444; width:230px; }
+.jrnlAssgn               { border:1px solid #BC2A4D; }
+.jrnlTrash               { background-color:red; }
+
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}

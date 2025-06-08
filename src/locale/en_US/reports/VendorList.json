@@ -1,0 +1,296 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "contacts",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "address_book",
+                "relationship": "contacts.id = address_book.ref_id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 15,
+        "rows": [
+            {
+                "fieldname": "contacts.short_name",
+                "title": "Vendor ID",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.inactive",
+                "title": "Inactive",
+                "visible": "1",
+                "break": "1",
+                "width": "10",
+                "align": "C",
+                "formatting": "yesBno"
+            },
+            {
+                "fieldname": "address_book.primary_name",
+                "title": "Primary Name",
+                "visible": "1",
+                "break": "1",
+                "width": "50",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.contact_first",
+                "title": "Contact - First",
+                "visible": "0",
+                "break": "0",
+                "width": "25",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.flex_field_1",
+                "title": "Contact - Middle",
+                "align": "L"
+            },
+            {
+                "fieldname": "contacts.contact_last",
+                "title": "Contact - Last",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.address1",
+                "title": "Address 1",
+                "visible": "1",
+                "width": "40",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.address2",
+                "title": "Address 2",
+                "visible": "1",
+                "break": "1",
+                "width": "40",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.city",
+                "title": "City",
+                "visible": "1",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.state",
+                "title": "State",
+                "visible": "1",
+                "break": "1",
+                "width": "20",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.postal_code",
+                "title": "ZipCode",
+                "visible": "1",
+                "break": "0",
+                "width": "20",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.country",
+                "title": "Country",
+                "visible": "1",
+                "break": "1",
+                "width": "20",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.gov_id_number",
+                "title": "Tax ID Number",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.account_number",
+                "title": "Account Number",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.email",
+                "title": "Email Address",
+                "break": "1",
+                "width": "45",
+                "visible": "1"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "address_book.state",
+                "title": "State",
+                "default": "0",
+                "page_break": "0",
+                "processing": "0"
+            },
+            {
+                "fieldname": "address_book.country",
+                "title": "Country",
+                "default": "0",
+                "page_break": "0",
+                "processing": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "contacts.short_name",
+                "title": "Vendor ID",
+                "default": "1"
+            },
+            {
+                "fieldname": "contacts.inactive",
+                "title": "Inactive",
+                "default": "0"
+            },
+            {
+                "fieldname": "address_book.primary_name",
+                "title": "Primary Name",
+                "default": "0"
+            },
+            {
+                "fieldname": "address_book.postal_code",
+                "title": "ZipCode",
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 7,
+        "rows": [
+            {
+                "fieldname": "contacts.short_name",
+                "description": "Vendor ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "contacts.inactive",
+                "title": "Inactive",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "address_book.primary_name",
+                "title": "Primary Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "address_book.postal_code",
+                "title": "ZipCode",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "address_book.country",
+                "title": "Country",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "address_book.type",
+                "title": "Account Type",
+                "min": "m",
+                "type": "6"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "contacts.type",
+                "title": "Contact Type",
+                "type": "6",
+                "min": "v"
+            }
+        ]
+    },
+    "title": "Vendor List",
+    "description": "List vendor account information. Format: Letter, Portrait",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "vend:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2022-12-20"
+}

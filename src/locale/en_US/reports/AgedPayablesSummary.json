@@ -1,0 +1,208 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "journal_main",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 9,
+        "rows": [
+            {
+                "fieldname": "DISTINCT(journal_main.contact_id_b)",
+                "title": "Vendor",
+                "visible": "1",
+                "break": "1",
+                "width": "60",
+                "align": "L",
+                "processing": "contactName"
+            },
+            {
+                "fieldname": "journal_main.telephone1_b",
+                "title": "Telephone",
+                "visible": "1",
+                "width": "50",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.contact_b",
+                "title": "Contact",
+                "visible": "1",
+                "break": "1",
+                "width": "50",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Vendor ID",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "processing": "contactID"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Current",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "processing": "age_00",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "31-60",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "processing": "age_30",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "61-90",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "processing": "age_60",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Over 90",
+                "visible": "1",
+                "break": "1",
+                "width": "25",
+                "processing": "age_90",
+                "align": "R",
+                "total": "1",
+                "formatting": "curNull0"
+            },
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Total",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "processing": "endBal",
+                "formatting": "currency",
+                "total": "1"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_main.contact_id_b",
+                "title": "Vendor ID"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Primary Name",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "description": "Primary Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Closed",
+                "visible": "0",
+                "min": "0",
+                "type": "6"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "min": "6,7",
+                "type": "9"
+            }
+        ]
+    },
+    "title": "Aged Payables Summary",
+    "description": "Lists Aged Payables in summary format. Format: Landscape, Size: Letter",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b"
+    ],
+    "datedefault": "a",
+    "datefield": "journal_main.post_date",
+    "truncate": "1",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "vend:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2019-06-19"
+}

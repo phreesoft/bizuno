@@ -1,0 +1,274 @@
+{
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "xChild": null,
+    "type": "rpt",
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "inventory",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 13,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "title": "SKU Number",
+                "visible": "1",
+                "width": "29",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "inventory.description_short",
+                "title": "Description Short",
+                "visible": "1",
+                "width": "48",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "inventory.gl_inv",
+                "title": "Inv. Acct",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "inventory.item_cost",
+                "title": "Item Cost",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "inventory.full_price",
+                "title": "Full Price",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "inventory.qty_min",
+                "title": "Min Stock",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.qty_stock",
+                "title": "In Stock",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.qty_po",
+                "title": "On Order",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.qty_so",
+                "title": "On SO",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.id",
+                "title": "On WO",
+                "break": "1",
+                "width": "14",
+                "visible": "1",
+                "processing": "sbOnOrder",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.qty_alloc",
+                "title": "On Alloc",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.qty_restock",
+                "title": "Reorder",
+                "visible": "1",
+                "width": "14",
+                "break": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory.vendor_id",
+                "title": "Vendor",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "processing": "contactID",
+                "align": "L"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "inventory.vendor_id",
+                "title": "Vendor Name",
+                "default": "1",
+                "processing": "contactID"
+            },
+            {
+                "fieldname": "inventory.gl_inv",
+                "title": "GL Inventory Acct"
+            },
+            {
+                "fieldname": "inventory.inventory_type",
+                "title": "Inventory Type"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "title": "SKU",
+                "default": "1"
+            },
+            {
+                "fieldname": "inventory.qty_stock",
+                "title": "In Stock"
+            },
+            {
+                "fieldname": "inventory.qty_po",
+                "title": "On Order"
+            },
+            {
+                "fieldname": "inventory.qty_so",
+                "title": "On SO"
+            },
+            {
+                "fieldname": "inventory.description_short",
+                "title": "Description"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 7,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "title": "SKU",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory.inactive",
+                "title": "Inactive",
+                "visible": "1",
+                "type": "2"
+            },
+            {
+                "fieldname": "inventory.inventory_type",
+                "title": "Inventory Type",
+                "type": "9",
+                "min": "sa,si,sr,ms,ma"
+            },
+            {
+                "fieldname": "inventory.gl_inv",
+                "title": "GL Inventroy Acct",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory.vendor_id",
+                "title": "Vendor ID",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory.qty_stock",
+                "title": "In Stock",
+                "type": "10",
+                "min": "(inventory.qty_min + inventory.qty_so + inventory.qty_alloc - inventory.qty_po)"
+            },
+            {
+                "fieldname": "inventory.inactive",
+                "title": "Inactive",
+                "type": "6",
+                "min": "0"
+            }
+        ]
+    },
+    "title": "Inventory Re-order Worksheet",
+    "description": "Lists inventory items needed for re-order. Format: Letter, Portrait",
+    "emailmessage": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 8,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a"
+    ],
+    "datefield": null,
+    "datedefault": "a",
+    "defaultemail": "user",
+    "filenamefield": "",
+    "filenameprefix": "",
+    "special_class": null,
+    "truncate": 1,
+    "totalonly": "0",
+    "headingshow": 1,
+    "headingfont": "helvetica",
+    "headingsize": 12,
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": 1,
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": 10,
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": 1,
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": 10,
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": 8,
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": 8,
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": "helvetica",
+    "totalsize": 10,
+    "totalcolor": "#000000",
+    "totalalign": "L"
+}

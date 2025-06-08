@@ -1,0 +1,796 @@
+{
+    "group_id": "cust:rtn",
+    "mime_type": "frm",
+    "xChild": null,
+    "type": "frm",
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "join_type": "JOIN",
+                "tablename": "journal_main",
+                "_selected": true,
+                "relationship": "",
+                "isNewRecord": false
+            },
+            {
+                "isNewRecord": false,
+                "join_type": "JOIN",
+                "tablename": "journal_meta",
+                "relationship": "journal_main.id=journal_meta.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 34,
+        "rows": [
+            {
+                "title": "Text - Title",
+                "abscissa": "78",
+                "ordinate": "8",
+                "width": "60",
+                "height": "12",
+                "type": "Text",
+                "settings": {
+                    "text": "Return Traveler",
+                    "display": "0",
+                    "font": "default",
+                    "size": "18",
+                    "align": "C",
+                    "color": "#0b5394",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Name\/Business",
+                "abscissa": "50",
+                "ordinate": "20",
+                "width": "70",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.caller_name",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "_selected": true,
+                "isNewRecord": false
+            },
+            {
+                "title": "Data - Caller",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.contact_name",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "abscissa": "50",
+                "ordinate": "25",
+                "width": "70",
+                "height": "5"
+            },
+            {
+                "title": "Data - Email",
+                "abscissa": "50",
+                "ordinate": "30",
+                "width": "140",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.email",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Telephone #",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.telephone",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "abscissa": "50",
+                "ordinate": "35",
+                "width": "70",
+                "height": "5"
+            },
+            {
+                "title": "Data - Invoice #",
+                "abscissa": "50",
+                "ordinate": "40",
+                "width": "70",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.invoice_num",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - PO #",
+                "abscissa": "50",
+                "ordinate": "45",
+                "width": "70",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.purch_order_id",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Create Date",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.creation_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "abscissa": "170",
+                "ordinate": "20",
+                "width": "50",
+                "height": "5"
+            },
+            {
+                "title": "Data - Receive Date",
+                "abscissa": "170",
+                "ordinate": "25",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.receive_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Invoice Date",
+                "abscissa": "170",
+                "ordinate": "35",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.invoice_date",
+                    "formatting": "date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Freight Carrier",
+                "abscissa": "170",
+                "ordinate": "40",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.receive_carrier",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Tracking #",
+                "abscissa": "170",
+                "ordinate": "45",
+                "width": "50",
+                "height": "5",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.receive_tracking",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Data - Customer Notes",
+                "abscissa": "8",
+                "ordinate": "60",
+                "width": "200",
+                "height": "40",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Table - Items Returned",
+                "abscissa": "8",
+                "ordinate": "105",
+                "width": "200",
+                "height": "40",
+                "type": "Tbl",
+                "settings": {
+                    "hfont": "default",
+                    "hsize": "10",
+                    "halign": "L",
+                    "hcolor": "#000000",
+                    "hbshow": "1",
+                    "hbsize": "1",
+                    "hbcolor": "#000000",
+                    "hfcolor": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000",
+                    "fieldname": "journal_main.close_details",
+                    "processing": "json",
+                    "boxfield": {
+                        "total": 4,
+                        "rows": [
+                            {
+                                "fieldname": "qty",
+                                "title": "Qty",
+                                "font": "default",
+                                "size": "10",
+                                "align": "C",
+                                "color": "#000000",
+                                "width": "25"
+                            },
+                            {
+                                "fieldname": "sku",
+                                "title": "SKU",
+                                "font": "default",
+                                "size": "10",
+                                "align": "C",
+                                "color": "#000000",
+                                "width": "25"
+                            },
+                            {
+                                "fieldname": "desc",
+                                "title": "Description",
+                                "font": "default",
+                                "size": "10",
+                                "align": "L",
+                                "color": "#000000",
+                                "width": "50"
+                            },
+                            {
+                                "fieldname": "notes",
+                                "title": "Notes",
+                                "font": "default",
+                                "size": "10",
+                                "align": "L",
+                                "color": "#000000",
+                                "width": "100"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "title": "Data - Rec\/Insp Notes",
+                "abscissa": "8",
+                "ordinate": "160",
+                "width": "200",
+                "height": "40",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_main.receive_notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#38761d",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Rect - Disposition Notes",
+                "abscissa": "8",
+                "ordinate": "205",
+                "width": "200",
+                "height": "50",
+                "type": "Rect",
+                "settings": {
+                    "bshow": "1",
+                    "bsize": "1",
+                    "bcolor": "#0b5394",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Name\/Business",
+                "abscissa": "8",
+                "ordinate": "20",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Name\/business",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Caller Name",
+                "abscissa": "8",
+                "ordinate": "25",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Caller Name",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Email",
+                "abscissa": "8",
+                "ordinate": "30",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Email",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Telephone",
+                "abscissa": "8",
+                "ordinate": "35",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Telephone",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Invoice #",
+                "abscissa": "8",
+                "ordinate": "40",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Invoice #",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - PO #",
+                "abscissa": "8",
+                "ordinate": "45",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Purchase Order #",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Request Date",
+                "abscissa": "130",
+                "ordinate": "20",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Request Date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Receive Date",
+                "abscissa": "130",
+                "ordinate": "25",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Receive Date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Invoice Date",
+                "abscissa": "130",
+                "ordinate": "35",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Invoice Date",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Carrier",
+                "abscissa": "130",
+                "ordinate": "40",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Freight Carrier",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Tracking #",
+                "abscissa": "130",
+                "ordinate": "45",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Tracking #",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Closed By",
+                "abscissa": "8",
+                "ordinate": "265",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Closed By:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Closed Date",
+                "abscissa": "108",
+                "ordinate": "265",
+                "width": "40",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Closed Date:",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Line - Closed By",
+                "abscissa": "50",
+                "ordinate": "270",
+                "width": "50",
+                "height": "5",
+                "type": "Line",
+                "settings": {
+                    "linetype": "H",
+                    "length": "50",
+                    "bsize": "1",
+                    "bcolor": "#000000"
+                }
+            },
+            {
+                "title": "Line - Closed Date",
+                "abscissa": "150",
+                "ordinate": "270",
+                "width": "50",
+                "height": "5",
+                "type": "Line",
+                "settings": {
+                    "linetype": "H",
+                    "length": "50",
+                    "bsize": "1",
+                    "bcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Customer Notes",
+                "abscissa": "8",
+                "ordinate": "55",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Customer Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Receive Notes",
+                "abscissa": "8",
+                "ordinate": "155",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Product Receive Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
+                "title": "Text - Disposition Notes",
+                "abscissa": "8",
+                "ordinate": "200",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Disposition Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 0,
+        "rows": []
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_main.creation_date",
+                "title": "Date Created",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_main.caller_name",
+                "title": "Caller Name"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_main.creation_date",
+                "title": "Creation Date",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.caller_name",
+                "title": "Caller Name",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.return_num",
+                "title": "Return Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.closed_date",
+                "title": "Closed Date",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "title": "Product Return Traveler",
+    "description": "Creates a traveler form to go with product returns to make notes during the  processing. Format: Portrait",
+    "emailmessage": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": 8,
+    "marginbottom": 8,
+    "marginleft": 8,
+    "marginright": 8,
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "restrict_rep": "0",
+    "dateperiod": "d",
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f",
+        "h",
+        "j"
+    ],
+    "datefield": "journal_main.creation_date",
+    "datedefault": "c",
+    "filenamefield": "",
+    "filenameprefix": "",
+    "special_class": null,
+    "formbreakfield": "journal_main.id",
+    "skipnullfield": null,
+    "contactlog": null,
+    "printedfield": null,
+    "breakfield": null,
+    "serialform": "0"
+}

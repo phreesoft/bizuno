@@ -1,0 +1,171 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "inventory"
+            },
+            {
+                "tablename": "inventory_assy_list",
+                "relationship": "inventory.id = inventory_assy_list.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "title": "Assembly SKU",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "inventory.description_short",
+                "title": "Assembly Description",
+                "visible": "1",
+                "break": "1",
+                "width": "50",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "inventory_assy_list.sku",
+                "title": "Assembly Item",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "inventory_assy_list.description",
+                "title": "Assy Item Description",
+                "visible": "1",
+                "break": "1",
+                "width": "65",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "inventory_assy_list.qty",
+                "title": "Qty Req",
+                "visible": "1",
+                "break": "1",
+                "align": "R",
+                "total": "0"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "inventory.vendor_id",
+                "title": "Preferred Vendor",
+                "processing": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "title": "Inventory SKU",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "inventory.sku",
+                "description": "Inventory SKU",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory.vendor_id",
+                "title": "Preferred Vendor",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory_assy_list.sku",
+                "title": "Containing SKU",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "inventory.inventory_type",
+                "title": "Inventory Type",
+                "min": "ma",
+                "type": "6"
+            }
+        ]
+    },
+    "title": "Assembly Item List",
+    "description": "Lists skis of type assembly and the parts to build",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "0:0:0",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "on",
+    "headingshow": "on",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "0:0:0",
+    "headingalign": "C",
+    "title1show": "on",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "0:0:0",
+    "title1align": "C",
+    "title2show": "on",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "0:0:0",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "0:0:0",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "0:0:0",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2016-06-22"
+}

@@ -1,0 +1,116 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id=journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "journal_main.id",
+                "title": "Description",
+                "visible": "1",
+                "width": "75",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.id",
+                "title": "Value",
+                "visible": "1",
+                "width": "35",
+                "break": "1",
+                "align": "R",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.id",
+                "title": "Sub-total",
+                "visible": "1",
+                "width": "35",
+                "break": "1",
+                "align": "R",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_main.id",
+                "title": "Total",
+                "visible": "1",
+                "width": "35",
+                "break": "1",
+                "align": "R",
+                "formatting": "currency"
+            }
+        ]
+    },
+    "title": "Balance Sheet",
+    "description": "General Ledger Balance Sheet. Format: Letter, Portrait. Requires special report: balance_sheet.",
+    "totals": {
+        "font": "default",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datedefault": "a",
+    "special_class": "balance_sheet",
+    "truncate": "1",
+    "datelist": [
+        "z"
+    ],
+    "headingshow": "1",
+    "headingfont": "default",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "default",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "default",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "default",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "default",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2018-10-20",
+    "last_update": "2022-12-12"
+}

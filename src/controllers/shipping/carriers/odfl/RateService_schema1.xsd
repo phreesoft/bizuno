@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://myRate.ws.odfl.com/" version="1.0" xmlns:tns="http://myRate.ws.odfl.com/">
+
+  <xs:element name="getHomeMoveRateEstimate" type="tns:getHomeMoveRateEstimate"/>
+
+  <xs:element name="getHomeMoveRateEstimateResponse" type="tns:getHomeMoveRateEstimateResponse"/>
+
+  <xs:element name="getLTLRateEstimate" type="tns:getLTLRateEstimate"/>
+
+  <xs:element name="getLTLRateEstimateResponse" type="tns:getLTLRateEstimateResponse"/>
+
+  <xs:complexType name="getHomeMoveRateEstimate">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:myRateRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="myRateRequest">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="accessorials" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="codAmount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="contactPhoneNumber" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="cubicUnits" type="xs:string"/>
+      <xs:element minOccurs="0" name="currencyFormat" type="xs:string"/>
+      <xs:element minOccurs="0" name="deliveryDateTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="destinationCountry" type="xs:string"/>
+      <xs:element minOccurs="1" name="destinationPostalCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="discount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="dropDateTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="email" type="xs:string"/>
+      <xs:element minOccurs="0" name="equipmentType" type="xs:string"/>
+      <xs:element minOccurs="0" name="firstName" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="1" name="freightItems" nillable="true" type="tns:freight"/>
+      <xs:element minOccurs="0" name="insuranceAmount" type="xs:int"/>
+      <xs:element minOccurs="0" name="lastName" type="xs:string"/>
+      <xs:element minOccurs="0" name="linearFeet" type="xs:int"/>
+      <xs:element minOccurs="0" name="loosePieces" type="xs:int"/>
+      <xs:element minOccurs="0" name="mexicoServiceCenter" type="xs:string"/>
+      <xs:element minOccurs="0" name="movement" type="xs:string"/>
+      <xs:element minOccurs="0" name="numberPallets" type="xs:int"/>
+      <xs:element minOccurs="0" name="numberStackablePallets" type="xs:int"/>
+      <xs:element minOccurs="1" name="odfl4MePassword" type="xs:string"/>
+      <xs:element minOccurs="1" name="odfl4MeUser" type="xs:string"/>
+      <xs:element minOccurs="1" name="odflCustomerAccount" type="xs:long"/>
+      <xs:element minOccurs="0" name="originCountry" type="xs:string"/>
+      <xs:element minOccurs="1" name="originPostalCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="pickupDateTime" type="xs:dateTime"/>
+      <xs:element minOccurs="1" name="requestReferenceNumber" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="sendEmailOffers" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="shipType" type="xs:string"/>
+      <xs:element minOccurs="0" name="tariff" type="xs:int"/>
+      <xs:element minOccurs="0" name="totalCubicVolume" type="xs:int"/>
+      <xs:element minOccurs="0" name="weightUnits" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="freight">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="actualClass" type="xs:string"/>
+      <xs:element minOccurs="0" name="dimensionUnits" type="xs:string"/>
+      <xs:element minOccurs="0" name="height" type="xs:int"/>
+      <xs:element minOccurs="0" name="length" type="xs:int"/>
+      <xs:element minOccurs="0" name="nmfc" type="xs:string"/>
+      <xs:element minOccurs="0" name="nmfcSub" type="xs:string"/>
+      <xs:element minOccurs="0" name="numberOfUnits" type="xs:int"/>
+      <xs:element minOccurs="0" name="ratedClass" type="xs:int"/>
+      <xs:element minOccurs="1" name="weight" type="xs:int"/>
+      <xs:element minOccurs="0" name="width" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getHomeMoveRateEstimateResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:myHomeMoveRateResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="myHomeMoveRateResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:myRateResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rateEstimate" type="tns:homeMoveEstimateDetail"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="myRateResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="destinationCities" nillable="true" type="tns:city"/>
+      <xs:element minOccurs="0" name="destinationInterlineCarrierName" type="xs:string"/>
+      <xs:element minOccurs="0" name="destinationInterlineScac" type="xs:string"/>
+      <xs:element minOccurs="0" name="destinationServiceCenter" type="tns:serviceCenter"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="errorMessages" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="originatingInterlineCarrierName" type="xs:string"/>
+      <xs:element minOccurs="0" name="originatingInterlineScac" type="xs:string"/>
+      <xs:element minOccurs="0" name="originatingServiceCenter" type="tns:serviceCenter"/>
+      <xs:element minOccurs="0" name="referenceNumber" type="xs:string"/>
+      <xs:element name="success" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="homeMoveEstimateDetail">
+    <xs:complexContent>
+      <xs:extension base="tns:estimateDetail">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="linearFeetCharge" type="xs:decimal"/>
+          <xs:element minOccurs="0" name="milesFromDestination" type="xs:decimal"/>
+          <xs:element minOccurs="0" name="milesFromOrigin" type="xs:decimal"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="estimateDetail">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="accessorialCharges" nillable="true" type="tns:accessorialCharge"/>
+      <xs:element minOccurs="0" name="discountAmount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="discountPercentage" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="discountedFreightCharge" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="fuelSurcharge" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="grossFreightCharge" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="guaranteedServiceOption" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="internationalCharge" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="netFreightCharge" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="totalAccessorialCharge" type="xs:decimal"/>
+      <xs:element name="variableAccessorialRate" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessorialCharge">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="amount" type="xs:decimal"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="city">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element name="serviceDays" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceCenter">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="address" type="xs:string"/>
+      <xs:element minOccurs="0" name="alphaCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="cityStateZip" type="xs:string"/>
+      <xs:element minOccurs="0" name="country" type="xs:string"/>
+      <xs:element minOccurs="0" name="emailAddress" type="xs:string"/>
+      <xs:element minOccurs="0" name="fax" type="xs:string"/>
+      <xs:element minOccurs="0" name="manager" type="xs:string"/>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="phone" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getLTLRateEstimate">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:myRateRequest"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getLTLRateEstimateResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:myLTLRateResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="myLTLRateResponse">
+    <xs:complexContent>
+      <xs:extension base="tns:myRateResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="rateEstimate" type="tns:estimateDetail"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

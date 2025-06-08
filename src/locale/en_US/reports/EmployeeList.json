@@ -1,0 +1,253 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "contacts",
+                "join_type": "JOIN"
+            },
+            {
+                "tablename": "address_book",
+                "relationship": "contacts.id = address_book.ref_id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 15,
+        "rows": [
+            {
+                "fieldname": "contacts.contact_last",
+                "title": "Last Name",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.contact_first",
+                "title": "First Name",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.contact_middle",
+                "title": "Middle Name",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.short_name",
+                "title": "Employee ID",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "contacts.store_id",
+                "title": "Store ID",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.telephone1",
+                "title": "Telephone 1",
+                "visible": "1",
+                "width": "30",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.telephone2",
+                "title": "Telephone 2",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.email",
+                "title": "Email",
+                "visible": "1",
+                "width": "70",
+                "align": "L"
+            },
+            {
+                "fieldname": "contacts.gov_id_number",
+                "title": "SSN",
+                "visible": "1",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.address1",
+                "title": "Address 1",
+                "visible": "1",
+                "width": "50",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.address2",
+                "title": "Address 2",
+                "visible": "1",
+                "break": "1",
+                "width": "50",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.city",
+                "title": "City",
+                "visible": "1",
+                "width": "30",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.state",
+                "title": "State",
+                "visible": "1",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "address_book.postal_code",
+                "title": "Zip Code",
+                "visible": "1",
+                "break": "1",
+                "width": "20",
+                "align": "L"
+            },
+            {
+                "fieldname": "address_book.country",
+                "title": "Country",
+                "visible": "0",
+                "break": "0",
+                "align": "L",
+                "total": "0"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "contacts.store_id",
+                "title": "Store ID",
+                "default": "0",
+                "page_break": "0",
+                "processing": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "contacts.contact_first",
+                "title": "First Name",
+                "default": "0"
+            },
+            {
+                "fieldname": "contacts.contact_last",
+                "title": "Last Name",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 4,
+        "rows": [
+            {
+                "fieldname": "address_book.city",
+                "title": "City",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "address_book.type",
+                "title": "Address Type",
+                "min": "m",
+                "type": "6"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "contacts.type",
+                "title": "Contact Type",
+                "type": "6",
+                "min": "e"
+            },
+            {
+                "isNewRecord": "1",
+                "fieldname": "contacts.inactive",
+                "title": "Inactive",
+                "visible": "1",
+                "type": "3"
+            }
+        ]
+    },
+    "title": "Employee List",
+    "description": "Lists Employees address information. format: Letter, Landscape",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "0:0:0",
+        "align": "L"
+    },
+    "datelist": [
+        "a"
+    ],
+    "datedefault": "a",
+    "truncate": "on",
+    "headingshow": "on",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "0:0:0",
+    "headingalign": "C",
+    "title1show": "on",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "0:0:0",
+    "title1align": "C",
+    "title2show": "on",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "0:0:0",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "0:0:0",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "0:0:0",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "hr:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2016-06-22"
+}

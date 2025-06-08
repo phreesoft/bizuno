@@ -1,0 +1,202 @@
+{
+    "tables": {
+        "total": 2,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id = journal_item.ref_id"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "width": "22",
+                "break": "1",
+                "align": "L",
+                "formatting": "date"
+            },
+            {
+                "fieldname": "journal_item.qty",
+                "title": "Qty",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1"
+            },
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "visible": "1",
+                "width": "30",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_item.debit_amount - journal_item.credit_amount",
+                "title": "Amount",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "journal_item.description",
+                "title": "SKU Desc",
+                "break": "1",
+                "width": "40",
+                "visible": "1"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "default": "1"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Invoice Date",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_item.sku"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Reference",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_item.sku",
+                "title": "SKU",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "type": "6",
+                "min": "asy"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "type": "9",
+                "min": "14"
+            }
+        ]
+    },
+    "title": "Inventory Assembly Activity",
+    "description": "Shows the inventory assembly journal records. Report size: Letter, Landscape.",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "l",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "f",
+    "datefield": "journal_main.post_date",
+    "filenameprefix": "assy-",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2019-10-07",
+    "last_update": "2019-10-07"
+}

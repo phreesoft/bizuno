@@ -1,0 +1,111 @@
+<?php
+/*
+ * @name Bizuno ERP - Inventory Receiving/Inspection Extension
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
+ *
+ * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
+ * @copyright  2008-2025, PhreeSoft, Inc.
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-04-24
+ * @filesource /controllers/shipping/invReceiving.php
+ */
+
+namespace bizuno;
+
+bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/main.php", 'phreebooksMain');
+
+class shippingInvReceiving
+{
+    public $moduleID= 'shipping';
+    public $pageID  = 'invReceiving';
+
+    function __construct()
+    {
+        $this->lang = getExtLang($this->moduleID);
+    }
+    public function receivingMain(&$layout=[])
+    {
+        if (!$security = validateAccess('j6_mgr', 2)) { return; }
+        $_GET['jID'] = 6; // Purchase Journal
+        compose('phreebooks', 'main', 'manager', $layout);
+        // now remove some columns and add some new ones to add receiving DLCs, etc.
+        unset($layout['accordion']['accJournal']['divs']['divJournalManager']);
+        unset($layout['datagrid']['manager']);
+        $layout['jsReady']['init']= "
+jqBiz('#contactSel').combogrid({width:200,panelWidth:425,delay:500,idField:'id',textField:'primary_name_b',mode:'remote',
+    url:       bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/receivingList&jID=4',
+    onSelect:  function (id, data){ jqBiz('#divJournalDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/receivingEdit&jID=6&bizAction=inv&iID='+data.id); },
+    columns:[[{field:'id', hidden:true},
+        {field:'primary_name_b',title:'".lang('primary_name')."', width:200},
+        {field:'invoice_num',   title:'".lang('invoice_num_4')."',width:100},
+        {field:'post_date',     title:'".lang('date')."',         width:100}]]
+});
+bizFocus('contactSel');";
+        $html = html5('contactSel', ['label'=>lang('search')])."\n";
+        $layout['accordion']['accJournal']['divs']['divJournalDetail'] = ['order'=>60, 'label'=>$this->lang['title_receiving'], 'type'=>'html','html'=>$html];
+    }
+    public function receivingList(&$layout=[])
+    {
+        if (!$security = validateAccess('j6_mgr', 2)) { return; }
+        $ctl  = new phreeBooksMain();
+        $_POST['search'] = getSearch();
+        $data = $ctl->dgPhreeBooks('dgPhreeBooks', $security);
+        // reset some search criteria
+        $data['source']['filters']['closed']= ['order'=>99, 'hidden'=>true, 'sql'=>BIZUNO_DB_PREFIX."journal_main.closed='0'"];
+        $data['source']['filters']['jID']['sql'] = BIZUNO_DB_PREFIX."journal_main.journal_id=4";
+        $data['source']['sort'] = ['s0'=> ['order'=>10, 'field'=>BIZUNO_DB_PREFIX."journal_main.invoice_num"]];
+        unset($data['source']['filters']['period']);
+        $layout = array_replace_recursive($layout, ['type'=>'datagrid','key'=>'dgPhreeBooks','datagrid'=>['dgPhreeBooks'=>$data]]);
+    }
+    public function receivingEdit(&$layout=[])
+    {
+        if (!$security = validateAccess('j6_mgr', 2)) { return; }
+        compose('phreebooks', 'main', 'edit', $layout);
+        // un-hide quantity in stock
+        $layout['datagrid']['item']['columns']['qty_stock'] = ['order'=>29, 'label'=>lang('qty_stock'),'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']];
+        // hide the totals div
+        $layout['divs']['divDetail']['divs']['totals']['styles']['display'] = 'none';
+        $layout['divs']['divDetail']['divs']['billAD']['styles']['display'] = 'none';
+        $layout['divs']['divDetail']['divs']['shipAD']['styles']['display'] = 'none';
+        $layout['datagrid']['item']['columns']['trans_code'] = ['order'=>70,'label'=>lang('notes'),'attr'=>['width'=>400,'editor'=>'text','resizable'=>true]];
+        $layout['datagrid']['item']['columns']['tax_rate_id']['attr']['hidden']= 'true';
+        $layout['datagrid']['item']['columns']['gl_account']['attr']['hidden'] = 'true';
+        $layout['datagrid']['item']['columns']['price']['attr']['hidden']      = 'true';
+        $layout['datagrid']['item']['columns']['total']['attr']['hidden']      = 'true';
+//      $layout['datagrid']['item']['columns']['sku']['events']['editor']      = "{type:'text'}"; // set sku editor to text instead of combo
+        $layout['datagrid']['item']['columns']['qty']['events']['editor']      = "{type:'numberbox',options:{onChange:function(){ ordersCalc('qty'); totalUpdate(); } } }";
+        // unset some other icons that are not needed
+        unset($layout['datagrid']['item']['columns']['action']['actions']['trash'], $layout['datagrid']['item']['columns']['action']['actions']['price']);
+        unset($layout['datagrid']['item']['events']['onBeforeEdit'],  $layout['toolbars']['tbPhreeBooks']['icons']['jSave']['child']);
+        unset($layout['toolbars']['tbPhreeBooks']['icons']['payment'],$layout['toolbars']['tbPhreeBooks']['icons']['recur']);
+        unset($layout['toolbars']['tbPhreeBooks']['icons']['trash']);
+        // change some behavior
+        $layout['fields']['waiting']['attr']['checked'] = true;
+        $layout['toolbars']['tbPhreeBooks']['icons']['new']['events']['onClick'] = "location.reload();";
+        $layout['forms']['frmJournal']['attr']['action']= BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/receivingSave&jID=6";
+    }
+    public function receivingSave(&$layout=[])
+    {
+        if (!$security = validateAccess('j6_mgr', 2)) { return; }
+        $ctl = new phreeBooksMain();
+        $ctl->save();
+        if (msgErrors() === 0) {
+            $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"window.location=bizunoHome+'&bizRt=$this->moduleID/$this->pageID/receivingMain';"]]);
+        }
+    }
+}

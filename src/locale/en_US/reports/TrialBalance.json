@@ -1,0 +1,134 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_history",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Account #",
+                "visible": "1",
+                "width": "20",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Title",
+                "visible": "1",
+                "width": "65",
+                "break": "1",
+                "align": "L",
+                "formatting": "glTitle"
+            },
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Account Type",
+                "visible": "1",
+                "width": "50",
+                "break": "1",
+                "align": "L",
+                "formatting": "glType"
+            },
+            {
+                "fieldname": "greatest(journal_history.debit_amount -journal_history.credit_amount + journal_history.beginning_balance, 0)",
+                "title": "Debit Amount",
+                "visible": "1",
+                "width": "30",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "rnd2d"
+            },
+            {
+                "fieldname": "greatest(journal_history.credit_amount - journal_history.debit_amount - journal_history.beginning_balance, 0)",
+                "title": "Credit Amount",
+                "visible": "1",
+                "width": "30",
+                "break": "1",
+                "align": "R",
+                "total": "1",
+                "formatting": "rnd2d"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "journal_history.gl_account",
+                "title": "Account Number",
+                "default": "1"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "Trial Balance",
+    "description": "General Ledger Trial Balance. Format: Letter, Portrait",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datedefault": "a",
+    "datefield": "journal_history.period",
+    "truncate": "1",
+    "datelist": [
+        "z"
+    ],
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2012-02-03",
+    "last_update": "2022-04-10"
+}

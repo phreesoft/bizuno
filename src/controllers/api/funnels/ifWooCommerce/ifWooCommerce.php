@@ -1,0 +1,529 @@
+<?php
+/*
+ * @name Bizuno ERP - WooCommerce Interface Extension
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
+ *
+ * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
+ * @copyright  2008-2025, PhreeSoft, Inc.
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-06-03
+ * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
+ */
+
+namespace bizuno;
+
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/export.php', 'apiExport');
+
+class ifWooCommerce extends apiExport
+{
+    public    $moduleID   = 'api';
+    public    $methodDir  = 'funnels';
+    public    $code       = 'ifWooCommerce';
+    protected $domSuffix  = 'wpWoo';
+    protected $metaPrefix = 'woocommerce';
+    private   $refreshRows= 100; // number of inventory items to pass in a single cron call
+    private   $psServer   = 'https://www.phreesoft.com';
+    private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
+    public    $lang       = ['title' => 'WooCommerce Interface',
+        'acronym' => 'WooCommerce',
+        'description' => 'The WooCommerce interface extension provides an interface to the WooCommerce shopping cart. Features include product upload/sync, order download/status updates and more.',
+        'inc_inactive_lbl' => 'Include inactive products with the upload?',
+        'bulk_upload_log' => 'WooCommerce inventory bulk upload request. %s total products to be uploaded',
+        'inventory_refresh' => 'Quick refresh of pricing and stock levels (fast)',
+        'upload_opt1' => 'Full Upload (Slowest - replace/regenerate all images)',
+        'upload_opt2' => 'Full Product Details (Skip images if present)',
+        'upload_opt3' => 'Product Data, Tags, Categories, Pricing (No Images)',
+//      'upload_opt4' => 'Product Core Info (No Categories/Images)', No longer used, didn't save much time
+        'upload_fltr' => 'Prefix to filter data sent (Saves time by only uploading SKU\'s that start with the specified prefix)',
+        'test_tax_lbl'=>'Sales Tax Rates',
+        'test_tax_desc'=>'Check with the PhreeSoft server for new sales tax rates. If new rates are available then they can be downloaded and imported into your WordPress site. Remember to update your Nexus settings (Settings -> PhreeBooks -> Nexus) as only the enabled Nexus states will be imported. Import at WooCommerce -> Settings -> Tax (Remember to delete your existing rates first!)',
+        'check_now'=>'Check Now',
+        'get_table' => 'Fetch and Download Sales Tax Table From PhreeSoft'];
+
+    function __construct()
+    {
+        parent::__construct();
+        localizeLang($this->lang, $this->methodDir, $this->code);
+        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
+        $userMeta      = getMetaMethod($this->methodDir, $this->code);
+        $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
+    }
+
+    public function settingsStructure()
+    {
+        return [
+            'rest_url'    =>['order'=>10,'label'=>lang('url'),     'attr'=>['value'=>$this->settings['rest_url']]],
+            'rest_user'   =>['order'=>20,'label'=>lang('username'),'attr'=>['value'=>$this->settings['rest_user']]],
+            'rest_pass'   =>['order'=>30,'label'=>lang('password'),'attr'=>['type'=>'password','value'=>$this->settings['rest_pass']]],
+            'inc_inactive'=>['order'=>70,'label'=>$this->lang['inc_inactive_lbl'],'attr'=>['type'=>'selNoYes','value'=>$this->settings['inc_inactive']]]];
+    }
+
+    /**
+     * Home landing page for this module
+     * @param array $layout - Structure coming in
+     * @return modified $layout
+     */
+    public function home(&$layout=[])
+    {
+        if (!$security = validateAccess($this->code, 1)) { return; }
+        $fields = [
+            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZUNO_IMAGES."api/funnels/$this->code/logo.png"]],
+            'radio1'    => ['order'=>20,'break' =>true,'label' =>$this->lang['upload_opt1'],'attr'=>['type'=>'radio','value'=>1,'id'=>'optUpload','name'=>'optUpload']],
+            'radio2'    => ['order'=>21,'break' =>true,'label' =>$this->lang['upload_opt2'],'attr'=>['type'=>'radio','value'=>2,'id'=>'optUpload','name'=>'optUpload']],
+            'radio3'    => ['order'=>22,'break' =>true,'label' =>$this->lang['upload_opt3'],'attr'=>['type'=>'radio','value'=>3,'id'=>'optUpload','name'=>'optUpload','checked'=>true]],
+            'fltr'      => ['order'=>25,'break' =>true,'label' =>$this->lang['upload_fltr'],'attr'=>['size'=>6]],
+            'btnInv'    => ['order'=>80,'events'=>['onClick'=>"bulkUpload();"],             'attr'=>['type'=>'button',  'value'=>lang('go')]],
+            'btnQkInv'  => ['order'=>10,'events'=>['onClick'=>"jqBiz('#btnQkInv').hide(); jsonAction('$this->moduleID/admin/invRefresh&modID=$this->code');"],'attr'=>['type'=>'button','value'=>$this->lang['inventory_refresh']]],
+            'selSync'   => ['order'=>10,'break' =>true,'label'=>$this->lang['sync_delete'], 'attr'=>['type'=>'checkbox','value'=>1]],
+            'btnSync'   => ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartSync&modID=$this->code&syncDelete='+bizCheckBoxGet('selSync'));"],  'attr'=>['type'=>'button','value'=>lang('go')]],
+            'calConfirm'=> ['order'=>10,'break' =>true,'label'=>$this->lang['status_date'], 'attr'=>['type'=>'date',    'value'=>biz_date('Y-m-d')]],
+            'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val());"],'attr'=>['type'=>'button','value'=>lang('confirm')]],
+            'btnTaxVer' => ['order'=>40,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/getTaxVersion&modID=$this->code');"],'attr'=>['type'=>'button','value'=>$this->lang['check_now']]],
+            'btnTaxGet' => ['order'=>60,'events'=>['onClick'=>"jqBiz('#frmTaxTbl').submit();"],'attr'=>['type'=>'button','value'=>$this->lang['get_table']]]];
+        $data = ['title'=>$this->lang['title'],
+            'divs'   => ['divIfWC'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
+                'head'   => ['order'=> 1,'type'=>'fields','keys'=>['imgLogo']],
+                'lineBR' => ['order'=> 2,'type'=>'html',  'html'=>"<br />"],
+                'manager'=> ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
+                    'setInv' => ['order'=>20,'type'=>'panel','key'=>'setInv', 'classes'=>['block33']],
+                    'setSync'=> ['order'=>30,'type'=>'panel','key'=>'setSync','classes'=>['block33']],
+                    'setConf'=> ['order'=>40,'type'=>'panel','key'=>'setConf','classes'=>['block33']],
+                    'testTax'=> ['order'=>80,'type'=>'panel','key'=>'testTax','classes'=>['block33']]]]]]],
+            'panels' => [
+                'setInv' => ['title'=>$this->lang['upload_title'],'type'=>'divs','divs'=>[
+                    'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmInv'],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['upload_info']}</p>"],
+                    'body'   => ['order'=>30,'type'=>'fields','keys'=>['radio1','radio2','radio3','fltr','btnInv']],
+                    'status' => ['order'=>50,'type'=>'html',  'html'=>"<progress></progress>"],
+                    'refresh'=> ['order'=>70,'type'=>'fields','keys'=>['btnQkInv']],
+                    'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
+                'setSync'=> ['title'=>$this->lang['sync_title'],'type'=>'divs','divs'=>[
+                    'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmSync'],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['sync_info']}</p>"],
+                    'body'   => ['order'=>30,'type'=>'fields','keys'=>['selSync','btnSync']],
+                    'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
+                'setConf'=> ['title'=>$this->lang['status_title'],'type'=>'divs','divs'=>[
+                    'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmConfirm'],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['status_info']}</p>"],
+                    'body'   => ['order'=>30,'type'=>'fields','keys'=>['calConfirm','btnConfirm']],
+                    'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
+                'testTax'=> ['title'=>$this->lang['test_tax_lbl'],'type'=>'divs','divs'=>[
+                    'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmTaxTbl'],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['test_tax_desc']}</p>"],
+                    'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnTaxVer','btnTaxGet']],
+                    'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
+            'forms'  => [
+                'frmInv'    =>['attr'=>['type'=>'form','action'=>'']],
+                'frmSync'   =>['attr'=>['type'=>'form','action'=>'']],
+                'frmConfirm'=>['attr'=>['type'=>'form','action'=>'']],
+                'frmTaxTbl' =>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/getTaxTable&modID=$this->code"]]],
+            'fields' => $fields,
+            'jsHead' => ['init'=>$this->getViewJS()],
+            'jsReady'=> ['init'=>"ajaxForm('frmInv');\najaxForm('frmSync');\najaxForm('frmConfirm');\najaxDownload('frmTaxTbl');\njqBiz('progress').attr({value:0,max:100});"]];
+        $layout = array_replace_recursive($layout, viewMain(), $data);
+    }
+
+    /**
+     * Generates the JavaScript for the landing page
+     * @return string - JavaScript actions
+     */
+    private function getViewJS()
+    {
+        return "var skuList = new Array();
+var cnt     = 0;
+var cntTotal= 0;
+var cntCur  = 0;
+var runaway = 0;
+function bulkUpload() { // fetch the sku count
+    jqBiz.ajax({
+        url: '".BIZUNO_AJAX."&bizRt=$this->moduleID/admin/apiInvCount&modID=$this->code&fltr='+bizTextGet('fltr'),
+        success: function(json) {
+            processJson(json);
+            skuList = json.items;
+            cntTotal= skuList.length;
+            var id  = skuList.shift();
+            if (id) {
+                runaway = 999999;
+                jqBiz('progress').after('".str_replace("\n", '', html5('', ['events'=>['onClick'=>"runaway=0;"],'attr'=>['type'=>'button', 'value'=>lang('cancel'), 'id'=>'upCancel']]))."');
+                bizButtonOpt('upCancel', 'iconCls', 'icon-cancel');
+                productUpload(id);
+            } else { alert ('No items to upload!'); }
+        }
+    });
+}
+function productUpload(rID) {
+    if (!rID) return;
+    jqBiz.ajax({
+        url: '".BIZUNO_AJAX."&bizRt=$this->moduleID/admin/productToStore&modID=$this->code&rID='+rID+'&optUpload='+jqBiz('input[name=optUpload]:checked').val()+'&quiet=1',
+        success: function(json) {
+            processJson(json);
+            var rID = skuList.shift();
+            if (rID) {
+                jqBiz('progress').attr({value:((cntCur/cntTotal)*100),max:100});
+                cntCur++;
+                runaway--;
+                if (runaway > 0) { productUpload(rID); }
+                else             { jqBiz('#upCancel').hide(); }
+            } else {
+                jqBiz('#upCancel').hide();
+                jqBiz('progress').attr({value:100,max:100});
+                alert('Bulk Upload Complete! '+cntTotal+' products uploaded');
+            }
+        }
+    });
+}";
+    }
+
+    /**
+     * This method uploads a single inventory item to WooCommerce
+     * @see apiImport::apiInventory()
+     */
+    public function productToStore($invID=0)
+    {
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
+        $rID    = !empty($invID) ? $invID : clean('rID', 'integer', 'get');
+        msgDebug("\nEntering productToStore with invID = $rID");
+        if (empty($rID)) { return msgAdd('bad inventory ID passed!'); }
+        $struc  = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory'); // map array to table
+        $result = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID"); // build inventory table map (may contain custom fields added by user), mask fields that cannot be updated
+        $product= [];
+        foreach ($result as $key => $value) { $product[$struc[$key]['tag']] = $value; }
+        $product[$struc['qty_stock']['tag']] = availableQty($result); // adjust out so's and allocations.
+        $product['SEO_URL']  = clean($result['description_short'], 'alpha_num'); // set the permalink url
+        $product['sendMode'] = clean('optUpload','integer','get');
+        $product['skuFilter']= clean('fltr',     'cmd',    'get');
+        //remove invOptions field
+        if (!empty($product['invOptions'])) { $product['invOptions'] = $this->prepVariations($product['SKU'], $product['invOptions']); }
+        if (array_key_exists('invVendors', $product)) { $product['invVendors'] = ''; }
+        $prices = $this->setPriceLevels($rID);
+        msgDebug("\nFetched updated price by item = ".print_r($prices, true));
+        $output = array_merge($product, $prices);
+        msgDebug("\nReady to compose api/export/apiInventory");
+        compose('api', 'export', 'apiInventory', $output);
+        $args = ['data'=>$output,'class'=>'api_product','method'=>'productImport', 'type'=>'post', 'endpoint'=>'product/update'];
+        msgDebug("\nCalling portal API with product of length: ".sizeof($output));
+//      msgDebug("\nCalling portal API with product: ".print_r($output, true));
+        $success = $this->apiAction($args);
+        if (!empty($success)) { msgAdd("Successfully imported SKU: {$output['SKU']}", 'success'); }
+    }
+
+    /**
+     *
+     * @param string sku
+     * @param array $invOptions
+     * @return array
+     */
+    private function prepVariations($sku, $invOptions=[])
+    {
+        $output= [];
+        $options  = json_decode($invOptions, true);
+        if (empty($options)) { return msgAdd("\nExpecting some data in InvOptions but there was an error"); }
+        msgDebug("\nStart processing attributes = ".print_r($options, true));
+        foreach ($options as $value) {
+            $value['attrs'] = explode(';', $value['attrs']);
+            $value['labels']= explode(';', $value['labels']);
+            $output['attributes'][] = ['name'=>$value['option'], 'options'=>$value['labels']];
+            $aAttrs[] = $value['attrs'];
+            $aLbls[]  = $value['labels'];
+        }
+        $allSfxs = $this->combinations($aAttrs);
+        msgDebug("\nFinished processing attributes, allSfxs is = ".print_r($allSfxs, true));
+        $allLbls = $this->combinations($aLbls);
+        msgDebug("\nFinished processing attributes, allLbls is = ".print_r($allLbls, true));
+        // build all possible SKU's from options
+        $variants = [];
+        foreach ($allLbls as $key => $value) {
+            $attributes = [];
+            foreach ($value as $key1 => $lbl) { $attributes[$options[$key1]['option']] = $lbl; }
+            $thisSku = $sku.'-'.implode('', $allSfxs[$key]);
+            $variants[$thisSku] = $attributes;
+        }
+        msgDebug("\nBuilt variation array = ".print_r($variants, true));
+        $sqlList = [];
+        foreach (array_keys($variants) as $key) { $sqlList[] = addslashes($key); }
+        $skus = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "sku IN ('".implode("','", $sqlList)."')", '', ['id','sku','item_weight','sale_price','full_price','qty_stock']);
+        msgDebug("\nRead SKUs to upload= ".print_r($skus, true));
+        // prep the variation array
+        foreach ($skus as $props) {
+            $output['variations'][] = [
+                'sku'          => $props['sku'],
+//              'regular_price'=> $props['full_price'], // this needs to be the sell price
+                'sale_price'   => $props['sale_price'],
+                'weight'       => $props['item_weight'],
+                'stock'        => $props['qty_stock'],
+                'attributes'   => $variants[$props['sku']]];
+        }
+        msgDebug("\nFinished processing variations, output is = ".print_r($output, true));
+        return $output;
+    }
+
+    private function combinations($arrays, $i = 0) {
+        if (!isset($arrays[$i])) { return array(); }
+        if ($i == count($arrays) - 1) { return $arrays[$i]; }
+        // get combinations from subsequent arrays
+        $tmp = $this->combinations($arrays, $i + 1);
+        $result = array();
+        foreach ($arrays[$i] as $v) {
+            foreach ($tmp as $t) { $result[] = is_array($t) ? array_merge(array($v), $t) : array($v, $t); }
+        }
+        return $result;
+    }
+
+    /**
+     * Quick inventory upload in blocks with limited daily update info
+     * @param array $layout - structure coming in
+     * @return modified $layout
+     */
+    public function invRefresh(&$layout=[])
+    {
+        $crit = "woocommerce_sync='1'";
+        if ( empty($this->settings['inc_inactive'])) { $crit .= " AND inactive='0'"; }
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', $crit, 'sku', ['id', 'sku']);
+        if (sizeof($result) == 0) { return msgAdd("No items have been tagged to upload to your store!"); }
+        foreach ($result as $row) { $rows[] = $row['id']; }
+// $rows = array_slice($rows, 0, 10); // to limit the number of results for testing, comment out when ready to run
+        msgDebug("\nRows to process = ".print_r($rows, true));
+        setUserCron('invRefresh', ['cnt'=>0,'acted'=>0,'total'=>sizeof($rows),'rows'=>$rows]);
+        $layout = array_replace_recursive($layout,['content'=>['action'=>'eval','actionData'=>"cronInit('invRefresh','$this->moduleID/admin/invRefreshNext&modID=$this->code');"]]);
+    }
+
+    /**
+     * Execution of the next cron step of inventory refresh
+     * @param array $layout - structure coming in
+     * @return modified $layout
+     */
+    public function invRefreshNext(&$layout=[])
+    {
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
+        $cron   = getUserCron('invRefresh');
+        $numRows= $this->refreshRows;
+        $data   = [];
+        while ($numRows > 0) {
+            $skuID  = array_shift($cron['rows']);
+            if (empty($skuID)) { break; }
+            $data[] = $this->setPriceLevels($skuID);
+            $numRows--;
+            $cron['cnt']++;
+        }
+        $args = ['data'=>$data, 'class'=>'api_product', 'method'=>'productRefresh', // local
+            'type'=>'put', 'endpoint'=>'product/refresh']; // RESTful
+        $this->apiAction($args);
+        if (sizeof($cron['rows']) == 0) {
+            msgLog("Completed {$cron['total']} inventory items.)");
+            $data = ['content'=>['percent'=>100,'msg'=>"Processed {$cron['total']} total items",'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
+            clearUserCron('invRefresh');
+        } else { // return to update progress bar and start next step
+            $percent = floor(100*$cron['cnt']/$cron['total']);
+            $data = ['content'=>['percent'=>$percent,'msg'=>"Completed {$cron['cnt']} of {$cron['total']} inventory items.",'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
+            setUserCron('invRefresh', $cron);
+        }
+        $layout = array_replace_recursive($layout, $data);
+    }
+
+    private function setPriceLevels($skuID)
+    {
+        $fields = ['id','sku','qty_stock','qty_so','qty_alloc','full_price','inventory_type','item_weight','price_byItem'];
+        $result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', $fields, "id=$skuID");
+        $stock  = availableQty($result);
+        $pDetails['args'] = ['iID'=>$skuID];
+        compose('inventory', 'prices', 'quote', $pDetails);
+        msgDebug("\nAfter compose with pDetails = ".print_r($pDetails, true));
+        $product= ['RecordID'=>$skuID, 'SKU'=>$result['sku'], 'QtyStock'=>$stock, 'Weight'=>$result['item_weight'],
+            'FullPrice'=>$result['full_price'],'Price'=>$pDetails['content']['price']];
+        $product['RegularPrice'] = $product['price']; // for Woo both need to be the same
+        if (!empty($pDetails['content']['sale_price'])){ $product['SalePrice']   = $pDetails['content']['sale_price']; }
+        if (!empty($pDetails['content']['sheets']))    { $product['PriceLevels'] = $pDetails['content']['sheets']; }
+        $product['PriceByItem'] = $this->updateByItem($pDetails, $stock);
+        msgDebug("\nWorking with product: ".print_r($product, true));
+        return $product;
+    }
+
+    private function updateByItem($prices, $stock=0)
+    {
+        msgDebug("\nEntering updateByItem with stock = $stock with prices = ".print_r($prices, true));
+        if (empty($prices['content']['levels'])) { return; }
+        $level1  = array_shift($prices['content']['levels']); // assume the first level is the one to use
+        $sellQtys= [];
+        foreach ($level1['sheets'] as $sheet) {
+            if (empty($sheet['qty']) || empty($sheet['price'])) { continue; }
+            $sheet['price'] = $sheet['price'] * $sheet['qty'];
+            $sheet['stock'] = floor($stock/$sheet['qty']);
+            $sellQtys[] = $sheet;
+        }
+        $output = json_encode(['total'=>sizeof($sellQtys), 'rows'=>$sellQtys]);
+        msgDebug("\nCleaning up byItem db entry with: ".print_r($output, true));
+        dbWrite(BIZUNO_DB_PREFIX.'inventory', ['price_byItem'=>$output], 'update', "id={$prices['args']['iID']}");
+        return $output;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see apiImport::apiInvCount()
+     */
+    public function apiInvCount(&$layout=[], $result=[])
+    {
+        $output = [];
+        if (empty($result)) {
+            $fltr = clean('fltr', 'cmd', 'get');
+            $crit = "woocommerce_sync='1'"; // Removed AND inactive='0' to upload all no matter what the status, status is handled at the cart
+            if ( empty($this->settings['inc_inactive'])) { $crit .= " AND inactive='0'"; }
+            if (!empty($fltr)) { $crit .= " AND sku LIKE '$fltr%'"; }
+            $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', $crit, '', $field='id');
+        }
+        foreach ($result as $row) { $output[] = $row['id']; }
+        $layout = array_replace_recursive($layout, ['content' => ['items' => $output]]);
+        msgLog(sprintf($this->lang['bulk_upload_log'], sizeof($layout['content']['items'])));
+    }
+
+    /**
+     * Synchronizes the products listed in the store with the products expected to be there according to the Bizuno settings.
+     */
+    public function cartSync(&$layout=[])
+    {
+        msgDebug("\nWorking in cartSync with settings = ".print_r($this->settings, true));
+        $layout = ['data'=>['syncTag'=>'woocommerce_sync']];
+        compose('api', 'export', 'apiSync', $layout);
+        $args = ['data'=>$layout['data'], 'class'=>'api_product', 'method'=>'productSync', // local
+            'type'=>'post', 'endpoint'=>'product/sync']; // RESTful
+        $this->apiAction($args);
+    }
+
+    /**
+     * This method uploads all shipping tracking information for orders on a given day
+     * @see
+     */
+    public function cartConfirm(&$layout=[])
+    {
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'getCarrierText', 'function');
+        $output  = [];
+        $shipDate= clean('dateShip', 'date', 'get');
+        msgDebug("\nEntering cartConfirm with ship_date = $shipDate and settings = ".print_r($this->settings, true));
+        $stmt    = dbGetResult("SELECT journal_main.id, journal_meta.id, invoice_num, method_code, purch_order_id, meta_value
+            FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
+            WHERE meta_key='shipment' AND post_date='$shipDate'");
+        $rows    = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
+        foreach ($rows as $row) {
+            $meta = json_decode($row['meta_value'], true);
+            $meth = getCarrierText($row['method_code']);
+            $output['head'][$row['purch_order_id']] = 'Shipped '.viewFormat($shipDate, 'date')." via $meth, tracking number(s):";
+            $output['body'][$row['purch_order_id']] = $meta['packages'];
+        }
+        msgDebug("\nReady to send cart confirmation with output = ".print_r($output, true));
+        $args = ['data'=>$output, 'class'=>'api_order', 'method'=>'shipConfirm', // local
+            'type'=>'post', 'endpoint'=>'order/confirm']; // RESTful
+        $this->apiAction($args);
+    }
+
+    public function getTaxVersion(&$layout=[])
+    {
+        global $portal;
+//        if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
+        // This needs a complete re-write it should:
+        // be part of the upgrade polling messaging system, cron operation
+        // provide instructions on how to do the upgrade as WordPress tax service needs to be local
+        // tax tables are located @phreesoft
+        // reset get and then set upgrade flag
+        
+        msgDebug("\nWorking in getTaxVersion with settings = ".print_r($this->settings, true));
+//        $result = $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/sales_tax_ver');
+        if (!empty($result['tax_version'])) {
+            $curVersion = '2024.01'; // This needs to be kept as a common meta value
+            if (version_compare($result['tax_version'], $curVersion) > 0) {
+                return msgAdd("A new tax table version is available, please download it by clicking the Download Tax button and update your WordPress site.", 'info');
+            } else {
+                return msgAdd("Your tax rate tables are current", 'info');
+            }
+        }
+        return msgAdd("There was an issue retrieving the sales tax rate table version from Phreesoft. Please try again later.", 'trap');
+    }
+
+    public function getTaxTable()
+    {
+        global $io, $portal;
+        $output = [];
+        if (!$security = validateAccess($this->code, 2)) { return; }
+        $result = $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/tax_table_dump');
+        if (empty($result['data'])) { return msgAdd("Error retrieving the new sales tax data!"); }
+        // get the Nexus States
+        $modSet= getModuleCache('proCust', 'settings');
+        $nexus = $modSet['nexusSt'];
+        msgDebug("\nNexus states = ".print_r($nexus, true));
+        if (empty($nexus)) { return msgAdd("You don't have any Nexus states defined. Please do that in Settings -> PhreeBooks -> Settings and then re-run this script."); }
+        $output[] = array_shift($result['data']); // heading
+        foreach ($result['data'] as $row) {
+            $parts = explode(',', $row);
+            if (in_array($parts[1], $nexus)) { $output[] = $row; } // check the state
+        }
+        msgLog("Retrieved sales tax table from PhreeSoft");
+        $io->download('data', implode("\n", $output), 'SalesTaxDump.csv');
+    }
+    
+    /**
+     * Preps the request to a remote WordPress server hosting the e-store
+     * @param array $layout
+     * @param array $args
+     * @return type
+     */
+    public function apiAction($args=[])
+    {
+        global $portal;
+        $portal->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
+        $resp = $portal->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-erp/v1/{$args['endpoint']}", ['data'=>$args['data']]);
+        msgDebug("\napiAction received back from REST: ".print_r($resp, true));
+        if (isset($resp['message'])) { msgMerge($resp['message']); }
+        $postID= !empty($resp['ID']) ? $resp['ID'] : 0;
+        return !empty($postID) ? $postID : false;
+    }
+    
+    public function adminHome(&$layout=[])
+    {
+        if (!$security = validateAccess('admin', 1)) { return; }
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang));
+    }
+    public function install()
+    {
+        $lbl = sprintf($this->lang['cart_sync'],$this->lang['acronym']);
+        $cat = sprintf($this->lang['cart_cat'], $this->lang['acronym']);
+        $tag = sprintf($this->lang['cart_tags'],$this->lang['acronym']);
+        $slug= sprintf($this->lang['cart_slug'],$this->lang['acronym']);
+        $id  = validateTab('inventory', lang('estore'), 90);
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_sync")) {
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_sync ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;label:$lbl;tag:{$this->metaPrefix}Sync;tab:$id;order:25;group:{$this->metaPrefix}'");
+        }
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_category")) {
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_category VARCHAR(255) DEFAULT NULL COMMENT 'label:$cat;tag:{$this->metaPrefix}Category;tab:$id;order:26;group:{$this->metaPrefix}'");
+        }
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_tags")) {
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_tags VARCHAR(255) DEFAULT NULL COMMENT 'label:$tag;tag:{$this->metaPrefix}Tags;tab:$id;order:27;group:{$this->metaPrefix}'");
+        }
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_slug")) {
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_slug VARCHAR(128) DEFAULT NULL COMMENT 'label:$slug;tag:{$this->metaPrefix}Slug;tab:$id;order:28;group:{$this->metaPrefix}'");
+        }
+        parent::installStoreFields();
+        return true;
+    }
+    public function remove()
+    {
+        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_sync"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_sync"); }
+        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_category")) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_category"); }
+        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_tags"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_tags"); }
+        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_slug"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_slug"); }
+//        parent::removeStoreFields();
+        return true;
+    }
+}

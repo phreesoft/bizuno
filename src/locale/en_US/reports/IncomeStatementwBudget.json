@@ -1,0 +1,146 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "tablename": "journal_history"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 7,
+        "rows": [
+            {
+                "formatting": "glTitle"
+            },
+            {
+                "fieldname": "current",
+                "title": "Current Month",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isCur",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "current_ytd",
+                "title": "Year to Date",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isYtd",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "ly_current",
+                "title": "LY Current",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isLcur",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "ly_ytd",
+                "title": "Last YTD",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isLytd",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "budget_cur",
+                "title": "Budget",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isBdgt",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            },
+            {
+                "fieldname": "budget_ytd",
+                "title": "Budget YTD",
+                "visible": "1",
+                "break": "1",
+                "width": "30",
+                "processing": "isBytd",
+                "align": "R",
+                "total": "1",
+                "formatting": "currency"
+            }
+        ]
+    },
+    "title": "Income Statement w\/Budget",
+    "description": "General ledger Income statement with budget and last year to date capability. Format: Letter, Portrait. Requires special report: is_budget.",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datedefault": "a",
+    "filenamefield": "journal_history.period",
+    "filenameprefix": "income_statement",
+    "special_class": "income_statement",
+    "truncate": "1",
+    "datelist": [
+        "z"
+    ],
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "L",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "gl:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2010-11-03",
+    "last_update": "2022-12-12"
+}

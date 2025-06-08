@@ -1,0 +1,226 @@
+Attribute XML Name,Attribute Name,Definition,,
+activeIngredientName,Active Ingredient-Active Ingredient Name (#3) (Optional),Ingredient name. Example: Benzoyl Peroxide (Please enter text with 4000 character max),,
+activeIngredientPercentage,Active Ingredient-Active Ingredient Percentage (#3) (Optional),The percent of the active ingredient in the item. Example: 0.02 (Please enter the value),,
+altText,Additional Asset-Alt Text (#3) (Optional),"Alternative text of an image, video, or other asset. Use descriptive
+terms to describe the image. (Please enter text with 150 character max)",,
+assemblyInstructions,Assembly Instructions (Optional),"URL location showing assembly instructions for items requiring
+assembly. (Please enter text with 2000 character max)",,
+assetType,Additional Asset-Asset Type (#3) (Optional),"Provides additional information on the assets. Example: Secondary
+Image; Video; Instruction Manual; Assembly Instructions; Badge;
+Manufacturer Logo (Please enter text with 4000 character max)",,
+assetUrl,Additional Asset-Asset Url (#3) (Optional),"Location of the additional assets. Required if additional assets
+beyond the main image are provided. URLs must begin with http:// or
+https:// Example: http://www.walmart.com/video1.jpg (Please enter text with 2000 character max)",,
+autographed,Autographed (Optional),Is this product autographed?,,
+autographedBy,Autographed By (Optional),"The full name of the autographer Example: Wayne Gretzky; Bradley
+Wiggins (Please enter text with 4000 character max)",,
+batteryTechnologyType,Battery Type And Quantity Value-Battery Technology Type (#3) (Optional),"If battery type is lead acid, lead acid (nonspillable), lithium ion,
+or lithium metal, the item requires a hazardous materials risk
+assessment via WERCS. Example: Does Not Contain a Battery; Alkaline;
+Carbon Zinc; Lead Acid; Lead Acid (Nonspillable); Lithium Primary
+(Lithium Metal); Lithium Ion; Magnesium; Mercury; Nickel Cadmium;
+Nickel Metal Hydride; Silver; Thermal; Other; Multiple Types (Please select a value from the drop-down in the cell)",,
+brand,Brand (Optional),"If item does not have a brand, enter ""Unbranded"" Example: HP; Toshiba;
+Unbranded (Please enter text with 4000 character max)",,
+certificationAndClaimType,Certifications And Claim-Certification And Claim Type (#3) (Optional),Type of certification or claim. Example: Organic; BPA-Free; Fair Trade (Please enter text with 4000 character max),,
+certifyingAgent,Certifications And Claim-Certifying Agent (#3) (Optional),"Certifying agency for claim. Not all claims have a certifying agent.
+Example: Oregon Tilth; GOTS (Please enter text with 4000 character max)",,
+characterValue,Character-Character Value (Optional),"A person or entity portrayed in print or visual media. A character
+might be a fictional personality or an actual living person. Example:
+Dora the Explorer; SpongeBob SquarePants (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+colorValue,Color-Color Value (Optional),"Color value as provided by the manufacturer. Example: Aqua; Burgundy;
+Mauve; Fuchsia (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+connection,Connections-Connection (Optional),"The standardized connections provided on the item. Example: HDMI;
+S-Video; RCA (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+countryOfOriginAssembly,Country Of Origin Assembly (Optional),"2-letter country code for where the item was assembled. Example: CN;
+US (Please select a value from the drop-down in the cell)",,
+countryOfOriginComponents,Country Of Origin Components (Optional),"Information to be displayed on the item page. If the item originated
+in the USA, documentation authorized by the FTC may be requested.
+Example: USA; Imported; USA and/or Imported (Please select a value from the drop-down in the cell)",,
+displayTechnology,Display Technology (Optional),"The primary technology used for the item's display. Example: OLED;
+Retina Display; DLP; Plasma; LCD (Please enter text with 4000 character max)",,
+fabricCareInstruction,Fabric Care Instructions-Fabric Care Instruction (Optional),"Enter details of the fabric care label. Example: Dry Clean Only;
+Machine Washable; Hand Wash (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+finish,Finish (Optional),"Overall finish of the item. Example: Natural; Unfinished; Brown;
+Espresso; Oak (Please enter text with 4000 character max)",,
+form,Form (Optional),"Describes the way the item is dispensed or consumed, including its
+texture or other physical characteristics. Example: Spray; Foam;
+Cream; Gel; Tablet; Suppository (Please enter text with 4000 character max)",,
+gender,Gender (Optional),"To specify target gender of the item. Example: Women; Men; Girls;
+Boys; Unisex (Please select a value from the drop-down in the cell)",,
+hasBatteries,Has Batteries (Optional),"An item has batteries if any component, including reusable packaging,
+contains a battery. Example: Y; N",,
+hasExpiration,Has Expiration (Optional),"Indicates whether an item has an expiration date, such as for food,
+cleaning supplies, beauty products, etc. Example: Y; N",,
+hasWarnings,Has Warnings (Optional),"Indicates if any cautionary statements should accompany the item.
+Example: Y; N",,
+hasWarranty,Has Warranty (Optional),Indicates if item comes with a warranty. Example: Y; N,,
+inactiveIngredient,Inactive Ingredients-Inactive Ingredient (Optional),"The list of inactive ingredients in order of potency, as shown on the
+item label. (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+ingredients,Ingredients (Optional),"The list of ingredients contained in an item, according to FDA
+guidelines. Example: Carbonated Water; Natural Flavors (Please enter text with 4000 character max)",,
+instructions,Instructions (Optional),Text of how to use the item. (Please enter text with 4000 character max),,
+isAssemblyRequired,Assembly Required? (Optional),Is product unassembled and must be put together before use?,,
+isBiodegradable,Biodegradable? (Optional),Example: Y; N,,
+isCollectible,Collectible? (Optional),"Indicates if the item is regarded as being of value or interest to a
+collector.",,
+isCombustible,Combustible? (Optional),Example: Y; N,,
+isControlledSubstance,Controlled Substance? (Optional),"Indicates whether the item is a drug or chemical whose manufacture or
+use is regulated. Example: Y; N",,
+isEnergyStarCertified,Energy Star Certified? (Optional),Example: Y; N,,
+isFlammable,Flammable? (Optional),Example: Y; N,,
+isFoldable,Foldable? (Optional),Indicates that an item can be folded. Example: Y; N,,
+isIndustrial,Industrial? (Optional),"Indicates that an item can be used in an industrial setting or has an
+industrial application. Example: Y; N",,
+isMadeFromRecycledMaterial,Made From Recycled Material? (Optional),Example: Y; N,,
+isPortable,Portable? (Optional),Is the item portable? Example: Y; N,,
+isPowered,Powered? (Optional),Indicates that an item is powered. Example: Y; N,,
+isPrimaryVariant,Primary Variant? (Optional),"Note whether item is intended as the main variant in a variant
+grouping. Example: Y; N",,
+isProp65WarningRequired,Prop65Warning Required? (Optional),"California's Proposition 65 entitles California consumers to special
+warnings for products that contain chemicals known to the state of
+California to cause cancer and birth defects or other reproductive
+harm. http://oehha.ca.gov/prop65.html Example: Y; N",,
+isRecyclable,Recyclable? (Optional),"Recycle is the act of processing used or abandoned materials for use
+in creating new products or capable of being used again. Example: Y;
+N",,
+isRetractable,Retractable? (Optional),"Indicates that the item can be withdrawn into a holder, as in a cord
+or leash. Example: Y; N",,
+longDescription,Long Description *,"Complete description that will be displayed on the item page as a
+bulleted list. Enter the item's key features, benefits, and other
+notables, each on its own line. Use HTML to create the headings, line
+breaks,  and bulleted list. Example: - Fabric content
+- Features
+and/or attributes related to the product as a whole, such as pattern,
+fabric, etc.)
+- Neckline 
+- Sleeves 
+- Fit 
+- Additional details (any
+info on tag) 
+- Hem details 
+- Bonus item/accessory, if applicable 
+-
+Care instructions (Please enter text with 4000 character max)",,
+mainImageUrl,Main Image-Main Image Url *,"Location of the image. URLs must begin with http:// or https://
+Example: http://www.walmart.com/main_image.jpg (Please enter text with 2000 character max)",,
+manufacturer,Manufacturer (Optional),"Manufacturer is the maker of the product. This is the name of the
+company that produces the product, not necessarily the brand name of
+the item. (Please enter text with 4000 character max)",,
+manufacturerPartNumber,Manufacturer Part Number (Optional),"MPN uniquely identifies the product to its manufacturer. For many
+products this will be identical to the model number. Some
+manufacturers distinguish part number from model number. (Please enter text with 4000 character max)",,
+materialName,Fabric Content Value-Material Name (#3) (Optional),Material name. Example: Cotton; Rayon (Please enter text with 4000 character max),,
+materialPercentage,Fabric Content Value-Material Percentage (#3) (Optional),Corresponding material percentage. Example: 98%; 2% (Please enter the value),,
+materialValue,Material-Material Value (Optional),"Material makeup of the item. Fabric materials should be entered using
+the ""Fabric Content"" attribute. Example: Nickel; Metal; Plastic (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+measure,Fluid Ounces-Measure (Optional),Example: 8 fl oz (Please enter the value),,
+modelNumber,Model Number (Optional),"Having this information allows customers to search for items on the
+site and informs product matching. (Please enter text with 4000 character max)",,
+numberOfBatteries,Battery Type And Quantity Value-Number Of Batteries (#3) (Optional),"Required if ""Has Batteries = Y"" (Please enter the value)",,
+patternValue,Pattern-Pattern Value (Optional),"Decorative design or visual ornamentation, often with a thematic,
+recurring motif. Example: Floral; Plaid; Paisley (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+percentageOfRecycledMaterial,Recycled Material Content Value-Percentage Of Recycled Material (#3) (Optional),"Corresponding percentage of the recycled material used to create the
+item. Example: 90%; 80% (Please enter the value)",,
+powerType,Power Type (Optional),"Provides information on the exact type of power used by the item.
+Example: Electric; Batteries (Please enter text with 4000 character max)",,
+productAttributeName,Additional Product Attribute-Product Attribute Name (#3) (Optional),"A name of a single attribute for the additional detail name-value
+pair. Example: isCFLLightBulb (Please enter text with 100 character max)",,
+productAttributeValue,Additional Product Attribute-Product Attribute Value (#3) (Optional),"A value of a single attribute for the additional detail name-value
+pair. Example: true (Please enter text with 4000 character max)",,
+productId,Product Identifier-Product Id (#3) (Optional),Alphanumeric ID that uniquely identifies the product. Example: X12345 (Please enter text with 14 character max),,
+productIdType,Product Identifier-Product Id Type (#3) (Optional),"Type of unique identifier used in the ""Product ID"" field. Example:
+UPC; GTIN; ISBN; ISSN; EAN (Please select a value from the drop-down in the cell)",,
+productName,Product Name *,"Title of the product to be displayed on the product details page.
+Brand + Category + Defining Quality + Item Name + Pack Count if
+applicable. Example: George Girls' Short-Sleeve Polo; Hanes Men's
+V-Neck Tees, 3-Pack (Please enter text with 200 character max)",,
+productTaxCode,Product Tax Code *,Code used to identify tax properties of the product. (Please enter text with 10 character max),,
+prop65WarningText,Prop65Warning Text (Optional),"There is more than one variation of the Proposition 65 text; we need
+the actual text in order to determine the variation Example: WARNING:
+This product contains chemicals known to the State of California to
+cause cancer andbirth defects or other reproductive harm. (Please enter text with 4000 character max)",,
+recommendedLocation,Recommended Locations-Recommended Location (Optional),"The primary location recommended for the item's use. Example: Indoor;
+Outdoor; Vehicle (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+recommendedRoom,Recommended Rooms-Recommended Room (Optional),"The rooms recommended for the item's use. Example: Family Room; Home
+Office; Kitchen; Dining Room (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+recommendedSurface,Recommended Surfaces-Recommended Surface (Optional),"Example: Wood; Concrete; Vinyl (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+recycledMaterial,Recycled Material Content Value-Recycled Material (#3) (Optional),"Type of recycled material used to create the item. Example: Bamboo;
+Cotton (Please enter text with 4000 character max)",,
+scent,Scent (Optional),Descriptive term for fragrance. Example: Vanilla; Geranium; Rose (Please enter text with 4000 character max),,
+shape,Shape (Optional),"Physical shape of the item. Example: Aviator; Cateye; Horned; Oval;
+Rectangle; Round; Square; Wayfarer (Please enter text with 4000 character max)",,
+shelfDescription,Shelf Description *,"Abbreviated list of key item features in no more than three bullet
+points. This is viewable in search, category, and shelf pages. Format
+bullet points with HTML. Example: - V-neck
+- Studded details
+- Loose
+fit (Please enter text with 1000 character max)",,
+shortDescription,Short Description *,"Overview of the key selling points of the item, marketing content, and
+highlights in paragraph form. For SEO purposes, repeat the product
+name and relevant keywords here. HTML is supported, and should be
+used only for making paragraph breaks. Plain text is also acceptable;
+it will render as a single paragraph. Example: The George - Girls'
+Short Sleeve Polo Shirt will make a great addition to your daughter's
+uniform wardrobe. This short-sleeved girls' shirt has a flat knit
+collar and cuff for a comfortable fit. Plus, it's tagless, so your
+daughter's skin won't be irritated by a scratchy tag.  This girls'
+short sleeve polo is made from a cotton blend, and treated with
+Scotchgard for stain protection. It has a two-button placket, an
+extended back hem and vents on each side hem. The girls' polo shirt
+is machine washable and very easy to maintain. (Please enter text with 1000 character max)",,
+smallPartsWarning,Small Parts Warnings-Small Parts Warning (Optional),"Indicates type of choking hazard warning to show on the item
+page.
+
+Code definitions:
+0 - Not Applicable
+1 - Any ball with a
+diameter of 1.75 inches (44.4mm) or less that is intended for use by
+children 3 years or older
+2 - Any toy or game intended for children 3
+years or older but less than 8 years that contains a small ball
+3 -
+Any toy and game with small parts intended for use by children at
+least 3 years old but under 6 years
+4 - Any latex balloon, or toy or
+game that contains a latex balloon
+5 - Any marble intended for
+children 3 years or older
+6 - Any toy and game intended for children
+at least 3 years old but less than 8 years which contains a marble
+Example: 0; 1; 2; 3; 4; 5; 6 (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter the value)",,
+swatchImageUrl,Swatch Image-Swatch Image Url (#3) (Optional),"URL of the color or pattern swatch image. This will be shown as a
+small square on the item page. Recommended resolution is 100 x 100
+pixels. URLs must begin with http:// or https:// Example:
+http://www.walmart.com/swatch1.jpg (Please enter text with 2000 character max)",,
+swatchVariantAttribute,Swatch Image-Swatch Variant Attribute (#3) (Optional),Attribute name corresponding to the swatch. Example: color; pattern (Please enter text with 4000 character max),,
+systemOfMeasurement,System Of Measurement (Optional),Example: Metric; Imperial (Please enter text with 4000 character max),,
+unit,Fluid Ounces-Unit (Optional),Example: 8 fl oz (Please select a value from the drop-down in the cell),,
+unitsPerConsumerUnit,Units Per Consumer Unit (Optional),"Number of subunits contained in the unit.
+
+Example: For a single
+3-pack of T-shirts, where the T-shirts are packaged all together with
+one barcode, enter ""1"" as the quantity. If the item for sale is two
+3-packs of T-shirts, enter ""2."" Example: 1; 2 (Please enter the value)",,
+variantAttributeName,Variant Attribute Names-Variant Attribute Name (Optional),"Designate all attributes by which the item is varying. This list may
+include variants that the category spec has not explicitly
+identified. 
+Ex: If partner provides data for ""Collar Size,"" and
+""Collar Size"" is not in the list of valid variants, then input
+""Collar Size"" as a value here. Example: collarSize; color; shirtSize (If you want to submit multiple values, use a semicolon to separate the values. For example – value1;value2;value3. Please enter text with 4000 character max)",,
+variantGroupId,Variant Group Id (Optional),"Required if item is a variant.
+ 
+Make up a number for ""Variant Group
+ID,"" and add this to all variations of the same product. Partners
+must ensure uniqueness of their Variant Group IDs. (Please enter text with 20 character max)",,
+warningText,Warning Text (Optional),"Text of the warning to accompany the item. Example: You must be 18 or
+over to purchase this product. By purchasing this item you certify
+that your are 18 years or older. (Please enter text with 4000 character max)",,
+warrantyLength,Warranty Length (Optional),"The length of the warranty: if there are different lengths for
+different areas of the warranty, state so. Example: 90 Days; 6 months
+parts, twelve months labor (Please enter text with 4000 character max)",,
+warrantyText,Warranty Text (Optional),"Text of the warranty terms, such as what's covered and length of
+warranty. (Please enter text with 50000 character max)",,
+warrantyURL,Warranty URL (Optional),"URL location of the Image, PDF, or link to the manufacturer's warranty
+page, showing the warranty and its terms. URLs must begin with
+http:// or https:// Example: http://www.walmart.com/warranty_info.pdf (Please enter text with 2000 character max)",,

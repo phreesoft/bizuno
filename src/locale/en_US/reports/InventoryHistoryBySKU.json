@@ -1,0 +1,148 @@
+{
+    "tables": {
+        "total": 1,
+        "rows": [
+            {
+                "join_type": "JOIN",
+                "tablename": "inventory_history"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 5,
+        "rows": [
+            {
+                "fieldname": "inventory_history.qty",
+                "title": "Quantity",
+                "width": "30",
+                "visible": "1",
+                "align": "R"
+            },
+            {
+                "fieldname": "inventory_history.remaining",
+                "title": "Remaining",
+                "width": "30",
+                "visible": "1",
+                "align": "R"
+            },
+            {
+                "fieldname": "inventory_history.journal_id",
+                "title": "Journal ID",
+                "width": "30",
+                "visible": "1",
+                "align": "C"
+            },
+            {
+                "fieldname": "inventory_history.post_date",
+                "title": "Date",
+                "width": "30",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "inventory_history.ref_id",
+                "title": "Ref ID",
+                "width": "20",
+                "visible": "1",
+                "align": "R"
+            }
+        ]
+    },
+    "grouplist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "inventory_history.journal_id",
+                "title": "Journal_id",
+                "formatting": "j_desc"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 2,
+        "rows": [
+            {
+                "fieldname": "inventory_history.journal_id",
+                "title": "Journal ID"
+            },
+            {
+                "fieldname": "inventory_history.post_date",
+                "title": "Post Date",
+                "default": "1"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 1,
+        "rows": [
+            {
+                "fieldname": "inventory_history.sku",
+                "title": "SKU",
+                "visible": "1",
+                "type": "0"
+            }
+        ]
+    },
+    "title": "Inventory History By SKU",
+    "description": "Lists the historical transactions in the inventory_history table filtered by SKU",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "j",
+        "m"
+    ],
+    "datedefault": "b",
+    "datefield": "inventory_history.post_date",
+    "headingshow": null,
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": null,
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": null,
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "LETTER:216:279",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "inv:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2021-03-23",
+    "last_update": "2022-12-12"
+}

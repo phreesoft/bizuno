@@ -1,0 +1,343 @@
+{
+    "tables": {
+        "total": 3,
+        "rows": [
+            {
+                "tablename": "journal_main"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "contacts",
+                "relationship": "journal_main.contact_id_b=contacts.id",
+                "join_type": "JOIN"
+            },
+            {
+                "joinopt": "JOIN",
+                "tablename": "journal_item",
+                "relationship": "journal_main.id=journal_item.ref_id",
+                "join_type": "JOIN"
+            }
+        ]
+    },
+    "fieldlist": {
+        "total": 19,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Inv Date",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "processing": "date",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Inv Number",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_item.debit_amount - journal_item.credit_amount",
+                "title": "Invoice Amount",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "processing": "currency",
+                "align": "R",
+                "total": "1"
+            },
+            {
+                "fieldname": "journal_main.sales_tax",
+                "title": "Sales Tax",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "processing": "currency",
+                "align": "R",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Bill Name",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.address1_b",
+                "title": "Bill Address",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.city_b",
+                "title": "Bill City",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.state_b",
+                "title": "Bill State",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.postal_code_b",
+                "title": "Bill Zip Code",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.country_b",
+                "title": "Bill Country",
+                "visible": "0",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.primary_name_s",
+                "title": "Ship Name",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.address1_s",
+                "title": "Ship Address",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.city_s",
+                "title": "Ship City",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.state_s",
+                "title": "Ship State",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.postal_code_s",
+                "title": "Ship Zip Code",
+                "visible": "1",
+                "width": "25",
+                "break": "1",
+                "align": "L",
+                "total": "0"
+            },
+            {
+                "fieldname": "journal_main.country_s",
+                "title": "Ship Country",
+                "width": "25",
+                "break": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.freight",
+                "title": "Freight amount",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "align": "L"
+            },
+            {
+                "fieldname": "journal_main.method_code",
+                "title": "Ship Method",
+                "break": "1",
+                "width": "25",
+                "visible": "1",
+                "align": "L"
+            },
+            []
+        ]
+    },
+    "grouplist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "default": "1",
+                "page_break": "0"
+            },
+            {
+                "fieldname": "journal_main.period",
+                "title": "Period",
+                "default": "0",
+                "page_break": "0"
+            },
+            {
+                "fieldname": "journal_main.postal_code_s",
+                "title": "Ship Zip Code",
+                "default": "0",
+                "page_break": "0"
+            }
+        ]
+    },
+    "sortlist": {
+        "total": 3,
+        "rows": [
+            {
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
+                "default": "0"
+            },
+            {
+                "fieldname": "journal_main.invoice_num",
+                "title": "Invoice Number",
+                "default": "1"
+            },
+            {
+                "fieldname": "journal_main.postal_code_s",
+                "title": "Ship Zip Code",
+                "default": "0"
+            }
+        ]
+    },
+    "filterlist": {
+        "total": 6,
+        "rows": [
+            {
+                "fieldname": "journal_main.total_amount",
+                "title": "SO Total",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.purch_order_id",
+                "title": "SO Number",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "title": "Sales Rep",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.postal_code_s",
+                "title": "Ship Zip Code",
+                "visible": "1",
+                "type": "0"
+            },
+            {
+                "fieldname": "journal_main.journal_id",
+                "title": "Journal ID",
+                "visible": "0",
+                "type": "9",
+                "min": "12,13"
+            },
+            {
+                "fieldname": "journal_item.gl_type",
+                "title": "GL Type",
+                "type": "6",
+                "min": "ttl"
+            }
+        ]
+    },
+    "xChild": "print",
+    "title": "Enhanced Sales Report",
+    "description": "Lists sales for a given period. Format: Letter, Portrait. Best to be downloaded to a spreadsheet.",
+    "totals": {
+        "font": "helvetica",
+        "size": "10",
+        "color": "#000000",
+        "align": "L"
+    },
+    "datelist": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "l",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k"
+    ],
+    "datedefault": "c",
+    "datefield": "journal_main.post_date",
+    "headingshow": "1",
+    "headingfont": "helvetica",
+    "headingsize": "12",
+    "headingcolor": "#000000",
+    "headingalign": "C",
+    "title1show": "1",
+    "title1text": "%reportname%",
+    "title1font": "helvetica",
+    "title1size": "10",
+    "title1color": "#000000",
+    "title1align": "C",
+    "title2show": "1",
+    "title2text": "Report Generated %date%",
+    "title2font": "helvetica",
+    "title2size": "10",
+    "title2color": "#000000",
+    "title2align": "C",
+    "filterfont": "helvetica",
+    "filtersize": "8",
+    "filtercolor": "#000000",
+    "filteralign": "L",
+    "datafont": "helvetica",
+    "datasize": "10",
+    "datacolor": "#000000",
+    "dataalign": "C",
+    "totalfont": null,
+    "totalsize": null,
+    "totalcolor": null,
+    "totalalign": null,
+    "pagesize": "Letter:216:282",
+    "pageorient": "P",
+    "margintop": "8",
+    "marginbottom": "8",
+    "marginleft": "8",
+    "marginright": "8",
+    "type": "rpt",
+    "group_id": "cust:rpt",
+    "mime_type": "rpt",
+    "users": [
+        -1
+    ],
+    "roles": [
+        -1
+    ],
+    "create_date": "2013-03-24",
+    "last_update": "2023-02-07"
+}
