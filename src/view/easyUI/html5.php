@@ -521,7 +521,6 @@ final class html5 {
      * @return string - modified $output - HTML formatted EasyUI menu appended to $output
      */
     public function sidemenu(&$output, $prop) {
-        msgTrap();
         msgDebug("\nEntering sidemenu."); // with prop = ".print_r($prop, true)
         if (empty($prop['data']['child'])) { return; }
         $prop['data']['child'] = sortOrder($prop['data']['child']);
@@ -547,8 +546,7 @@ final class html5 {
      * @param type $curSec
      * @param type $level
      */
-    private function sidemenuStruc($branches=[], $curSec='', $level=1)
-    {
+    private function sidemenuStruc($branches=[], $curSec='', $level=1) {
         global $bizunoLang;
         $tree = [];
         foreach ($branches as $idx => $branch) {
@@ -556,6 +554,14 @@ final class html5 {
             if (1==$level) { // add the dashboard, level 1 only
                 $branch['child'][] = ['order'=>0, 'label'=>lang('dashboard'), 'icon'=>'apps', 'size'=>'large', 'route'=>"bizuno/main/bizunoHome&menuID=$idx"];
             }
+// BOF - @TODO REMOVE AFTER RELEASE OF 7.1 - Special case while running 7.0 and 7.1 on same server
+// ,'events'=>['onClick'=>"hrefClick('bizuno/main/bizunoHome&menuID=tools');"
+if (!empty($branch['events']['onClick'])) {
+    $first = strpos($branch['events']['onClick'], "'");
+    $branch['route'] = substr($branch['events']['onClick'], $first+1, strrpos($branch['events']['onClick'], "'")-$first);
+    msgDebug("\nCalculated route = {$branch['route']}");
+}
+// EOF = Special mod
             $event= !empty($branch['route']) ? $branch['route'] : '';
             $state = $curSec==$idx?'open':'closed';
             if (empty($branch['child'])) {

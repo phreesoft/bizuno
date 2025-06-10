@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -352,8 +352,9 @@ if (!formValidate()) return false;\n\treturn true;\n}";
         $jsHead  .= "bizDefaults.phreebooks = { journalID:$this->journalID,type:'$this->type' };\n";
         $jsHead  .= "var totalsMethods = ".json_encode($ledger->journal->totals).";\n";
         $jsTotals = "function totalUpdate(func) {\n\tvar taxRunning=0;\n\tvar curTotal=0;\n";
-        foreach ($ledger->journal->totals as $methID) { 
-            $jsTotals .= "\tif (typeof totals_{$methID}==='function') { curTotal=totals_{$methID}(curTotal); }\n";
+        $jsTotals.= "    if (!jqBiz('#total_amount').length) { return; }\n"; // make sure there is a totals panel
+        foreach ($ledger->journal->totals as $methID) {
+            $jsTotals .= "    if (typeof totals_{$methID}==='function') { curTotal=totals_{$methID}(curTotal); }\n";
         }
         $jsTotals.= "}";
         $jsHead  .= $jsTotals;

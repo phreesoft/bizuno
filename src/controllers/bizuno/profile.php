@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -68,7 +68,7 @@ class bizunoProfile extends mgrJournal
         $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>$this->lang['reminders'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=bizuno/reminder/manager'"]];
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow new, copy here
     }
-    public function save(&$layout=[])
+    public function save()
     {
         if (empty(getUserCache('profile', 'userID'))) { return; }
         if (empty(clean('user_pin', 'text', 'post'))) { unset($this->struc['user_pin']); } // only update password if it there is a value, otherwise keep the value

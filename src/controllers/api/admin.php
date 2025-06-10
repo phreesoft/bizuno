@@ -92,6 +92,9 @@ class apiAdmin extends apiCommon
         $modID = clean('modID', 'cmd', 'get');
         $meta  = dbMetaGet(0, "methods_{$this->methodDir}");
         if (empty($meta[$modID])) { return msgAdd('Bad channel ID!'); }
+// @TODO - remove after release of 7.1
+$meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $meta[$modID]['path']);
+        msgDebug("\nEntering getMetehod with search pth = ".$meta[$modID]['path']."$modID.php");
         bizAutoLoad($meta[$modID]['path']."$modID.php");
         $fqdn = "\\bizuno\\$modID";
         $chan = new $fqdn();
@@ -185,6 +188,7 @@ class apiAdmin extends apiCommon
      */
     public function pbEdit(&$layout) // extends /phreebooks/main/edit
     {
+        msgDebug("\nEntering api/admin/pbEdit");
         // foreach enabled module, see if they have to add anything to the edit screen
         $_GET['modID'] = 'ifAmazon';
         $chan = $this->getMethod();

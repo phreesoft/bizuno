@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/inventory/build.php
  */
 
@@ -211,6 +211,7 @@ class proInvBuild extends mgrJournal
     private function newBuild($skuID)
     {
         msgDebug("\nEntering newBuild with skuID = $skuID");
+        if (!is_int($skuID)) { return msgAdd("I cannot find the SKU, did you select it from the list?"); }
         $sku = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id={$skuID}");
         $main= [
             'journal_id' => $this->journalID,

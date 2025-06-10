@@ -85,6 +85,10 @@ function compose($module, $page, $method, &$layout=[])
     foreach ($processes as $modID => $modProps) {
         if (empty($modProps['page'])) { $modProps['page'] = 'admin'; }
         $fqdn = isset($modProps['class']) ? "\\bizuno\\".$modProps['class'] : "\\bizuno\\".$modID.ucfirst($modProps['page']);
+// @TODO - remove after release of 7.1
+$modProps['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $modProps['path']);
+if (strpos($modProps['path'], 'BIZBOOKS_EXT')!==false) { continue; }
+// EOF - patch
         $controller = "{$modProps['path']}{$modProps['page']}.php";
         if (!bizAutoLoad($controller, $fqdn)) {
             msgDebug("\nCache hooks for module: $module contains: ".print_r(getModuleCache($module, 'hooks'), true));

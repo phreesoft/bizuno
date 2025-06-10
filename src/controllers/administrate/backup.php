@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-28
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/administrate/backup.php
  */
 
@@ -60,7 +60,7 @@ class administrateBackup
                     'divAtch'=> ['order'=>30,'type'=>'panel','key'=>'divAtch','classes'=>['block66']],
                     'audit'  => ['order'=>40,'type'=>'panel','key'=>'audit',  'classes'=>['block33']]]]]]],
             'toolbars'=> ['tbBackup'=>['icons'=>[
-                'restore'=> ['order'=>20,'hidden'=>$security>3?false:true,'events'=>['onClick'=>"hrefClick('administrate/backup/managerRestore');"]]]]],
+                'restore'=> ['order'=>20,'hidden'=>$security>3?false:true,'events'=>['onClick'=>"bizPanelReload('bizBody', 'administrate/backup/managerRestore');"]]]]],
             'panels' => [
                 'backup' => ['title'=>lang('bizuno_backup'),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmBackup'],
@@ -96,7 +96,7 @@ class administrateBackup
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
         $upload_mb= min((int)(ini_get('upload_max_filesize')), (int)(ini_get('post_max_size')), (int)(ini_get('memory_limit')));
-        $data     = ['title'=>lang('bizuno_restore'),
+        $data     = ['type'=>'divHTML', 'title'=>lang('bizuno_restore'),
             'divs'    => ['body'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
                 'toolbar'=> ['order'=>10,'type'=>'toolbar','key'=>'tbRestore'],
                 'heading'=> ['order'=>15,'type'=>'html',   'html'=>"<h1>".lang('bizuno_restore')."</h1>"],
@@ -108,7 +108,7 @@ class administrateBackup
                     'formBOF'=> ['order'=>50,'type'=>'form',    'key' =>'frmRestore'],
                     'body'   => ['order'=>60,'type'=>'fields',  'keys'=>['txtFile','fldFile','btnFile'],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]]],
-            'toolbars'=> ['tbRestore' => ['icons'=>['cancel'=>['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_HOME."&bizRt=administrate/backup/manager'"]]]]],
+            'toolbars'=> ['tbRestore' => ['icons'=>['cancel'=>['order'=>10,'events'=>['onClick'=>"bizPanelReload('bizBody', 'administrate/backup/manager');"]]]]],
             'datagrid'=> ['dgRestore' => $this->dgRestore('dgRestore')],
             'forms'   => ['frmRestore'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/backup/uploadRestore",'enctype'=>"multipart/form-data"]]],
             'fields'  => [
@@ -200,7 +200,7 @@ class administrateBackup
     public function saveRestore(&$layout)
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
-        $dbFile = clean('data', 'text', 'get');
+        $dbFile = clean('data', 'filename', 'get');
         if (!file_exists(BIZUNO_DATA.$dbFile)) { return msgAdd("Bad filename passed! ".BIZUNO_DATA.$dbFile); }
         ini_set('memory_limit','1024M');
         set_time_limit(3600); // One hour
@@ -213,7 +213,7 @@ class administrateBackup
         }
     }
 
-    private function dbRestore($dbFile)
+    private function dbRestore($filename)
     {
         msgDebug("\nEntering dbRestore with path = BIZUNO_DATA/$filename");
         $output = $retValue = null;
@@ -224,6 +224,7 @@ class administrateBackup
         $dbUser  = BIZPORTAL['user'];
         $dbPass  = BIZPORTAL['pass'];
         $ext     = strtolower(pathinfo($dbFile, PATHINFO_EXTENSION));
+        msgDebug("\nLooking for how to process extension: $ext");
         if (in_array($ext, ['sql'])) { // raw sql in text format
             $cmd = "mysql --host=$dbHost --user=$dbUser --password=$dbPass --default_character_set=utf8 --database=$dbName < $dbFile";
         } elseif (in_array($ext, ['zip'])) { // in zip format

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -160,7 +160,7 @@ class ifAmazon {
             $maps[] = ['id'=>$tmp2, 'text'=>$tmp2];
         } }
         $fields = [
-            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZUNO_IMAGES."api/funnels/$this->code/logo.png"]],
+            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS."controllers/api/funnels/$this->code/logo.png"]],
             'selMap'      => ['values' =>$maps, 'attr'=> ['type'=>'select']],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
@@ -209,14 +209,13 @@ class ifAmazon {
     {
         if (empty($layout['fields']['journal_id'])) { return; }
         $jID = $layout['fields']['journal_id']['attr']['value'];
-        msgDebug("\nEntering ifAmazon for customization with jID = $jID and contact ID = ".$layout['fields']['contact_id_b']['attr']['value']);
-        if (!empty($layout['fields']['contact_id_b']['attr']['value'])) {
-            $cID = $layout['fields']['contact_id_b']['attr']['value'];
-            if ($jID==18 && $cID==$this->settings['contact_id']) {
-                $layout['jsHead'][$this->moduleID] = "var AmazonGlAr = '{$this->settings['gl_acct_ar']}';\nvar AmazonGlTax = '{$this->settings['gl_acct_tax']}'";
-                $layout['toolbars']['tbPhreeBooks']['icons']['ifAmazon'] = ['order'=>80,'label'=>$this->lang['import_payment'],'events'=>['onClick'=>"reconcileAmazon();"]];
-                $layout['jsBody']['ifAmazon'] =  "jqBiz.cachedScript('".BIZUNO_SCRIPTS."view/images/api/funnels/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
-            }
+        $cID = $layout['fields']['contact_id_b']['attr']['value'];
+        msgDebug("\nEntering ifAmazon for customization with jID = $jID and contact ID = $cID");
+        if (empty($cID)) { return; }
+        if ($jID==18 && $cID==$this->settings['contact_id']) {
+            $layout['jsHead'][$this->moduleID] = "var AmazonGlAr = '{$this->settings['gl_acct_ar']}';\nvar AmazonGlTax = '{$this->settings['gl_acct_tax']}'";
+            $layout['toolbars']['tbPhreeBooks']['icons']['ifAmazon'] = ['order'=>80,'label'=>$this->lang['import_payment'],'events'=>['onClick'=>"reconcileAmazon();"]];
+            $layout['jsBody']['ifAmazon'] =  "jqBiz.cachedScript('".BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
         }
     }
 

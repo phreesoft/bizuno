@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-13
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -29,16 +29,25 @@ namespace bizuno;
 
 class phreebooksRestfulTax
 {
-    public  $moduleID = 'phreebooks';
-    public  $pageID   = 'restfulTax';
-    private $server   = 'https://www.phreesoft.com';
-    private $skipCity = true;
+    public    $moduleID  = 'phreebooks';
+    public    $pageID    = 'restfulTax';
+    protected $secID     = 'admin';
+    protected $domSuffix = 'Nexus';
+    protected $metaPrefix= 'nexus';
+    private   $server   = 'https://www.phreesoft.com';
+    private   $skipCity = true;
+    public    $lang;
+    private   $nexusSt;
+    private   $states;
+    public    $settings;
+    private   $statesDetail;
+    private   $statesNoTax;
 
     function __construct()
     {
-        $this->lang        = getExtLang($this->moduleID);
-        $this->settings    = ['nexusSt'=>[]]; // set the defaults
-        $this->states      = [
+        $this->lang    = getLang($this->moduleID);
+        $this->nexusSt = getMetaCommon($this->metaPrefix);
+        $this->states  = [
             'AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA',
             'HI','IA','ID','IL','IN','KS','KY','LA','MA','MD',
             'ME','MI','MN','MO','MS','MT','NC','ND','NE','NH',
@@ -46,17 +55,6 @@ class phreebooksRestfulTax
             'SD','TN','TX','UT','VA','VT','WA','WI','WV','WY'];
         $this->statesDetail= ['AZ','CA','CO','GA','IL','MN','NC','OH','PA','TN','UT','VA','WA'];
         $this->statesNoTax = ['DE','MT','NH','OR'];
-        $usrSettings   = getModuleCache($this->moduleID, 'settings');
-        settingsReplace($this->settings, $usrSettings, $this->settingsStructure());
-    }
-
-    public function settingsStructure()
-    {
-        $data = [
-            'nexusSt'=>['order'=>30,'break'=>true,'label'=>$this->lang['nexus_states'],'options'=>['multiple'=>'true'],'values'=>$this->viewStates(),'attr'=>['type'=>'select','name'=>'nexusSt[]']],
-        ];
-        langFillLabels($data, $this->lang);
-        return $data;
     }
 
     /**
@@ -68,7 +66,9 @@ class phreebooksRestfulTax
         // pre-check the state where the business is based, if possible
         // add links to SoS sites where each state defines their nexus
         if (!$security = validateAccess('admin', 1)) { return; }
-        $fields = $this->settingsStructure();
+        $fields = [
+            'nexusSt'=>['order'=>30,'break'=>true,'label'=>lang('nexus_states'),'options'=>['multiple'=>'true'],'values'=>$this->viewStates(),'attr'=>['type'=>'select','name'=>'nexusSt[]', 'value'=>$this->nexusSt]],
+        ];
         $fields['btnSaveNexus'] = ['order'=>70,'attr'=>['type'=>'button','value'=>lang('save')],
             'events'=>['onClick'=>"jqBiz('#frmNexus').submit();"]];
         $data = ['type'=>'divHTML',
@@ -81,9 +81,9 @@ class phreebooksRestfulTax
                     'desc'   => ['order'=>20,'type'=>'html','html'=>"<p>Pick your Nexus states and press Save:</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnSaveNexus','nexusSt']],
                     'formEOF'=> ['order'=>90,'type'=>'html','html'=>"</form>"]]]],
-            'forms'  => ['frmNexus'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/saveSettings"]]],
+            'forms'  => ['frmNexus'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save"]]],
             'fields' => $fields,
-            'jsReady'=> ['init'=>"ajaxForm('frmNexus'); bizSelSet('nexusSt',".json_encode($this->settings['nexusSt']).");"]];
+            'jsReady'=> ['init'=>"ajaxForm('frmNexus'); bizSelSet('nexusSt',".json_encode($this->nexusSt).");"]];
         $layout = array_replace_recursive($layout, $data);
         msgDebug("\nlayout is now: ".print_r($layout, true));
     }
@@ -96,16 +96,13 @@ class phreebooksRestfulTax
         foreach ($this->states as $state) { $output[] = ['id'=>$state, 'text'=>$state]; }
         return $output;
     }
-
-    /**
-     * Update the states and save
-     */
-    public function saveSettings()
+    public function save()
     {
         $states = clean('nexusSt', 'array', 'post');
-        $this->settings['nexusSt'] = $states;
-        msgDebug("\nSaving states into settings -> ".print_r($this->settings, true));
-        setModuleCache($this->moduleID, 'settings', '', $this->settings);
+        msgDebug("\nEntering and saving restfulTax:save with states = ".print_r($states, true));
+        $metaVal= dbMetaGet(0, $this->metaPrefix);
+        $rID    = metaIdxClean($metaVal); // remove the indexes
+        dbMetaSet($rID, $this->metaPrefix, $states);
         msgAdd("Settings saved.", 'success');
     }
 
@@ -127,7 +124,7 @@ class phreebooksRestfulTax
             'state'      => strtoupper(clean('state','alpha_num','get')),
             'country'    => clean('country',    'alpha_num','get'),
             'postal_code'=> clean('postal_code','chars','get')]; // Just USA for now, Canada is alphanum and has 6 characters, maybe by country
-        $isTaxable = in_array($props['state'], $this->settings['nexusSt']) ? true : false;
+        $isTaxable = in_array($props['state'], $this->nexusSt) ? true : false;
         if (!$isTaxable) { return; }
         if (empty($props['postal_code'])) { return msgAdd("Missing or invalid postal code provided."); }
         
@@ -145,15 +142,13 @@ class phreebooksRestfulTax
     public function calcTaxCollected()
     {
         global $io;
-        msgDebug("\nEntering calcTaxCollected with nexus states = ".print_r($this->settings['nexusSt'], true));
+        msgDebug("\nEntering calcTaxCollected with nexus states = ".print_r($this->nexusSt, true));
         $data  = [];
         $period= clean('period', 'integer',  'post');
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "period=$period AND journal_id IN (12, 13)", 'state_s', ['id', 'journal_id', 'invoice_num', 'total_amount', 'sales_tax', 'city_s', 'state_s', 'postal_code_s', 'country_s']);
         foreach ($rows as $row) {
-//        $this->statesDetail= ['AZ','CA','CO','GA','IL','MN','NC','OH','PA','TN','UT','VA','WA'];
-//        $this->statesNoTax = ['DE','MT','NH','OR'];
             $state = 'USA'<>strtoupper($row['country_s']) ? '_INT' : strtoupper($row['state_s']);
-            $nexus = in_array($row['state_s'], $this->settings['nexusSt']) ? 1 : '';
+            $nexus = in_array($row['state_s'], $this->nexusSt) ? 1 : '';
             $exempt= in_array($row['state_s'], $this->statesNoTax)         ? 1 : '';
             $info  = in_array($state, $this->statesDetail) ? $this->getCounty($row['postal_code_s']) : ['county'=>'_all', 'rate_state'=>0, 'rate_county'=>0, 'rate_city'=>0];
             $cnty  = !empty($row['sales_tax']) ? $info['county'] : '_exempt';

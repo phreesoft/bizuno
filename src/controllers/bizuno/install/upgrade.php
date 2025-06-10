@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-04
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -54,27 +54,46 @@ function bizunoUpgrade()
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_account` VARCHAR(16) NULL DEFAULT NULL COMMENT 'type:integer;order:40;tag:ACHAccount' AFTER ach_routing");
         }
         // These config values need to be merged into the new format
-        $modMap = ['api'=>'proIF', 'contacts'=>'proCust', 'contacts'=>'proVend', 'inventory'=>'proInv', 'quality'=>'proQA', 'phreebooks'=>'proPayment', 'shipping'=>'proLgstc'];
-        foreach ($modMap as $dest => $source) {
-            // pull the source and make sure it is present, else continue
-            // pull the destination
-            // merge the destination onto the source, dest contains the newest path information
-            // update the cache and save the record
+        $modMap = ['api', 'contacts', 'quality', 'phreebooks', 'shipping'];
+        foreach ($modMap as $dest) {
+            switch ($dest) {
+                case 'api': // merge the proIF settings
+                    break;
+                case 'contacts': // merge the proCust settings
+                    $nexus = getModuleCache('proCust', 'settings', 'nexusSt');
+                    if (!empty($nexus)){ dbMetaSet(0, 'nexus',$nexus); }
+                    $edi   = getModuleCache('proCust', 'edi');
+                    if (!empty($edi))  { dbMetaSet(0, 'edi',  $edi); }
+                    break;
+                case 'quality': setModuleCache('quality', 'settings', 'manual', getModuleCache('proQA', 'settings', 'manual')); break;
+                case 'phreebooks':
+                    $banks = getModuleCache('proPayment', 'banks');
+                    if (!empty($banks)){ dbMetaSet(0, 'ach_banks', $banks); }
+                    break;
+                case 'shipping': // merge the proLgstc settings
+                    break;
+            }
         }
-        
-        // These have no useful information and can just be deleted.
-/*      dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proEDI'");
+    }
+
+/*  if (version_compare($dbVer, '7.2') < 0) {
+        // These have no useful information and can just be deleted. Maybe in next upgrade to make sure no data is lost
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proEDI'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proGL'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proHR'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='public'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='toolXlate'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='xfrData'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='xfrPhreeBooks'");
-        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='xfrQuickBooks'"); */
-
-        // Need to convert nacha contacts to contacts meta
-        
-    }
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='xfrQuickBooks'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proIF'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proCust'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proVend'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proInv'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proQA'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proPayment'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proLgstc'");
+    } */
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
     require_once(BIZBOOKS_ROOT.'controllers/administrate/tools.php');
@@ -83,4 +102,5 @@ function bizunoUpgrade()
 
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
+    bizCacheExpClear(); // clear cache to force reload 
 }

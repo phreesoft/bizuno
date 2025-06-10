@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/administrate/main.php
  */
 
@@ -51,20 +51,22 @@ class administrateMain extends mgrJournal
         $title = getModuleCache('bizuno', 'settings', 'company', 'primary_name');
         if (empty($title)) { $title = portalGetBizIDVal(getUserCache('business', 'bizID'), 'title'); }
         $data  = ['title'=>lang('settings').'-'.$title,
-            'west'  => ['menu'   => ['data'=>$this->viewMenu()]],
-            'jsHead'=> ['menu_id'=> "var menuID='settings';"]];
+            'west'  =>['header' =>['divs'=>['menu'=>['type'=>'menu', 'data'=>$this->viewMenu()]]]],
+            'jsHead'=>['menu_id'=> "var menuID='settings';"]];
         $order = 10;
         $validMods = portalModuleList();
         foreach (array_keys($validMods) as $module) { // add the apps dynamically
             if (!empty(getModuleCache($module, 'properties', 'hasAdmin'))) {
-                $data['west']['menu']['data']['child']['apps']['child'][$module] = ['order'=>$order,'label'=>lang($module),'icon'=>$module,
+                $data['west']['header']['divs']['menu']['data']['child']['apps']['child'][$module] = ['order'=>$order,'label'=>lang($module),'icon'=>$module,
                     'events'=>['onClick'=>"bizPanelReload('bizBody', '$module/admin/adminHome');"]];
                 $order = $order + 5;
             }
         }
         viewDashJS($data);
         $struc = viewMain();
-        unset($struc['west']['menu']['data']);
+        unset($struc['west']['header']['divs']['menu']['data']);
+        msgDebug("\nBefore merge, struc = ".print_r($struc, true));
+        msgDebug("\nBefore merge, data = ".print_r($data, true));
         $layout = array_replace_recursive($layout, $struc, $data);
         msgDebug("\ndata AFTER array replace = ".print_r($layout, true));
     }

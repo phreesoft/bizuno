@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-14
+ * @version    7.x Last Update: 2025-06-10
  * @filesource /controllers/bizuno/dashboards/my_links/my_links.php
  *
  */
@@ -34,7 +34,7 @@ class my_links
     public $methodDir= 'dashboards';
     public $code     = 'my_links';
     public $category = 'general';
-    public  $struc;
+    public $struc;
     public $lang = ['title'=>'My Links',
         'description'=> 'Lists URLs for personal use with a single click. Opens link in a new window.'];
 
@@ -67,7 +67,7 @@ class my_links
         $title= clean($this->code.'title','text', 'post');
         $url  = clean($this->code.'url',  'text', 'post');
         if (empty($rmID) && empty($url)) { return msgAdd(lang('bad_data')); } // do nothing if no title or url entered
-        if ($rmID) { array_splice($usrMeta[$this->code]['opts']['data'], array_search($rmID, $usrMeta[$this->code]['opts']['data']), 1); }
+        if ($rmID) { array_splice($usrMeta[$this->code]['opts']['data'], $rmID-1, 1); }
         else       { 
             $usrMeta[$this->code]['opts']['data'][] = ['title'=>$title, 'url'=>$url]; }
             $usrMeta[$this->code]['opts']['data'] = sortOrder($usrMeta[$this->code]['opts']['data'], 'title');
