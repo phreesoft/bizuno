@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -58,7 +58,12 @@ class administrateAdmin
         $type= clean('type', 'char', 'get');
         $rID = clean('rID', 'integer', 'get');
         msgDebug("\nEntering administrate::contactsEdit with type = $type");
-        if ((empty($rID) && method_exists($portal, 'contactTypeUser')) ||
+        if (validateAccess('admin', 4)) { // add contact type access panel if admin
+            $fldRole= ['ctype_b','ctype_c','ctype_e','ctype_i','ctype_j','ctype_u','ctype_v'];
+            $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
+            $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
+        }
+        if (!in_array($type, ['u']) || (empty($rID) && method_exists($portal, 'contactTypeUser')) ||
             !validateAccess('admin', 4)) { return; } // Only existing records, admins and type user
         // unset some panels
         msgDebug("\nPassed security");
@@ -73,12 +78,9 @@ class administrateAdmin
         $opts = array_replace_recursive($this->defaults, $meta);
         msgDebug("\nAfter replace, meta = ".print_r($opts, true));
         // Adjust fields and add role select
-        $rFields= ['role_id'=>['order'=>10,'label'=>lang('role'),'attr'=>['type'=>'roles','value'=>$meta['role_id']],'options'=>['hideAll'=>true,'single'=>true]]];
+        // @TODO - role_id is not set in this meta key, should be able to get it from bizCreds
+        $rFields= ['role_id'=>['order'=>10,'label'=>lang('role'),'attr'=>['type'=>'roles','value'=>''],'options'=>['hideAll'=>true,'single'=>true]]]; // 'value'=>$meta['role_id'] broken
         $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id', 'primary_name'];
-        // add contact type access panel
-        $fldRole= ['ctype_b','ctype_c','ctype_e','ctype_i','ctype_j','ctype_u','ctype_v'];
-        $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>45,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
-        $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
         // Add phreebooks panel
         $pbFields = [
             'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],

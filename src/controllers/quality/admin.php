@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/quality/admin.php
  */
 
@@ -32,6 +32,9 @@ class qualityAdmin
 {
     public $moduleID= 'quality';
     public $pageID  = 'admin';
+    public $lang;
+    public $settings;
+    public $structure;
 
     function __construct()
     {
@@ -41,36 +44,28 @@ class qualityAdmin
             'attachPath'=> ['audits'=>'data/quality/audits/', 'correctives'=>'data/quality/tickets/', 'training'=>'data/quality/objectives/'],
             'menuBar'   => ['child'=>[
                 'quality' => ['order'=>70,'label'=>('quality'),                                          'icon'=>'quality','route'=>"bizuno/main/bizunoHome&menuID=quality",'child'=>[
-                    'qa_ticket'=> ['order'=>81,'label'=>sprintf(lang('tbd_manager'), lang('ticket')),    'icon'=>'ticket', 'route'=>"$this->moduleID/tickets/manager"],
-                    'qa_obj'   => ['order'=>82,'label'=>sprintf(lang('tbd_manager'), lang('objectives')),'icon'=>'new',    'route'=>"$this->moduleID/objectives/manager"],
-                    'qa_audit' => ['order'=>83,'label'=>sprintf(lang('tbd_manager'), lang('audit')),     'icon'=>'support','route'=>"$this->moduleID/audits/manager"],
-                    'qa_train' => ['order'=>90,'label'=>sprintf(lang('tbd_manager'), lang('training')),  'icon'=>'mimePpt','route'=>"$this->moduleID/training/manager"],
+                    'qa_ticket'=> ['order'=>50,'label'=>sprintf(lang('tbd_manager'), lang('ticket')),    'icon'=>'ticket', 'route'=>"$this->moduleID/tickets/manager"],
+                    'qa_obj'   => ['order'=>60,'label'=>sprintf(lang('tbd_manager'), lang('objectives')),'icon'=>'new',    'route'=>"$this->moduleID/objectives/manager"],
+                    'qa_audit' => ['order'=>70,'label'=>sprintf(lang('tbd_manager'), lang('audit')),     'icon'=>'support','route'=>"$this->moduleID/audits/manager"],
+                    'qa_train' => ['order'=>80,'label'=>sprintf(lang('tbd_manager'), lang('training')),  'icon'=>'mimePpt','route'=>"$this->moduleID/training/manager"],
                     'rpt_qa'   => ['order'=>99,'label'=>('reports'),                                     'icon'=>'mimeDoc','route'=>"phreeform/main/manager&gID=qa"]]]]],
             'hooks'     => [
-                'administrate'=> [
-                    'roles'=>[
-                        'edit' => ['order'=>70,'method'=>'rolesEdit'],
-                        'save' => ['order'=>70,'method'=>'rolesSave']]]],
-            'lang'      => [
-                'next_qaobj_num'   => $this->lang['cor_mgr'].' - '.$this->lang['ca_num'],
-                'next_ticket_num'  => $this->lang['obj_mgr'].' - '.$this->lang['pa_num'],
-                'next_audit_num'   => $this->lang['aud_mgr'].' - '.$this->lang['task_num'],
-                'next_training_num'=> $this->lang['training_title'].' - '.$this->lang['task_num']]];
+                'administrate'=>['roles'      =>['edit'       =>['order'=>70,'method'=>'rolesEdit'], 'save'=>['order'=>70,'method'=>'rolesSave']]],
+                'inventory'   =>['build'      =>['manager'    =>['order'=>80,'method'=>'invBld']]],
+                'inventory'   =>['main'       =>['manager'    =>['order'=>80,'method'=>'invMgr']]],
+                'phreebooks'  =>['fulfillment'=>['fulfillEdit'=>['order'=>80,'method'=>'pbRcv']]],
+                'phreebooks'  =>['main'       =>['manager'    =>['order'=>80,'method'=>'pbMgr']]],
+                'quality'     =>['tickets'    =>['manager'    =>['order'=>80,'method'=>'qaMgr']]],
+                'shipping'    =>['manager'    =>['manager'    =>['order'=>80,'method'=>'shipMgr']]]],
+//            'lang'      => [
+//                'next_qaobj_num'   => $this->lang['cor_mgr'].' - '.$this->lang['ca_num'],
+//                'next_ticket_num'  => $this->lang['obj_mgr'].' - '.$this->lang['pa_num'],
+//                'next_audit_num'   => $this->lang['aud_mgr'].' - '.$this->lang['task_num'],
+//                'next_training_num'=> $this->lang['training_title'].' - '.$this->lang['task_num']],
+            ];
         if (!empty($this->settings['manual']['manual_link'])) {
-            $this->structure['menuBar']['child']['quality']['child']['QualManual'] = ['order'=>5,'label'=>$this->settings['manual']['manual_title'],'required'=>true,'icon'=>'quality','events'=>['onClick'=>"winHref('{$this->settings['manual']['manual_link']}');"]];
+            $this->structure['menuBar']['child']['quality']['child']['QualManual'] = ['order'=>5,'label'=>lang('quality_manual'),'required'=>true,'icon'=>'quality','events'=>['onClick'=>"winHref('{$this->settings['manual']['manual_link']}');"]];
         }
-        foreach ($this->settingsStructure()['general']['fields'] as $idx => $field) { // add in the doc links to predefined menu's
-            if (empty($field['attr']['value'])) { continue; }
-            $parts = explode('_', $idx, 2);
-            switch ($parts[0]) {
-                default:
-                case 'proc': $type='process'; $label=$this->lang['processes'];   $icon='steps';  $order=95; break;
-                case 'stnd': $type='standard';$label=$this->lang['standards'];   $icon='mimeTxt';$order=96; break;
-                case 'inst': $type='instr';   $label=$this->lang['instructions'];$icon='mimeDoc';$order=97; break;
-            }
-            $this->structure['menuBar']['child'][$field['parent']]['child'][$parts[1]]['child'][$type] = ['order'=>$order,'label'=>$label,'icon'=>$icon,'required'=>true,'events'=>['onClick'=>"windowEdit('$this->moduleID/admin/renderQA&qaIdx=$idx', 'qaDoc', '{$field['label']}', 600, 500);"]];
-        }
-        if (method_exists($this, 'adminTables')) { $this->tables = $this->adminTables(); }
     }
 
     /**
@@ -99,8 +94,8 @@ class qualityAdmin
             'stnd_shipping' => ['label'=>$this->lang['stnd_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']],
             'inst_shipping' => ['label'=>$this->lang['inst_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']]];
         $data = [
-            'manual' => ['order'=>20,'label'=>$this->lang['quality_manual'],'fields'=>[
-                'manual_title'=> ['label'=>$this->lang['manual_title'],'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->lang['quality_manual']]],
+            'manual' => ['order'=>20,'label'=>lang('quality_manual'),'fields'=>[
+                'manual_title'=> ['label'=>$this->lang['manual_title'],'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>lang('quality_manual')]],
                 'manual_link' => ['label'=>$this->lang['manual_link'], 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']]]],
             'general'=> ['order'=>30,'label'=>lang('general'),'fields'=>$fields]];
         settingsFill($data, $this->moduleID);
@@ -180,10 +175,80 @@ class qualityAdmin
         return true;
     }
 
+    public function invBld(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['dgBuild']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_woProd', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['dgBuild']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_woProd', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['dgBuild']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_woProd', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
+    public function invMgr(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_inv_mgr', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_inv_mgr', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_inv_mgr', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
+    public function pbRcv(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_receiving', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_receiving', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_receiving', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
+    public function pbMgr(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_sales', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_sales', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_sales', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
+    public function qaMgr(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['dgTicket']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['dgTicket']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_qa_ticket', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['dgTicket']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_qa_ticket, 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
+    public function shipMgr(&$layout=[])
+    {
+        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_shipping', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_shipping', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        }
+        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_shipping', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        }
+    }
     /**
      * Extends the Roles - Edit - PhreeBooks tab to add Sales and Purchase access
-     * @param array $layout - page structure coming in
-     * @return modified $layout
      */
     public function rolesEdit(&$layout=[])
     {

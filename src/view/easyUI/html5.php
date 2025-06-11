@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /view/easyUI/html5.php
  */
 
@@ -554,17 +554,19 @@ final class html5 {
             if (1==$level) { // add the dashboard, level 1 only
                 $branch['child'][] = ['order'=>0, 'label'=>lang('dashboard'), 'icon'=>'apps', 'size'=>'large', 'route'=>"bizuno/main/bizunoHome&menuID=$idx"];
             }
+
 // BOF - @TODO REMOVE AFTER RELEASE OF 7.1 - Special case while running 7.0 and 7.1 on same server
 // ,'events'=>['onClick'=>"hrefClick('bizuno/main/bizunoHome&menuID=tools');"
 if (!empty($branch['events']['onClick'])) {
     $first = strpos($branch['events']['onClick'], "'");
-    $branch['route'] = substr($branch['events']['onClick'], $first+1, strrpos($branch['events']['onClick'], "'")-$first);
+    $branch['route'] = substr($branch['events']['onClick'], $first+1, strrpos($branch['events']['onClick'], "'")-$first-1);
     msgDebug("\nCalculated route = {$branch['route']}");
 }
 // EOF = Special mod
+
             $event= !empty($branch['route']) ? $branch['route'] : '';
             $state = $curSec==$idx?'open':'closed';
-            if (empty($branch['child'])) {
+            if (empty($branch['child']) || $level>1) { // limit the menu to 2 levels
                 $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'route'=>$event];
             } else {
                 $branch['child'] = sortOrder($branch['child']);
@@ -1416,9 +1418,9 @@ columns:  [[
     }
 
     public function inputContact($id, $prop) {
-        $defs = ['value'=>0,'suffix'=>'','store'=>0,'drop'=>false,'fill'=>false,'data'=>false,'callback'=>"contactsDetail(row.id, '', false);"];
+        $defs = ['type'=>'a','value'=>0,'suffix'=>'','store'=>0,'drop'=>false,'fill'=>false,'data'=>false,'callback'=>"contactsDetail(row.id, '', false);"];
         $attr = array_merge($defs, !empty($prop['defaults']) ? $prop['defaults'] : []);
-        $url  = "'".BIZUNO_AJAX."&bizRt=contacts/main/managerRowsSel&clr=1&type=a";
+        $url  = "'".BIZUNO_AJAX."&bizRt=contacts/main/managerRowsSel&clr=1&type={$attr['type']}";
         $url .= "&store=".(!empty($attr['store']) ? '1' : '0');
         $url .= "'";
         $prop['classes'][]               = 'easyui-combogrid';

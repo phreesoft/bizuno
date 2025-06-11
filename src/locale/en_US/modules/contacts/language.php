@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-28
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -71,7 +71,6 @@ $lang = [
     // Returns
     'returns_title' => 'Returns Manager',
     'returns_desc' => 'The Returns Manager extension provides the ability to track products returned by customers.',
-    'edi_title' => 'EDI Manager',
     'edi_description' => 'The EDI module allow connections to your vendors and customers through the X.12 industry standard.',
     'promos_title' => 'Promotion Manager',
     'promos_desc' => 'The crmPromos module manages and distributes promotional emails to specified customer lists.',

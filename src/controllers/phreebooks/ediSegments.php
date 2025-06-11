@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/phreebooks/ediSegments.php
  */
 
@@ -350,7 +350,7 @@ class phreebooksEdiSegments
             case 'UPS 2ND DAY 10:30':
             case 'FEDEX 2ND DY 10:30':
             case 'FEDEX 2 DAY AM':              return 'fedex:2DA';
-            case 'SMART POST':                  return 'fedex:3DA';
+            case 'FEDEX GROUND ECONOMY':        return 'fedex:3DA';
             case 'UPS 3RD DAY':
             case 'FEDEX 3RD DAY':
             case 'FEDEX EXPRESS SAVER':         return 'fedex:3DP';

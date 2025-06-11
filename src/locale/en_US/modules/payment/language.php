@@ -21,8 +21,8 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-19
- * @filesource /controllers/payment/locale/en_US/language.php
+ * @version    7.x Last Update: 2025-06-11
+ * @filesource locale/en_US/modules/payment/language.php
  */
 
 $lang = [
@@ -74,7 +74,6 @@ $lang = [
     'CVV_U' => 'Issuer has not certified for CVV2 or issuer has not provided Visa with the CVV2 encryption keys.',
     // ACH Settings
     'ach_accounts' => 'ACH Accounts',
-    'title_nacha' => 'ACH Manager',
     'panel_nacha' => 'Nacha Panel',
     'description' => 'The Bizuno Pro Payment extension ...',
     'file_nacha' => 'NACHA Transmit History',

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -30,6 +30,7 @@ namespace bizuno;
 class inventoryAdmin
 {
     public $moduleID = 'inventory';
+    public $pageID   = 'main';
 
     function __construct()
     {
@@ -47,12 +48,12 @@ class inventoryAdmin
             'attachPath'=> ['inventory'=>'data/inventory/uploads/', 'production'=>'data/production/uploads/'],
             'menuBar'   => ['child'=>[
                 'inventory'=> ['order'=>30,   'label'=>('inventory'),'group'=>'inv','icon'=>'inventory','child'=>[
-                    'inv_mgr'    => ['order'=>20,'label'=>('gl_acct_type_4_mgr'),'icon'=>'inventory','route'=>"inventory/main/manager"],
-                    'invBulkEdit'=> ['order'=>70,'label'=>('inv_bulk_edit'),     'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
+                    'inv_mgr'    => ['order'=>20,'label'=>('gl_acct_type_4_mgr'),'icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
+                    'invBulkEdit'=> ['order'=>70,'label'=>('bulk_edit'),         'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
                     'woProd'     => ['order'=>80,'label'=>('production'),        'icon'=>'work',     'route'=>"$this->moduleID/build/manager",'child'=>[
                         'woDesign'=>['order'=>10,'label'=>('wo_design'),         'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
-                        'woTasks' =>['order'=>20,'label'=>('wo_tasks'),          'icon'=>'list',     'route'=>"$this->moduleID/tasks/manager"]]],
-                    'rpt_inv'    => ['order'=>99,'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>"phreeform/main/manager&gID=inv"]]]]],
+                        'woTasks' =>['order'=>20,'label'=>('wo_tasks'),          'icon'=>'mimeLst',  'route'=>"$this->moduleID/tasks/manager"]]],
+                    'rpt_inv'    => ['order'=>99,'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>'phreeform/main/manager&gID=inv']]]]],
             'hooks' => [
                 'administrate'=>['roles'=>['edit'=>['order'=>10,'method'=>'rolesEdit'], 'save'=>['order'=>10,'method'=>'rolesSave']]],
                 'phreebooks'  =>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]]];

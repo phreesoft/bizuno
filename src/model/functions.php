@@ -554,7 +554,13 @@ function mapMetaGridToDB(&$dg, $struc)
     }
 }
 
-function getMetaCommon($key, $args=[]) { 
+/**
+ * When expecting only a single hit in the meta table with multiple entries. Meta indexes are stripped
+ * @param string $key - meta key to look for
+ * @param array $args - arguments to pass to dbMetaGet function 
+ * @return type
+ */
+function getMetaCommon($key, $args=[]) {
     $meta = dbMetaGet(0, $key, 'common', 0, $args);
     metaIdxClean($meta); // remove the db indexes
     return $meta;

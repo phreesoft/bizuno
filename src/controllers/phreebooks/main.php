@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-10
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -612,9 +612,9 @@ function bizUnitDiscDisc(newValue) {
         $ledger->main['description'] = pullTableLabel('journal_main', 'journal_id', $this->journalID).": ".(!empty($values['primary_name_b']) ? $values['primary_name_b'] : '');
         $ledger->main = array_replace($ledger->main, $values);
 /********** START add/update fix **************/
-// ADD THIS ROW
+// @TODO - ADD THIS ROW
         if (!$ledger->updateContact()) { return; } // Create/Update contact information
-// DELETE THESE ROWS 
+// DELETE THESE ROWS AFTER 7.1
         // add/update address book, address updates need to be here so recur doesn't keep making new contacts
 /*      if (clean('AddUpdate_b', 'bool', 'post')) { if (!$ledger->updateContact('b')) { return; } }
         if (clean('AddUpdate_s', 'bool', 'post')) {
@@ -785,7 +785,7 @@ function bizUnitDiscDisc(newValue) {
         // ***************************** START TRANSACTION *******************************
         bizAutoLoad(BIZBOOKS_ROOT.'controllers/payment/nacha.php', 'paymentNacha');
         $achMapID = clean('totals_achMapID', 'alpha_num', 'post');
-        $nacha = new phreebooksNacha($achMapID);
+        $nacha = new paymentNacha($achMapID);
         $nacha->openACH($achMapID);
         dbTransactionStart();
         $postedGLAcct = clean('gl_acct_id', 'text', 'post'); // need to capture the original GL Account desired by the user as ACH overwrites it if an ACH tranaction is posted
@@ -1162,8 +1162,8 @@ function bizUnitDiscDisc(newValue) {
             'open_orders'=> ['order'=>30,'label'=>$this->lang['status_open_j10'],'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
             'unpaid_inv' => ['order'=>40,'label'=>$this->lang['status_open_j12'],'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
             'unpaid_crd' => ['order'=>50,'label'=>$this->lang['status_open_j13'],'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']]];
-        if ($contact['type']=='v') { $idx='vendors';   $jQuote=3; $jOrder= 4; $jSale= 6; $jRtn= 7; }
-        else                       { $idx='customers'; $jQuote=9; $jOrder=10; $jSale=12; $jRtn=13; }
+        if ($contact['ctype_v']=='1') { $idx='vendors';   $jQuote=3; $jOrder= 4; $jSale= 6; $jRtn= 7; }
+        else                          { $idx='customers'; $jQuote=9; $jOrder=10; $jSale=12; $jRtn=13; }
         if (!empty($new_data['inv_orders']) && sizeof($new_data['inv_orders']) >1) { $fields['inv_orders'] = array_merge($fields['inv_orders'], ['values'=>$this->getStatusOpen($new_data, 'inv_orders'),
             'options'=>['width'=>300],'attr'=>['type'=>'select'],'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jSale, 0, 0, 'inv', '', newVal);"]]); }
         if (!empty($new_data['open_quotes'])&& sizeof($new_data['open_quotes'])>1) { $fields['open_quotes']= array_merge($fields['open_quotes'],['values'=>$this->getStatusOpen($new_data, 'open_quotes'),
@@ -1323,7 +1323,7 @@ function bizUnitDiscDisc(newValue) {
                     BIZUNO_DB_PREFIX.'journal_main.purch_order_id',
                     BIZUNO_DB_PREFIX.'journal_main.total_amount'],
                 'actions' => [
-                    'newJournal'=>['order'=>10,'icon'=>'new',    'events'=>['onClick'=>"jsonAction('phreebooks/main/getJournalEdit&jID='+$this->journalID);"]],
+                    'newJournal'=>['order'=>10,'icon'=>'add',    'events'=>['onClick'=>"jsonAction('phreebooks/main/getJournalEdit&jID='+$this->journalID);"]],
                     'clrSearch' =>['order'=>50,'icon'=>'refresh','events'=>['onClick'=>"hrefClick('phreebooks/main/manager&mgr=1&jID=$this->journalID');"]]],
                 'filters' => [
                     'period' => ['order'=>10,'break'=>true,'options'=>['width'=>300],'sql'=>$sqlPeriod,
@@ -1743,14 +1743,6 @@ function bizUnitDiscDisc(newValue) {
         return new $fqcn();
     }
 
-    /**
-     * @TODO DEPRECATED - Remove after 2023-02-01
-     */
-    public function getJournalSel(&$layout=[])
-    {
-        return $this->getJournalEdit($layout);
-    }
-
     /*
      * Displays the list of journals to open in edit mode
      * @param array $layout
@@ -1771,7 +1763,7 @@ function bizUnitDiscDisc(newValue) {
                 $parts= explode('_', $key);
                 $jrnl = intval(substr($parts[0], 1));
                 if (empty($jrnl)) { continue; } // not a journal
-                $html = ['attr'=>['type'=>'a','value'=>$child['label']],'classes'=>['easyui-linkbutton'],
+                $html = ['attr'=>['type'=>'a','value'=>lang($child['label'])],'classes'=>['easyui-linkbutton'],
                     'options'=>['iconCls'=>"'iconL-{$child['icon']}'",'size'=>"'large'",'plain'=>'true'],'events'=>['onClick'=>"jqBiz('#jrnlSel').window('close'); journalEdit($jrnl, 0);"]];
                 $rows[] = $html;
             }

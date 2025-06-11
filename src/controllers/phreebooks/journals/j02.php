@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -77,7 +77,7 @@ class j02 extends jCommon
             'dgItems'=> ['order'=>50,'type'=>'panel','key'=>'dgItems','classes'=>['block99']],
             'divAtch'=> ['order'=>90,'type'=>'panel','key'=>'divAtch','classes'=>['block50']]]];
         $data['panels']['billAD'] = ['label'=>lang('bill_to'),'type'=>'address','attr'=>['id'=>'address_b'],'keys'=>$fldAddr,
-                'settings'=>['type'=>'ceiv','suffix'=>'_b','search'=>true,'required'=>false,'store'=>false]];
+                'settings'=>['type'=>'a','suffix'=>'_b','search'=>true,'required'=>false,'store'=>false]];
         $data['panels']['props']  = ['label'=>lang('details'),'type'=>'fields', 'keys'   =>$fldKeys];
         $data['panels']['totals'] = ['label'=>lang('totals'), 'type'=>'totals', 'content'=>$data['totals']];
         $data['panels']['dgItems']= ['order'=>60,'type'=>'datagrid','key'=>'item'];

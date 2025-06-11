@@ -123,10 +123,10 @@ class contactsMain
      */
     public function managerRowsSel(&$layout=[])
     {
-        $rID  = clean('rID', 'integer','get');
+        $rID  = clean('rID', 'integer', 'get');
         if (!$security = 'mgr_a'==$this->secID ? 1 : validateAccess($this->secID, 1)) { return; } // allow access for type a, otherwise dependent on role
         $_POST['search'] = getSearch();
-        $data = $this->dgContacts('Contacts', 'a', $security, $rID);
+        $data = $this->dgContacts('Contacts', $this->type, $security, $rID);
         $data['rows'] = 250;
         $this->managerFilters($data); // set filters based on type
         if ($rID) {
@@ -178,17 +178,17 @@ class contactsMain
                 'postal_code'  => $row['postal_code'],
                 'country'      => $row['country'],
                 'email'        => $row['email'],
-//                'email2'       => $row['email2'],
-//                'email3'       => $row['email3'],
-//                'email4'       => $row['email4'],
+//              'email2'       => $row['email2'],
+//              'email3'       => $row['email3'],
+//              'email4'       => $row['email4'],
                 'telephone1'   => $row['telephone1'],
-//                'telephone2'   => $row['telephone2'],
-//                'telephone3'   => $row['telephone3'],
-//                'telephone4'   => $row['telephone4'],
-//                'website'      => $row['website'],
-//                'contact_first'=> $row['contact_first'],
-//                'flex_field_1' => $row['flex_field_1'],
-//                'contact_last' => $row['contact_last'],
+//              'telephone2'   => $row['telephone2'],
+//              'telephone3'   => $row['telephone3'],
+//              'telephone4'   => $row['telephone4'],
+//              'website'      => $row['website'],
+//              'contact_first'=> $row['contact_first'],
+//              'flex_field_1' => $row['flex_field_1'],
+//              'contact_last' => $row['contact_last'],
                 ];
         }
         return ['total'=>sizeof($output), 'rows'=>$output];
@@ -314,33 +314,28 @@ class contactsMain
         if (!validateAccess('admin', 4, false)) { unset($data['tabs']['tabContacts']['divs']['general']['divs']['genRole']); }
         // Some mods for new records
         if (!$rID) { unset($data['tabs']['tabContacts']['divs']['bill_add'], $data['tabs']['tabContacts']['divs']['ship_add']); }
+        if       (!$rID && !empty($this->restrict)) { // Stores
+            $data['fields']['store_id']['attr']['value'] = $this->myStore;
+            $data['fields']['store_id']['attr']['type'] = 'hidden';
+        } elseif (!$rID) {
+            $data['fields']['store_id']['attr']['value'] = $this->myStore;
+        }
+        if (sizeof($this->stores) > 1) {
+            $data['fields']['store_id']['attr']['type'] = 'select';
+            $data['fields']['store_id']['values'] = viewStores();
+        }
+        if (in_array($this->type, ['c', 'v'])) { // Add CRM tab and enable ACH to General page
+            $data['tabs']['tabContacts']['divs']['crm_add'] = ['order'=>25,'label'=>lang('address_type_i'), 'type'=>'html', 'html'=>'',
+                'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=contacts/address/manager&dom=div&type=$this->type&aType=i&refID=$rID'"]];
+            $data['panels']['genProp']['keys'][] = 'ach_enable';
+        }
+        if ($this->type=='c' && !empty(getMetaContact($rID, 'crm_project'))) { // only show CRM projects tab for customers
+            $data['tabs']['tabContacts']['divs']['crm_proj'] = ['order'=>27,'label'=>lang('ctype_j'),'type'=>'html','html'=>'',
+            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/projects/manager&cID=$rID'"]];
+        }
         customTabs($data, 'contacts', 'tabContacts');
         $this->editCustomType($data, $rID); // customize based on type
         $layout = array_replace_recursive($layout, $data);
-        
-        
-        // Stores
-        if       (!$rID && !empty($this->restrict)) {
-            $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-            $layout['fields']['store_id']['attr']['type'] = 'hidden';
-            return;
-        } elseif (!$rID) {
-            $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-        }
-        if (sizeof($this->stores) > 1) {
-            $layout['fields']['store_id']['attr']['type'] = 'select';
-            $layout['fields']['store_id']['values'] = viewStores();
-        }
-        // CRM
-        if (in_array($this->type, ['c', 'v'])) { // Add CRM tab and enable ACH to General page
-            $layout['tabs']['tabContacts']['divs']['crm_add'] = ['order'=>25,'label'=>lang('address_type_i'), 'type'=>'html', 'html'=>'',
-                'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=contacts/address/manager&dom=div&type=$this->type&aType=i&refID=$rID'"]];
-            $layout['panels']['genProp']['keys'][] = 'ach_enable';
-        }
-        if ($this->type=='c' && !empty(getMetaContact($rID, 'crm_project'))) { // only show CRM projects tab for customers
-            $layout['tabs']['tabContacts']['divs']['crm_proj'] = ['order'=>27,'label'=>lang('ctype_j'),'type'=>'html','html'=>'',
-            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/projects/manager&cID=$rID'"]];
-        }
     }
 
     /**
@@ -373,6 +368,7 @@ class contactsMain
 
     private function editCustomType(&$data, $rID)
     {
+        msgDebug("\nEntering editCustomType with rID = $rID and type = $this->type");
         switch ($this->type) {
             case 'b':
                 unset($data['fields']['tax_rate_id'], $data['fields']['store_id']);
@@ -653,7 +649,7 @@ class contactsMain
                 'tables' => ['contacts'=>['table'=>BIZUNO_DB_PREFIX.'contacts']],
                 'search' => ['id', 'short_name', 'primary_name', 'city', 'postal_code', 'email'], // ,'contact','telephone1','telephone2','telephone3','telephone4','address1','address2'
                 'actions' => [
-                    'newContact'  =>['order'=>10,'icon'=>'new',  'events'=>['onClick'=>"accordionEdit('acc$name', 'dg$name', 'div{$name}Detail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$type&ref=$rID', 0, '');"]],
+                    'newContact'  =>['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc$name', 'dg$name', 'div{$name}Detail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$type&ref=$rID', 0, '');"]],
                     'mergeContact'=>['order'=>40,'icon'=>'merge','hidden'=>$security>3?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
                     'clrSearch'   =>['order'=>50,'icon'=>'clear','events'=>['onClick'=>"jqBiz('#f0').val('$this->f0_default'); bizTextSet('search', ''); dg{$name}Reload();"]]],
                 'filters' => [

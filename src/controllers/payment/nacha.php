@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/payment/nacha.php
  *
  */
@@ -30,28 +30,25 @@ namespace bizuno;
 
 class paymentNacha
 {
-    public  $moduleID   = 'payment';
-    private $dirBackup  = 'data/banking/nacha/';
-    private $lineLength = 94; // number of characters per line in the output, does not change
-    private $output     = [];
-    private $rowCount   = 0;
-    private $totalDeb   = 0;
-    private $totalCred  = 0;
-    private $totalHash  = 0;
+    public  $moduleID  = 'payment';
+    public  $pageID    = 'nacha';
+    private $dirBackup = 'data/banking/nacha/';
+    private $lineLength= 94; // number of characters per line in the output, does not change
+    private $output    = [];
+    private $rowCount  = 0;
+    private $totalDeb  = 0;
+    private $totalCred = 0;
+    private $totalHash = 0;
+    public  $lang;
+    public  $refNum;
+    private $myData;
 
     function __construct($mapID='')
     {
         $this->lang= getExtLang($this->moduleID);
         $this->refNum = 'ACH'.biz_date('ymdHi'); // .'-'; // bank groups these into single withdrawal
-        $banks = getModuleCache($this->moduleID, 'banks');
-        foreach ($banks as $bank) {
-            if ($bank['mapID']==$mapID) { $this->myData = $bank; break; }
-        }
-//        $this->myData = [
-//            'biz_route'=> getModuleCache($this->moduleID,'settings','nacha','biz_route'),
-//            'biz_id'   => getModuleCache($this->moduleID,'settings','nacha','biz_id'),
-//            'biz_name' => getModuleCache($this->moduleID,'settings','nacha','biz_name'),
-//            'biz_entry'=> getModuleCache($this->moduleID,'settings','nacha','biz_entry')];
+        $banks = getMetaCommon('ach_banks');
+        foreach ($banks as $bank) { if ($bank['mapID']==$mapID) { $this->myData = $bank; break; } }
         $this->myData['transit_routing'] = substr($this->myData['biz_route'], 0, 8); // Transit routing Number, less check digit
     }
 
@@ -59,7 +56,7 @@ class paymentNacha
     {
         global $io;
         if (!$security = validateAccess('nacha', 3)) { return; }
-        $data = ['title'=>$this->lang['title_nacha'],
+        $data = ['title'=>sprintf(lang('journal_id_20_ach'), lang('tbd_manager')),
             'divs'  => ['body'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
                 'manager'=> ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'nacha'  => ['order'=>20,'type'=>'panel','key'=>'nacha',  'classes'=>['block33']],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -260,7 +260,6 @@ $lang = [
     'msg_no_security' => 'No security settings were selected, defaulting to access for everyone.',
     'percent_good'  => '% Good',
     // EDI
-    'edi_title' => 'EDI Manager',
     'tab_title' => 'EDI Clients',
     'email_to_lbl' => 'Email Destination',
     'email_to_tip' => 'Designate and email address to send confirmations to upon receipt of an EDI transmission.',

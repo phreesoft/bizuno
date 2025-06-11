@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -40,14 +40,13 @@ class bizunoAdmin
             'attachPath'=> ['docs'=>'data/docs/uploads/', 'fixedAssets'=>'data/fixedAssets/uploads/', 'maint'=>'data/maint/uploads/'],
             'usersAttachPath'=> "data/$this->moduleID/users/uploads",
             'menuBar' => ['child'=>[
-                'quality'=> ['order'=>70,'label'=>('quality'),'icon'=>'extQuality','group'=>'quality','child'=>[
-                    'mgr_docs' => ['order'=>60,'label'=>sprintf(lang('tbd_manager'), lang('document')),   'icon'=>'fileMgr','route'=>"$this->moduleID/docs/manager"]],
-                    'mgr_maint'=> ['order'=>90,'label'=>sprintf(lang('tbd_manager'), lang('maintenance')),'icon'=>'maint',  'route'=>"$this->moduleID/maint/manager"]],
-                'tools'  => ['order'=>70,'label'=>('tools'),  'icon'=>'tools','group'=>'tool','child'=>[
-                    'imgmgr'   => ['order'=>75,'label'=>sprintf(lang('tbd_manager'), lang('image')),      'icon'=>'mimeImg','route'=>"bizuno/image/manager&dom=page"]], // was jsonAction
-                    'impexp'   => ['order'=>85,'label'=>('bizuno_impexp'),                                'icon'=>'refresh','route'=>"api/import/impExpMain"]],
-//                  'drillDown'=> ['order'=>10,'label'=>('gl_drill_down'),                                'icon'=>'search', 'route'=>"$this->moduleID/drillDown/manager"]],
-                    ]],
+                'quality'=> ['order'=>70,'label'=>lang('quality'),'icon'=>'extQuality','group'=>'quality','child'=>[
+                    'mgr_docs' => ['order'=>60,'label'=>sprintf(lang('tbd_manager'), lang('document')),   'icon'=>'fileMgr','route'=>"$this->moduleID/docs/manager"],
+                    'mgr_maint'=> ['order'=>90,'label'=>sprintf(lang('tbd_manager'), lang('maintenance')),'icon'=>'maint',  'route'=>"$this->moduleID/maint/manager"]]],
+                'tools'  => ['order'=>90,'label'=>('tools'),  'icon'=>'tools','group'=>'tool','child'=>[
+                    'imgmgr'   => ['order'=>75,'label'=>sprintf(lang('tbd_manager'), lang('image')),      'icon'=>'mimeImg','route'=>"bizuno/image/manager&dom=page"], // was jsonAction
+//                  'drillDown'=> ['order'=>90,'label'=>('gl_drill_down'),                                'icon'=>'search', 'route'=>"$this->moduleID/drillDown/manager"]],
+                    'impexp'   => ['order'=>85,'label'=>('bizuno_impexp'),                                'icon'=>'refresh','route'=>"api/import/impExpMain"]]]]],
             'hooks'   => [
                 'administrate'=> ['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]]];
         $this->dirlist = ['backups','data','images','temp'];

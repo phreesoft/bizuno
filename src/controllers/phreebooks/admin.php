@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2025-06-11
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -42,41 +42,44 @@ class phreebooksAdmin {
             'dirMethods'=> ['totals'],
             'attachPath'=> ['phreebooks'=>'data/phreebooks/uploads/','edi'=>'data/edi/','returns'=>'data/returns/uploads/'],
             'menuBar'   => ['child'=>[
-                'banking' => ['order'=>40,'label'=>('banking'),'group'=>'bnk',     'icon'=>'bank',      'child'=>[
-                    'j17_mgr' => ['order'=>70,'label'=>('journal_id_17'),          'icon'=>'payment',   'route'=>"$this->moduleID/main/manager&jID=17"],
-                    'j18_mgr' => ['order'=>10,'label'=>('journal_id_18'),          'icon'=>'payment',   'route'=>"$this->moduleID/main/manager&jID=18"],
-                    'j20_bulk'=> ['order'=>55,'label'=>('phreebooks_manager_bulk'),'icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=20&bizAction=bulk"],
-                    'j20_mgr' => ['order'=>50,'label'=>('journal_id_20'),          'icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=20"],
-                    'j22_mgr' => ['order'=>20,'label'=>('journal_id_22'),          'icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=22"],
-                    'register'=> ['order'=>80,'label'=>('phreebooks_register'),    'icon'=>'register',  'route'=>"$this->moduleID/register/manager"],
-                    'recon'   => ['order'=>85,'label'=>('phreebooks_recon'),       'icon'=>'apply',     'route'=>"$this->moduleID/reconcile/manager"],
-                    'rpt_bank'=> ['order'=>99,'label'=>('reports'),                'icon'=>'mimeDoc',   'route'=>"phreeform/main/manager&gID=bnk"]]],
+                'banking' => ['order'=>40,'label'=>('banking'),'group'=>'bnk','icon'=>'bank',      'child'=>[
+                    'j17_mgr' => ['order'=>70,'label'=>'journal_id_17',     'icon'=>'payment',   'route'=>"$this->moduleID/main/manager&jID=17"],
+                    'j18_mgr' => ['order'=>10,'label'=>'journal_id_18',     'icon'=>'payment',   'route'=>"$this->moduleID/main/manager&jID=18"],
+                    'j20_bulk'=> ['order'=>55,'label'=>'journal_id_20_bulk','icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=20&bizAction=bulk"],
+                    'j20_mgr' => ['order'=>50,'label'=>'journal_id_20',     'icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=20"],
+                    'j22_mgr' => ['order'=>20,'label'=>'journal_id_22',     'icon'=>'bank-check','route'=>"$this->moduleID/main/manager&jID=22"],
+                    'nacha'   => ['order'=>85,'label'=>'journal_id_20_ach', 'icon'=>'nacha',     'route'=>'payment/nacha/manager'],
+                    'register'=> ['order'=>80,'label'=>'bank_register',     'icon'=>'register',  'route'=>"$this->moduleID/register/manager"],
+                    'recon'   => ['order'=>85,'label'=>'bank_recon',        'icon'=>'apply',     'route'=>"$this->moduleID/reconcile/manager"],
+                    'rpt_bank'=> ['order'=>99,'label'=>'reports',           'icon'=>'mimeDoc',   'route'=>"phreeform/main/manager&gID=bnk"]]],
                 'customers' => ['child'=>[
-                    'sales' => ['order'=>20,'label'=>('journal_id_12_mgr'), 'icon'=>'sales', 'child'=>[
-                        'j9_mgr' => ['order'=>30,'label'=>('journal_id_9'), 'icon'=>'quote', 'route'=>"$this->moduleID/main/manager&jID=9"],
-                        'j10_mgr'=> ['order'=>20,'label'=>('journal_id_10'),'icon'=>'order', 'route'=>"$this->moduleID/main/manager&jID=10"],
-                        'j12_mgr'=> ['order'=>10,'label'=>('journal_id_12'),'icon'=>'sales', 'route'=>"$this->moduleID/main/manager&jID=12"],
-                        'j13_mgr'=> ['order'=>40,'label'=>('journal_id_13'),'icon'=>'credit','route'=>"$this->moduleID/main/manager&jID=13"]]],
-                    'returns'    => ['order'=>30,'label'=>('returns'),      'icon'=>'return','route'=>"$this->moduleID/returns/manager');"]]],
+                    'sales' => ['order'=>20,'label'=>('journal_id_12_mgr'),  'icon'=>'sales',    'route'=>"$this->moduleID/main/manager&jID=12&mgr=1",'child'=>[
+                        'j9_mgr' => ['order'=>30,'label'=>('journal_id_9'),  'icon'=>'quote',    'route'=>"$this->moduleID/main/manager&jID=9"],
+                        'j10_mgr'=> ['order'=>20,'label'=>('journal_id_10'), 'icon'=>'order',    'route'=>"$this->moduleID/main/manager&jID=10"],
+                        'j12_mgr'=> ['order'=>10,'label'=>('journal_id_12'), 'icon'=>'sales',    'route'=>"$this->moduleID/main/manager&jID=12"],
+                        'j13_mgr'=> ['order'=>40,'label'=>('journal_id_13'), 'icon'=>'credit',   'route'=>"$this->moduleID/main/manager&jID=13"]]],
+                    'returns'    => ['order'=>30,'label'=>('returns'),       'icon'=>'return',   'route'=>"$this->moduleID/returns/manager');"],
+                    'fulfillment'=> ['order'=>40,'label'=>('fulfillment'),   'icon'=>'fill',     'route'=>"$this->moduleID/fulfillment/fulfillMain"]]],
                 'inventory' => ['child'=>[
-                    'j14_mgr' => ['order'=>35,'label'=>('journal_id_14'),'icon'=>'tools',   'route'=>"$this->moduleID/main/manager&jID=14"],
-                    'j15_mgr' => ['order'=>52,'label'=>('journal_id_15'),'icon'=>'transfer','route'=>"$this->moduleID/main/manager&jID=15"],
-                    'j16_mgr' => ['order'=>50,'label'=>('journal_id_16'),'icon'=>'inv-adj', 'route'=>"$this->moduleID/main/manager&jID=16"]]],
+                    'j14_mgr' => ['order'=>35,'label'=>('journal_id_14'),    'icon'=>'tools',    'route'=>"$this->moduleID/main/manager&jID=14"],
+                    'j15_mgr' => ['order'=>52,'label'=>('journal_id_15'),    'icon'=>'transfer', 'route'=>"$this->moduleID/main/manager&jID=15"],
+                    'j16_mgr' => ['order'=>50,'label'=>('journal_id_16'),    'icon'=>'inv-adj',  'route'=>"$this->moduleID/main/manager&jID=16"]]],
                 'ledger'    => ['order'=>50,'label'=>('general_ledger'),'group'=>'gl','icon'=>'journal','child'=>[
-                    'j2_mgr'  => ['order'=>10, 'label'=>('journal_id_2'),'icon'=>'journal', 'route'=>"$this->moduleID/main/manager&jID=2"]],
-//                  'cashflow'=> ['order'=>80,'label'=>lang('cash_flow')),       'icon'=>'linechart','events'=>['onClick'=>"hrefClick('phreebooks/budget/cashFlow');"]],
-                    'budget'  => ['order'=>90,'label'=>('phreebooks_budget'),'icon'=>'budget', 'route'=>"$this->moduleID/budget/manager"],
-                    'rpt_jrnl'=> ['order'=>99,'label'=>('reports'),          'icon'=>'mimeDoc','route'=>"phreeform/main/manager&gID=gl"]],
+                    'j2_mgr'  => ['order'=>10, 'label'=>('journal_id_2'),    'icon'=>'journal',  'route'=>"$this->moduleID/main/manager&jID=2&mgr=1"],
+//                  'cashflow'=> ['order'=>80,'label'=>lang('cash_flow')),   'icon'=>'linechart','route'=>"hrefClick('phreebooks/budget/cashFlow');"],
+                    'budget'  => ['order'=>90,'label'=>('phreebooks_budget'),'icon'=>'budget',   'route'=>"$this->moduleID/budget/manager"],
+                    'rpt_jrnl'=> ['order'=>99,'label'=>('reports'),          'icon'=>'mimeDoc',  'route'=>"phreeform/main/manager&gID=gl"],
+                    'rpt_gl'  => ['order'=>99,'label'=>('reports'),          'icon'=>'mimeDoc',   'route'=>'phreeform/main/manager&gID=gl']]],
                 'tools'     => ['child'=>[
                     'j0_mgr'  => ['order'=>75,'label'=>('journal_id_0'),                         'icon'=>'search','route'=>"$this->moduleID/main/manager&jID=0"],
                     'edi'     => ['order'=>85,'label'=>sprintf(lang('tbd_manager'), lang('edi')),'icon'=>'edi',   'route'=>"$this->moduleID/ediMain/manager"]]],
                 'vendors'   => ['child'=>[
-                    'purch' => ['order'=>20,'label'=>('journal_id_6_mgr'),  'icon'=>'purchase','route'=>"$this->moduleID/main/manager&jID=6&mgr=1",'child'=>[
-                        'j3_mgr' => ['order'=>30,'label'=>('journal_id_3'), 'icon'=>'quote',   'route'=>"$this->moduleID/main/manager&jID=3"],
-                        'j4_mgr' => ['order'=>20,'label'=>('journal_id_4'), 'icon'=>'order',   'route'=>"$this->moduleID/main/manager&jID=4"],
-                        'j6_mgr' => ['order'=>10,'label'=>('journal_id_6'), 'icon'=>'purchase','route'=>"$this->moduleID/main/manager&jID=6"],
-                        'j7_mgr' => ['order'=>40,'label'=>('journal_id_7'), 'icon'=>'credit',  'route'=>"$this->moduleID/main/manager&jID=7"]]],
-                    'fulfillment'=> ['order'=>40,'label'=>('fulfill_title'),'icon'=>'fill',    'route'=>"$this->moduleID/fulfillment/fulfillMain"]]]]],
+                    'purch' => ['order'=>20,'label'=>('journal_id_6_mgr'),   'icon'=>'purchase','route'=>"$this->moduleID/main/manager&jID=6&mgr=1",'child'=>[
+                        'j3_mgr' => ['order'=>30,'label'=>('journal_id_3'),  'icon'=>'quote',   'route'=>"$this->moduleID/main/manager&jID=3"],
+                        'j4_mgr' => ['order'=>20,'label'=>('journal_id_4'),  'icon'=>'order',   'route'=>"$this->moduleID/main/manager&jID=4"],
+                        'j6_mgr' => ['order'=>10,'label'=>('journal_id_6'),  'icon'=>'purchase','route'=>"$this->moduleID/main/manager&jID=6"],
+                        'j7_mgr' => ['order'=>40,'label'=>('journal_id_7'),  'icon'=>'credit',  'route'=>"$this->moduleID/main/manager&jID=7"]]],
+                    ]]]],
             'hooks' => [
                 'administrate'=>['roles'=>['edit'=>['order'=>10,'method'=>'rolesEdit'], 'save'=>['order'=>10,'method'=>'rolesSave']]],
                 'bizuno'      =>['admin'=>['loadBrowserSession'=>['order'=>50]]]],
