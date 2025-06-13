@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /view/easyUI/html5.php
  */
 
@@ -521,21 +521,26 @@ final class html5 {
      * @return string - modified $output - HTML formatted EasyUI menu appended to $output
      */
     public function sidemenu(&$output, $prop) {
-        msgDebug("\nEntering sidemenu."); // with prop = ".print_r($prop, true)
+        msgDebug("\nEntering sidemenu"); // with prop = ".print_r($prop, true));
         if (empty($prop['data']['child'])) { return; }
         $prop['data']['child'] = sortOrder($prop['data']['child']);
         $curSec = '';
-        $tree   = $this->sidemenuStruc($prop['data']['child'], $curSec);
+        $divWid = 200; // width with menu expanded
+        $tree   = $this->sidemenuStruc($prop['data']['child'], $curSec, 1, !empty($prop['options']['noDash'])?true:false);
         msgDebug("\nstruc after processing = ".print_r($tree, true));
-        $meta   = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
-        $id     = !empty($prop['attr']['id']) ? $prop['attr']['id'] : 'tbd';
-        $icnDir = $meta['menuSize']=='min'?'right':'left';
-        $divWid = $meta['menuSize']=='min'?60:200;
+        $id     = !empty($prop['attr']['id']) ? $prop['attr']['id'] : 'SideMenu';
         $output.= '<script type="text/javascript">'."var menu_{$id} = ".json_encode($tree).";</script>\n";
-        $output.= '<a id="'.$id.'Toggle" class="easyui-linkbutton" onClick="bizMenuToggle(\''.$id.'\')" data-options="plain:true,size:\'small\',iconCls:\'fa-sharp-duotone fa-solid fa-chevrons-'.$icnDir.'\'"></a>';
-        $options= 'data:menu_'.$id.',onSelect:bizMenuSelect,multiple:false,collapsed:'.($meta['menuSize']=='min'?'true':'false');
+        if (empty($prop['options']['noMin'])) {
+            $meta   = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
+            $icnDir = $meta['menuSize']=='min'?'right':'left';
+            $divWid = $meta['menuSize']=='min'?60:$divWid;
+            $output.= '<a id="'.$id.'Toggle" class="easyui-linkbutton" onClick="bizMenuToggle(\''.$id.'\')" data-options="plain:true,size:\'small\',iconCls:\'fa-sharp-duotone fa-solid fa-chevrons-'.$icnDir.'\'"></a>'."\n";
+        }
+        // addOptions($props=[])
+        $options= ['data'=>'menu_'.$id, 'multiple'=>'false', 'collapsed'=>$meta['menuSize']=='min'?'true':'false'];
+        $options['onSelect'] = !empty($prop['options']['dom']) && $prop['options']['dom']=='div' ? "function (item) { bizPanelReload('bizBody', item.route); }" : "function (item) { hrefClick(item.route); }";
         msgDebug("\nSetting options = $options");
-        $output.= '<div id="'.$id.'" class="easyui-sidemenu" style="width:'.$divWid.'px" data-options="{'.$options.'}"></div>';
+        $output.= '<div id="'.$id.'" class="easyui-sidemenu" style="width:'.$divWid.'px" data-options="'.$this->addOptions($options).'"></div>'."\n";
     }
     
     /**
@@ -546,12 +551,12 @@ final class html5 {
      * @param type $curSec
      * @param type $level
      */
-    private function sidemenuStruc($branches=[], $curSec='', $level=1) {
+    private function sidemenuStruc($branches=[], $curSec='', $level=1, $noDash=true) {
         global $bizunoLang;
         $tree = [];
         foreach ($branches as $idx => $branch) {
             $text = jsLang(isset($bizunoLang[$idx]) ? $bizunoLang[$idx] : $branch['label']);
-            if (1==$level) { // add the dashboard, level 1 only
+            if (1==$level && !$noDash) { // add the dashboard, level 1 only
                 $branch['child'][] = ['order'=>0, 'label'=>lang('dashboard'), 'icon'=>'apps', 'size'=>'large', 'route'=>"bizuno/main/bizunoHome&menuID=$idx"];
             }
 
@@ -1828,9 +1833,9 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
 
     }
 
-    /*     * *************************** APIs ***************** */
+    /***************************** APIs *********************/
 
-    /*     * *************************** Attributes ***************** */
+    /************************** Attributes ******************/
 
     /**
      * Adds the attributes to a input field.
@@ -1897,6 +1902,12 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         return "{ ".implode(",", $options)." }";
     }
 
+    public function addOptions($props=[]) {
+        $options = [];
+        if (!empty($props)) { foreach ($props as $key => $value) { $options[] = "$key:$value"; } }
+        return "{ ".implode(", ", $options)." }";
+    }
+    
     /**
      * Maps the events to the EasyUI format
      * @param array $prop - field properties

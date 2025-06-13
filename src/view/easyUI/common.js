@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /view/easyUI/common.js
  */
 
@@ -1752,10 +1752,6 @@ function bizMenuResize() {
             jqBiz('#'+this.id).splitbutton({text:''});
         });
     }
-}
-
-function bizMenuSelect(item) {
-    hrefClick(item.route);
 }
 
 function bizMenuToggle(id) {

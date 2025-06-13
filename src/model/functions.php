@@ -80,12 +80,12 @@ function bizAutoLoadRemap($path)
 function compose($module, $page, $method, &$layout=[])
 {
     global $io;
-//    error_log("\nIn compose, processing module: $module, page = $page, and method = $method"); return;
     $processes = mergeHooks($module, $page, $method);
     foreach ($processes as $modID => $modProps) {
         if (empty($modProps['page'])) { $modProps['page'] = 'admin'; }
         $fqdn = isset($modProps['class']) ? "\\bizuno\\".$modProps['class'] : "\\bizuno\\".$modID.ucfirst($modProps['page']);
 // @TODO - remove after release of 7.1
+$modProps['path'] = str_replace('BIZBOOKS_EXT/controllers/proLgstc/', 'BIZBOOKS_ROOT/controllers/shipping/', $modProps['path']);
 $modProps['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $modProps['path']);
 if (strpos($modProps['path'], 'BIZBOOKS_EXT')!==false) { continue; }
 // EOF - patch

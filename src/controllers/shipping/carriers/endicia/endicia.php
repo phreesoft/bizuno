@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /controllers/shipping/carriers/endicia/endicia.php
  *
  * Docs: https://www.endicia.com/developer/docs
@@ -93,14 +93,10 @@ class endicia extends endiciaCommon
      */
     public function settingSave()
     {
-        $meta     = dbMetaGet(0, "methods_{$this->methodDir}");
-        msgDebug("\nRead meta for this method = ".print_r($meta, true));
-        $metaIdx  = metaIdxClean($meta);
-        // extract the services
-        $services = clean("{$this->code}_service_types", 'array', 'post');
-        $meta[$this->code]['settings']['service_types'] = implode(':', $services);
-        $meta[$this->code]['settings']['services']  = viewCarrierServices($this->code, $meta[$this->code]['settings']['service_types'], $this->lang);
-        msgDebug("\nReady to write updated meta to index $metaIdx = ".print_r($meta, true));
+        $meta   = dbMetaGet(0, "methods_{$this->methodDir}");
+        $metaIdx= metaIdxClean($meta);
+        $meta[$this->code]['settings']['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
+        msgDebug("\nSetting settings:services to: ".print_r($meta[$this->code]['settings']['services'], true));
         dbMetaSet($metaIdx, "methods_{$this->methodDir}", $meta);
     }
 

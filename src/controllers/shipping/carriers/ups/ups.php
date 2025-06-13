@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /controllers/shipping/carriers/ups/manager.php
  *
  * UPS Developer Site:
@@ -78,11 +78,11 @@ class ups extends upsCommon
 
     public function settingSave()
     {
-        $methProps = getModuleCache($this->moduleID, $this->methodDir, $this->code);
-        settingsSaveMethod($this->settings, $this->settingsStructure(), $this->code.'_');
-        $this->settings['services']  = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
-        $methProps['settings'] = $this->settings;
-        setModuleCache($this->moduleID, $this->methodDir, $this->code, $methProps);
+        $meta   = dbMetaGet(0, "methods_{$this->methodDir}");
+        $metaIdx= metaIdxClean($meta);
+        $meta[$this->code]['settings']['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
+        msgDebug("\nSetting settings:services to: ".print_r($meta[$this->code]['settings']['services'], true));
+        dbMetaSet($metaIdx, "methods_{$this->methodDir}", $meta);
     }
 
     public function manager(&$layout=[])

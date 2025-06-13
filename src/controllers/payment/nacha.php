@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /controllers/payment/nacha.php
  *
  */
@@ -41,13 +41,15 @@ class paymentNacha
     private $totalHash = 0;
     public  $lang;
     public  $refNum;
-    private $myData;
+    public  $myData;
 
     function __construct($mapID='')
     {
+        msgTrap();
         $this->lang= getExtLang($this->moduleID);
         $this->refNum = 'ACH'.biz_date('ymdHi'); // .'-'; // bank groups these into single withdrawal
         $banks = getMetaCommon('ach_banks');
+        msgDebug("\nConstucting nacha with mapID = $mapID and banks meta = ".print_r($banks, true));
         foreach ($banks as $bank) { if ($bank['mapID']==$mapID) { $this->myData = $bank; break; } }
         $this->myData['transit_routing'] = substr($this->myData['biz_route'], 0, 8); // Transit routing Number, less check digit
     }

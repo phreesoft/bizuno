@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-13
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -257,6 +257,13 @@ class phreebooksAdmin {
         bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
         $currency= new phreebooksCurrency();
         $repost  = $this->getViewRepost();
+        // Add the Sales Tax Collected panel to tools tab
+        $period= getModuleCache('phreebooks', 'fy', 'period') - 1;
+        $taxNxs  = '<div><form id="frmTaxCalc" action="'.BIZUNO_AJAX.'&bizRt=phreebooks/restfulTax/calcTaxCollected">';
+        $taxNxs .= "<p>".lang('tax_calc_desc')."</p>\n";
+        $taxNxs .= html5('period', ['label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]]);
+        $taxNxs .= '<p>'.html5('', ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]).'</p>';
+        $taxNxs .= "</form><script>ajaxDownload('frmTaxCalc');</script></div>";
         $fields  = [
             'glTestDesc'   => ['order'=>10,'html'=>$this->lang['pbtools_gl_test_desc'],'attr'=>['type'=>'raw']],
             'btnRepairGL'  => ['order'=>20,'attr'=>['type'=>'button','value'=>lang('start')],'events'=>['onClick'=>"jsonAction('phreebooks/tools/glRepair');"]],
@@ -273,6 +280,7 @@ class phreebooksAdmin {
             'tabs'    => ['tabAdmin'=>['divs'=>[
                 'tabGL'    => ['order'=>20,'label'=>lang('chart_of_accts'), 'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/chart/manager'"]],
                 'tabCur'   => ['order'=>30,'label'=>lang('currencies'),     'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/currency/manager'"]],
+                'tabNexus' => ['order'=>38,'label'=>lang('nexus_lbl'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
                 'tabTaxc'  => ['order'=>40,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
                 'tabTaxv'  => ['order'=>50,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
                 'tabFY'    => ['order'=>80,'label'=>lang('fiscal_calendar'),'type'=>'html','html'=>'',
@@ -285,7 +293,8 @@ class phreebooksAdmin {
                     'pruneCOGS'=> ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'pruneCOGS'],
                     'repostGL' => ['order'=>40,'type'=>'panel','classes'=>['block66'],'key'=>'repostGL'],
                     'ediGet'   => ['order'=>50,'type'=>'panel','classes'=>['block33'],'key'=>'ediGet'],
-                    'ediMan'   => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'ediMan']]],
+                    'taxCalc'  => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'taxCalc'],
+                    'ediMan'   => ['order'=>70,'type'=>'panel','classes'=>['block33'],'key'=>'ediMan']]],
                     'purgeGL'  => ['order'=>90,'type'=>'panel','hidden'=> $security>4?false:true,'classes'=>['block33'],'key'=>'purgeGL']]]]]],
             'panels'  => [
                 'repostGL' => ['label'=>$this->lang['phreebooks_repost_title'],'type'=>'html',  'html'=>$repost],
@@ -301,7 +310,8 @@ class phreebooksAdmin {
                     'ediRID' => ['order'=>20,'type'=>'html','html'=>"<p>".html5('rID', ['attr'=>['type'=>'text']])."</p>"],
                     'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jqBiz('#frmEdiMan').submit();"]])."</p>"]],
                     'formEOF'=> ['order'=>85,'type'=>'html','html'=>'</form>']],
-                'purgeGL'  => ['label'=>$this->lang['msg_gl_db_purge'],        'type'=>'fields','keys'=>['purgeGlDesc','purge_db','btn_purge']]],
+                'purgeGL'  => ['label'=>$this->lang['msg_gl_db_purge'],        'type'=>'fields','keys'=>['purgeGlDesc','purge_db','btn_purge']],
+                'taxCalc'  => ['label'=>lang('tax_collected'),'type'=>'html',  'html'=>$taxNxs]],
             'datagrid'=> ['dgCurrency'  =>$currency->dgCurrency('dgCurrency', $security)],
             'forms'   => [
                 'frmEdiMan'  => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
@@ -321,17 +331,6 @@ class phreebooksAdmin {
             $order++;
         }
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
-        // Add the nexus tab
-        $layout['tabs']['tabAdmin']['divs']['tabNexus'] = ['order'=>38,'label'=>$this->lang['nexus_lbl'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/restfulTax/manager'"]];
-        // Add the Sales Tax Collected panel to tools tab
-        $period= getModuleCache('phreebooks', 'fy', 'period') - 1;
-        $html  = '<div><form id="frmTaxCalc" action="'.BIZUNO_AJAX.'&bizRt=phreebooks/restfulTax/calcTaxCollected">';
-        $html .= "<p>".lang('tax_calc_desc')."</p>\n";
-        $html .= html5('period', ['label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]]);
-        $html .= '<p>'.html5('', ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]).'</p>';
-        $html .= "</form><script>ajaxDownload('frmTaxCalc');</script></div>";
-        $layout['tabs']['tabAdmin']['divs']['tabTools']['divs']['general']['divs']['taxCalc'] = ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'taxCalc'];
-        $layout['panels']['taxCalc'] = ['label'=>lang('tax_collected'),'type'=>'html',  'html'=>$html];
     }
 
     private function getViewRepost()

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /local/en_US/language.php
  */
 
@@ -54,12 +54,10 @@ $langCore = [
     'bizuno_backup' => 'Business Backup',
     'bizuno_company' => 'My Business',
     'bizuno_upgrade' => 'Upgrade Bizuno',
-    'dashboards' => 'Dashboards',
     'bizuno_help' => 'Bizuno Help',
     'bizuno_impexp' => 'Import/Export',
     'bizuno_profile' => 'My Profile',
     'quality' => 'Quality',
-    'dashboard' => 'Dashboard',
     'edi' => 'EDI',
     'employees' => 'Employees',
     'image_manager' => 'Image Manager',
@@ -213,6 +211,8 @@ $langCore = [
     'current_image' => 'Current Image',
     'custom' => 'Custom',
     'cust_feedback' => 'Customer Feedback',
+    'dashboard' => 'Dashboard',
+    'dashboards' => 'Dashboards',
     'date' => 'Date',
     'date_acq' => 'Date Acquired',
     'date_actual' => 'Actual Date',
