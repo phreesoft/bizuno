@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-14
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -41,7 +41,7 @@ class bizunoAdmin
             'usersAttachPath'=> "data/$this->moduleID/users/uploads",
             'menuBar' => ['child'=>[
                 'quality'=> ['order'=>70,'label'=>lang('quality'),'icon'=>'extQuality','group'=>'quality','child'=>[
-                    'mgr_docs' => ['order'=>60,'label'=>sprintf(lang('tbd_manager'), lang('document')),   'icon'=>'fileMgr','route'=>"$this->moduleID/docs/manager"],
+                    'mgr_docs' => ['order'=>60,'label'=>sprintf(lang('tbd_manager'), lang('document')),   'icon'=>'fileMgr','route'=>'office/docs/manager'],
                     'mgr_maint'=> ['order'=>90,'label'=>sprintf(lang('tbd_manager'), lang('maintenance')),'icon'=>'maint',  'route'=>"$this->moduleID/maint/manager"]]],
                 'tools'  => ['order'=>90,'label'=>('tools'),  'icon'=>'tools','group'=>'tool','child'=>[
                     'imgmgr'   => ['order'=>75,'label'=>sprintf(lang('tbd_manager'), lang('image')),      'icon'=>'mimeImg','route'=>"bizuno/image/manager&dom=page"], // was jsonAction

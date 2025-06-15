@@ -21,14 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-14
  * @filesource /controllers/shipping/address.php
  */
 
 namespace bizuno;
 
-bizAutoLoad(dirname(__FILE__).'/common.php',    'shippingCommon');
-bizAutoLoad(dirname(__FILE__).'/functions.php', 'processExtShippping', 'function');
+bizAutoLoad(dirname(__FILE__).'/common.php', 'shippingCommon');
 
 class shippingAddress extends shippingCommon
 {

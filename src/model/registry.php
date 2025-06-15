@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-15
  * @filesource /model/registry.php
  */
 
@@ -423,7 +423,6 @@ unset($bizunoMod[$module]['dashboards']);
             $args = [ // just the values to update
                 'id'         => $method, // This should already be set via the registry install, probably not needed here
                 'title'      => $title,
-                'status'     => !empty($clsMeth->required) ? '1' : '0',
                 'acronym'    =>  isset($clsMeth->lang['acronym']) ? $clsMeth->lang['acronym']: $title,
                 'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
                 'path'       => $path,

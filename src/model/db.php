@@ -682,7 +682,7 @@ function dbStructureFill(&$structure, $data=[], $suffix='')
 function dbTableRead($data)
 {
     global $currencies;
-    msgDebug("\nEntering dbTableRead with data = ".print_r($data, true));
+    msgDebug("\nEntering dbTableRead"); //  with data = ".print_r($data, true));
     // Need to force strict mode if more than one table as fields with same name will overlap resulting in bad content, i.e. column id gets last tables value
     if (sizeof($data['source']['tables']) > 1) { $data['strict'] = true; }
     $sqlTables  = dbTableReadTables  ($data['source']['tables']);

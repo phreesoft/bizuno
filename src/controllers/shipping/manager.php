@@ -21,13 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-14
  * @filesource /controllers/shipping/manager.php
  */
 
 namespace bizuno;
 
-bizAutoLoad(dirname(__FILE__).'/functions.php', 'processExtShippping', 'function');
+bizAutoLoad(dirname(__FILE__).'/functions.php', 'shippingView', 'function');
 
 class shippingManager extends mgrJournal
 {
@@ -72,7 +72,7 @@ class shippingManager extends mgrJournal
             'ref_num'     => ['panel'=>'general',   'order'=>10,                                'clean'=>'cmd',     'attr'=>['type'=>'hidden',  'value'=>'']],
             'invoice_num' => ['panel'=>'general',   'order'=>15,'label'=>lang('invoice_num_12'),'clean'=>'cmd',     'attr'=>['value'=>'']],
             'store_id'    => ['panel'=>'general',   'order'=>20,'label'=>lang('store_id'),      'clean'=>'integer', 'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>-1], 'values'=>viewStores()],
-            'method_code' => ['panel'=>'general',   'order'=>25,'label'=>lang('method'),        'clean'=>'cmd',     'attr'=>['type'=>'select',  'value'=>''], 'values'=>$choices, 'options'=>['width'=>350], 'process'=>'shipInfo'],
+            'method_code' => ['panel'=>'general',   'order'=>25,'label'=>lang('method'),        'clean'=>'cmd',     'attr'=>['type'=>'select',  'value'=>''], 'values'=>$choices, 'options'=>['width'=>350], 'format'=>'shipInfo'],
             'ship_date'   => ['panel'=>'general',   'order'=>30,'label'=>lang('ship_date'),     'clean'=>'datetime','attr'=>['type'=>'datetime','value'=>biz_date('Y-m-d H:i:s')]],
             'deliver_date'=> ['panel'=>'general',   'order'=>35,'label'=>lang('date_deliver'),  'clean'=>'datetime','attr'=>['type'=>'datetime','value'=>'']],
             'total_cost'  => ['panel'=>'general',   'order'=>40,'label'=>lang('cost'),          'clean'=>'float',   'attr'=>['type'=>'currency','value'=>0]],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-12
  * @filesource /controllers/contacts/projects.php
  *
  * @TODO - Add last_update field to database and use as main sort DESC
@@ -29,9 +29,9 @@
 
 namespace bizuno;
 
-class proCustProjects extends mgrJournal
+class contactsProjects extends mgrJournal
 {
-    public    $moduleID  = 'proCust';
+    public    $moduleID  = 'contacts';
     public    $pageID    = 'projects';
     protected $secID     = 'projects';
     protected $domSuffix = 'Projects';
@@ -54,11 +54,6 @@ class proCustProjects extends mgrJournal
         $this->managerSettings();
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     protected function fieldStructure()
     {
         $reps = viewRoleDropdown('all');
@@ -78,12 +73,6 @@ class proCustProjects extends mgrJournal
             'reminder_date'=> ['panel'=>'general','order'=>60,'label'=>$this->lang['reminder_date'],'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>'']],
             'notes'        => ['panel'=>'notes',  'order'=>10,                                      'clean'=>'text',     'attr'=>['type'=>'textarea', 'value'=>'']]];
     }
-    
-    /**
-     * This function builds the grid structure for retrieving the data
-     * @param integer $security - access level range 0-4
-     * @return array $data - structure of the grid to render
-    */
     protected function managerGrid($security=0, $args=[])
     {
         $data    = array_replace_recursive(parent::gridBase($security, $args), [
@@ -101,13 +90,19 @@ class proCustProjects extends mgrJournal
                 'created_date'=> ['order'=>70, 'label'=>lang('date_first'),     'attr'=>['sortable'=>true, 'resizable'=>true],'format'=>'date']]]);
         return $data;
     }
-
+    protected function managerSettings()
+    {
+        parent::managerDefaults();
+        $this->defaults['sort']  = clean('sort',  ['format'=>'cmd',      'default'=>'post_date'],'post');
+        $this->defaults['status']= clean('status',['format'=>'alpha_num','default'=>''],         'post');
+        $this->defaults['market']= clean('market',['format'=>'alpha_num','default'=>''],         'post');
+    }
     /******************************** Journal Manager ********************************/
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $cID = clean('cID', 'integer', 'get');
-        parent::manager($layout);
+        parent::managerMain($layout);
         $layout['jsHead']['vars'] = "var bizQualStatuses = ".json_encode($this->status).";\nvar bizQualMarkets = ".json_encode($this->markets).";";
         if (!empty($cID)) { $layout['type'] = 'divHTML'; }
     }
@@ -117,13 +112,6 @@ class proCustProjects extends mgrJournal
         parent::mgrRowsMeta($layout);
         if ($this->defaults['status']=='') { unset($layout['metagrid']['source']['filters']['status']); } // status=all so do test it
         if ($this->defaults['market']=='') { unset($layout['metagrid']['source']['filters']['market']); } // market=all so do test it
-    }
-    protected function managerSettings()
-    {
-        parent::managerSettings();
-        $this->defaults['sort']  = clean('sort',  ['format'=>'cmd',      'default'=>'post_date'],'post');
-        $this->defaults['status']= clean('status',['format'=>'alpha_num','default'=>''],         'post');
-        $this->defaults['market']= clean('market',['format'=>'alpha_num','default'=>''],         'post');
     }
     public function edit(&$layout=[])
     {

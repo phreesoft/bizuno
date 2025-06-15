@@ -18,16 +18,16 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-04-02
- * @filesource /bizuno-pro/controllers/proInv/tools.php
+ * @version    7.x Last Update: 2025-06-14
+ * @filesource /controllers/inventory/toolsInv.php
  */
 
 namespace bizuno;
 
-class proInvTools
+class inventoryToolsInv
 {
-    public  $moduleID = 'proInv';
-    public  $pageID   = 'tools';
+    public  $moduleID = 'inventory';
+    public  $pageID   = 'invTools';
     private $dateStart= '2021-12-31';
     private $states   = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
                          'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',

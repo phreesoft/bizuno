@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-15
  * @filesource /model/functions.php
  */
 
@@ -84,11 +84,6 @@ function compose($module, $page, $method, &$layout=[])
     foreach ($processes as $modID => $modProps) {
         if (empty($modProps['page'])) { $modProps['page'] = 'admin'; }
         $fqdn = isset($modProps['class']) ? "\\bizuno\\".$modProps['class'] : "\\bizuno\\".$modID.ucfirst($modProps['page']);
-// @TODO - remove after release of 7.1
-$modProps['path'] = str_replace('BIZBOOKS_EXT/controllers/proLgstc/', 'BIZBOOKS_ROOT/controllers/shipping/', $modProps['path']);
-$modProps['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $modProps['path']);
-if (strpos($modProps['path'], 'BIZBOOKS_EXT')!==false) { continue; }
-// EOF - patch
         $controller = "{$modProps['path']}{$modProps['page']}.php";
         if (!bizAutoLoad($controller, $fqdn)) {
             msgDebug("\nCache hooks for module: $module contains: ".print_r(getModuleCache($module, 'hooks'), true));
@@ -906,7 +901,7 @@ function getModuleCache($module, $group='settings', $lvl1=false, $lvl2=false, $d
         return isset($bizunoMod[$module][$group][$lvl1]) ? $bizunoMod[$module][$group][$lvl1] : $default;
     } elseif ( $lvl1 &&  $lvl2) { // lvl1 is an array
         if (isset($bizunoMod[$module][$group][$lvl1][$lvl2])) { return $bizunoMod[$module][$group][$lvl1][$lvl2]; }
-        if (isset($bizunoMod[$module][$group][$lvl1]) && array_key_exists($lvl2, $bizunoMod[$module][$group][$lvl1])) {
+        if (isset($bizunoMod[$module][$group][$lvl1]) && array_key_exists($lvl2, (array)$bizunoMod[$module][$group][$lvl1])) {
             return $bizunoMod[$module][$group][$lvl1][$lvl2]; // check for index with null
         }
     }

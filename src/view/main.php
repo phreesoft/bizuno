@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-14
  * @filesource /view/main.php
  */
 
@@ -417,6 +417,13 @@ function resizeEverything() { ".implode(" ", $jsResize)." }"; }
  */
 function viewFormat($value, $format = '')
 {
+    if (empty($GLOBALS['DAVE_DEBUG'])) { $GLOBALS['DAVE_DEBUG'] = 0; }
+    $GLOBALS['DAVE_DEBUG']++;
+    if ($GLOBALS['DAVE_DEBUG'] > 100000) {
+        msAdd("Trap hit");
+        msgDebugWrite();
+        exit();
+    }
 //  msgDebug("\nIn viewFormat value = $value and format = $format");
     switch ($format) {
         case 'blank':      return '';
@@ -483,7 +490,7 @@ return "Needs Fixin: $value";
         case 'storeID':   $rID = intval($value);
             foreach (getModuleCache('bizuno', 'stores') as $row) { if ($rID==$row['id']) { return $row['text']; } }
             if ($rID == -1) { return lang('all'); }
-            break;
+            return $value;
         case 'stripTags': return html_entity_decode(strip_tags($value));
         case 'cTerms':    return viewTerms($value, true, 'c');
         case 'terms':     return viewTerms($value); // must be passed encoded terms, default terms will use customers default
@@ -498,7 +505,8 @@ return "Needs Fixin: $value";
         if (!function_exists($fqfn)) {
             $module = getModuleCache('phreeform', 'formatting')[$format]['module'];
             $path = getModuleCache($module, 'properties', 'path');
-            if (!bizAutoLoad("{$path}functions.php", $fqfn, 'function')) {
+            msgDebug("\nAutoloading module = $module and path = $path");
+            if (!bizAutoLoad("{$path}functions.php", $func, 'function')) {
                 msgDebug("\nFATAL ERROR looking for file {$path}functions.php and function $func and format $format, but did not find", 'trap');
                 return $value;
             }

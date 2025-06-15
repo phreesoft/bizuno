@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-10
+ * @version    7.x Last Update: 2025-06-14
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -160,7 +160,7 @@ class ifAmazon {
             $maps[] = ['id'=>$tmp2, 'text'=>$tmp2];
         } }
         $fields = [
-            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS."controllers/api/funnels/$this->code/logo.png"]],
+            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
             'selMap'      => ['values' =>$maps, 'attr'=> ['type'=>'select']],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
