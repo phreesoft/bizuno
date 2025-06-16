@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/administrate/functions.php
  */
 
@@ -47,7 +47,7 @@ function administrateView($value, $format='') {
                 return $extRtn->lang['used'];
             }
             else { return $value; }
-        case 'storeStock':
+        case 'storeStock': // @TODO - DEPRECATED - removed after 7/1/2025
             $storeID  = !empty($GLOBALS['bizuno_store_id']) ? $GLOBALS['bizuno_store_id'] : 0;
             $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku='".addslashes($value)."'", false);
             if (!$thisStore) { $thisStore = 0;}
@@ -57,53 +57,4 @@ function administrateView($value, $format='') {
         default:
     }
     return $value;
-}
-
-/**
- * Pulls the quantity of a SKU on order by store
- * @param type $sku
- * @param type $jID
- */
-function getStoreOnOrder($sku='', $jID=10) {
-    $output=[];
-    $stmt = dbGetResult("SELECT i.id, m.store_id, i.qty, i.item_ref_id FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
-        WHERE m.journal_id='$jID' AND i.sku='".addslashes($sku)."' AND m.closed='0'");
-    if (empty($stmt)) { msgDebug ("\nNo Results for sku = $sku and journal ID = $jID"); return $output; }
-    $result= $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    msgDebug("\nReturned number of open SO/PO rows = ".sizeof($result));
-    msgDebug("\nRows = ".print_r($result, true));
-    foreach ($result as $row) {
-        $bal = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', "SUM(qty)", "item_ref_id={$row['id']} AND gl_type='itm'", false); // so/po - filled
-        if (empty($bal)) { $bal = 0; }
-        msgDebug("\nCalculated balance = ".print_r($bal, true));
-        if (!isset($output[$row['store_id']]['order'])) { $output[$row['store_id']]['order'] = 0; }
-        $output[$row['store_id']]['order'] += $row['qty'] - $bal;
-    }
-    msgDebug("\nOutput = ".print_r($output, true));
-    return $output;
-}
-
-/**
- * Pulls current stock levels by store with other tidbits of data
- * @param type $sku
- * @return type
- */
-function getStoreStock($sku='') {
-    $output  = [];
-    $newCost = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'item_cost', "sku='".addslashes($sku)."'");
-    $balance = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND remaining>0");
-//    msgDebug("\nRead balance from inventory history: ".print_r($balance, true));
-    foreach ($balance as $row) {
-        if (empty($output['b'.$row['store_id']])) { $output['b'.$row['store_id']] = ['stock'=>0, 'cost'=>$newCost]; }
-        $output['b'.$row['store_id']]['stock']+= $row['remaining'];
-        $output['b'.$row['store_id']]['cost']  = max($output['b'.$row['store_id']]['cost'], $newCost); // pulls the highest cost
-    }
-    // subtract stock owed
-    $owed = dbGetMulti(BIZUNO_DB_PREFIX.'journal_cogs_owed', "sku='".ADDSLASHES($sku)."'");
-    foreach ($owed as $row) {
-        if (!isset($output['b'.$row['store_id']]['stock'])) { $output['b'.$row['store_id']]['stock'] = 0; }
-        $output['b'.$row['store_id']]['stock'] -= $row['qty'];
-    }
-    msgDebug("\nLeaving getStoreStock with output = ".print_r($output, true));
-    return $output;
 }

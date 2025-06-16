@@ -108,10 +108,13 @@ class shipping
      * @param type $data
      * @return string
      */
-    public function render($data=[]) {
+    public function render($data=[])
+    {
+        msgTrap();
         $billingTypes = ['sender'=>lang('sender'),'3rdparty'=>$this->lang['third_party'],'recip'=>lang('recipient'),'collect'=>lang('collect'),'other'=>lang('other')];
         $choices = [['id'=>'', 'text'=>lang('select')]];
         $carriers= getMetaMethod('carriers');
+        msgDebug("\nRead methods carriers = ".print_r($carriers, true));
         foreach ($carriers as $carrier) {
             if ($carrier['status'] && isset($carrier['settings']['services'])) {
                 $choices = array_merge_recursive($choices, $carrier['settings']['services']);

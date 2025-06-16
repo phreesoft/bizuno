@@ -119,7 +119,6 @@ final class html5 {
                 break;
             case 'totals':
                 $meta = getMetaCommon('methods_totals');
-                msgDebug("\nRead methodfs totals = ".print_r($meta, true));
                 foreach ($prop['content'] as $methID) {
                     $fqcn = "\\bizuno\\$methID";
                     bizAutoLoad("{$meta[$methID]['path']}$methID.php", $fqcn);
@@ -399,7 +398,6 @@ final class html5 {
      */
     public function menu(&$output, $prop) {
         msgDebug("\nEntering menu");
-        msgDebug("\nwith menu props = ".print_r($prop, true));
         if (empty($prop['data']['child'])) { return; }
         $hideLabel= !empty($prop['hideLabels']) ? $prop['hideLabels'] : false;
         $orient   = !empty($prop['orient']) && $prop['orient']=='v' ? 'v' : 'h';
@@ -723,8 +721,6 @@ columns:  [[
             $output .= html5('contactSel'.$attr['suffix'], ['attr'=>['type'=>'hidden']]);
         }
         $output .= "</div>\n";
-        msgDebug("\nprops[keys] = ".print_r($props['keys'], true));
-        msgDebug("\ndata = ".print_r($viewData['fields'], true));
         $data = [];
         foreach ($props['keys'] as $key)  {
             $data['fields'][$key] = !empty($viewData['fields'][$key.$attr['suffix']]) ? $viewData['fields'][$key.$attr['suffix']] : $viewData['fields'][$key];

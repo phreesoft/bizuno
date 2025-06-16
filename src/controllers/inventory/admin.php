@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -75,7 +75,7 @@ class inventoryAdmin
             'inv_mv12'  => ['text'=>lang('annual_sales')     .' (sku)'],
             'inv_stk'   => ['text'=>lang('qty_min')          .' (sku)']];
         $this->phreeformFormatting = [
-            'buySell'=>['text'=>$this->lang['buy_sell_title'], 'group'=>$this->lang['title'], 'module'=>$this->moduleID, 'function'=>'contactsView']];
+            'buySell'=>['text'=>$this->lang['buy_sell_title'], 'group'=>$this->lang['title'], 'module'=>$this->moduleID, 'function'=>'inventoryView']];
         $this->setPriceProcessing($this->phreeformProcessing); // build dynamic processing based on quantity price sheets available
         setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
         $this->job_units = ['0'=>lang('minutes'), '1'=>lang('hours'), '2'=>lang('days')];

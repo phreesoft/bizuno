@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/inventory/main.php
  */
 
@@ -604,7 +604,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
      * Calculates the cost of building an assembly
      * @return entry is made in the message queue with current assembly cost
      */
-    public function getCostAssy($rID=0)
+    public function getCostAssy(&$layout=[])
     {
         global $currencies;
         if (!$rID) { $rID = clean('rID', 'integer', 'get'); }

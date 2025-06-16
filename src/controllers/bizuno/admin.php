@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -56,7 +56,7 @@ class bizunoAdmin
             'today'     => ['text'=>lang('today'),                  'group'=>lang('date')],
             'faType'    => ['text'=>lang('asset_type'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
             'faCond'    => ['text'=>lang('purch_cond'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
-            'storeStock'=> ['text'=>lang('store_stock'),   'group'=>lang('ctype_b'),     'module'=>$this->moduleID,'function'=>'administrateView'],
+            'storeStock'=> ['text'=>lang('store_stock'),   'group'=>lang('ctype_b'),     'module'=>$this->moduleID,'function'=>'inventoryView'],
             'sbBOM'     => ['text'=>$this->lang['sb_proc_bom'],  'group'=>$this->lang['srvBldJrnl_title']],
             'sbOnOrder' => ['text'=>$this->lang['sb_proc_order'],'group'=>$this->lang['srvBldJrnl_title']],
             'sbSteps'   => ['text'=>$this->lang['sb_step_list'], 'group'=>$this->lang['srvBldJrnl_title']],

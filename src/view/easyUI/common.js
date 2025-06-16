@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /view/easyUI/common.js
  */
 
@@ -2046,7 +2046,7 @@ function shippingValidate(suffix) {
     var suffix = suffix;
     var ship   = encodeURIComponent(JSON.stringify(temp));
     // For ISP hosted run everything through the Client server
-    jsonAction('proLgstc/address/validateAddress&suffix='+suffix+'&methodCode='+code+'&country='+country, 0, ship);
+    jsonAction('shipping/address/validateAddress&suffix='+suffix+'&methodCode='+code+'&country='+country, 0, ship);
     // For PhreeSoft hosted, run through the portal???
 //  jsonPortal('myPortal/shipping/validateAddress&suffix='+suffix+'&methodCode='+code+'&country='+country, 0, ship);
 }
@@ -2623,7 +2623,7 @@ function shippingEstimate() {
     }
     data.storeID = bizSelGet('store_id');
     data.totals['total_amount'] = cleanCurrency(jqBiz('#total_amount').val()) - cleanCurrency(jqBiz('#freight').val());
-    var href = bizunoAjax+'&bizRt=proLgstc/rate/rateMain&resi='+resi+'&data='+encodeURIComponent(JSON.stringify(data));
+    var href = bizunoAjax+'&bizRt=shipping/rate/rateMain&resi='+resi+'&data='+encodeURIComponent(JSON.stringify(data));
     var json = { action:'window', id:'shippingEst', title:bizLangJS('SHIPPING_ESTIMATOR'), width:1000, height:600, href:href };
     processJson(json);
 }
