@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /model/io.php
  */
 
@@ -57,6 +57,7 @@ final class io
     }
 
     /**
+     * @TODO - DEPRECATED AS THE SUBFOLDER NEEDS TO BE PROVIDED
      * Deletes a module attachment file and resets the attach flag if no more attachments are present
      * @param array $layout - page structure coming in
      * @param integer $mID - module ID
@@ -64,7 +65,7 @@ final class io
      * @param boolean $dbID - table name
      * @return modified $structure
      */
-    public function attachDelete(&$layout, $mID, $pfxID='rID_', $dbID=false)
+/*    public function attachDelete(&$layout, $mID, $pfxID='rID_', $dbID=false)
     {
         $dgID = clean('rID', 'text', 'get');
         $file = clean('data','text', 'get');
@@ -83,7 +84,7 @@ final class io
         if (!sizeof($rows)) { dbWrite(BIZUNO_DB_PREFIX.$dbID, ['attach'=>'0'], 'update', "id=$rID"); }
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval', 'actionData'=>"var row=jqBiz('#$dgID').datagrid('getSelected');
             var idx=jqBiz('#$dgID').datagrid('getRowIndex', row); jqBiz('#$dgID').datagrid('deleteRow', idx);"]]);
-    }
+    } */
 
     /**
      * Sends a cURL request to a server

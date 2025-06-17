@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-14
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/contacts/main.php
  */
 
@@ -304,7 +304,7 @@ class contactsMain
                 'genStat' => ['label'=>$status['label'],      'type'=>'fields', 'keys'=>$status['fields']],
                 'genAcct' => ['label'=>lang('account'),       'type'=>'fields', 'keys'=>$fldAcct],
                 'genProp' => ['label'=>lang('properties'),    'type'=>'fields', 'keys'=>$fldProp],
-                'genAtch' => ['type'=>'attach','defaults'=>['dgName'=>$this->moduleID.'Attach','path'=>getModuleCache($this->moduleID,'properties','attachPath'),'prefix'=>"rID_{$rID}_"]]],
+                'genAtch' => ['type'=>'attach','defaults'=>['dgName'=>$this->moduleID.'Attach','path'=>getModuleCache($this->moduleID,'properties','attachPath','contacts'),'prefix'=>"rID_{$rID}_"]]],
             'forms'    => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
             'fields'   => $structure,
             'jsReady'  => ['init'=>"ajaxForm('frmContact');"]];
@@ -357,7 +357,7 @@ class contactsMain
         $_GET['rID'] = $_POST['id'] = $rID; // save for custom processing
         $this->saveLog($layout, $rID);
         if ($makeTransaction) { dbTransactionCommit(); }
-        if ($io->uploadSave('file_attach', getModuleCache('contacts', 'properties', 'attachPath')."rID_{$rID}_")) {
+        if ($io->uploadSave('file_attach', getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_")) {
             dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
         }
         msgAdd(lang('msg_record_saved'), 'success'); // doesn't hang if returning to manager
@@ -497,7 +497,7 @@ class contactsMain
             'contacts'     => 'DELETE FROM '.BIZUNO_DB_PREFIX."contacts WHERE id=$rID",
             'contacts_meta'=> 'DELETE FROM '.BIZUNO_DB_PREFIX."contacts_meta WHERE ref_id=$rID",
             'contacts_log' => 'DELETE FROM '.BIZUNO_DB_PREFIX."contacts_log WHERE contact_id=$rID"]];
-        $files = glob(getModuleCache('contacts', 'properties', 'attachPath')."rID_{$rID}_*.zip");
+        $files = glob(getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_*.zip");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
         msgLog(lang('contacts_title')." ".lang('delete')." - $short_name (rID=$rID)");
         $layout = array_replace_recursive($layout, $data);

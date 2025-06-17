@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -37,7 +37,7 @@ class contactsAdmin
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure= [
             'api'       => ['path'=>'contacts/api/contactsAPI'],
-            'attachPath'=> 'data/contacts/uploads/',
+            'attachPath'=> ['contacts'=>'data/contacts/uploads/'],
             'menuBar'   => ['child'=>[
                 'customers'=> ['order'=>10,'label'=>('customers'),'group'=>'cust','icon'=>'sales','child'=>[
                     'mgr_c'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_c')),'icon'=>'users','route'=>'contacts/main/manager&type=c'],

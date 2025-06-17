@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -55,53 +55,6 @@ function inventoryProcess($value, $format='')
         case 'inv_mv12':  if (empty($range)) { $range = 'm12';}
                           return viewInvSales($value, $range); // value passed should be the SKU
         case 'inv_stk':   return viewInvMinStk($value); // value passed should be the SKU
-        default:
-    }
-    if (substr($format, 0, 5) == 'skuPS') { // get the sku price based on the price sheet passed
-        if (!$value) { return ''; }
-        $fld   = explode(':', $format);
-        if (empty($report->currentValues['id']) || empty($report->currentValues['unit_price']) || empty($report->currentValues['full_price'])) { // need to get the sku details
-            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id','item_cost','full_price'], "sku='".addslashes($value)."'");
-        } else { $inv = $report->currentValues; }
-        $values= ['iID'=>$inv['id'], 'iCost'=>$inv['item_cost'],'iList'=>$inv['full_price'],'iSheetc'=>$fld[1],'iSheetv'=>$fld[1],'cID'=>0,'cSheet'=>$fld[1],'cType'=>'c','qty'=>1];
-        $prices= [];
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/inventory/prices.php", 'inventoryPrices');
-        $mgr   = new inventoryPrices();
-        $mgr->pricesLevels($prices, $values);
-        return $prices['price'];
-    }
-    return $value;
-}
-
-/**
- * @TODO - DEPRECATED - remove after 7/1/2025
- * @param type $value
- * @param type $format
- * @return type
- */
-function contactsView($value, $format='') {
-    switch ($format) {
-        case 'buySell':
-            // receive value, get id from keyed values, read db, convert value
-            if (empty($GLOBALS['currentRow']['id'])) { msgDebug(" ... EMPTY ID, returning $value"); return $value; }
-            $prop  = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['buy_uom','sell_uom','sell_qty'], "id={$GLOBALS['currentRow']['id']}");
-            if (empty($prop['sell_qty']) || $prop['sell_qty'] == 1) { msgDebug(" ... SELL QTY = 1, returning $value"); return $value; }
-            $newVal= round($value/$prop['sell_qty'], 2);
-            if (empty($GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']])) { $GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']] = '???'; }
-            return $newVal." (".$GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']].")";
-    }
-}
-
-function inventoryView($value, $format='') {
-    switch ($format) {
-        case 'buySell':
-            // receive value, get id from keyed values, read db, convert value
-            if (empty($GLOBALS['currentRow']['id'])) { msgDebug(" ... EMPTY ID, returning $value"); return $value; }
-            $prop  = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['buy_uom','sell_uom','sell_qty'], "id={$GLOBALS['currentRow']['id']}");
-            if (empty($prop['sell_qty']) || $prop['sell_qty'] == 1) { msgDebug(" ... SELL QTY = 1, returning $value"); return $value; }
-            $newVal= round($value/$prop['sell_qty'], 2);
-            if (empty($GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']])) { $GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']] = '???'; }
-            return $newVal." (".$GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']].")";
         case 'storeStock':
             $storeID  = !empty($GLOBALS['bizuno_store_id']) ? $GLOBALS['bizuno_store_id'] : 0;
             $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku='".addslashes($value)."'", false);
@@ -109,18 +62,6 @@ function inventoryView($value, $format='') {
             $thisOwed = dbGetValue(BIZUNO_DB_PREFIX.'journal_cogs_owed', 'SUM(qty) AS qty', "store_id=$storeID AND sku='".addslashes($value)."'", false);
             if (!$thisOwed) { $thisOwed = 0;}
             return $thisStore - $thisOwed; // removed viewFormat(*, 'number')
-    }
-}
-
-/**
- * This function is a data processing operation used by PhreeForm to build the work order bill of materials for forms.
- * @param string $value - contains the qty:sku_id encoded integer values
- * @param string $format - the work order processing to perform
- * @return string - processed result, depends on the format requested
- */
-function proInvView($value, $format = '')
-{
-    switch ($format) {
         case 'sbBOM':
             $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
             $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
@@ -177,6 +118,33 @@ return '';
             $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'ref_doc', "id='$value'");
             return $result ? $result : ' ';
         default:
+    }
+    if (substr($format, 0, 5) == 'skuPS') { // get the sku price based on the price sheet passed
+        if (!$value) { return ''; }
+        $fld   = explode(':', $format);
+        if (empty($report->currentValues['id']) || empty($report->currentValues['unit_price']) || empty($report->currentValues['full_price'])) { // need to get the sku details
+            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id','item_cost','full_price'], "sku='".addslashes($value)."'");
+        } else { $inv = $report->currentValues; }
+        $values= ['iID'=>$inv['id'], 'iCost'=>$inv['item_cost'],'iList'=>$inv['full_price'],'iSheetc'=>$fld[1],'iSheetv'=>$fld[1],'cID'=>0,'cSheet'=>$fld[1],'cType'=>'c','qty'=>1];
+        $prices= [];
+        bizAutoLoad(BIZBOOKS_ROOT."controllers/inventory/prices.php", 'inventoryPrices');
+        $mgr   = new inventoryPrices();
+        $mgr->pricesLevels($prices, $values);
+        return $prices['price'];
+    }
+    return $value;
+}
+
+function inventoryView($value, $format='') {
+    switch ($format) {
+        case 'buySell':
+            // receive value, get id from keyed values, read db, convert value
+            if (empty($GLOBALS['currentRow']['id'])) { msgDebug(" ... EMPTY ID, returning $value"); return $value; }
+            $prop  = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['buy_uom','sell_uom','sell_qty'], "id={$GLOBALS['currentRow']['id']}");
+            if (empty($prop['sell_qty']) || $prop['sell_qty'] == 1) { msgDebug(" ... SELL QTY = 1, returning $value"); return $value; }
+            $newVal= round($value/$prop['sell_qty'], 2);
+            if (empty($GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']])) { $GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']] = '???'; }
+            return $newVal." (".$GLOBALS['invBuySell']['lang']['uom_'.$prop['buy_uom']].")";
     }
 }
 

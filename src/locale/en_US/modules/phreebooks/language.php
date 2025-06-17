@@ -76,6 +76,7 @@ $lang = [
     'msg_chart_merge_dest' => 'Select the GL Account to merge into. This GL Account will remain after the merge.',
     'msg_chart_merge_note' => '<b>CAUTION:</b>THIS PROCESS IS NOT REVERSABLE. Please make a backup before proceeding! This tool will will only merge GL Accounts of the same type. Once finished, please run the Verify Journal Balances tool to verify your books are in balance in Settings -> PhreeBooks Accounting -> Journal Tools.',
     'msg_confirm_create_po' => 'Are you sure you want to create a drop ship Purchase Order for this order?',
+    'msg_confirm_auto_assy' => 'Are you sure you want build all assemblies to fill this order?',
     'msg_missing_contact_id' => 'No contact record was found! Either turn on the Add/Update button in the billing address or search for an existing contact and reload the billing address fields.',
     'msg_gl_fiscal_year_edit' => 'Fiscal period calendar dates can be modified here. Please note that fiscal year dates cannot be changed for any period up to and including the last general journal entry in the system.',
     'msg_gl_fiscal_year_confirm' => 'Are you sure you want to add fiscal year %s',

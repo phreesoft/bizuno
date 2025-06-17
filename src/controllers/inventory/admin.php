@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -74,14 +74,14 @@ class inventoryAdmin
             'inv_mv6'   => ['text'=>lang('last_6month_sales').' (sku)'],
             'inv_mv12'  => ['text'=>lang('annual_sales')     .' (sku)'],
             'inv_stk'   => ['text'=>lang('qty_min')          .' (sku)'],
-            'sbBOM'     => ['text'=>$this->lang['sb_proc_bom'],  'group'=>$this->lang['srvBldJrnl_title']],
-            'sbOnOrder' => ['text'=>$this->lang['sb_proc_order'],'group'=>$this->lang['srvBldJrnl_title']],
-            'sbSteps'   => ['text'=>$this->lang['sb_step_list'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbTask'    => ['text'=>$this->lang['sb_proc_task'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbTaskList'=> ['text'=>$this->lang['sb_task_list'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbRefDraw' => ['text'=>$this->lang['sb_proc_draw'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbRefDocs' => ['text'=>$this->lang['sb_proc_docs'], 'group'=>$this->lang['srvBldJrnl_title']],
-            ];
+            'storeStock'=> ['text'=>lang('store_stock'),         'group'=>lang('ctype_b')],
+            'sbBOM'     => ['text'=>$this->lang['sb_proc_bom'],  'group'=>lang('work_orders')],
+            'sbOnOrder' => ['text'=>$this->lang['sb_proc_order'],'group'=>lang('work_orders')],
+            'sbSteps'   => ['text'=>$this->lang['sb_step_list'], 'group'=>lang('work_orders')],
+            'sbTask'    => ['text'=>$this->lang['sb_proc_task'], 'group'=>lang('work_orders')],
+            'sbTaskList'=> ['text'=>$this->lang['sb_task_list'], 'group'=>lang('work_orders')],
+            'sbRefDraw' => ['text'=>$this->lang['sb_proc_draw'], 'group'=>lang('work_orders')],
+            'sbRefDocs' => ['text'=>$this->lang['sb_proc_docs'], 'group'=>lang('work_orders')]];
         $this->phreeformFormatting = [
             'buySell'=>['text'=>$this->lang['buy_sell_title'], 'group'=>$this->lang['title'], 'module'=>$this->moduleID, 'function'=>'inventoryView']];
         $this->setPriceProcessing($this->phreeformProcessing); // build dynamic processing based on quantity price sheets available

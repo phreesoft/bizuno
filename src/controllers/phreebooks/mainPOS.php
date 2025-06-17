@@ -242,7 +242,7 @@ function bizPOSBalCalc() {
         if (!$security = validateAccess('j19_mgr', 4)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         if (empty($rID)) { return msgAdd("No ID passed, could not delete!", 'error'); }
-        $files = glob(getModuleCache('extBizPOS', 'properties', 'attachPath')."rID_{$rID}_");
+        $files = glob(getModuleCache('extBizPOS', 'properties', 'attachPath', 'phreebooks')."rID_{$rID}_");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } } // remove attachments
         $oldID = dbGetValue(BIZUNO_DB_PREFIX."extBizPOS",'asset_num', "id=$rID");
         msgLog(lang('extBizPOS_title').' '.lang('delete')." - $oldID ($rID)");

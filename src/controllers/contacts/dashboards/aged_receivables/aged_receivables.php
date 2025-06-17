@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/contacts/dashboards/aged_receivables/aged_receivables.php
  */
 
@@ -96,7 +96,7 @@ google.charts.setOnLoadCallback(chart{$this->code});\n";
 
     public function getTotals()
     {
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'calculate_aging', 'function');
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'calculate_aging', 'function');
         $output= ['data'=>[['Customer','Post Date','Ref Number','Current','1-30','31-60','61-90','91-120','Over 120']],
             'balance_121' => 0,'balance_120' => 0,'balance_91' => 0,'balance_90' => 0,'balance_61' => 0,'balance_60' => 0,'balance_30' => 0,'balance_0' => 0];
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "journal_id IN (12, 13) AND closed='0'", 'primary_name_b', ['DISTINCT contact_id_b'], 0, false);

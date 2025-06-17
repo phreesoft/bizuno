@@ -18,7 +18,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/inventory/toolsInv.php
  */
 
@@ -67,6 +67,7 @@ class inventoryToolsInv
      */
     public function edit(&$layout=[])
     {
+        msgTrap();
         if (!$security = validateAccess('inv_mgr', 1)) { return; }
         $rID  = clean('rID', 'integer', 'get');
         $tabID= clean('tabID', 'text', 'get');
@@ -275,7 +276,7 @@ class inventoryToolsInv
             $layout['dbAction']['invOpt_inventory'] = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory      WHERE id IN $range";
             $layout['dbAction']['invOpt_assy_list'] = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE ref_id IN $range";
             foreach ($mID as $row) { // remove attachments
-                $files = glob(getModuleCache('inventory', 'properties', 'attachPath')."rID_{$row['id']}_*.*");
+                $files = glob(getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."rID_{$row['id']}_*.*");
                 if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
             }
         }

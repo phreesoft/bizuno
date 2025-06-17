@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -86,8 +86,8 @@ class contactsTools
         dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->destC, 'update', "id=$this->destID"); // save all of the changes
         msgAdd("deleted contact {$this->srcC['short_name']} (ID: {$this->srcID})", 'info');
         // Move attachments
-        msgDebug("\nMoving file at path: ".getModuleCache('contacts', 'properties', 'attachPath')." from rID_{$this->srcID}_ to rID_{$this->destID}_");
-        $io->fileMove(getModuleCache('contacts', 'properties', 'attachPath'), "rID_{$this->srcID}_", "rID_{$this->destID}_");
+        msgDebug("\nMoving file at path: ".getModuleCache('contacts', 'properties', 'attachPath', 'contacts')." from rID_{$this->srcID}_ to rID_{$this->destID}_");
+        $io->fileMove(getModuleCache('contacts', 'properties', 'attachPath', 'contacts'), "rID_{$this->srcID}_", "rID_{$this->destID}_");
         // Finish things up
         dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."contacts WHERE id=$this->srcID");
         dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."contacts_meta WHERE ref_id=$this->srcID");
@@ -434,7 +434,7 @@ class contactsTools
         global $io;
         $verbose = clean('verbose', 'integer', 'get');
         $deleted = $repaired = 0;
-        $files = $io->folderRead(getModuleCache('contacts', 'properties', 'attachPath'));
+        $files = $io->folderRead(getModuleCache('contacts', 'properties', 'attachPath', 'contacts'));
         foreach ($files as $attachment) {
             $tID = substr($attachment, 4); // remove rID_
             $rID = substr($tID, 0, strpos($tID, '_'));
@@ -443,7 +443,7 @@ class contactsTools
             if (!$exists) {
                 $deleted++;
                 msgDebug("\nDeleting attachment for rID = $rID and file: $attachment");
-                $io->fileDelete(getModuleCache('contacts', 'properties', 'attachPath')."/$attachment");
+                $io->fileDelete(getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."/$attachment");
             } elseif (!$exists['attach']) {
                 $repaired++;
                 msgDebug("\nSetting attachment flag for id = $rID and file: $attachment");

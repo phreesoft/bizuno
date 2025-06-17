@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/inventory/main.php
  */
 
@@ -37,6 +37,7 @@ class inventoryMain
     public $inventoryTypes;
     public $dbDefault;
     public $uom;
+    public $myStore;
 
     function __construct()
     {
@@ -711,7 +712,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $f1  = clean('f1', 'integer', 'request');
         setUserCache('inventory', 'f1', $f1);
         $bID = clean('bID', ['format'=>'integer', 'default'=>-1], 'get'); // restrict all information to a specific store
-        if ($bID > -1) { $this->myStore = $bID; } // set the store overrides, if any
+        $this->myStore = $bID > -1 ? $bID : getUserCache('profile', 'store_id'); // set the store overrides, if any
         $GLOBALS['bizuno_store_id'] = $this->myStore;
         $values  = [['id'=>'0','text'=>lang('all')],['id'=>'1','text'=>$this->lang['stock_all']],['id'=>'2','text'=>lang('active')],['id'=>'3','text'=>$this->lang['store_stock']]];
         // get the datagrid structure, different place for manager than managerRows

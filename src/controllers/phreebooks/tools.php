@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -66,7 +66,7 @@ class phreebooksTools
     {
         global $io;
         $fqdn  = "\\bizuno\\aged_receivables";
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/dashboards/aged_receivables/aged_receivables.php', $fqdn);
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/dashboards/aged_receivables/aged_receivables.php', $fqdn);
         $dash  = new $fqdn([]);
         $data  = $dash->getTotals();
         msgDebug("\nRecevied back from aging calculation: ".print_r($data, true));

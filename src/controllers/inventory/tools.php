@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-29
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -101,8 +101,8 @@ class inventoryTools
             dbWrite(BIZUNO_DB_PREFIX.'inventory', ['image_with_path'=>$srcImg], 'update', "id=$destID");
         }
         // Merge the attachments
-        msgDebug("\nMoving file at path: ".getModuleCache($this->moduleID, 'properties', 'attachPath')." from rID_{$srcID}_ to rID_{$destID}_");
-        $io->fileMove(getModuleCache($this->moduleID, 'properties', 'attachPath'), "rID_{$srcID}_", "rID_{$destID}_");
+        msgDebug("\nMoving file at path: ".getModuleCache($this->moduleID, 'properties', 'attachPath', 'inventory')." from rID_{$srcID}_ to rID_{$destID}_");
+        $io->fileMove(getModuleCache($this->moduleID, 'properties', 'attachPath', 'inventory'), "rID_{$srcID}_", "rID_{$destID}_");
         // fix the qty's
         $stks = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock','qty_po','qty_so','qty_alloc'], "id=$srcID");
         if (!empty($stks)) {
@@ -769,7 +769,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
     private function syncAttachments()
     {
         global $io;
-        $files = $io->folderRead(getModuleCache('inventory', 'properties', 'attachPath'));
+        $files = $io->folderRead(getModuleCache('inventory', 'properties', 'attachPath', 'inventory'));
         foreach ($files as $attachment) {
             $tID = substr($attachment, 4); // remove rID_
             $rID = substr($tID, 0, strpos($tID, '_'));
@@ -777,7 +777,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
             $exists = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
             if (!$exists) {
                 msgDebug("\nDeleting attachment for rID = $rID and file: $attachment");
-                $io->fileDelete(getModuleCache('inventory', 'properties', 'attachPath')."/$attachment");
+                $io->fileDelete(getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."/$attachment");
             } elseif (!$exists['attach']) {
                 msgDebug("\nSetting attachment flag for id = $rID and file: $attachment");
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['attach'=>'1'], 'update', "id=$rID");

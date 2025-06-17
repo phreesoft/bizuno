@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -55,9 +55,7 @@ class bizunoAdmin
             'jsonFld'   => ['text'=>$this->lang['pf_proc_json_fld'],'group'=>lang('tools')],
             'today'     => ['text'=>lang('today'),                  'group'=>lang('date')],
             'faType'    => ['text'=>lang('asset_type'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
-            'faCond'    => ['text'=>lang('purch_cond'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
-            'storeStock'=> ['text'=>lang('store_stock'),   'group'=>lang('ctype_b'),     'module'=>$this->moduleID,'function'=>'inventoryView'],
-            ];
+            'faCond'    => ['text'=>lang('purch_cond'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView']];
         setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
         $this->phreeformFormatting = [
             'uc'       => ['text'=>$this->lang['pf_proc_uc'],      'group'=>lang('text')],

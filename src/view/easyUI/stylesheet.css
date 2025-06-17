@@ -83,6 +83,20 @@ body.loading .modal      { display:block; }
 .jrnlAssgn               { border:1px solid #BC2A4D; }
 .jrnlTrash               { background-color:red; }
 
+.google-visualization-table-table {
+  background-color: #333; /* Dark background */
+  color: #fff; /* Light text */
+}
+.google-visualization-table-th,
+.google-visualization-table-td {
+  border: 1px solid #555; /* Slightly lighter border */
+}
+.google-visualization-table-tr-odd {
+  background-color: #444; /* Slightly lighter row background */
+}
+.google-visualization-table-tr-even {
+  background-color: #555;
+}
 #overlay {
   position: fixed; /* Sit on top of the page content */
   display: none; /* Hidden by default */
