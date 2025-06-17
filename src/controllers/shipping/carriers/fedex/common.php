@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -155,7 +155,7 @@ Replace the test URL and test credentials with the production URL and production
             'gl_acct_v'    => getModuleCache('shipping','settings','general','gl_shipping_v'),
             'default'      => '1', 'token'=>'', 'token_date'=>''];
         $this->options = $this->getOptions();
-        $this->settings= array_replace_recursive($this->defaults, getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []));
+        $this->settings= array_replace_recursive($this->defaults, (array)getMetaMethod($this->methodDir, $this->code)['settings']);
         $this->today   = biz_date('Y-m-d');
         $this->currency= 'USD';
         $this->test    = $this->settings['test_mode']=='test' ? true : false;
@@ -170,15 +170,14 @@ Replace the test URL and test credentials with the production URL and production
      */
     protected function getCreds($bID=0)
     {
-        msgDebug("\nEntering getCreds store id = $bID");
-        $output= [];
-        $multi = getModuleCache('contacts', $this->moduleID, $this->code, 'multi_store');
-        $creds = empty($bID) || empty($multi[$bID]) ? $this->settings : $multi[$bID];
-        if (empty($creds['ltl_acct_num'])) { $creds['ltl_acct_num'] = $creds['acct_number']; } // for combo accounts
-        $keys  = ['acct_number', 'ltl_acct_num'];
-        foreach ($keys as $key) { $output[$key] = isset($creds[$key]) ? $creds[$key] : ''; }
-        msgDebug("\nLeaving getCreds with creds = ".print_r($output, true));
-        return $output;
+        msgDebug("\nEntering common:getCreds store id = $bID");
+        $meta = !empty($bID) ? getMetaContact($bID, $this->code) : [];
+        msgDebug("\nfetched meta value before clean = ".print_r($meta, true));
+        metaIdxClean($meta);
+        if (empty($meta['acct_number'])) { $meta['acct_number'] = $this->settings['acct_number']; } // for combo accounts
+        if (empty($meta['ltl_acct_num'])){ $meta['ltl_acct_num']= $meta['acct_number']; } // for combo accounts
+        msgDebug("\nLeaving getCreds with meta = ".print_r($meta, true));
+        return $meta;
     }
 
     /**
@@ -254,19 +253,19 @@ Replace the test URL and test credentials with the production URL and production
         msgDebug("\nin tokenUpdate, read token = {$response['access_token']} and expires_in = {$response['expires_in']}");
         $token    = $response['access_token'];
         $tokenDate= time()+$response['expires_in'];
-        if (empty($this->storeID)) { // HQ update this extension
+//        if (empty($this->storeID)) { // HQ update this extension
             $this->settings['token']     = $token;
             $this->settings['token_date']= $tokenDate;
             $props   = getModuleCache($this->moduleID, $this->methodDir, $this->code);
             $props['settings'] = $this->settings;
             setModuleCache($this->moduleID, $this->methodDir, $this->code, $props);
-        } else { // it's a branch, update that branch so token matches creds.
-            $allStores = getModuleCache('contacts', $this->moduleID, 'fedex');
-            $allStores['multi_store'][$this->storeID]['token']     = $token;
-            $allStores['multi_store'][$this->storeID]['token_date']= $tokenDate;
-            msgDebug("\nWrite multi-store data to cache = ".print_r($allStores, true));
-            setModuleCache('contacts', $this->moduleID, $this->code, $allStores);
-        }
+//        } else { // it's a branch, update that branch so token matches creds.
+//            $allStores = getModuleCache('contacts', $this->moduleID, 'fedex');
+//            $allStores['multi_store'][$this->storeID]['token']     = $token;
+//            $allStores['multi_store'][$this->storeID]['token_date']= $tokenDate;
+//            msgDebug("\nWrite multi-store data to cache = ".print_r($allStores, true));
+//            setModuleCache('contacts', $this->moduleID, $this->code, $allStores);
+//        }
     }
 
     /**

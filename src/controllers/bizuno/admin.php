@@ -57,13 +57,7 @@ class bizunoAdmin
             'faType'    => ['text'=>lang('asset_type'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
             'faCond'    => ['text'=>lang('purch_cond'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'administrateView'],
             'storeStock'=> ['text'=>lang('store_stock'),   'group'=>lang('ctype_b'),     'module'=>$this->moduleID,'function'=>'inventoryView'],
-            'sbBOM'     => ['text'=>$this->lang['sb_proc_bom'],  'group'=>$this->lang['srvBldJrnl_title']],
-            'sbOnOrder' => ['text'=>$this->lang['sb_proc_order'],'group'=>$this->lang['srvBldJrnl_title']],
-            'sbSteps'   => ['text'=>$this->lang['sb_step_list'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbTask'    => ['text'=>$this->lang['sb_proc_task'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbTaskList'=> ['text'=>$this->lang['sb_task_list'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbRefDraw' => ['text'=>$this->lang['sb_proc_draw'], 'group'=>$this->lang['srvBldJrnl_title']],
-            'sbRefDocs' => ['text'=>$this->lang['sb_proc_docs'], 'group'=>$this->lang['srvBldJrnl_title']]];
+            ];
         setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
         $this->phreeformFormatting = [
             'uc'       => ['text'=>$this->lang['pf_proc_uc'],      'group'=>lang('text')],

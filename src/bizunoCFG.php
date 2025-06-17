@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /src/bizunoCFG.php
  */
 
@@ -32,7 +32,7 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 define('MODULE_BIZUNO_VERSION', '7.1');
 
 // URL paths
-define('BIZUNO_HOME',        strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); // Full URL path to Bizuno Home
+if (!defined('BIZUNO_HOME')) { define('BIZUNO_HOME', strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); } // Full URL path to Bizuno Home
 define('BIZUNO_AJAX',        substr(BIZUNO_SRVR, 0, strlen(BIZUNO_SRVR)-1).'?ajax=1'); // for non-html requests
 define('BIZBOOKS_URL_ROOT',  BIZUNO_SRVR); // full url to Bizuno root folder
 define('BIZBOOKS_URL_EXT',   BIZUNO_SRVR); // full url to Bizuno Pro plugin folder
@@ -44,12 +44,12 @@ define('BIZBOOKS_EXT',       BIZUNO_REPO); // file system path to Bizuno pro
 define('BIZBOOKS_LOCALE',    BIZUNO_REPO); // file system path to non-US locale folder
 // Core image paths
 define('BIZUNO_IMAGES',      'https://www.bizuno.com/view/images/'); // URL to root image folder
-define('BIZUNO_LOGO',        BIZUNO_IMAGES.'bizuno.png'); // URL to default logo
+define('BIZUNO_LOGO',        BIZBOOKS_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
 
 // PhreeSoft constants
 define('PHREESOFT_URL',      'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft API
 define('PHREESOFT_IP',       '128.92.62.26'); // URL to default logo
-define('PHREESOFT_LOGO',     BIZUNO_IMAGES.'phreesoft.png'); // URL to default logo
+define('PHREESOFT_LOGO',     BIZBOOKS_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
 
 // Set support ticket email, this makes the menu option show
 if (!defined('BIZUNO_SUPPORT_NAME'))  { define('BIZUNO_SUPPORT_NAME', 'Bizuno Support'); }

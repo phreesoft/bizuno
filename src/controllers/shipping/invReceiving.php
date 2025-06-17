@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/shipping/invReceiving.php
  */
 
@@ -68,6 +68,7 @@ bizFocus('contactSel');";
         // reset some search criteria
         $data['source']['filters']['closed']= ['order'=>99, 'hidden'=>true, 'sql'=>BIZUNO_DB_PREFIX."journal_main.closed='0'"];
         $data['source']['filters']['jID']['sql'] = BIZUNO_DB_PREFIX."journal_main.journal_id=4";
+        $data['source']['filters']['store']['sql'] = '';
         $data['source']['sort'] = ['s0'=> ['order'=>10, 'field'=>BIZUNO_DB_PREFIX."journal_main.invoice_num"]];
         unset($data['source']['filters']['period']);
         $layout = array_replace_recursive($layout, ['type'=>'datagrid','key'=>'dgPhreeBooks','datagrid'=>['dgPhreeBooks'=>$data]]);

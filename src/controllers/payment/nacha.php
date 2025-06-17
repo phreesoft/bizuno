@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/payment/nacha.php
  *
  */
@@ -45,7 +45,6 @@ class paymentNacha
 
     function __construct($mapID='')
     {
-        msgTrap();
         $this->lang= getExtLang($this->moduleID);
         $this->refNum = 'ACH'.biz_date('ymdHi'); // .'-'; // bank groups these into single withdrawal
         $banks = getMetaCommon('ach_banks');

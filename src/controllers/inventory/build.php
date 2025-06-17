@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/inventory/build.php
  */
 
@@ -164,7 +164,7 @@ class inventoryBuild extends mgrJournal
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $rID   = clean('rID',   'integer','get');
-        $newSKU= clean('newSKU','text',   'get');
+        $newSKU= clean('newSKU','integer','get'); // newSKU coming in from add above is the skuID
         if (empty($rID) && !empty($newSKU)) { $rID = $this->newBuild($newSKU); }
         $args  = ['rID'=>$rID, '_table'=>'journal'];
         parent::editDB($layout, $security, $args);
@@ -190,7 +190,6 @@ class inventoryBuild extends mgrJournal
             'jsBody'  => ['init'=>$jsBody]];
         $layout= array_replace_recursive($layout, $data);
         // Stores
-        $rID = clean('rID', 'integer', 'get');
         if (!empty($this->restrict)) {
             $layout['fields']['store_id']['attr']['value'] = $this->myStore;
             return;
@@ -211,8 +210,8 @@ class inventoryBuild extends mgrJournal
     private function newBuild($skuID)
     {
         msgDebug("\nEntering newBuild with skuID = $skuID");
-        if (!is_int($skuID)) { return msgAdd("I cannot find the SKU, did you select it from the list?"); }
         $sku = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id={$skuID}");
+        if (empty($sku)) { return msgAdd("I cannot find the SKU, did you select it from the list?"); }
         $main= [
             'journal_id' => $this->journalID,
             'invoice_num'=> getNextReference($this->nextRefIdx),

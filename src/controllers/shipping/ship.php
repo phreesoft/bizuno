@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -562,9 +562,9 @@ function labelPDF(rID, path) {
             'toolbars'=> ['tbLabel'=>['icons'=>['close'=>['order'=>10,'events'=>['onClick'=>"window.close();"]]]]],
             'jsReady' => ['init'=>$jsReady]];
         if (!empty($enTherm)) {
-            $data['head']['qzTray']    = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'assets/qz-tray/qz-tray.js"></script>'];
+            $data['head']['qzTray']    = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'qz-tray/qz-tray.js"></script>'];
 //          $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>'];
-            $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'assets/qz-tray/jsrsasign.js"></script>'];
+            $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'qz-tray/jsrsasign.js"></script>'];
             $data['head']['qzSign']    = ['order'=>92,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->thermalTransport.'sign-message.js"></script>'];
         } elseif (!file_exists(BIZUNO_SCRIPTS.'assets/qz-tray/qz-tray.js')) {
             msgAdd("Thermal labels are not available to print, proper transport is not installed!");

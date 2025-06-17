@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -373,7 +373,7 @@ var pbChart=[];\njqBiz.each(bizDefaults.glAccounts.rows, function( key, value ) 
                 'formEOF'=> ['order'=>99,'type'=>'html',   'html'=>'</form>']],
             'panels'  => [
                 'notes'  => ['label'=>lang('notes'),'type'=>'fields','keys'=>['notes']],
-                'divAtch'=> ['type'=>'attach', 'defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath'),'prefix'=>$prefix, 'secID'=>$secID]]],
+                'divAtch'=> ['type'=>'attach', 'defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath','phreebooks'),'prefix'=>$prefix, 'secID'=>$secID]]],
             'toolbars'=> ['tbPhreeBooks'=>['icons'=>[
                 'jSave'  => ['order'=>10,'label'=>lang('save'),  'icon'=>'save','type'=>'menu','hidden'=>$security>1?false:true,
                     'events'=> ['onClick'=>"jqBiz('#frmJournal').submit();"],'child'=>$this->renderMenuSave($security)],
@@ -1013,7 +1013,7 @@ function bizUnitDiscDisc(newValue) {
         dbTransactionCommit();
         // *************** END TRANSACTION *************************
         msgLog(lang('journal_id', $this->journalID).' '.lang('delete')." - {$delOrd->main['invoice_num']} (rID=$rID)");
-        $files = glob(getModuleCache('phreebooks', 'properties', 'attachPath')."rID_".$rID."_*.*");
+        $files = glob(getModuleCache('phreebooks', 'properties', 'attachPath', 'phreebooks')."rID_".$rID."_*.*");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } } // remove attachments
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accJournal').accordion('select',0); bizGridReload('dgPhreeBooks'); jqBiz('#divJournalDetail').html('&nbsp;');"]]);
     }
@@ -1341,7 +1341,7 @@ function bizUnitDiscDisc(newValue) {
                 'journal_id'   => ['order'=>1, 'field'=>BIZUNO_DB_PREFIX.'journal_main.journal_id',    'attr'=>['hidden'=>true]],
                 'currency'     => ['order'=>1, 'field'=>BIZUNO_DB_PREFIX.'journal_main.currency',      'attr'=>['hidden'=>true]],
                 'currency_rate'=> ['order'=>1, 'field'=>BIZUNO_DB_PREFIX.'journal_main.currency_rate', 'attr'=>['hidden'=>true]],
-                'attach'       => ['order'=>1, 'field'=>BIZUNO_DB_PREFIX.'journal_main.attach',        'attr'=>['hidden'=>true]],//'alias'=>'id', 'format'=>'attch:'.getModuleCache('phreebooks', 'properties', 'attachPath')."rID_idTBD_"],
+                'attach'       => ['order'=>1, 'field'=>BIZUNO_DB_PREFIX.'journal_main.attach',        'attr'=>['hidden'=>true]],
                 'action' => ['order'=>0, 'label'=>lang('action'), // leave order BEFORE id so it stays first on view, id need to go first in sql as DISTINCT
                     'events' => ['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> [
@@ -1355,6 +1355,9 @@ function bizUnitDiscDisc(newValue) {
                         'toggle_j12' => ['order'=>40,'icon'=>'toggle', 'label'=>lang('toggle_status'),'hidden'=>$sec6_12>3?false:true,
                             'events' => ['onClick' => "jsonAction('phreebooks/main/toggleWaiting&jID=jrnlTBD', idTBD);"],
                             'display'=> "row.journal_id=='12'"],
+                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>$this->lang['auto_assy'],
+                            'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_auto_assy']."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
+                            'display'=> "(row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"],
                         'dates'      => ['order'=>50,'icon'=>'date',   'label'=>lang('delivery_dates'), 'hidden'=>$sec4_10>1?false:true,
                             'events' => ['onClick' => "windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"],
                             'display'=> "row.journal_id=='4' || row.journal_id=='10'"],
@@ -1593,8 +1596,7 @@ function bizUnitDiscDisc(newValue) {
                 'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/api/ediTransmit', idTBD, '856');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 856 - Shipment confirmation with tracking
         }
-        
-        /* PROBABL;Y DUPLICATES, FROM MANAGERROWS
+/* PROBABLY DUPLICATES, FROM MANAGERROWS
         // Stores
         $jID    = clean('jID', 'integer', 'get');
         if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }
@@ -1612,13 +1614,7 @@ function bizUnitDiscDisc(newValue) {
             case -1: $layout['datagrid']['manager']['source']['filters']['store']['sql'] = ''; break;
             default: $layout['datagrid']['manager']['source']['filters']['store']['sql'] = BIZUNO_DB_PREFIX."journal_main.store_id=$storeID"; break;
         }
-        // Work Orders
-        if (validateAccess('j14_mgr', 2, false)) {
-            $layout['datagrid']['manager']['columns']['action']['actions']['xAutoAssy'] = ['order'=>46,'icon'=>'work','label'=>$this->lang['auto_assy'],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_auto_assy']."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
-                'display'=> "(row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"];
-        }
-         */
+ */
         return $data;
     }
 
@@ -1715,11 +1711,11 @@ function bizUnitDiscDisc(newValue) {
     private function getAttachments($srcField, $rID, $refID=0)
     {
         global $io;
-        if ($io->uploadSave($srcField, getModuleCache('phreebooks', 'properties', 'attachPath')."rID_{$rID}_")) {
+        if ($io->uploadSave($srcField, getModuleCache('phreebooks', 'properties', 'attachPath', 'phreebooks')."rID_{$rID}_")) {
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'1'], 'update', "id=$rID");
         }
         if ($refID) { // if so_po_ref_id, check for attachment to copy over
-            $files = glob(getModuleCache('phreebooks', 'properties', 'attachPath')."rID_{$refID}_*");
+            $files = glob(getModuleCache('phreebooks', 'properties', 'attachPath', 'phreebooks')."rID_{$refID}_*");
             if ($files === false || sizeof($files) == 0) { return; }
             foreach ($files as $oldFile) {
                 $newFile = str_replace("rID_{$refID}_", "rID_{$rID}_", $oldFile);
@@ -2058,7 +2054,7 @@ function bizUnitDiscDisc(newValue) {
         if (empty($rID)) { return; }
         $layout= array_replace_recursive($layout, ['type'=>'popup','title'=>'Attachments','attr'=>['id'=>'winMgrAtch'],
             'divs'=>['divAtch'=>['type'=>'attach',
-                'defaults'=>['noUpload'=>true,'path'=>getModuleCache($this->moduleID,'properties','attachPath'),'prefix'=>"rID_{$rID}_",'delPath'=>'']]]]);
+                'defaults'=>['noUpload'=>true,'path'=>getModuleCache($this->moduleID,'properties','attachPath','phreebooks'),'prefix'=>"rID_{$rID}_",'delPath'=>'']]]]);
     }
 
     /**

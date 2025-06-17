@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -807,6 +807,10 @@ msgDebug("\nresult = ".print_r($result, true));
                     if (!$stmt = dbGetResult("SELECT $tblField $TrailingSQL")) { return msgAdd("Error selecting table data! See trace file.", 'trap'); }
                     $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                 }
+                if (empty($data))     { $data = []; }
+                if (!is_array($data)) { $data = [$data]; }
+//                msgDebug("\ndata in render is now: ".print_r($data, true));
+//                msgDebug("\nheading in render is now: ".print_r($tblHeading, true));
                 array_unshift($data, $tblHeading); // set the first data element to the headings
                 $TableObject->data = $data;
                 $StoredTable = clone $TableObject;

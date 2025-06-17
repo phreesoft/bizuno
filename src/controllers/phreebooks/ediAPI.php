@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-16
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -53,10 +53,11 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
 
     function __construct()
     {
-        $this->lang   = getExtLang($this->moduleID);
+        $this->lang   = getLang($this->moduleID);
         $this->prices = new inventoryPrices();
         $this->prices->type = 'c';
-        $this->creds  = getModuleCache($this->moduleID, 'clients');
+        $this->creds  = getMetaCommon('edi');
+        msgDebug("\nRetrieved creds from meta = ".print_r($this->creds, true));
         parent::__construct();
     }
 
@@ -87,7 +88,7 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
             msgAdd("Method ediGet complete, check the debug log for details.", 'success');
             msgLog("Completed EDI get with # of files read: $this->filesReadFromEDI");
         }
-        if ($opt=='man') { msgAdd("Completed EDI get with # of files read: $this->filesReadFromEDI"); }
+        if ($opt=='man') { msgAdd("Completed EDI get with # of files read: $this->filesReadFromEDI", 'info'); }
     }
     protected function ediGetFiles()
     {

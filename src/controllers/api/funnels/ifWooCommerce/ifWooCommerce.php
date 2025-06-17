@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -82,7 +82,7 @@ class ifWooCommerce extends apiExport
     {
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
-            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZUNO_IMAGES."0/controllers/api/funnels/$this->code/logo.png"]],
+            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
             'radio1'    => ['order'=>20,'break' =>true,'label' =>$this->lang['upload_opt1'],'attr'=>['type'=>'radio','value'=>1,'id'=>'optUpload','name'=>'optUpload']],
             'radio2'    => ['order'=>21,'break' =>true,'label' =>$this->lang['upload_opt2'],'attr'=>['type'=>'radio','value'=>2,'id'=>'optUpload','name'=>'optUpload']],
             'radio3'    => ['order'=>22,'break' =>true,'label' =>$this->lang['upload_opt3'],'attr'=>['type'=>'radio','value'=>3,'id'=>'optUpload','name'=>'optUpload','checked'=>true]],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-17
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -327,9 +327,10 @@ function myPkgSave() {
         $rID   = clean('rID', 'integer','get');
         $type  = clean('type','char',   'get');
         if ($type != 'b') { return; }
-        $creds = getModuleCache('contacts', $this->moduleID, 'fedex', 'multi_store');
-        msgDebug("\nRead multi_store data from cache = ".print_r($creds, true));
-        $values= !empty($creds[$rID]) ? $creds[$rID] : ['acct_number'=>'','ltl_acct_num'=>'','rest_api_key'=>'','rest_secret'=>'','meter_number'=>'','auth_key'=>'','auth_pw'=>'','sp_hub'=>''];
+//        $creds = getModuleCache('contacts', $this->moduleID, 'fedex', 'multi_store');
+        $meta  = getMetaContact($rID, 'fedex');
+        msgDebug("\nRead meta data = ".print_r($meta, true));
+        $values= !empty($meta) ? $meta : ['acct_number'=>'','ltl_acct_num'=>'']; // ,'rest_api_key'=>'','rest_secret'=>'','meter_number'=>'','auth_key'=>'','auth_pw'=>'','sp_hub'=>''];
         $fields= [
             'acct_number' =>['label'=>$lang['acct_number'],  'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['acct_number'], 'maxlength'=>9]],
             'ltl_acct_num'=>['label'=>$lang['ltl_acct_num'], 'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['ltl_acct_num'],'maxlength'=>9]]];
@@ -344,14 +345,13 @@ function myPkgSave() {
     {
         $type = clean('type','char','get');
         if ($type != 'b') { return; }
-        $rID         = clean('id',          'integer','post');
-        $acct_number = clean('acct_number', 'integer','post');
-        $ltl_acct_num= clean('ltl_acct_num','integer','post');
-        if (empty($acct_number)) { return; }
-        $allStores   = getModuleCache('contacts', $this->moduleID, 'fedex');
-        $allStores['multi_store'][$rID] = ['acct_number' =>$acct_number,'ltl_acct_num'=>$ltl_acct_num];
-        msgDebug("\nWrite multi-store data to cache = ".print_r($allStores, true));
-        setModuleCache('contacts', $this->moduleID, 'fedex', $allStores);
+        $rID    = clean('id', 'integer', 'post');
+        $meta   = dbMetaGet(0, 'fedex', 'contacts', $rID);
+        $metaIdx= metaIdxClean($meta);
+        $meta['acct_number'] = clean('acct_number', 'integer','post');
+        $meta['ltl_acct_num']= clean('ltl_acct_num','integer','post');
+        if (empty($meta['acct_number'])) { return; }
+        dbMetaSet($metaIdx, 'fedex', $meta, 'contacts', $rID);
     }
 
     /**
@@ -362,9 +362,9 @@ function myPkgSave() {
     {
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return; }
-        $allStores = getModuleCache('contacts', $this->moduleID, 'fedex');
-        unset($allStores['multi_store'][$rID]);
-        setModuleCache('contacts', $this->moduleID, 'fedex', $allStores);
+        $meta   = dbMetaGet(0, 'fedex', 'contacts', $rID);
+        $metaIdx= metaIdxClean($meta);
+        if (!empty($metaIdx)) { dbMetaDelete($metaIdx, 'contacts'); }
     }
 
     /**

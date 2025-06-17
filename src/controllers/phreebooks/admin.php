@@ -303,7 +303,7 @@ class phreebooksAdmin {
                 'cleanAtch'=> ['label'=>$this->lang['pb_attach_clean_title'],  'type'=>'fields','keys'=>['cleanAtchDesc','dateAtchCln','btnAtchCln']],
                 'ediGet'   => ['title'=>$this->lang['edi_get_title'],'type'=>'divs','divs'=>[
                     'desc'   => ['order'=>10,'type'=>'html','html'=>$this->lang['edi_get_desc']],
-                    'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jsonAction('$this->moduleID/api/ediGet&opt=man');"]])."</p>"]]],
+                    'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediGet&opt=man');"]])."</p>"]]],
                 'ediMan'   => ['title'=>$this->lang['edi_man_title'],'type'=>'divs','divs'=>[
                     'desc'   => ['order'=>10,'type'=>'html','html'=>$this->lang['edi_man_desc']],
                     'formBOF'=> ['order'=>15,'type'=>'form','key' =>'frmEdiMan'],

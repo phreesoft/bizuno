@@ -342,7 +342,7 @@ class inventoryMain
                 'genCust' => ['label'=>lang('details').' ('.lang('customers').')',      'type'=>'fields','keys'=>$fldCust],
                 'genVend' => ['label'=>lang('details').' ('.lang('vendors').')',        'type'=>'fields','keys'=>$fldVend],
                 'genGL'   => ['label'=>lang('details').' ('.lang('general_ledger').')', 'type'=>'fields','keys'=>$fldGL],
-                'genAtch' => ['type'=>'attach','defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath'),'prefix'=>"rID_{$rID}_"]]],
+                'genAtch' => ['type'=>'attach','defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath', 'inventory'),'prefix'=>"rID_{$rID}_"]]],
             'forms'   => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=inventory/main/save"]]],
             'fields'  => $structure,
             'jsHead'  => ['invHead' => "var curIndex=undefined; var invTypeMsg=[]; curIndex=0;
@@ -452,7 +452,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $dgAssy = clean('dg_assy', 'json', 'post');
         if (!empty($dgAssy)) { $this->saveBOM($rID, $type, $values['sku'], $dgAssy); } // handle assemblies
         if ($makeTransaction) { dbTransactionCommit(); }
-        if ($io->uploadSave('file_attach', getModuleCache('inventory', 'properties', 'attachPath')."rID_{$rID}_")) {
+        if ($io->uploadSave('file_attach', getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."rID_{$rID}_")) {
             dbWrite(BIZUNO_DB_PREFIX.'inventory', ['attach'=>'1'], 'update', "id=$rID");
         }
         msgAdd(lang('msg_database_write'), 'success');
@@ -594,7 +594,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             'dbAction'=> [
                 'inventory'     => "DELETE FROM ".BIZUNO_DB_PREFIX."inventory WHERE id=$rID",
                 'inventory_meta'=> "DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE ref_id=$rID"]];
-        $files = glob(getModuleCache('inventory', 'properties', 'attachPath')."rID_{$rID}_*.*");
+        $files = glob(getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."rID_{$rID}_*.*");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } } // remove attachments
         msgLog(lang('inventory').' '.lang('delete')." - $sku ($rID)");
         $layout = array_replace_recursive($layout, $data);
