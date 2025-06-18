@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/inventory/history.php
  */
 
@@ -79,8 +79,8 @@ class inventoryHistory
         $layout = array_replace_recursive($layout, $data);
         // drop ship PO
         if (validateAccess('j4_mgr', 2, false)) { // Drop Ship action
-            $layout['datagrid']['dgJ10']['columns']['action']['actions']['xDropShip'] = ['order'=>45,'icon'=>'order','label'=>$this->lang['create_po'],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_create_po']."')) jsonAction('$this->moduleID/dropShip/savePO', idTBD);"]];
+            $layout['datagrid']['dgJ10']['columns']['action']['actions']['xDropShip'] = ['order'=>45,'icon'=>'order','label'=>lang('create_po'),
+                'events' => ['onClick'=>"if (confirm('".lang('msg_confirm_create_po')."')) jsonAction('$this->moduleID/dropShip/savePO', idTBD);"]];
         }
     }
 
@@ -521,7 +521,7 @@ class inventoryHistory
                     'events' => ['formatter'=>"function(value,row,index) { return dgWOFormatter(value,row,index); }"],
                     'actions'=> [
                         'edit'       => ['order'=>20,'icon'=>'edit',    'label'=>lang('edit'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=proInv/build/manager&rID=idTBD');"]],
+                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=inventory/build/manager&rID=idTBD');"]],
                         'print'=>['order'=>20,'icon'=>'print','label'=>lang('print'),'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=mfg:wo&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]]]],
                 'sku'          => ['order'=>10,'field'=>'sku',          'label'=>lang('sku'),      'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true],
                     'events' => ['styler'=>"function(value,row,index) { if (row.started=='1') { return {style:'background-color:lightgreen'}; } }"]],

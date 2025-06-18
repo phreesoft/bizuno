@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -455,13 +455,13 @@ function productUpload(rID) {
     public function getTaxTable()
     {
         global $io, $portal;
-        $output = [];
+        $output= [];
         if (!$security = validateAccess($this->code, 2)) { return; }
-        $result = $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/tax_table_dump');
+        $result= $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/tax_table_dump');
         if (empty($result['data'])) { return msgAdd("Error retrieving the new sales tax data!"); }
         // get the Nexus States
-        $modSet= getModuleCache('proCust', 'settings');
-        $nexus = $modSet['nexusSt'];
+        $nexus = dbMetaGet(0, 'nexus');
+        metaIdxClean($nexus); // remove the indexes
         msgDebug("\nNexus states = ".print_r($nexus, true));
         if (empty($nexus)) { return msgAdd("You don't have any Nexus states defined. Please do that in Settings -> PhreeBooks -> Settings and then re-run this script."); }
         $output[] = array_shift($result['data']); // heading
@@ -472,7 +472,7 @@ function productUpload(rID) {
         msgLog("Retrieved sales tax table from PhreeSoft");
         $io->download('data', implode("\n", $output), 'SalesTaxDump.csv');
     }
-    
+
     /**
      * Preps the request to a remote WordPress server hosting the e-store
      * @param array $layout

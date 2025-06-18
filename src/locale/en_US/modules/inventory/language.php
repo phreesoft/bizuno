@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-19
+ * @version    7.x Last Update: 2025-06-18
  * @filesource controllers/inventory/locale/en_US/language.php
  */
 
@@ -153,7 +153,6 @@ $lang = [
     'srvBldJrnl_title' => 'Build Manager',
     'srvBldMain_title' => 'Job Templates',
     'srvBldTask_title' => 'Tasks',
-    'srvBuilder_roles_title' => 'Sign-off Permissions',
     'role_mfg' => 'Allow signoff of manufacturing assembly steps',
     'accessories' => 'Accessories',
     'forecast' => 'Forecast',

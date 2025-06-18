@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-13
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -39,8 +39,8 @@ class phreebooksAdmin {
         $this->assets    = [0, 2, 4, 6, 8, 12, 32, 34]; // gl_account types that are assets
         $this->settings  = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure = [
-            'dirMethods'=> ['totals'],
-            'attachPath'=> ['phreebooks'=>'data/phreebooks/uploads/','edi'=>'data/edi/','returns'=>'data/returns/uploads/'],
+            'dirMethods'=> ['totals', 'payroll'],
+            'attachPath'=> ['phreebooks'=>'data/phreebooks/uploads/', 'edi'=>'data/edi/', 'returns'=>'data/returns/uploads/', 'payroll'=>'data/payroll/uploads/'],
             'menuBar'   => ['child'=>[
                 'banking' => ['order'=>40,'label'=>('banking'),'group'=>'bnk','icon'=>'bank',      'child'=>[
                     'j17_mgr' => ['order'=>70,'label'=>'journal_id_17',     'icon'=>'payment',   'route'=>"$this->moduleID/main/manager&jID=17"],
@@ -280,12 +280,12 @@ class phreebooksAdmin {
             'tabs'    => ['tabAdmin'=>['divs'=>[
                 'tabGL'    => ['order'=>20,'label'=>lang('chart_of_accts'), 'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/chart/manager'"]],
                 'tabCur'   => ['order'=>30,'label'=>lang('currencies'),     'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/currency/manager'"]],
-                'tabNexus' => ['order'=>38,'label'=>lang('nexus_lbl'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
-                'tabTaxc'  => ['order'=>40,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
+                'tabNexus' => ['order'=>40,'label'=>lang('nexus'),          'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
+                'tabTaxc'  => ['order'=>45,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
                 'tabTaxv'  => ['order'=>50,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
                 'tabFY'    => ['order'=>80,'label'=>lang('fiscal_calendar'),'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/admin/managerFY'"]],
-                'tabEdi'   => ['order'=>30,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
+                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
                 'tools'    => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                 'tabTools' => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'testGL'   => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'testGL'],

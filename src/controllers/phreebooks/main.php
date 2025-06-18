@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -117,6 +117,18 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
             $data['jsHead']['frmGrps'] = "var formGroups = ".json_encode(getDefaultFormID(0, true)).";";
             $data['jsHead']['jTitles'] = "var jrnlTitles = ".json_encode($jtitles).";";
             $data['datagrid']['manager']['columns']['action']['actions']['print']['events']['onClick'] = "winOpen('phreeformOpen', 'phreeform/render/open&group='+formGroups['jjrnlTBD']+'&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');";
+        }
+        if ($this->journalID == 2) { // add Payroll to the toolbar
+            $payrolls = getMetaCommon('methods_payroll');
+            msgDebug("\npayrolls read = ".print_r($payrolls, true));
+            $order = 40;
+            foreach ($payrolls as $payroll) {
+                if (!empty($payroll['status'])) {
+                    $data['datagrid']['manager']['source']['actions'][$payroll['id']] = ['order'=>$order,'icon'=>'paychex','label'=>'Paychex',
+                        'events'=>['onClick'=>"jsonAction('$this->moduleID/payroll/importForm&payroll={$payroll['id']}');"]];
+                    $order++;
+                }
+            }
         }
         $layout = array_replace_recursive($layout, viewMain(), $data);
     }
@@ -1355,7 +1367,7 @@ function bizUnitDiscDisc(newValue) {
                         'toggle_j12' => ['order'=>40,'icon'=>'toggle', 'label'=>lang('toggle_status'),'hidden'=>$sec6_12>3?false:true,
                             'events' => ['onClick' => "jsonAction('phreebooks/main/toggleWaiting&jID=jrnlTBD', idTBD);"],
                             'display'=> "row.journal_id=='12'"],
-                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>$this->lang['auto_assy'],
+                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>lang('auto_assy'),
                             'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_auto_assy']."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
                             'display'=> "(row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"],
                         'dates'      => ['order'=>50,'icon'=>'date',   'label'=>lang('delivery_dates'), 'hidden'=>$sec4_10>1?false:true,
@@ -1560,7 +1572,7 @@ function bizUnitDiscDisc(newValue) {
         }
         if (validateAccess('j4_mgr', 2, false)) { // Drop Ship action
             $data['columns']['action']['actions']['xDropShip'] = ['order'=>45,'icon'=>'order','label'=>lang('create_po'),
-                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_create_po']."')) jsonAction('$this->moduleID/dropShip/savePO', idTBD);"],
+                'events' => ['onClick'=>"if (confirm('".lang('msg_confirm_create_po')."')) jsonAction('$this->moduleID/dropShip/savePO', idTBD);"],
                 'display'=> "row.closed=='0' && (row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"];
         }
         if (validateAccess('j12_mgr', 2, false)) { // Create RMA action

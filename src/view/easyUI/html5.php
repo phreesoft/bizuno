@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /view/easyUI/html5.php
  */
 
@@ -530,14 +530,14 @@ final class html5 {
         $output.= '<script type="text/javascript">'."var menu_{$id} = ".json_encode($tree).";</script>\n";
         if (empty($prop['options']['noMin'])) {
             $meta   = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
-            $icnDir = $meta['menuSize']=='min'?'right':'left';
-            $divWid = $meta['menuSize']=='min'?60:$divWid;
+            $icnDir = !empty($meta['menuSize']) && $meta['menuSize']=='min'?'right':'left';
+            $divWid = !empty($meta['menuSize']) && $meta['menuSize']=='min'?60:$divWid;
             $output.= '<a id="'.$id.'Toggle" class="easyui-linkbutton" onClick="bizMenuToggle(\''.$id.'\')" data-options="plain:true,size:\'small\',iconCls:\'fa-sharp-duotone fa-solid fa-chevrons-'.$icnDir.'\'"></a>'."\n";
         }
         // addOptions($props=[])
-        $options= ['data'=>'menu_'.$id, 'multiple'=>'false', 'collapsed'=>$meta['menuSize']=='min'?'true':'false'];
+        $options= ['data'=>'menu_'.$id, 'multiple'=>'false', 'collapsed'=>!empty($meta['menuSize']) && $meta['menuSize']=='min'?'true':'false'];
         $options['onSelect'] = !empty($prop['options']['dom']) && $prop['options']['dom']=='div' ? "function (item) { bizPanelReload('bizBody', item.route); }" : "function (item) { hrefClick(item.route); }";
-        msgDebug("\nSetting options = $options");
+        msgDebug("\nSetting options = ".print_r($options, true));
         $output.= '<div id="'.$id.'" class="easyui-sidemenu" style="width:'.$divWid.'px" data-options="'.$this->addOptions($options).'"></div>'."\n";
     }
     
@@ -932,7 +932,7 @@ columns:  [[
     {
         $bizID   = getUserCache('business', 'bizID');
         $meta    = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
-        $divWid  = $meta['menuSize']=='min'?60:200;
+        $divWid  = !empty($meta['menuSize']) && $meta['menuSize']=='min'?60:200;
         msgDebug("\nEntering layoutDesktop with menuID = $menuID and bizID = $bizID");
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $src     = $logoPath ? BIZBOOKS_URL_FS."$bizID/images/$logoPath" : BIZUNO_LOGO;

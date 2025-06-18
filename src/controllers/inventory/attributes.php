@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/inventory/attributes.php
  */
 
@@ -169,7 +169,7 @@ class inventoryAttributes
      */
     public function apiImport()
     {
-        msgDebug("\nEntering proInv:apiImport");
+        msgDebug("\nEntering inventory:apiImport");
         if (!$security = validateAccess('admin', 2)) { return; }
         set_time_limit(600); // 10 minutes
         $structure= dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
@@ -219,7 +219,7 @@ class inventoryAttributes
      */
     public function apiInventory(&$product=[])
     {
-        msgDebug("\nEntering proInv attributes.php apiInventory");
+        msgDebug("\nEntering inventory:attributes:apiInventory");
         if (empty($product['bizProAttr'])) { return; }
         $data = json_decode($product['bizProAttr'], true);
         $cat  = !empty($data['category']) ? $data['category'] : '';

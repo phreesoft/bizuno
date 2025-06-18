@@ -270,7 +270,7 @@
                 "type": "Data",
                 "settings": {
                     "fieldname": "journal_main.id",
-                    "processing": "tnrBOM",
+                    "processing": "bsiBOM",
                     "formatting": "",
                     "procFld": "",
                     "display": "0",

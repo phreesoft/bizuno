@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /model/mail.php
  */
 
@@ -171,6 +171,7 @@ class bizunoMailer
             $email= $meta['email'];
             $appPW= $meta['gmail_app_pw']; // gmail_app_pw2
         } else {
+            if (empty($key)) { $key = 'gen'; }
             $map  = ['gen'=>'', 'ap'=>'_ap','ar'=>'_ar'];
             $myBiz= getModuleCache('bizuno', 'settings', 'company');
             msgDebug("\nRead biz settings = ".print_r($myBiz, true));

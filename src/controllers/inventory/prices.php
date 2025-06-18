@@ -478,13 +478,14 @@ function preSubmitPrices() {
         $choices= [];
         $levels = !empty($sheet['levels']['rows']) ? $sheet['levels']['rows'] : [];
         $this->first = 0;
-//      msgDebug("\nReady to process args = ".print_r($args, true));
-//      msgDebug("\nReady to process sheet = ".print_r($sheet, true));
+msgDebug("\nReady to process args = ".print_r($args, true));
+msgDebug("\nReady to process sheet = ".print_r($sheet, true));
         msgDebug("\nReady to process levels = ".print_r($levels, true));
         foreach ($levels as $idx => $level) {
             $price = $this->calcPrice($level, $args['iCost'], $args['iList']);
             if (!empty($price) && $args['qty']>=$level['qty']) {
                 $this->levelIdx = $idx;
+if (!isset($sheet['cType'])) { msgDebug("\nTRAP CODE TO CATCH UNDEFINED PRICE SHEET INDEX cType."); msgTrap(); }
                 if (( $sheet['cType']==$args['cType'] && $sheet['cID']==$args['cID'] && $sheet['iID']==$args['iID']) || // type, CID and iID hit
                     ( empty($sheet['cID'])&& !empty($sheet['iID'])&& $sheet['iID']==$args['iID']) || // cID -> *, iID != 0, iID = 
                     ( empty($args['cID']) &&  empty($args['iID']) && !empty($sheet['default'])) || // global price sheets, make sure the default is checked

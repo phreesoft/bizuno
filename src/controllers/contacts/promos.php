@@ -21,15 +21,15 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/contacts/promos.php
  */
 
 namespace bizuno;
 
-class proCustPromos extends mgrJournal
+class contactsPromos extends mgrJournal
 {
-    public    $moduleID  = 'proCust';
+    public    $moduleID  = 'contacts';
     public    $pageID    = 'promos';
     protected $secID     = 'Promotions';
     protected $domSuffix = 'Promos';
@@ -371,7 +371,6 @@ function xfrResponse(json) {
      */
     public function nextBlock(&$layout=[])
     {
-        bizAutoLoad(BIZBOOKS_ROOT."model/mail.php", 'bizunoMailer');
         $cron = getUserCron($this->moduleID);
         $mailer = new bizunoMailer('', '', $cron['subject'], $cron['body'], $cron['email'], $cron['sender']);
         msgDebug("\nStarting with cnt = ".$cron['cnt']);

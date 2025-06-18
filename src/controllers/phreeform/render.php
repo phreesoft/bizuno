@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -519,7 +519,6 @@ class phreeformRender
         $msgTo     = $this->getAddrInfo('msgTo');
         $msgCC1    = $this->getAddrInfo('msgCC1');
         $msgCC2    = $this->getAddrInfo('msgCC2');
-//        bizAutoLoad(BIZBOOKS_ROOT.'model/mail.php', 'bizunoMailer');
         if (empty($msgTo['email']) || empty($msgFrom['email'])) { return msgAdd("I cannot find a valid From/To email address to generate the message."); }
         $bizMail = new bizunoMailer($msgTo['email'], $msgTo['name'], $msgSubject, $msgBody, $msgFrom['email'], $msgFrom['name']);
         if (!empty($msgCC1)) { $bizMail->addToCC($msgCC1['email'], $msgCC1['name']); }

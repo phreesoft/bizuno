@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/inventory/main.php
  */
 
@@ -113,6 +113,17 @@ class inventoryMain
                 'divInventoryDetail' => ['order'=>70,'label'=>lang('details'),'type'=>'html',    'html'=>'&nbsp;']]]],
             'datagrid' => ['manager'=>$this->dgInventory('dgInventory', 'none', $security)],
             'jsReady'  =>['init'=>"bizFocus('search', 'dgInventory');"]]);
+        // Old Pro stuff to be integrated
+        if ($security > 2 && isset($layout['datagrid']['manager']['columns']['action']['actions']['rename']['display'])) {
+            $layout['datagrid']['manager']['columns']['action']['actions']['rename']['display'] .= " && row.inventory_type!='mi'";
+        } elseif($security > 2) {
+            $layout['datagrid']['manager']['columns']['action']['actions']['rename']['display'] = "row.inventory_type!='mi'";
+        }
+        if ($security > 1 && isset($layout['datagrid']['manager']['columns']['action']['actions']['copy']['display'])) {
+            $layout['datagrid']['manager']['columns']['action']['actions']['copy']['display'] .= " && row.inventory_type!='mi'";
+        } elseif ($security > 1) {
+            $layout['datagrid']['manager']['columns']['action']['actions']['copy']['display'] = "row.inventory_type!='mi'";
+        }
     }
 
     /**
@@ -226,6 +237,7 @@ class inventoryMain
     {
         $security    = validateAccess('inv_mgr', 1);
         $rID         = clean('rID', 'integer', 'get');
+        $tabID       = clean('tabID', 'text', 'get');
         $cost_methods= [['id'=>'f','text'=>lang('cost_method_f')],['id'=>'l','text'=>lang('cost_method_l')],['id'=>'a','text'=>lang('cost_method_a')]];
         $structure   = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
         $dbData      = $rID ? dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id='$rID'") : $this->dbDefault;
@@ -322,7 +334,7 @@ class inventoryMain
                 'new'  => ['order'=>40,'hidden'=>$security >1?false:true,      'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', 0);"]],
                 'trash'=> ['order'=>80,'hidden'=>$rID&&$security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('inventory/main/delete', $rID);"]]]]],
             'tabs'    => ['tabInventory'=> ['divs'=>[
-                'general' => ['order'=>10,'label'=>lang('general'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
+                'general'  => ['order'=>10,'label'=>lang('general'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'genProp' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'genProp'],
                     'genStat' => ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'genStat'],
                     'genImage'=> ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'genImage'],
@@ -330,12 +342,18 @@ class inventoryMain
                     'genVend' => ['order'=>50,'type'=>'panel','classes'=>['block33'],'key'=>'genVend','hidden'=>$hideV],
                     'genGL'   => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'genGL'],
                     'genAtch' => ['order'=>80,'type'=>'panel','classes'=>['block66'],'key'=>'genAtch']]],
-                'movement'=> ['order'=>30,'label'=>lang('movement'),'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/history/movement&rID=$rID'"]],
-                'history' => ['order'=>35,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/history/historian&rID=$rID'"]],
-                'prices'  => ['order'=>40, 'label'=>lang('prices'), 'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&type=$this->type&dom=div&iID=$rID'"]]]]],
+                'movement' => ['order'=>30,'label'=>lang('movement'),'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
+                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/movement&rID=$rID'"]],
+                'history'  => ['order'=>35,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
+                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/historian&rID=$rID'"]],
+                'prices'   => ['order'=>40,'label'=>lang('prices'),   'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/prices/manager&type=c&dom=div&iID=$rID'"]],
+                'invImages'=> ['order'=>55,'label'=>lang('images'),     'type'=>'html','html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/images/imagesLoad&rID=$rID'"]],
+                'invAttr'  => ['order'=>65,'label'=>lang('attributes'), 'type'=>'html','html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/attributes/attrLoad&rID=$rID'"]],
+                'invAccy'  => ['order'=>90,'label'=>lang('accessories'),'type'=>'html','html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/accessory/accessoryEdit&rID=$rID'"]]]]],
             'panels'  => [
                 'genProp' => ['label'=>lang('properties'),                              'type'=>'fields','keys'=>$fldProp],
                 'genStat' => ['label'=>lang('status'),                                  'type'=>'fields','keys'=>$fldStatus],
@@ -353,7 +371,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         customTabs($data, 'inventory', 'tabInventory'); // add custom tabs
         if (in_array($data['fields']['inventory_type']['attr']['value'], ['ma','sa'])) { // assembly, add tab
             $data['tabs']['tabInventory']['divs']['bom'] = ['order'=>20,'label'=>lang('inventory_assy_list'),'type'=>'html','html'=>'',
-                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/main/managerBOM&rID=$rID'"]];
+                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/main/managerBOM&rID=$rID'"]];
+            $data['tabs']['tabInventory']['divs']['invWO'] = ['order'=>52,'label'=>lang('work_orders'),'type'=>'html','html'=>'',
+                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/build/manager&dom=div&refID=$rID'"]];
         }
         $layout = array_replace_recursive($layout, $data);
 
@@ -374,10 +394,30 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 $storeKeys[] = 'store_'.$store['id'];
                 $order = $order + 5;
             }
-            $layout['fields']['store_id'] = ['order'=>90,'label'=>$this->lang['limit_store'],'values'=>viewStores(),'attr'=>['type'=>'select']];
+            $layout['fields']['store_id'] = ['order'=>90,'label'=>lang('limit_store'),'values'=>viewStores(),'attr'=>['type'=>'select']];
             $layout['tabs']['tabInventory']['divs']['general']['divs']['genStore'] = ['order'=>75,'type'=>'panel','classes'=>['block33'],'key'=>'genStore'];
-            $layout['panels']['genStore'] = ['label'=>$this->lang['all_stores'],'type'=>'fields','keys'=>$storeKeys];
+            $layout['panels']['genStore'] = ['label'=>lang('all_stores'),'type'=>'fields','keys'=>$storeKeys];
         }
+        // options
+        $layout['toolbars']['tbInventory']['icons']['forecast'] = ['icon'=>'mimePpt', 'order'=>70, 'label'=>$this->lang['forecast'],
+            'events'=> ['onClick' => "windowEdit('$this->moduleID/tools/invForecast&rID=$rID', 'forecastChart', '{$this->lang['forecast']}', 600, 550);"]];
+        if ($layout['fields']['inventory_type']['attr']['value'] == 'ms') {
+            $rID = clean('rID', 'integer', 'get');
+            $tabID = clean('tabID', 'integer', 'get');
+            // Set the current options (in case the tab doesn't get selected)
+            $curOpt = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'invOptions', "id=$rID");
+            msgDebug("\nRead curOpt = ".print_r($curOpt, true));
+            if (!$curOpt) { $curOpt = json_encode([]); }
+            $html = html5('invOptions', ['attr'=>  ['type'=>'hidden', 'value'=>$curOpt]]);
+            $layout['tabs']['tabInventory']['divs']['tabOptions'] = ['order'=>20, 'label'=>lang('options'),'type'=>'html', 'html'=>$html,
+                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/options/optionsEdit&rID=$rID'"]];
+        }
+        $defaults = ['sales'=>getChartDefault(30), 'stock'=>getChartDefault(4), 'cogs'=>getChartDefault(32), 'method'=>'f'];
+        $layout['fields']['lang']['ms_skus_created'] = $this->lang['skus_created'];
+        $layout['fields']['inventory_type']['values']['ms'] = ['id'=>'ms','text'=>lang('inventory_type_ms'),'hidden'=>0,'tracked'=>1,'order'=>20,'gl_sales'=>$defaults['sales'],'gl_inv'=>$defaults['stock'],'gl_cogs'=>$defaults['cogs'],'method'=>$defaults['method']]; // Master Stock
+        $layout['jsHead']['ms'] = "invTypeMsg['ms'] = '".addslashes($this->lang['msg_sel_ms'])."'";
+        
+        if ($tabID) { $layout['tabs']['tabInventory']['selected'] = $tabID; }
     }
 
     /**
@@ -459,6 +499,100 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         msgAdd(lang('msg_database_write'), 'success');
         msgLog(lang('inventory').'-'.lang('save')." - ".$values['sku']." (rID=$rID)");
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accInventory').accordion('select', 0); bizGridReload('dgInventory'); jqBiz('#divInventoryDetail').html('&nbsp;');"]]);
+        $this->saveProStuff($layout);
+    }
+
+    private function saveProStuff(&$layout=[])
+    {
+        if (!$security = validateAccess('inv_mgr', 2)) { return; }
+        $rID = clean('id', 'integer', 'post');
+        if (!$rID) { return; }
+        // Save inventory Images tab
+        // if tab is not viewed, the images are not loaded so check to see if there is at least one image before saving
+        // this means that there will always need to be at least one image to save the data
+        if (isset($_POST['invImg_0'])) { // tab has been opened, process the data
+            $output = [];
+            $maxCnt = 100; // set max images per item to 100
+            for ($i=0; $i<$maxCnt; $i++) {
+                $path = clean('invImg_'.$i, 'text', 'post');
+                if (!empty($path) && file_exists(BIZUNO_DATA."images/$path")) {
+                    msgDebug("\nSaving path = $path");
+                    $output[] = $path; }
+            }
+            dbWrite(BIZUNO_DB_PREFIX.'inventory', ['invImages'=>json_encode($output)], 'update', "id=$rID");
+        }
+        // save attributes
+        $attrCat = clean('invAttrCat', 'alpha_num', 'post');
+        if (!empty($attrCat)) {
+            $invAttr = ['category'=>$attrCat, 'attrs'=>[]];
+            foreach($_POST as $key => $value) {
+                if (substr($key, 0, 7)!=='invAttr' || $key=='invAttrCat') { continue; }
+                $invAttr['attrs'][$key] = $value;
+            }
+            ksort($invAttr['attrs']);
+            msgDebug("\nReady to write attribute data = ".print_r($invAttr, true));
+            dbWrite(BIZUNO_DB_PREFIX.'inventory', ['bizProAttr'=>json_encode($invAttr)], 'update', "id=$rID");
+        }
+        // save options
+        $options = clean('invOptions', 'json', 'post');
+        msgDebug("\nReached invOptions Save, rID = $rID");
+        if (!empty($options)) {
+            $inv = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
+            if ($inv['inventory_type'] <> 'ms') { return; }
+            msgDebug("\nSave, invOptions: ".print_r($options, true));
+            if (!$options || sizeof($options) < 1) { return; } // no options have been set
+            msgDebug("\nWorking with options = ".print_r($options, true));
+            $skuData = [[
+                'ms_sku'   => $inv['sku'].'-',
+                'ms_title' => $inv['description_short'].'-',
+                'ms_dSale' => $inv['description_sales'],
+                'ms_dPurch'=> $inv['description_purchase']]];
+            for ($i = 0; $i < sizeof($options); $i++) {
+                unset($options[$i]['isNewRecord']);
+                $attrs = explode(';', $options[$i]['attrs']);
+                $labels= explode(';', $options[$i]['labels']);
+                $tmpData = $skuData;
+                $skuData = [];
+                for ($j = 0; $j < sizeof($tmpData); $j++) {
+                    for ($k = 0; $k < sizeof($attrs); $k++) {
+                        $t = (sizeof($tmpData) * $k) + $j;
+                        if (!isset($skuData[$t])) { $skuData[$t] = []; }
+                        $skuData[$t] = [
+                            'ms_sku'   => $tmpData[$j]['ms_sku']   .$attrs[$k],
+                            'ms_title' => $tmpData[$j]['ms_title'] .$attrs[$k],
+                            'ms_dSale' => $tmpData[$j]['ms_dSale'] .' -'.$labels[$k],
+                            'ms_dPurch'=> $tmpData[$j]['ms_dPurch'].' -'.$labels[$k]];
+                    }
+                }
+            }
+            // save production if it's an assembly 
+            msgAdd("Hook for saving work order from Inventory screen, Code doesn't exist!");
+            // Check length of new SKU to make sure it will fit
+            $struc = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
+            $maxSkuLen = $struc['sku']['attr']['maxlength'];
+            dbTransactionStart();
+            foreach ($skuData as $row) {
+                if (strlen($row['ms_sku']) > $maxSkuLen) {
+                    msgAdd(sprintf($this->lang['err_sku_too_long'], $row['ms_sku']));
+                    dbTransactionRollback();
+                    return;
+                }
+                $tmp = $inv; // copy the inventory record
+                unset($tmp['id']);
+                $tmp['sku']                 = $row['ms_sku'];
+                $tmp['inventory_type']      = 'mi';
+                $tmp['description_short']   = $row['ms_title'];
+                $tmp['description_sales']   = $row['ms_dSale'];
+                $tmp['description_purchase']= $row['ms_dPurch'];
+                $tmp['last_update']         = biz_date('Y-m-d');
+                unset($tmp['qty_stock'], $tmp['qty_po'], $tmp['qty_so'], $tmp['qty_alloc'], $tmp['upc_code'], $tmp['creation_date'], $tmp['last_journal_date']);
+                $newID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='{$tmp['sku']}'");
+                if (!$newID) { $tmp['creation_date'] = biz_date('Y-m-d'); }
+                msgDebug("\nReady to write: ".print_r($tmp, true));
+                dbWrite(BIZUNO_DB_PREFIX.'inventory', $tmp, $newID?'update':'insert', "id=$newID");
+            }
+            dbTransactionCommit();
+        }
     }
 
     /**
@@ -510,6 +644,17 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'journal_item'     => "UPDATE ".BIZUNO_DB_PREFIX."journal_item      SET sku='".addslashes($newSKU)."' WHERE sku='".addslashes($oldSKU)."'"]];
         msgLog(lang('inventory').' '.lang('rename')." - $oldSKU ($rID) -> $newSKU");
         $layout = array_replace_recursive($layout, $data);
+        
+        // Rename Pro Stuff
+        $oldInv = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
+        if ('ms' <> $oldInv['inventory_type']) { return; }
+        // rename just children as master was renamed in inventory module
+        if (isset($layout['dbAction'])) { // then standard rename must have been ok
+            $layout['dbAction']['invOpt_inventory'] = "UPDATE ".BIZUNO_DB_PREFIX."inventory           SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
+            $layout['dbAction']['invOpt_history']   = "UPDATE ".BIZUNO_DB_PREFIX."inventory_history   SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
+            $layout['dbAction']['invOpt_cogs_owed'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_cogs_owed   SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
+            $layout['dbAction']['invOpt_Jrnl_item'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_item        SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%' AND gl_type='itm'";
+        }
     }
 
     /**
@@ -561,6 +706,12 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         }
         msgLog(lang('inventory').'-'.lang('copy')." - $oldSKU => $newSKU");
         $layout = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"bizGridReload('dgInventory'); accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', $nID);"]]);
+
+        // Copy Pro stuff
+        msgAdd("Hook for copying work order from Inventory screen, Code doesn't exist!");
+        if ('ms' <> dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "id=$rID")) { return; }
+        if (!$newID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='$newSKU'")) { return; } // must have been an error
+        $this->save();
     }
 
     /**
@@ -599,6 +750,33 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } } // remove attachments
         msgLog(lang('inventory').' '.lang('delete')." - $sku ($rID)");
         $layout = array_replace_recursive($layout, $data);
+        
+        // Add Pro Stuff
+        if ('ms' <> $item['inventory_type']) { return; }
+        $cancelDelete = false;
+        $rID = clean('rID', 'integer', 'get');
+        $inv = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
+        $sku = $inv['sku'];
+        if ('ms' <> $inv['inventory_type']) { return; }
+        if (!isset($layout['dbAction']['inventory'])) { return; } // the item is not being deleted, probably an error
+        // make sure SKU is not part of an assembly
+        // @TODO - if it is and the other SKU's are not in journal then let delete AND remove sku from all assembly BOMs
+
+//      if (dbGetValue(BIZUNO_DB_PREFIX."inventory_assy_list", 'id', "sku LIKE '$sku-%'")) { $cancelDelete = msgAdd($this->lang['err_inv_delete_assy']); }
+        if (dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku LIKE '$sku-%'"))        { $cancelDelete = msgAdd($this->lang['err_inv_delete_gl_entry']); }
+        if ($cancelDelete) { unset($layout['dbAction']); }
+        else { // get all ID's for the children
+            if (!$mID = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "sku LIKE '$sku-%'", '', ['id'])) { return; }
+            $range = [];
+            foreach ($mID as $row) { $range[] = $row['id']; }
+            $range = '('.implode(',', $range).')';
+            $layout['dbAction']['invOpt_inventory'] = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory      WHERE id IN $range";
+            $layout['dbAction']['invOpt_assy_list'] = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE ref_id IN $range";
+            foreach ($mID as $row) { // remove attachments
+                $files = glob(getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."rID_{$row['id']}_*.*");
+                if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
+            }
+        }
     }
 
     /**
@@ -714,7 +892,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $bID = clean('bID', ['format'=>'integer', 'default'=>-1], 'get'); // restrict all information to a specific store
         $this->myStore = $bID > -1 ? $bID : getUserCache('profile', 'store_id'); // set the store overrides, if any
         $GLOBALS['bizuno_store_id'] = $this->myStore;
-        $values  = [['id'=>'0','text'=>lang('all')],['id'=>'1','text'=>$this->lang['stock_all']],['id'=>'2','text'=>lang('active')],['id'=>'3','text'=>$this->lang['store_stock']]];
+        $values  = [['id'=>'0','text'=>lang('all')],['id'=>'1','text'=>lang('stock_all')],['id'=>'2','text'=>lang('active')],['id'=>'3','text'=>lang('store_stock')]];
         // get the datagrid structure, different place for manager than managerRows
         $data['columns']['qty_all'] = $data['columns']['qty_stock'];
         $data['columns']['qty_all']['alias'] = 'qty_stock';
@@ -993,7 +1171,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $layout['panels']['genProp']['keys'] = array_merge($layout['panels']['genProp']['keys'], ['buy_uom','sell_qty','sell_uom']);
         $layout['panels']['genStat']['keys'] = array_merge($layout['panels']['genStat']['keys'], ['qty_min_desc','qty_restock_desc','qty_stock_desc','qty_po_desc','qty_so_desc','qty_alloc_desc']);
         $layout['tabs']['tabInventory']['divs']['vendors'] = ['order'=>55,'label'=>lang('vendors'),'type'=>'html','html'=>'',
-            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=contacts/vendors/vendorsLoad&rID=$rID'"]];
-        if ($tabID) { $layout['tabs']['tabInventory']['selected'] = $tabID; }
+            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/vendors/vendorsLoad&rID=$rID'"]];
     }
 }

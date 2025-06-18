@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -91,7 +91,6 @@ $lang = [
     'item_details' => 'Items to be Returned',
     'receive_details' => 'Items Received',
     'warranty_exp_date'=>'Warranty Exp Date',
-    'pf_rma_status' => 'RMA Status (status)',
     'preventable' => 'Preventable',
     'at_fault' => 'At Fault',
     'return_num' => 'Return #',

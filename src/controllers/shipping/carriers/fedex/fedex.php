@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -172,7 +172,7 @@ class fedex extends fedexCommon
             $ref_num  = $record['Original Customer Reference'];
             $refParts = explode('-', $ref_num, 2);
             $inv_num  = $refParts[0];
-            $pkg_num  = isset($refParts[1]) ? $refParts[1]-1 : 0;
+            $pkg_num  = isset($refParts[1]) ? intval($refParts[1])-1 : 0;
             $extraRef = !empty($record['Original Ref#2'])           ? ", Ref #2: {$record['Original Ref#2']}"           : "";
             $extraRef.= !empty($record['Original Ref#3/PO Number']) ? ", Ref #3: {$record['Original Ref#3/PO Number']}" : "";
             $payor_id = $record['Payor'];

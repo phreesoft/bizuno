@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -91,7 +91,6 @@ class administrateTools {
     public function ticketSave(&$layout=[])
     {
         global $io;
-        bizAutoLoad(BIZBOOKS_ROOT.'model/mail.php', 'bizunoMailer');
         $user   = clean('ticketUser', 'text', 'post');
         $email  = clean('ticketEmail','text', 'post');
         $url    = clean('ticketURL',  'text', 'post');

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/contacts/dashboards/rtn_by_cust/rtn_by_cust.php
  */
 
@@ -82,7 +82,7 @@ google.charts.setOnLoadCallback(chart0{$this->code});
 function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
 function chart0{$this->code}Select(chart, data) {
     var cData = chart.getSelection();
-    winHref(bizunoHome+'&bizRt=proCust/$this->methodID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
+    winHref(bizunoHome+'&bizRt=phreebooks/$this->methodID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
 }";
         return ['html'=>$html, 'jsHead'=>$js];
     }

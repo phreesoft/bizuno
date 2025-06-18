@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /local/en_US/language.php
  */
 
@@ -84,6 +84,7 @@ $langCore = [
     'validate_address' => 'Validate Address',
     'validate_address_results' => 'Address Validation Results',
     // General
+    'accessories' => 'Accessories',
     'account' => 'Account',
     'accounting' => 'Accounting',
     'ach_enable'  => 'Enable ACH',
@@ -734,6 +735,7 @@ $langCore = [
     'msg_no_settings' => 'There are no settings available!',
     'msg_capture_payment' => 'Capture authorized amount of: %s',
     'msg_method_delete_confirm' => 'Are you sure you want to remove this method? WARNING: This will erase all files and database entries!',
+    'msg_confirm_create_po' => 'Are you sure you want to create a drop ship Purchase Order for this order?',
     // Tips
     'tip_right_click_for_options' => 'Right click on element for more options',
     'tip_wp_edit_user' => 'Changes to this field must be made through the WordPress Administrator in the Edit User page for this user.',

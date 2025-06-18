@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -147,6 +147,67 @@ class inventoryTools
             }
         }
         return $cnt;
+    }
+
+    /**
+     * 
+     * @param type $skuID
+     * @return type
+     */
+    private function chartForecastData($skuID)
+    {
+        $numWeeks= 26;
+        $delta = $ints = $data = [];
+        if (empty($skuID)) { return msgAdd(lang('bad_id')); }
+        $inv   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['sku', 'qty_stock', 'qty_alloc'], "id=$skuID");
+        msgDebug("\nRead values for this SKU ID: ".print_r($inv, true));
+        $weekOf= strtotime("this week");
+        for ($i=0; $i<$numWeeks; $i++) {
+            $delta[]= 0; // initialize
+            $ints[] = $weekOf;
+            $weekOf = $weekOf + (60 * 60 * 24 * 7); // add a week
+        }
+        $rInts = array_reverse($ints, true);
+        $sql   = "SELECT m.journal_id, m.invoice_num, i.id, i.qty, i.date_1 FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
+             WHERE m.journal_id IN (4, 10) AND m.closed='0' AND i.sku='".addslashes($inv['sku'])."' ORDER BY i.date_1";
+        $stmt  = dbGetResult($sql);
+        $result= $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            $qtyFilled = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', "SUM(qty)", "item_ref_id={$row['id']} AND gl_type='itm'", false); // so/po - filled
+            $balance = $row['qty'] - $qtyFilled;
+            msgDebug("\nQty = {$row['qty']} and filled = $qtyFilled, balance = $balance");
+            if ($row['qty']==$qtyFilled) { msgDebug("\nFilled - Continuing"); continue; } // line item has been filled.
+            msgDebug("\nProcessing row from db: ".print_r($row, true));
+            foreach ($rInts as $key => $value) {
+                $delDate = strtotime($row['date_1']);
+                if ($delDate >= $value) {
+                    $delta[$key] += $row['journal_id']==4 ? $balance : -$balance;
+                    break;
+                } elseif ($key==0 && $delDate < $value) { // for late deliveries before first date, put into first week
+                    $delta[0] += $row['journal_id']==4 ? $balance : -$balance;
+                }
+            }
+        }
+        msgDebug("\nDeltas calculation = ".print_r($delta, true));
+        $data[]= [lang('date'), lang('total')];
+        $bal   = $inv['qty_stock'] - $inv['qty_alloc'];
+        foreach ($delta as $key => $value) {
+            $bal += $value;
+            $data[] = [date('M d', $ints[$key]), $bal];
+        }
+        msgDebug("\nReturning with data = ".print_r($data, true));
+        return $data;
+    }
+
+    public function chartForecastGo()
+    {
+        global $io;
+        $skuID   = clean('rID', 'integer', 'get');
+        $struc = $this->chartForecastData($skuID);
+        $sku   = clean(dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_short', "id=$skuID"), 'alpha_num');
+        $output= [];
+        foreach ($struc as $row) { $output[] = implode(",", $row); }
+        $io->download('data', implode("\n", $output), "Forecast: $sku.csv");
     }
 
     /**
@@ -338,7 +399,6 @@ class inventoryTools
     {
         dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_alloc'=>0], 'update', "qty_alloc<>0");
         msgAdd(lang('msg_database_write'), 'success');
-        // proInv
         $stmt = dbGetResult("SELECT journal_main.description, journal_item.sku, journal_item.qty FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_item 
             ON journal_main.id=journal_item.ref_id WHERE journal_id=32 AND closed='0'");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
@@ -420,6 +480,40 @@ class inventoryTools
         return $item_list;
     }
 
+    private function getShipTos($sku)
+    {
+        $shipW = $shipC = $shipE = $shipO = $shipAll = 0;
+        $sql   = "SELECT m.journal_id, m.store_id, i.qty FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
+            WHERE m.post_date>'$this->dateStart' AND m.journal_id IN (12,13) AND i.sku='".addslashes($sku)."' ORDER BY m.post_date";
+        $stmt  = dbGetResult($sql);
+        $rows  = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            if ($row['journal_id']==13) { $shipAll -= $row['qty']; } else { $shipAll += $row['qty']; }
+            switch ($row['store_id']) {
+                case '1': if ($row['journal_id']==13) { $shipW -= $row['qty']; } else { $shipW += $row['qty']; } break;
+                case '2': if ($row['journal_id']==13) { $shipC -= $row['qty']; } else { $shipC += $row['qty']; } break;
+                case '3': if ($row['journal_id']==13) { $shipE -= $row['qty']; } else { $shipE += $row['qty']; } break;
+                default:  if ($row['journal_id']==13) { $shipO -= $row['qty']; } else { $shipO += $row['qty']; } break;
+            }
+        }
+        return ['shipAll'=>$shipAll, 'shipW'=>$shipW, 'shipC'=>$shipC, 'shipE'=>$shipE, 'shipO'=>$shipO];
+    }
+
+    private function getStockLevels($sku)
+    {
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND post_date>'$this->dateStart'", 'post_date', ['qty', 'store_id']);
+        foreach ($rows as $row) {
+            $stockAll += $row['qty'];
+            switch ($row['store_id']) {
+                case '1': $stockW += $row['qty']; break;
+                case '2': $stockC += $row['qty']; break;
+                case '3': $stockE += $row['qty']; break;
+                default:  $stockO += $row['qty']; break;
+            }
+        }
+        return ['stockAll'=>$stockAll, 'stockW'=>$stockW, 'stockC'=>$stockC, 'stockE'=>$stockE, 'stockO'=>$stockO];
+    }
+
     /**
      * Re-prices all assemblies based on current item costs, best done after new item costing has been done completed, through ajax steps
      * @param array $layout - Structure coming in
@@ -468,6 +562,92 @@ class inventoryTools
         }
         $layout = array_replace_recursive($layout, $data);
     }
+
+    /**
+     * This tool balances and recommended inventory locations base on sales geographies
+     * @param array $layout - Structure coming in
+     * @return - Modified $layout
+     */
+    public function invBalance(&$layout=[])
+    {
+        global $io;
+        $fn    = 'temp/invAnalysis.csv';
+        $types = explode(',', COG_ITEM_TYPES);
+        $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", $types)."')", 'sku', ['id']);
+        if (sizeof($result) == 0) { return msgAdd('No rows to process!'); }
+        foreach ($result as $row) { $skus[] = $row['id']; }
+//$skus = array_slice($skus, 500, 10);
+        msgDebug("\nNumber of rows to process = ".sizeof($skus));
+        $head  = "skuID,sku,description,type,";
+//      $head .= "avgM,avgY,";
+        $head .= "stockAll,stockW,stockC,stockE,stockO,";
+        $head .= "shipAll,shipW,shipC,shipE,shipO\n";
+        $io->fileWrite($head, $fn, true, false, true);
+        setUserCron('invBalance', ['filename'=>$fn, 'cnt'=>0, 'total'=>sizeof($skus), 'rows'=>$skus]);
+        $layout= array_replace_recursive($layout, ['content'=>['action'=>'eval', 'actionData'=>"cronInit('invBalance', '$this->moduleID/$this->pageID/invBalanceNext');"]]);
+    }
+
+    /**
+     * Next block of inventory balance tool
+     * @param array $layout - Structure coming in
+     * @return - Modified layout
+     */
+    public function invBalanceNext(&$layout=[])
+    {
+        global $io;
+        $output  = [];
+        $blockCnt= 50;
+        $cron    = getUserCron('invBalance');
+        while ($blockCnt > 0) {
+            $skuID= array_shift($cron['rows']);
+            if (empty($skuID)) { break; }
+            $inv  = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id','sku','description_short','inventory_type'], "id=$skuID");
+            $stks = $this->getStockLevels($inv['sku']);
+            $ships= $this->getShipTos($inv['sku']);
+            $temp = [
+                $inv['id'], csvEncapsulate($inv['sku']), csvEncapsulate($inv['description_short']), lang('inventory_type_'.$inv['inventory_type']),
+//              $avgs['avgM'],     $avgs['avgY'],
+                $stks['stockAll'], $stks['stockW'], $stks['stockC'], $stks['stockE'], $stks['stockO'],
+                $ships['shipAll'], $ships['shipW'], $ships['shipC'], $ships['shipE'], $ships['shipO'],
+            ];
+            $output[] = implode(",", $temp);
+            $cron['cnt']++;
+            $blockCnt--;
+        }
+        $io->fileWrite(implode("\n",$output)."\n", $cron['filename'], true, true);
+        if (sizeof($cron['rows']) == 0) {
+            msgLog("GL Pro Tools (Balance Inventory) - ({$cron['total']} records)");
+            $data = ['content'=>['percent'=>100,'msg'=>"Processed {$cron['total']} SKUs",'baseID'=>'invBalance','urlID'=>"$this->moduleID/$this->pageID/invBalanceNext"]];
+            clearUserCron('invBalance');
+        } else { // return to update progress bar and start next step
+            $percent = floor(100*$cron['cnt']/$cron['total']);
+            setUserCron('invBalance', $cron);
+            $data = ['content'=>['percent'=>$percent,'msg'=>"Completed next block",'baseID'=>'invBalance','urlID'=>"$this->moduleID/$this->pageID/invBalanceNext"]];
+        }
+        $layout = array_replace_recursive($layout, $data);
+    }
+
+    public function invForecast(&$layout=[])
+    {
+        if (!$security = validateAccess('inv_mgr', 1, false)) { return; }
+        $skuID = clean('rID', 'integer', 'get');
+        $data  = $this->chartForecastData($skuID);
+        $output= ['divID'=>'chartForecastChart','type'=>'column','attr'=>['legend'=>'none','title'=>$this->lang['inv_forecast']],'data'=>array_values($data)];
+        $action= BIZUNO_AJAX."&bizRt=$this->moduleID/tools/chartForecastGo&rID=$skuID";
+        $js    = "ajaxDownload('frmForecastChart');\n";
+        $js   .= "var dataForecastChart = ".json_encode($output).";\n";
+        $js   .= "function funcForecastChart() { drawBizunoChart(dataForecastChart); };";
+        $js   .= "google.charts.load('current', {'packages':['corechart']});\n";
+        $js   .= "google.charts.setOnLoadCallback(funcForecastChart);\n";
+        $layout = array_merge_recursive($layout, ['type'=>'divHTML',
+            'divs'  => [
+                'body'  =>['order'=>50,'type'=>'html',  'html'=>'<div style="width:100%" id="chartForecastChart"></div>'],
+                'divExp'=>['order'=>70,'type'=>'html',  'html'=>'<form id="frmForecastChart" action="'.$action.'"></form>'],
+                'btnExp'=>['order'=>90,'type'=>'fields','keys'=>['icnExp']]],
+            'fields'=> ['icnExp'=>['attr'=>['type'=>'button','value'=>lang('download_data')],'events'=>['onClick'=>"jqBiz('#frmForecastChart').submit();"]]],
+            'jsHead'=> ['init'=>$js]]);
+    }
+
     /**
      * Recalculates the inventory history table quantities based on journal entries
      * @param array $layout - Structure coming in

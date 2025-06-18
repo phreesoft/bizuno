@@ -21,13 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/phreebooks/dropShip.php
  */
 
 namespace bizuno;
 
-class proCustDropShip
+class phreebooksDropShip
 {
     public  $moduleID = 'phreebooks';
 

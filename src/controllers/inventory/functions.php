@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -66,7 +66,7 @@ function inventoryProcess($value, $format='')
             $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
             $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
             $meta  = getMetaInventory($skuID, 'bill_of_materials');
-            msgDebug("\nIn proInvView with value = $value and sku = ".print_r($sku, true));
+            msgDebug("\nIn inventoryProcess with value = $value and sku = ".print_r($sku, true));
             $output= lang('qty').' - '.lang('sku').' - '.lang('description')."\n";
             foreach ($meta as $row) { $output .= ($sku['qty']*$row['qty'])." - {$row['sku']} - {$row['description']}\n"; }
             return $output;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-06-18
  * @filesource /locale/en_US/modules/bizuno/language.php
  */
 
@@ -121,6 +121,7 @@ $lang = [
     'wrong_code_time' => "This is the wrong code or time expired.",
     'password_changed' => 'Your password has been successfully changed.',
     // PhreeForm processing/separators
+    'pf_rma_status' => 'RMA Status (status)',
 //  'pf_proc_cur_exc' => 'Convert to Currency',
     'pf_proc_json' => 'JSON Decode',
     'pf_proc_json_fld' => 'JSON Decode Field',
