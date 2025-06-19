@@ -153,7 +153,6 @@ unset($bizunoMod[$module]['dashboards']);
         $admin->structure['url']        = str_replace('BIZBOOKS_ROOT/', 'BIZBOOKS_URL_ROOT/', $relPath);
         if (!isset($admin->structure['status'])) { $admin->structure['status'] = 1; }
         $admin->structure['hasAdmin']   = method_exists($admin, 'adminHome') ? true : false;
-//        $admin->structure['dirMethods'] = !empty($admin->dirMethods) ? (array)$admin->dirMethods : [];
         $admin->structure['devStatus']  = !empty($admin->devStatus) ? $admin->devStatus : false;
         $this->setMenus($admin->structure);
         $this->setGlobalLang($admin->structure);
@@ -433,6 +432,8 @@ unset($bizunoMod[$module]['dashboards']);
             $newMeta[$method] = $merged;
             if (isset($clsMeth->structure)) { $this->setHooks($clsMeth->structure, $method, $path); }
         }
+        msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID with data = ".print_r($newMeta, true));
+//        setModuleCache($structure['id'], $folderID, '', $newMeta);
         dbMetaSet($metaIdx, "methods_{$folderID}", $newMeta);
     }
 

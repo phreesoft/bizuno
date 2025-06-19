@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-06-19
  * @filesource /controllers/phreebooks/totals/tax_order/tax_order.php
  */
 
@@ -33,7 +33,7 @@ class tax_order
     public $methodDir= 'totals';
     public $code     = 'tax_order';
     public $hidden   = false;
-    public $required = true;
+    public $required = false;
     public $lang     = ['title'=>'Sales Tax (By Order)',
         'description'=> 'This method calculates sales tax based on the running total for the entire order, The tax rate defaults to None and can be changed in the settings. It is used for order operations, i.e. Customer Sales and Vendor Purchases and is typically used for VAT or GST type taxation.',
         'tax_id_v' => 'Default sales tax rate for Purchases (Vendors)',

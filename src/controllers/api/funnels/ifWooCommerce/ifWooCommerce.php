@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-19
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -217,7 +217,7 @@ function productUpload(rID) {
         compose('api', 'export', 'apiInventory', $output);
         $args = ['data'=>$output,'class'=>'api_product','method'=>'productImport', 'type'=>'post', 'endpoint'=>'product/update'];
         msgDebug("\nCalling portal API with product of length: ".sizeof($output));
-//      msgDebug("\nCalling portal API with product: ".print_r($output, true));
+//msgDebug("\nCalling portal API with product: ".print_r($output, true));
         $success = $this->apiAction($args);
         if (!empty($success)) { msgAdd("Successfully imported SKU: {$output['SKU']}", 'success'); }
     }
@@ -483,7 +483,7 @@ function productUpload(rID) {
     {
         global $portal;
         $portal->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
-        $resp = $portal->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-erp/v1/{$args['endpoint']}", ['data'=>$args['data']]);
+        $resp = $portal->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
         if (isset($resp['message'])) { msgMerge($resp['message']); }
         $postID= !empty($resp['ID']) ? $resp['ID'] : 0;

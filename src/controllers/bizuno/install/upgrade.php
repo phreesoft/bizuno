@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-10
+ * @version    7.x Last Update: 2025-06-19
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -77,6 +77,9 @@ function bizunoUpgrade()
     }
 
 /*  if (version_compare($dbVer, '7.2') < 0) {
+        // Prices methods in common_meta is not used, delete it
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key='methods_prices'");
+
         // These have no useful information and can just be deleted. Maybe in next upgrade to make sure no data is lost
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proEDI'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proGL'");

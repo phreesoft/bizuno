@@ -41,7 +41,8 @@ class paymentAdmin
             'gl_payment_v'  => getChartDefault(0),
             'gl_discount_v' => getChartDefault(0)];
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
-        $this->structure= ['dirMethods'=> ['gateways']];
+        $this->structure= [
+            'dirMethods'=> ['gateways']];
     }
 
     /**
