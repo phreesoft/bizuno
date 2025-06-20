@@ -1,0 +1,5 @@
+Version: 1.0.x
+--------------
+* Improvement
+ * The 'maximizable' property is available for portal panel.
+ * Add 'dir' property.

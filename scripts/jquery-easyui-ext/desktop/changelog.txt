@@ -1,0 +1,6 @@
+Version 1.0.x
+-------------
+
+* Improvement
+ * The time information on the taskbar can be customized by setting the 'timer' configuration.
+ * Add context menu events for app shortcut and task.

@@ -1,0 +1,7 @@
+Version 1.0.x
+-------------
+
+* Improvement
+ * Add 'clear' and 'reset' methods.
+ * Add 'lineheight' tool.
+ * The toolbar is not clickable in the readonly or disabled status.

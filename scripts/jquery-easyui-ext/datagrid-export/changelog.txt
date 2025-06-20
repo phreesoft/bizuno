@@ -1,0 +1,6 @@
+Version 1.0.x
+-------------
+
+* Improvement
+ * The 'toCsv' method is available to export rows to csv file.
+ * The 'fields' parameter is accepted in 'toCsv','toExcel' and 'print' methods.
