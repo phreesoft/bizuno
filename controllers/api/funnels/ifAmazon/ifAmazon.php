@@ -649,7 +649,7 @@ class ifAmazon {
         $layout['fields']['tplDescAm'] = ['order'=>10,'html'=>$this->lang['amazon_template_desc'],   'attr'=>['type'=>'raw']];
         $layout['fields']['selTempAm'] = ['order'=>20,'values'=>$templAm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifAmazon', 0, bizSelGet('selTempAm'));"], 'attr'=>['type'=>'select']];
         $layout['fields']['divMapAm']  = ['order'=>90,'html'=>'<div id="divAmazonMap">&nbsp;</div>', 'attr'=>['type'=>'raw']];
-        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_EXT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
     }
 
   /**
@@ -726,7 +726,7 @@ class ifAmazon {
                 'amazon_field' => $this->lang['amazon_field'],
                 'bizuno_field' => $this->lang['bizuno_field']],
             'fields' => [], // filled below
-            'jsHead' => ['initAmazon'=>"jqBiz.cachedScript('".BIZBOOKS_URL_EXT."controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');"]];
+            'jsHead' => ['initAmazon'=>"jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');"]];
         foreach ($fields['fields'] as $key => $value) {
             $data['fields'][$key] = [
                 'group' => $value['group']>0 ? $fields['groups'][$value['group']] : '',

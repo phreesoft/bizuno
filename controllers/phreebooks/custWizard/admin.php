@@ -21,15 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/phreebooks/custWizard/admin.php
  */
 
 namespace bizuno;
 
-define('MODULE_CUSTWIZARD_VERSION','4.4.0');
-
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/main.php", 'phreebooksMain');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
 
 class custWizardAdmin {
     public  $moduleID   = 'custWizard';
@@ -41,10 +39,9 @@ class custWizardAdmin {
         $this->lang     = getExtLang($this->moduleID);
         $this->settings = getModuleCache($this->moduleID, 'settings', false, false, []);
         $this->structure= [
-            'version'      => MODULE_CUSTWIZARD_VERSION,
             'prerequisites'=> ['bizuno'=>'3.0'],
             'category'     => $this->category,
-            'url'          => BIZBOOKS_URL_EXT."controllers/$this->moduleID/",
+            'url'          => BIZBOOKS_URL_ROOT."controllers/$this->moduleID/",
             'hooks'        => ['phreebooks'=>['main'=>['manager'=>['page'=>'admin','class'=>'custWizardAdmin','order'=>50]]]]];
     }
 

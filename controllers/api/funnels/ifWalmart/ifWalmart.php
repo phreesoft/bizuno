@@ -202,7 +202,7 @@ class ifWalmart
         $layout['fields']['tplDescWm'] = ['order'=>10,'html'=>$this->lang['walmart_template_desc'],  'attr'=>['type'=>'raw']];
         $layout['fields']['selTempWm'] = ['order'=>20,'values'=>$templWm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifWalmart', 0, bizSelGet('selTempWm'));"],'attr'=>['type'=>'select']];
         $layout['fields']['divMapWm']  = ['order'=>90,'html'=>'<div id="divWalmartMap">&nbsp;</div>','attr'=>['type'=>'raw']];
-        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_EXT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
         $layout['jsReady'][$channel]= "walmartContact();";
     }
 

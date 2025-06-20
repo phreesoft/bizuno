@@ -53,7 +53,6 @@ function bizAutoLoadMap($path='')
     if (strpos($path, 'BIZUNO_PATH/')  ===0)     { return str_replace('BIZUNO_PATH/',      BIZUNO_PATH,      $path, $max); }
     if (strpos($path, 'BIZUNO_DATA/')  ===0)     { return str_replace('BIZUNO_DATA/',      BIZUNO_DATA,      $path, $max); }
     if (strpos($path, 'BIZBOOKS_URL_ROOT/')===0) { return str_replace('BIZBOOKS_URL_ROOT/',BIZBOOKS_URL_ROOT,$path, $max); }
-    if (strpos($path, 'BIZBOOKS_URL_EXT/') ===0) { return str_replace('BIZBOOKS_URL_EXT/', BIZBOOKS_URL_EXT, $path, $max); }
     if (strpos($path, 'BIZBOOKS_URL_FS/')  ===0) { return str_replace('BIZBOOKS_URL_FS/',  BIZBOOKS_URL_FS,  $path, $max); }
     return $path;
 }
@@ -280,11 +279,11 @@ function loadBaseLang($lang='en_US')
     }
     if ($lang == 'en_US') { return $langCache; } // just english, we're done
     $otherLang = [];
-    if (file_exists(BIZBOOKS_LOCALE."$lang/language.php")) {
+    if (file_exists(BIZBOOKS_ROOT."locale/$lang/language.php")) {
         msgDebug("\nFetching lang: $lang from file system.");
-        require(BIZBOOKS_LOCALE."$lang/language.php");  // pulls locale overlay
+        require(BIZBOOKS_ROOT."locale/$lang/language.php");  // pulls locale overlay
         $langCore = array_replace_recursive($langCache, $langCore); // overlay ISO lang on top of working cache file
-        include(BIZBOOKS_ROOT."locale/en_US/langByRef.php"); // lang by reference (reset after loading translation)
+        include(BIZBOOKS_ROOT.'locale/en_US/langByRef.php'); // lang by reference (reset after loading translation)
         $otherLang = array_replace_recursive($langCore, $langByRef);
     }
     return array_replace($langCache, $otherLang);

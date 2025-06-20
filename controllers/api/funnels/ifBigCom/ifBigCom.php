@@ -130,7 +130,7 @@ class ifBigCom extends apiExport
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
             'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://www.bigcommerce.com');"],
-                'attr'=>['type'=>'img','height'=>100,'src'=>BIZBOOKS_URL_EXT."0/controllers/$this->moduleID/channels/$this->code/$this->code.png"]],
+                'attr'=>['type'=>'img','height'=>100,'src'=>BIZBOOKS_URL_ROOT."0/controllers/$this->moduleID/channels/$this->code/$this->code.png"]],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
             'btnOrders'   => ['events' =>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"], 'attr'=>['type'=>'button','value'=>lang('go')]],

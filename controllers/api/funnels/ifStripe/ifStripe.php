@@ -101,7 +101,7 @@ class ifStripe {
                     'formEOF' => ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => ['frmOrders'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]]],
             'fields' => [
-                'imgLogo'   => ['styles'=>['cursor'=>'pointer'],'events'=>['onClick'=>"winHref('https://www.stripe.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_EXT.'0/controllers/api/funnels/ifStripe/ifStripe.png']],
+                'imgLogo'   => ['styles'=>['cursor'=>'pointer'],'events'=>['onClick'=>"winHref('https://www.stripe.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_ROOT.'0/controllers/api/funnels/ifStripe/ifStripe.png']],
                 'fileOrders'=> ['order'=>30,'attr'  =>['type'=>'file']],
                 'btnOrders' => ['order'=>40,'icon'=>'next', 'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"]]],
             'jsReady'=>['init'=>"ajaxForm('frmOrders');"]];

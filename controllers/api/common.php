@@ -39,26 +39,6 @@ class apiCommon
     }
 
     /**
-     * Validates the requestors credentials and sets the bizID
-     */
-    protected function authenticateUser()
-    {
-        global $portal;
-        $userID = clean('HTTP_BIZUSER', 'email','server');
-        $userPW = clean('HTTP_BIZPASS', 'text', 'server');
-        if (!empty($userID) && !empty($userPW)) {
-            $portal->restHeaders = ['email'=>$userID, 'pass'=>$userPW, 'bizID'=>BIZUNO_BIZID];
-            $resp = $portal->restRequest('get', PHREESOFT_URL, 'biz_hosted/get_rights');
-            if (empty($resp['userID'])) { return msgAdd('Invalid credentials!'); }
-//            $profile = array_replace(getUserCache('profile'), getMetaContact(getUserCache('profile', 'userID'), 'user_profile'));
-//            setUserCache('profile', '', $profile);
-            $role = dbMetaGet($resp['userRole'], 'bizuno_role');
-            setUserCache('role', '', $role);
-        }
-        return true;
-    }
-    
-    /**
      * Communicates with the remote server through the RESTful API
      * @global type $portal
      * @param type $type

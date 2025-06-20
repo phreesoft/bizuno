@@ -54,7 +54,7 @@ class shippingCommon
         $this->lang     = getExtLang($this->moduleID);
         $this->options  = $this->getOptions();
         $this->settings = array_replace_recursive($this->defaults, getModuleCache($this->moduleID, 'settings'));
-        $this->thermalTransport = defined('BIZUNO_3P_QZ_TRAY') ? BIZUNO_3P_QZ_TRAY : BIZBOOKS_URL_EXT.'assets/qz-tray/';
+        $this->thermalTransport = defined('BIZUNO_3P_QZ_TRAY') ? BIZUNO_3P_QZ_TRAY : BIZBOOKS_URL_ROOT.'scripts/qz-tray/';
         $this->shipment = ['Qty'=>1, 'Wt'=>0, 'L'=>8, 'W'=>6, 'H'=>4, 'Ins'=>0];
         $this->addrStruc= dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
         unset($this->addrStruc['address_id'],$this->addrStruc['type']);

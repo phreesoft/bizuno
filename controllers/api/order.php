@@ -47,13 +47,8 @@ class apiOrder extends apiCommon
      */
     public function add(&$layout=[])
     {
-        // validate user
-        if (!$this->authenticateUser()) { return msgAdd(lang('invalid_access')); }
-        // process order
         $postID = $this->apiJournalEntry();
-        // build response
         $output = ['result'=>!empty($postID)?'Success':'Fail', 'ID'=>$postID];
-        // need a more informative response, Bizuno order ID, messages
         $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);
         msgDebug("\nReturning from API order/add with layout = ".print_r($layout, true));
     }

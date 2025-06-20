@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/api/admin.php
  */
 
@@ -314,7 +314,7 @@ $meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $m
     {
         $bizID = clean('bizID', 'alpha_num', 'get');
         msgDebug("\nEntering getRoles with bizID = $bizID");
-        if (empty($bizID) || !$this->validatePSrequest($bizID)) { return msgAdd('Illegal Access!'); }
+        if (empty($bizID)) { return msgAdd('Illegal Access!'); }
         $result= dbMetaGet('%', 'bizuno_role');
         $roles = [];
         if (!empty($result)) {
@@ -323,12 +323,6 @@ $meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $m
             $roles = [];
         }
         $layout = array_replace_recursive($layout, ['content'=>['roles'=>$roles]]);
-    }
-
-    private function validatePSrequest($bizID='')
-    {
-        msgDebug("\nEntering validatePSrequest with bizID = $bizID and remote address = ".$_SERVER['REMOTE_ADDR']);
-        return (PHREESOFT_IP==$_SERVER['REMOTE_ADDR']) ? true : false;
     }
 
     /**

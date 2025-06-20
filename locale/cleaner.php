@@ -345,8 +345,8 @@ function getLang($module)
     }
     if ($myLang == 'en_US') { return $output; }
     $lang = [];
-    if (file_exists(BIZBOOKS_LOCALE."$myLang/module/$module/language.php")) {
-        require    (BIZBOOKS_LOCALE."$myLang/module/$module/language.php"); // populates $lang
+    if (file_exists(BIZBOOKS_ROOT."locale/$myLang/modules/$module/language.php")) {
+        require    (BIZBOOKS_ROOT."locale/$myLang/modules/$module/language.php"); // populates $lang
         $output = array_replace($output, $lang);
     }
     return $output;
@@ -394,8 +394,8 @@ function getMethLang($module, $method, $code)
     }
     if ($myLang=='en_US') { return $output; }
     // merge with locale
-    if (file_exists(BIZBOOKS_LOCALE."$myLang/module/$module/$mDir/$method/language.php")) {
-        include    (BIZBOOKS_LOCALE."$myLang/module/$module/$mDir/$method/language.php"); // populates $lang
+    if (file_exists(BIZBOOKS_ROOT."locale/$myLang/modules/$module/$mDir/$method/language.php")) {
+        include    (BIZBOOKS_ROOT."locale/$myLang/modules/$module/$mDir/$method/language.php"); // populates $lang
         $output = array_replace($output, $lang);
     }
     return $output;
@@ -409,28 +409,6 @@ function getExtMethLang($modID, $folder, $code)
     return getMethLang($modID, $folder, $code);
 }
 
-
-function localeLangMethExt(&$locale, $moduleID, $methodDir, $code)
-{
-    $myLang = getUserCache('profile', 'language', false, 'en_US');
-    if ('en_US'==$myLang) { return; }
-    
-    // @todo this doesn't work, need to extract the module and go from there
-    // maybe have registry build lang file for each locale and pull into global variable, similar to lang
-    // $lang = [
-    //  'core' => [], - current lang structure
-    //  'modules' => [],
-    //    'core' => [],
-    //    'dashbaords' => [],
-    //    'methods' => [],
-    // ];
-    // This will also include customizations and will not move around 
-    
-    if (file_exists(BIZBOOKS_LOCALE."$myLang/ext/$modID/$folder/$method/language.php")) {
-        require    (BIZBOOKS_LOCALE."$myLang/ext/$modID/$folder/$method/language.php"); // populates $lang
-        $output = array_replace($output, $lang);
-    }
-}
 /**
  * @TODO - DEPRECATED - Tries to pull the best label for a table field using a suffix for additional resolution.
  * @param string $table name of the table

@@ -166,7 +166,7 @@ class ifGoogle extends apiExport
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=ifGoogle&dl=1"]]],
             'fields' => [
-                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZBOOKS_URL_EXT.'0/controllers/api/funnels/ifGoogle/google_large.png']],
+                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZBOOKS_URL_ROOT.'0/controllers/api/funnels/ifGoogle/google_large.png']],
                 'btnInv' => ['events'=>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]]],
             'jsReady'=> ['init'    =>"ajaxDownload('frmInventory');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);
