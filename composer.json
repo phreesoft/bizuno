@@ -1,6 +1,7 @@
 {
     "name": "phreesoft/bizuno",
     "type": "project",
+    "version": "7.1.1",
     "description": "Bizuno is a full featured web based ERP/Accouting library written in PHP",
     "authors": [
         {
