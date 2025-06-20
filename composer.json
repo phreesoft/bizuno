@@ -1,0 +1,34 @@
+{
+    "name": "phreesoft/bizuno",
+    "type": "project",
+    "description": "Bizuno is a full featured web based ERP/Accouting library written in PHP",
+    "authors": [
+        {
+            "name": "David Premo",
+            "email": "dave.premo@phreesoft.com"
+        }
+    ],
+    "keywords": ["phreesoft","bizuno","web","erp","accounting","crm"],
+    "homepage": "https://phreesoft.com/",
+    "support": {
+        "security": "https://phreesoft.com/security/",
+        "forum": "https://phreesoft.com/support/",
+        "issues": "https://github.com/phreesoft/bizuno/issues",
+        "docs": "https://phreesoft.com/docs/",
+        "source": "https://github.com/phreesoft/bizuno"
+    },
+    "license": "AGPL-3.0-only",
+    "funding": [
+        {
+            "url": "https://www.phreesoft.com/donations/fundraising-campaign/",
+            "type": "other"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.9",
+        "phpseclib/phpseclib": "~3.0",
+        "tecnickcom/tcpdf": "^6.8",
+        "setasign/fpdf": "^1.8",
+	"setasign/fpdi": "^2.5"
+    }
+}
