@@ -383,7 +383,7 @@ class PDF extends \TCPDF
             $Fill = '0';
         }
         if ($Params->type <> 'PgNum') { $TextField = isset($Params->settings->text) ? $Params->settings->text : ''; }
-            else { $TextField = $this->GroupPageNo().' '.lang('of').' '.$this->PageGroupAlias(); } // fix for multi-page multi-group forms
+        else { $TextField = $this->GroupPageNo().' '.lang('of').' '.$this->PageGroupAlias(); } // fix for multi-page multi-group forms
         $GLOBALS['pfFieldSettings'] = $Params;
         if (isset($Params->settings->processing)) { $TextField = viewProcess($TextField, $Params->settings->processing); }
         if (isset($Params->settings->formatting)) { $TextField = viewFormat ($TextField, $Params->settings->formatting); }

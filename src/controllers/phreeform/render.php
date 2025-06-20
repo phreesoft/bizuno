@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -785,6 +785,7 @@ msgDebug("\nresult = ".print_r($result, true));
                 if ($TableObject->type <> 'Tbl') { continue; }
                 if (!isset($TableObject->settings->boxfield->rows)) { return msgAdd($this->lang['err_pf_field_empty'] . $TableObject->title); }
                 // Build the sql
+                $GLOBALS['pfFieldSettings'] = $TableObject;
                 $tblField   = '';
                 $tblHeading = [];
                 foreach ($TableObject->settings->boxfield->rows as $TableField) { if (isset($TableField->title)) { $tblHeading[] = $TableField->title; } }
@@ -793,10 +794,10 @@ msgDebug("\nresult = ".print_r($result, true));
                     $data = $special_form->load_table_data($TableObject->boxfield->rows);
                 } elseif (!empty($TableObject->settings->fieldname)) { // for field encoded data, typically json
                     msgDebug("\nProcessing Data for table: ".print_r($report->FieldValues["d$key"], true));
-                    if (!empty($TableObject->settings->processing) && !in_array($TableObject->settings->processing, ['json'])) { // let the processing create the data array, mostly used for special processing actions
+                    if (!empty($TableObject->settings->processing) && !in_array($TableObject->settings->processing, ['json', 'jsonFld'])) { // let the processing create the data array, mostly used for special processing actions
                         $data = viewProcess($report->FieldValues["d$key"], $TableObject->settings->processing);
                     } else { // build it by sequence
-                        if (in_array($TableObject->settings->processing, ['json'])) {
+                        if (in_array($TableObject->settings->processing, ['json', 'jsonFld'])) {
                             $report->FieldValues["d$key"] = viewProcess($report->FieldValues["d$key"], $TableObject->settings->processing);
                         }
                         $data = $this->setEncodedList($TableObject->settings->boxfield->rows, $report->FieldValues["d$key"]);
@@ -808,8 +809,8 @@ msgDebug("\nresult = ".print_r($result, true));
                 }
                 if (empty($data))     { $data = []; }
                 if (!is_array($data)) { $data = [$data]; }
-//                msgDebug("\ndata in render is now: ".print_r($data, true));
-//                msgDebug("\nheading in render is now: ".print_r($tblHeading, true));
+//msgDebug("\ndata in render is now: ".print_r($data, true));
+//msgDebug("\nheading in render is now: ".print_r($tblHeading, true));
                 array_unshift($data, $tblHeading); // set the first data element to the headings
                 $TableObject->data = $data;
                 $StoredTable = clone $TableObject;
@@ -1123,6 +1124,7 @@ msgDebug("\nresult = ".print_r($result, true));
         $rID = clean('rID', 'integer', 'get');
         if (empty($rID)) { return; } // no message if only an attachment is selected
         $report = dbMetaGet($rID, 'phreeform', 'common', 0, ['object'=>true]);
+        if (empty($report)) { return; } // Report was deleted or cannot be found, return null
         $report->xfilterlist           = new \stdClass();
         $report->xfilterlist->fieldname= clean('xfld', 'text', 'get');
         $report->xfilterlist->default  = clean('xcr',  'text', 'get');
@@ -1300,8 +1302,7 @@ msgDebug("\nresult = ".print_r($result, true));
 
     private function setEncodedList($boxfield, $rows)
     {
-//        msgDebug("\nboxfield = ".print_r($boxfield, true));
-//        msgDebug("\nrows = ".print_r($rows, true));
+        if (!empty($rows['rows'])) { $rows = $rows['rows']; } // if it's grid data
         $data = [];
         foreach ($rows as $row) {
             $output = [];

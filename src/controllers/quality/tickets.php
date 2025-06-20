@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -244,7 +244,8 @@ class qualityTickets extends mgrJournal
         $menu = clean('menu',   'cmd',    'get');
         $props= dbMetaGet(0, "dashboard_{$menu}", 'contacts', getUserCache('profile', 'userID'));
         $dash = getDashboard($dashID, $props['$dashID']['opts']);
-        $cData= $dash->getData();
+        $range = ''; // pull range from users dashboard setting, depends on the user and the category where the dashbvoard is, probably needs to be sent in the original request
+        $cData= $dash->getData($range);
         msgDebug("\n Back from readiong cData with results: ".print_r($cData, true));
         $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"id IN (".implode(',', $cData['data'][$key]['rID']).")"];
         // clean up some filters

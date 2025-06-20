@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/phreeform/main.php
  */
 
@@ -214,6 +214,7 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
         parent::deleteMeta($layout);
+        dbReportsCache(); // rebuild the reports cache
         $layout['content']['actionData']  = "jqBiz('#accDocs').accordion('select', 0); bizTreeReload('treePhreeform'); bizPanelRefresh('myBookMark'); jqBiz('#docRecent').panel('refresh');";
     }
 

@@ -7,11 +7,10 @@
         "total": 2,
         "rows": [
             {
+                "isNewRecord": false,
                 "join_type": "JOIN",
                 "tablename": "journal_main",
-                "_selected": true,
-                "relationship": "",
-                "isNewRecord": false
+                "relationship": ""
             },
             {
                 "isNewRecord": false,
@@ -22,26 +21,51 @@
         ]
     },
     "fieldlist": {
-        "total": 34,
+        "total": 39,
         "rows": [
             {
                 "title": "Text - Title",
-                "abscissa": "78",
+                "abscissa": "18",
                 "ordinate": "8",
                 "width": "60",
                 "height": "12",
                 "type": "Text",
                 "settings": {
-                    "text": "Return Traveler",
+                    "text": "Return Traveler: ",
                     "display": "0",
                     "font": "default",
                     "size": "18",
-                    "align": "C",
+                    "align": "R",
                     "color": "#0b5394",
                     "bsize": "1",
                     "bcolor": "#000000",
                     "fcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
+            },
+            {
+                "isNewRecord": false,
+                "title": "Data - Return Number",
+                "abscissa": "78",
+                "ordinate": "8",
+                "width": "60",
+                "height": "12",
+                "type": "Data",
+                "settings": {
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
+                    "formatting": "",
+                    "procFld": "ref_num",
+                    "display": "0",
+                    "font": "",
+                    "size": "16",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "_selected": true
             },
             {
                 "title": "Data - Name\/Business",
@@ -51,7 +75,10 @@
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.caller_name",
+                    "fieldname": "journal_main.primary_name_b",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -61,14 +88,16 @@
                     "bcolor": "#000000",
                     "fcolor": "#000000"
                 },
-                "_selected": true,
                 "isNewRecord": false
             },
             {
                 "title": "Data - Caller",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.contact_name",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
+                    "formatting": "",
+                    "procFld": "caller_name",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -91,7 +120,10 @@
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.email",
+                    "fieldname": "journal_main.email_b",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -106,7 +138,10 @@
                 "title": "Data - Telephone #",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.telephone",
+                    "fieldname": "journal_main.telephone1_b",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -130,6 +165,9 @@
                 "type": "Data",
                 "settings": {
                     "fieldname": "journal_main.invoice_num",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -149,6 +187,9 @@
                 "type": "Data",
                 "settings": {
                     "fieldname": "journal_main.purch_order_id",
+                    "processing": "",
+                    "formatting": "",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -163,8 +204,10 @@
                 "title": "Data - Create Date",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.creation_date",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
                     "formatting": "date",
+                    "procFld": "creation_date",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -187,8 +230,10 @@
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.receive_date",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
                     "formatting": "date",
+                    "procFld": "receive_date",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -207,8 +252,10 @@
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.invoice_date",
+                    "fieldname": "journal_main.post_date",
+                    "processing": "",
                     "formatting": "date",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -227,7 +274,10 @@
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.receive_carrier",
+                    "fieldname": "journal_main.method_code",
+                    "processing": "",
+                    "formatting": "shipInfo",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -239,14 +289,17 @@
                 }
             },
             {
-                "title": "Data - Tracking #",
+                "title": "Data - Store ID",
                 "abscissa": "170",
                 "ordinate": "45",
                 "width": "50",
                 "height": "5",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.receive_tracking",
+                    "fieldname": "journal_main.store_id",
+                    "processing": "",
+                    "formatting": "storeID",
+                    "procFld": "",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -255,17 +308,41 @@
                     "bsize": "1",
                     "bcolor": "#000000",
                     "fcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
+            },
+            {
+                "title": "Text - Customer Notes",
+                "abscissa": "8",
+                "ordinate": "55",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Customer Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                },
+                "isNewRecord": false
             },
             {
                 "title": "Data - Customer Notes",
                 "abscissa": "8",
                 "ordinate": "60",
                 "width": "200",
-                "height": "40",
+                "height": "20",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.notes",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
+                    "formatting": "",
+                    "procFld": "notes",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -275,29 +352,17 @@
                     "bsize": "1",
                     "bcolor": "#000000",
                     "fcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
             },
             {
                 "title": "Table - Items Returned",
                 "abscissa": "8",
-                "ordinate": "105",
+                "ordinate": "85",
                 "width": "200",
-                "height": "40",
+                "height": "20",
                 "type": "Tbl",
                 "settings": {
-                    "hfont": "default",
-                    "hsize": "10",
-                    "halign": "L",
-                    "hcolor": "#000000",
-                    "hbshow": "1",
-                    "hbsize": "1",
-                    "hbcolor": "#000000",
-                    "hfcolor": "#000000",
-                    "bsize": "1",
-                    "bcolor": "#000000",
-                    "fcolor": "#000000",
-                    "fieldname": "journal_main.close_details",
-                    "processing": "json",
                     "boxfield": {
                         "total": 4,
                         "rows": [
@@ -326,7 +391,7 @@
                                 "size": "10",
                                 "align": "L",
                                 "color": "#000000",
-                                "width": "50"
+                                "width": "100"
                             },
                             {
                                 "fieldname": "notes",
@@ -338,18 +403,55 @@
                                 "width": "100"
                             }
                         ]
-                    }
+                    },
+                    "hfont": "default",
+                    "hsize": "10",
+                    "halign": "L",
+                    "hcolor": "#000000",
+                    "hbshow": "1",
+                    "hbsize": "1",
+                    "hbcolor": "#000000",
+                    "hfcolor": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
+                    "formatting": "",
+                    "procFld": "close_details"
+                }
+            },
+            {
+                "title": "Text - Receive Notes",
+                "abscissa": "8",
+                "ordinate": "110",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Product Receive Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
                 }
             },
             {
                 "title": "Data - Rec\/Insp Notes",
                 "abscissa": "8",
-                "ordinate": "160",
+                "ordinate": "115",
                 "width": "200",
-                "height": "40",
+                "height": "20",
                 "type": "Data",
                 "settings": {
-                    "fieldname": "journal_main.receive_notes",
+                    "fieldname": "journal_meta.meta_value",
+                    "processing": "jsonFld",
+                    "formatting": "",
+                    "procFld": "receive_notes",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -362,11 +464,30 @@
                 }
             },
             {
+                "title": "Text - Disposition Notes",
+                "abscissa": "8",
+                "ordinate": "235",
+                "width": "60",
+                "height": "5",
+                "type": "Text",
+                "settings": {
+                    "text": "Disposition Notes",
+                    "display": "0",
+                    "font": "default",
+                    "size": "12",
+                    "align": "L",
+                    "color": "#000000",
+                    "bsize": "1",
+                    "bcolor": "#000000",
+                    "fcolor": "#000000"
+                }
+            },
+            {
                 "title": "Rect - Disposition Notes",
                 "abscissa": "8",
-                "ordinate": "205",
+                "ordinate": "240",
                 "width": "200",
-                "height": "50",
+                "height": "20",
                 "type": "Rect",
                 "settings": {
                     "bshow": "1",
@@ -563,17 +684,18 @@
                     "bsize": "1",
                     "bcolor": "#000000",
                     "fcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
             },
             {
-                "title": "Text - Tracking #",
+                "title": "Text - Store",
                 "abscissa": "130",
                 "ordinate": "45",
                 "width": "40",
                 "height": "5",
                 "type": "Text",
                 "settings": {
-                    "text": "Tracking #",
+                    "text": "Store",
                     "display": "0",
                     "font": "default",
                     "size": "12",
@@ -582,7 +704,8 @@
                     "bsize": "1",
                     "bcolor": "#000000",
                     "fcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
             },
             {
                 "title": "Text - Closed By",
@@ -634,7 +757,8 @@
                     "length": "50",
                     "bsize": "1",
                     "bcolor": "#000000"
-                }
+                },
+                "isNewRecord": false
             },
             {
                 "title": "Line - Closed Date",
@@ -649,63 +773,6 @@
                     "bsize": "1",
                     "bcolor": "#000000"
                 }
-            },
-            {
-                "title": "Text - Customer Notes",
-                "abscissa": "8",
-                "ordinate": "55",
-                "width": "60",
-                "height": "5",
-                "type": "Text",
-                "settings": {
-                    "text": "Customer Notes",
-                    "display": "0",
-                    "font": "default",
-                    "size": "12",
-                    "align": "L",
-                    "color": "#000000",
-                    "bsize": "1",
-                    "bcolor": "#000000",
-                    "fcolor": "#000000"
-                }
-            },
-            {
-                "title": "Text - Receive Notes",
-                "abscissa": "8",
-                "ordinate": "155",
-                "width": "60",
-                "height": "5",
-                "type": "Text",
-                "settings": {
-                    "text": "Product Receive Notes",
-                    "display": "0",
-                    "font": "default",
-                    "size": "12",
-                    "align": "L",
-                    "color": "#000000",
-                    "bsize": "1",
-                    "bcolor": "#000000",
-                    "fcolor": "#000000"
-                }
-            },
-            {
-                "title": "Text - Disposition Notes",
-                "abscissa": "8",
-                "ordinate": "200",
-                "width": "60",
-                "height": "5",
-                "type": "Text",
-                "settings": {
-                    "text": "Disposition Notes",
-                    "display": "0",
-                    "font": "default",
-                    "size": "12",
-                    "align": "L",
-                    "color": "#000000",
-                    "bsize": "1",
-                    "bcolor": "#000000",
-                    "fcolor": "#000000"
-                }
             }
         ]
     },
@@ -717,46 +784,53 @@
         "total": 2,
         "rows": [
             {
-                "fieldname": "journal_main.creation_date",
-                "title": "Date Created",
-                "default": "1"
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Business Name",
+                "default": "1",
+                "isNewRecord": false
             },
             {
-                "fieldname": "journal_main.caller_name",
-                "title": "Caller Name"
+                "fieldname": "journal_main.post_date",
+                "title": "Caller Name",
+                "_selected": false,
+                "default": "",
+                "isNewRecord": false
             }
         ]
     },
     "filterlist": {
-        "total": 4,
+        "total": 3,
         "rows": [
             {
-                "fieldname": "journal_main.creation_date",
-                "title": "Creation Date",
+                "fieldname": "journal_main.post_date",
+                "title": "Post Date",
                 "visible": "1",
-                "type": "0"
+                "type": "0",
+                "min": "",
+                "max": "",
+                "isNewRecord": false
             },
             {
-                "fieldname": "journal_main.caller_name",
-                "title": "Caller Name",
+                "fieldname": "journal_main.primary_name_b",
+                "title": "Company Name",
                 "visible": "1",
-                "type": "0"
+                "type": "0",
+                "min": "",
+                "max": "",
+                "isNewRecord": false
             },
             {
-                "fieldname": "journal_main.return_num",
-                "title": "Return Number",
-                "visible": "1",
-                "type": "0"
-            },
-            {
-                "fieldname": "journal_main.closed_date",
-                "title": "Closed Date",
-                "visible": "1",
-                "type": "0"
+                "isNewRecord": false,
+                "fieldname": "journal_meta.meta_key",
+                "title": "Meta Key",
+                "visible": "",
+                "type": "6",
+                "min": "return",
+                "max": ""
             }
         ]
     },
-    "title": "Product Return Traveler",
+    "title": "Return Traveler",
     "description": "Creates a traveler form to go with product returns to make notes during the  processing. Format: Portrait",
     "emailmessage": null,
     "pagesize": "LETTER:216:279",
@@ -782,8 +856,9 @@
         "h",
         "j"
     ],
-    "datefield": "journal_main.creation_date",
+    "datefield": "journal_main.post_date",
     "datedefault": "c",
+    "defaultemail": "user",
     "filenamefield": "",
     "filenameprefix": "",
     "special_class": null,

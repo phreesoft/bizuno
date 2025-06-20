@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /view/main.php
  */
 
@@ -519,7 +519,7 @@ return "Needs Fixin: $value";
         if (!$field) { return 'Error - No index provided!'; }
         $data = json_decode($value, true);
         if (is_null($data)) { return 'Error - Data is not encoded!'; }
-        return isset($data[$field]) ? $data[$field] : lang('undefined');
+        return isset($data[$field]) ? $data[$field] : '';
     } elseif (substr($format, 0, 5) == 'dbVal') { // retrieve a specific db field value from the reference $value field
         if (!$value) { return ''; }
         $tmp = explode(';', $format); // $format = dbVal;table;field;ref or dbVal;table;field:index;ref

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -689,7 +689,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 $output .= " <tbody><tr>";
                 $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
                 $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
-                $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>"; // procFld
+                $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
                 $output .= "  </tr><tr>";
                 $output .= '    <td colspan="2">'.$this->lang['phreeform_encoded_field'].' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
                 $output .= "  </tr></tbody></table>";
@@ -747,10 +747,12 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 $output .= "  <tr><th>".lang('fieldname')."</th><th>".$this->lang['processing']."</th><th>".$this->lang['formatting']."</th></tr>";
                 $output .= " </thead>";
                 $output .= " <tbody><tr>";
-                $output .= "  <td>".html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
-                $output .= '  <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
-                $output .= '  <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
-                $output .= " </tr></tbody></table>";
+                $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
+                $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
+                $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
+                $output .= "  </tr><tr>";
+                $output .= '    <td colspan="2">'.$this->lang['phreeform_encoded_field'].' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
+                $output .= "  </tr></tbody></table>";
                 break;
             case 'PgNum':  $output .= $this->box_build_attributes($viewData, false);        break;
             case 'Rect':   $output .= $this->box_build_attributes($viewData, false, false); break;

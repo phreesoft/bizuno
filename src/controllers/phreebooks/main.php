@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1596,16 +1596,16 @@ function bizUnitDiscDisc(newValue) {
             default: $data['source']['filters']['store']['sql'] = BIZUNO_DB_PREFIX."journal_main.store_id=$storeID"; break;
         }
         // EDI
-// @TODO - THIS NEEDS TO BE MADE INTO A META VALUE FO SPEED
+// @TODO - THIS NEEDS TO BE MADE INTO A META VALUE FOR SPEED
         if (in_array($this->journalID, [9,10,12,13])) {
             $data['columns']['action']['actions']['ediConfirm'] = ['order'=>5,'icon'=>'apply',
-                'label'=>$this->lang['edi_confirm_po'],'events'=>['onClick'=>"jsonAction('$this->moduleID/api/ediTransmit', idTBD, '855');"],
+                'label'=>$this->lang['edi_confirm_po'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '855');"],
                 'display'=>"row.journal_id=='10' && row.contact_id_b==206"]; // EDI 855 - PO confirmation
             $data['columns']['action']['actions']['ediInvoice'] = ['order'=>6,'icon'=>'mimeHtml',
-                'label'=>$this->lang['edi_send_invoice'],'events'=>['onClick'=>"jsonAction('$this->moduleID/api/ediTransmit', idTBD, '810');"],
+                'label'=>$this->lang['edi_send_invoice'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '810');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 810 - Invoice
             $data['columns']['action']['actions']['ediTrack']   = ['order'=>7,'icon'=>'truck',
-                'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/api/ediTransmit', idTBD, '856');"],
+                'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '856');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 856 - Shipment confirmation with tracking
         }
 /* PROBABLY DUPLICATES, FROM MANAGERROWS

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/quality/dashboards/qa_by_vendor/qa_by_vendor.php
  */
 
@@ -30,7 +30,7 @@ namespace bizuno;
 class qa_by_vendor
 {
     public  $moduleID = 'quality';
-    public  $methodID = 'extISO9001';
+    public  $pageID   = 'tickets';
     public  $methodDir= 'dashboards';
     public  $code     = 'qa_by_vendor';
     public  $secID    = 'extISO9001';
@@ -82,7 +82,7 @@ google.charts.setOnLoadCallback(chart0{$this->code});
 function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
 function chart0{$this->code}Select(chart, data) {
     var cData = chart.getSelection();
-    winHref(bizunoHome+'&bizRt=$this->moduleID/correctives/manager&mgrAction=$this->code&rIDList='+cData[0].row);
+    winHref(bizunoHome+'&bizRt=$this->moduleID/$this->pageID/manager&mgrAction=$this->code&rIDList='+cData[0].row);
 }";
         return ['html'=>$html, 'jsHead'=>$js];
     }

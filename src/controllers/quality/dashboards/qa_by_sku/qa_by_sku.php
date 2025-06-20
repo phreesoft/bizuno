@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/quality/dashboards/qa_by_sku/qa_by_sku.php
  */
 
@@ -30,7 +30,7 @@ namespace bizuno;
 class qa_by_sku
 {
     public $moduleID = 'quality';
-    public $pageID   = 'correctives';
+    public $pageID   = 'tickets';
     public $methodID = 'extISO9001'; // needs to be this as the security is based on the old extension name
     public $methodDir= 'dashboards';
     public $code     = 'qa_by_sku';

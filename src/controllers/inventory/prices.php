@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-06-20
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -478,15 +478,12 @@ function preSubmitPrices() {
         $choices= [];
         $levels = !empty($sheet['levels']['rows']) ? $sheet['levels']['rows'] : [];
         $this->first = 0;
-msgDebug("\nReady to process args = ".print_r($args, true));
-msgDebug("\nReady to process sheet = ".print_r($sheet, true));
         msgDebug("\nReady to process levels = ".print_r($levels, true));
         foreach ($levels as $idx => $level) {
             $price = $this->calcPrice($level, $args['iCost'], $args['iList']);
             if (!empty($price) && $args['qty']>=$level['qty']) {
                 $this->levelIdx = $idx;
-if (!isset($sheet['cType'])) { msgDebug("\nTRAP CODE TO CATCH UNDEFINED PRICE SHEET INDEX cType."); msgTrap(); }
-                if (( $sheet['cType']==$args['cType'] && $sheet['cID']==$args['cID'] && $sheet['iID']==$args['iID']) || // type, CID and iID hit
+                if (( !empty($sheet['cType']) && $sheet['cType']==$args['cType'] && $sheet['cID']==$args['cID'] && $sheet['iID']==$args['iID']) || // type, CID and iID hit
                     ( empty($sheet['cID'])&& !empty($sheet['iID'])&& $sheet['iID']==$args['iID']) || // cID -> *, iID != 0, iID = 
                     ( empty($args['cID']) &&  empty($args['iID']) && !empty($sheet['default'])) || // global price sheets, make sure the default is checked
                     (!empty($args['cSheetc']) && $args['cSheetc']==$sheet['_rID']) || // Contact has specified sheet and this is it
