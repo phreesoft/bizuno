@@ -203,14 +203,14 @@ final class view
         $data['head']['cssStyle']    = ['order'=>44,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/easyUI/stylesheet.css&ver='.MODULE_BIZUNO_VERSION.'" />'];
         $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_AJAX    .'&bizRt=api/admin/viewCSS&icons='.$icons.'" />'];
         $data['head']['cssMobile']   = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/mobile.css" />'];
-        $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.$this->server  .'?bizRt=myPortal/admin/easyuiCSS" />']; // combines all of the easyUI extension css
+        $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiCSS" />']; // combines all of the easyUI extension css
         // JavaScript Links 
         $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS .'jQuery-3.7.1.js"></script>'];
         $data['head']['jsFontAwe']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->fontAwe .'" crossorigin="anonymous"></script>'];
         $data['head']['jsBizuno']    = ['order'=>64,'type'=>'html','html'=>'<script type="text/javascript">'.$js."</script>"];
         $data['head']['jsEasyUI']    = ['order'=>66,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS .'jquery-easyui/jquery.easyui.min.js?ver='.MODULE_BIZUNO_VERSION.'"></script>'];
         $data['head']['jsCommon']    = ['order'=>78,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZBOOKS_URL_FS.'0/view/easyUI/common.js&ver='.MODULE_BIZUNO_VERSION.'"></script>']; 
-        $data['head']['jsEasyExt']   = ['order'=>80,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->server  .'?bizRt=myPortal/admin/easyuiJS"></script>']; // combines all of the easyUI extension js
+        $data['head']['jsEasyExt']   = ['order'=>80,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiJS"></script>']; // combines all of the easyUI extension js
     }
 
     /**
