@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-19
+ * @version    7.x Last Update: 2025-06-22
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -407,10 +407,10 @@ function productUpload(rID) {
      * This method uploads all shipping tracking information for orders on a given day
      * @see
      */
-    public function cartConfirm(&$layout=[])
+    public function cartConfirm()
     {
         bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'getCarrierText', 'function');
-        $output  = [];
+        $output  = ['head'=>[], 'body'=>[]];
         $shipDate= clean('dateShip', 'date', 'get');
         msgDebug("\nEntering cartConfirm with ship_date = $shipDate and settings = ".print_r($this->settings, true));
         $stmt    = dbGetResult("SELECT journal_main.id, journal_meta.id, invoice_num, method_code, purch_order_id, meta_value
@@ -431,7 +431,7 @@ function productUpload(rID) {
 
     public function getTaxVersion(&$layout=[])
     {
-        global $portal;
+//        global $portal;
 //        if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
         // This needs a complete re-write it should:
         // be part of the upgrade polling messaging system, cron operation
