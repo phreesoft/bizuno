@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/bizuno/image.php
  */
 
@@ -39,7 +39,7 @@ class bizunoImage
     {
         global $io;
         if (!validateAccess('imgmgr', 1)) { return; }
-$dom    = clean('dom', 'alpha_num', 'get');
+        $dom    = clean('dom',  'alpha_num', 'get');
         $search = clean('imgSearch', 'text', 'get');
         $target = clean('imgTarget', 'text', 'get');
         $action = clean('imgAction', ['format'=>'text',    'default'=>''], 'get');
@@ -62,7 +62,7 @@ $dom    = clean('dom', 'alpha_num', 'get');
         $frmImgFields = html5('imgTarget', ['attr'=>['type'=>'hidden','value'=>$target]]);
         $frmImgFields.= html5('imgAction', ['attr'=>['type'=>'hidden','value'=>'']]);
         $frmImgFields.= html5('imgMgrPath',['attr'=>['type'=>'hidden','value'=>$path]]);
-        $data = ['type'=>'popup', 'title'=>jsLang('image_manager').": $path/",
+        $data = ['type'=>$dom=='page'?'page':'popup', 'title'=>jsLang('image_manager').": $path/",
             'attr'    => ['id'=>'winImgMgr','width'=>860,'height'=>600],
             'divs'    => [
                 'frmStart'  => ['order'=>10,'type'=>'html',   'html'=>html5('frmImgMgr',['attr'=>['type'=>'form']])],
@@ -84,7 +84,7 @@ $dom    = clean('dom', 'alpha_num', 'get');
             'jsReady' => ['init'=>"jqBiz('#winImgMgr').window({'title':'".addslashes($title)."'});"]];
         if (in_array($action, ['parent','refresh','search'])) { $data['type'] = 'divHTML'; } // just the window contents
         setUserCache('imgMgr', 'lastPath', $path);
-        $layout = array_replace_recursive($layout, $data);
+            $layout = array_replace_recursive($layout, $data);
     }
 
     /**
@@ -110,7 +110,7 @@ $dom    = clean('dom', 'alpha_num', 'get');
             if ($search && strpos(strtolower($fn), $search) === false) { continue; }
             $newPath = clean("$path/$fn", 'path_rel'); // remove double slashes, if present
             if (is_dir(BIZUNO_DATA."images/$newPath")) {
-                $src = BIZUNO_SCRIPTS."view/icons/default/32x32/folder.png";
+                $src = BIZBOOKS_URL_FS."0/view/icons/default/32x32/folder.png";
                 $isDir = true;
             } else {
                 $ext = pathinfo(BIZUNO_DATA."images/$newPath", PATHINFO_EXTENSION);

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-22
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -420,7 +420,7 @@ function productUpload(rID) {
         foreach ($rows as $row) {
             $meta = json_decode($row['meta_value'], true);
             $meth = getCarrierText($row['method_code']);
-            $output['head'][$row['purch_order_id']] = 'Shipped '.viewFormat($shipDate, 'date')." via $meth, tracking number(s):";
+            $output['head'][$row['purch_order_id']] = 'Shipped '.viewFormat(substr($meta['ship_date'], 0, 10), 'date')." via $meth, tracking number(s):";
             $output['body'][$row['purch_order_id']] = $meta['packages'];
         }
         msgDebug("\nReady to send cart confirmation with output = ".print_r($output, true));

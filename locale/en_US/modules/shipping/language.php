@@ -21,8 +21,8 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-20
- * @filesource /controllers/shipping/locale/en_US/language.php
+ * @version    7.x Last Update: 2025-06-19
+ * @filesource locale/en_US/modules/shipping/language.php
  */
 
 $lang = [

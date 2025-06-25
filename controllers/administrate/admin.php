@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-06-23
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -58,13 +58,13 @@ class administrateAdmin
         $type= clean('type', 'char', 'get');
         $rID = clean('rID', 'integer', 'get');
         msgDebug("\nEntering administrate::contactsEdit with type = $type");
-        if (validateAccess('admin', 4)) { // add contact type access panel if admin
+        if (validateAccess('admin', 4, false)) { // add contact type access panel if admin
             $fldRole= ['ctype_b','ctype_c','ctype_e','ctype_i','ctype_j','ctype_u','ctype_v'];
             $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
             $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
         }
         if (!in_array($type, ['u']) || (empty($rID) && method_exists($portal, 'contactTypeUser')) ||
-            !validateAccess('admin', 4)) { return; } // Only existing records, admins and type user
+            !validateAccess('admin', 4, false)) { return; } // Only existing records, admins and type user
         // unset some panels
         msgDebug("\nPassed security");
         unset($layout['tabs']['tabContacts']['divs']['history'],$layout['tabs']['tabContacts']['divs']['wallet'],
@@ -104,7 +104,7 @@ class administrateAdmin
         $type= clean('type', 'char', 'get');
         msgDebug("\nEntering phreebooks::contactsSave with type = $type");
         if (!$cID = clean('id', 'integer', 'post')) { return; }
-        if (!in_array($type, ['u']) || !validateAccess('admin', 4)) { return; } // Only users
+        if (!in_array($type, ['u']) || !validateAccess('admin', 4, false)) { return; } // Only users
         $meta= dbMetaGet(0, 'user_profile', 'contacts', $cID);
         $rID = metaIdxClean($meta);
         $data= [

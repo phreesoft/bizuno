@@ -150,7 +150,7 @@ class bizunoSettings
             if (!empty($clsMeth->hidden) || !empty($clsMeth->devStatus)) { continue; }
             $settings = array_replace($settings, ['module'=>$module, 'folder'=>$folder]);
             $html .= "  <tr>\n".'    <td valign="top">'.htmlFindImage($settings)."</td>\n";
-            $html .= '    <td valign="top" '.($settings['status'] ? ' style="background-color:lightgreen"' : '').">".$settings['title'].'</td>';
+            $html .= '    <td valign="top" '.(!empty($settings['status']) ? ' style="background-color:lightgreen"' : '').">".$settings['title'].'</td>';
             $html .= "    <td><div>".$settings['description']."</div>";
             if (empty($settings['status'])) {
                 $html .= "</td>\n";

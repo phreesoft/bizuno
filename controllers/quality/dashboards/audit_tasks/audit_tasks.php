@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/quality/dashboards/audit_tasks/audit_tasks.php
  */
 
@@ -99,7 +99,7 @@ class audit_tasks
         $filter= "journal_id={$this->journalID} AND post_date IS NULL";
         if (!empty(getUserCache('profile', 'restrict_store')) && sizeof(getModuleCache('bizuno', 'stores')) > 1) {
             $filter .= " AND store_id=".getUserCache('profile', 'store_id', false, -1);
-        } elseif ($opts['store_id'] > -1) {
+        } elseif ($opts['store_id'] > 0 && sizeof(getModuleCache('bizuno', 'stores')) > 1) {
             $filter .= " AND store_id='{$opts['store_id']}'";
         }
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, '', ['id','description']);

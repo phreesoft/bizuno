@@ -79,6 +79,11 @@ class phreebooksMain
      */
     public function manager(&$layout=[])
     {
+if (getUserCache('profile', 'email')=='dpremo@batterystore.com') { 
+    msgTrap();
+    // reset the payrtoll meta
+    
+}
         if (!$security = validateAccess("j{$this->journalID}_mgr", 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $cID   = clean('cID', 'integer', 'get');

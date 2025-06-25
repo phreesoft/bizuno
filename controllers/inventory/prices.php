@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -426,7 +426,10 @@ function preSubmitPrices() {
         $sheets = $this->getSheets($args);
         msgDebug("\nRead number of price sheets = ".sizeof($sheets));
         $prices['price'] = $this->type=='v' ? $args['iCost'] : $args['iList'];
-        foreach ($sheets as $sheet) { $this->priceQuote($prices, $sheet, $args); } // Find the best price
+        foreach ($sheets as $sheet) { // Find the best price
+            if (!isset($sheet['cType']) && isset($sheet['contact_type'])) { $sheet['cType'] = $sheet['contact_type']; } // fixes bug in pre 7.0 stored price_sheets
+            $this->priceQuote($prices, $sheet, $args);
+        }
         msgDebug("\nStart processing fixed discounts");
         foreach ($sheets as $sheet) { // Now process fixed discounts if criteria met
             if ($this->locked || empty($sheet['postCalc']) || (!empty($sheet['postCalc']) && $args['cSheetc']<>$sheet['_rID'])) { continue; }
@@ -488,8 +491,10 @@ function preSubmitPrices() {
                     ( empty($args['cID']) &&  empty($args['iID']) && !empty($sheet['default'])) || // global price sheets, make sure the default is checked
                     (!empty($args['cSheetc']) && $args['cSheetc']==$sheet['_rID']) || // Contact has specified sheet and this is it
                     (!empty($args['iSheetc']) && $args['iSheetc']==$sheet['_rID']) || // Inventory (customer) has specified this sheet
-                    (!empty($args['iSheetv']) && $args['iSheetv']==$sheet['_rID'])) // Inventory (vendor) has specified this sheet
-                        { $prices['price'] = min($prices['price'], $price); }
+                    (!empty($args['iSheetv']) && $args['iSheetv']==$sheet['_rID'])) { // Inventory (vendor) has specified this sheet
+                        msgDebug("\nSetting a new price as the conditions have been met!");
+                        $prices['price'] = min($prices['price'], $price);
+                    }
             }
             $choices[] = ['label'=>!empty($level['label'])?$level['label']:'', 'qty'=>$level['qty'], 'price'=>$price, 'weight'=>!empty($level['weight'])?$level['weight']:0];
             if (empty($idx)) { $this->first = $price; } // save level 1 pricing for later if needed

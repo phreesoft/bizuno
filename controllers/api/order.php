@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-07
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/api/order.php
  */
 
@@ -191,10 +191,10 @@ class apiOrder extends apiCommon
     private function guessTaxMethod($values)
     {
         if (!in_array($values['Shipping']['Country'], ['US', 'USA'])) { return; }
-        if (!empty(getModuleCache('phreebooks', 'totals', 'tax_rest', 'status'))) {
-            $_POST['totals_tax_rest'] = $values['General']['SalesTaxAmount'];
+        if (!empty(getModuleCache('phreebooks', 'totals', 'tax_other', 'status'))) {
+            $_POST['totals_tax_other']= $values['General']['SalesTaxAmount'];
         } else {
-            $_POST['totals_tax_other'] = $values['General']['SalesTaxAmount'];
+            $_POST['totals_tax_rest'] = $values['General']['SalesTaxAmount'];
         }
     }
     private function setDefGL()

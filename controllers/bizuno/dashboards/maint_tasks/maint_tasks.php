@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/bizuno/dashboards/maint_tasks/maint_tasks.php
  */
 
@@ -29,19 +29,19 @@ namespace bizuno;
 
 class maint_tasks
 {
-    public $moduleID   = 'bizuno';
-    public $methodID   = 'extMaint';
-    public $pageID     = 'maint';
-    public $methodDir  = 'dashboards';
-    public $code       = 'maint_tasks';
-    public $secID      = 'mgr_maint';
-    public $category   = 'general';
-    public  $struc;
-    public $lang       = ['title'=>'Maintenance Reminder',
-        'description' => 'Lists your maintenance items that are due for action.',
-        'msg_confirm_complete' => 'Please confirm to mark this task complete.'];
+    public  $moduleID  = 'bizuno';
+    public  $methodID  = 'extMaint';
+    public  $pageID    = 'maint';
+    public  $methodDir = 'dashboards';
+    public  $code      = 'maint_tasks';
+    public  $secID     = 'mgr_maint';
     private $journalID = 35;
     private $metaPrefix= 'maintenance';
+    public  $category  = 'general';
+    public  $struc;
+    public  $lang      = ['title'=>'Maintenance Reminder',
+        'description' => 'Lists your maintenance items that are due for action.',
+        'msg_confirm_complete' => 'Please confirm to mark this task complete.'];
 
     function __construct()
     {
@@ -100,7 +100,7 @@ class maint_tasks
         $filter= "journal_id={$this->journalID} AND post_date IS NULL";
         if (!empty(getUserCache('profile', 'restrict_store')) && sizeof(getModuleCache('bizuno', 'stores')) > 1) {
             $filter .= " AND store_id=".getUserCache('profile', 'store_id', false, -1);
-        } elseif ($opts['store_id'] > -1) {
+        } elseif ($opts['store_id'] > 0 && sizeof(getModuleCache('bizuno', 'stores')) > 1) {
             $filter .= " AND store_id='{$opts['store_id']}'";
         }
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, '', ['id','description']);

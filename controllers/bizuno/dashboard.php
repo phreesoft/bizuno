@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-26
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -212,10 +212,10 @@ class bizunoDashboard
         if (empty($myDash)) { return msgAdd(lang('illegal_access').": dashboard:attr"); }
         $userMenu= dbMetaGet(0, "dashboard_{$menuID}", 'contacts', getUserCache('profile', 'userID'));
         $rID     = metaIdxClean($userMenu);
-        if (method_exists($myDash, 'save')) {
+        if (method_exists($myDash, 'save')) { // special processing, like Work, just do and continue in case it was a settings change
             msgDebug("\nDashboard has save method, going there to do more stuff.");
             $myDash->save($userMenu);
-        } // special processing, like Work, just do and continue in case it was a settings change
+        }
         foreach ($myDash->struc as $idx => $values) {
             if (!empty($values['admin'])) { continue; } // ignore if admin settings - removed !isset($_POST[$dashID.$idx]) as checkboxes are not cleared
             $cleaned = clean($dashID.$idx, $values['clean'], 'post');

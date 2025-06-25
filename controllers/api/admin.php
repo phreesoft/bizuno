@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-06-23
  * @filesource /controllers/api/admin.php
  */
 
@@ -160,6 +160,10 @@ $meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $m
     public function inventoryGo(&$layout=[])
     {
         $chan = $this->getMethod();
+        $security = getUserCache('role', 'security');
+        $security['prices_c'] = 1;
+        $security['j12_mgr'] = 1;
+        setUserCache('role', 'security', $security);
         $chan->inventoryGo($layout);
     }
 

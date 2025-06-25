@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-25
  * @filesource /local/en_US/language.php
  */
 
@@ -1014,7 +1014,7 @@ $langCore = [
     'journal_id_0' => 'Search Journal',
     'journal_id_2' => 'General Journal',
     'journal_id_3' => 'Request For Quote',
-    'journal_id_4' => 'Purchases',
+    'journal_id_4' => 'Purchase Order',
     'journal_id_6' => 'Purchase',
     'journal_id_7' => 'Vendor Credit',
     'journal_id_9' => 'Sales Quote',
