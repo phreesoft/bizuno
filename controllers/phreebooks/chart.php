@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-04
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -44,11 +44,18 @@ class phreebooksChart extends mgrJournal
     {
         parent::__construct();
         $this->lang       = getLang($this->moduleID);
-        $this->chartMeta  = dbMetaGet(0, $this->metaPrefix);
-        $this->chartMetaID= metaIdxClean($this->chartMeta);
-        msgDebug("\nRead meta ID = $this->chartMetaID and sizeof chart = ".sizeof((array)$this->chartMeta));
+        $meta  = dbMetaGet(0, $this->metaPrefix);
+        $this->chartMetaID= metaIdxClean($meta);
+        $this->chartMeta  = $this->validateMeta($meta); // if chart acct ID's are integers then the array reindexes the keys to 0, 1, 2, 3 ...
+        msgDebug("\nRead meta ID = $this->chartMetaID and sizeof chart = ".sizeof($this->chartMeta));
         $this->managerSettings();
         $this->fieldStructure();
+    }
+    private function validateMeta($meta) // Fixes charts that have integer keys
+    {
+        $output = [];
+        foreach ((array)$meta as $row) { $output[$row['id']] = $row; }
+        return $output;
     }
     private function fieldStructure()
     {
@@ -65,11 +72,14 @@ class phreebooksChart extends mgrJournal
     protected function managerGrid($security=0, $args=[])
     {
         $yes_no_choices = [['id'=>'a','text'=>lang('all')], ['id'=>'0','text'=>lang('active')], ['id'=>'1','text'=>lang('inactive')]];
-        $defs = array_replace(['textCopy'=>'Enter the new account ID:'], $args);
-        $data = array_replace_recursive(parent::gridBase($security, $defs), [
+        $defs  = array_replace(['textCopy'=>'Enter the new account ID:'], $args);
+        $ftNote= lang('color_codes').': <span class="row-default">&nbsp;'.lang('default').'&nbsp;</span>&nbsp;';
+        $styler= "function(value, row, index) { if (row.default=='1') { return { class:'row-default' }; } }";
+        $data  = array_replace_recursive(parent::gridBase($security, $defs), [
             'attr'   => ['idField'=>'id'],
             'events' => [
                 'onDblClickRow'=>"function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit', rowData.id); }"],
+            'footnotes' => ['codes'=>$ftNote],
             'source' => [
                 'search' => ['account', 'title', 'cur'],
                 'actions'=>[
@@ -85,9 +95,9 @@ class phreebooksChart extends mgrJournal
                 'default' => ['order'=> 0,                                 'attr'=>['hidden'=>true]],
                 'id'      => ['order'=>20,'label'=>lang('gl_account'),     'attr'=>['hidden'=>false,'width'=> 80,'sortable'=>true,'resizable'=>true],
                     'events'=>['styler'=>"function(value, row) { if (row.inactive==1) return {class:'row-inactive'}; }",'sorter'=>"function(a,b){return parseInt(a) > parseInt(b) ? 1 : -1;}"]],
-                'title'   => ['order'=>30,'label'=>lang('title'),          'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],
-                'type'    => ['order'=>40,'label'=>lang('type'),           'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true], 'format'=>'glTypeLbl'],
-                'cur'     => ['order'=>50,'label'=>lang('currency'),       'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true,'align'=>'center']],
+                'title'   => ['order'=>30,'label'=>lang('title'),          'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true],'events'=>['styler'=>$styler]],
+                'type'    => ['order'=>40,'label'=>lang('type'),           'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true],'format'=>'glTypeLbl'],
+                'cur'     => ['order'=>50,'label'=>lang('currency'),       'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true, 'align' =>'center']],
                 'parent'  => ['order'=>70,'label'=>lang('primary_gl_acct'),'attr'=>['width'=> 80,'sortable'=>true,'align'=>'center'],
                     'events'=>['formatter'=>"function(value,row){ return value ? value : ''; }"]]]]);
         return $data;
@@ -167,7 +177,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         ksort($this->chartMeta);
         msgDebug("\nReady to write updated full chart = ".print_r($this->chartMeta, true));
         dbTransactionStart();
-        dbMetaSet($this->chartMetaID, 'chart_of_accounts', $this->chartMeta);
+        dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         insertChartOfAccountsHistory($this->chartMeta[$destID]['id'], $this->chartMeta[$destID]['type']); // build the journal_history entries
         dbTransactionCommit();
         msgLog("$this->mgrTitle - ".lang('copy').": {$this->chartMeta[$destID]['title']}");
@@ -189,7 +199,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         ksort($this->chartMeta);
         msgDebug("\nReady to write updated full chart = ".print_r($this->chartMeta, true));
         dbTransactionStart();
-        dbMetaSet($this->chartMetaID, 'chart_of_accounts', $this->chartMeta);
+        dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         // @TODO - BOF - DEPRECATED
         dbWrite(BIZUNO_DB_PREFIX.'contacts',       ['gl_account'=>$newID], 'update', "gl_account='$oldID'");
         // EOF - DEPRECATED
@@ -243,7 +253,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
 // End re-index
         msgDebug("\nReady to write updated full chart = ".print_r($this->chartMeta, true));
         dbTransactionStart();
-        dbMetaSet($this->chartMetaID, 'chart_of_accounts', $this->chartMeta);
+        dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         if ( empty($rID)) { insertChartOfAccountsHistory($output['id'], $output['type']); } // build the journal_history entries
         if (!empty($metaVal['type']) && $metaVal['type']<>$output['type']) { // check for type change
             dbWrite(BIZUNO_DB_PREFIX.'journal_history',['gl_type'=>$output['type']], 'update', "gl_account='{$output['id']}'");
@@ -326,7 +336,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         msgAdd("journal_history table rows modified: $cnt;", 'info');
         // Fix the meta, cache
         unset($this->chartMeta[$srcGL]);
-        dbMetaSet($this->chartMetaID, 'chart_of_accounts', $this->chartMeta);
+        dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         $glAccounts= getModuleCache('phreebooks', 'chart');
         unset($glAccounts[$srcGL]);
         setModuleCache('phreebooks', 'chart', '', $glAccounts);
@@ -364,7 +374,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         unset($this->chartMeta[$rID]);
         msgDebug("\nReady to write updated full chart = ".print_r($this->chartMeta, true));
         dbTransactionStart();
-        dbMetaSet($this->chartMetaID, 'chart_of_accounts', $this->chartMeta);
+        dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         dbGetResult('DELETE FROM '.BIZUNO_DB_PREFIX."journal_history WHERE gl_account='$rID'");
         dbTransactionCommit();
         msgLog("$this->mgrTitle - ".lang('delete').": $title");
@@ -457,9 +467,9 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
                 'parent'  => !empty($row['parent'])  ? $row['parent'] : ''];
         }
         ksort($output, SORT_STRING);
-        $accts = dbMetaGet(0, 'chart_of_accounts');
+        $accts = dbMetaGet(0, $this->metaPrefix);
         $coaIdx= metaIdxClean($accts);
-        dbMetaSet($coaIdx, 'chart_of_accounts', $output);
+        dbMetaSet($coaIdx, $this->metaPrefix, $output);
         // error check
         if (empty($reCnt)) { return msgAdd('No retained earnings accounts were found! There can to be ONLY 1 retained earnings account in your chart!'); }
         if ($reCnt>1)      { return msgAdd('More than one retained earnings accounts were found. There can to be ONLY 1 retained earnings account in your chart!'); }

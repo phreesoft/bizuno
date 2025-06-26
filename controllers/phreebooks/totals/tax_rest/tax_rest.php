@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -85,7 +85,7 @@ class tax_rest
             'post_date'    => $main['post_date']];
         $main['sales_tax'] += roundAmount($tax_rest, $isoVals['dec_len']);
         $begBal += roundAmount($tax_rest, $isoVals['dec_len']);
-        msgDebug("\nTaxItemTbl is returning balance = $begBal");
+        msgDebug("\ntax_rest is returning balance = $begBal");
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -79,11 +79,6 @@ class phreebooksMain
      */
     public function manager(&$layout=[])
     {
-if (getUserCache('profile', 'email')=='dpremo@batterystore.com') { 
-    msgTrap();
-    // reset the payrtoll meta
-    
-}
         if (!$security = validateAccess("j{$this->journalID}_mgr", 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $cID   = clean('cID', 'integer', 'get');

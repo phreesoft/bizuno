@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/inventory/main.php
  */
 
@@ -304,10 +304,12 @@ class inventoryMain
         }
         if (sizeof(getModuleCache('inventory', 'prices'))) {
             $prices_c = [['id'=>0, 'text'=>lang('none')]];
-            foreach (getMetaCommon('price_c') as $row) { $prices_c[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; }
+            $cPrices = getMetaCommon('price_c');
+            foreach ((array)$cPrices as $row) { if (!empty($row['_rID'])) { $prices_c[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; } }
             $structure['price_sheet_c']['values'] = $prices_c;
             $prices_v = [['id'=>0, 'text'=>lang('none')]];
-            foreach (getMetaCommon('price_v') as $row) { $prices_v[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; }
+            $vPrices = getMetaCommon('price_v');
+            foreach ((array)$vPrices as $row) { if (!empty($row['_rID'])) { $prices_v[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; } }
             $structure['price_sheet_v']['values'] = $prices_v;
         } else {
             unset($structure['price_sheet_c'], $structure['price_sheet_v']);

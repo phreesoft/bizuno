@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/bizuno/dashboards/launchpad/launchpad.php
  */
 
@@ -61,6 +61,13 @@ class launchpad
 
     public function render()
     {
+        // pull menuBar from current user roles
+        // use it to generate the list
+        // also to remove an menut item if permissions have been removed
+        // build the pull down with sorted category dividers
+        // while we are here sort the dashboard categories when managing dashboards
+        // use easyui combobox with group field
+        
         $this->choices = [['id'=>'', 'text'=>lang('select')]];
         $menus= dbGetRoleMenu();
         $menu1= sortOrderLang($menus['menuBar']['child']);

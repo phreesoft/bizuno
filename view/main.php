@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /view/main.php
  */
 
@@ -463,7 +463,7 @@ function viewFormat($value, $format = '')
             if (!isset($acct['type'])) { return $value; }
             return lang("gl_acct_type_{$acct['type']}");
         case 'glTypeLbl': return is_numeric($value) ? lang("gl_acct_type_{$value}") : $value;
-        case 'glTitle':   return getMetavalue('chart_of_accounts', $value, 'title'); // getModuleCache('phreebooks', 'chart', $value, 'title');
+        case 'glTitle':   return getModuleCache('phreebooks', 'chart', $value, 'title');
         case 'fa_condition': return $value=='u' ? lang('used') : lang('new');
         case 'fa_type':   $types = getModuleCache('bizuno', 'options', 'faTypes');
                           return isset($types[$value]) ? $types[$value] : $value;

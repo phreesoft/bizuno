@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-06-26
  * @filesource /controllers/api/order.php
  */
 
@@ -65,9 +65,7 @@ class apiOrder extends apiCommon
         bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
         $this->mapPost($order); // map the input to the proper post format to use existing
         msgDebug("\nModified post = ".print_r($_POST, true));
-        $entry = new phreebooksMain();
-        $entry->save($layout);
-//      compose('phreebooks', 'main', 'save', $layout); // compose doesn't work because user is not logged in
+        compose('phreebooks', 'main', 'save', $layout); // compose doesn't work because user is not logged in
         msgDebug("\nAfter phrebooks compose, layout = ".print_r($layout, true));
         $this->setJournalPayment();
         return $layout['rID'];
@@ -76,7 +74,7 @@ class apiOrder extends apiCommon
     private function mapPost($values=[])
     {
         if (empty($values)) { $values = $_POST; }
-        $defjID    = getModuleCache('bizuno', 'settings', 'bizuno_api', 'auto_detect'); // get_option ( 'bizuno_api_journal_id' );
+        $defjID    = getModuleCache('api', 'settings', 'bizuno_api', 'auto_detect');
         msgDebug("\nRead Auto Detect = $defjID");
         $this->jID = !empty($defjID) ? $defjID : 12; // defaults to Invoice if empty or Auto
         $account   = $this->getContactID($values['Billing']['Email']);
@@ -163,9 +161,9 @@ class apiOrder extends apiCommon
     }
     private function getStockLevels($sku, $qty)
     {
-        $stock = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'qty_stock', "sku='".addslashes($sku)."'");
+        $stock = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type', 'qty_stock'], "sku='".addslashes($sku)."'");
         msgDebug("\nEntering getStockLevels with sku = $sku and Qty = $qty and in stock = $stock");
-        if ($qty > $stock) { $this->jID = 10; }
+        if (strpos(COG_ITEM_TYPES, $stock['inventory_type'])!==false && $qty > $stock['qty_stock']) { $this->jID = 10; }
     }
     private function guessPaymentMethod($fromCart='creditcard')
     {
@@ -199,14 +197,16 @@ class apiOrder extends apiCommon
     }
     private function setDefGL()
     {
+        msgDebug("\nEntering setDefGL");
         if (in_array($this->jID, [3,4,6,7])) { return getModuleCache('phreebooks', 'settings', 'vendors', 'gl_payables'); }
-        return getModuleCache('bizuno','settings','bizuno_api','gl_receivables',getModuleCache('phreebooks','settings','customers','gl_receivables'));
+        return getModuleCache('api','settings','bizuno_api','gl_receivables',getModuleCache('phreebooks','settings','customers','gl_receivables'));
     }
 
     private function setDefGLItem()
     {
+        msgDebug("\nEntering setDefGLItem");
         if (in_array($this->jID, [3,4,6,7])) { return getModuleCache('phreebooks', 'settings', 'vendors', 'gl_purchases'); }
-        return getModuleCache('bizuno', 'settings', 'bizuno_api', 'gl_sales', getModuleCache('phreebooks','settings','customers','gl_sales'));
+        return getModuleCache('api', 'settings', 'bizuno_api', 'gl_sales', getModuleCache('phreebooks','settings','customers','gl_sales'));
     }
 
     /**
