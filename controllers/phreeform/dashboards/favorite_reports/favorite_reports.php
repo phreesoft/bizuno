@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-15
+ * @version    7.x Last Update: 2025-07-02
  * @filesource /controllers/phreeform/dashboards/favorite_reports/favorite_reports.php
  */
 
@@ -68,7 +68,7 @@ class favorite_reports
             $sorted = sortOrder($theList, 'title');
             foreach ($sorted as $row) {
                 $content= html5('', ['icon'=>viewMimeIcon($row['mime_type']),'events'=>['onClick'=>"winOpen('phreeform', 'phreeform/render/open&rID={$row['id']}');"]]).viewText($row['title']);
-                $trash  = '<span style="float:right">'.html5('', ['icon'=>'trash','size'=>'small','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) { dashSubmit('$this->code', ".($row['id']+1)."); }"]]);
+                $trash  = '<span style="float:right">'.html5('', ['icon'=>'trash','size'=>'small','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) { dashSubmit('$this->code', ".$row['id']."); }"]]);
                 $rows[] = viewDashList($content, $trash);
             }
         }

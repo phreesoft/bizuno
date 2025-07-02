@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-30
  * @filesource /model/manager.php
  */
 
@@ -64,7 +64,7 @@ class mgrJournal
                 'tables' => ['journal_main'=>['table'=>BIZUNO_DB_PREFIX.'journal_main']],
                 'search' => ['ref_num', 'title', 'notes'],
                 'actions'=> [
-                    'new'   => ['order'=>10,'icon'=>'new',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&dom={$defs['dom']}&table={$defs['_table']}&refID={$defs['_refID']}{$defs['xGet']}', 0);"]],
+                    'new'   => ['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&dom={$defs['dom']}&table={$defs['_table']}&refID={$defs['_refID']}{$defs['xGet']}', 0);"]],
                     'clear' => ['order'=>50,'icon'=>'clear','events'=>['onClick'=>"bizTextSet('search', ''); dg{$this->domSuffix}Reload();"]]],
                 'filters'=> [
                     'search'=> ['order'=>90,'attr'=>['id'=>'search','value'=>$this->defaults['search']]]],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-23
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -33,7 +33,9 @@ class administrateAdmin
     public    $pageID   = 'admin';
     protected $secID    = 'admin';
     protected $domSuffix= 'Admin';
-    private   $mailDefs = [];
+    public    $lang;
+    public    $defaults;
+    public    $structure;
 
     function __construct()
     {

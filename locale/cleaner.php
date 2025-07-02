@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-02
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /locale/cleaner.php
  */
 
@@ -325,23 +325,23 @@ function jsLang($idx, $suffix='')
  * Pulls language files from an extension, overwrites with locale, will keep English if ANY locale index is not set, helps for upgrades where language lags.
  * @return boolean false - But sets the session lang array with the admin language file
  */
-function getLang($module)
+function getLang($module='')
 {
     global $bizunoLang;
-    msgDebug("\nEntering getLang.");
+    msgDebug("\nEntering getLang with module = $module.");
     $myLang= getUserCache('profile', 'language', false, 'en_US');
     $output= [];
-    if (isset($bizunoLang['modules'][$module])) {
+    if (!empty($bizunoLang['modules'][$module]) && is_array($bizunoLang['modules'][$module])) {
+        msgDebug("\nLoaded from cache, returning with size = ".sizeof((array)$bizunoLang['modules'][$module]));
         $output = $bizunoLang['modules'][$module];
     } else { // try to load it from disk
         $lang = [];
         $path = getModuleCache($module, 'settings', 'path');
         $fullPath = bizAutoLoadMap($path);
+        $fullPath.= "locale/en_US/modules/$module/language.php";
         msgDebug("\nTrying to load language for module $module from disk at: $fullPath");
-        if (file_exists("$fullPath/locale/en_US/language.php")) { require("$fullPath/locale/en_US/language.php"); } // populates $lang
+        if (file_exists($fullPath)) { require($fullPath); } // populates $lang
         $output = $bizunoLang['modules'][$module] = $lang;
-
-//        msgAdd("\nError! Bizuno cannot find the language translation for module $module and locale $myLang");
     }
     if ($myLang == 'en_US') { return $output; }
     $lang = [];

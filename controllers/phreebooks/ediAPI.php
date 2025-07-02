@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -53,6 +53,23 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     protected $ediCntrlNum= 0;
     protected $log        = ['errors'=>[]]; // To store the entire transaction on disk
     protected $errors     = [];
+    public $lang;
+    public $struc;
+    public $prices;
+    public $creds;
+    public $cID;
+    public $cTitle;
+    public $ediID;
+    public $sepTag;
+    public $sepSec;
+    public $hostName;
+    public $userName;
+    public $userPass;
+    public $pathPut;
+    public $pathGet;
+    public $rcvrID;
+    public $sftp;
+    public $filesReadFromEDI;
 
     function __construct()
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -35,6 +35,9 @@ class shippingAdmin extends shippingCommon
     public  $methodDir = 'carriers';
     public  $syncMonths= 3;
     private $defMethods= ['best_way', 'flat', 'freeshipper', 'item', 'percent', 'thirdparty'];
+    public $structure;
+    public $phreeformProcessing;
+    public $phreeformFormatting;
 
     function __construct()
     {
@@ -69,7 +72,6 @@ class shippingAdmin extends shippingCommon
             'shipTrack'=>['text'=>lang('tracking_id'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView']];
         $this->phreeformFormatting = [
             'shipInfo' =>['text'=>lang('delivery_method'),'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView']];
-        if (method_exists($this, 'adminTables')) { $this->tables = $this->adminTables(); }
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /model/db.php
  */
 
@@ -363,7 +363,7 @@ function dbWritePrep($table, $data, $action='insert', $parameters='', $quote=tru
                 case 'now()': $columns[] = "`$column`=NOW()"; break;
                 case 'NULL':
                 case 'null':  $columns[] = "`$column`=NULL";  break;
-                default:      $columns[] = $quote ? "`$column`='".addslashes($value)."'" : "`$column`=$value"; break;
+                default:      $columns[] = $quote ? "`$column`='".addslashes((string)$value)."'" : "`$column`=$value"; break;
             }
         }
         $query = "UPDATE $table SET ".implode(', ', $columns) . ($parameters<>'' ? " WHERE $parameters" : '');
@@ -887,12 +887,12 @@ function dbMetaReadSearch($metaData, $grid, $search='')
     $output = [];
     msgDebug("\nEntering dbMetaReadSearch with search = $search and row count from db: ".sizeof($metaData));
     msgDebug("\n  and filters = ".print_r($grid['source']['filters'], true));
+    msgDebug("\n  and search fields = ".print_r($grid['source']['search'], true));
     if (sizeof($metaData)) { msgDebug("\nFirst 10 rows: ".print_r(array_slice($metaData, 0, 10), true)); }
     foreach ($metaData as $row) {
         if (empty($grid['source']['filters'])) { $output[] = $row; continue; } // no filters
         $hit = [];
         foreach ($grid['source']['filters'] as $idx => $values) { // apply filters
-            msgDebug("\nApplying filter $idx");
             switch ($idx) {
                 case 'search':
                     $hit[$idx] = empty($search) ? true : false;

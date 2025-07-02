@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -33,25 +33,47 @@ class inventoryPrices extends mgrJournal
     public    $pageID    = 'prices';
     protected $domSuffix = 'Prices';
     protected $metaPrefix= 'price_';
-    private   $mgrRowData= [];
     private   $first     = 0; // first price for level calculations
     private   $locked    = false;
     private   $levelIdx  = 0;
+    public $rID;
+    public $iID;
+    public $cID;
+    public $lang;
+    public $struc;
+    public $dom;
+    public $type;
+    public $secID;
+    public $scope;
+    public $qtySource;
+    public $qtyAdj;
+    public $qtyRnd;
     
-    function __construct()
+    function __construct($rID=0, $iID=0, $cID=0)
     {
         msgDebug("\nConstructing inventoryPrices");
         $this->lang       = getLang($this->moduleID);
         $this->dom        = clean('dom', ['format'=>'cmd', 'default'=>'page'],'get');
         $this->type       = clean('type',['format'=>'char','default'=>'c'],   'get');
         $this->secID      = "prices_{$this->type}";
+        $this->rID        = clean('rID', ['format'=>'integer', 'default'=>$rID], 'get');
+        $this->iID        = clean('iID', ['format'=>'integer', 'default'=>$rID], 'get'); // For inventory tab
+        $this->cID        = clean('cID', ['format'=>'integer', 'default'=>$iID], 'get'); // For contacts tab
+        $this->scope      = $this->getScope();
         $this->qtySource  = ['1'=>lang('direct_entry'), '2'=>lang('item_cost'), '3'=>lang('full_price'), '4'=>lang('price_level_1'), '5'=>lang('fixed_discount')];
         $this->qtyAdj     = ['0'=>lang('none'), '1'=>lang('decrease_by_amount'),'2'=>lang('decrease_by_percent'),'3'=>lang('increase_by_amount'), '4'=>lang('increase_by_percent')];
         $this->qtyRnd     = ['0'=>lang('none'), '1'=>lang('next_integer'),      '2'=>lang('next_fraction'),      '3'=>lang('next_increment')];
-        $this->metaPrefix.= $this->type; 
+        $this->metaPrefix.= $this->type;
+        $this->domSuffix .= $this->type;
         parent::__construct();
         $this->managerSettings();
         $this->fieldStructure();
+    }
+    private function getScope()
+    {
+        if (in_array($this->dom, ['div']) && !empty($this->cID)) { return 'contacts'; } // tab on contacts edit page
+        if (in_array($this->dom, ['div']) && !empty($this->iID)) { return 'inventory';  } // tab on inventory edit page
+        return 'common'; // price manager
     }
     private function fieldStructure()
     {
@@ -77,7 +99,12 @@ class inventoryPrices extends mgrJournal
         $data = array_replace_recursive(parent::gridBase($security, $args), [
             'attr'     => ['url'=>BIZUNO_AJAX."&bizRt=inventory/prices/managerRows&type=$this->type&dom={$opts['dom']}&cID={$opts['cID']}&iID={$opts['iID']}"],
             'events'   => ['onDblClickRow' => "function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&table='+rowData._table, rowData._rID); }"],
-            'source'   => ['search'=>['title', 'cName', 'iName']],
+            'source'   => [
+                'search'=>['title', 'cName', 'iName'],
+                'actions'=> [
+                    'new'   => ['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&dom=$this->dom&table=$this->scope&refID=$this->iID', 0);"]],
+                    'clear' => ['order'=>50,'icon'=>'clear','events'=>['onClick'=>"bizTextSet('search', ''); dg{$this->domSuffix}Reload();"]]],
+                ],
             'footnotes'=> ['codes'=>lang('color_codes').': <span class="row-default">'.lang('default').'</span>'],
             'columns'  => ['action'=>['actions'=>['edit'=>['events'=>[
                     'onClick' => "function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&table='+rowData._table, rowData._rID); }"]]]],
@@ -99,64 +126,53 @@ class inventoryPrices extends mgrJournal
     {
         msgDebug("\nEntering inventory:prices:manager");
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $rID = clean('rID', 'integer', 'get'); // For specific row ID (NEEDS TABLE???)
-        $cID = clean('cID', 'integer', 'get'); // For contacts tab
-        $iID = clean('iID', 'integer', 'get'); // For inventory tab
-        $args= ['dom'=>$this->dom, 'rID'=>$rID, 'cID'=>$cID, 'iID'=>$iID, 'title'=>lang('price_sheet', $this->type)]; // 
-        if     (!empty($cID) && 'div'==$this->dom) { $args['refID'] = $cID; $args['table'] = 'contacts'; }
-        elseif (!empty($iID) && 'div'==$this->dom) { $args['refID'] = $iID; $args['table'] = 'inventory'; }
+        $args= ['dom'=>$this->dom, 'rID'=>$this->rID, 'cID'=>$this->cID, 'iID'=>$this->iID, 'title'=>lang('price_sheet', $this->type)]; // 
+        if     (!empty($this->cID) && 'div'==$this->dom) { $args['refID'] = $this->cID; $args['table'] = 'contacts'; }
+        elseif (!empty($this->iID) && 'div'==$this->dom) { $args['refID'] = $this->iID; $args['table'] = 'inventory'; }
         parent::managerMain($layout, $security, $args);
-        // Stores
-        if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }
-        $storeID = clean('store', ['format'=>'integer','default'=>-1], 'post');
-        if (!empty($this->restrict)) {
-            $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-        }
-        if ($storeID > -1) {
-            $layout['datagrid']['dgPricesMgr']['source']['filters']['contact_id'] = ['order'=>15,'sql'=>'('.BIZUNO_DB_PREFIX."contact_id=$storeID OR ".BIZUNO_DB_PREFIX."contact_id=0)",
-                'attr'=>['type='=>'hidden','value'=>$storeID]];
-        }
     }
     public function managerRows(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $rID = clean('rID',  'integer', 'get');
-        $cID = clean('cID',  'integer', 'get');
-        $iID = clean('iID',  'integer', 'get');
-        $_POST['search'] = getSearch();
-        $args= ['rID'=>$rID, 'cID'=>$cID, 'iID'=>$iID, 'dom'=>$this->dom];
-        // Can't use parent::mgrRowsMeta, it's more complicated as meta is spread across three tables
-        $grid = $this->managerGrid($security, $args);
-        if (empty($this->defaults['search'])) { unset($grid['source']['filters']['search']); }
-        if ($args['dom']<>'div') {
-            $this->mgrRowData = array_merge($this->mgrRowData, dbMetaGet('%',$this->metaPrefix));
-        }
-        if ($args['dom']=='page' || !empty($cID)) {
-            $this->mgrRowData = array_merge($this->mgrRowData, dbMetaGet('%',  $this->metaPrefix, 'contacts', !empty($cID) ? $cID : '%'));
-        }
-        if (!empty($iID)) { // removed $args['dom']=='page' as this causes an out of memory error
-            $this->mgrRowData = array_merge($this->mgrRowData, dbMetaGet('%',  $this->metaPrefix, 'inventory', !empty($iID) ? $iID : '%'));
-        }
-        msgDebug("\nsizeof output = ".sizeof($this->mgrRowData));
-        $layout  = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($this->managerRowsSort($grid, $this->mgrRowData, $args))]);
-        // Stores
-        if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }
-        $storeID = clean('store', ['format'=>'integer','default'=>-1], 'post');
-        if (!empty($this->restrict)) {
-            $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-        }
-        if ($storeID > -1) {
-            $layout['datagrid']['dgPricesMgr']['source']['filters']['contact_id'] = ['order'=>15,'sql'=>'('.BIZUNO_DB_PREFIX."contact_id=$storeID OR ".BIZUNO_DB_PREFIX."contact_id=0)",
-                'attr'=>['type='=>'hidden','value'=>$storeID]];
-        }
+        $args  = ['rID'=>$this->rID, 'cID'=>$this->cID, 'iID'=>$this->iID, 'dom'=>$this->dom];
+        $grid  = $this->managerGrid($security, $args);
+        $output= $this->getMgrRows();
+        $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($this->managerRowsSort($grid, $output, $args))]);
     }
-    
+    private function getMgrRows()
+    {
+        msgDebug("\nEntering getMgrRows with scope = $this->scope");
+        $rows = [];
+        switch ($this->scope) {
+            default:
+            case 'common':
+                $rows = dbMetaGet('%', $this->metaPrefix);
+                $rows+= array_merge((array)$rows, dbMetaGet('%', $this->metaPrefix, 'inventory','%'));
+                $rows+= array_merge((array)$rows, dbMetaGet('%', $this->metaPrefix, 'contacts', '%')); break;
+            case 'inventory':
+                $rows = !empty($this->iID) ? dbMetaGet('%', $this->metaPrefix, 'inventory',$this->iID) : [];
+                $rows+= array_merge((array)$rows, $this->getMgrRowsCont()); break;
+            case 'contacts':
+                $rows = !empty($this->cID) ? dbMetaGet('%', $this->metaPrefix, 'contacts', $this->cID) : []; break;
+        }
+        msgDebug("\nRead total rows of raw data = ".sizeof((array)$rows)." and first 10 rows = ".print_r(array_slice((array)$rows, 0, 10), true));
+        return $rows;
+    }
+    private function getMgrRowsCont() // Fetches the contacts that call out a specific inventory ID
+    {
+        $output = [];
+        $rows = dbMetaGet('%', $this->metaPrefix, 'contacts', '%');
+        foreach ((array)$rows as $row) { 
+            if ($row['iID']==$this->iID) { $output[] = $row; }
+        }
+        return $output;
+    }
     private function managerRowsSort($dg, $data=[], $args=[])
     {
         msgDebug("\nEntering managerRowsSort with args = ".print_r($args, true));
         $cIDs = $iIDs = $cNames = $iNames = [];
         if ($this->dom<>'page') { // we're in a tab, remove not applicable rows
-            foreach ($data as $key => $row) {
+        foreach ($data as $key => $row) {
                 $hit = false;
                 if (!empty($args['cID']) && $row['cID']==$args['cID']) { $hit=true; }
                 if (!empty($args['iID']) && $row['iID']==$args['iID']) { $hit=true; }
@@ -217,11 +233,13 @@ class inventoryPrices extends mgrJournal
         if (!empty($iID)) { $this->calculateMargin($layout['fields']['levels']['attr']['value'], $iID); }
         if ($table=='common') {
             $layout['fields']['title']['attr']['type']  = 'text';
-//          $layout['fields']['locked']['attr']['type'] = 'selNoYes';
             $layout['fields']['default']['attr']['type']= 'selNoYes';
         } elseif ($table=='contacts') {
             $layout['fields']['cID']['attr']['type']  = 'hidden';
             if (!empty($refID)) { $layout['fields']['cID']['attr']['value']  = $refID; }
+        } elseif ($table=='inventory') {
+            $layout['fields']['iID']['attr']['type']  = 'hidden';
+            if (!empty($refID)) { $layout['fields']['iID']['attr']['value']  = $refID; }
         }
         // Add the preSubmit to the Save action
         if (!empty($rID)) {

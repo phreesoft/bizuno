@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/inventory/main.php
  */
 
@@ -38,6 +38,7 @@ class inventoryMain
     public $dbDefault;
     public $uom;
     public $myStore;
+    public $defaults;
 
     function __construct()
     {
@@ -348,8 +349,10 @@ class inventoryMain
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/movement&rID=$rID'"]],
                 'history'  => ['order'=>35,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/historian&rID=$rID'"]],
-                'prices'   => ['order'=>40,'label'=>lang('prices'),   'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
+                'prices_c' => ['order'=>40,'label'=>lang('prices_c'),   'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
                     'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/prices/manager&type=c&dom=div&iID=$rID'"]],
+                'prices_v' => ['order'=>41,'label'=>lang('prices_v'),   'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/prices/manager&type=v&dom=div&iID=$rID'"]],
                 'invImages'=> ['order'=>55,'label'=>lang('images'),     'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/images/imagesLoad&rID=$rID'"]],
                 'invAttr'  => ['order'=>65,'label'=>lang('attributes'), 'type'=>'html','html'=>'',
@@ -737,6 +740,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             $bom = json_decode($row['meta_value'], true);
             if (empty($bom)) { continue; }
             foreach ($bom as $value) {
+                if (!is_array($value)) { continue; }
                 if ($value['sku']==$sku) { $cnt++; }
             }
         }

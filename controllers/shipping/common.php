@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-06-30
  * @filesource /controllers/shipping/common.php
  */
 
@@ -42,6 +42,14 @@ class shippingCommon
     private   $maxBoxWt  = 50; // maximum weight to put into a box
     private   $freightWt = 150; // Weight from which the shipment is palletized and shipped LTL
     private   $palletWt  = 1500;
+    public $lang;
+    public $options;
+    public $settings;
+    public $thermalTransport;
+    public $shipment;
+    public $addrStruc;
+    public $carriers;
+    public $myCarriers;
 
     function __construct()
     {
@@ -59,7 +67,7 @@ class shippingCommon
         $this->addrStruc= dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
         unset($this->addrStruc['address_id'],$this->addrStruc['type']);
         unset($this->addrStruc['telephone2'],$this->addrStruc['email2'],$this->addrStruc['telephone3'],$this->addrStruc['email3']);
-        unset($this->addrStruc['telephone4'],$this->addrStruc['email4'],$this->addrStruc['website'],$this->addrStruc['notes']);
+        unset($this->addrStruc['telephone4'],$this->addrStruc['email4'],$this->addrStruc['website'],   $this->addrStruc['notes']);
         $this->carriers = ['freeshipper', 'flat']; // pick a couple of default carriers to install
         $carriers = $carriers = getMetaMethod('carriers');
         $this->myCarriers = [];

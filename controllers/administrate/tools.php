@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-06-30
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -110,6 +110,7 @@ class administrateTools {
         if (!empty($_FILES['ticketFile']['name'])) { if ($io->validateUpload('ticketFile', '', $io->getValidExt('file'))) {
             $mail->attach($_FILES['ticketFile']['tmp_name'], $_FILES['ticketFile']['name']);
         } }
+        $_POST['msgFrom'] = 'user'; // Forces the message to be send from users email account (if using gMail)
         $mail->sendMail();
         msgAdd("Your email has been sent to the PhreeSoft Support team. We'll be in contact with you shortly.", 'success');
         $this->ticketMain($layout);

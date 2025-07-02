@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/contacts/main.php
  */
 
@@ -254,31 +254,29 @@ class contactsMain
         $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.$structure['id']['attr']['value']."</p>",'attr'=>['type'=>'raw']];
         $structure['histPay']   = ['order'=>95,'attr'=>['type'=>'button','value'=>$this->lang['payment_history']],'events'=>['onClick'=>"jsonAction('$this->moduleID/history/payment', $rID);"]];
         $status = $this->editStatus($structure, $rID);
-// @TODO - This needs fixin as modlule cache should not be used and meta pulled specifically
-        if (sizeof(getModuleCache('inventory', 'prices'))) {
-            $prices = [['id'=>0, 'text'=>lang('none')]];
-            foreach (getMetaCommon(in_array($this->type, ['b','v'])?'price_v':'price_c') as $row) { $prices[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; }
-            $structure['price_sheet']['values'] = $prices;
-        }
+        $prices = [['id'=>0, 'text'=>lang('none')]];
+        $sheets = dbMetaGet('%', in_array($this->type, ['b','v'])?'price_v':'price_c'); // [getMetaCommon()];
+        if (!empty($sheets)) { foreach ((array)$sheets as $row) { $prices[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; } }
+        $structure['price_sheet']['values'] = $prices;
         switch ($this->type) {
             case 'c': $formID = 'cust:ltr'; break;
             case 'v': $formID = 'vend:ltr'; break;
             default:  $formID = false;
         }
         $data = ['type'=>'divHTML', 'title'=>$title,
-            'divs'     => [
+            'divs'    => [
                 'toolbar' => ['order'=>10,'type'=>'toolbar','key' =>'tbContacts'],
                 'heading' => ['order'=>15,'type'=>'html',   'html'=>"<h1>$title</h1>"],
                 'formBOF' => ['order'=>20,'type'=>'form',   'key' =>'frmContact'],
                 'tabs'    => ['order'=>50,'type'=>'tabs',   'key' =>'tabContacts'],
                 'formEOF' => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
-            'toolbars' => [
+            'toolbars'=> [
                 'tbContacts'=> ['icons' => [
                     'save'    => ['order'=>20,'hidden'=>$security >1?false:true,       'events'=>['onClick'=>"if (jqBiz('#frmContact').form('validate')) { jqBiz('body').addClass('loading'); jqBiz('#frmContact').submit(); }"]],
                     'new'     => ['order'=>40,'hidden'=>$security >1?false:true,       'events'=>['onClick'=>"accordionEdit('accContacts', 'dgContacts', 'divContactsDetail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type', 0);"]],
                     'icnEmail'=> ['order'=>60,'hidden'=>$rID && $formID?false:true,    'events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=$formID&xfld=contacts.id&xcr=equal&xmin=$rID');"],'label'=>lang('email'),'icon'=>'email'],
                     'trash'   => ['order'=>80,'hidden'=>$rID && $security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/$this->pageID/delete&type=$this->type', $rID, 'reset');"]]]]],
-            'tabs'     => ['tabContacts'=>['divs'=>[
+            'tabs'    => ['tabContacts'=>['divs'=>[
                 'general'   => ['order'=>10,'label'=>lang('general'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'genAddA' => ['order'=>10,'type'=>'panel','key'=>'genAddA','classes'=>['block33']],
                     'genCont' => ['order'=>20,'type'=>'panel','key'=>'genCont','classes'=>['block33']],
@@ -290,27 +288,26 @@ class contactsMain
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/manager&type=$this->type&rID=$rID'"]],
                 'wallet'  => ['order'=>35,'label'=>lang('wallet'),'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
                     'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=payment/wallet/manager&type=$this->type&rID=$rID'"]],
-                'prices'  => ['order'=>40, 'label'=>lang('prices'), 'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&dom=div&type=$this->type&cID=$rID&table=contacts'"]],
+                'prices_c'=> ['order'=>40, 'label'=>lang('prices_c'),'hidden'=>!empty($cData['ctype_c'])?false:true,'type'=>'html', 'html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&dom=div&type=c&cID=$rID&table=contacts'"]],
+                'prices_v'=> ['order'=>40, 'label'=>lang('prices_v'),'hidden'=>!empty($cData['ctype_v'])?false:true,'type'=>'html', 'html'=>'',
+                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&dom=div&type=v&cID=$rID&table=contacts'"]],
                 'bill_add'=> ['order'=>45,'label'=>lang('address_type_b'), 'type'=>'html', 'html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=b&refID=$rID'"]],
                 'ship_add'=> ['order'=>50,'label'=>lang('address_type_s'), 'type'=>'html', 'html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=s&refID=$rID'"]],
                 'notes'   => ['order'=>70,'label'=>lang('notes'), 'type'=>'html', 'html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getTabNotes&type=$this->type&rID=$rID'"]]]]],
-            'panels' => [
+            'panels'  => [
                 'genAddA' => ['label'=>lang('address_type_m'),'type'=>'address','keys'=>$fldAddr,'settings'=>['limit'=>'a','required'=>true]],
                 'genCont' => ['label'=>lang('contact_info'),  'type'=>'fields', 'keys'=>$fldCont],
                 'genStat' => ['label'=>$status['label'],      'type'=>'fields', 'keys'=>$status['fields']],
                 'genAcct' => ['label'=>lang('account'),       'type'=>'fields', 'keys'=>$fldAcct],
                 'genProp' => ['label'=>lang('properties'),    'type'=>'fields', 'keys'=>$fldProp],
                 'genAtch' => ['type'=>'attach','defaults'=>['dgName'=>$this->moduleID.'Attach','path'=>getModuleCache($this->moduleID,'properties','attachPath','contacts'),'prefix'=>"rID_{$rID}_"]]],
-            'forms'    => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
-            'fields'   => $structure,
-            'jsReady'  => ['init'=>"ajaxForm('frmContact');"]];
-        if (!in_array($this->type, ['c','v'])) {
-            unset($data['tabs']['tabContacts']['divs']['genStat'], $data['tabs']['tabContacts']['divs']['wallet'], $data['tabs']['tabContacts']['divs']['prices']);
-        }
+            'forms'   => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
+            'fields'  => $structure,
+            'jsReady' => ['init'=>"ajaxForm('frmContact');"]];
         if (!validateAccess('admin', 4, false)) { unset($data['tabs']['tabContacts']['divs']['general']['divs']['genRole']); }
         // Some mods for new records
         if (!$rID) { unset($data['tabs']['tabContacts']['divs']['bill_add'], $data['tabs']['tabContacts']['divs']['ship_add']); }
@@ -328,6 +325,9 @@ class contactsMain
             $data['tabs']['tabContacts']['divs']['crm_add'] = ['order'=>25,'label'=>lang('address_type_i'), 'type'=>'html', 'html'=>'',
                 'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=contacts/address/manager&dom=div&type=$this->type&aType=i&refID=$rID'"]];
             $data['panels']['genProp']['keys'][] = 'ach_enable';
+        } else {
+            unset($data['tabs']['tabContacts']['divs']['genStat'], $data['tabs']['tabContacts']['divs']['wallet'],
+                  $data['tabs']['tabContacts']['divs']['prices_c'],$data['tabs']['tabContacts']['divs']['prices_v']);
         }
         if ($this->type=='c' && !empty(getMetaContact($rID, 'crm_project'))) { // only show CRM projects tab for customers
             $data['tabs']['tabContacts']['divs']['crm_proj'] = ['order'=>27,'label'=>lang('ctype_j'),'type'=>'html','html'=>'',

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -48,7 +48,7 @@ class fedexCommon
     // These are from the developer site but LTL sandbox is really broken!!!
     public  $testShip = ['accountNumber'=>'510087020','address'=>['streetLines'=>['1202 Chalet Ln'],          'city'=>'Harrison','stateOrProvinceCode'=>'AR','postalCode'=>'72601']];
     public  $testBill = ['accountNumber'=>'510051408','address'=>['streetLines'=>['2000 Freight LTL Testing'],'city'=>'Harrison','stateOrProvinceCode'=>'AR','postalCode'=>'72601']];
-    public $lang      = ['title'=>'Federal Express',
+    public  $lang     = ['title'=>'Federal Express',
         'acronym'      => 'FedEx',
         'description'  => 'Federal Express shipping with rates pulled directly from FedEx servers. (Requires validation with FedEx, <a href="#" onClick="jsonAction(\'shippingb/admin/signup&carrier=fedex\')">instructions</a>)',
         'instructions' => '<h3>Step 1. Develop and Test Web Services Enabled Application</h3>
@@ -782,7 +782,6 @@ return '';
                 ['id'=>'STOCK_4X8',                     'text'=>$this->lang['label_10']],
                 ['id'=>'STOCK_4X9_LEADING_DOC_TAB',     'text'=>$this->lang['label_11']],
                 ['id'=>'STOCK_4X9_TRAILING_DOC_TAB',    'text'=>$this->lang['label_12']]]];
-        if (!isset($this->lang['label_01'])) { msgDebug("\nTrap for undefined lang index..."); msgTrap(); }
         return $options;
     }
 }
