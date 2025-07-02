@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-02
  * @filesource /model/db.php
  */
 
@@ -1028,7 +1028,7 @@ function dbReportsCache()
             'users'=>$row['users'],'roles'    =>$row['roles']];
     }
     $sort0  = sortOrder($output,'title');
-    msgDebug("\nWriting sorted report/form list = ".print_r($sort0, true));
+    msgDebug("\nWriting ".sizeof((array)$sort0)." sorted report/form from list."); // = ".print_r($sort0, true));
     dbMetaSet($rID, 'phreeform_cache', $sort0);
     return $sort0;
 }
@@ -1163,9 +1163,8 @@ function dbGLDropDown($inc_sel=true, $limits=[], $hideInactive=true)
  */
 function dbSetBizunoUsers()
 {
-    msgDebug("\nEntering dbSetBizunoUsers");
     $users = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_u='1'");
-    msgDebug("\nRead users from all roles = ".print_r($users ,true));
+    msgDebug("\nEntering dbSetBizunoUsers, read ".sizeof((array)$users)."users from all roles."); // = ".print_r($users ,true));
     $output = [];
     foreach ($users as $user) {
         $metaPro= dbMetaGet(0, 'user_profile', 'contacts', $user['id']); // fetch the users role from the contacts_meta

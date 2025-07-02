@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /controllers/shipping/carriers/fedex/rate.php
  *
  * FedEx Developer Rate:
@@ -135,11 +135,11 @@ class fedexRate extends fedexCommon
 //              'totalWeight'      => number_format($pkg['settings']['weight'],1,'.',''), // INTERNATIONAL ONLY
 //              'groupShipment'    => true,
 //              'serviceTypeDetail'=> ['carrierCode'=>'FDXE','description'=>'string','serviceName'=>'string','serviceCategory'=>'string'],
-// @TODO enable this service?
-//              'smartPostInfoDetail' =>['ancillaryEndorsement'=>'ADDRESS_CORRECTION','hubId'=>'5531','indicia'=> 'MEDIA_MAIL','specialServices'=> 'USPS_DELIVERY_CONFIRMATION'],
+                'smartPostInfoDetail' =>['hubId'=>$this->settings['sp_hub'], 'indicia'=> 'PARCEL_SELECT'], // 'ancillaryEndorsement'=>'ADDRESS_CORRECTION', 'specialServices'=> 'USPS_DELIVERY_CONFIRMATION'
 //              'expressFreightDetail'=>['bookingConfirmationNumber'=>'string','shippersLoadAndCount'=> 0],
 //              'groundShipment'   => false,
-                'requestedPackageLineItems' => $this->addPkgs($pkg)]]; // EOF - requestedShipment
+                'requestedPackageLineItems' => $this->addPkgs($pkg)], // EOF - requestedShipment
+            'carrierCodes'=> ['FDXE', 'FDXG', 'FXSP']]; // Required to get Ground Economy rates (despite documentation)
         $this->addEmailNotifications($payload, $pkg);
         $this->addCustoms($payload, $pkg);
         msgDebug("\nReturning from payloadREST with payload = ".print_r($payload, true));

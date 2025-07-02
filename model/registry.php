@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-15
+ * @version    7.x Last Update: 2025-07-02
  * @filesource /model/registry.php
  */
 
@@ -426,13 +426,13 @@ unset($bizunoMod[$module]['dashboards']);
                 'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
                 'path'       => $path,
                 'url'        => $url];
-            msgDebug("\nregistry args array = ".print_r($args, true));
+//msgDebug("\nregistry args array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
-            msgDebug("\nmerged array = ".print_r($merged, true));
+//msgDebug("\nmerged array = ".print_r($merged, true));
             $newMeta[$method] = $merged;
             if (isset($clsMeth->structure)) { $this->setHooks($clsMeth->structure, $method, $path); }
         }
-        msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID with data = ".print_r($newMeta, true));
+        msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID"); // with data = ".print_r($newMeta, true));
 //        setModuleCache($structure['id'], $folderID, '', $newMeta);
         dbMetaSet($metaIdx, "methods_{$folderID}", $newMeta);
     }

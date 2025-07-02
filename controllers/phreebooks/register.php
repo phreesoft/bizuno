@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-02
  * @filesource /controllers/phreebooks/register.php
  */
 
@@ -37,7 +37,7 @@ class phreebooksRegister
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess('register', 1)) { return; }
-        $title         = lang('phreebooks_register');
+        $title         = lang('bank_register');
         $layout        = array_replace_recursive($layout, viewMain(), [
             'title'=> $title,
             'datagrid' => ['manager'=>$this->dgRegister('dgRegister', $security)],

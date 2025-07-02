@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-07-01
  * @filesource /local/en_US/language.php
  */
 
@@ -64,7 +64,7 @@ $langCore = [
     'inventory' => 'Inventory',
     'general_ledger' => 'General Ledger',
     'mail' => 'Mail Server',
-    'bank_register' => 'Register',
+    'bank_register' => 'Bank Register',
     'bank_recon' => 'Reconciliation',
     'phreebooks_budget' => 'Budgeting',
     'phreebooks_tools' => 'General Journal Tools',
@@ -411,6 +411,7 @@ $langCore = [
     'new_tab' => 'New Browser Tab',
     'next' => 'Next',
     'next_ref' => 'Next Reference: %s',
+    'nexus' => 'Nexus',
     'no' => 'No',
     'no_image' => 'No Image Found!',
     'no_results' => 'No Results Found!',
@@ -436,6 +437,7 @@ $langCore = [
     'paid' => 'Paid',
     'page' => 'Page',
     'pay_to' => 'Pay To',
+    'payroll' => 'Payroll',
     'payment' => 'Payment',
     'payment_discount' => 'Pay Bills Discount',
     'payment_net_due' => 'Pay Bills Net Due',
