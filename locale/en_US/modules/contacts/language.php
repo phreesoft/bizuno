@@ -78,7 +78,6 @@ $lang = [
     'crm_desc' => 'The customer CRM manager has many useful features to manage your customer base. Features include including multiple contacts to a customer, sales reports, sales tracking, reminders and more.',
     'drop_ship_title' => 'Drop Ship Action Button',
     'drop_ship_desc' => 'This extension adds an icon to a customer Sale/Sales Order action bar (Sale Manager screen). When selected, Bizuno will generate a purchase order from the products preferred vendor to ship directly to the orders ship to address. All items on the Sale/Sales Order must be from the same preferred vendor.',
-    'fulfill_title' => 'Order Fulfillment',
     'fulfill_desc' => 'The order fulfillment module alters the Customers -> Orders function to ship open sales orders. This module is helpful for shipping departments where limited order details are desired.',
     'item_disc_title' => 'Line Item Discount',
     'item_disc_desc' => 'The customer line item discount extension adds an expandable row to the item grid on orders to allow for discounts at the individual item level.',

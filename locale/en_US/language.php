@@ -305,6 +305,7 @@ $langCore = [
     'forms' => 'Forms',
     'from' => 'From',
     'full' => 'Full',
+    'fulfillment' => 'Order Fulfillment',
     'funnels' => 'Funnels',
     'gateways' => 'Gateways',
     'general' => 'General',

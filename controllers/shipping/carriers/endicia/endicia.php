@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-07-03
  * @filesource /controllers/shipping/carriers/endicia/endicia.php
  *
  * Docs: https://www.endicia.com/developer/docs
@@ -41,7 +41,7 @@ class endicia extends endiciaCommon
     function __construct()
     {
         parent::__construct();
-        $tabImage = BIZUNO_SCRIPTS."view/images/shipping/carriers/$this->code/tab_logo.png";
+        $tabImage = BIZBOOKS_URL_FS."controllers/shipping/carriers/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
     }
 

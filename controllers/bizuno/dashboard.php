@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-07-04
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -212,15 +212,16 @@ class bizunoDashboard
         if (empty($myDash)) { return msgAdd(lang('illegal_access').": dashboard:attr"); }
         $userMenu= dbMetaGet(0, "dashboard_{$menuID}", 'contacts', getUserCache('profile', 'userID'));
         $rID     = metaIdxClean($userMenu);
-        if (method_exists($myDash, 'save')) { // special processing, like Work, just do and continue in case it was a settings change
-            msgDebug("\nDashboard has save method, going there to do more stuff.");
-            $myDash->save($userMenu);
-        }
         foreach ($myDash->struc as $idx => $values) {
             if (!empty($values['admin'])) { continue; } // ignore if admin settings - removed !isset($_POST[$dashID.$idx]) as checkboxes are not cleared
             $cleaned = clean($dashID.$idx, $values['clean'], 'post');
             msgDebug("\nCleaning post variable {$dashID}$idx with clean = {$values['clean']} resulting in: $cleaned");
             $userMenu[$dashID]['opts'][$idx] = $cleaned;
+        }
+        // Moved this AFTER saving all of the value because sometimes we don't want to save the values, e.g. favorite_reports 
+        if (method_exists($myDash, 'save')) { // special processing, like Work, just do and continue in case it was a settings change
+            msgDebug("\nDashboard has save method, going there to do more stuff.");
+            $myDash->save($userMenu);
         }
         msgDebug("\nWriting userMeta: ".print_r($userMenu, true));
         dbMetaSet($rID, "dashboard_{$menuID}", $userMenu, 'contacts', getUserCache('profile', 'userID'));
@@ -412,7 +413,7 @@ class bizunoDashboard
         }
         $output['jsHead']['init'] = !empty($data['jsHead']) ? $data['jsHead'] : '';
         $output['jsReady']['init']= $jsReady;
-        msgDebug("\nresults from viewDash = ".print_r($output, true));
+//msgDebug("\nresults from viewDash = ".print_r($output, true));
         return $output;
     }
 }

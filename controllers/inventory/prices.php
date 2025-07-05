@@ -111,7 +111,7 @@ class inventoryPrices extends mgrJournal
                 'title'      => ['order'=>10, 'label'=>lang('title'),       'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true]],
                 'cName'      => ['order'=>40, 'label'=>lang('primary_name'),'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true]],
                 'iName'      => ['order'=>50, 'label'=>lang('SKU'),         'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true]],
-                'postCalc'   => ['order'=>50, 'label'=>lang('post_calc'),   'attr'=>['size'=> 60,'sortable'=>true,'resizable'=>true],'format'=>'noYes'],
+                'postCalc'   => ['order'=>50, 'label'=>lang('discount'),    'attr'=>['size'=> 60,'sortable'=>true,'resizable'=>true],'format'=>'noYes'],
                 'last_update'=> ['order'=>70, 'label'=>lang('date_last'),   'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true],'format'=>'date']]]);
         if (in_array($GLOBALS['myDevice'], ['mobile', 'tablet'])) { $data['columns']['last_update']['attr']['hidden']= true; }
         return $data;

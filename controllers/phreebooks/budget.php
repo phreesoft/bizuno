@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-03
  * @filesource /controllers/phreebooks/budget.php
  */
 
@@ -156,7 +156,7 @@ function budgetDistribute() {
                     'avgBgt' => ['order'=>40,'icon'=>'average','label' =>'Spread Monthly Values Averaged Over the Fiscal Year','events'=>['onClick'=>"budgetAverage();"]],
                     'avgTtl' => ['order'=>50,'icon'=>'fillup', 'label' =>'Distribute Total Budget Value Over the Fiscal Year','events'=>['onClick'=>"budgetDistribute();"]]],
                 'filters' => [
-                    'fy'    => ['order'=>10,'label'=>lang('phreebooks_fiscal_year'),'values'=>dbFiscalDropDown(), 'attr'=>['type'=>'select', 'value'=>biz_date('Y')]],
+                    'fy'    => ['order'=>10,'label'=>lang('fiscal_year'),'values'=>dbFiscalDropDown(), 'attr'=>['type'=>'select', 'value'=>biz_date('Y')]],
                     'glAcct'=> ['order'=>20,'label'=>lang('gl_account'), 'values'=>dbGLDropDown(false, [34]),'attr'=>['type'=>'select', 'value'=>getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')]]]],
             'columns'=> [
                 'period'  => ['order'=>10, 'label'=>lang('period'), 'attr'=>  ['width'=>50,'resizable'=>true,'align'=>'center']],

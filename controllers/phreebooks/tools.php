@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-03
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -109,7 +109,7 @@ class phreebooksTools
         setModuleCache('phreebooks', 'fy', 'fy_period_max',$fy_max['period']);
         $this->setChartHistory($maxPeriod, $fy_max['period']);
         periodAutoUpdate(false);
-        msgLog(lang('phreebooks_fiscal_year')." - ".lang('add').": $maxFY");
+        msgLog(lang('fiscal_year')." - ".lang('add').": $maxFY");
         $layout = array_replace_recursive($layout, ['content'=>  ['action'=>'eval','actionData'=>"location.reload();"]]);
     }
 
@@ -161,7 +161,7 @@ class phreebooksTools
         }
         setModuleCache('phreebooks', 'fy', 'period', 0); // force a new period as the dates may require this
         periodAutoUpdate(false);
-        msgLog(lang('phreebooks_fiscal_year')." - ".lang('edit'));
+        msgLog(lang('fiscal_year')." - ".lang('edit'));
         msgAdd(lang('msg_settings_saved'), 'success');
     }
 

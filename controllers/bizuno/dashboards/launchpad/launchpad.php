@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-07-04
  * @filesource /controllers/bizuno/dashboards/launchpad/launchpad.php
  */
 
@@ -29,18 +29,21 @@ namespace bizuno;
 
 class launchpad
 {
-    public $moduleID = 'bizuno';
-    public $methodDir= 'dashboards';
-    public $code     = 'launchpad';
-    public $category = 'bizuno';
+    public  $moduleID = 'bizuno';
+    public  $methodDir= 'dashboards';
+    public  $code     = 'launchpad';
+    public  $category = 'bizuno';
     public  $struc;
     private $choices = [];
-    public $lang = ['title'=>'Launchpad',
+    public  $lang = ['title'=>'Launchpad',
         'description'=> 'Creates a one-click launchpad to popular menu items.'];
 
     function __construct()
     {
         localizeLang($this->lang, $this->methodDir, $this->code);
+        $roleID = getUserCache('profile', 'userRole');
+        $this->role = dbMetaGet($roleID, 'bizuno_role');
+//msgDebug("\nRead role properties for this user = ".print_r($this->role, true));
         $this->fieldStructure();
     }
 
@@ -50,86 +53,71 @@ class launchpad
      */
     private function fieldStructure()
     {
+        $this->choices = [['id'=>'', 'text'=>lang('select')]];
+        $this->listMenus();
         $this->struc = [
             // Admin fields
-            'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array', 'attr'=>['type'=>'users', 'value'=>[0],], 'admin'=>true],
-            'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array', 'attr'=>['type'=>'roles', 'value'=>[-1]], 'admin'=>true],
+            'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array',    'attr'=>['type'=>'users', 'value'=>[0],], 'admin'=>true],
+            'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array',    'attr'=>['type'=>'roles', 'value'=>[-1]], 'admin'=>true],
             // User fields
-            'rptID' => ['order'=>40,'label'=>lang('report_add'),'clean'=>'integer','attr'=>['type'=>'select','value'=>''],'values'=>[]]]; // $reports
+            'menuID'=> ['order'=>40,'label'=>lang('action'),'clean'=>'alpha_num','attr'=>['type'=>'select','value'=>''], 'values'=>$this->choices, 'options'=>['groupField'=>"'group'"]]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    public function render()
+    public function render($opts=[])
     {
-        // pull menuBar from current user roles
-        // use it to generate the list
-        // also to remove an menut item if permissions have been removed
-        // build the pull down with sorted category dividers
-        // while we are here sort the dashboard categories when managing dashboards
-        // use easyui combobox with group field
-        
-        $this->choices = [['id'=>'', 'text'=>lang('select')]];
-        $menus= dbGetRoleMenu();
-        $menu1= sortOrderLang($menus['menuBar']['child']);
-        $this->listMenus($menu1);
-        $data = ['delete_icon'=>['icon'=>'trash', 'size'=>'small']];
-        // build the delete list inside of the settings
-        $html = $body = 'Needs Fixin';
-/*        if (is_array($this->settings)) { foreach ($this->settings as $idx => $value) {
-            $parts = explode(':', $value, 2);
-            if (sizeof($parts) > 1) { $parts[0] = $parts[1]; } // for legacy
-            $props = $this->findIdx($menu1, $parts[0]);
-            $data['delete_icon']['events'] = ['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) { dashSubmit('$this->moduleID:$this->code', ($idx+1)); }"];
-            $html  .= '<div><div style="float:right;height:17px;">'.html5('delete_icon', $data['delete_icon']).'</div>';
-            $html  .= '<div style="min-height:17px;">'.lang($props['label']).'</div></div>';
-            // build the body part while we're here
-            $btnHTML= html5('', ['icon'=>$props['icon']]).'<br />'.lang($props['label']);
-            $body  .= html5('', ['styles'=>['width'=>'100px','height'=>'100px'],'events'=>['onClick'=>$props['events']['onClick']],'attr'=>['type'=>'button','value'=>$btnHTML]])."&nbsp;";
-        } } else { $body .= "<span>".lang('no_results')."</span>"; } */
-        return ['html'=>$body];
+        if (empty($opts['data'])) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }
+        else { 
+            foreach ($opts['data'] as $menuID) {
+                $action = $this->findIdx($menuID);
+                if (empty($action)) { msgDebug("\nReport ID $menuID not found"); continue; } // menu item is missing or permission changed?
+                $action['id']   = $menuID;
+                $action['label']= lang($action['label']);
+                $theList[]      = $action;
+            }
+            $sorted = sortOrder($theList, 'label');
+            foreach ($sorted as $row) {
+                $onClick= isset($row['onClick']) ? $row['onClick'] : "winHref(bizunoHome+'&bizRt={$row['route']}');";
+                $content= html5('', ['icon'=>$row['icon'],'events'=>['onClick'=>$onClick]]).viewText($row['label']);
+                $trash  = '<span style="float:right">'.html5('', ['icon'=>'trash','size'=>'small','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) { dashSubmit('$this->code', '{$row['id']}'); }"]]);
+                $rows[] = viewDashList($content, $trash);
+            }
+        }
+        return ['lists'=>$rows];
     }
 
-    private function listMenus($source, $cat=false)
+    private function listMenus()
     {
-        if (empty($source)) { return; }
-        foreach ($source as $key => $menu) {
+        if (empty($this->role['menuBar'])) { return; }
+        foreach ($this->role['menuBar'] as $key => $menu) {
             if (!isset($menu['child'])) { continue; }
-            if (empty($menu['label'])) { $menu['label'] = $key; }
+            if ( empty($menu['label'])) { $menu['label'] = $key; }
+            $menu['child'] = sortOrder($menu['child']);
             foreach ($menu['child'] as $idx => $submenu) {
                 if (empty($submenu['label'])) { $submenu['label'] = $idx; }
                 if (empty($submenu['security'])) { continue; }
-                if (!isset($submenu['hidden']) || !$submenu['hidden']) {
-                    $label = $cat ? $cat : lang($menu['label']);
-                    $this->choices[] = ['id'=>"$idx", 'text'=>"$label - ".lang($submenu['label'])];
-                    if (isset($submenu['child'])) { $this->listMenus($menu['child']); }
-                }
+                if (!isset($submenu['hidden']) || !$submenu['hidden']) { $this->choices[] = ['id'=>"$idx", 'text'=>lang($submenu['label']), 'group'=>lang($key)]; }
             }
         }
     }
 
-    private function findIdx($source, $key='')
+    private function findIdx($key='')
     {
         $props = false;
-        foreach ($source as $menu) {
+        foreach ($this->role['menuBar'] as $menu) {
             if (!isset($menu['child'])) { continue; }
-            foreach ($menu['child'] as $idx => $submenu) {
-                if ($key == $idx) { return $submenu; }
-                if (isset($submenu['child'])) {
-                    $props = $this->findIdx($menu['child'], $key);
-                    if ($props) { return $props; }
-                }
-            }
+            foreach ($menu['child'] as $idx => $submenu) { if ($key == $idx) { return $submenu; } }
         }
         return $props;
     }
 
-    public function save($usrMeta)
+    public function save(&$usrMeta)
     {
-        $rmID = clean('rID', 'integer', 'get');
-        $rptID= clean($this->code.'rptID', 'integer', 'post');
-        if (empty($rmID) && empty($rptID)) { return msgAdd(lang('bad_data')); } // do nothing if no title or url entered
+        $rmID  = clean('rID', 'alpha_num', 'get');
+        $menuID= clean($this->code.'menuID', 'alpha_num', 'post');
+        if (empty($rmID) && empty($menuID)) { return msgAdd(lang('illegal_access')); } // do nothing if no title or url entered
         if ($rmID) { array_splice($usrMeta[$this->code]['opts']['data'], array_search($rmID, $usrMeta[$this->code]['opts']['data']), 1); }
-        else       { $usrMeta[$this->code]['opts']['data'][] = $rptID; }
-        return $usrMeta;
+        else       { $usrMeta[$this->code]['opts']['data'][] = $menuID; }
+        unset($usrMeta[$this->code]['opts']['menuID']); // reset the menuID for the next round
     }
 }
