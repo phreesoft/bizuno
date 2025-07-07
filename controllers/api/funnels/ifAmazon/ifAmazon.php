@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -31,6 +31,8 @@ class ifAmazon {
     public $moduleID = 'api';
     public $methodDir= 'funnels';
     public $code     = 'ifAmazon';
+    public $defaults;
+    public $settings;
     public $lang = ['title' => 'Amazon Interface',
         'description' => 'The Amazon interface provides capability to download orders, upload product feeds and help reconcile payments.',
         'amazon_field' => 'Amazon Feed Index',

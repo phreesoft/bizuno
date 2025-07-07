@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -31,6 +31,14 @@ class inventoryAdmin
 {
     public $moduleID = 'inventory';
     public $pageID   = 'main';
+    public $lang;
+    public $defaults;
+    public $settings;
+    public $structure;
+    public $phreeformProcessing;
+    public $phreeformFormatting;
+    public $job_units;
+    public $notes;
 
     function __construct()
     {

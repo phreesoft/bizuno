@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/api/funnels/ifGoogle/ifGoogle.php
  */
 
@@ -34,6 +34,9 @@ class ifGoogle extends apiExport
     public $moduleID = 'api';
     public $methodDir= 'funnels';
     public $code     = 'ifGoogle';
+    public $defaults;
+    public $settings;
+    public $map;
     public $lang     = ['title' => 'Google Interface',
         'acronym' => 'Google',
         'description' => 'The Google interface provides capability to upload product feeds.',

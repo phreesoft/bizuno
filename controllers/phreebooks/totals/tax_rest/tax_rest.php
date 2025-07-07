@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -33,6 +33,8 @@ class tax_rest
     public $methodDir= 'totals';
     public $code     = 'tax_rest';
     public $hidden   = false;
+    public $settings;
+    public $fields;
     public $lang     = ['title'=>'Sales Tax (REST)',
 //      'label' => 'Sales Tax (REST)',
         'extra_title' => '(REST)',

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/payment/admin.php
  */
 
@@ -31,6 +31,10 @@ class paymentAdmin
 {
     public $moduleID= 'payment';
     public $pageID  = 'admin';
+    public $lang;
+    public $defaults;
+    public $settings;
+    public $structure;
 
     public function __construct()
     {

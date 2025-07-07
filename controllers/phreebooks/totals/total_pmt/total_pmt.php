@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/total_pmt/total_pmt.php
  */
 
@@ -33,6 +33,7 @@ class total_pmt
     public $methodDir= 'totals';
     public $code     = 'total_pmt';
     public $required = true;
+    public $settings;
     public $lang     = ['title'=>'Total Payment',
         'description'=> 'This method calculates the total payment for a Point of Sale entries. The order is fixed and should remain the last total method (highest order position).'];
 
@@ -40,8 +41,6 @@ class total_pmt
     {
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->settings= ['journals'=>'[19]','order'=>98];
-//      $usrSettings   = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);
-//      settingsReplace($this->settings, $usrSettings, $this->settingsStructure());
      }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -39,6 +39,7 @@ class ifWooCommerce extends apiExport
     private   $refreshRows= 100; // number of inventory items to pass in a single cron call
     private   $psServer   = 'https://www.phreesoft.com';
     private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
+    public    $settings;
     public    $lang       = ['title' => 'WooCommerce Interface',
         'acronym' => 'WooCommerce',
         'description' => 'The WooCommerce interface extension provides an interface to the WooCommerce shopping cart. Features include product upload/sync, order download/status updates and more.',

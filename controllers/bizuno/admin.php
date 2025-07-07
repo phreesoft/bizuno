@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -31,6 +31,13 @@ class bizunoAdmin
 {
     public  $moduleID    = 'bizuno';
     private $mailDefaults= ['smtp_enable'=>0, 'smtp_host'=>'mail.mydomain.com', 'smtp_port'=>587, 'smtp_user'=>'', 'smtp_pass'=>''];
+    public $lang;
+    public $settings;
+    public $structure;
+    public $dirList;
+    public $phreeformProcessing;
+    public $phreeformFormatting;
+    public $phreeformSeparators;
 
     function __construct()
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -30,6 +30,11 @@ namespace bizuno;
 class contactsAdmin
 {
     public $moduleID = 'contacts';
+    public $pageID = 'admin';
+    public $lang;
+    public $settings;
+    public $structure;
+    public $phreeformProcessing;
 
     function __construct()
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/tax_item/tax_item.php
  */
 
@@ -33,6 +33,9 @@ class tax_item
     public $methodDir= 'totals';
     public $code     = 'tax_item';
     public $hidden   = false;
+    public $cType;
+    public $settings;
+    public $fields;
     public $lang     = ['title'=>'Sales Tax (By Item)',
         'description'=> 'This method calculates sales tax based on the rate selected for each order item. It is used for order operations, i.e. Customer Sales and Vendor Purchases.',
         'extra_title'=> '(By Item)'];

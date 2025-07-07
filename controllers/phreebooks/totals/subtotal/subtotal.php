@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/subtotal/subtotal.php
  */
 
@@ -34,6 +34,7 @@ class subtotal
     public $code     = 'subtotal';
     public $hidden   = false;
     public $required = true;
+    public $settings;
     public $lang     = ['title'=>'Order Subtotal',
         'description'=> 'This method calculates the order total of all item rows irregardless of sort order position. This option is used for order operations, i.e. Customer Sales and Vendor Purchases, the order is fixed at zero.'];
 

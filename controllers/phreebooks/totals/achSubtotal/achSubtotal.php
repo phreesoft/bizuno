@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/achSubtotal/achSubtotal.php
  */
 
@@ -33,6 +33,7 @@ class achSubtotal
     public $methodDir= 'totals';
     public $code     = 'achSubtotal';
     public $required = true;
+    public $settings;
     public $lang     = ['title'=>'ACH Subtotal',
         'description'=> 'This method calculates the subtotal for ACH payments to vendors.',
         'subtotal'   => 'Subtotal'];

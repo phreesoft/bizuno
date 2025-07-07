@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/balanceEnd/balanceEnd.php
  */
 
@@ -32,6 +32,7 @@ class balanceEnd {
     public $moduleID  = 'phreebooks';
     public $methodDir = 'totals';
     public $required  = true;
+    public $settings;
     public $lang = ['title'=>'Ending Balance',
         'description'=> 'This calculates the ending balance for a given GL account to use for Bills. Typically used for banking transactions, Customer receipts and Vendor Payments. Order is fixed at 100, this should be the last total method.'];
 

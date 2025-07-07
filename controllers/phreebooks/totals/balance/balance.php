@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/balance/balance.php
  */
 
@@ -33,6 +33,7 @@ class balance
     public $moduleID  = 'phreebooks';
     public $methodDir = 'totals';
     public $required  = true;
+    public $settings;
     public $lang = ['title'=>'Debit/Credit Difference',
         'description'=> 'This method calculates the total difference between the total debits and credits for general journal entries. This method is only used on General ledger transactions and should be the highest ordered total method.'];
 

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/api/funnels/ifWalmart/ifWalmart.php
  */
 
@@ -34,6 +34,8 @@ class ifWalmart
     public $moduleID = 'api';
     public $methodDir= 'funnels';
     public $code     = 'ifWalmart';
+    public $defaults;
+    public $settings;
     public $lang     = ['title' => 'Walmart Interface',
         'description' => 'The Walmart interface provides capability to download orders, upload product feeds and help reconcile payments.',
         'walmart_template_desc' => 'Walmart templates are how your Bizuno inventory database fields map to Walmart fields.

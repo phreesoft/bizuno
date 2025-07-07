@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/api/funnels/ifStripe/ifStripe.php
  */
 
@@ -38,6 +38,8 @@ class ifStripe {
     private $totFee   = 0; // total fees charged
     private $totAll   = 0; // Total sales/refunds
     private $totNet   = 0; // total cash transferred into bank account, inclusive of fees
+    public  $defaults;
+    public  $settings;
     public  $lang     = ['title' => 'Stripe Interface',
         'description' => 'The Stripe interface provides capability to import purchases and orders. It also creates a journal entry for the fees charged.',
         'gl_acct_purchases_lbl' => 'Purchases GL Account',
@@ -63,7 +65,6 @@ class ifStripe {
             'gl_acct_exp'  =>getModuleCache('phreebooks','settings','customers','gl_expense')];
         $userMeta      = getMetaMethod($this->methodDir, $this->code);
         $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
-        $this->today = biz_date('Y-m-d');
     }
 
     public function settingsStructure()

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/payment/gateways/directdebit.php
  */
 
@@ -33,6 +33,8 @@ class directdebit
     public $methodDir= 'gateways';
     public $code     = 'directdebit';
     public $required = true;
+    public $defaults;
+    public $settings;
     public $lang     = ['title' => 'Direct Debits',
         'description'=> 'Direct Debit and Electronic Funds Transfer (EFT) Payments.',
         'check_number' => 'Reference Number'];

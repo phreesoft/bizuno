@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/balanceBeg/balanceBeg.php
  */
 
@@ -33,6 +33,7 @@ class balanceBeg
     public $moduleID  = 'phreebooks';
     public $methodDir = 'totals';
     public $required  = true;
+    public $settings;
     public $lang      = ['title'=>'Beginning Balance',
         'description'=> 'This method pulls the beginning balance for a given GL account to use for Bills. Typically used for banking transactions, Customer receipts and Vendor Payments. Order is fixed at zero, this should be the first total method.'];
 

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/fee_order/fee_order.php
  */
 
@@ -33,6 +33,7 @@ class fee_order
     public $methodDir= 'totals';
     public $code     = 'fee_order';
     public $hidden   = false;
+    public $settings;
     public $lang     = ['title'=>'Fee (By Order)',
         'label'      => 'Fee',
         'description'=> 'This method adds a fee based on the total of the order. Typically used for order transactions, Customer Sales and Vendor Purchases.'];

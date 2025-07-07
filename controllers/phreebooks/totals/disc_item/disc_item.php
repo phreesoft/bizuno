@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/disc_item/disc_item.php
  */
 
@@ -32,6 +32,7 @@ class disc_item
     public $code     = 'disc_item';
     public $moduleID = 'phreebooks';
     public $methodDir= 'totals';
+    public $settings;
     public $lang     = ['title'=>'Discount (By Item)',
         'label'      => 'Item Discount',
         'description'=> 'This method allows discounts at the item level. It is used for order operations, i.e. Customer Sales and Vendor Purchases. NOTE: THIS METHOD REQUIRES THE CUSTOMER ITEM DISCOUNT EXTENSION!',

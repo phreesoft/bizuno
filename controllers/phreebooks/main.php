@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -122,9 +122,9 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
             $payrolls = getMetaCommon('methods_payroll');
             msgDebug("\npayrolls read = ".print_r($payrolls, true));
             $order = 40;
-            foreach ($payrolls as $payroll) {
+            foreach ($payrolls as $idx => $payroll) {
                 if (!empty($payroll['status'])) {
-                    $data['datagrid']['manager']['source']['actions'][$payroll['id']] = ['order'=>$order,'icon'=>'paychex','label'=>'Paychex',
+                    $data['datagrid']['manager']['source']['actions'][$payroll['id']] = ['order'=>$order,'icon'=>$payroll['id'],'label'=>'Paychex',
                         'events'=>['onClick'=>"jsonAction('$this->moduleID/payroll/importForm&payroll={$payroll['id']}');"]];
                     $order++;
                 }

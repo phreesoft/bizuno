@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-05
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/inventory/main.php
  */
 
@@ -856,11 +856,11 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'tables' => ['inventory' => ['table'=>BIZUNO_DB_PREFIX."inventory"]],
                 'search' => [BIZUNO_DB_PREFIX.'inventory.id',BIZUNO_DB_PREFIX.'inventory.sku','description_short','description_purchase','description_sales','upc_code'],
                 'actions' => [
-                    'newInventory'=>['order'=>10,'icon'=>'add',   'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', 0);"]],
-                    'mergeInv'    =>['order'=>30,'icon'=>'merge', 'hidden'=>$security>4?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
-                    'woDesign'    =>['order'=>50,'icon'=>'design','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/design/manager');"]],
-                    'woTasks'     =>['order'=>55,'icon'=>'list',  'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/tasks/manager');"]],
-                    'clrSearch'   =>['order'=>85,'icon'=>'clear', 'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizTextSet('search', ''); ".$name."Reload();"]]],
+                    'newInventory'=>['order'=>10,'icon'=>'add',    'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', 0);"]],
+                    'mergeInv'    =>['order'=>30,'icon'=>'merge',  'hidden'=>$security>4?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
+                    'woDesign'    =>['order'=>50,'icon'=>'design', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/design/manager');"]],
+                    'woTasks'     =>['order'=>55,'icon'=>'inv-adj','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/tasks/manager');"]],
+                    'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizTextSet('search', ''); ".$name."Reload();"]]],
                 'filters'=> [
                     'f0'     => ['order'=>10,'label'=>lang('status'),'break'=>true,'sql'=>$f0_value,'values'=> $yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['f0']]],
                     'search' => ['order'=>90,'attr'=>['value'=>$this->defaults['search']]]],

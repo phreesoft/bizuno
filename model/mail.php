@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /model/mail.php
  */
 
@@ -33,6 +33,16 @@ use PHPMailer\PHPMailer\Exception;
 
 class bizunoMailer
 {
+    public $struc;
+    public $toEmail;
+    public $ToName;
+    public $Subject;
+    public $Body;
+    public $FromEmail;
+    public $FromName;
+    public $toCC      = [];
+    public $attach    = [];
+
     /**
      * Prepares the mail transport to send emails.
      * @param mixed  $toEmail - email addresses, can be array, separated with comma or semi-colons
@@ -55,8 +65,6 @@ class bizunoMailer
         $this->Body      = $body;
         $this->FromEmail = !empty($fromEmail) ? $fromEmail : getUserCache('profile', 'email');
         $this->FromName  = !empty($fromName)  ? $fromName  : getUserCache('profile', 'title');
-        $this->toCC      = [];
-        $this->attach    = [];
         msgDebug("\nSending to: $toName email: $toEmail sub: $subject body: $body from: $fromName email: $fromEmail");
     }
 

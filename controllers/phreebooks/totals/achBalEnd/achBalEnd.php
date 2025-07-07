@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /controllers/phreebooks/totals/achBalEnd/achBalEnd.php
  */
 
@@ -33,6 +33,7 @@ class achBalEnd
     public $methodDir= 'totals';
     public $code     = 'achBalEnd';
     public $required = true;
+    public $settings;
     public $lang     = ['title'=>'ACH Ending Balance',
         'description'=> 'This calculates the ending balance for ACH bill pay.'];
 

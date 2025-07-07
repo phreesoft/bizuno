@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-07
  * @filesource /lib/controllers/payment/gateways/paypal.php
  */
 
@@ -32,7 +32,9 @@ class paypal
     public  $moduleID = 'payment';
     public  $methodDir= 'gateways';
     public  $code     = 'paypal';
-    public $lang = ['title' => 'PayPal',
+    public  $defaults;
+    public  $settings;
+    public  $lang = ['title' => 'PayPal',
         'description'=> 'PayPal interface, covers both PayPal Express and PayPal Pro.',
         'at_paypal' => '@PayPal',
         'user' => 'User ID (provided by PayPal)',
