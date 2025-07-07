@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-07-05
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -89,6 +89,7 @@ class inventoryTools
         msgAdd("Assembly BOM SKU changes: $assyCnt;",'info');
         $rtnCnt = $this->renameMetaReturn($srcSKU, $destSKU);
         msgAdd("Customer/Vendor return changes: $rtnCnt;",'info');
+        $this->mergeIfExists($srcID, $destID); // special processing for some meta keys
         // SKU ID based changes
         msgDebug("\nDeleting meta from source SKU: $srcSKU");
         $jMeta  = dbMetaGet(0, '%', 'inventory', $srcID);
@@ -116,9 +117,23 @@ class inventoryTools
     }
 
     /**
+     * Keeps specific meta if it exists in the source and not in the destination
+     */
+    private function mergeIfExists($srcID, $destID)
+    {
+        $metaS = dbMetaGet(0, 'production_job', 'inventory', $srcID);
+        $metaD = dbMetaGet(0, 'production_job', 'inventory', $destID);
+        if (empty($metaD) && !empty($metaS)) { // saves the production job template from the old SKU to the new SKU
+            $jobID = metaIdxClean($metaS);
+            $metaS['sku_id'] = $destID;
+            dbWrite(BIZUNO_DB_PREFIX.'inventory_meta', ['ref_id'=>$destID, 'meta_value'=>json_encode($metaS)], 'update', "id=$jobID");
+        }
+    }
+    
+    /**
      * Handles the merge of journal_meta 'return' key
      */
-    public function renameMetaReturn($srcSKU='', $destSKU='')
+    private function renameMetaReturn($srcSKU='', $destSKU='')
     {
         $rows= dbMetaGet(0, 'return', 'journal', '%');
         msgDebug("\nWorking on journal_meta:return key , read ".sizeof($rows)." rows to process.");

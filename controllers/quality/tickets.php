@@ -103,9 +103,10 @@ class qualityTickets extends mgrJournal
     protected function managerGrid($security=0, $args=[])
     {
         $stores   = getModuleCache('bizuno', 'stores');
-        $action   = clean('mgrAction','cmd',     'get');
-        $rIDList  = clean('rIDList',  'integer', 'get');
-        $menu     = clean('menu',     'cmd',     'get');
+        $action   = clean('mgrAction','cmd',    'get');
+        $rIDList  = clean('rIDList',  'integer','get');
+        $range    = clean('range',    'integer','get');
+        $menu     = clean('menu',     'cmd',    'get');
         $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status')));
         $selClosed= [['id'=>'a','text'=>lang('all')], ['id'=>'1','text'=>lang('yes')], ['id'=>'0','text'=>lang('no')]];
         // clean up the filter sqls
@@ -118,7 +119,7 @@ class qualityTickets extends mgrJournal
         $f1 = clean('f1', 'integer', 'post');
         $f1_value = $f1 ? "printed='$f1'" : "";
         $data = array_replace_recursive(parent::gridBase($security, $args), [
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList"],
+            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList&range=$range"],
             'source' => [
                 'search' => ['contact_name', 'invoice_num', 'contact_id', 'ref_num', 'title'],
                 'filters'=> [
@@ -242,9 +243,9 @@ class qualityTickets extends mgrJournal
         msgDebug("\nEntering addFilters with dashID=$dashID");
         $key  = clean('rIDList','integer','get');
         $menu = clean('menu',   'cmd',    'get');
+        $range = clean('range', 'integer','get');
         $props= dbMetaGet(0, "dashboard_{$menu}", 'contacts', getUserCache('profile', 'userID'));
         $dash = getDashboard($dashID, $props['$dashID']['opts']);
-        $range = ''; // pull range from users dashboard setting, depends on the user and the category where the dashbvoard is, probably needs to be sent in the original request
         $cData= $dash->getData($range);
         msgDebug("\n Back from readiong cData with results: ".print_r($cData, true));
         $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"id IN (".implode(',', $cData['data'][$key]['rID']).")"];
@@ -252,9 +253,9 @@ class qualityTickets extends mgrJournal
         $data['source']['filters']['search']['attr']['value'] = '';
         $data['source']['filters']['period']['attr']['value'] = 'a';
         $data['source']['filters']['period']['sql'] = '';
-        $data['source']['filters']['f0']['attr']['value'] = 'a';
-        $data['source']['filters']['f0']['sql'] = '';
-        $data['source']['filters']['f1']['attr']['value'] = '0';
-        $data['source']['filters']['f1']['sql'] = '';
+        $data['source']['filters']['status']['attr']['value'] = 'a';
+        $data['source']['filters']['status']['sql'] = '';
+        $data['source']['filters']['closed']['attr']['value'] = '0';
+        $data['source']['filters']['closed']['sql'] = '';
     }
 }

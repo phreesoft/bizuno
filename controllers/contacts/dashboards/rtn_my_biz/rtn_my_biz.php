@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-06
  * @filesource /controllers/contacts/dashboards/rtn_my_biz/rtn_my_biz.php
  */
 
@@ -70,7 +70,7 @@ class rtn_my_biz
      */
     public function render($opts=[])
     {
-        $cData = $this->rtnSKUs($opts);
+        $cData = $this->rtnSKUs($opts['range']);
         $html  = '<div style="width:100%" id="'.$this->code.'_chart0"></div>';
         $output= ['divID'=>$this->code."_chart0",'type'=>'pie','attr'=>['title'=>"Returns by SKU = ".$cData['totalRtn']." entries"],'data'=>$cData['chart']];
         $js    = "ajaxDownload('form{$this->code}');
@@ -86,12 +86,12 @@ function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
      * @param integer $pieces - number of pie pieces
      * @return array - structure with the pie chart data
      */
-    public function rtnSKUs($opts)
+    public function rtnSKUs($range)
     {
-        msgDebug("\nEntering rtnSKUs with range = {$opts['range']}");
-        $dates= dbSqlDates($opts['range']); // this quarter
+        msgDebug("\nEntering rtnSKUs with range = $range");
+        $dates = dbSqlDatesQrtrs($range, 'post_date'); // found date
         $stmt = dbGetResult("SELECT journal_main.id, post_date, meta_value FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
-            WHERE post_date>='{$dates['start_date']}' AND post_date<'{$dates['end_date']}' AND meta_key='return'");
+            WHERE {$dates['sql']} AND meta_key='return'");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         msgDebug("\nrows result = ".print_r($rows, true));
 //      $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "post_date>='{$dates['start_date']}' AND post_date<'{$dates['end_date']}' AND preventable='1'", '', ['creation_date','close_details']); // ,'fault'
@@ -99,7 +99,6 @@ function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
         foreach ($rows as $row) { // preventable='1'
             $meta = json_decode($row['meta_value'], true);
             if (empty($meta)) { continue; }
-break; // @TODO - This needs to be fixed AFTER returns is fully tested.
             foreach ($meta['details'] as $item) {
                 if (empty($item['sku'])) { continue; }
                 if (!isset($output[$item['sku']])) { $output[$item['sku']] = ['qty'=>0,'desc'=>$item['desc']]; } // ,'fault'=>[]

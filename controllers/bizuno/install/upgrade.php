@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-19
+ * @version    7.x Last Update: 2025-07-06
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -77,6 +77,21 @@ function bizunoUpgrade()
     }
 
 /*  if (version_compare($dbVer, '7.2') < 0) {
+        // Remove duplicate WO's
+        $allBlds = dbMetaGet('%', 'production_job', 'inventory', '%');
+        msgDebug("\nLooking at all builds with count = ".sizeof($allBlds));
+        $skus = $delIDs = [];
+        foreach ($allBlds as $build) { // override rID, i.e. only allow one production job per sku
+            if (!in_array($build['sku_id'], $skus)) { $skus[] = $build['sku_id']; continue; }
+            $delIDs[] = $build['_rID'];
+        }
+        msgDebug("\nFound duplicates = ".print_r($delIDs, true));
+        if (!empty($delIDs)) { // delete the meta, the job has been orphaned
+            $sql = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE id IN (".implode(',', $delIDs).")";
+            msgDebug(" ... Executing sql = $sql");
+            dbGetResult($sql); 
+        }
+
         // Prices methods in common_meta is not used, delete it
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key='methods_prices'");
 

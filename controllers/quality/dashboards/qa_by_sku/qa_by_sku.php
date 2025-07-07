@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-07-06
  * @filesource /controllers/quality/dashboards/qa_by_sku/qa_by_sku.php
  */
 
@@ -73,6 +73,7 @@ class qa_by_sku
      */
     public function render($opts=[])
     {
+        $menu  = clean('menu', 'db_field', 'get');
         $cData = $this->getData($opts['range']);
         $title = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['totalRtn']);
         $html  = '<div style="width:100%" id="'.$this->code.'_chart0"></div>';
@@ -83,7 +84,7 @@ google.charts.setOnLoadCallback(chart0{$this->code});
 function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
 function chart0{$this->code}Select(chart, data) {
     var cData = chart.getSelection();
-    winHref(bizunoHome+'&bizRt=$this->moduleID/$this->pageID/manager&mgrAction=$this->code&rIDList='+cData[0].row);
+    winHref(bizunoHome+'&bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
 }";
         return ['html'=>$html, 'jsHead'=>$js];
     }

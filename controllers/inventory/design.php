@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-07-06
  * @filesource /controllers/inventory/design.php
  */
 
@@ -68,8 +68,9 @@ class inventoryDesign extends mgrJournal
                 'filters'=> ['status'=>['order'=>10, 'label'=>lang('status'),'values'=>$yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
             'columns' => [
                 'id'         => ['order'=>0, 'attr'=>['hidden'=>true]],
+                'sku_id'     => ['order'=>0, 'attr'=>['hidden'=>true]],
                 'inactive'   => ['order'=>0, 'attr'=>['hidden'=>true]],
-                'sku_id'     => ['order'=>10, 'label'=>lang('sku'),        'attr'=>['width'=>100,'resizable'=>true], 'process'=>'inv_sku',
+                'sku'        => ['order'=>10, 'label'=>lang('sku'),        'attr'=>['width'=>100,'resizable'=>true],
                     'events'=>  ['styler'=>"function(index, row) { if (row.inactive==1) { return {class:'row-inactive'}; }}"]],
                 'title'      => ['order'=>20, 'label'=>lang('title'),      'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true]],
                 'description'=> ['order'=>30, 'label'=>lang('description'),'attr'=>['width'=>300,'sortable'=>true,'resizable'=>true]],
@@ -92,11 +93,58 @@ class inventoryDesign extends mgrJournal
     public function managerRows(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $_POST['search'] = getSearch();
-        $args= ['_table'=>'inventory', '_refID'=>'%']; // , 'dom'=>$this->dom
-        parent::mgrRowsMeta($layout, $security, $args);
-        if ($this->defaults['status']=='a') { unset($layout['metagrid']['source']['filters']['status']); } // status=all so don't test it
+        $grid  = $this->managerGrid($security); // , $args
+        if ($this->defaults['status']=='a') { unset($grid['source']['filters']['status']); } // status=all so don't test it
+        $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($this->managerRowsSort($grid))]);
     }
+    private function managerRowsSort($dg)
+    {
+        msgDebug("\nEntering managerRowsSort");
+        $this->tasks = dbMetaGet('%', 'production_task');
+        $data  = dbMetaGet('%', $this->metaPrefix, 'inventory', '%');
+        $search= getSearch();
+        $output= [];
+        // @TODO - This can be re-written to read all sku data in a single sql and then iterrate
+        foreach ($data as $key => $row) {
+            $hit = false;
+            $sku = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['sku', 'description_short'], "id={$row['sku_id']}");
+            if (empty($sku)) { // delete the meta, orphaned job
+                msgDebug("\n    SKU not found, skipping!");
+                $sql = "DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE ref_id={$row['sku_id']}";
+                msgDebug(" .. Executing sql = $sql"); dbGetResult($sql); 
+                continue;
+            }
+            if (!empty($search)) {
+                $skuHit = array_filter($sku, function($value) use ($search) { return strpos($value, $search) !== false; });
+                if     (!empty($skuHit))                   { $hit = true; } // check for hits in inventory
+                elseif ($this->searchTasks($row['steps'])) { $hit = true; } // check for hits in production tasks
+            } else { $hit = true; }
+            $row['sku'] = $sku['sku'];
+            if ($hit) { $output[] = $row; }
+        }
+        msgDebug("\nafter adjustment for view, sizeof data = ".sizeof($data));
+        $output1= sortOrder($output, $this->defaults['sort'], strtolower($this->defaults['order'])=='desc'?'desc':'asc'); // sort
+        foreach ($output1 as $idx => $row) {
+            foreach ($row as $key => $value) {
+                if (!empty($dg['columns'][$key]['process'])){ $output1[$idx][$key] = viewProcess($value,              $dg['columns'][$key]['process']); }
+                if (!empty($dg['columns'][$key]['format'])) { $output1[$idx][$key] = viewFormat ($output1[$idx][$key],$dg['columns'][$key]['format']); }
+            }
+        }
+        $results = array_slice($output1, ($this->defaults['page']-1)*$this->defaults['rows'], $this->defaults['rows']); // get slice
+        msgDebug("\nPost processing, returning row count = ".sizeof($results));
+        return ['total'=>sizeof($output), 'rows'=>$results];
+    }
+    private function searchTasks($search, $steps=[])
+    {
+        $hit = false;
+        foreach ($this->tasks as $task) {
+            if (!in_array($task['_rID'], $steps)) { continue; }
+            $taskHit = array_filter($task, function($value) use ($search) { return strpos($value, $search) !== false; });
+            if (!empty($taskHit)) { $hit = true; } 
+        }
+        return $hit;
+    }
+
     public function copy(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
@@ -162,8 +210,18 @@ jqBiz('#sku_id').combogrid({ panelWidth: 550, delay:500, value:'', idField:'id',
     }
     public function save(&$layout=[])
     {
-        $rID = clean('_rID', 'integer', 'post');
+        $rID  = clean('_rID',  'integer','post');
+        $skuID= clean('sku_id','text',   'post');
         if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
+        // Error check
+        $exists = dbMetaGet('%', $this->metaPrefix, 'inventory', $skuID);
+        msgDebug("\nLooking for exiting records: ".print_r($exists, true));
+        if (!empty($exists)) { // override rID, i.e. only allow one production job per sku
+            $meta = array_shift($exists);
+            $newID = metaIdxClean($meta);
+            msgDebug("\nFound a job template already, changing _rID to: $newID");
+            $_POST['_rID'] = $newID;
+        }
         // clean up the steps, all we need is the task_id
         $steps = clean('steps', 'json', 'post');
         msgDebug("\nsteps after decode = ".print_r($steps, true));
@@ -172,7 +230,7 @@ jqBiz('#sku_id').combogrid({ panelWidth: 550, delay:500, value:'', idField:'id',
         foreach ($steps['rows'] as $step) { $output[] = ['task_id'=>$step['_rID']]; }
         msgDebug("\nsteps to set post = ".print_r($output, true));
         $_POST['steps'] = json_encode($output);
-        parent::saveMeta($layout, ['_table'=>'inventory', '_refID'=>clean('sku_id', 'text', 'post')]);
+        parent::saveMeta($layout, ['_table'=>'inventory', '_refID'=>$skuID]);
     }
     public function delete(&$layout=[])
     {

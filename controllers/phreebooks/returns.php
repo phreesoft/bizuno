@@ -372,7 +372,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
         if (empty($oldSKU) || empty($newSKU)) { return; }
         $cnt    = 0;
         $returns= dbMetaGet(0, 'return', 'journal', '%');
-        msgDebug("\nWorking in renameMetaReturn  with number of returns = ".sizeof($returns));
+        msgDebug("\nWorking in invRename  with number of returns = ".sizeof($returns));
         foreach ($returns as $return) {
             $found = false;
             if (!empty($return['receive_details']['rows'])) { 
