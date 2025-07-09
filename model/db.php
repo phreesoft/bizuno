@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-02
+ * @version    7.x Last Update: 2025-07-08
  * @filesource /model/db.php
  */
 
@@ -590,11 +590,15 @@ function dbPullSetting($table, $index, $filter = false)
  */
 function dbTableExists($table)
 {
-    if (!$stmt = dbGetResult("SHOW TABLES LIKE '$table'")) { return; }
-    if (!$row  = $stmt->fetch(\PDO::FETCH_ASSOC)) { return; }
-    $value = array_shift($row);
-    if (false === $value) { return; }
-    return ($value==$table) ? true : false;
+    if (empty($GLOBALS['BIZUNO_TABLES'])) {
+        if (!$stmt = dbGetResult("SHOW TABLES;")) { return; }
+        if (!$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC)) { return; }
+        $output = [];
+        foreach ((array)$rows as $row) { $output[] = array_shift($row); }
+        $GLOBALS['BIZUNO_TABLES'] = $output;
+        msgDebug("\nRead ".sizeof($output)." tables in dbTableExists.");
+    }
+    return (in_array($table, $GLOBALS['BIZUNO_TABLES'])) ? true : false;
 }
 
 /**
@@ -1066,7 +1070,8 @@ function dbGetStores($addAll=false)
 {
     if ($addAll) { $output[] = ['id'=>-1, 'text'=>lang('all')]; }
     $output[] = ['id'=>0, 'text'=> getModuleCache('bizuno', 'settings', 'company', 'id')];
-    $result = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_b='1'", 'short_name');
+    $crit  = dbTableExists(BIZUNO_DB_PREFIX.'address_book') ? "type='b'" : "ctype_b='1'"; // For legacy, pre 7.0 installs
+    $result = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', $crit, 'short_name');
     foreach ($result as $row) { $output[] = ['id'=>$row['id'], 'text'=>$row['short_name']]; }
     return $output;
 }
@@ -1163,9 +1168,10 @@ function dbGLDropDown($inc_sel=true, $limits=[], $hideInactive=true)
  */
 function dbSetBizunoUsers()
 {
-    $users = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_u='1'");
+    $crit  = dbTableExists(BIZUNO_DB_PREFIX.'address_book') ? "type='u'" : "ctype_u='1'"; // For legacy, pre 7.0 installs
+    $users = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', $crit);
     msgDebug("\nEntering dbSetBizunoUsers, read ".sizeof((array)$users)."users from all roles."); // = ".print_r($users ,true));
-    $output = [];
+    $output= [];
     foreach ($users as $user) {
         $metaPro= dbMetaGet(0, 'user_profile', 'contacts', $user['id']); // fetch the users role from the contacts_meta
         $roleID = $metaPro['role_id'];
@@ -1188,8 +1194,9 @@ function dbSetBizunoUsers()
 function dbSetBizunoEmployees()
 {
     msgDebug("\nEntering dbSetBizunoEmployees");
-    $users = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_e='1'");
-    $output = [];
+    $crit  = dbTableExists(BIZUNO_DB_PREFIX.'address_book') ? "type='e'" : "ctype_e='1'"; // For legacy, pre 7.0 installs
+    $users = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', $crit);
+    $output= [];
     foreach ($users as $user) {
         // try to see if the employee has a role assigned
         // @TODO - This will go much faster if the user and employee contact records are merged first

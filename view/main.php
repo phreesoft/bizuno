@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-07-08
  * @filesource /view/main.php
  */
 
@@ -89,6 +89,15 @@ final class view
                 echo $dom;
                 $msgStack->debugWrite();
                 break;
+            case 'migrate': // hybrid 
+                $this->setEnvHTML($data);
+                $dom  = "<!DOCTYPE HTML>\n<html>\n<head>\n".$this->renderHead($data)."</head>\n";
+                $dom .= "  <body>\n".$this->renderGuestDivs($data)."  </body>\n";
+                $dom .= "</html>\n";
+                msgDebug("\n sending type: guest and data = $dom");
+                echo $dom;
+                $msgStack->debugWrite();
+                break;
             case 'page':
                 $dom = $this->viewPageDOM($data); // formats final HTML to specific host expectations
                 msgDebug("\n sending type: page and data = $dom");
@@ -125,7 +134,7 @@ final class view
         $js .= "var bizID = 0;\n";
         $js .= "var myDevice = '{$GLOBALS['myDevice']}';\n";
         // Page head Meta 
-        $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.'Bizuno Title'.'</title>'];
+        $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.'Bizuno'.'</title>'];
         $data['head']['metaTitle']   = ['order'=>22,'type'=>'html','html'=>'<meta name="robots" content="noindex">'];
         $data['head']['metaContent'] = ['order'=>24,'type'=>'html','html'=>'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'];
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];

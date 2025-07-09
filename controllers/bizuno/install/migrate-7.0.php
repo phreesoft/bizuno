@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-08
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -539,7 +539,7 @@ function migrate_inv_prices(&$cron=[], $cntOnly=false)
 {
     msgDebug("\nEntering migrate_inv_prices.");
     $table= 'inventory_prices';
-    $chunk= 1000; // Needs to be done in a single transaction or the price map is split
+    $chunk= 1000000; // Needs to be done in a single transaction or the price map is split
     $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
@@ -671,6 +671,8 @@ function migrate_gl_chart(&$cron=[], $cntOnly=false)
         msgDebug("\nprocessing dashboards list: ".print_r($props['dashboards'], true));
         foreach ($props['dashboards'] as $idx => $values) {
             unset($values['id'], $values['status'], $values['default'], $values['order'], $values['acronym']); // not needed for dashboards
+            // Some installs have a malformed settings, just remove the dashboard for now, the user will need to put it back manually.
+            if (is_array($values['settings']['users']) || is_array($values['settings']['roles'])) { continue; }
             if (strpos($values['settings']['users'], ':')!==false) { $parts = explode(':', $values['settings']['users']); }
             elseif (empty($values['settings']['users']))           { $parts = [0]; }
             else                                                   { $parts = [$values['$values']['users']]; }
@@ -1624,7 +1626,6 @@ function migrate_rm_tables_pt1(&$cron=[])
     msgDebug("\nEntering migrate_rm_tables_pt1.");
     dbTransactionStart();
     // Drop the tables
-    dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'address_book');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'current_status');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'data_security');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_assy_list');
@@ -1682,6 +1683,7 @@ function migrate_rm_tables_pt2(&$cron=[])
     dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` CHANGE `last_update` `date_last` DATE DEFAULT NULL COMMENT 'type:date;tag:DateLastEntry;order:72';");
     // Some more cleanup
     $priceMap = getMetaCommon('_PRICE_MAP');
+    msgDebug("\nPrice map = ".print_r($priceMap, true));
     foreach ($priceMap as $key => $priceID) {
         $srcID = substr($key, 1);
         $destID= !empty($priceID) ? $priceID : 0;

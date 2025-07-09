@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /view/easyUI/common.js
  */
 
@@ -2595,6 +2595,11 @@ function bankingEdit(rowIndex) {
 function inventoryForm(rowData) {
     if (typeof rowData.sku == 'undefined') { return; }
     winOpen('phreeformOpen', 'phreeform/render/open&group=inv:frm&date=a&xfld=inventory.sku&xcr=equal&xmin='+encodeURIComponent(rowData.sku));
+}
+
+function inventoryGetAging(rowData) {
+    if (typeof rowData.sku == 'undefined') { return; }
+    jsonAction('inventory/prices/aging&sku='+encodeURIComponent(rowData.sku));
 }
 
 function inventoryGetPrice(rowData, type) {

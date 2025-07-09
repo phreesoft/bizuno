@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-10
+ * @version    7.x Last Update: 2025-07-08
  * @filesource /controllers/administrate/backup.php
  */
 
@@ -220,9 +220,10 @@ class administrateBackup
         $bizCreds= getUserCache('business');
         $dbFile  = BIZUNO_DATA.$filename;
         $dbHost  = BIZPORTAL['host'];
-        $dbName  = $bizCreds['bizDB'];
+        $dbName  = !empty(BIZPORTAL['name']) ? BIZPORTAL['name'] : (!empty($bizCreds['bizDB']) ? $bizCreds['bizDB'] : '');
         $dbUser  = BIZPORTAL['user'];
         $dbPass  = BIZPORTAL['pass'];
+        if (empty($dbName) || empty($dbUser) || empty($dbPass)) { return msgAdd('invalid_credentials'); }
         $ext     = strtolower(pathinfo($dbFile, PATHINFO_EXTENSION));
         msgDebug("\nLooking for how to process extension: $ext");
         if (in_array($ext, ['sql'])) { // raw sql in text format

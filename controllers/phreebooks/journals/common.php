@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -995,6 +995,7 @@ class jCommon
                     'actions' => [
                         'settings'=> ['order'=>10,'icon'=>'settings','events'=>['onClick'=>"inventoryProperties(bizGridGetRow('$name'));"]],
                         'price'   => ['order'=>40,'icon'=>'price',   'events'=>['onClick'=>"inventoryGetPrice(bizGridGetRow('$name'), '$type');"]],
+                        'aging'   => ['order'=>70,'icon'=>'date',    'events'=>['onClick'=>"inventoryGetAging(bizGridGetRow('$name'));"]],
                         'print'   => ['order'=>80,'icon'=>'print',   'events'=>['onClick'=>"inventoryForm(bizGridGetRow('$name'));"]],
                         'trash'   => ['order'=>90,'icon'=>'trash',   'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"],
                             'display' => "typeof row.item_ref_id==='undefined' || row.item_ref_id=='0' || row.item_ref_id==''"]]],

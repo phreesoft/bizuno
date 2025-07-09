@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-08
  * @filesource /model/registry.php
  */
 
@@ -262,24 +262,12 @@ unset($bizunoMod[$module]['dashboards']);
     private function initBizuno()
     {
         msgDebug("\nEntering initBizuno.");
-        $output  = [];
-        $output[]= ['id'=>0, 'text'=> getModuleCache('bizuno', 'settings', 'company', 'id')];
-        $result  = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_b='1'", 'short_name');
-        foreach ($result as $row) { $output[] = ['id'=>$row['id'], 'text'=>$row['short_name']]; }
-        setModuleCache('bizuno', 'stores', '', $output);
+        setModuleCache('bizuno', 'stores', '', dbGetStores());
     }
 
     private function initPayment()
     {
-        // Need to reload the methods_gateways meta to account for deleted, new and moved gateways
-        
-        
-        
-        
-//        global $bizunoMod;
-//        msgDebug("\nread bizunoMod:payment = ".print_r($bizunoMod['payment'], true));
-//        clearModuleCache ('payment',   'methods'); // no longer used
-//        msgDebug("\nAFTER clear cache bizunoMod:payment = ".print_r($bizunoMod['payment'], true));
+        // @TODO - Need to reload the methods_gateways meta to account for deleted, new and moved gateways
     }
 
     private function initPhreeBooks()

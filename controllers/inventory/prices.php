@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -326,6 +326,30 @@ function preSubmitPrices() {
     {
         if (!$security = validateAccess('prices_'.$this->type, 4)) { return; }
         parent::deleteMeta($layout, ['_table'=>clean('table', 'db_field', 'get')]);
+    }
+
+    public function aging(&$layout=[])
+    {
+        if (!$security = validateAccess('inv_mgr', 1)) { return; }
+        $sku   = clean('sku', 'text', 'get');
+        if (empty($sku)) { return msgAdd("Bad SKU sent!"); }
+        $inv   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($sku)."'");
+        if (strpos(COG_ITEM_TYPES, $inv['inventory_type']) === false) { return msgAdd("This SKU is not tracked in inventory! The aging is not recorded."); }
+        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND remaining>0", 'post_date', ['sku', 'post_date', 'remaining', 'store_id']);
+        msgDebug("\nFound hits = ".print_r($rows, true));
+        $stores= $list = [];
+        foreach ($rows as $row) { $stores['s'.$row['store_id']][] = ['qty'=>$row['remaining'], 'date'=>$row['post_date']]; }
+        foreach ($stores as $idx => $store) {
+            $list[] = ['group'=>viewFormat(substr($idx, 1), 'storeID'), 'text'=>"<div style='float:right'>".lang('qty').'</div><div>'.lang('post_date')."</div>"];
+            foreach ($store as $entry) {
+                $list[] = ['group'=>viewFormat(substr($idx, 1), 'storeID'), 'text'=>"<div style='float:right'>".viewFormat($entry['qty'], 'integer').'</div><div>'.viewFormat($entry['date'], 'date')."</div>"];
+            }
+        }
+        $data = ['type'=>'popup', 'title'=>'<div>'.'Aging for SKU: '.$sku.'</div>', 'attr'=>['id'=>'winPrices','width'=>300,'height'=>700],
+            'divs'  => ['winStatus'=>['order'=>50,'options'=>['groupField'=>"'group'",'data'=>"pricesData"],'type'=>'list','key' =>'lstPrices']],
+            'lists' => ['lstPrices'=>[]], // handled as JavaScript data
+            'jsHead'=> ['init'=>"var pricesData = ".json_encode($list).";"]];
+        $layout = array_merge_recursive($layout, $data);
     }
 
     /**
