@@ -32,6 +32,8 @@ class disc_item
     public $code     = 'disc_item';
     public $moduleID = 'phreebooks';
     public $methodDir= 'totals';
+    public $jID;
+    public $type;
     public $settings;
     public $lang     = ['title'=>'Discount (By Item)',
         'label'      => 'Item Discount',

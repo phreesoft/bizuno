@@ -36,6 +36,7 @@ class phreeformRender
     public    $moduleID    = 'phreeform';
     public    $attachments = [];
     protected $metaPrefix  = 'phreeform';
+    public $lang;
 
     function __construct()
     {

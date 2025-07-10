@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/phreebooks/dashboards/todays_j06/todays_j06.php
  */
 
@@ -93,7 +93,7 @@ class todays_j06
                 if (!empty($entry['waiting'])) {
                     $elDOM = ['icon'=>'invoice','events'=>['onClick'=>"var invNum=prompt('".$this->lang['enter_invoice_num']."'); if (invNum) { jsonAction('phreebooks/main/setInvoiceNum&panel=$this->code&jID=$this->journalID', {$entry['id']}, invNum); }"],'attr'=>[]];
                 } else {
-                    $elDOM = ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID={$opts['jID']}&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]];
+                    $elDOM = ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]];
                 }
                 $left   = viewText($entry['primary_name_b'], $opts['trim']);
                 $right  = viewFormat($jTotal, 'currency');

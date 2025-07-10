@@ -32,7 +32,10 @@ bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/common.php", 'jCommon
 class j19 extends jCommon
 {
     public $journalID = 19;
-
+    public $main;
+    public $items;
+    public $action;
+    
     function __construct($main=[], $item=[])
     {
         parent::__construct();

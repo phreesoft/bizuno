@@ -30,6 +30,8 @@ namespace bizuno;
 class jCommon
 {
     private $cogs_entry = [];
+    public $rounding;
+    public $isolate_cogs;
 
     public function __construct()
     {

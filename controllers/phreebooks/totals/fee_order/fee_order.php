@@ -33,6 +33,7 @@ class fee_order
     public $methodDir= 'totals';
     public $code     = 'fee_order';
     public $hidden   = false;
+    public $jID; 
     public $settings;
     public $lang     = ['title'=>'Fee (By Order)',
         'label'      => 'Fee',
