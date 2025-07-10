@@ -300,7 +300,7 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
 //if (getUserCache('profile', 'email')=='support@phreesoft.com') { msgTrap(); }
         $rID        = $this->rID = clean('rID', ['format'=>'integer','default'=>0], 'get');
         $cID        = clean('cID', 'integer', 'get'); // contact record for banking stuff
-        $references = explode(":", (array)clean('iID', 'text', 'get'));
+        $references = explode(":", (string)clean('iID', 'text', 'get'));
         $xAction    = clean('xAction','text', 'get');
         $prefix     =  $rID && !in_array($this->action, ['inv','ord']) ? "rID_{$rID}_" : "rID_0_";
         $min_level  = !$rID ||  in_array($this->action, ['inv','ord']) ? 2 : 1; // if converting SO/PO then add else read-only and above
