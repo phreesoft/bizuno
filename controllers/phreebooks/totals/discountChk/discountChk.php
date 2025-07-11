@@ -33,6 +33,7 @@ class discountChk
     public $methodDir= 'totals';
     public $code     = 'discountChk';
     public $required = true;
+    public $jID;
     public $settings;
     public $lang     = ['title'=>'Discount (Line Checked)',
         'label'      => 'Discount',

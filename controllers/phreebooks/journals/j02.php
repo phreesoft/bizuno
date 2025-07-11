@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -32,6 +32,8 @@ bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/common.php", 'jCommon
 class j02 extends jCommon
 {
     public  $journalID = 2;
+    public $main;
+    public $items;
     private $assets    = [0,2,4,6,8,12,32,34];
 
     function __construct($main=[], $item=[])

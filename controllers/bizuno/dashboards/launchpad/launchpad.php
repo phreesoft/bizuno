@@ -34,6 +34,7 @@ class launchpad
     public  $code     = 'launchpad';
     public  $category = 'bizuno';
     public  $struc;
+    public  $role;
     private $choices = [];
     public  $lang = ['title'=>'Launchpad',
         'description'=> 'Creates a one-click launchpad to popular menu items.'];

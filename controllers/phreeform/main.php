@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/phreeform/main.php
  */
 
@@ -35,6 +35,9 @@ class phreeformMain extends mgrJournal
     protected $domSuffix = 'Phreeform';
     protected $metaPrefix= 'phreeform';
     private   $limit = 20; // limit the number of results for recent reports
+    public $struc;
+    public $canAdd;
+    public $mgrTitle; 
 
     function __construct()
     {

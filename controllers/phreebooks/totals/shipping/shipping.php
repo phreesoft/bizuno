@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-09
  * @filesource /controllers/phreebooks/totals/shipping/shipping.php
  */
 
@@ -35,6 +35,7 @@ class shipping
     public $hidden   = false;
     public $required = true;
     public $settings;
+    public $fields;
     public $lang     = ['title'=>'Shipping (By Order)',
         'label' => 'Shipping',
         'description' => 'This method adds shipping charges to the order. The running total will be used to calculate shipping charges. It is used for order operations, i.e. Customer Sales and Vendor Purchases.',

@@ -32,6 +32,7 @@ class discount
     public $code     = 'discount';
     public $moduleID = 'phreebooks';
     public $methodDir= 'totals';
+    public $jID;
     public $settings;
     public $lang     = ['title'=>'Discount (By Order)',
         'label'      => 'Discount',

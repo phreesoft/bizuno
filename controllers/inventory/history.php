@@ -30,13 +30,14 @@ namespace bizuno;
 class inventoryHistory
 {
     public $moduleID = 'inventory';
+    public $lang;
+    public $percent_diff  = 0.10; // the percentage differnece from current value to notify for adjustment
+    public $months_of_data= 12;   // valid values are 1, 3, 6, or 12
+    public $med_avg_diff  = 0.25; // the maximum percentage difference from the median and average, for large swings
 
     function __construct()
     {
-        $this->lang          = getLang($this->moduleID);
-        $this->percent_diff  = 0.10; // the percentage differnece from current value to notify for adjustment
-        $this->months_of_data= 12;   // valid values are 1, 3, 6, or 12
-        $this->med_avg_diff  = 0.25; // the maximum percentage difference from the median and average, for large swings
+        $this->lang = getLang($this->moduleID);
     }
 
     /**

@@ -34,7 +34,7 @@ class bizunoAdmin
     public $lang;
     public $settings;
     public $structure;
-    public $dirList;
+    public $dirlist;
     public $phreeformProcessing;
     public $phreeformFormatting;
     public $phreeformSeparators;
