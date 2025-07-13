@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-12
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -52,9 +52,9 @@ class ifWooCommerce extends apiExport
 //      'upload_opt4' => 'Product Core Info (No Categories/Images)', No longer used, didn't save much time
         'upload_fltr' => 'Prefix to filter data sent (Saves time by only uploading SKU\'s that start with the specified prefix)',
         'test_tax_lbl'=>'Sales Tax Rates',
-        'test_tax_desc'=>'Check with the PhreeSoft server for new sales tax rates. If new rates are available then they can be downloaded and imported into your WordPress site. Remember to update your Nexus settings (Settings -> PhreeBooks -> Nexus) as only the enabled Nexus states will be imported. Import at WooCommerce -> Settings -> Tax (Remember to delete your existing rates first!)',
+        'test_tax_desc'=>'Check with the PhreeSoft server for new sales tax rates. If new rates are available then they can be downloaded and imported into your WordPress site. Remember to update your Nexus settings (Settings -> PhreeBooks -> Nexus) as only the enabled Nexus states will be imported. Import at WooCommerce -> Settings -> Tax (Delete your existing rates first! <a target="_blank" href="https://support.taxjar.com/article/313-delete-all-tax-rates-in-woocommerce">HERE</a>)',
         'check_now'=>'Check Now',
-        'get_table' => 'Fetch and Download Sales Tax Table From PhreeSoft'];
+        'get_table' => 'Download Sales Tax Table'];
 
     function __construct()
     {
@@ -432,18 +432,20 @@ function productUpload(rID) {
 
     public function getTaxVersion(&$layout=[])
     {
-//        global $portal;
+        global $portal;
 //        if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
-        // This needs a complete re-write it should:
+        // @TODO - This needs a complete re-write it should:
         // be part of the upgrade polling messaging system, cron operation
         // provide instructions on how to do the upgrade as WordPress tax service needs to be local
         // tax tables are located @phreesoft
         // reset get and then set upgrade flag
         
-        msgDebug("\nWorking in getTaxVersion with settings = ".print_r($this->settings, true));
-//        $result = $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/sales_tax_ver');
+        $meta = dbMetaGet(0, 'sales_tax_table_ver');
+        $curVersion = !empty($meta['value']) ? $meta['value'] : '';
+        msgDebug("\nWorking in getTaxVersion with current version = $curVersion");
+        $portal->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $result = $portal->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/sales_tax_ver');
         if (!empty($result['tax_version'])) {
-            $curVersion = '2024.01'; // This needs to be kept as a common meta value
             if (version_compare($result['tax_version'], $curVersion) > 0) {
                 return msgAdd("A new tax table version is available, please download it by clicking the Download Tax button and update your WordPress site.", 'info');
             } else {
@@ -458,7 +460,8 @@ function productUpload(rID) {
         global $io, $portal;
         $output= [];
         if (!$security = validateAccess($this->code, 2)) { return; }
-        $result= $portal->restRequest('get', $this->psServer, 'wp-json/bizuno-accounting/v1/tax_table_dump');
+        $portal->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $result= $portal->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/tax_table_dump');
         if (empty($result['data'])) { return msgAdd("Error retrieving the new sales tax data!"); }
         // get the Nexus States
         $nexus = dbMetaGet(0, 'nexus');
