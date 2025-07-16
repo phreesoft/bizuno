@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/contacts/history.php
  */
 
@@ -31,6 +31,9 @@ class contactsHistory
 {
     private $moduleID   = 'contacts';
     private $pageID     = 'history';
+    public $lang;
+    public $type;
+    public $securityMenu;
 
     function __construct($type='c')
     {

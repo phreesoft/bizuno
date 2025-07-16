@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/contacts/main.php
  */
 
@@ -38,6 +38,7 @@ class contactsMain
     private   $refTries  = 10; // number of attempts to pull a new refernce before punting. Helps fix bad Vendor IDs and Customer IDs
     private   $metaPfxAdd= 'address_';
     public    $cTypes    = ['b', 'c', 'e', 'i', 'j', 'u', 'v'];
+    public    $defaults;
     public    $lang;
     public    $type;
     private   $f0_default;

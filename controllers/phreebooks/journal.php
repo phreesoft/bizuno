@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -58,6 +58,7 @@ class journal
         $this->setDefaults($jID, $post_date, $cID);
         $this->getDbData($mID, $cID);
         if (!empty($jID)) {
+            $this->journal         = new \stdClass();
             $this->journal         = $this->getJournal($jID, $this->main, $this->items);
             $this->journal->action = $action;
             $this->journal->items  = $this->items;

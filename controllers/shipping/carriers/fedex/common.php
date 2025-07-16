@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-15
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -112,12 +112,12 @@ Replace the test URL and test credentials with the production URL and production
         // Settings
         'GND' => 'Ground', // service options
         'GDR' => 'Home Delivery',
+        '3DA' => 'Ground Economy',
         '1DM' => 'First Overnight',
         '1DA' => 'Priority Overnight',
         '1DP' => 'Standard Overnight',
         '2DA' => 'Express 2 Day A.M.',
         '2DP' => 'Express 2 Day',
-        '3DA' => 'Ground Economy',
         '3DP' => 'Express Saver',
         'I1D' => 'Int. First',
         'I2D' => 'Int. Priority',
@@ -146,7 +146,7 @@ Replace the test URL and test credentials with the production URL and production
         $this->defaults = [
             'order'        => 10, 'test_mode'   =>'prod', // 'transport' =>'wsdl',
             'acct_number'  => '', 'rest_api_key'=> '', 'rest_secret'=> '',
-            'service_types'=> 'GND:GDR:1DM:1DA:1DP:2DA:2DP:3DA:3DP:I1D:I2D:IGD:1DF:2DF:3DF:GDF',
+            'service_types'=> 'GND:GDR:3DA:1DM:1DA:1DP:2DA:2DP:3DP:I1D:I2D:IGD:1DF:2DF:3DF:GDF',
             'sp_hub'       => '',   'max_sp_weight'=>7,      'max_weight'=>150,
             'printer_type' => 'PDF','printer_name' =>'zebra','label_pdf' =>'PAPER_8.5X11_TOP_HALF_LABEL','label_thermal'=>'STOCK_4X6.75_LEADING_DOC_TAB',
             'ltl_acct_num' => '',   'ltl_class'    => '125', 'ltl_desc'  =>'',
@@ -713,12 +713,12 @@ return '';
             'rateCodes' => [
                 'FEDEX_GROUND'          => 'GND',
                 'GROUND_HOME_DELIVERY'  => 'GDR',
+                'SMART_POST'            => '3DA',
                 'FIRST_OVERNIGHT'       => '1DM',
                 'PRIORITY_OVERNIGHT'    => '1DA',
                 'STANDARD_OVERNIGHT'    => '1DP',
                 'FEDEX_2_DAY'           => '2DP', // must be before FEDEX_2_DAY_AM for service matching to work
                 'FEDEX_2_DAY_AM'        => '2DA',
-                'SMART_POST'            => '3DA',
                 'FEDEX_EXPRESS_SAVER'   => '3DP',
                 'INTERNATIONAL_FIRST'   => 'I1D',
                 'INTERNATIONAL_PRIORITY'=> 'I2D',

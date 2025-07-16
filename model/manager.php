@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-30
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /model/manager.php
  */
 
@@ -324,7 +324,7 @@ class mgrJournal
      */
     protected function copyMeta(&$layout=[], $args=[])
     {
-        $defs    = array_replace(['_rID'=>clean('rID','integer','get'), '_table'=>'common', '_refID'=>clean('refID','integer','get'), 'title'=>clean('data','text','get'), 'index'=>'title'], $args);
+        $defs    = array_replace(['_rID'=>clean('rID','integer','get'), '_table'=>'common', '_refID'=>clean('refID','integer','get'), 'title'=>clean('data','text','get'), 'index'=>'title'], (array)$args);
         msgDebug("\nEntering editMeta with replaced defs = ".print_r($defs, true));
         if (empty($defs['_rID']) || empty($defs['title'])) { return msgAdd(lang('err_inv_title_blank')); }
         $metaVal = dbMetaGet($defs['_rID'], $this->metaPrefix, $defs['_table'], $defs['_refID']);

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreeform/renderHTML.php
  */
 
@@ -31,6 +31,19 @@ class HTML
 {
     public $moduleID = 'phreeform';
     private $dataAligns = [];
+    public $lang;
+    public $defaultFont;
+    public $FillColor;
+    public $HdColor;
+    public $ttlColor;
+    public $fontHeading;
+    public $fontTitle1;
+    public $fontTitle2;
+    public $fontFilter;
+    public $fontData;
+    public $output;
+    public $tableHead;
+    public $numColumns;
 
     function __construct($data, $report)
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/shipping/carriers/fedex/rate.php
  *
  * FedEx Developer Rate:
@@ -32,6 +32,11 @@ namespace bizuno;
 
 class fedexRate extends fedexCommon
 {
+    public $contact_type;
+    public $currency;
+    public $choices;
+    public $storeID;
+    
     function __construct()
     {
         parent::__construct();
@@ -205,6 +210,11 @@ class fedexRate extends fedexCommon
         $pkg['total_weight']   = $pkg['settings']['weight'];
         $pkg['total_insurance']= $pkg['settings']['ins_amount'];
         $pkg['total_packages'] = sizeof($pkg['packages']);
+        if (sizeof($pkg['packages'])>1 && in_array('3DA', $this->choices)) {
+            msgAdd('FedEx Ground Economy is not permitted for multi-piece shipments. No rates will be returned for this service.', 'caution');
+            $key = array_search('3DA', $this->choices);
+            unset($this->choices[$key]);
+        }
         msgDebug("\nReturning from prepShipment with packages = ".print_r($pkg['packages'], true));
     }
 }

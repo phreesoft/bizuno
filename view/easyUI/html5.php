@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1846,6 +1846,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
             $prop['attr']['data-options'] = implode(',', $tmp); // was with braces but layout broke, "{".implode(',', $tmp)."}";
         }
         if (!empty($prop['attr'])) { foreach ($prop['attr'] as $key => $value) {
+            if (empty($value)) { $value=''; } // fixes null being passed
             $field .= ' '.$key.'="'.str_replace('"', '\"', $value).'"'; // was str_replace('"', '&quot;', $value)
         } }
         if (!empty($prop['classes'])) { $field .= $this->addClasses($prop['classes']); }
@@ -1877,7 +1878,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
     }
 
     /**
-     * Builds an array of properties for a datagrid used when passing through JavaScript
+     * Builds an array of properties for a grid used when passing through JavaScript
      * @param array $props
      * @return string - ready to
      */

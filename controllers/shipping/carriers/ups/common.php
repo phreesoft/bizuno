@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-15
  * @filesource /controllers/shipping/carriers/ups/common.php
  */
 
@@ -372,6 +372,10 @@ return '';
     protected function mapAddress($addr=[])
     {
         $output = [];
+        if (strlen($addr['primary_name'])>35) {
+            $addr['primary_name'] = substr($addr['primary_name'], 0, 35); // UPS limits company name to 35 characters
+            msgAdd("The primary name was tuncated to 35 characters per UPS spec: [{$addr['primary_name']}]");
+        }
         if (!empty($addr['primary_name'])){ $output['Name']                        = $addr['primary_name']; }
         if (!empty($addr['contact']))     { $output['AttentionName']               = $addr['contact']; }
         if (!empty($addr['telephone1']))  { $output['Phone']['Number']             = substr(str_replace(' ', '', clean($addr['telephone1'], 'numeric')), 0, 10); }

@@ -35,6 +35,10 @@ class j09 extends jCommon
     public $main;
     public $items;
     public $action;
+    public $type;
+    public $lang;
+    public $rID;
+    public $totals;
     
     function __construct($main=[], $item=[])
     {

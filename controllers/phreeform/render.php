@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -29,7 +29,7 @@ namespace bizuno;
 
 use setasign\Fpdi\Tcpdf\Fpdi;
 
-bizAutoLoad(BIZBOOKS_ROOT .'controllers/phreeform/functions.php', 'phreeformImport', 'function');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
 
 class phreeformRender
 {
@@ -37,7 +37,9 @@ class phreeformRender
     public    $attachments = [];
     protected $metaPrefix  = 'phreeform';
     public $lang;
-
+    public $toNames;
+    public $critChoices;
+    
     function __construct()
     {
         global $critChoices; // @todo this needs to be fixed, used in phreeform/functions.php (probably should be put in here!)
@@ -1197,7 +1199,7 @@ msgDebug("\nresult = ".print_r($result, true));
             case 'journal_main.id':
                 $data = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "id=$mID");
                 if (empty($data)) { return; }
-                $name = !empty(trim($data['contact_b'])) ? trim($data['contact_b']) : trim($data['primary_name_b']);
+                $name = !empty(trim((string)$data['contact_b'])) ? trim((string)$data['contact_b']) : trim((string)$data['primary_name_b']);
                 $this->extractAddresses($output, $name, $data['email_b']);
                 if (!empty($data['contact_id_b'])) { // fetch the email from the main contact record
                     $cData = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['primary_name', 'email'], "id={$data['contact_id_b']}");
@@ -1211,7 +1213,7 @@ msgDebug("\nresult = ".print_r($result, true));
                 break;
         }
         $xKeys= $xVals = [];
-        foreach ($data as $key => $val) { $xKeys[] = "%$key%"; $xVals[] = $val; }
+        foreach ((array)$data as $key => $val) { $xKeys[] = "%$key%"; $xVals[] = $val; }
         $sParts = !empty($report->filenamefield) ? explode('.', $report->filenamefield) : false;
         if (empty($sParts[1])) { $sParts[1] = ''; }
         $title  = !empty($report->filenameprefix)? $report->filenameprefix: '';
@@ -1250,7 +1252,7 @@ msgDebug("\nresult = ".print_r($result, true));
     private function extractAddresses(&$output, $name='', $email=false, $primary=true)
     {
         msgDebug("\nEntering extractAddresses with name = $name and email = $email");
-        $parts = explode(',', $email);  // handle comma separated email addresses
+        $parts = explode(',', (string)$email);  // handle comma separated email addresses
         foreach ($parts as $part) {
             $tEmail= strtolower(trim($part));
             $tName = strtolower(trim($name));

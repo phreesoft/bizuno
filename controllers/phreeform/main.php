@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreeform/main.php
  */
 
@@ -203,7 +203,7 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
         $rID  = clean('rID',  'integer', 'get');
         $title= clean('data', 'text', 'get');
         if (empty($rID) || empty($title)) { return msgAdd($this->lang['err_copy_fail']); }
-        parent::copyMeta($layout, $security);
+        parent::copyMeta($layout);
         $newID = clean('newID', 'integer', 'get');
         $layout['content']['actionData'] = "bizTreeReload('treePhreeform'); bizPanelRefresh('myBookMark'); jqBiz('#docRecent').panel('refresh'); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/edit&rID=$newID');";
     }

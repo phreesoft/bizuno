@@ -44,6 +44,7 @@ class fedexShip extends fedexCommon
 // ***************************************************************************************************************
     public function labelGet($request=[])
     {
+if (getUserCache('profile', 'email')=='dpremo@batterystore.com') { msgTrap(); }
         $this->is_freight = (in_array($request['ship_method'], ['GDF','ECF'])) ? true : false;
         $this->prepShipment($request);
         $this->addCreds($request);
@@ -76,6 +77,7 @@ class fedexShip extends fedexCommon
           return msgAdd('The ship method requested is not supported by this tool presently. Please ship the package via the fedex website (www.FedEx.com).');
         }
         $payload= $this->is_freight ? $this->payloadREST_LTL($request) : $this->payloadREST($request, $is_return);
+        msgDebug("\njson encoded payload = ".print_r(json_encode($payload), true));
         $resp   = $this->queryREST($this->is_freight?'ship/v1/freight/shipments':'ship/v1/shipments', $payload);
         if (!empty($resp['errors'])) {
             foreach ($resp['errors'] as $error) { msgAdd("Error! FedEx rate request <br />Code: {$error['code']}<br />Message: {$error['message']}"); }
@@ -191,6 +193,7 @@ class fedexShip extends fedexCommon
             case 'SENDER':
                 $payload['requestedShipment']['shippingChargesPayment'] = ['paymentType'=>'SENDER'];
         }
+        $this->addSmartPost($payload, $pkg);
         $this->addLabelSpec($payload, $pkg);
         $this->addEmailNotifications($payload, $pkg);
         $this->addSpSrv($payload, $pkg, $is_return);
@@ -215,7 +218,7 @@ class fedexShip extends fedexCommon
         $methods  = array_flip($this->options['rateCodes']);
         $payload = [
             'accountNumber'           => ['value'=>$pkg['origin']['creds']['ltl_acct_num']],
-            'labelResponseOptions'    => 'LABEL',  // option 'URL_ONLY' will return link to fedex.com to retireve label
+            'labelResponseOptions'    => 'LABEL',  // option 'URL_ONLY' will return link to fedex.com to retrieve label
             'freightRequestedShipment'=> [
                 'shipper'                  => ['contact'=>$this->mapContact($pkg['origin']),     'address'=>$this->mapAddress($pkg['origin'])],
                 'recipient'                => ['contact'=>$this->mapContact($pkg['destination']),'address'=>$this->mapAddress($pkg['destination'])],
@@ -231,13 +234,23 @@ class fedexShip extends fedexCommon
                         'contact'=>$this->mapContact($pkg['origin']), 'address'=>$this->mapAddress($pkg['origin'])]]],
                 'freightShipmentDetail'    => $this->addPkgsFrt($pkg),
                 'requestedPackageLineItems'=> $this->reqPkgsFrt($pkg)]];
-        $this->addLabelSpecLTL($payload, $pkg);
+        $this->addLabelSpecLTL($payload, $pkg, $methods);
 //      $this->addEmailNotifications($payload, $pkg);
         $this->addSpSrvFrt($payload);
         msgDebug("\nReturning from payloadREST with payload = ".print_r($payload, true));
         return $payload;
     }
 
+    private function addSmartPost(&$payload, $pkg)
+    {
+        msgDebug("\nEntering addSmartPost with ship_method = ".print_r($pkg['ship_method'], true));
+        if ($pkg['ship_method']<>'3DA') { return; }
+        $payload['requestedShipment']['serviceType'] = 'GROUND_SMART_POST';
+        $payload['requestedShipment']['smartPostInfoDetail'] = [
+            'hubId'  => 5531,
+            'indicia'=> 'PARCEL_SELECT'];
+    }
+    
     private function addLabelSpec(&$payload, $pkg)
     {
         $payload['requestedShipment']['labelSpecification'] = [

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreebooks/journals/j22.php
  */
 
@@ -35,6 +35,10 @@ class j22 extends jCommon
     private $isNewPost= false;
     public $main;
     public $items;
+    public $type;
+    public $lang;
+    public $rID;
+    public $totals;
 
     function __construct($main=[], $item=[])
     {

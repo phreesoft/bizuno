@@ -34,6 +34,10 @@ class j04 extends jCommon
     public $journalID = 4;
     public $main;
     public $items;
+    public $type;
+    public $lang;
+    public $rID;
+    public $totals;
 
     function __construct($main=[], $item=[])
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreeform/renderForm.php
  */
 
@@ -42,6 +42,10 @@ class PDF extends \TCPDF
     var $CurrPageGroup;  // variable containing the alias of the current page group
     protected $last_page_flag = false;
     protected $first_page_flag= false;
+    public $defaultFont;
+    public $lastValues;
+    public $firstValues;
+    
 
     function __construct() {
         global $report;

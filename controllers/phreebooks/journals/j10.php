@@ -21,19 +21,24 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreebooks/journals/j10.php
  */
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/common.php", 'jCommon');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journals/common.php', 'jCommon');
 
 class j10 extends jCommon
 {
     public $journalID = 10;
     public $main;
     public $items;
+    public $dgDataItem;
+    public $type;
+    public $lang;
+    public $rID;
+    public $totals;
 
     function __construct($main=[], $item=[])
     {

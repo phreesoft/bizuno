@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-14
  * @filesource /controllers/shipping/carriers/fedex/address.php
  *
  */
@@ -46,6 +46,7 @@ class fedexAddress extends fedexCommon
             foreach ($resp['errors'] as $error) { $output['notes'] .= "Code: {$error['code']}; Message: {$error['message']}<br />"; }
             return $output;
         }
+        if (empty ($resp['output']['resolvedAddresses'])) { return; }
         if (sizeof($resp['output']['resolvedAddresses']) > 1) { msgAdd('More than one address was returned! Further validation is necessary', 'caution'); }
         foreach ($resp['output']['resolvedAddresses'] as $addr) {
             if (in_array($addr['classification'], ['BUSINESS', 'RESIDENTIAL'])) {

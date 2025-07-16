@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-17
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -41,6 +41,7 @@ class phreebooksMain
     public $action;
     public $totals;
     public $type;
+    public $isACH;
     public $restrict = false;
 
     function __construct()
@@ -301,7 +302,7 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
         $rID        = $this->rID = clean('rID', ['format'=>'integer','default'=>0], 'get');
         $cID        = clean('cID', 'integer', 'get'); // contact record for banking stuff
         $references = explode(":", (string)clean('iID', 'text', 'get'));
-        $xAction    = clean('xAction','text', 'get');
+        $xAction    = clean('xAction', 'text', 'get');
         $prefix     =  $rID && !in_array($this->action, ['inv','ord']) ? "rID_{$rID}_" : "rID_0_";
         $min_level  = !$rID ||  in_array($this->action, ['inv','ord']) ? 2 : 1; // if converting SO/PO then add else read-only and above
         $secID      = "j{$this->journalID}_mgr";
@@ -415,7 +416,7 @@ var pbChart=[];\njqBiz.each(bizDefaults.glAccounts.rows, function( key, value ) 
         if (!empty($data['fields']['journal_msg']['html'])) {
             $data['divs']['status'] = ['order'=> 5,'styles'=>['float'=>'right'],'type'=>'fields','keys'=>['journal_msg']];
         }
-        if (substr($xAction, 0, 8) == 'journal:') { // see if there are any extra actions
+        if (substr((string)$xAction, 0, 8) == 'journal:') { // see if there are any extra actions
             $temp = explode(':', $xAction);
             if (isset($temp[1])) {
                 $data['toolbars']['tbPhreeBooks']['icons']['jSave']['events']['onClick'] = "jqBiz('#xAction').val('journal:{$temp[1]}'); jqBiz('#frmJournal').submit();";

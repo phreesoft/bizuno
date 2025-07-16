@@ -36,6 +36,8 @@ class inventoryBuild extends mgrJournal
     protected $metaPrefix= 'bill_of_materials';
     protected $nextRefIdx= 'next_wo_num';
     protected $journalID = 32;
+    public    $attachPath;
+    public    $struc;
 
     function __construct()
     {
@@ -303,8 +305,8 @@ class inventoryBuild extends mgrJournal
                 $output .= "<td>".$step['description'];
                 $output .= !empty($step['data_value']) ? ("<br />".$this->lang['data_value'].": {$step['data_value']}") : "";
                 $output .= "</td>\n";
-                $output .= '<td style="text-align:center">'.($step['mfg']?($step['mfg_id']? getContactById($step['mfg_id']): lang('yes')): ' ')."</td>\n";
-                $output .= '<td style="text-align:center">'.($step['qa'] ?($step['qa_id'] ? getContactById($step['qa_id']) : lang('yes')): ' ')."</td>\n";
+                $output .= '<td style="text-align:center">'.(!empty($step['mfg'])?($step['mfg_id']? getContactById($step['mfg_id']): lang('yes')): ' ')."</td>\n";
+                $output .= '<td style="text-align:center">'.(!empty($step['qa']) ?($step['qa_id'] ? getContactById($step['qa_id']) : lang('yes')): ' ')."</td>\n";
                 $output .= '<td style="text-align:center">'.($step['erp_entry']?lang('yes'): ' ')."</td>\n";
                 $output .= "<td>&nbsp;</td>\n";
             }

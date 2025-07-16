@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-16
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -35,6 +35,10 @@ class j02 extends jCommon
     public $main;
     public $items;
     private $assets    = [0,2,4,6,8,12,32,34];
+    public $type;
+    public $lang;
+    public $rID;
+    public $totals;
 
     function __construct($main=[], $item=[])
     {
