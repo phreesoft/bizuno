@@ -44,7 +44,6 @@ class fedexShip extends fedexCommon
 // ***************************************************************************************************************
     public function labelGet($request=[])
     {
-if (getUserCache('profile', 'email')=='dpremo@batterystore.com') { msgTrap(); }
         $this->is_freight = (in_array($request['ship_method'], ['GDF','ECF'])) ? true : false;
         $this->prepShipment($request);
         $this->addCreds($request);
@@ -245,9 +244,9 @@ if (getUserCache('profile', 'email')=='dpremo@batterystore.com') { msgTrap(); }
     {
         msgDebug("\nEntering addSmartPost with ship_method = ".print_r($pkg['ship_method'], true));
         if ($pkg['ship_method']<>'3DA') { return; }
-        $payload['requestedShipment']['serviceType'] = 'GROUND_SMART_POST';
+        $payload['requestedShipment']['serviceType'] = 'SMART_POST';
         $payload['requestedShipment']['smartPostInfoDetail'] = [
-            'hubId'  => 5531,
+            'hubId'  => $pkg['shipper']['creds']['gnd_econ_hub'],
             'indicia'=> 'PARCEL_SELECT'];
     }
     

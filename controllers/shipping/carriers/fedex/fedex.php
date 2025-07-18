@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-07-17
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -80,6 +80,7 @@ class fedex extends fedexCommon
 
     public function settingSave()
     {
+        msgDebug("\nEntering FedEx settingsSave");
         $meta    = dbMetaGet(0, "methods_{$this->methodDir}");
         $metaIdx = metaIdxClean($meta);
         $srvTypes= [];

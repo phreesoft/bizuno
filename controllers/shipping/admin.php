@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-17
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -334,9 +334,11 @@ function myPkgSave() {
         msgDebug("\nRead meta data = ".print_r($meta, true));
         $values= !empty($meta) ? $meta : ['acct_number'=>'','ltl_acct_num'=>'']; // ,'rest_api_key'=>'','rest_secret'=>'','meter_number'=>'','auth_key'=>'','auth_pw'=>'','sp_hub'=>''];
         $fields= [
-            'acct_number' =>['label'=>$lang['acct_number'],  'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['acct_number'], 'maxlength'=>9]],
-            'ltl_acct_num'=>['label'=>$lang['ltl_acct_num'], 'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['ltl_acct_num'],'maxlength'=>9]]];
-        $html  = "Enter the FedEx credentials for this store.<br />".html5('acct_number', $fields['acct_number']) ."<br />".html5('ltl_acct_num',$fields['ltl_acct_num']);
+            'acct_number' =>['label'=>$lang['acct_number'], 'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['acct_number'], 'maxlength'=>9]],
+            'ltl_acct_num'=>['label'=>$lang['ltl_acct_num'],'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['ltl_acct_num'],'maxlength'=>9]],
+            'gnd_econ_hub'=>['label'=>$lang['sp_hub'],      'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['gnd_econ_hub'],'maxlength'=>4]]];
+        $html  = "Enter the FedEx credentials for this store.<br />".html5('acct_number', $fields['acct_number']);
+        $html .= "<br />".html5('ltl_acct_num',$fields['ltl_acct_num'])."<br />".html5('gnd_econ_hub',$fields['gnd_econ_hub']);
         $layout['tabs']['tabContacts']['divs']['fedex'] = ['order'=>95,'label'=>'FedEx','type'=>'html','html'=>$html];
     }
 
@@ -345,13 +347,14 @@ function myPkgSave() {
      */
     public function fedExSave()
     {
-        $type = clean('type','char','get');
+        $type   = clean('type','char','get');
         if ($type != 'b') { return; }
         $rID    = clean('id', 'integer', 'post');
         $meta   = dbMetaGet(0, 'fedex', 'contacts', $rID);
         $metaIdx= metaIdxClean($meta);
         $meta['acct_number'] = clean('acct_number', 'integer','post');
         $meta['ltl_acct_num']= clean('ltl_acct_num','integer','post');
+        $meta['gnd_econ_hub']= clean('gnd_econ_hub','integer','post');
         if (empty($meta['acct_number'])) { return; }
         dbMetaSet($metaIdx, 'fedex', $meta, 'contacts', $rID);
     }

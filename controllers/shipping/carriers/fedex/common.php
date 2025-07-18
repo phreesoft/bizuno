@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-15
+ * @version    7.x Last Update: 2025-07-17
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -43,7 +43,6 @@ class fedexCommon
     public  $today;
     public  $currency;
     public  $test;
-    public  $creds;
     public  $urlREST;
     // These are from the developer site but LTL sandbox is really broken!!!
     public  $testShip = ['accountNumber'=>'510087020','address'=>['streetLines'=>['1202 Chalet Ln'],          'city'=>'Harrison','stateOrProvinceCode'=>'AR','postalCode'=>'72601']];
@@ -146,7 +145,7 @@ Replace the test URL and test credentials with the production URL and production
         $this->defaults = [
             'order'        => 10, 'test_mode'   =>'prod', // 'transport' =>'wsdl',
             'acct_number'  => '', 'rest_api_key'=> '', 'rest_secret'=> '',
-            'service_types'=> 'GND:GDR:3DA:1DM:1DA:1DP:2DA:2DP:3DP:I1D:I2D:IGD:1DF:2DF:3DF:GDF',
+            'service_types'=> 'GND:GDR:3DA:1DM:1DA:1DP:2DA:2DP:3DP:I1D:I2D:IGD:1DF:2DF:3DF:GDF:ECF:IP1:IFE:IFP',
             'sp_hub'       => '',   'max_sp_weight'=>7,      'max_weight'=>150,
             'printer_type' => 'PDF','printer_name' =>'zebra','label_pdf' =>'PAPER_8.5X11_TOP_HALF_LABEL','label_thermal'=>'STOCK_4X6.75_LEADING_DOC_TAB',
             'ltl_acct_num' => '',   'ltl_class'    => '125', 'ltl_desc'  =>'',
@@ -160,9 +159,8 @@ Replace the test URL and test credentials with the production URL and production
         $this->currency= 'USD';
         $this->test    = $this->settings['test_mode']=='test' ? true : false;
         $this->urlREST = $this->test ? $this->url_test : $this->url_prod;
-        $this->creds   = $this->getCreds($this->storeID); // get HQ creds for most operations
     }
-
+    
     /**
      *
      * @param type $bID
@@ -176,6 +174,7 @@ Replace the test URL and test credentials with the production URL and production
         metaIdxClean($meta);
         if (empty($meta['acct_number'])) { $meta['acct_number'] = $this->settings['acct_number']; } // for combo accounts
         if (empty($meta['ltl_acct_num'])){ $meta['ltl_acct_num']= $meta['acct_number']; } // for combo accounts
+        if (empty($meta['gnd_econ_hub'])){ $meta['gnd_econ_hub']= $this->settings['sp_hub']; } // FedEx Ground Economy (was smart post)
         msgDebug("\nLeaving getCreds with meta = ".print_r($meta, true));
         return $meta;
     }
@@ -253,19 +252,11 @@ Replace the test URL and test credentials with the production URL and production
         msgDebug("\nin tokenUpdate, read token = {$response['access_token']} and expires_in = {$response['expires_in']}");
         $token    = $response['access_token'];
         $tokenDate= time()+$response['expires_in'];
-//        if (empty($this->storeID)) { // HQ update this extension
-            $this->settings['token']     = $token;
-            $this->settings['token_date']= $tokenDate;
-            $props   = getModuleCache($this->moduleID, $this->methodDir, $this->code);
-            $props['settings'] = $this->settings;
-            setModuleCache($this->moduleID, $this->methodDir, $this->code, $props);
-//        } else { // it's a branch, update that branch so token matches creds.
-//            $allStores = getModuleCache('contacts', $this->moduleID, 'fedex');
-//            $allStores['multi_store'][$this->storeID]['token']     = $token;
-//            $allStores['multi_store'][$this->storeID]['token_date']= $tokenDate;
-//            msgDebug("\nWrite multi-store data to cache = ".print_r($allStores, true));
-//            setModuleCache('contacts', $this->moduleID, $this->code, $allStores);
-//        }
+        $this->settings['token']     = $token;
+        $this->settings['token_date']= $tokenDate;
+        $props    = getModuleCache($this->moduleID, $this->methodDir, $this->code);
+        $props['settings'] = $this->settings;
+        setModuleCache($this->moduleID, $this->methodDir, $this->code, $props);
     }
 
     /**
