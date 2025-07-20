@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2025-07-19
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -45,7 +45,7 @@ function migrateBizunoPrep()
     migrate_sales_tax($cron, true);
     migrate_inv_prices($cron, true);
     migrate_inv_assy($cron, true);
-    migrate_gl_chart($cron, true);
+    migrate_dashboards($cron, true);
     migrate_phreeform($cron, true);
     migrate_docs($cron, true);
     migrate_shipping_log($cron, true);
@@ -61,7 +61,7 @@ function migrateBizunoPrep()
     migrate_crm_promos($cron, true);
     migrate_crm_promoHist($cron, true);
     migrate_edi_log($cron, true);
-    migrate_dashboards($cron, true);
+    migrate_dash_users($cron, true);
     migrate_misc($cron, true);
     migrate_map($cron, true);
     $cron['ttlSteps']++; $cron['ttlBlk']++; // migrate_rm_tables_pt1
@@ -92,7 +92,7 @@ function migrateBizuno(&$cron)
         case  9: migrate_sales_tax($cron);    break; // sales_tax table
         case 10: migrate_inv_prices($cron);   break; // inventory_prices_table
         case 11: migrate_inv_assy($cron);     break; // inventory_assembly table
-        case 12: migrate_gl_chart($cron);     break; // Convert Chart of Accounts to meta
+        case 12: migrate_dashboards($cron);   break; // Convert Chart of Accounts to meta
         case 13: migrate_phreeform($cron);    break; // phreeform table
         case 14: migrate_docs($cron);         break; // extDocs table
         case 15: migrate_shipping_log($cron); break; // Convert shipping logs to journal_meta
@@ -108,7 +108,7 @@ function migrateBizuno(&$cron)
         case 25: migrate_crm_promos($cron);   break; // CRM
         case 26: migrate_crm_promoHist($cron);break;
         case 27: migrate_edi_log($cron);      break; // EDI
-        case 28: migrate_dashboards($cron);   break; // Fix the dashboard structures to new format
+        case 28: migrate_dash_users($cron);   break; // Fix the dashboard structures to new format
         case 29: migrate_misc($cron);         break; // Tabs, fields, etc.
         case 30: migrate_map($cron);          break; // Map the new user IDs to old IDs
         case 31: migrate_rm_tables_pt1($cron);break; // Drop tables
@@ -233,16 +233,38 @@ function migrate_tables_part_2(&$cron=[])
     dbGetResult("UPDATE `".BIZUNO_DB_PREFIX."users_profiles` SET module_id='contacts' WHERE module_id='proCust'");
     dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."journal_main CHANGE notes notes TEXT");
     // Set some initial common meta values
-    dbMetaSet(0, 'bizuno_cache_expires', 0);
-    dbMetaSet(0, 'methods_totals',  getModuleCache('phreebooks', 'totals'));
-    dbMetaSet(0, 'methods_prices',  getModuleCache('inventory', 'prices'));
-    dbMetaSet(0, 'methods_gateways',getModuleCache('payment', 'methods'));
-    dbMetaSet(0, 'methods_carriers',getModuleCache('proLgstc', 'carriers'));
-    dbMetaSet(0, 'methods_funnels', getModuleCache('proIF', 'channels'));
-    dbMetaSet(0, 'methods_payroll', getModuleCache('proHR', 'methods'));
+    dbMetaSet(0, 'bizuno_cache_expires', 0); // record ID: 1
+    dbMetaSet(0, 'methods_totals',  getModuleCache('phreebooks', 'totals')); // record ID: 2
+    dbMetaSet(0, 'methods_prices',  getModuleCache('inventory', 'prices')); // record ID: 3
+    dbMetaSet(0, 'methods_gateways',getModuleCache('payment', 'methods')); // record ID: 4
+    dbMetaSet(0, 'methods_carriers',getModuleCache('proLgstc', 'carriers')); // record ID: 5
+    dbMetaSet(0, 'methods_funnels', getModuleCache('proIF', 'channels')); // record ID: 6
+    dbMetaSet(0, 'methods_payroll', getModuleCache('proHR', 'methods')); // record ID: 7
+    migrate_chart_of_accounts(); // needs to be done here as when cache reloads 
     dbTransactionCommit();
     $cron['curStep']++;
     $cron['curBlk']++;
+}
+
+function migrate_chart_of_accounts()
+{
+    $set   = dbGetRow(BIZUNO_DB_PREFIX.'configuration', "config_key='phreebooks'"); // needs to come from db as cache is not loaded
+    $rows  = json_decode($set['config_value'], true);
+    msgDebug("\nRead phreebooks config value: ".print_r($rows, true));
+    $output=[];
+    if (!empty($rows['chart']['accounts'])) {
+        foreach ($rows['chart']['accounts'] as $row) {
+            if (empty($row['inactive'])) { $row['inactive'] = 0; }
+            $output[$row['id']] = $row;
+        }
+    }
+    // set the defaults
+    $defaults = array_shift($rows['chart']['defaults']); // just the first ISO, assume this is the default ISO
+    foreach ((array)$defaults as $acct) { if (isset($output[$acct])) { $output[$acct]['default'] = 1; } }
+    msgDebug("\nReady to write output = ".print_r($output, true));
+    dbMetaSet(0, 'chart_of_accounts', $output); // record ID: 8
+//  clearModuleCache('phreebooks', 'chart'); // don't do this until this script is rock solid, maybe in next release.
+//  setModuleCache('phreebooks', 'chart', false, $output);
 }
 
 /**
@@ -634,33 +656,14 @@ function migrate_inv_assy(&$cron=[], $cntOnly=false)
 /**
  * Convert chart of accounts and dashboard defaults to db meta data
  */
-function migrate_gl_chart(&$cron=[], $cntOnly=false)
+function migrate_dashboards(&$cron=[], $cntOnly=false)
 {
-    msgDebug("\nEntering migrate_gl_chart.");
+    msgDebug("\nEntering migrate_dashboards.");
     global $bizunoMod;
-    $charts = getModuleCache('phreebooks', 'chart', 'accounts');
-    if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=sizeof($charts); return; }
-    
+    if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=75; return; } // approx number of dashboards
+
     // Let's go
     dbTransactionStart();
-    $set   = dbGetRow(BIZUNO_DB_PREFIX.'configuration', "config_key='phreebooks'");
-    $rows  = json_decode($set['config_value'], true);
-    $output=[];
-    if (!empty($rows['chart']['accounts'])) {
-        foreach ($rows['chart']['accounts'] as $row) {
-            if (empty($row['inactive'])) { $row['inactive'] = 0; }
-            $output[$row['account']] = $row;
-            
-        }
-    }
-    // set the defaults
-    $defaults = array_shift(getModuleCache('phreebooks', 'chart', 'defaults')); // just first currency
-    foreach ($defaults as $def) { if (isset($output[$def])) { $output[$def]['default'] = 1; } }
-    dbMetaSet(0, 'chart_of_accounts', $output);
-//    clearModuleCache('phreebooks', 'chart'); // don't do this until this script is rock solid, maybe in next release.
-//    setModuleCache('phreebooks', 'chart', false, $output);
-
-    // Dashboards
     $metaDash= dbMetaGet(0, 'dashboards'); // get rID just in case it got set during registry
     $rID     = metaIdxClean($metaDash);
     $defs = [];
@@ -1467,9 +1470,9 @@ function migrate_edi_log(&$cron=[], $cntOnly=false)
 /*
  * Migrates the dashboards to the new format and updates reportIDs, userIDs, and roleIDs
  */
-function migrate_dashboards(&$cron=[], $cntOnly=false)
+function migrate_dash_users(&$cron=[], $cntOnly=false)
 {
-    msgDebug("\nEntering migrate_dashboards.");
+    msgDebug("\nEntering migrate_dash_users.");
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=1; return; }
 
     // Let's go
