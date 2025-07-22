@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -155,7 +155,7 @@ class inventoryPrices extends mgrJournal
             case 'contacts':
                 $rows = !empty($this->cID) ? dbMetaGet('%', $this->metaPrefix, 'contacts', $this->cID) : []; break;
         }
-        msgDebug("\nRead total rows of raw data = ".sizeof((array)$rows)." and first 10 rows = ".print_r(array_slice((array)$rows, 0, 10), true));
+        msgDebug("\nRead total rows of raw data = ".sizeof((array)$rows));
         return $rows;
     }
     private function getMgrRowsCont() // Fetches the contacts that call out a specific inventory ID

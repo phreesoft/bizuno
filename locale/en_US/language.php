@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-21
  * @filesource /local/en_US/language.php
  */
 
@@ -1006,7 +1006,6 @@ $langCore = [
     'qty_15' => 'Transfer Qty',
     'qty_16' => 'Adjust Qty',
     'gl_type' => 'GL Type',
-    'reconciled' => 'Reconciled',
     'debit_amount' => 'Debit Amount',
     'credit_amount' => 'Credit Amount',
     'full_price' => 'Full Price',

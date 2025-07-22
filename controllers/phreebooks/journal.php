@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -43,11 +43,13 @@ class journal
     public  $postList       = [];
     public  $main           = [];
     public  $items          = [];
+    public  $totals;
     public  $type;
     public  $structure;
     public  $action;
     public  $journalID;
     public  $journal;
+    public  $isACH;
 
     function __construct($mID=0, $jID=0, $post_date=false, $cID=0, $structure=[], $action=false)
     {

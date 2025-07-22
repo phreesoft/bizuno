@@ -30,6 +30,7 @@ namespace bizuno;
 class paymentMain
 {
     public $moduleID = 'payment';
+    public $lang;
 
     public function __construct()
     {

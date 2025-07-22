@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/shipping/rate.php
  */
 
@@ -31,7 +31,8 @@ bizAutoLoad(dirname(__FILE__).'/common.php', 'shippingCommon');
 
 class shippingRate extends shippingCommon
 {
-    public $pageID = 'rate';
+    public $moduleID = 'shipping';
+    public $pageID   = 'rate';
 
     function __construct()
     {
@@ -226,8 +227,9 @@ class shippingRate extends shippingCommon
         }
         foreach ($rates as $carrier => $values) {
             if (!is_array($values)) { continue; }
-            $shipSet = getMetaMethod('carriers', $carrier);
-            $image = htmlFindImage($shipSet, 32);
+            $settings= getMetaMethod('carriers', $carrier);
+            $shipSet = array_replace($settings, ['module'=>$this->moduleID, 'folder'=>'carriers']);
+            $image   = htmlFindImage($shipSet, 32);
             $struc['tbody']['tr'][] = ['classes'=>['panel-header'],'attr'=>['type'=>'tr'],'td'=>[
                 ['attr'=>['type'=>'th','value'=>($image ? $image : $shipSet['title'])]],
                 ['attr'=>['type'=>'th','value'=>lang('rate_quote')]],

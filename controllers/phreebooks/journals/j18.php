@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/phreebooks/journals/j18.php
  */
 
@@ -38,6 +38,7 @@ class j18 extends jCommon
     public $lang;
     public $rID;
     public $totals;
+    public $action;
 
     function __construct($main=[], $item=[])
     {

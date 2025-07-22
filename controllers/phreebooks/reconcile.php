@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-21
  * @filesource /controllers/phreebooks/reconcile.php
  */
 
@@ -39,13 +39,13 @@ class phreebooksReconcile
         if (!$security = validateAccess('recon', 3)) { return; }
         $htmlHead = html5('frmReconcile',['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/reconcile/save"]]).
                     html5('item_array',  ['attr'=>['type'=>'hidden']]);
-        $data = ['title'=> lang('phreebooks_recon'),
+        $data = ['title'=> lang('bank_recon'),
             'toolbars'=> ['tbRecon'=>['icons'=>['save'=>['order'=>40,'events'=>['onClick'=>"jqBiz('#frmReconcile').submit();"]]]]],
             'datagrid'=> ['manager'=>$this->tgReconcile('tgReconcile')],
             'divs'    => [
                 'toolbar'=> ['order'=>20,'type'=>'toolbar', 'key' =>'tbRecon'],
                 'formBOF'=> ['order'=>40,'type'=>'html',    'html'=>$htmlHead],
-                'dgRecon'=> ['order'=>60,'type'=>'datagrid','key' =>'manager','label'=>lang('phreebooks_recon')],
+                'dgRecon'=> ['order'=>60,'type'=>'datagrid','key' =>'manager','label'=>lang('bank_recon')],
                 'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>'</form>']],
             'jsBody'  => ['preSubmit'=>"function preSubmit() {
     var items = jqBiz('#tgReconcile').treegrid('getData');
@@ -213,7 +213,7 @@ class phreebooksReconcile
                 WHERE m.id IN (".implode(",", $toOpenMain).") AND i.reconciled=0 AND i.gl_account IN ('".implode("','", $glCash)."')");
         }
         msgAdd(lang('msg_database_write'),'success');
-        msgLog(lang('phreebooks_recon').' - '.lang('save')." ($glAcct)");
+        msgLog(lang('bank_recon').' - '.lang('save')." ($glAcct)");
     }
 
     /**
@@ -229,7 +229,7 @@ class phreebooksReconcile
             'period'=> max(1, getModuleCache('phreebooks', 'fy', 'period')-1),
             'glAcct'=> getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')];
         $stmt_balance = dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'stmt_balance', "period='{$this->defaults['period']}' AND gl_account='{$this->defaults['glAcct']}'");
-        return ['id'=>$name, 'type'=>'treegrid', 'title'=>lang('phreebooks_recon'),
+        return ['id'=>$name, 'type'=>'treegrid', 'title'=>lang('bank_recon'),
             'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'treeField'=>'title', 'singleSelect'=>false, 'showFooter'=>true, 'animate'=>true, 'pagination'=>false, 'width'=>1000,
                 'url' => BIZUNO_AJAX."&bizRt=phreebooks/reconcile/managerRows"],
             'events' => [

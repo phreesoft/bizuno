@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/inventory/api.php
  */
 
@@ -30,6 +30,7 @@ namespace bizuno;
 class inventoryApi
 {
     public $moduleID = 'inventory';
+    public $lang;
 
     function __construct()
     {

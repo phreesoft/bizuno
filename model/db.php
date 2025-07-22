@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /model/db.php
  */
 
@@ -1494,7 +1494,7 @@ function encodeType($value)
         case "integer":
         case "double":  return $value; // no quotes required
         case "NULL":
-        case "string":  return "'".str_replace("'", "\'", $value)."'"; // add quotes
+        case "string":  return "'".str_replace("'", "\'", (string)$value)."'"; // add quotes
         case "array":
         case "object":  return json_encode($value);
     }

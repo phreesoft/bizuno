@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/inventory/history.php
  */
 
@@ -368,7 +368,7 @@ class inventoryHistory
     private function dgAnnualHistory($name, $rows=[])
     {
         return ['id' => $name,
-            'attr'   => ['title'=>$this->lang['annual_history'], 'pagination'=>false, 'width'=>300],
+            'attr'   => ['title'=>lang('annual_history'), 'pagination'=>false, 'width'=>300],
             'events' => ['data'=>json_encode($rows)],
             'columns'=> [
                 'year' => ['order'=>10,'label'=>'Year', 'attr'=>['width'=>200,'resizable'=>true,'align'=>'center']],

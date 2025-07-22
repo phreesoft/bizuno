@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/phreebooks/totals/total/total.php
  */
 
@@ -36,6 +36,7 @@ class total
     public $required = true;
     public $journal_id;
     public $settings;
+    public $fields;
     public $lang     = ['title'=>'Total',
         'description'=> 'This method calculates the total for the journal entry. It is used for order operations, i.e. Customer Sales and Vendor Purchases. The order is fixed and should remain the last total method (highest order position).'];
 

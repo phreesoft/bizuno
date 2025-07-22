@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -33,9 +33,6 @@
  */
 
 namespace bizuno;
-
-//use phpseclib3\Net\SSH2;
-//use phpseclib3\Net\SFTP;
 
 bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/ediSegments.php', 'phreebooksEdiSegments');
 bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
@@ -303,7 +300,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
                 $spec = intval($this->ediLines['AK2'][1]);
                 $this->dbLog = dbMetaGet(0, "edi_spec_{$spec}", 'journal', $refID);
                 metaIdxClean($this->dbLog);        
-                $this->dbLog = ['ack_name'=>$this->getFilename, 'ack_data'=>$this->working_file, 'ack_date'=>biz_date('Y-m-d H:i:s')]; // 'id'=>$id, 
+                $this->dbLog = ['spec'=>$this->ediLines['ST'][1], 'ack_name'=>$this->getFilename, 'ack_data'=>$this->working_file, 'ack_date'=>biz_date('Y-m-d H:i:s')]; // 'id'=>$id, 
                 if (empty($this->dbLog)) {
                     $error = "Bizuno cannot find receive record in our DB for our control number $this->ediCntrlNum. This is bad, contact PhreeSoft! ACK data = ".print_r($this->ediLines, true);
                     msgDebug("\n".$error, 'trap');
@@ -491,7 +488,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
     {
         $refID= !empty($this->dbLog['main_id']) ? $this->dbLog['main_id'] : 0;
         $spec = $this->dbLog['spec'];
-        if (empty($refID) || empty($spec)) { return msgDebug("\nEDI ERROR - Trying to write the log but refID OR spec is empty!", 'trap'); }
+        if (empty($spec) || ('997'<>$spec && empty($refID))) { return msgDebug("\nEDI ERROR - Trying to write the log but refID OR spec is empty!", 'trap'); }
         $meta = dbMetaGet(0, "edi_spec_{$spec}", 'journal', $refID);
         $rID  = metaIdxClean($meta);        
         dbMetaSet($rID, "edi_spec_{$spec}", $this->dbLog, 'journal', $refID);

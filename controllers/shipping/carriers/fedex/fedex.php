@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-17
+ * @version    7.x Last Update: 2025-07-22
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -42,7 +42,7 @@ class fedex extends fedexCommon
     function __construct()
     {
         parent::__construct();
-        $tabImage = BIZBOOKS_URL_FS."controllers/shipping/carriers/$this->code/tab_logo.png";
+        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->reconcile_path  = "data/shipping/reconcile/$this->code/";
     }
