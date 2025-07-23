@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-15
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/ups/common.php
  */
 
@@ -45,6 +45,12 @@ class upsCommon
     public $test;
     public $creds;
     public $urlREST;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     public  $lang       = ['title' => 'United Parcel Service',
         'acronym'      => 'UPS',
         'description'  => 'UPS shipping with rates pulled directly from UPS servers. (Requires an account with UPS, <a href="#" onClick="jsonAction(\'shipping/admin/signup&carrier=ups\')">instructions</a>)',

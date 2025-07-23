@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/best_way/best_way.php
  */
 
@@ -34,7 +34,14 @@ class best_way {
     public $methodDir= 'carriers';
     public $code     = 'best_way';
     public $required = true;
+    public $options;
     public $settings;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     public $lang     = ['title'=>'Best Way',
         'acronym'    => 'Best Way', // 'other', // leave null as this really translates to 'other'
         'description'=> 'Use best way shipping when the shipper determines the carrier and method for delivering the product. Shipping charges, if any, can be added manually.',
@@ -45,6 +52,7 @@ class best_way {
     {
         $this->lang = array_replace(getLang($this->moduleID), $this->lang);
         localizeLang($this->lang, $this->methodDir, $this->code);
+        $this->options = $this->getOptions();
         $this->getSettings();
     }
 
@@ -90,5 +98,18 @@ class best_way {
                 'cost'   => '',
                 'quote'  => $this->settings['rate'],
                 'note'   => '']];
+    }
+    private function getOptions()
+    {
+        return [
+            'rateCodes'   => ['BESTWAY'=> 'GND'],
+            'PickupMap'   => ['OTHER'  => lang('Other')],
+            'PackageMap'  => ['CUSTOM' => lang('custom')],
+            'CODMap'      => [],
+            'PaymentMap'  => ['OTHER' => lang('collect')],
+            'SignatureMap'=> [],
+            'LTLClasses'  => ['0'=>lang('select'),'050'=>'50','055'=>'55','060'=>'60','065'=>'65','070'=>'70','077'=>'77.5','085'=>'85',
+                '092'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300'],
+            'paperTypes'  => []];
     }
 }

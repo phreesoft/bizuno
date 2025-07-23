@@ -369,7 +369,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                     $href = str_replace("TRACKINGNUM", $pkg['tracking_id'], $tracking_url);
                     $html.= '  <tr><td><a href="'.$href.'" target="_blank">'.$pkg['tracking_id']."</a></td>";
                 } else { $html .= "  <tr><td>".$pkg['tracking_id']."</td>"; }
-                $html .= "  <td>".viewFormat($pkg['actual_date'], 'date')."</td></tr>";
+                $html .= "  <td>".(!empty($pkg['actual_date'])?viewFormat($pkg['actual_date'], 'date'):'&nbsp;')."</td></tr>";
                 if ($pkg['cost'])  { $cost += $pkg['cost']; }
             }
             $html .= " </tbody>";

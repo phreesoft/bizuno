@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-17
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -44,6 +44,12 @@ class fedexCommon
     public  $currency;
     public  $test;
     public  $urlREST;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     // These are from the developer site but LTL sandbox is really broken!!!
     public  $testShip = ['accountNumber'=>'510087020','address'=>['streetLines'=>['1202 Chalet Ln'],          'city'=>'Harrison','stateOrProvinceCode'=>'AR','postalCode'=>'72601']];
     public  $testBill = ['accountNumber'=>'510051408','address'=>['streetLines'=>['2000 Freight LTL Testing'],'city'=>'Harrison','stateOrProvinceCode'=>'AR','postalCode'=>'72601']];
@@ -625,7 +631,7 @@ return '';
     {
         $payload['requestedShipment']['emailNotificationDetail'] = [
             'recipients'      => [[
-                'emailAddress'                  => $pkg['recipient']['contact']['emailAddress'],
+                'emailAddress'                  => !empty($pkg['recipient']['contact']['emailAddress']) ? $pkg['recipient']['contact']['emailAddress'] : '',
 //              'smsDetail'                     => ['phoneNumber'=>'string','phoneNumberCountryCode'=>'string'],
                 'notificationEventType'         => ['ON_PICKUP', 'ON_ESTIMATED_DELIVERY', 'ON_DELIVERY'], // ON_BILL_OF_LADING
                 'notificationFormatType'        => 'HTML',

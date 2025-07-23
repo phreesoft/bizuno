@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -204,7 +204,7 @@ class shippingShip extends shippingCommon
             'txtHeight'   => ['order'=>59,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
             'height'      => ['order'=>60,'attr'=>['type'=>'integer','value'=>4,'size'=>3]],
             'total_amount'=> ['order'=>40,'attr'=>['type'=>'hidden', 'value'=>0]],
-            'ins_amount'  => ['order'=>61,'label'=>$this->lang['amt_insurance'],'attr'=>['type'=>'currency','value'=>$data['pkg']['Ins']]]];
+            'ins_amount'  => ['order'=>61,'label'=>$this->lang['amt_insurance'],'attr'=>['type'=>'currency','value'=>!empty($data['pkg']['Ins'])?$data['pkg']['Ins']:0]]];
         dbStructureFill($this->addrStruc, $data, '_s');
         $output = array_replace($fields, $this->addrStruc);
 

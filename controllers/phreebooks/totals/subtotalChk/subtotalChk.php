@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/phreebooks/totals/subtotalChk/subtotalChk.php
  */
 
@@ -33,6 +33,7 @@ class subtotalChk {
     public $methodDir= 'totals';
     public $required = true;
     public $settings;
+    public $fields;
     public $lang     = ['title'=>'Order Subtotal (checked)',
         'description'=> 'This method calculates the order total of all item rows that are checked irregardless of sort order position. This option is used for banking operations, i.e. Customer Receipts and Paying Bills, the order is fixed at zero.',
         'subtotal'   => 'Subtotal'];

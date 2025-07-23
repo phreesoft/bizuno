@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/fedex/rate.php
  *
  * FedEx Developer Rate:
@@ -201,14 +201,14 @@ class fedexRate extends fedexCommon
         for ($i=0; $i<$pkg['settings']['num_boxes']; $i++) {
             $box = [
                 'weight' => ceil($pkg['settings']['weight']/$pkg['settings']['num_boxes']),
-                'length' => ceil($pkg['settings']['length']),
-                'width'  => ceil($pkg['settings']['width']),
-                'height' => ceil($pkg['settings']['height']),
+                'length' => !empty($pkg['settings']['length'])? ceil($pkg['settings']['length']): 8,
+                'width'  => !empty($pkg['settings']['width']) ? ceil($pkg['settings']['width']) : 6,
+                'height' => !empty($pkg['settings']['height'])? ceil($pkg['settings']['height']): 4,
                 'value'  => !empty($pkg['settings']['ins_amount']) ? intval($pkg['settings']['ins_amount']/$pkg['settings']['num_boxes']) : $this->default_insurance_value];
             $pkg['packages'][] = $box;
         }
         $pkg['total_weight']   = $pkg['settings']['weight'];
-        $pkg['total_insurance']= $pkg['settings']['ins_amount'];
+        $pkg['total_insurance']= !empty($pkg['settings']['ins_amount']) ? $pkg['settings']['ins_amount'] : $this->default_insurance_value;
         $pkg['total_packages'] = sizeof($pkg['packages']);
         if (sizeof($pkg['packages'])>1 && in_array('3DA', $this->choices)) {
             msgAdd('FedEx Ground Economy is not permitted for multi-piece shipments. No rates will be returned for this service.', 'caution');

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/item/item.php
  */
 
@@ -34,6 +34,12 @@ class item {
     public $methodDir= 'carriers';
     public $code     = 'item';
     public $settings;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     public $lang     = ['title'=>'Per Package Shipping',
         'acronym'    => 'Item',
         'description'=> 'Per item shipping set a single flat rate shipping price for each package in an order.',

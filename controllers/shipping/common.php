@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/common.php
  */
 
@@ -51,12 +51,6 @@ class shippingCommon
     public $addrStruc;
     public $carriers;
     public $myCarriers;
-    public $weightUOM;
-    public $dimUOM;
-    public $ship_pkg;
-    public $ship_pickup;
-    public $ship_cod_type;
-    public $confirm_type;
 
     function __construct()
     {
@@ -129,12 +123,12 @@ class shippingCommon
             $shipper->code = '';
             $shipper->lang['GND'] = $this->lang['GND'];
         }
-        $shipper->weightUOM    = $this->settings['weight_uom'];
-        $shipper->dimUOM       = $this->settings['dim_uom'];
-        $shipper->ship_pkg     = array_shift(array_keys((array)$shipper->options['PackageMap']));
-        $shipper->ship_pickup  = array_shift(array_keys((array)$shipper->options['PickupMap']));
-        $shipper->ship_cod_type= array_shift(array_keys((array)$shipper->options['CODMap']));
-        $shipper->confirm_type = array_shift(array_keys((array)$shipper->options['SignatureMap']));
+        $shipper->weightUOM    = !empty($this->settings['weight_uom'])    ? $this->settings['weight_uom']: 'LBS';
+        $shipper->dimUOM       = !empty($this->settings['dim_uom'])       ? $this->settings['dim_uom']   : 'IN';
+        $shipper->ship_pkg     = !empty($shipper->options['PackageMap'])  ? array_shift(array_keys((array)$shipper->options['PackageMap'])) : '';
+        $shipper->ship_pickup  = !empty($shipper->options['PickupMap'])   ? array_shift(array_keys((array)$shipper->options['PickupMap'])) : '';
+        $shipper->ship_cod_type= !empty($shipper->options['CODMap'])      ? array_shift(array_keys((array)$shipper->options['CODMap'])) : '';
+        $shipper->confirm_type = !empty($shipper->options['SignatureMap'])? array_shift(array_keys((array)$shipper->options['SignatureMap'])) : '';
 
         if (!isset($shipper->options['rateCodes']))    { $shipper->options['rateCodes']    = [''=>lang('none')]; }
         if (!isset($shipper->options['PaymentMap']))   { $shipper->options['PaymentMap']   = [''=>lang('none')]; }

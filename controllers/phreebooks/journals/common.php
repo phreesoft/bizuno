@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -30,8 +30,11 @@ namespace bizuno;
 class jCommon
 {
     private $cogs_entry = [];
+    public $action;
     public $rounding;
     public $isolate_cogs;
+    public $storeGL;
+    public $sku_cogs;
 
     public function __construct()
     {
@@ -662,7 +665,7 @@ class jCommon
                 dbWrite(BIZUNO_DB_PREFIX.'journal_cogs_owed', $sql_data_array);
             }
         }
-
+        
         if ($this->main['journal_id'] == 15) { $cogs = 0; } // no cogs for transfers
         $this->sku_cogs = $cogs;
         if ($return_cogs) {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/phreeform/renderReport.php
  */
 
@@ -30,9 +30,21 @@ namespace bizuno;
 class PDF extends \TCPDF
 {
     public $moduleID = 'phreeform';
+    public $lang;
+    public $defaultFont;
+    public $fontHeading;
+    public $fontTitle1;
+    public $fontTitle2;
+    public $fontFilter;
+    public $fontData;
+    public $columnWidths;
+    public $ColBreak;
+    public $align;
+    public $MaxRowHt;
     var $y0; // current y position
     var $x0; // current x position
     var $pageY; // y value of bottom of page less bottom margin
+    
 
     function __construct()
     {

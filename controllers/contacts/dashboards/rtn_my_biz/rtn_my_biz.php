@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-06
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/contacts/dashboards/rtn_my_biz/rtn_my_biz.php
  */
 
@@ -98,7 +98,7 @@ function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
         $output= [];
         foreach ($rows as $row) { // preventable='1'
             $meta = json_decode($row['meta_value'], true);
-            if (empty($meta)) { continue; }
+            if (empty($meta) || empty($meta['details'])) { continue; }
             foreach ($meta['details'] as $item) {
                 if (empty($item['sku'])) { continue; }
                 if (!isset($output[$item['sku']])) { $output[$item['sku']] = ['qty'=>0,'desc'=>$item['desc']]; } // ,'fault'=>[]

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -67,6 +67,15 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     public $rcvrID;
     public $sftp;
     public $filesReadFromEDI;
+    public $ediLines;
+    public $working_file;
+    public $getFilename;
+    public $compSep;
+    public $dbLog;
+    public $main;
+    public $items;
+    public $contact;
+    public $orderTotal;
 
     function __construct()
     {

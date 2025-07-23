@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/phreebooks/journals/j09.php
  */
 
@@ -35,6 +35,7 @@ class j09 extends jCommon
     public $main;
     public $items;
     public $action;
+    public $dgDataItem;
     public $type;
     public $lang;
     public $rID;

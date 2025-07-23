@@ -22,7 +22,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/canadapost/canadapost.php
  */
 
@@ -48,6 +48,12 @@ class canadapost
     public $code      = 'canadapost';
     public $settings;
     public $contact_type;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     public $rateCodes = [
         'DOM.RP' => 'GND',
         'DOM.EP' => '1DM',

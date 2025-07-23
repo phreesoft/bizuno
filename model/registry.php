@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /model/registry.php
  */
 
@@ -413,10 +413,11 @@ unset($bizunoMod[$module]['dashboards']);
             $args = [ // just the values to update
                 'id'         => $method, // This should already be set via the registry install, probably not needed here
                 'title'      => $title,
-                'acronym'    =>  isset($clsMeth->lang['acronym']) ? $clsMeth->lang['acronym']: $title,
-                'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
+                'acronym'    =>  isset($clsMeth->lang['acronym'])    ? $clsMeth->lang['acronym']    : $title,
+                'description'=> !empty($clsMeth->lang['description'])? $clsMeth->lang['description']: "Description - $method",
                 'path'       => $path,
-                'url'        => $url];
+                'url'        => $url,
+                'menuID'     => !empty($clsMeth->menuID) ? $clsMeth->menuID : ''];
 //msgDebug("\nregistry args array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
 //msgDebug("\nmerged array = ".print_r($merged, true));
@@ -424,7 +425,6 @@ unset($bizunoMod[$module]['dashboards']);
             if (isset($clsMeth->structure)) { $this->setHooks($clsMeth->structure, $method, $path); }
         }
         msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID"); // with data = ".print_r($newMeta, true));
-//        setModuleCache($structure['id'], $folderID, '', $newMeta);
         dbMetaSet($metaIdx, "methods_{$folderID}", $newMeta);
     }
 

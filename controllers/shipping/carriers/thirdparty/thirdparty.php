@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/thirdparty/thirdparty.php
  */
 
@@ -35,6 +35,12 @@ class thirdparty
     public $methodDir= 'carriers';
     public $code     = 'thirdparty';
     public $settings;
+    public $weightUOM;
+    public $dimUOM;
+    public $ship_pkg;
+    public $ship_pickup;
+    public $ship_cod_type;
+    public $confirm_type;
     public $lang     = ['title' => 'Third Party Shipping!',
         'acronym'    => '3rd Party',
         'description'=> 'For freight charges billed to a third party. An allowance is available to charge for packaging and handling.',

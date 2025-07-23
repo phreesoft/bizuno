@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/inventory/build.php
  */
 
@@ -305,8 +305,8 @@ class inventoryBuild extends mgrJournal
                 $output .= "<td>".$step['description'];
                 $output .= !empty($step['data_value']) ? ("<br />".$this->lang['data_value'].": {$step['data_value']}") : "";
                 $output .= "</td>\n";
-                $output .= '<td style="text-align:center">'.(!empty($step['mfg'])?($step['mfg_id']? getContactById($step['mfg_id']): lang('yes')): ' ')."</td>\n";
-                $output .= '<td style="text-align:center">'.(!empty($step['qa']) ?($step['qa_id'] ? getContactById($step['qa_id']) : lang('yes')): ' ')."</td>\n";
+                $output .= '<td style="text-align:center">'.(!empty($step['mfg'])?(!empty($step['mfg_id'])? getContactById($step['mfg_id']): lang('yes')): ' ')."</td>\n";
+                $output .= '<td style="text-align:center">'.(!empty($step['qa']) ?(!empty($step['qa_id']) ? getContactById($step['qa_id']) : lang('yes')): ' ')."</td>\n";
                 $output .= '<td style="text-align:center">'.($step['erp_entry']?lang('yes'): ' ')."</td>\n";
                 $output .= "<td>&nbsp;</td>\n";
             }
