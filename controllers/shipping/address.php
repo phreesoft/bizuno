@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2025-07-25
  * @filesource /controllers/shipping/address.php
  */
 
@@ -52,7 +52,7 @@ class shippingAddress extends shippingCommon
         if (!$ship || !isset($ship['address1'])) { return msgAdd("Cannot validate address, not enough address information sent!"); }
         $ship['country']= clean('country', ['format'=>'cmd', 'default;'=>'USA'], 'get');
         // first try shipper code validator, else try from registry in sort order
-        $carrier   = explode(":", $methodCode)[0];
+        $carrier   = explode(":", (string)$methodCode)[0];
         $output    = [];
         if (!empty($carrier)){ $output = retrieve_carrier_function($carrier, 'validateAddress', $ship); }
         if ( empty($output)) {

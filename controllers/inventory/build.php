@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-07-25
  * @filesource /controllers/inventory/build.php
  */
 
@@ -293,7 +293,7 @@ class inventoryBuild extends mgrJournal
                     else                             { $output .= "<td>".$step['description']."<br />".html5('step_data', ['attr'=>  ['size'=>'60']])."</td>\n"; }
                 } else { $output .= "<td>".$step['description']."</td>\n"; }
                 if ($step['mfg']) {
-                    if ($step['mfg_id']) { $output .= '<td style="text-align:center">'.getContactById($step['mfg_id'])."</td>\n"; }
+                    if (!empty($step['mfg_id'])) { $output .= '<td style="text-align:center">'.getContactById($step['mfg_id'])."</td>\n"; }
                     else                 { $output .= "<td>".html5('bldr_pin',  ['label'=>lang('sign_off_pin'), 'attr'=>['type'=>'password']])."</td>\n"; }
                 } else { $output .= "<td>&nbsp;</td>\n"; }
                 if ($step['qa']) {
@@ -362,7 +362,7 @@ class inventoryBuild extends mgrJournal
         msgDebug("\nTask {$steps[$step_id]['task_id']} with data = ".print_r($task, true));
         $stepData = $steps[$step_id];
         if (!empty($task['mfg']) && empty($stepData['mfg_id'])) {
-            msgDebug("\nmfg is required in this step, mfg_id = {$stepData['mfg_id']} and bldr_pin = $bldr_pin");
+            msgDebug("\nmfg is required in this step, mfg_id = EMPTY and bldr_pin = $bldr_pin");
             if (!empty($bldr_pin)) {
                 $bldr_user = validateSignoff($bldr_pin, 'mfg');
                 if (!empty($bldr_user)) { // the mfg signoff is required and present
@@ -415,12 +415,12 @@ class inventoryBuild extends mgrJournal
         dbTransactionCommit();
         // *************** END TRANSACTION *************************
         if (!empty($mainData['closed'])) {
-            msgLog(sprintf($this->lang['msg_build_complete'], $main['sb_ref'], $item['qty'], $item['sku']));
-            msgAdd(sprintf($this->lang['msg_build_complete'], $main['sb_ref'], $item['qty'], $item['sku']),'success');
+            msgLog(sprintf($this->lang['msg_build_complete'], $main['invoice_num'], $item['qty'], $item['sku']));
+            msgAdd(sprintf($this->lang['msg_build_complete'], $main['invoice_num'], $item['qty'], $item['sku']),'success');
             $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select', 0); jqBiz('#dg{$this->domSuffix}').datagrid('reload'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]]);
         } else {
-            msgLog(sprintf($this->lang['msg_build_step'], $main['sb_ref'], $step_id+1));
-            msgAdd(sprintf($this->lang['msg_build_step'], $main['sb_ref'], $step_id+1),'success');
+            msgLog(sprintf($this->lang['msg_build_step'], $main['invoice_num'], $step_id+1));
+            msgAdd(sprintf($this->lang['msg_build_step'], $main['invoice_num'], $step_id+1),'success');
             $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#build').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/build/details&woID={$main['id']}');"]]);
         }
     }

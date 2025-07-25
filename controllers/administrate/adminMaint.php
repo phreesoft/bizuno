@@ -39,6 +39,7 @@ class administrateAdminMaint extends mgrJournal
     public    $freqs;
     public    $leadTimes;
     public    $attachPath;
+    public    $struc;
     public    $defaults;
 
     public function __construct()

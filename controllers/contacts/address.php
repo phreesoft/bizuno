@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-07-25
  * @filesource /controllers/contacts/address.php
  */
 
@@ -34,6 +34,10 @@ class contactsAddress extends mgrJournal
 //    private   $reqFields = ['primary_name','address1','telephone1','email'];
     protected $domSuffix = 'Address';
     protected $metaPrefix= 'address_';
+    public $aType;
+    public $cType;
+    public $secID;
+    public $struc;
 
     function __construct()
     {
