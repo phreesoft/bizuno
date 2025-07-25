@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-07-25
  * @filesource /controllers/administrate/maint.php
  */
 
@@ -84,7 +84,10 @@ class administrateMaint extends mgrJournal
     protected function managerGrid($security=0, $args=[], $admin=false)
     {
         $data = array_replace_recursive(parent::gridBase($security, $args, $admin), [
-            'source' => ['search'=>['ref_num', 'title', 'notes']],
+            'source' => [
+                'search'=>['ref_num', 'title', 'notes'],
+                'filters'=> [
+                    'store_id'=> ['order'=>10,'label'=>lang('ctype_b'),'attr' =>['type'=>sizeof($this->stores)>1?'select':'hidden','value'=>$this->defaults['store_id']], 'values'=>viewStores()]]],
             'columns'=> [
                 'ref_num'   => ['order'=>10, 'field'=>'invoice_num','label'=>$this->lang['ref_num'],'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'maint_date'=> ['order'=>15, 'field'=>'post_date',  'label'=>$admin?sprintf(lang('tbd_next'), lang('maintenance')):lang('date_maint'), 'attr'=>['type'=>'date','sortable'=>true,'resizable'=>true], 'format'=>'date'],
@@ -108,9 +111,8 @@ class administrateMaint extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>'y'],'post');
-        $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1], 'post');
-        $this->defaults['status']  = clean('status',  ['format'=>'db_field','default'=>'a'],'post');
+        $this->defaults['period']  = clean('period',  ['format'=>'cmd',    'default'=>'y'],'post');
+        $this->defaults['store_id']= clean('store_id',['format'=>'integer','default'=>-1], 'post');
     }
 
     /******************************** Journal Entries ********************************/

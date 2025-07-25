@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2025-07-24
  * @filesource /controllers/administrate/main.php
  */
 
@@ -55,6 +55,13 @@ class administrateMain extends mgrJournal
         $data  = ['title'=>lang('settings').'-'.$title,
             'west'  =>['header' =>['divs'=>['menu'=>['type'=>'sidemenu', 'options'=>['dom'=>'div', 'noDash'=>true, 'noMin'=>true], 'data'=>$this->viewMenu()]]]],
             'jsHead'=>['menu_id'=> "var menuID='settings';"]];
+        msgDebug("\nLooking for more admin at ".BIZUNO_DATA.'myExt/controllers/myAdmin/main.php');
+        bizAutoLoad(BIZUNO_DATA.'myExt/controllers/myAdmin/admin.php', 'myAdminAdmin');
+        if (class_exists('\bizuno\myAdminAdmin')) { // Add customizations to administrate
+            msgDebug("\nAdding custom admin stuff.");
+            $myAdmin = new myAdminAdmin();
+            $myAdmin->manager($data);
+        }
         $order = 10;
         $validMods = portalModuleList();
         foreach (array_keys($validMods) as $module) { // add the apps dynamically

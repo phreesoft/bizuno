@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2025-07-24
  * @filesource /view/main.php
  */
 
@@ -1205,7 +1205,7 @@ function adminStructure($module, $structure=[], $lang=[])
             'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=bizuno/settings/adminMethods&module=$module&folder=$folder'"]];
         $order++;
     }
-    return array_replace_recursive(viewMain(), $data);
+    return $data; // since this now just a div, don't need viewMain()
 }
 
 function adminSettings(&$data, $structure, $lang)

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-06
+ * @version    7.x Last Update: 2025-07-24
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -111,6 +111,8 @@ function bizunoUpgrade()
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proQA'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proPayment'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proLgstc'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='ispPortal'");
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='myPortal'");
     } */
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
