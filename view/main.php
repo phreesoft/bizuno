@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-24
+ * @version    7.x Last Update: 2025-07-26
  * @filesource /view/main.php
  */
 
@@ -429,9 +429,9 @@ function viewFormat($value, $format = '')
     if (empty($GLOBALS['DAVE_DEBUG'])) { $GLOBALS['DAVE_DEBUG'] = 0; }
     $GLOBALS['DAVE_DEBUG']++;
     if ($GLOBALS['DAVE_DEBUG'] > 100000) {
-        msAdd("Trap hit");
+        msgAdd("Trap hit");
         msgDebugWrite();
-        exit();
+        exit(); // Entering BuildDataArray
     }
 //  msgDebug("\nIn viewFormat value = $value and format = $format");
     switch ($format) {
@@ -791,6 +791,7 @@ function viewNumToWords($value=0)
  */
 function viewProcess($strData, $Process=false)
 {
+    if (empty($Process)) { return $strData; }
     msgDebug("\nEntering viewProcess with strData = $strData and process = $Process");
     if ($Process && getModuleCache('phreeform', 'processing', $Process, 'function')) {
         $func = getModuleCache('phreeform', 'processing')[$Process]['function'];

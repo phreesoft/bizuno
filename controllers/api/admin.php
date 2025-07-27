@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-07-26
  * @filesource /controllers/api/admin.php
  */
 
@@ -53,7 +53,7 @@ class apiAdmin extends apiCommon
         foreach ($props as $channel => $prop) { // set the methods on the menu bar
             if (empty($prop['status'])) { continue; }
             $menuID = !empty($prop['menuID']) ? $prop['menuID'] : 'customers';
-            $this->structure['menuBar']['child'][$menuID]['child'][$channel] = ['order'=>$order,'label'=>$prop['title'],'icon'=>$channel,'events'=>['onClick'=>"hrefClick('api/admin/home&modID=$channel');"]];
+            $this->structure['menuBar']['child'][$menuID]['child'][$channel] = ['order'=>$order,'label'=>$prop['title'],'icon'=>$channel,'route'=>"api/admin/home&modID=$channel"];
             $order++;
         }
     }

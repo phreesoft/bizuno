@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-27
+ * @version    7.x Last Update: 2025-07-26
  * @filesource /controllers/phreeform/functions.php
  */
 
@@ -441,7 +441,7 @@ function BuildDataArray($sql, $report)
         $report->currentValues = false; // reset the stored processing values to save sql's
         if (isset($GrpField) && $GrpField) { // we're checking for group totals, see if this group is complete
             if (($myrow[$GrpField] <> $GrpWorking) && $GrpWorking !== false) { // it's a new group so print totals
-                $gTmp = viewProcess($GrpWorking, $GrpFieldProcessing);
+                $gTmp = !empty($GrpFieldProcessing) ? viewProcess($GrpWorking, $GrpFieldProcessing) : $GrpWorking;
                 $OutputArray[$RowCnt][0] = 'g:'.viewFormat($gTmp, $GrpFieldFormatting);
                 foreach ($seq as $offset => $TotalCtl) {
                     // NOTE: Do not process here as this is just a total and the processing was used to get here, just display the total.
@@ -455,7 +455,7 @@ function BuildDataArray($sql, $report)
         if (!empty($myrow['currency']))     { $currencies->iso = $myrow['currency']; }
         if (!empty($myrow['currency_rate'])){ $currencies->rate= $myrow['currency_rate']; }
         foreach ($seq as $key => $TableCtl) {
-            $processedData = viewProcess($myrow[$TableCtl['fieldname']], $TableCtl['processing']);
+            $processedData = !empty($TableCtl['processing']) ? viewProcess($myrow[$TableCtl['fieldname']], $TableCtl['processing']) : $myrow[$TableCtl['fieldname']];
             if (empty($report->totalonly)) { // insert data into output array and set to next column
                 $OutputArray[$RowCnt][0] = 'd'; // let the display class know its a data element
                 $OutputArray[$RowCnt][$ColCnt] = viewFormat($processedData, $TableCtl['formatting']);
@@ -475,7 +475,7 @@ function BuildDataArray($sql, $report)
     $currencies->iso = !empty($report->iso) ? $report->iso : getDefaultCurrency(); // force iso if requested else set default
     unset($currencies->rate); // reset forces load at viewFormat to current rate
     if ($GrpWorking !== false) { // if we collected group data show the final group total
-        $gTmp = viewProcess($GrpWorking, $GrpFieldProcessing);
+        $gTmp = !empty($GrpFieldProcessing) ? viewProcess($GrpWorking, $GrpFieldProcessing) : $GrpWorking;
         $OutputArray[$RowCnt][0] = 'g:'.viewFormat($gTmp, $GrpFieldFormatting);
         foreach ($seq as $TotalCtl) {
             // NOTE: Do not process here as this is just a total and the processing was used to get here, just format the total.

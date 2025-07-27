@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-27
  * @filesource /controllers/inventory/main.php
  */
 
@@ -670,16 +670,16 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
     public function copy(&$layout=[])
     {
         if (!$security = validateAccess('inv_mgr', 2)) { return; }
-        $rID    = clean('rID', 'integer', 'get');
-        $newSKU = clean('data','text', 'get'); // new sku
+        $rID   = clean('rID', 'integer', 'get');
+        $newSKU= clean('data','text', 'get'); // new sku
         if (!$newSKU) { return msgAdd($this->lang['err_inv_sku_blank']); }
-        $sku    = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
-        $oldSKU = $sku['sku'];
+        $sku   = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
+        $oldSKU= $sku['sku'];
         // check for duplicate skus
         $found = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='$newSKU'");
         if ($found) { return msgAdd(lang('error_duplicate_id')); }
         // clean up the fields (especially the system fields, retain the custom fields)
-        foreach ($sku as $key => $value) {
+        foreach (array_keys($sku) as $key) {
             switch ($key) {
                 case 'sku':          $sku[$key] = $newSKU; break; // set the new sku
                 case 'creation_date':
@@ -702,7 +702,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             $bom = dbMetaGet(0, 'bill_of_materials', 'inventory', $rID);
             dbMetaSet(0, 'bill_of_materials', $bom, 'inventory', $nID);
         }
-        $prices = dbMetaGet(0, 'price_%', 'inventory', '%');
+        $prices = dbMetaGet(0, 'price_%', 'inventory', $rID);
         foreach ($prices as $price) {
             metaIdxClean($price);
             if (empty($price['cType'])) { $price['cType'] = 'c'; }
