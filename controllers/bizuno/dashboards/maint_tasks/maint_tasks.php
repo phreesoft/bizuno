@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-07-31
  * @filesource /controllers/bizuno/dashboards/maint_tasks/maint_tasks.php
  */
 
@@ -91,10 +91,9 @@ class maint_tasks
             $task['maint_date'] = localePeriodicDate($task['maint_date'], $task['frequency']);
             msgDebug("\nUpdating the meta task with values = ".print_r($task, true));
             dbMetaSet($rID, $this->metaPrefix, $task);
-            // set the journal entry
-            $jEntry= [
-                'journal_id' =>$this->journalID, 'so_po_ref_id'=>$rID, 'contact_id_b'=>!empty($task['rep_id'])?$task['rep_id']:0,'description'=>$jTitle,'store_id'=>$task['store_id'],
-                'invoice_num'=>$task['task_num'],'rep_id'      =>$task['contact_id'], 'admin_id'    =>getUserCache('profile', 'userID'),        'post_date'  =>'NULL']; // , 'notes'=>$task['notes']
+            $jEntry= [ // set the journal entry
+                'journal_id' =>$this->journalID, 'so_po_ref_id'=>$rID, 'contact_id_b'=>!empty($task['rep_id'])?$task['rep_id']:0, 'description'=>$jTitle, 'store_id'=>$task['store_id'],
+                'invoice_num'=>$task['task_num'],'rep_id'=>getUserCache('profile', 'userID'), 'admin_id'=>getUserCache('profile', 'userID'), 'post_date'=>'NULL']; // , 'notes'=>$task['notes']
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', $jEntry); // add a new journal entry
         }
         $filter= "journal_id={$this->journalID} AND post_date IS NULL";

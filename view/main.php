@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-26
+ * @version    7.x Last Update: 2025-07-29
  * @filesource /view/main.php
  */
 
@@ -426,13 +426,13 @@ function resizeEverything() { ".implode(" ", $jsResize)." }"; }
  */
 function viewFormat($value, $format = '')
 {
-    if (empty($GLOBALS['DAVE_DEBUG'])) { $GLOBALS['DAVE_DEBUG'] = 0; }
+/*  if (empty($GLOBALS['DAVE_DEBUG'])) { $GLOBALS['DAVE_DEBUG'] = 0; }
     $GLOBALS['DAVE_DEBUG']++;
     if ($GLOBALS['DAVE_DEBUG'] > 100000) {
         msgAdd("Trap hit");
         msgDebugWrite();
         exit(); // Entering BuildDataArray
-    }
+    } */
 //  msgDebug("\nIn viewFormat value = $value and format = $format");
     switch ($format) {
         case 'blank':      return '';
@@ -522,7 +522,14 @@ return "Needs Fixin: $value";
         }
         return $fqfn($value, $format);
     }
-    if (substr($format, 0, 7) == 'jsonFld') { // pull the value from the json encoded field
+    if (substr($format, 0, 7) == 'metaFld') { // pull the value from the json encoded field, used for reports
+        msgDebug("\nThis metaFld settings = ".print_r($GLOBALS['pfFieldSettings'], true));
+        $field = !empty($GLOBALS['pfFieldSettings']['meta_index']) ? $GLOBALS['pfFieldSettings']['meta_index'] : false;
+        if (!$field) { return 'Error - No index provided!'; }
+        $data = json_decode($value, true);
+        if (is_null($data)) { return 'Error - Data is not encoded!'; }
+        return isset($data[$field]) ? $data[$field] : '';
+    } elseif (substr($format, 0, 7) == 'jsonFld') { // pull the value from the json encoded field, used for forms
         msgDebug("\nThis field settings = ".print_r($GLOBALS['pfFieldSettings'], true));
         $field = !empty($GLOBALS['pfFieldSettings']->settings->procFld) ? $GLOBALS['pfFieldSettings']->settings->procFld : false;
         if (!$field) { return 'Error - No index provided!'; }

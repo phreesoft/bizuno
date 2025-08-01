@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-07-30
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -57,8 +57,8 @@ class inventoryPrices extends mgrJournal
         $this->type       = clean('type',['format'=>'char','default'=>'c'],   'get');
         $this->secID      = "prices_{$this->type}";
         $this->rID        = clean('rID', ['format'=>'integer', 'default'=>$rID], 'get');
-        $this->iID        = clean('iID', ['format'=>'integer', 'default'=>$rID], 'get'); // For inventory tab
-        $this->cID        = clean('cID', ['format'=>'integer', 'default'=>$iID], 'get'); // For contacts tab
+        $this->iID        = clean('iID', ['format'=>'integer', 'default'=>$iID], 'get'); // For inventory tab
+        $this->cID        = clean('cID', ['format'=>'integer', 'default'=>$cID], 'get'); // For contacts tab
         $this->scope      = $this->getScope();
         $this->qtySource  = ['1'=>lang('direct_entry'), '2'=>lang('item_cost'), '3'=>lang('full_price'), '4'=>lang('price_level_1'), '5'=>lang('fixed_discount')];
         $this->qtyAdj     = ['0'=>lang('none'), '1'=>lang('decrease_by_amount'),'2'=>lang('decrease_by_percent'),'3'=>lang('increase_by_amount'), '4'=>lang('increase_by_percent')];
@@ -218,10 +218,6 @@ class inventoryPrices extends mgrJournal
         $args = ['_rID'=>$rID, '_table'=>$table];
         parent::editMeta($layout, $security, $args);
         $layout['forms']["frm{$this->domSuffix}"]['attr']['action'] = BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type";
-        if ('common'<>$table) {
-           $layout['fields']['default']['attr']['type'] = 'hidden';
-           $layout['fields']['postCalc']['attr']['type']= 'hidden';
-        }
         $cID  = $layout['fields']['cID']['attr']['value'];
         $iID  = $layout['fields']['iID']['attr']['value'];
         $cName= !empty($cID) ? dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name',     "id=$cID") : '';
@@ -233,11 +229,14 @@ class inventoryPrices extends mgrJournal
         if (!empty($iID)) { $this->calculateMargin($layout['fields']['levels']['attr']['value'], $iID); }
         if ($table=='common') {
             $layout['fields']['title']['attr']['type']  = 'text';
-            $layout['fields']['default']['attr']['type']= 'selNoYes';
+//          $layout['fields']['default']['attr']['type']= 'selNoYes'; // this is already this type
         } elseif ($table=='contacts') {
-            $layout['fields']['cID']['attr']['type']  = 'hidden';
+            $layout['fields']['default']['attr']['type'] = 'hidden';
+            $layout['fields']['postCalc']['attr']['type']= 'hidden';
+//            $layout['fields']['cID']['attr']['type']  = 'hidden';
             if (!empty($refID)) { $layout['fields']['cID']['attr']['value']  = $refID; }
         } elseif ($table=='inventory') {
+            $layout['fields']['postCalc']['attr']['type']= 'hidden';
             $layout['fields']['iID']['attr']['type']  = 'hidden';
             if (!empty($refID)) { $layout['fields']['iID']['attr']['value']  = $refID; }
         }
@@ -514,12 +513,12 @@ function preSubmitPrices() {
     public function priceQuote(&$prices, $sheet, $args=[])
     {
         msgDebug("\nEntering price::priceQuote with sheet title = ".$sheet['title']." and price coming in = ".print_r(!empty($prices['price'])?$prices['price']:0, true));
-        msgDebug("\nEntering priceQuote with prices = ".print_r($prices, true));
+//msgDebug("\nEntering priceQuote with prices = ".print_r($prices, true));
         // make sure the sheet applies
         if (!empty($sheet['postCalc'])) { msgDebug("\npostCalc set, bailing!"); return; } // it's a post calculation to be determined at the end
         if (!empty($args['iID']) && !empty($sheet['iID']) && $sheet['iID']<>$args['iID']) { msgDebug("\nsku doesn't match, bailing!"); return; } // inventory item specified but doesn't match sheet
         // Cleared filters, let's go
-        if (!empty($sheet['iID']) && !empty($sheet['cID'])) { msgDebug("\nSetting Locked!"); $this->locked = true; } // Lock the price as the iID and cID have been provided, prevents fixed discounts being applied
+        if (!empty($sheet['iID']) && !empty($sheet['cID']) && $sheet['cID']==$args['cID']){ msgDebug("\nSetting Locked!"); $this->locked = true; } // Lock the price as the iID and cID have been provided, prevents fixed discounts being applied
         $choices= [];
         $levels = !empty($sheet['levels']['rows']) ? $sheet['levels']['rows'] : [];
         $this->first = 0;
