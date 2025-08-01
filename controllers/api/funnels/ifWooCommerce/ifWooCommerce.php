@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-12
+ * @version    7.x Last Update: 2025-07-30
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -36,7 +36,7 @@ class ifWooCommerce extends apiExport
     public    $code       = 'ifWooCommerce';
     protected $domSuffix  = 'wpWoo';
     protected $metaPrefix = 'woocommerce';
-    private   $refreshRows= 100; // number of inventory items to pass in a single cron call
+    private   $refreshRows= 10; // number of inventory items to pass in a single cron call
     private   $psServer   = 'https://www.phreesoft.com';
     private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
     public    $settings;
@@ -212,13 +212,11 @@ function productUpload(rID) {
         if (!empty($product['invOptions'])) { $product['invOptions'] = $this->prepVariations($product['SKU'], $product['invOptions']); }
         if (array_key_exists('invVendors', $product)) { $product['invVendors'] = ''; }
         $prices = $this->setPriceLevels($rID);
-        msgDebug("\nFetched updated price by item = ".print_r($prices, true));
         $output = array_merge($product, $prices);
         msgDebug("\nReady to compose api/export/apiInventory");
         compose('api', 'export', 'apiInventory', $output);
         $args = ['data'=>$output,'class'=>'api_product','method'=>'productImport', 'type'=>'post', 'endpoint'=>'product/update'];
         msgDebug("\nCalling portal API with product of length: ".sizeof($output));
-//msgDebug("\nCalling portal API with product: ".print_r($output, true));
         $success = $this->apiAction($args);
         if (!empty($success)) { msgAdd("Successfully imported SKU: {$output['SKU']}", 'success'); }
     }
@@ -348,32 +346,39 @@ function productUpload(rID) {
             'FullPrice'=>$result['full_price'],'Price'=>$pDetails['content']['price']];
         $product['RegularPrice'] = $product['price']; // for Woo both need to be the same
         if (!empty($pDetails['content']['sale_price'])){ $product['SalePrice']   = $pDetails['content']['sale_price']; }
-        if (!empty($pDetails['content']['sheets']))    { $product['PriceLevels'] = $pDetails['content']['sheets']; }
-        $product['PriceByItem'] = $this->updateByItem($pDetails, $stock);
+//      if (!empty($pDetails['content']['sheets']))    { $product['PriceLevels'] = $pDetails['content']['sheets']; }
+        $variations = $this->updateByItem($pDetails, $stock);
+        if (!empty($variations))                       { $product['PriceVariations'] = $variations; }
         msgDebug("\nWorking with product: ".print_r($product, true));
         return $product;
     }
 
     private function updateByItem($prices, $stock=0)
     {
-        msgDebug("\nEntering updateByItem with stock = $stock with prices = ".print_r($prices, true));
+        msgDebug("\nEntering updateByItem with stock = $stock"); // with prices = ".print_r($prices, true));
         if (empty($prices['content']['levels'])) { return; }
-        $level1  = array_shift($prices['content']['levels']); // assume the first level is the one to use
         $sellQtys= [];
-        foreach ($level1['sheets'] as $sheet) {
-            if (empty($sheet['qty']) || empty($sheet['price'])) { continue; }
-            $sheet['price'] = $sheet['price'] * $sheet['qty'];
-            $sheet['stock'] = floor($stock/$sheet['qty']);
-            $sellQtys[] = $sheet;
+// BOF - Temp patch
+if (sizeof($prices['content']['levels'])==1) { $prices['content']['levels'][0]['default'] = 1; }
+// EOF - Temp patch
+        foreach ($prices['content']['levels'] as $sheet) {
+            if (empty($sheet['default'])) { continue; } // needs to be a default sheet
+// BOF - Temp Patch
+if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move on to the next one
+// EOF - Temp Patch
+            foreach ($sheet['sheets'] as $level) {
+                if (empty($level['qty']) || empty($level['price'])) { continue; } // skip empty rows
+                $level['price'] = $level['price'] * $level['qty'];
+                $level['stock'] = floor($stock/$level['qty']);
+                $sellQtys[] = $level; // this will use the last default sheet if mutliple defaults are selected.
+            }
         }
-        $output = json_encode(['total'=>sizeof($sellQtys), 'rows'=>$sellQtys]);
-        msgDebug("\nCleaning up byItem db entry with: ".print_r($output, true));
-        dbWrite(BIZUNO_DB_PREFIX.'inventory', ['price_byItem'=>$output], 'update', "id={$prices['args']['iID']}");
-        return $output;
+        msgDebug("\nCleaning up priceVariations resulted in the number of rows: ".sizeof($sellQtys));
+        return $sellQtys;
     }
 
     /**
-     * (non-PHPdoc)
+     * 
      * @see apiImport::apiInvCount()
      */
     public function apiInvCount(&$layout=[], $result=[])

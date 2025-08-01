@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-08-01
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -347,6 +347,7 @@ function pfTableUpdate() {
      */
     public function save(&$layout=[])
     {
+        msgTrap();
         $rID   = clean('_rID', 'integer', 'post');
         $xChild= clean('xChild', ['format'=>'text', 'default'=>false], 'post'); // set if preview button was pressed
         $_POST['xChild']='';
@@ -496,29 +497,29 @@ function pfTableUpdate() {
             case 'rpt':
             default:
                 $data['columns'] = [
-                    'action' => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>45],'events'=>['formatter'=>$name.'Formatter'],
+                    'action'     => ['order'=> 1, 'label'=>lang('action'),             'attr'=>['width'=>45],'events'=>['formatter'=>$name.'Formatter'],
                         'actions'=> [
                             'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                             'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
-                    'fieldname' => ['order'=>5, 'label' => lang('fieldname'), 'attr'=>['width'=>200, 'resizable'=>true],
+                    'fieldname'  => ['order'=> 5, 'label'=>lang('fieldname'),          'attr'=>['width'=>200, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'combobox',options:{editable:true,mode:'remote',url:'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
-                    'title' => ['order'=>10, 'label' => lang('title'), 'attr'=>  ['width'=>150, 'resizable'=>true, 'editor'=>'text']],
-                    'break' => ['order'=>20, 'label' => $this->lang['column_break'], 'attr'=>['width'=>80, 'resizable'=>true],
+                    'title'      => ['order'=>10, 'label'=>lang('title'),              'attr'=>['width'=>150, 'resizable'=>true, 'editor'=>'text']],
+                    'break'      => ['order'=>20, 'label'=>$this->lang['column_break'],'attr'=>['width'=> 80, 'resizable'=>true],
                         'events'=>  ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                    'width' => ['order'=>30, 'label' => lang('width'), 'attr'=>  ['width'=>80, 'resizable'=>true,'editor'=>'text']],
-                    'widthTotal' => ['order'=>40, 'label' => $this->lang['total_width'], 'attr'=>['width'=>80, 'resizable'=>true]],
-                    'visible' => ['order'=>50, 'label' => lang('show'), 'attr'=>  ['width'=>50, 'resizable'=>true],
+                    'width'      => ['order'=>30, 'label'=>lang('width'),              'attr'=>['width'=> 80, 'resizable'=>true,'editor'=>'text']],
+                    'widthTotal' => ['order'=>40, 'label'=>$this->lang['total_width'], 'attr'=>['width'=> 80, 'resizable'=>true]],
+                    'visible'    => ['order'=>50, 'label'=>lang('show'),               'attr'=>['width'=> 50, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                    'processing' => ['order'=>60, 'label' => $this->lang['processing'], 'attr'=>['width'=>160, 'resizable'=>true],
+                    'processing' => ['order'=>60, 'label'=> $this->lang['processing'], 'attr'=>['width'=>160, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
-                    'formatting' => ['order'=>70, 'label' => lang('format'), 'attr'=>  ['width'=>160, 'resizable'=>true],
+//                  'meta_index' => ['order'=>61, 'label'=>lang('meta_index'),         'attr'=>['width'=>125, 'resizable'=>true, 'editor'=>'text']],
+                    'formatting' => ['order'=>70, 'label'=>lang('format'),             'attr'=>['width'=>160, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataFormatting,valueField:'id',textField:'text',groupField:'group'}}"]],
-                    'total' => ['order'=>80, 'label' => lang('total'), 'attr'=>  ['width'=>50, 'resizable'=>true],
+                    'total'      => ['order'=>80, 'label'=>lang('total'),              'attr'=>['width'=> 50, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                    'align' => ['order'=>90, 'label' => lang('align'), 'attr'=>  ['width'=>75, 'resizable'=>true],
-                        'events'=> [
-                            'editor'   =>"{type:'combobox',options:{valueField:'id',textField:'text',data:dataAligns}}",
-                            'formatter'=>"function(value){ return getTextValue(dataAligns, value); }"]]];
+                    'align'      => ['order'=>90, 'label'=>lang('align'),              'attr'=>['width'=> 75, 'resizable'=>true],
+                        'events'=> ['editor'   =>"{type:'combobox',options:{valueField:'id',textField:'text',data:dataAligns}}",
+                                    'formatter'=>"function(value){ return getTextValue(dataAligns, value); }"]]];
         }
         return $data;
     }

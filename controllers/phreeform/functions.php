@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-26
+ * @version    7.x Last Update: 2025-08-01
  * @filesource /controllers/phreeform/functions.php
  */
 
@@ -462,8 +462,8 @@ function BuildDataArray($sql, $report)
             }
             $ColCnt++;
             if (!empty($TableCtl['total'])) { // add to the running total if need be
-                $seq[$key]['grptotal'] += $processedData;
-                $seq[$key]['rpttotal'] += $processedData;
+                $seq[$key]['grptotal'] += floatval($processedData);
+                $seq[$key]['rpttotal'] += floatval($processedData);
                 $ShowTotals = true;
             } else {
                 $seq[$key]['grptotal']  = $report->totalonly ? $processedData : ' '; // set to last value for summary reports to show something
@@ -493,7 +493,7 @@ function BuildDataArray($sql, $report)
             $ColCnt++;
         }
     }
-    msgDebug("\nOutput array = ".print_r($OutputArray, true));
+    msgDebug("\nFirst 10 rows of output array = ".print_r(array_slice($OutputArray, 0, 10), true));
     return $OutputArray;
 }
 

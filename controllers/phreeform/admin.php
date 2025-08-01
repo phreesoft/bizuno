@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-07-29
  * @filesource /controllers/phreeform/admin.php
  */
 
@@ -43,7 +43,7 @@ class phreeformAdmin
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure= [
             'menuBar' => ['child'=>['tools'=>['child'=>[
-                'phreeform'=>['order'=>50,'label'=>lang('phreeform_manager'),'icon'=>'mimeDoc','events'=>['onClick'=>"hrefClick('phreeform/main/manager');"]]]]]]];
+                'phreeform'=>['order'=>50,'label'=>lang('phreeform_manager'),'icon'=>'mimeDoc','route'=>'phreeform/main/manager']]]]]];
     }
 
     /**
