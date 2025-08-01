@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-19
+ * @version    7.x Last Update: 2025-07-27
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -65,7 +65,7 @@ function migrateBizunoPrep()
     migrate_misc($cron, true);
     migrate_map($cron, true);
     $cron['ttlSteps']++; $cron['ttlBlk']++; // migrate_rm_tables_pt1
-    $cron['ttlSteps']++; $cron['ttlBlk']++; // migrate_rm_tables_pt2
+    $cron['ttlSteps']++; // migrate_rm_tables_pt2
     $cron['ttlSteps']++; // since we start at zero
     msgDebug("\nReturning from migrateBizunoPrep with cron = ".print_r($cron, true));
     return $cron;
@@ -476,7 +476,7 @@ function migrate_crm_projects(&$cron=[], $cntOnly=false) // Map CRMProjects to j
     msgDebug("\nEntering migrate_crm_projects.");
     $table= 'crmProjects';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1391,7 +1391,7 @@ function migrate_crm_promos(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_crm_promos.");
     $table= 'crmPromos';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1420,7 +1420,7 @@ function migrate_crm_promoHist(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_crm_promoHist.");
     $table= 'crmPromos_history';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1633,6 +1633,8 @@ function migrate_rm_tables_pt1(&$cron=[])
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'data_security');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_assy_list');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_prices');
+    dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_cogs_usage');
+    dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_cogs_owed');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'sales_tax');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'tax_rates');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'phreeform');
@@ -1644,6 +1646,7 @@ function migrate_rm_tables_pt1(&$cron=[])
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'extFixedAssets');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'extDocs');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'extMaint');
+    dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'extQuality');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'extTraining');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'srvBuilder_jobs');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'srvBuilder_journal');
