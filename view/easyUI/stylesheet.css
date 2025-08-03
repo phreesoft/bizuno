@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-03-23
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /view/easyui/stylesheet.css
  */
 
@@ -37,7 +37,7 @@ legend                   { font-family:Verdana; font-size:14px; font-weight:bold
 label                    { margin:0; padding:0; font-weight:bold; display:inline-block; min-width:125px;}
 th                       { text-align:center; font-weight:bold;}
 .modal                   { display:none; position:fixed; z-index:10000; top:0; left:0; height:100%; width:100%;
-						   background: rgba( 255, 255, 255, .8 ) url('https://bizuno.com/view/images/loading.gif') 50% 50% no-repeat; }
+						   background: rgba( 255, 255, 255, .8 ) url('https://bizuno.com/?bizRt=portal/api/fs&src=0/view/icons/default/32x32/loading.gif') 50% 50% no-repeat; }
 body.loading             { overflow: hidden; }
 body.loading .modal      { display:block; }
 .areaView                { display:block; width:100%; position:relative; }

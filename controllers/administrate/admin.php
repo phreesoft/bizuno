@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -80,8 +80,8 @@ class administrateAdmin
         $opts = array_replace_recursive($this->defaults, $meta);
         msgDebug("\nAfter replace, meta = ".print_r($opts, true));
         // Adjust fields and add role select
-        // @TODO - role_id is not set in this meta key, should be able to get it from bizCreds
-        $rFields= ['role_id'=>['order'=>10,'label'=>lang('role'),'attr'=>['type'=>'roles','value'=>''],'options'=>['hideAll'=>true,'single'=>true]]]; // 'value'=>$meta['role_id'] broken
+        $roleMeta = dbMetaGet($opts['role_id'], 'bizuno_role');
+        $rFields= ['role_id'=>['order'=>80,'label'=>lang('role'),'attr'=>['value'=>$roleMeta['title'], 'readonly'=>true]]];
         $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id', 'primary_name'];
         // Add phreebooks panel
         $pbFields = [
@@ -101,7 +101,7 @@ class administrateAdmin
      * Extends the users save method with Phreebooks specific fields
      * @return boolean null
      */
-    public function contactsSave(&$layout=[])
+    public function contactsSave()
     {
         $type= clean('type', 'char', 'get');
         msgDebug("\nEntering phreebooks::contactsSave with type = $type");
@@ -110,7 +110,7 @@ class administrateAdmin
         $meta= dbMetaGet(0, 'user_profile', 'contacts', $cID);
         $rID = metaIdxClean($meta);
         $data= [
-            'role_id'        => clean('role_id',        'integer','post'),
+//          'role_id'        => clean('role_id',        'integer','post'), // Do not allow role changes here.
             'store_id'       => clean('store_id',       'integer','post'),
             'restrict_store' => clean('restrict_store', 'boolean','post'),
             'restrict_user'  => clean('restrict_user',  'boolean','post'),

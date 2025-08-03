@@ -605,13 +605,14 @@ final class io
      * @param boolean $verbose [default: true] - false to suppress error messages or true to show them
      * @return true on valid path, false otherwise
      */
-    public function validatePath($srcPath, $verbose=true, $create=false) {
+    public function validatePath($srcPath, $verbose=true, $create=false)
+    {
         msgDebug("\nEntering validatePath with srcPath = $srcPath");
         if (!defined('BIZUNO_DATA')) { return msgAdd("Error: Bizuno not initialized!"); }
         // cannot use empty() because it can be a string equating to "0"
         if ($srcPath === '' || $srcPath === null || $srcPath === false) { return; }
         $path  = pathinfo(BIZUNO_DATA . $srcPath, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR; // pull the path from the full path and file
-        if (!file_exists($path) || !is_dir($path) && $create) {
+        if ($create && (!file_exists($path) || !is_dir($path))) {
             msgDebug("\nPath doesn't exist, trying to make it.");
             @mkdir($path, 0775, true);
             $blnkDir = pathinfo($srcPath, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR; // need to remove BIZUNO_DATA before writing file
