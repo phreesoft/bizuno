@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -74,6 +74,7 @@ class bizInstall // Checking users:
         $bAdmin  = new bizunoSettings();
         msgDebug("\n  Creating the company directory");
         msgDebug("\nReady to install, bizID = ".getUserCache('business', 'bizID')." and BIZUNO_DATA = ".BIZUNO_DATA);
+// This line is probably not needed except just to make sure the data folder exists and is writeable
         $io->validatePath('index.php'); // create the data folder
         // ready to install, tables first
         if (dbTableExists(BIZUNO_DB_PREFIX.'journal_main')) { return msgAdd("Cannot install, the database has tables present. Aborting!"); }

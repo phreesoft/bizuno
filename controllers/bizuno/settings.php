@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -306,9 +306,11 @@ class bizunoSettings
      */
     function adminInstDirs($adm)
     {
+/* @TODO - DEPRECATED - Folders are now created on the fly as needed. 
         global $io;
         if (!isset($adm->dirlist)) { return; }
         if (is_array($adm->dirlist)) { foreach ($adm->dirlist as $dir) { $io->validatePath($dir); } }
+ */
     }
 
     /**

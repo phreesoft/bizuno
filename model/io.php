@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /model/io.php
  */
 
@@ -248,7 +248,7 @@ final class io
         msgDebug("\nEntering io::fileWrite with fn = $fn and length of data = ".strlen($data));
         if (strlen($data) < 1) { return; }
         if (!$append && $replace && file_exists($this->myFolder.$fn)) { msgDebug("\nDeleting file!"); $this->fileDelete($fn); }
-        if (!$this->validatePath($fn, true)) { return $verbose ? msgAdd('Cannot write file, invalid path!') : false; }
+        if (!$this->validatePath($fn, true, true)) { return $verbose ? msgAdd('Cannot write file, invalid path!') : false; }
 //      header("Content-Type:text/html; charset=utf-8"); // make it UTF-8
         if (!$handle = @fopen($this->myFolder.$fn, $append?'a':'wb')) {
             flush();
@@ -284,7 +284,7 @@ final class io
                 copy($dir_source . $file, $dir_dest . $file);
                 touch($dir_dest . $file, $mTime, $aTime);
             } else {
-                $this->validatePath($dir_dest."$file/index.php");
+                $this->validatePath($dir_dest."$file/index.php", true, true);
                 $this->folderCopy($dir_source . "$file/", $dir_dest."$file/");
             }
         }
@@ -605,13 +605,13 @@ final class io
      * @param boolean $verbose [default: true] - false to suppress error messages or true to show them
      * @return true on valid path, false otherwise
      */
-    public function validatePath($srcPath, $verbose=true) {
+    public function validatePath($srcPath, $verbose=true, $create=false) {
         msgDebug("\nEntering validatePath with srcPath = $srcPath");
         if (!defined('BIZUNO_DATA')) { return msgAdd("Error: Bizuno not initialized!"); }
         // cannot use empty() because it can be a string equating to "0"
         if ($srcPath === '' || $srcPath === null || $srcPath === false) { return; }
         $path  = pathinfo(BIZUNO_DATA . $srcPath, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR; // pull the path from the full path and file
-        if (!file_exists($path) || !is_dir($path)) {
+        if (!file_exists($path) || !is_dir($path) && $create) {
             msgDebug("\nPath doesn't exist, trying to make it.");
             @mkdir($path, 0775, true);
             $blnkDir = pathinfo($srcPath, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR; // need to remove BIZUNO_DATA before writing file
@@ -625,7 +625,6 @@ final class io
         $pPath = rtrim($pPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         if (strlen($pPath) < strlen($fPath)) { $error = true; }
         if (substr($pPath, 0, strlen($fPath)) !== $fPath) { $error = true; }
-//      msgDebug("\nExiting validatePath with Path = $pPath and fPath = $fPath and error = ".($error?'true':'false'));
         msgDebug("\nExiting validatePath with error = ".($error?'true':'false'));
         return $error ? ($verbose ? msgAdd("Path validation error!") : false) : true; // passed all tests
     }

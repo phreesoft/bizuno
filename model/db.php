@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /model/db.php
  */
 
@@ -436,7 +436,7 @@ function dbDump($filename='bizuno_backup', $dirWrite='', $dbTable='')
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         if ($rows) { foreach ($rows as $row) { $dbTable .= array_shift($row).' '; } }
     }
-    if (!$io->validatePath($dirWrite.$dbFile, true)) { return; }
+    if (!$io->validatePath($dirWrite.$dbFile, true, true)) { return; }
     $cmd    = "mysqldump --opt -h $dbHost -u $dbUser -p$dbPass $dbName $dbTable | gzip > $dbPath$dbFile";
     msgDebug("\n Executing command: $cmd");
     if (!function_exists('exec')) { msgAdd("php exec is disabled, the backup cannot be achieved this way!"); }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    http://opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
- * @version    1.x Last Update: 2022-02-27
+ * @version    1.x Last Update: 2025-08-03
  * @filesource /controllers/bizAdmin/admin.php
  */
 
@@ -403,7 +403,7 @@ class bizAdmin
         $rID = $this->addFile($props);
         $fID = $this->padID($rID, 'd');
         msgDebug("\nAdding folder named: $fID");
-        $io->validatePath($this->bizPath.$this->pathInfo['path']."$fID/index.php", true);
+        $io->validatePath($this->bizPath.$this->pathInfo['path']."$fID/index.php", true, true);
         $treeData = $this->getFolderTree();
         $treeAction = str_replace('bizMenuCallback(', 'bizMenuRefresh(', $treeData['content']['actionData']);
         return ['content'=>['action'=>'eval','actionData'=>"bizCenterRefresh(); $treeAction"]];
