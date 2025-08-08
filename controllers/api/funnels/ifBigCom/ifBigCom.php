@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-08-04
  * @filesource /controllers/api/funnels/ifBigCom/ifBigCom.php
  */
 
@@ -246,7 +246,6 @@ class ifBigCom extends apiExport
                 if (empty($this->main['contact_id_b'])) {
                     msgDebug("\nAdding customer, need to set POST variables so new contact is saved properly!");
                     $this->setCustomerPOST();
-                    $ledger->updateContact_b = true;
                 }
                 msgDebug("\nReady to post with ledger = ".print_r($ledger, true));
                 if (!$ledger->Post()) { return; }
@@ -349,6 +348,7 @@ class ifBigCom extends apiExport
      */
     private function setCustomerPOST()
     {
+        $_POST['AddUpdate_b']   = 1;
         $_POST['id_b']          = 0;
         $_POST['address_id_b']  = 0;
         $_POST['primary_name_b']= $this->main['primary_name_b'];

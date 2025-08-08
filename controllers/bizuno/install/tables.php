@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-08-06
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -131,13 +131,15 @@ $tables = [
             'account_number'=> ['format'=>'VARCHAR(16)',  'attr'=>"DEFAULT NULL",             'comment'=> 'tag:AccountNumber;order:64',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Account Number for vendors this would be your account number assigned by the vendor"],
             'ach_enable'    => ['format'=>"ENUM('0','1')",  'attr'=>"NOT NULL DEFAULT '0'",   'comment'=> 'type:checkbox;order:10;tag:ACHEnable',
-                'import'=>true, 'export'=>false,'required'=>false,'desc'=>""],
-            'ach_bank'      => ['format'=>"VARCHAR(32)",  'attr'=>"DEFAULT NULL",             'comment'=> 'order:20;tag:ACHBankName',
-                'import'=>true, 'export'=>false,'required'=>false,'desc'=>""],
-            'ach_routing'   => ['format'=>"INT(11)",  'attr'=>"DEFAULT NULL",                 'comment'=> 'type:integer;order:30;tag:ACHRouting',
-                'import'=>true, 'export'=>false,'required'=>false,'desc'=>""],
-            'ach_account'=> ['format'=>"VARCHAR(16)", 'attr'=>"DEFAULT NULL",                 'comment'=> 'type:integer;order:40;tag:ACHAccount',
-                'import'=>true, 'export'=>false,'required'=>false,'desc'=>""],
+                'import'=>true, 'export'=>false,'required'=>false,'desc'=>"Set the contact up for invoice payments via electronic ACH payments with you bank"],
+            'ach_bank'      => ['format'=>"VARCHAR(32)",  'attr'=>"DEFAULT NULL",             'comment'=> 'order:12;tag:ACHBankName',
+                'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank name"],
+            'ach_routing'   => ['format'=>"INT(11)",  'attr'=>"DEFAULT NULL",                 'comment'=> 'type:integer;order:14;tag:ACHRouting',
+                'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank routing number"],
+            'ach_account'=> ['format'=>"VARCHAR(16)", 'attr'=>"DEFAULT NULL",                 'comment'=> 'type:integer;order:16;tag:ACHAccount',
+                'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank account number"],
+            'marketplace'=> ['format'=>"ENUM('0','1')",  'attr'=>"NOT NULL DEFAULT '0'",      'comment'=> 'type:checkbox;order:20;tag:Marketplace',
+                'import'=>true, 'export'=>true, 'required'=>false,'desc'=>"Whether the customer is a marketplace and if sales tax is withheld and remitted by the customer."],
             'gov_id_number' => ['format'=>'VARCHAR(16)',  'attr'=>"DEFAULT NULL",           'comment'=> 'tag:GovID;order:66',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Government ID Number, i.e. SSN for US citizens"],
             'gl_account'    => ['format'=>'VARCHAR(15)',  'attr'=>"DEFAULT NULL",           'comment'=> 'type:ledger;tag:DefaultGLAccount;order:68',

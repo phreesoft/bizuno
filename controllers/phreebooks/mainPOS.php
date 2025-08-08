@@ -21,13 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-08-04
  * @filesource /controllers/phreebooks/mainPOS.php
  */
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/main.php", 'phreebooksMain');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
 
 class mainPOSMain
 {
@@ -259,7 +259,7 @@ function bizPOSBalCalc() {
     {
         $values = cleanRequest(dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main', $this->journalID), 'post');
         $ledger->main = array_replace($ledger->main, $values);
-        if (clean('AddUpdate_b', 'boolean', 'post')) { if (!$ledger->updateContact('b')) { return; } }
+        if (!$ledger->updateContact()) { return; }
         $ledger->main['description'] = 'title:' . $ledger->main['primary_name_b'];
         // find which till was used, get till defaults
         //$till = [];

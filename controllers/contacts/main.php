@@ -38,6 +38,9 @@ class contactsMain
     private   $refTries  = 10; // number of attempts to pull a new refernce before punting. Helps fix bad Vendor IDs and Customer IDs
     private   $metaPfxAdd= 'address_';
     public    $cTypes    = ['b', 'c', 'e', 'i', 'j', 'u', 'v'];
+    public    $addFields = ['primary_name', 'contact', 'address1', 'address2', 'city', 'state', 'postal_code', 'country',
+        'email', 'email2', 'email3', 'email4', 'telephone1', 'telephone2', 'telephone3', 'telephone4',
+        'website' , 'contact_first', 'contact_last', 'flex_field_1'];
     public    $defaults;
     public    $lang;
     public    $type;
@@ -61,7 +64,7 @@ class contactsMain
     {
         $postTaxID= clean('tax_rate_id', ['format'=>'integer','default'=>null], 'post');
         $defTaxID = $this->type=='v' ? getModuleCache('phreebooks', 'settings', 'vendors', 'tax_rate_id_v') : getModuleCache('phreebooks', 'settings', 'customers', 'tax_rate_id_c');
-        $this->contact = ['id'=>0, 'inactive'=>'0', 'terms'=>'0', 'price_sheet'=>0, 'rep_id'=>0, 'store_id'=>0, 'gov_id_number'=>'',
+        $this->contact = ['id'=>0, "ctype_{$this->type}"=>'1', 'inactive'=>'0', 'terms'=>'0', 'price_sheet'=>0, 'rep_id'=>0, 'store_id'=>0, 'gov_id_number'=>'',
             'gl_account'=>$this->type=='v'? getModuleCache('phreebooks', 'settings', 'vendors', 'gl_expense') : getModuleCache('phreebooks', 'settings', 'customers', 'gl_sales'),
             'tax_rate_id'=> $postTaxID !== null ? $postTaxID : $defTaxID, 'first_date'=>biz_date('Y-m-d'), 'date_last'=>biz_date('Y-m-d')];
     }
@@ -240,7 +243,7 @@ class contactsMain
         $fldAddr = ['primary_name', 'contact', 'address1', 'address2', 'city', 'state', 'postal_code', 'country'];
         $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'website'];
         $fldAcct = ['short_name','inactive','rep_id','tax_rate_id','price_sheet','store_id','terms','terms_text','terms_edit','first_date','date_last','last_date_1','last_date_2','histPay'];
-        $fldProp = ['id','account_number','gov_id_number','gl_account','recordID','tax_exempt'];
+        $fldProp = ['id','account_number','gov_id_number','gl_account','recordID','tax_exempt','marketplace'];
         // set some special cases
 //        $structure['type']['attr']['value']  = $this->type;
         $structure['short_name']['tooltip']  = lang('msg_leave_null_to_assign_ref');
@@ -625,6 +628,68 @@ class contactsMain
             elseif ($dup) { return msgAdd(lang('error_duplicate_id')); }
         }
         return $output;
+    }
+
+    public function addressUpdate($args=[])
+    {
+msgTrap();
+        $defaults= ['cID'=>0, 'aID'=>0, 'cType'=>'c', 'aType'=>'s', 'suffix'=>'_s', 'verbose'=>true, 'dropShip'=>false];
+        $opts    = array_replace($defaults, $args);
+        msgDebug("\nEntering addressUpdate with merged opts = ".print_r($opts, true));
+        $priName = clean("primary_name{$opts['suffix']}", 'text', 'post'); // primary name is always required
+        // Error check
+        if (empty($priName)) { 
+            if (!empty($opts['verbose'])) { msgAdd(lang('primary_name_required')); }
+            return false;
+        }
+        // Let's go
+        if (!empty($opts['cID'])) { // get contact record
+            $this->contact = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id={$opts['cID']}");
+        } else { // create new contact
+            $this->setDefaults();
+            $this->contact['primary_name'] = $priName;
+            $this->contact["ctype_{$opts}"] = '1';
+            $opts['cID'] = dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->contact);
+        }
+        if (empty($args['cID']) || (empty($opts['aID'] && $opts['aType']=='b'))) { // new/update contact record address
+            foreach ($this->addFields as $field) { $this->contact[$field] = clean($field.$opts['suffix'], 'text', 'post'); }
+            msgDebug("\nReady to write updated contact record = ".print_r($this->contact, true));
+            dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->contact, 'update', "id={$opts['cID']}");
+        } else { // update address meta
+            $meta  = !empty($opts['aID']) ? dbMetaGet($opts['aID'], "address_{$opts['aType']}", 'contacts', $opts['cID']) : ['type'=>$opts['aType'], 'primary_name'=>$priName];
+            metaIdxClean($meta);
+            foreach ($this->addFields as $field) { $meta[$field] = clean($field.$opts['suffix'], 'text', 'post'); }
+            $metaID= dbMetaSet($opts['aID'], "address_{$opts['aType']}", $meta, 'contacts', $opts['cID']);
+            if (empty($opts['aID'])) { $opts['aID'] = $metaID; } // if new get the ID to return
+        }
+        return ['cID'=>$opts['cID'], 'aID'=>$opts['aID']];
+    }
+
+    public function setAddressMeta($cID, $aID, $suffix='_b')
+    {
+        // verify contact ID
+        if (empty($cID)) { return; }
+        $addr = !empty($aID) ? dbMetaGet('%', "address_{$type}", 'contacts', $rID) : [];
+        // if aID empty new record else update record
+        // pull the values from the post with suffix
+        foreach ($this->addFields as $field) {
+            if (isset($_POST[$field.$suffix])) {
+                
+            }
+        }
+        metaIdxClean($addr);
+        foreach ($addr as $row) {
+            metaIdxClean($row);
+            msgDebug("\nAdding address of type $type = ".print_r($row, true));
+            $address[] = $row;
+        }
+        // insert/update the meta
+        
+    }
+
+    public function setContact($cID, $suffix='_b')
+    {
+        
     }
 
     /**

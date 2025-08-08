@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-01
+ * @version    7.x Last Update: 2025-08-04
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -347,7 +347,6 @@ function pfTableUpdate() {
      */
     public function save(&$layout=[])
     {
-        msgTrap();
         $rID   = clean('_rID', 'integer', 'post');
         $xChild= clean('xChild', ['format'=>'text', 'default'=>false], 'post'); // set if preview button was pressed
         $_POST['xChild']='';

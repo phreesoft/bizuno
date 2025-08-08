@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-24
+ * @version    7.x Last Update: 2025-08-04
  * @filesource /view/easyUI/html5.php
  */
 
@@ -683,7 +683,7 @@ final class html5 {
             // this needs to be set with the passed field as populated with data
 //          if (!empty($structure['drop_ship']['attr']['checked'])) { $drop_attr['checked'] = true; }
             $options[] = html5('drop_ship'.$attr['suffix'], ['label'=>lang('drop_ship'), 'attr'=>$drop_attr,
-                'events' => ['onChange'=>"jqBiz('#contactDiv{$attr['suffix']}').toggle();"]]);
+                'events' => ['onChange'=>"jqBiz('#contactDiv{$attr['suffix']}').toggle(); jqBiz('#addressDiv{$attr['suffix']}').toggle(); addressClear('{$attr['suffix']}');"]]);
         }
         // OK, prep done, build div
         $close = $this->buildDivProp($output, $props);

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-24
+ * @version    7.x Last Update: 2025-08-06
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -49,9 +49,9 @@ function bizunoUpgrade()
         }
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'ach_enable')) {
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_enable` ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;order:10;tag:ACHEnable' AFTER account_number");
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_bank` VARCHAR(32) NULL DEFAULT NULL COMMENT 'order:20;tag:ACHBankName' AFTER ach_enable");
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_routing` INT(9) NULL DEFAULT NULL COMMENT 'type:integer;order:30;tag:ACHRouting' AFTER ach_bank");
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_account` VARCHAR(16) NULL DEFAULT NULL COMMENT 'type:integer;order:40;tag:ACHAccount' AFTER ach_routing");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_bank` VARCHAR(32) NULL DEFAULT NULL COMMENT 'order:12;tag:ACHBankName' AFTER ach_enable");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_routing` INT(9) NULL DEFAULT NULL COMMENT 'type:integer;order:14;tag:ACHRouting' AFTER ach_bank");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_account` VARCHAR(16) NULL DEFAULT NULL COMMENT 'type:integer;order:16;tag:ACHAccount' AFTER ach_routing");
         }
         // These config values need to be merged into the new format
         $modMap = ['api', 'contacts', 'quality', 'phreebooks', 'shipping'];
@@ -76,7 +76,11 @@ function bizunoUpgrade()
         }
     }
 
-/*  if (version_compare($dbVer, '7.2') < 0) {
+    if (version_compare($dbVer, '7.2') < 0) {
+        // Add marketplace checkbox for tax remittance calculations
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'marketplace')) {
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD `marketplace` ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:selNoYes;tag:Marketplace;order:20' AFTER `ach_account`");
+        }
         // Remove duplicate WO's
         $allBlds = dbMetaGet('%', 'production_job', 'inventory', '%');
         msgDebug("\nLooking at all builds with count = ".sizeof($allBlds));
@@ -113,7 +117,7 @@ function bizunoUpgrade()
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proLgstc'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='ispPortal'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='myPortal'");
-    } */
+    }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
     require_once(BIZBOOKS_ROOT.'controllers/administrate/tools.php');

@@ -35,8 +35,6 @@ bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksPro
  */
 class journal
 {
-    public  $updateContact_b= false; // do not automatically add/update contact billing
-    public  $updateContact_s= false; // do not automatically add/update contact shipping
     public  $updatePayment  = false; // do not automatically add/update payment information
     private $lowestPeriod   = 999;
     public  $affectedGlAccts= []; // list the gl accounts that are touched for calculating journal balances
@@ -86,11 +84,6 @@ class journal
     public function Post($action='insert')
     {
         if (!isset($this->main['id'])) { $this->main['id'] = 0; }
-        if ($this->updateContact_b) { if (!$this->updateContact('b')) { return; } }
-        if ($this->updateContact_s) {
-            if (!$this->main['contact_id_s']) { $this->main['contact_id_s'] = $this->main['contact_id_b']; }
-            if (!$this->updateContact('s')) { return; }
-        }
         if (!$this->preFlightCheck($action)) { return; }
         $this->getPostList([$this->main['id']]); // get array of mIDs that need to be posted, source and referenced records
         if ($this->quickPost()) { return true; } // we were able to meet the post requirements without going through the entire post operation, i.e. simple stuff
@@ -510,33 +503,53 @@ class journal
      * @param char $type - suffix on the post variables to extract the data, choices are b [default] and s
      * @return integer - database contact record ID
      */
-    public function updateContact($type='b')
+    public function updateContact()
     {
-        // Handle Billing - check for existing contact_id_b
-        // if empty then create contact if AddUpdate_b is set else return msgAdd 'contact doesn't have a record and the add/update button was not pressed. Either check the Add/ Update button and resubmit or create the record in customer manmager'
-        // if created, then set the contact_id_b with the new id
-        
-        // Handle Shipping - check AddUpdate_s for ship address, if false then return
-        // if drop ship checked, don't allow update 
-        // else create/update based on address_id_s (which needs to be the contacts_meta table id index)
-        // 
-        
-        
-        
-        // add/update address book, address updates need to be here so recur doesn't keep making new contacts
-/*      if (clean('AddUpdate_b', 'bool', 'post')) { if (!$ledger->updateContact('b')) { return; } }
-        if (clean('AddUpdate_s', 'bool', 'post')) {
-            if (!$ledger->main['contact_id_s']) { $ledger->main['contact_id_s'] = $ledger->main['contact_id_b']; }
-            if ( $ledger->main['address_id_s'] == $ledger->main['address_id_b']) { $ledger->main['address_id_s'] = 0; } // when address copy and then edit shipping, prevents updating billing
-            if (!$ledger->updateContact('s'))   { return; }
-        } */
+        $updateB = clean('AddUpdate_b', 'boolean', 'post');
+        $aIDb    = clean('address_id_b','integer', 'post');
+        $cIDb    = clean('contact_id_b','integer', 'post');
+        $updateS = clean('AddUpdate_s', 'boolean', 'post');
+        $aIDs    = clean('address_id_s','integer', 'post');
+        $cIDs    = clean('contact_id_s','integer', 'post');
+        $dropShip= clean('drop_ship',   'boolean', 'post');
+        msgDebug("\nEntering journal:updateContact with Update Billing button selected: ".(!empty($updateB) ? 'YES' : 'NO'));
+        if ( empty($updateB) &&  empty($updateS)) { return; } // nothing to do, return
+        $cType  = in_array($this->main['journal_id'], [3,4,6,7,17,20,21]) ? 'v' : 'c';
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/main.php', 'contactsMain');
+        $contact= new contactsMain($cType);
+        if (!empty($updateB)) { // Billing
+            $billB = $contact->addressUpdate([$cIDb, $aIDb, 'b', '_b']);
+            $this->main['contact_id_b'] = $billB['cID'];
+            $this->main['address_id_b'] = $billB['aID'];
+        }
+        if (!empty($updateS)) { // Shipping
+            $billS = $contact->addressUpdate([$cIDs, $aIDs, 's', '_s']);
+            $this->main['contact_id_s'] = $billS['cID'];
+            $this->main['address_id_s'] = $billS['aID'];
+        }
+return true;
 
+        $noMore = false;
+        if (false) {
+            $success = $contact->dbContactSave($cType, "_b");
+            if (!$success) { return; } // record creation failed (permission, problem, etc), stop here
+            else { $cID = $success; }
+            msgLog(sprintf(lang('tbd_manager'), lang('ctype', 'b'))." ".lang('save')." - {$this->main['primary_name_b']} (rID=$cID)");
+            unset($this->main['id_'.$type], $this->main['terms_'.$type]); // unset map variables
+            $this->main['contact_id_'.$type] = $cID;
+        } elseif (!empty($updateB) && !empty($cIDb)) { // update billing
+            $contact->setAddress($cIDb, $suffix="_$type");
+            // get the existing customer record
+            $contact->setAddressMeta($cIDb, $cIDb, 's');
+            $contact->getByID($cIDb);
+            $contact->dbWrite();
+            msgLog(sprintf(lang('tbd_manager'), lang('ctype', $cType))." ".lang('update')." - {$this->main['primary_name_'.$type]} (rID=$cID)");
+            // replace with the posted values
+            // save
+        }
         // allow bypass if no address info passed
         if (empty($this->main['primary_name_'.$type])) { return true; }
         $cID  = isset($this->main['contact_id_'.$type]) ? $this->main['contact_id_'.$type] : 0;
-        $cType= in_array($this->main['journal_id'], [3,4,6,7,17,20,21]) ? 'v' : 'c';
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/main.php', 'contactsMain');
-        $contact = new contactsMain($cType);
         if (empty($cID)) { // only do this if creating a new contact, messes up fields not on the form, e.g. checkboxes
             $_POST['id_'.$type] = $this->main['id_'.$type] = $cID; // map the journal fields to contact fields
             if (getModuleCache('phreebooks', 'settings', 'general', 'upd_rep_terms', false)) {
@@ -546,12 +559,12 @@ class journal
             $success = $contact->dbContactSave($cType, "_$type");
             if (!$success) { return; } // record creation failed (permission, problem, etc), stop here
             else { $cID = $success; }
+            msgLog(sprintf(lang('tbd_manager'), lang('ctype', $cType))." ".lang('save')." - {$this->main['primary_name_'.$type]} (rID=$cID)");
             unset($this->main['id_'.$type], $this->main['terms_'.$type]); // unset map variables
             $this->main['contact_id_'.$type] = $cID;
         }
         // Check if save shipping address
 //      $this->main['address_id_'.$type] = $contact->dbAddressSave('s', $cID, $aID, "_s", true);
-        msgLog(sprintf(lang('tbd_manager'), lang('ctype', $cType))." ".lang('save')." - {$this->main['primary_name_'.$type]} (rID=$cID)");
         return $cID;
     }
 

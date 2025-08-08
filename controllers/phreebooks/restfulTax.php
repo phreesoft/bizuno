@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-10
+ * @version    7.x Last Update: 2025-08-06
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -143,13 +143,18 @@ class phreebooksRestfulTax
     {
         global $io;
         msgDebug("\nEntering calcTaxCollected with nexus states = ".print_r($this->nexusSt, true));
+        // get customer ID's that are marketplaces as tax for these is withheld separately.
+        $mktplaces = [];
+        
+        
         $data  = [];
         $period= clean('period', 'integer',  'post');
-        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "period=$period AND journal_id IN (12, 13)", 'state_s', ['id', 'journal_id', 'invoice_num', 'total_amount', 'sales_tax', 'city_s', 'state_s', 'postal_code_s', 'country_s']);
+        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "period=$period AND journal_id IN (12, 13)", 'state_s', ['id', 'journal_id', 'invoice_num', 'total_amount', 'sales_tax', 'contact_id_b', 'city_s', 'state_s', 'postal_code_s', 'country_s']);
         foreach ($rows as $row) {
+            if (in_array($row['contact_id_b'], $mktplaces)) { continue; }
             $state = 'USA'<>strtoupper($row['country_s']) ? '_INT' : strtoupper($row['state_s']);
-            $nexus = in_array($row['state_s'], $this->nexusSt) ? 1 : '';
-            $exempt= in_array($row['state_s'], $this->statesNoTax)         ? 1 : '';
+            $nexus = in_array($row['state_s'], $this->nexusSt)    ? 1 : '';
+            $exempt= in_array($row['state_s'], $this->statesNoTax)? 1 : '';
             $info  = in_array($state, $this->statesDetail) ? $this->getCounty($row['postal_code_s']) : ['county'=>'_all', 'rate_state'=>0, 'rate_county'=>0, 'rate_city'=>0];
             $cnty  = !empty($row['sales_tax']) ? $info['county'] : '_exempt';
             $city  = !empty($row['sales_tax']) && !$this->skipCity ? strtolower($row['city_s']) : '_all';

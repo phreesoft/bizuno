@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-08-03
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -126,7 +126,7 @@ class tax_rest
             $this->fields["totals_$this->code"]['attr']['value']= $data['items'][$i]['credit_amount'] + $data['items'][$i]['debit_amount'];
         }
         // for legacy if the gl entry was not there then there was no tax, set the exempt flag as default
-        if (!$present) { $this->fields['tax_exempt']['attr']['checked'] = 'checked'; }
+        if (!empty($data['items']) && !$present) { $this->fields['tax_exempt']['attr']['checked'] = true; }
         $hide  = $this->hidden ? ';display:none' : '';
         $html  = '<div style="text-align:right'.$hide.'">'."\n";
         $html .= html5('tax_exempt',        $this->fields['tax_exempt'])."<br />";

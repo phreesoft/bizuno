@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-17
+ * @version    7.x Last Update: 2025-08-06
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -626,18 +626,7 @@ function bizUnitDiscDisc(newValue) {
         $ledger = new journal($rID, $this->journalID);
         $ledger->main['description'] = pullTableLabel('journal_main', 'journal_id', $this->journalID).": ".(!empty($values['primary_name_b']) ? $values['primary_name_b'] : '');
         $ledger->main = array_replace($ledger->main, $values);
-/********** START add/update fix **************/
-// @TODO - ADD THIS ROW
         if (!$ledger->updateContact()) { return; } // Create/Update contact information
-// DELETE THESE ROWS AFTER 7.1
-        // add/update address book, address updates need to be here so recur doesn't keep making new contacts
-/*      if (clean('AddUpdate_b', 'bool', 'post')) { if (!$ledger->updateContact('b')) { return; } }
-        if (clean('AddUpdate_s', 'bool', 'post')) {
-            if (!$ledger->main['contact_id_s']) { $ledger->main['contact_id_s'] = $ledger->main['contact_id_b']; }
-            if ( $ledger->main['address_id_s'] == $ledger->main['address_id_b']) { $ledger->main['address_id_s'] = 0; } // when address copy and then edit shipping, prevents updating billing
-            if (!$ledger->updateContact('s'))   { return; }
-        } */
-/********** END add/update fix **************/
         if (in_array($ledger->journalID, [3,4,6,7,9,10,12,13]) && empty($ledger->main['contact_id_b'])) { return msgAdd($this->lang['msg_missing_contact_id']); }
         if (!$this->getItems($ledger))  { return; }
         if (!$this->getTotals($ledger)) { return; }
