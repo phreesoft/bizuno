@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-30
+ * @version    7.x Last Update: 2025-08-09
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -336,7 +336,7 @@ function productUpload(rID) {
 
     private function setPriceLevels($skuID)
     {
-        $fields = ['id','sku','qty_stock','qty_so','qty_alloc','full_price','inventory_type','item_weight','price_byItem'];
+        $fields = ['id','sku','qty_stock','qty_so','qty_alloc','full_price','inventory_type','item_weight'];
         $result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', $fields, "id=$skuID");
         $stock  = availableQty($result);
         $pDetails['args'] = ['iID'=>$skuID];
@@ -355,6 +355,7 @@ function productUpload(rID) {
 
     private function updateByItem($prices, $stock=0)
     {
+msgTrap();
         msgDebug("\nEntering updateByItem with stock = $stock"); // with prices = ".print_r($prices, true));
         if (empty($prices['content']['levels'])) { return; }
         $sellQtys= [];

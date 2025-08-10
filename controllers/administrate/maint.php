@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-08-09
  * @filesource /controllers/administrate/maint.php
  */
 
@@ -34,7 +34,6 @@ class administrateMaint extends mgrJournal
     protected $secID      = 'mgr_maint';
     protected $domSuffix  = 'Maint';
     protected $metaPrefix = 'maintenance';
-    protected $nextRefIdx = 'next_maint_num';
     protected $journalID  = 35;
     public    $stores;
     public    $freqs;

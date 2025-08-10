@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-06
+ * @version    7.x Last Update: 2025-08-09
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -77,8 +77,7 @@ function bizunoUpgrade()
     }
 
     if (version_compare($dbVer, '7.2') < 0) {
-        // Add marketplace checkbox for tax remittance calculations
-        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'marketplace')) {
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'marketplace')) { // Add marketplace checkbox for tax remittance calculations
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD `marketplace` ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:selNoYes;tag:Marketplace;order:20' AFTER `ach_account`");
         }
         // Remove duplicate WO's
@@ -95,10 +94,8 @@ function bizunoUpgrade()
             msgDebug(" ... Executing sql = $sql");
             dbGetResult($sql); 
         }
-
         // Prices methods in common_meta is not used, delete it
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key='methods_prices'");
-
         // These have no useful information and can just be deleted. Maybe in next upgrade to make sure no data is lost
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proEDI'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proGL'");

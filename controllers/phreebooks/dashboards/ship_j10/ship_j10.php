@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-08-09
  * @filesource /controllers/phreebooks/dashboards/ship_j10/ship_j10.php
  */
 
@@ -152,26 +152,21 @@ class ship_j10
         $this->emailList[] = ['invNum'=>$entry['invoice_num'], 'name'=>$entry['primary_name_b']];
         $this->sendEmail   = true;
     }
-
-    /**
-     *
-     */
     private function notifyEmail()
     {
         $html = '';
         msgDebug("\nEmail list before email: ".print_r($this->emailList, true));
         foreach ($this->emailList as $row) { $html .= "SO #{$row['invNum']}: {$row['name']}<br />"; }
-        $fromEmail = 'do-not-reply@phreesoft.com';
+        $fromEmail = 'support@phreesoft.com';
         $toEmail   = getModuleCache('bizuno', 'settings', 'company', 'email');
         $toName    = getModuleCache('bizuno', 'settings', 'company', 'contact');
         $msgSubject= sprintf($this->lang['email_subject'], viewFormat($this->today, 'date'));
         $msgBody   = sprintf($this->lang['email_body'], $html);
-        $mail    = new bizunoMailer($toEmail, $toName, $msgSubject, $msgBody, $fromEmail);
+        $mail      = new bizunoMailer($toEmail, $toName, $msgSubject, $msgBody, $fromEmail);
         $mail->sendMail();
         msgAdd($msgBody);
         msgLog($msgSubject);
     }
-
     private function rowStyler($cID, $cText)
     {
         msgDebug("\nEntering rowStyler with cID = $cID and cText = $cText");
