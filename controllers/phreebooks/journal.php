@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -55,6 +55,7 @@ class journal
         $this->structure= $structure;
         $this->action   = $action;
         $this->journalID= $jID;
+        $this->type     = in_array($this->journalID, [2,3,4,6,7,17,20,21]) ? 'v' : 'c';
         $this->setDefaults($jID, $post_date, $cID);
         $this->getDbData($mID, $cID);
         if (!empty($jID)) {
@@ -446,7 +447,7 @@ class journal
             $filter[] = "purch_order_id='".addslashes($this->main['purch_order_id'])."'";
             if (!empty($this->main['id'])) { $filter[] = "id<>{$this->main['id']}"; }
             $dup = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', implode(' AND ', $filter));
-            if ($dup) { return msgAdd(sprintf(lang('err_gl_invoice_num_dup'), lang('journal_main_purch_order_id'), $this->main['purch_order_id'])); }
+            if ($dup) { return msgAdd(sprintf(lang('err_gl_invoice_num_dup'), lang('purch_order_id'), $this->main['purch_order_id'])); }
         }
         $this->currencyConvert('toDefault');
         if ($action!=='delete') { if (!$this->setInvoice()) { return; } }
@@ -513,59 +514,21 @@ class journal
         $cIDs    = clean('contact_id_s','integer', 'post');
         $dropShip= clean('drop_ship',   'boolean', 'post');
         msgDebug("\nEntering journal:updateContact with Update Billing button selected: ".(!empty($updateB) ? 'YES' : 'NO'));
-        if ( empty($updateB) &&  empty($updateS)) { return; } // nothing to do, return
+        if ( empty($updateB) &&  empty($updateS)) { return true; } // nothing to do, return
         $cType  = in_array($this->main['journal_id'], [3,4,6,7,17,20,21]) ? 'v' : 'c';
         bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/main.php', 'contactsMain');
         $contact= new contactsMain($cType);
-        if (!empty($updateB)) { // Billing
-            $billB = $contact->addressUpdate([$cIDb, $aIDb, 'b', '_b']);
+        if (!empty($updateB)) { // Billing address
+            $billB = $contact->addressUpdate(['cID'=>$cIDb, 'aID'=>$aIDb, 'cType'=>$this->type, 'aType'=>'b', 'suffix'=>'_b']);
             $this->main['contact_id_b'] = $billB['cID'];
             $this->main['address_id_b'] = $billB['aID'];
         }
-        if (!empty($updateS)) { // Shipping
-            $billS = $contact->addressUpdate([$cIDs, $aIDs, 's', '_s']);
+        if (!empty($updateS) && empty($dropShip)) { // Shipping address
+            $billS = $contact->addressUpdate(['cID'=>$cIDs, 'aID'=>$aIDs, 'cType'=>$this->type, 'aType'=>'s', 'suffix'=>'_s']);
             $this->main['contact_id_s'] = $billS['cID'];
             $this->main['address_id_s'] = $billS['aID'];
         }
-return true;
-
-        $noMore = false;
-        if (false) {
-            $success = $contact->dbContactSave($cType, "_b");
-            if (!$success) { return; } // record creation failed (permission, problem, etc), stop here
-            else { $cID = $success; }
-            msgLog(sprintf(lang('tbd_manager'), lang('ctype', 'b'))." ".lang('save')." - {$this->main['primary_name_b']} (rID=$cID)");
-            unset($this->main['id_'.$type], $this->main['terms_'.$type]); // unset map variables
-            $this->main['contact_id_'.$type] = $cID;
-        } elseif (!empty($updateB) && !empty($cIDb)) { // update billing
-            $contact->setAddress($cIDb, $suffix="_$type");
-            // get the existing customer record
-            $contact->setAddressMeta($cIDb, $cIDb, 's');
-            $contact->getByID($cIDb);
-            $contact->dbWrite();
-            msgLog(sprintf(lang('tbd_manager'), lang('ctype', $cType))." ".lang('update')." - {$this->main['primary_name_'.$type]} (rID=$cID)");
-            // replace with the posted values
-            // save
-        }
-        // allow bypass if no address info passed
-        if (empty($this->main['primary_name_'.$type])) { return true; }
-        $cID  = isset($this->main['contact_id_'.$type]) ? $this->main['contact_id_'.$type] : 0;
-        if (empty($cID)) { // only do this if creating a new contact, messes up fields not on the form, e.g. checkboxes
-            $_POST['id_'.$type] = $this->main['id_'.$type] = $cID; // map the journal fields to contact fields
-            if (getModuleCache('phreebooks', 'settings', 'general', 'upd_rep_terms', false)) {
-                $_POST['terms_'.$type] = $this->main['terms_'.$type] = $this->main['terms'];
-                $_POST['rep_id_'.$type]= !empty($this->main['rep_id']) ? $this->main['rep_id'] : ''; // map the rep ID
-            }
-            $success = $contact->dbContactSave($cType, "_$type");
-            if (!$success) { return; } // record creation failed (permission, problem, etc), stop here
-            else { $cID = $success; }
-            msgLog(sprintf(lang('tbd_manager'), lang('ctype', $cType))." ".lang('save')." - {$this->main['primary_name_'.$type]} (rID=$cID)");
-            unset($this->main['id_'.$type], $this->main['terms_'.$type]); // unset map variables
-            $this->main['contact_id_'.$type] = $cID;
-        }
-        // Check if save shipping address
-//      $this->main['address_id_'.$type] = $contact->dbAddressSave('s', $cID, $aID, "_s", true);
-        return $cID;
+        return true;
     }
 
     /**

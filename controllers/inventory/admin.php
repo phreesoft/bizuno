@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-08-14
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -43,7 +43,6 @@ class inventoryAdmin
     function __construct()
     {
         $this->lang      = getLang($this->moduleID);
-//        $this->invMethods= ['byContact', 'bySKU', 'quantity', 'fxdDiscount']; // for install, pre-select some pricing methods to install
         $this->defaults  = [
             'sales'   => getChartDefault(30),
             'stock'   => getChartDefault(4),
@@ -55,13 +54,13 @@ class inventoryAdmin
             'api'       => ['path'=>'inventory/api/inventoryAPI'],
             'attachPath'=> ['inventory'=>'data/inventory/uploads/', 'production'=>'data/production/uploads/'],
             'menuBar'   => ['child'=>[
-                'inventory'=> ['order'=>30,   'label'=>('inventory'),'group'=>'inv','icon'=>'inventory','child'=>[
-                    'inv_mgr'    => ['order'=>20,'label'=>('gl_acct_type_4_mgr'),'icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
-                    'invBulkEdit'=> ['order'=>70,'label'=>('bulk_edit'),         'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
-                    'woProd'     => ['order'=>80,'label'=>('production'),        'icon'=>'work',     'route'=>"$this->moduleID/build/manager",'child'=>[
-                        'woDesign'=>['order'=>10,'label'=>('wo_design'),         'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
-                        'woTasks' =>['order'=>20,'label'=>('wo_tasks'),          'icon'=>'mimeLst',  'route'=>"$this->moduleID/tasks/manager"]]],
-                    'rpt_inv'    => ['order'=>99,'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>'phreeform/main/manager&gID=inv']]]]],
+                'inventory'=> ['order'=>30,       'label'=>('inventory'),'group'=>'inv','icon'=>'inventory','child'=>[
+                    'inv_mgr'    => ['order'=>20, 'label'=>('gl_acct_type_4_mgr'),'icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
+                    'invBulkEdit'=> ['order'=>70, 'label'=>('bulk_edit'),         'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
+                    'woProd'     => ['order'=>80, 'label'=>('production'),        'icon'=>'work',     'route'=>"$this->moduleID/build/manager",'child'=>[
+                        'wo_design'=>['order'=>10,'label'=>('wo_design'),         'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
+                        'wo_tasks' =>['order'=>20,'label'=>('wo_tasks'),          'icon'=>'mimeLst',  'route'=>"$this->moduleID/tasks/manager"]]],
+                    'rpt_inv'    => ['order'=>99, 'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>'phreeform/main/manager&gID=inv']]]]],
             'hooks' => [
                 'administrate'=>['roles'=>['edit'=>['order'=>10,'method'=>'rolesEdit'], 'save'=>['order'=>10,'method'=>'rolesSave']]],
                 'phreebooks'  =>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]]];
@@ -108,7 +107,7 @@ class inventoryAdmin
             ['id'=>'CM','text'=>lang('centimeters')],
             ['id'=>'M', 'text'=>lang('meters')]];
         $autoCosts= [['id'=>'0','text'=>lang('none')],  ['id'=>'PO', 'text'=>lang('journal_id_4')], ['id'=>'PR', 'text'=>lang('journal_id_6')]];
-        $invCosts = [['id'=>'f','text'=>lang('inventory_cost_method_f')], ['id'=>'l', 'text'=>lang('inventory_cost_method_l')], ['id'=>'a', 'text'=>lang('inventory_cost_method_a')]];
+        $invCosts = [['id'=>'f','text'=>lang('cost_method_f')], ['id'=>'l', 'text'=>lang('cost_method_l')], ['id'=>'a', 'text'=>lang('cost_method_a')]];
         $si = lang('inventory_type_si');
         $ms = lang('inventory_type_ms');
         $ma = lang('inventory_type_ma');

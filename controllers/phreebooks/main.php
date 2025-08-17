@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-06
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -125,9 +125,9 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
             $payrolls = getMetaCommon('methods_payroll');
             msgDebug("\npayrolls read = ".print_r($payrolls, true));
             $order = 40;
-            foreach ($payrolls as $idx => $payroll) {
+            foreach ($payrolls as $payroll) {
                 if (!empty($payroll['status'])) {
-                    $data['datagrid']['manager']['source']['actions'][$payroll['id']] = ['order'=>$order,'icon'=>$payroll['id'],'label'=>'Paychex',
+                    $data['datagrid']['manager']['source']['actions'][$payroll['id']] = ['order'=>$order,'icon'=>$payroll['id'],'label'=>$payroll['title'],
                         'events'=>['onClick'=>"jsonAction('$this->moduleID/payroll/importForm&payroll={$payroll['id']}');"]];
                     $order++;
                 }
@@ -1500,7 +1500,7 @@ function bizUnitDiscDisc(newValue) {
                         <span style="background-color:pink">'      .lang('journal_id_7').'</span>',
                     'jType'=>'<br />'.lang('status').':
                         <span style="background-color:yellowgreen">'.lang('confirmed').'</span>
-                        <span class="journal-waiting">'.lang('journal_main_waiting').'</span>'];
+                        <span class="journal-waiting">'.lang('waiting').'</span>'];
                 break;
             case  9:
             case 10:

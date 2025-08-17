@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1667,7 +1667,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
 //      if (!empty($prop['attr']['value'])) { $prop['options']['value'] = $prop['attr']['value']; }
 //        $prop['options']['rowStyler']= "function(index,row){ if (row.status>0) { return { class:'row-inactive' }; } }";
         $prop['options']['onSelect'] = "function(id, data) { {$defaults['callback']} }";
-        $prop['options']['columns']  = "[[{field:'id',hidden:true},{field:'status',hidden:true},{field:'text',title:'".jsLang('journal_main_tax_rate_id')."',width:160},{field:'tax_rate',title:'".jsLang('amount')."',align:'center',width:70}]]";
+        $prop['options']['columns']  = "[[{field:'id',hidden:true},{field:'status',hidden:true},{field:'text',title:'".jsLang('tax_rate_id')."',width:160},{field:'tax_rate',title:'".jsLang('amount')."',align:'center',width:70}]]";
         unset($prop['attr']['type']);
         if (!empty($defaults['data'])) { $data = $defaults['data']; }
         else { $data = json_encode(viewSalesTaxDropdown($defaults['type'], $defaults['target'])); } //"bizDefaults.taxRates.{$defaults['type']}.rows";
@@ -2085,7 +2085,7 @@ function dgEditTax($id, $field, $type='c', $xClicks='') {
     return "{type:'combogrid',options:{data: bizDefaults.taxRates.$type.rows,width:120,panelWidth:210,idField:'id',textField:'text',
         onClickRow:function (index, row) { jqBiz('#$id').edatagrid('getRows')[curIndex]['$field'] = row.id; $xClicks },
         rowStyler:function(idx, row) { if (row.status==1) { return {class:'journal-waiting'}; } else if (row.status==2) { return {class:'row-inactive'}; }  },
-        columns: [[{field:'id',hidden:true},{field:'text',width:120,title:'".jsLang('journal_main_tax_rate_id')."'},{field:'tax_rate',width:70,title:'".jsLang('amount')."',align:'center'}]]
+        columns: [[{field:'id',hidden:true},{field:'text',width:120,title:'".jsLang('tax_rate_id')."'},{field:'tax_rate',width:70,title:'".jsLang('amount')."',align:'center'}]]
     }}";
 }
 

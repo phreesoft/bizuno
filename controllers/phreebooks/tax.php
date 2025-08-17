@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-04
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /controllers/phreebooks/tax.php
  */
 
@@ -213,7 +213,7 @@ function preSubmit() {
     jqBiz('#'+id).combogrid({data:taxData,width:120,panelWidth:210,idField:'id',textField:'text',
         rowStyler:function(idx, row) { if (row.status==1) { return {class:'journal-waiting'}; } else if (row.status==2) { return {class:'row-inactive'}; }  },
         columns:[[{field:'id',hidden:true},
-            {field:'text',    width:120,title:'".jsLang('journal_main_tax_rate_id')."'},
+            {field:'text',    width:120,title:'".jsLang('tax_rate_id')."'},
             {field:'tax_rate',width:70, title:'".jsLang('amount')."',align:'center'}]]
     });
 }";

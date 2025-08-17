@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-08-11
  * @filesource /controllers/inventory/history.php
  */
 
@@ -111,8 +111,8 @@ class inventoryHistory
         $output = $skus = [];
         $skuID  = clean('skuID', 'integer', 'get');
         $sku    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$skuID");
-        $stmt   = dbGetResult("SELECT journal_main.id as id, journal_item.sku, journal_item.qty, journal_main.notes, journal_main.post_date, journal_main.terminal_date, journal_main.store_id
-            FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_item ON journal_main.id=journal_item.ref_id WHERE journal_id=32 AND closed='0'");
+        $stmt   = dbGetResult("SELECT m.id as id, i.sku, i.qty, m.notes, m.post_date, m.terminal_date, m.store_id
+            FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id WHERE journal_id=32 AND closed='0'");
         $openWOs= $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         msgDebug("\nRead ".sizeof($openWOs)." open WO's while searching for sku: $sku = ");
         foreach ($openWOs as $row) { // search within the BOM for each skuID for this SKU

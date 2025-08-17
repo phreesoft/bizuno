@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-30
+ * @version    7.x Last Update: 2025-08-14
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -250,9 +250,8 @@ class inventoryPrices extends mgrJournal
         }
         $layout['toolbars']["tb{$this->domSuffix}"]['icons']['save'] = ['order'=>40,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"if (preSubmitPrices()) jqBiz('#frm{$this->domSuffix}').submit();"]];
         // add the header data
-        $layout['jsHead']['dgLevels'] = "
-var dgLevelsData = ".json_encode($layout['fields']['levels']['attr']['value']).";
-var qtySource = "   .json_encode(viewKeyDropdown($this->qtySource)).";
+        $layout['jsHead']['levelData']= "var dgLevelsData = ".json_encode($layout['fields']['levels']['attr']['value']).";\n";
+        $layout['jsHead']['dgChoices']= "var qtySource = "   .json_encode(viewKeyDropdown($this->qtySource)).";
 var qtyAdj    = "   .json_encode(viewKeyDropdown($this->qtyAdj)).";
 var qtyRnd    = "   .json_encode(viewKeyDropdown($this->qtyRnd)).";
 function preSubmitPrices() {
@@ -620,7 +619,7 @@ function preSubmitPrices() {
                     'actions'=> ['trash'=>  ['icon'=>'trash','order'=>20,'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]],
                     'events' => ['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"]],
                 'qty'     => ['order'=>10,'label'=>lang('qty'), 'attr'=>['width'=>60,'align'=>'right'],
-                    'events'=>  ['editor'=>"{type:'numberbox',options:{formatter:function(value){return formatPrecise(value);}}}"]],
+                    'events'=>  ['editor'=>"{type:'numberbox',options:{formatter:function(value){ return formatPrecise(value); }}}"]],
                 'source'  => ['order'=>20,'label'=>lang('source'), 'attr'=>['width'=>120,'sortable'=>true, 'resizable'=>true, 'align'=>'center'],
                     'events' => ['formatter'=>"function(value){ return getTextValue(qtySource, value); }",
                         'editor'=>"{type:'combobox',options:{valueField:'id',textField:'text',data:qtySource,value:'1'}}"]],

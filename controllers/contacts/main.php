@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-08-13
  * @filesource /controllers/contacts/main.php
  */
 
@@ -342,34 +342,6 @@ class contactsMain
         $layout = array_replace_recursive($layout, $data);
     }
 
-    /**
-     * Saves posted data to a contact record
-     * @param array $layout - current working structure
-     * @param boolean $makeTransaction - [default: true] Makes the save operation a transaction, should only be set to false if this method is part of another transaction
-     * @return modified $laylout
-     */
-    public function save(&$layout=[], $makeTransaction=true)
-    {
-        global $io;
-        $rID  = clean('id', 'integer', 'post');
-        $title= clean('short_name', 'text', 'post');
-        msgDebug("\nEntering $this->moduleID::save with rID = $rID and title = $title");
-        if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
-        if ($makeTransaction) { dbTransactionStart(); } // START TRANSACTION (needs to be here as we need the id to create links
-        if (!$result = $this->dbContactSave($this->type, '')) { return; } // Main record
-        if (!$rID) { $rID = $result; }
-        $_GET['rID'] = $_POST['id'] = $rID; // save for custom processing
-        $this->saveLog($layout, $rID);
-        if ($makeTransaction) { dbTransactionCommit(); }
-        if ($io->uploadSave('file_attach', getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_")) {
-            dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
-        }
-        msgAdd(lang('msg_record_saved'), 'success'); // doesn't hang if returning to manager
-        msgLog(sprintf(lang('tbd_manager'), lang('type', $this->type))." - ".lang('save')." - $title (rID=$rID)");
-        $data = ['content' => ['action'=>'eval','actionData'=>"jqBiz('#accContacts').accordion('select', 0); bizGridReload('dgContacts'); jqBiz('#divContactsDetail').html('&nbsp;');"]];
-        $layout = array_replace_recursive($layout, $data);
-    }
-
     private function editCustomType(&$data, $rID)
     {
         msgDebug("\nEntering editCustomType with rID = $rID and type = $this->type");
@@ -436,6 +408,34 @@ class contactsMain
         $idxs = ['current','late30','late60','late90','late120','late121','total'];
         foreach ($idxs as $idx) { $structure[$idx]= !empty($layout['fields'][$idx]) ? $layout['fields'][$idx] : []; }
         return ['label'=>$layout['panels']['genBal']['label'], 'fields'=>$idxs];
+    }
+
+    /**
+     * Saves posted data to a contact record
+     * @param array $layout - current working structure
+     * @param boolean $makeTransaction - [default: true] Makes the save operation a transaction, should only be set to false if this method is part of another transaction
+     * @return modified $laylout
+     */
+    public function save(&$layout=[], $makeTransaction=true)
+    {
+        global $io;
+        $rID  = clean('id', 'integer', 'post');
+        $title= clean('short_name', 'text', 'post');
+        msgDebug("\nEntering $this->moduleID::save with rID = $rID and title = $title");
+        if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
+        if ($makeTransaction) { dbTransactionStart(); } // START TRANSACTION (needs to be here as we need the id to create links
+        if (!$result = $this->dbContactSave($this->type, '')) { return; } // Main record
+        if (!$rID) { $rID = $result; }
+        $_GET['rID'] = $_POST['id'] = $rID; // save for custom processing
+        $this->saveLog($layout, $rID);
+        if ($makeTransaction) { dbTransactionCommit(); }
+        if ($io->uploadSave('file_attach', getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_")) {
+            dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
+        }
+        msgAdd(lang('msg_record_saved'), 'success'); // doesn't hang if returning to manager
+        msgLog(sprintf(lang('tbd_manager'), lang('type', $this->type))." - ".lang('save')." - $title (rID=$rID)");
+        $data = ['content' => ['action'=>'eval','actionData'=>"jqBiz('#accContacts').accordion('select', 0); bizGridReload('dgContacts'); jqBiz('#divContactsDetail').html('&nbsp;');"]];
+        $layout = array_replace_recursive($layout, $data);
     }
 
     /**
@@ -547,11 +547,11 @@ class contactsMain
         $addr = dbMetaGet('%', "address_{$type}", 'contacts', $rID);
         metaIdxClean($addr);
         foreach ($addr as $row) {
-            metaIdxClean($row);
-            $row['type']  = $type;
-            $row['ref_id']= $rID;
+            $row['address_id']= metaIdxClean($row);
+            $row['type']      = $type;
+            $row['ref_id']    = $rID;
             msgDebug("\nAdding address of type $type = ".print_r($row, true));
-            $address[] = $row;
+            $address[]        = $row;
         }
     }
 
@@ -632,13 +632,12 @@ class contactsMain
 
     public function addressUpdate($args=[])
     {
-msgTrap();
         $defaults= ['cID'=>0, 'aID'=>0, 'cType'=>'c', 'aType'=>'s', 'suffix'=>'_s', 'verbose'=>true, 'dropShip'=>false];
         $opts    = array_replace($defaults, $args);
         msgDebug("\nEntering addressUpdate with merged opts = ".print_r($opts, true));
         $priName = clean("primary_name{$opts['suffix']}", 'text', 'post'); // primary name is always required
         // Error check
-        if (empty($priName)) { 
+        if (empty($priName)) {
             if (!empty($opts['verbose'])) { msgAdd(lang('primary_name_required')); }
             return false;
         }
@@ -647,12 +646,15 @@ msgTrap();
             $this->contact = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id={$opts['cID']}");
         } else { // create new contact
             $this->setDefaults();
+            unset($this->contact['id']); // need to clear the id to prevent dups
+            $this->contact['short_name'] = $this->getNextShortName(['short_name'=>''], $opts['cType'], 0);
             $this->contact['primary_name'] = $priName;
-            $this->contact["ctype_{$opts}"] = '1';
+            $this->contact["ctype_{$opts['cType']}"] = '1';
             $opts['cID'] = dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->contact);
         }
-        if (empty($args['cID']) || (empty($opts['aID'] && $opts['aType']=='b'))) { // new/update contact record address
+        if (empty($args['cID']) || (empty($opts['aID']) && $opts['aType']=='b')) { // new/update contact record address
             foreach ($this->addFields as $field) { $this->contact[$field] = clean($field.$opts['suffix'], 'text', 'post'); }
+            if (empty($args['cID'])) { $this->contact['rep_id'] = clean('rep_id', 'integer', 'post'); } // if new record, set the rep_id
             msgDebug("\nReady to write updated contact record = ".print_r($this->contact, true));
             dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->contact, 'update', "id={$opts['cID']}");
         } else { // update address meta
@@ -663,33 +665,6 @@ msgTrap();
             if (empty($opts['aID'])) { $opts['aID'] = $metaID; } // if new get the ID to return
         }
         return ['cID'=>$opts['cID'], 'aID'=>$opts['aID']];
-    }
-
-    public function setAddressMeta($cID, $aID, $suffix='_b')
-    {
-        // verify contact ID
-        if (empty($cID)) { return; }
-        $addr = !empty($aID) ? dbMetaGet('%', "address_{$type}", 'contacts', $rID) : [];
-        // if aID empty new record else update record
-        // pull the values from the post with suffix
-        foreach ($this->addFields as $field) {
-            if (isset($_POST[$field.$suffix])) {
-                
-            }
-        }
-        metaIdxClean($addr);
-        foreach ($addr as $row) {
-            metaIdxClean($row);
-            msgDebug("\nAdding address of type $type = ".print_r($row, true));
-            $address[] = $row;
-        }
-        // insert/update the meta
-        
-    }
-
-    public function setContact($cID, $suffix='_b')
-    {
-        
     }
 
     /**

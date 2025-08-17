@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /controllers/phreebooks/dashboards/open_j06/open_j06.php
  */
 
@@ -92,7 +92,7 @@ class open_j06
                 $result = sortOrder($result, 'post_date', $opts['order']=='desc' ? 'desc' : 'asc');
             }
             foreach ($result as $entry) {
-                $label  = !empty($entry['invoice_num']) ? "#{$entry['invoice_num']}" : lang('journal_main_waiting');
+                $label  = !empty($entry['invoice_num']) ? "#{$entry['invoice_num']}" : lang('waiting');
                 $currencies->iso  = $entry['currency'];
                 $currencies->rate = $entry['currency_rate'];
                 $entry['total_amount'] += getPaymentInfo($entry['id'], $entry['journal_id']);

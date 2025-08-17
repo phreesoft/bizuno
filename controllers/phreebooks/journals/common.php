@@ -981,7 +981,7 @@ class jCommon
                 'onDestroy'     => "function(rowIndex) { totalUpdate('dgOrders onDestroy'); curIndex = undefined; }",
                 'onAdd'         => "function(rowIndex) { setFields(rowIndex); }"],
             'source' => ['actions'=>[
-                'newItem'       =>['order'=>10,'icon'=>'add',   'size'=>'large','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
+                'newItem'       =>['order'=>10,'icon'=>'add','size'=>'large','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
             'columns'=> [
                 'id'            => ['order'=>0, 'attr'=>['hidden'=>'true']],
                 'ref_id'        => ['order'=>0, 'attr'=>['hidden'=>'true']],

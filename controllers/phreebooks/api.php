@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-08-15
  * @filesource /controllers/phreebooks/api.php
  */
 
@@ -88,7 +88,7 @@ class phreebooksApi
                 'asset'    => $coa_asset[$row['gl_type']]];
             }
         $output = '<table style="border-style:none;margin-left:auto;margin-right:auto;"><thead class="panel-header"><tr>
-    <th>'.lang('journal_main_gl_acct_id').'</th>
+    <th>'.lang('gl_acct_id').'</th>
     <th nowrap="nowrap">'.lang('description')               .'</th>
     <th nowrap="nowrap">'.lang('journal_item_gl_type')      .'</th>
     <th nowrap="nowrap">'.lang('journal_item_debit_amount') .'</th>

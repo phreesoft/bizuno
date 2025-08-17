@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-08-14
  * @filesource /view/icons/default.php
  */
 
@@ -101,6 +101,7 @@ $icons = [
     'open'       => ['dir'=>'default','path'=>'document-open.png'],
     'order'      => ['dir'=>'default','path'=>'signature.png'],
     'paychex'    => ['dir'=>'default','path'=>'paychex.png'],
+    'payrollCentric'=>['dir'=>'default','path'=>'payrollCentric.png'],
     'payment'    => ['dir'=>'default','path'=>'cash-register.png'],
     'phpmyadmin' => ['dir'=>'default','path'=>'phpmyadmin.jpg'],
     'pos'        => ['dir'=>'default','path'=>'computer.png'],

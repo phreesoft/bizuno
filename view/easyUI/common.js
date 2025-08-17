@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-08-10
  * @filesource /view/easyUI/common.js
  */
 
@@ -2452,9 +2452,15 @@ function orderFill(data, type) {
     if (glEditor)  jqBiz(glEditor.target).combogrid( 'setValue', gl_account);
     if (taxEditor) jqBiz(taxEditor.target).combogrid('setValue', def_tax_id);
     if (skuEditor) jqBiz(skuEditor.target).combogrid('setValue', data.sku);
-    var targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + parseInt(data.lead_time));
-    jqBiz('#dgJournalItem').edatagrid('getRows')[curIndex]['date_1'] = formatDate(targetDate);
+    // if purchase, use lead time as date, else sale, use terminal_date as selected by user on order screen
+    var jID = jqBiz('#journal_id').val();
+    if ((jID=='3' || jID=='4' || jID=='6')) {
+        var targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + parseInt(data.lead_time));
+        jqBiz('#dgJournalItem').edatagrid('getRows')[curIndex]['date_1'] = formatDate(targetDate);
+    } else {
+        jqBiz('#dgJournalItem').edatagrid('getRows')[curIndex]['date_1'] = typeof data.date_1 !== 'undefined' ? data.date_1 : bizDateGet('terminal_date');
+    }
 //  alert('calculating price, curIndex='+curIndex+' and sku = '+data.sku+' and qty = '+qty+' and type = '+type);
     ordersPricing(curIndex, data.sku, qty, type);
 }
