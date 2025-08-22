@@ -58,8 +58,8 @@ class inventoryAdmin
                     'inv_mgr'    => ['order'=>20, 'label'=>('gl_acct_type_4_mgr'),'icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
                     'invBulkEdit'=> ['order'=>70, 'label'=>('bulk_edit'),         'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
                     'woProd'     => ['order'=>80, 'label'=>('production'),        'icon'=>'work',     'route'=>"$this->moduleID/build/manager",'child'=>[
-                        'wo_design'=>['order'=>10,'label'=>('wo_design'),         'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
-                        'wo_tasks' =>['order'=>20,'label'=>('wo_tasks'),          'icon'=>'mimeLst',  'route'=>"$this->moduleID/tasks/manager"]]],
+                        'woDesign'=>['order'=>10,'label'=>('wo_design'),          'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
+                        'woTasks' =>['order'=>20,'label'=>('wo_tasks'),           'icon'=>'mimeLst',  'route'=>"$this->moduleID/tasks/manager"]]],
                     'rpt_inv'    => ['order'=>99, 'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>'phreeform/main/manager&gID=inv']]]]],
             'hooks' => [
                 'administrate'=>['roles'=>['edit'=>['order'=>10,'method'=>'rolesEdit'], 'save'=>['order'=>10,'method'=>'rolesSave']]],

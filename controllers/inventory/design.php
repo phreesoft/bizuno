@@ -31,7 +31,7 @@ class inventoryDesign extends mgrJournal
 {
     public    $moduleID  = 'inventory';
     public    $pageID    = 'design';
-    protected $secID     = 'inv_mgr';
+    protected $secID     = 'woDesign';
     protected $domSuffix = 'Design';
     protected $metaPrefix= 'production_job';
     public $struc;
