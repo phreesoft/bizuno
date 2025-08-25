@@ -658,10 +658,10 @@ function buildChartOfAccountsHistory()
 function insertChartOfAccountsHistory($glAcct='', $glType='', $period=1)
 {
     if (!$glAcct) { return msgAdd("Bad parameters sent to insertChartOfAccountsHistory()"); }
-    $max_period = dbGetValue(BIZUNO_DB_PREFIX."journal_periods", "MAX(period) AS period", '', false);
+    $max_period = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', "MAX(period) AS period", '', false);
     $records = array();
     for ($i=$period; $i<=$max_period; $i++) {
-        $record_found = dbGetValue(BIZUNO_DB_PREFIX."journal_history", "id", "gl_account='$glAcct' AND period=$i");
+        $record_found = dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'id', "gl_account='$glAcct' AND period=$i");
         if (!$record_found) { $records[] = "('$glAcct', '$glType', '$i', NOW())"; }
     }
     if (sizeof($records) > 0) {

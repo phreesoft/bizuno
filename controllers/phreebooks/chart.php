@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-08-23
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -243,9 +243,9 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
 //      if ($used && $heading)      { return msgAdd($this->lang['chart_save_05']); }
 //      if (!empty($output['parent']) && empty($glAccounts[$parent]['heading'])) { return msgAdd(sprintf($this->lang['chart_save_06'], $parent)); }
         msgDebug("\nReady to write updated chart record = ".print_r($output, true));
-        if ( empty($rID)) { $this->chartMeta[$output['id']]= $output; }
+        if (empty($rID)) { $this->chartMeta[$output['id']]= $output; }
         else             { $this->chartMeta[$rID]         = $output; }
-        ksort($this->chartMeta, SORT_LOCALE_STRING);
+        $this->chartMeta = sortOrder($this->chartMeta, 'id');
 // On 7.0 releases, this reorderd the indexes if they are numeric so re-index them by chart of accounts ID
         $temp = [];
         foreach ($this->chartMeta as $acct) { $temp[$acct['id']] = $acct; }
@@ -254,7 +254,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         msgDebug("\nReady to write updated full chart = ".print_r($this->chartMeta, true));
         dbTransactionStart();
         dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
-        if ( empty($rID)) { insertChartOfAccountsHistory($output['id'], $output['type']); } // build the journal_history entries
+        insertChartOfAccountsHistory($output['id'], $output['type']); // build the journal_history entries, if not existing
         if (!empty($metaVal['type']) && $metaVal['type']<>$output['type']) { // check for type change
             dbWrite(BIZUNO_DB_PREFIX.'journal_history',['gl_type'=>$output['type']], 'update', "gl_account='{$output['id']}'");
         }

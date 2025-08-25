@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-01
+ * @version    7.x Last Update: 2025-08-23
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -528,7 +528,8 @@ class phreebooksAdmin {
     public function loadBrowserSession(&$layout=[])
     {
         $accts = []; // load gl Accounts
-        $chart = getModuleCache('phreebooks', 'chart');
+        $chart = dbMetaGet(0, 'chart_of_accounts');
+        metaIdxClean($chart);
         if (is_array($chart)) { foreach ($chart as $row) {
             $row['asset']  = in_array($row['type'], $this->assets) ? 1 : 0;
             $row['type']   = viewFormat($row['type'], 'glTypeLbl');
