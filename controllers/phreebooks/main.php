@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -354,6 +354,7 @@ if (!formValidate()) return false;\n\treturn true;\n}";
             $jsBody .= "var def_contact_gl_acct = '$default_gl';\nvar def_contact_tax_id = ".($default_tax ? $default_tax : 0).";\n";
         }
         // Add some new non-db fields
+        $structure['notes_save']     = ['order'=>90,'icon'=>'save','label'=>lang('save'),'hidden'=>!empty($rID)?false:true,'events'=>['onClick'=>"jsonAction('phreebooks/main/notesSave', $rID, jqBiz('#notes').val());"]];
         $structure['terms_text']     = ['order'=>95,'label'=>lang('terms'),'break'=>false,'options'=>['width'=>175],'attr'=>['value'=>viewTerms($structure['terms']['attr']['value'], true, $this->type),'readonly'=>'readonly']];
         $structure['terms_edit']     = ['order'=>96,'icon'=>'settings','size'=>'small','label'=>lang('terms'),'events'=>['onClick'=>"jsonAction('contacts/main/editTerms&type=$this->type', $cID, jqBiz('#terms').val());"]];
         $structure['journal_msg']    = ['html'=>'','attr'=>['type'=>'raw']];
@@ -387,7 +388,7 @@ var pbChart=[];\njqBiz.each(bizDefaults.glAccounts.rows, function( key, value ) 
                 'formBOF'=> ['order'=>15,'type'=>'form',   'key' =>'frmJournal'],
                 'formEOF'=> ['order'=>99,'type'=>'html',   'html'=>'</form>']],
             'panels'  => [
-                'notes'  => ['label'=>lang('notes'),'type'=>'fields','keys'=>['notes']],
+                'notes'  => ['label'=>lang('notes'),'type'=>'fields','keys'=>['notes', 'notes_save']],
                 'divAtch'=> ['type'=>'attach', 'defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath','phreebooks'),'prefix'=>$prefix, 'secID'=>$secID]]],
             'toolbars'=> ['tbPhreeBooks'=>['icons'=>[
                 'jSave'  => ['order'=>10,'label'=>lang('save'),  'icon'=>'save','type'=>'menu','hidden'=>$security>1?false:true,
@@ -1063,6 +1064,18 @@ function bizUnitDiscDisc(newValue) {
         if (empty($ledger->items)) { return msgAdd($this->lang['msg_no_items']); }
         $this->mapStoreGL($ledger);
         return true;
+    }
+
+    /*
+     * Allows for updating notes to existing orders on the fly without requiring a re-post.
+     */
+    public function notesSave()
+    {
+        $rID  = clean('rID', 'integer', 'get');
+        if (empty($rID)) { return msgAdd(lang('illegal_access')); }
+        $notes= clean('data', 'text', 'get');
+        dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['notes'=>$notes], 'update', "id=$rID");
+        msgAdd(lang('msg_record_saved'), 'success');
     }
 
     /**

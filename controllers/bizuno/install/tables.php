@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-06
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -223,12 +223,13 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"[Default: 0] Tax Rate ID for customers from the db table"],
             'price_sheet_c'       => ['format'=>'INT(11)',      'attr'=>"NOT NULL DEFAULT '0'",    'comment'=>'type:select;tag:DefPriceSheetIDSales;order:30',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"[Default: 0] Default price sheet for customers"],
+            'block_discount'      => ['format'=>"ENUM('0','1')",'attr'=>"NOT NULL DEFAULT '0'",    'comment'=>'type:hidden;tag:BlockDiscount;order:35',
+                'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Block customer discounts from being applied to this specific product, valid values are 0 - No, or 1 - Discounts will not be applied"],
             'full_price'          => ['format'=>'DOUBLE',       'attr'=>"NOT NULL DEFAULT '0'",    'comment'=>'type:currency;tag:FullPrice;order:40',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Retail or List price for the item"],
             'sale_price'          => ['format'=>'DOUBLE',       'attr'=>"NOT NULL DEFAULT '0'",    'comment'=>'type:currency;tag:SalePrice;order:42',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Sale price for the item"],
-            'price_byItem'        => ['format'=>'TEXT',         'attr'=>"NOT NULL DEFAULT ''",    'comment'=>'tag:PriceByItem;order:44',
-                'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Sale price for the item"],
+//          'price_byItem'        => ['format'=>'TEXT',         'attr'=>"NOT NULL DEFAULT ''",    'comment'=>'tag:PriceByItem;order:44', 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Sale price for the item"],
             'description_purchase'=> ['format'=>'VARCHAR(255)', 'attr'=>"DEFAULT NULL",            'comment'=>'tag:DescriptionPurchase;order:10',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Detailed decription to use for purchases"],
             'tax_rate_id_v'       => ['format'=>'VARCHAR(6)',   'attr'=>"NOT NULL DEFAULT ''",    'comment'=>'type:tax;tag:TaxRateIDVendor;order:20',

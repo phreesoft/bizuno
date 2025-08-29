@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -50,13 +50,8 @@ class shippingShip extends shippingCommon
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $rID     = clean('rID', 'integer', 'get');
         $dbData  = $this->getShipmentData($rID);
+        if (empty($dbData['email_s'])) { $dbData['email_s'] = $dbData['email_b']; } // If shipping email is empty, use billing
         $shipper = $this->loadCarrier($dbData['carrier']);
-
-
-        // @TODO need to set fields that are not used in a particular method to avoid filling the error log
-        // e.g. $shipper->ship_pkg is not used for best way and generates an error
-
-
         if ($rID && !method_exists($shipper, 'labelGet')) {
             msgDebug("\nNo label method, just a log entry");
             $js  = "accordionEdit('accShipping', 'dgShipping', 'divDetail', '".$this->lang['shipping_entry']."', '$this->moduleID/manager/edit&jID=$rID', 0);";
@@ -190,7 +185,7 @@ class shippingShip extends shippingCommon
             'dimUOM'       => ['order'=>25,'label'=>$this->lang['dim_uom'],      'break'=>true,'values'=>$dimUOMs,     'attr'=>['type'=>'select','value'=>$shipper->dimUOM]],
             'currencyUOM'  => ['order'=>30,'label'=>lang('currency'),            'break'=>true,'values'=>$currencyUOMs,'attr'=>['type'=>'select','value'=>!empty($data['currency']) ? $data['currency'] : getDefaultCurrency()]],
             // notify
-            'ship_confirm' => ['order'=>10,'label'=>$this->lang['ship_confirm'], 'attr'=> ['type'=>'checkbox']],
+            'ship_confirm' => ['order'=>10,'label'=>$this->lang['ship_confirm'], 'attr'=> ['type'=>'checkbox', 'checked'=>!empty($data['email_s'])?true:false]],
             'confirm_type' => ['order'=>20,'values'=>viewKeyDropdown($shipper->options['SignatureMap']),'attr'=> ['type'=>'select', 'value'=>$shipper->confirm_type]],
             // ltl
             'ltl_desc'     => ['order'=>10,'label'=>$this->lang['ltl_desc'],     'attr'=> ['value'=>$ltlDesc]],
@@ -206,12 +201,7 @@ class shippingShip extends shippingCommon
             'total_amount'=> ['order'=>40,'attr'=>['type'=>'hidden', 'value'=>0]],
             'ins_amount'  => ['order'=>61,'label'=>$this->lang['amt_insurance'],'attr'=>['type'=>'currency','value'=>!empty($data['pkg']['Ins'])?$data['pkg']['Ins']:0]]];
         dbStructureFill($this->addrStruc, $data, '_s');
-        $output = array_replace($fields, $this->addrStruc);
-
-        // THIS NEEDS FIXING!
-        $attr = ['type'=>'checkbox', 'value'=>1];
-        if (!empty($data['email_s'])) { $attr['checked'] ='checked'; } // precheck ship notification if email present
-        return $output;
+        return array_replace($fields, $this->addrStruc);
     }
 
     /**

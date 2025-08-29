@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-30
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -346,7 +346,6 @@ function productUpload(rID) {
             'FullPrice'=>$result['full_price'],'Price'=>$pDetails['content']['price']];
         $product['RegularPrice'] = $product['price']; // for Woo both need to be the same
         if (!empty($pDetails['content']['sale_price'])){ $product['SalePrice']   = $pDetails['content']['sale_price']; }
-//      if (!empty($pDetails['content']['sheets']))    { $product['PriceLevels'] = $pDetails['content']['sheets']; }
         $variations = $this->updateByItem($pDetails, $stock);
         if (!empty($variations))                       { $product['PriceVariations'] = $variations; }
         msgDebug("\nWorking with product: ".print_r($product, true));

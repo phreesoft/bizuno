@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -631,7 +631,7 @@ return '';
     {
         $payload['requestedShipment']['emailNotificationDetail'] = [
             'recipients'      => [[
-                'emailAddress'                  => !empty($pkg['recipient']['contact']['emailAddress']) ? $pkg['recipient']['contact']['emailAddress'] : '',
+                'emailAddress'                  => !empty($pkg['destination']['email']) ? $pkg['destination']['email'] : '',
 //              'smsDetail'                     => ['phoneNumber'=>'string','phoneNumberCountryCode'=>'string'],
                 'notificationEventType'         => ['ON_PICKUP', 'ON_ESTIMATED_DELIVERY', 'ON_DELIVERY'], // ON_BILL_OF_LADING
                 'notificationFormatType'        => 'HTML',

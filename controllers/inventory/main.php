@@ -247,7 +247,7 @@ class inventoryMain
         $fldProp     = ['id','qty','dg_assy','store_id','sku','inactive','description_short','upc_code','item_weight','lead_time'];
         $fldStatus   = ['qty_min','qty_restock','qty_stock','qty_po','qty_so','qty_alloc'];
         $fldImage    = ['image_with_path'];
-        $fldCust     = ['description_sales','full_price','sale_price','tax_rate_id_c','price_sheet_c'];
+        $fldCust     = ['description_sales','full_price','sale_price','tax_rate_id_c','price_sheet_c', 'block_discount'];
         $fldVend     = ['description_purchase','item_cost','tax_rate_id_v','price_sheet_v','vendor_id'];
         $fldGL       = ['inventory_type','cost_method','gl_sales','gl_inv','gl_cogs'];
         // add additional fields

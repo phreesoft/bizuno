@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -162,7 +162,6 @@ function invIsTracked($type) {
 function availableQty($item=[], $args=[])
 {
     if (empty($item['id']))            { return 0; }
-//    $tracked  = explode(',', COG_ITEM_TYPES);
     $incAssy  = isset($args['incAssy'])  ? $args['incAssy']  : getModuleCache('inventory', 'settings', 'general', 'inc_assemblies', 1);
     $incCommit= isset($args['incCommit'])? $args['incCommit']: getModuleCache('inventory', 'settings', 'general', 'inc_committed', 1);
     if (empty($item['qty_stock']))     { $item['qty_stock']      = 0; }
@@ -172,12 +171,13 @@ function availableQty($item=[], $args=[])
     if (strpos(COG_ITEM_TYPES, $item['inventory_type']) === false) { $item['qty_stock'] = 1; } // Fix some special cases, non-stock types need qty > 0
     msgDebug("\nIn availableQty with incAssy = $incAssy and incCommit = $incCommit");
     if ($incAssy && in_array($item['inventory_type'], ['ma', 'sa'])) { // for assemblies, see how many we can build
-        $result = getMetaInventory($item['id'], 'bill_of_materials');
-        msgDebug("\nAssy parts = ".print_r($result, true));
+        $bom = getMetaInventory($item['id'], 'bill_of_materials');
+        msgDebug("\nAssy parts = ".print_r($bom, true));
         $min_qty= 999999;
-        foreach ($result as $row) {
-            $qtyStk = !empty($row['qty_stock']) ? $row['qty_stock'] : 0;
-            $min_qty = $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
+        foreach ($bom as $row) {
+            $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock'], "sku='".addslashes($row['sku'])."'");
+            $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
+            $min_qty= $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
         }
         $item['qty_stock'] += $min_qty;
         msgDebug("\nAfter assembly item[qty_stock] = ".print_r($item['qty_stock'], true));

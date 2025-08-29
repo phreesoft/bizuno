@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-14
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -308,17 +308,18 @@ function preSubmitPrices() {
         parent::saveMeta($layout);
     }
 
+/* DEPRECATED
     public function saveSellPkgs()
     {
         msgDebug("\nentering saveSellPkgs");
         $iID = clean('rID' , 'integer','get');
         $data= clean('data', 'json',   'get');
         if (empty($iID)) { return ("Invalid SKU ID!"); }
-        dbWrite(BIZUNO_DB_PREFIX.'inventory', ['price_byItem'=>json_encode($data)], 'update', "id=$iID");
+//      dbWrite(BIZUNO_DB_PREFIX.'inventory', ['price_byItem'=>json_encode($data)], 'update', "id=$iID");
         $sku = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$iID");
         msgLog(lang('prices').'-'.lang('save')." for SKU: $sku");
         msgAdd("Sell package levels saved for SKU: $sku!", 'success');
-    }
+    } */
 
     public function delete(&$layout=[])
     {
@@ -417,15 +418,16 @@ function preSubmitPrices() {
     {
         msgDebug("\nEntering prices::quoteInitArgs");
         $filter= '';
-        if     (!empty($args['iID'])) { $filter = "id = {$args['iID']}"; }
-        elseif (!empty($args['sku'])) { $filter = "sku='".addslashes($args['sku'])."'"; }
-        elseif (!empty($args['UPC'])) { $filter = "upc='{$args['UPC']}'"; }
-        $inv   = !empty($filter)      ? dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'sku', 'item_cost', 'full_price', 'sale_price', 'price_sheet_c', 'price_sheet_v'], $filter) : [];
+        if     (!empty($args['iID']))      { $filter = "id = {$args['iID']}"; }
+        elseif (!empty($args['sku']))      { $filter = "sku='".addslashes($args['sku'])."'"; }
+        elseif (!empty($args['UPC']))      { $filter = "upc='{$args['UPC']}'"; }
+        $inv   = !empty($filter)      ? dbGetValue(BIZUNO_DB_PREFIX.'inventory',['id', 'sku', 'item_cost', 'full_price', 'sale_price', 'price_sheet_c', 'price_sheet_v', 'block_discount'], $filter) : [];
         $cont  = !empty($args['cID']) ? dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['ctype_v', 'price_sheet', 'gl_account'], "id={$args['cID']}") : ['price_sheet'=>0, 'gl_account'=>''];
-        if (!empty($args['cost'])) { $inv['item_cost'] = $args['cost']; }
-        if (!empty($args['full'])) { $inv['full_price']= $args['full']; }
-        if (empty($cont['gl_account'])) { $cont['gl_account'] = getModuleCache('phreebooks', 'settings', 'customers', 'gl_sales'); }
-        if (!empty($cont['ctype_v']))   { $cont['gl_account'] = ''; } // they are also a vendor so use inventory gl acct
+        if (!empty($args['cost']))         { $inv['item_cost'] = $args['cost']; }
+        if (!empty($args['full']))         { $inv['full_price']= $args['full']; }
+        if ( empty($cont['gl_account']))   { $cont['gl_account'] = getModuleCache('phreebooks', 'settings', 'customers', 'gl_sales'); }
+        if (!empty($cont['ctype_v']))      { $cont['gl_account'] = ''; } // they are also a vendor so use inventory gl acct
+        if (!empty($inv['block_discount'])){ $this->locked = true; }
         return ['iID'=>$inv['id'],           'qty'    =>abs($args['qty']), // to properly handle negative sales/purchases and still get pricing based on method
             'cSheetc'=>$cont['price_sheet'], 'glAcct' =>$cont['gl_account'],
             'iSheetc'=>$inv['price_sheet_c'],'iSheetv'=>$inv['price_sheet_v'],

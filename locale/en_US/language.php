@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /local/en_US/language.php
  */
 
@@ -151,6 +151,7 @@ $langCore = [
     'billed' => 'Billed',
     'billing' => 'Billing',
     'bill_to' => 'Bill To',
+    'block_discount' => 'Prevent Discount',
     'bookmark' => 'Bookmark',
     'both' => 'Both',
     'browse' => 'Browse',

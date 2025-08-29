@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-09
+ * @version    7.x Last Update: 2025-08-25
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -114,6 +114,15 @@ function bizunoUpgrade()
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='proLgstc'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='ispPortal'");
         dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."configuration` WHERE config_key='myPortal'");
+    }
+
+    if (version_compare($dbVer, '7.3') < 0) {
+        if ( dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'price_byItem')) { // Field no longer used
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory` DROP price_byItem");
+        }
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'block_discount')) { // New field to prevent discounts from being applied to certain inventory items
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory` ADD `block_discount` ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:selNoYes;tag:BlockDiscount;order:40' AFTER `price_sheet_c`");
+        }
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
