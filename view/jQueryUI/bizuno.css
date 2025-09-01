@@ -1,5 +1,5 @@
 /*
- * Main css for this Bizuno Office plugin using jQuery UI
+ * Main css for Bizuno plugin using jQuery UI
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,8 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    http://opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
- * @version    0.1 Last Update: 2021-03-18
- * @filesource /view/jqueryUI/main.css
+ * @version    0.1 Last Update: 2025-08-30
+ * @filesource /view/jqueryUI/bizuno.css
  */
 
 @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
@@ -40,7 +40,7 @@ body{
 }
 .login-form{
   position: relative;
-  width: 370px;
+  width: 600px;
   height: auto;
   background: #1b1b1b;
   padding: 40px 35px 60px;

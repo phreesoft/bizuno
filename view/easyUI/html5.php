@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-08-31
  * @filesource /view/easyUI/html5.php
  */
 
@@ -938,7 +938,6 @@ columns:  [[
         } else {
             $company = $version.' - '.lang('copyright').' &copy;'.biz_date('Y').' <a href="http://www.PhreeSoft.com" target="_blank">PhreeSoft&trade;</a>';
         }
-        if (!empty($GLOBALS['bizunoNeedsDBUpgrade'])) { unset($menus['menuBar']); } // for some cases, keep user logged in and hide menu
         $data = ['type'=>'page',
             'north'   => ['header'=>['options'=>['region'=>"'north'"],'styles'=>['height'=>'58px'],'type'=>'divs','divs'=>[
                 'left'  => ['styles'=>['float'=>'left'], 'type'=>'fields','keys'=>['logo']],
@@ -1062,7 +1061,6 @@ columns:  [[
         $pgType= $this->mobileMenuType();
         msgDebug("\nEntering layoutMobile with type = $pgType and menuID = $menuID");
         $menus = dbGetRoleMenu();
-        if (!empty($GLOBALS['bizunoNeedsDBUpgrade'])) { $menus['menuBar'] = []; } // for some cases, keep user logged in and hide menu
         $data  = ['type'=>'page',
 //          'divs'  => [], // body supplied by the module detail
             'jsReady' => ['initPage'=>"jqBiz('.menuHide').css('display','inline-block'); window.onorientationchange = function() { window.location.reload(); };"]];

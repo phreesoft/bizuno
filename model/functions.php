@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-08-31
  * @filesource /model/functions.php
  */
 
@@ -1660,7 +1660,7 @@ function viewFavicon($url, $title='', $event=false)
         $img = base64_encode($result);
         if ($img) { $io->fileWrite($img, "cache/icons/{$parts['host']}.fav"); }
     }
-    if (empty($img)) { $img = base64_encode(file_get_contents(BIZUNO_SCRIPTS.'view/images/favicon.ico')); }
+    if (empty($img)) { $img = base64_encode(file_get_contents(BIZBOOKS_URL_FS.'0/view/images/favicon.ico')); }
     return '<img src="data:image/png;base64,'.$img.'" width="32" height="32" alt="'.$title.'" '.$target.'/>';
 }
 

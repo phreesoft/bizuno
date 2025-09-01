@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-08-31
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -92,6 +92,7 @@ class bizInstall // Checking users:
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 6, 'meta_key'=>'methods_funnels',     'meta_value'=>'{}']);
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 7, 'meta_key'=>'dashboards',          'meta_value'=>'{}']);
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']);
+//      dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'spare',               'meta_value'=>'[]']); // spare
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=>$roleID,'meta_key'=>'bizuno_role',     'meta_value'=>json_encode($roleMeta)]);
         setUserCache('profile', 'userRole', $roleID);
         $user = ['userID'=>$userID, 'psID'=>getUserCache('profile', 'psID'), 'userEmail'=>getUserCache('profile', 'email'), 'userRole'=>$roleID];
@@ -112,16 +113,18 @@ class bizInstall // Checking users:
         // insert a record into the contacts table, use email as the short name
         msgDebug("\nFinished installing modules, next up, setting first user.");
         $cID     = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['ctype_u'=>'1', 'email'=>$usrEmail, 'primary_name'=>$usrEmail, 'short_name'=>$usrEmail, 'first_date'=>biz_date()]);
+        dbMetaSet(0, 'user_profile', ['email'=>$usrEmail, 'role_id'=>$roleID], 'contacts', $cID);
         $this->initDashboards($cID, $bAdmin->notes); // create some starting dashboards
         $company = getModuleCache('bizuno', 'settings', 'company'); // set the business title and id
         $company['id'] = $company['primary_name'] = clean('biz_title', 'text', 'post');
         setModuleCache('bizuno', 'settings', 'company', $company);
         $locale  = getModuleCache('bizuno', 'settings', 'locale'); // set the timezone
         $locale['timezone'] = clean('biz_timezone', 'text', 'post');
-        setModuleCache('bizuno', 'settings', 'locale',  $locale);
-        setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION);
+        setModuleCache('bizuno', 'settings',  'locale',  $locale);
+        setModuleCache('bizuno', 'properties','version', MODULE_BIZUNO_VERSION);
         msgLog(lang('user_login')." ".getUserCache('profile', 'email'));
         bizCacheExpClear(); // clear the cache so the next reload sets everything up properly
+        $GLOBALS['BIZUNO_INSTALL_CID'] = $cID; // Set some globals for followup installations
         $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]];
     }
  
