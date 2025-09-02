@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-27
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -65,8 +65,8 @@ function migrateBizunoPrep()
     migrate_misc($cron, true);
     migrate_map($cron, true);
     $cron['ttlSteps']++; $cron['ttlBlk']++; // migrate_rm_tables_pt1
-    $cron['ttlSteps']++; // migrate_rm_tables_pt2
-    $cron['ttlSteps']++; // since we start at zero
+    $cron['ttlSteps']++; $cron['ttlBlk']++; // migrate_rm_tables_pt2
+    $cron['ttlSteps']++; $cron['ttlBlk']++; // since we start at zero
     msgDebug("\nReturning from migrateBizunoPrep with cron = ".print_r($cron, true));
     return $cron;
 }
@@ -113,7 +113,7 @@ function migrateBizuno(&$cron)
         case 30: migrate_map($cron);          break; // Map the new user IDs to old IDs
         case 31: migrate_rm_tables_pt1($cron);break; // Drop tables
         case 32: migrate_rm_tables_pt2($cron);break; // Fix contact type restructure
-        default: $cron['curStep']++; // for missing steps
+        default: $cron['curStep']++; $cron['curBlk']++; break; // for missing steps
     }
     msgDebug("\nLeaving migrateBizuno with cron = ".print_r($cron, true));
 }
@@ -343,7 +343,7 @@ function migrate_users(&$cron=[], $cntOnly=false)
     dbTransactionStart();
     $rIDs = $pIDs = $userMap = [];
     $rows = dbGetMulti(BIZUNO_DB_PREFIX.$table, '', 'admin_id', '', $chunk);
-//  $roleMap = dbMetaGet(0, '_ROLE_ID_MAP');
+    $roleMap = dbMetaGet(0, '_ROLE_ID_MAP');
     foreach ($rows as $user) {
         $rIDs[]= $user['admin_id'];
         // try to find existing record with same email, use the first one
@@ -358,14 +358,28 @@ function migrate_users(&$cron=[], $cntOnly=false)
             $io->fileMove(getModuleCache('bizuno', 'properties', 'usersAttachPath'), "rID_{$user['admin_id']}_", "rID_{$newID}_");
         }
         $attrs  = json_decode($user['settings'], true); // save the settings
-        $profile= ['language'=>$attrs['profile']['language'],       'title'    =>$attrs['profile']['title'], 'icons'=>$attrs['profile']['icons'],
-            'theme'          =>$attrs['profile']['theme'],          'gmail'    =>$attrs['profile']['gmail'], 'gzone'=>$attrs['profile']['gzone'],
-            'def_periods'    =>$attrs['profile']['def_periods'],    'grid_rows'=>$attrs['profile']['grid_rows'],
-            'store_id'       =>$attrs['profile']['store_id'],    // 'role_id'=>$roleMap['r'.$attrs['profile']['role_id']], // roll ID 
-            'restrict_store' =>$attrs['profile']['restrict_store'], 'restrict_user'=> $attrs['profile']['restrict_user'],
-            'restrict_period'=>$attrs['profile']['restrict_period'],'cash_acct'  =>$attrs['profile']['cash_acct'],  'ar_acct'  => $attrs['profile']['ar_acct'],
-            'ap_acct'        =>$attrs['profile']['ap_acct'],        'smtp_enable'=>$attrs['profile']['smtp_enable'],'smtp_host'=> $attrs['profile']['smtp_host'],
-            'smtp_port'      =>$attrs['profile']['smtp_port'],      'smtp_user'  =>$attrs['profile']['smtp_user'],  'smtp_pass'=> $attrs['profile']['smtp_pass']];
+        $profile= [
+            'language'       => !empty($attrs['profile']['language'])       ? $attrs['profile']['language']       : 'en_US',
+            'title'          => !empty($attrs['profile']['title'])          ? $attrs['profile']['title']          : $user['email'],
+            'icons'          => !empty($attrs['profile']['icons'])          ? $attrs['profile']['icons']          : 'default',
+            'theme'          => !empty($attrs['profile']['theme'])          ? $attrs['profile']['theme']          : 'bizuno',
+            'gzone'          => !empty($attrs['profile']['gzone'])          ? $attrs['profile']['gzone']          : 'America/New_York',
+            'def_periods'    => !empty($attrs['profile']['def_periods'])    ? $attrs['profile']['def_periods']    : 'l',
+            'grid_rows'      => !empty($attrs['profile']['grid_rows'])      ? $attrs['profile']['grid_rows']      : 20,
+            'store_id'       => !empty($attrs['profile']['store_id'])       ? $attrs['profile']['store_id']       : 0,
+            'role_id'        => $roleMap['r'.$attrs['profile']['role_id']],
+            'restrict_store' => !empty($attrs['profile']['restrict_store']) ? $attrs['profile']['restrict_store'] : 0,
+            'restrict_user'  => !empty($attrs['profile']['restrict_user'])  ? $attrs['profile']['restrict_user']  : 0,
+            'restrict_period'=> !empty($attrs['profile']['restrict_period'])? $attrs['profile']['restrict_period']: 0,
+            'cash_acct'      => !empty($attrs['profile']['cash_acct'])      ? $attrs['profile']['cash_acct']      : '',
+            'ar_acct'        => !empty($attrs['profile']['ar_acct'])        ? $attrs['profile']['ar_acct']        : '',
+            'ap_acct'        => !empty($attrs['profile']['ap_acct'])        ? $attrs['profile']['ap_acct']        : '',
+            'smtp_enable'    => !empty($attrs['profile']['smtp_enable'])    ? $attrs['profile']['smtp_enable']    : 0,
+            'smtp_host'      => !empty($attrs['profile']['smtp_host'])      ? $attrs['profile']['smtp_host']      : 'https://smtp.gmail.com',
+            'smtp_port'      => !empty($attrs['profile']['smtp_port'])      ? $attrs['profile']['smtp_port']      : 587,
+            'smtp_user'      => !empty($attrs['profile']['smtp_user'])      ? $attrs['profile']['smtp_user']      : '',
+            'smtp_pass'      => !empty($attrs['profile']['smtp_pass'])      ? $attrs['profile']['smtp_pass']      : ''
+            ];
         dbWrite(BIZUNO_DB_PREFIX.'contacts_meta', ['ref_id'=>$newID, 'meta_key'=>'user_profile', 'meta_value'=>json_encode($profile)]);
     }
     dbMetaSet(0, '_ADMIN_ID_MAP', $userMap); // save the user map as common meta for use later
@@ -666,7 +680,7 @@ function migrate_dashboards(&$cron=[], $cntOnly=false)
     dbTransactionStart();
     $metaDash= dbMetaGet(0, 'dashboards'); // get rID just in case it got set during registry
     $rID     = metaIdxClean($metaDash);
-    $defs = [];
+    $defs    = [];
     $userMap = dbMetaGet(0, '_ADMIN_ID_MAP');
     $roleMap = dbMetaGet(0, '_ROLE_ID_MAP');
     foreach ($bizunoMod as $module => $props) {
@@ -675,10 +689,11 @@ function migrate_dashboards(&$cron=[], $cntOnly=false)
         foreach ($props['dashboards'] as $idx => $values) {
             unset($values['id'], $values['status'], $values['default'], $values['order'], $values['acronym']); // not needed for dashboards
             // Some installs have a malformed settings, just remove the dashboard for now, the user will need to put it back manually.
+            if (empty($values['settings']['users']) || empty($values['settings']['roles'])) { continue; }
             if (is_array($values['settings']['users']) || is_array($values['settings']['roles'])) { continue; }
             if (strpos($values['settings']['users'], ':')!==false) { $parts = explode(':', $values['settings']['users']); }
             elseif (empty($values['settings']['users']))           { $parts = [0]; }
-            else                                                   { $parts = [$values['$values']['users']]; }
+            else                                                   { $parts = [$values['settings']['users']]; }
             $userIDs = [];
             foreach ($parts as $id) { if (isset($userMap['r'.$id])){ $userIDs[] = intval($userMap['r'.$id]); } }
             $values['settings']['users'] = $userIDs;
@@ -689,7 +704,6 @@ function migrate_dashboards(&$cron=[], $cntOnly=false)
             $roleIDs = [];
             foreach ($parts as $id) { if (isset($roleMap['r'.$id])){ $roleIDs[] = intval($roleMap['r'.$id]); } }
             $values['settings']['roles'] = $roleIDs;
- 
             $defs[$idx] = $values;
         }
         // Don't need the modules to store the dashboard properties anymore
@@ -769,40 +783,40 @@ function migrateReports(&$report, $row, $rptMap, $security)
     if ($report->reporttype=='rpt') { 
         $gID = explode(":", $report->groupname); $report->groupname = $gID[0].":rpt";
         // Heading
-        $report->headingshow = $report->heading->show;
-        $report->headingfont = $report->heading->font;
-        $report->headingsize = $report->heading->size;
-        $report->headingcolor= $report->heading->color;
-        $report->headingalign= $report->heading->align;
+        $report->headingshow = !empty($report->heading->show) ? $report->heading->show : '';
+        $report->headingfont = !empty($report->heading->font) ? $report->heading->font : 'helvetica';
+        $report->headingsize = !empty($report->heading->size) ? $report->heading->size : '10';
+        $report->headingcolor= !empty($report->heading->color)? $report->heading->color: '#000000';
+        $report->headingalign= !empty($report->heading->align)? $report->heading->align: 'L';
         // title1
-        $report->title1show  = $report->title1->show;
-        $report->title1text  = $report->title1->text;
-        $report->title1font  = $report->title1->font;
-        $report->title1size  = $report->title1->size;
-        $report->title1color = $report->title1->color;
-        $report->title1align = $report->title1->align;
+        $report->title1show  = !empty($report->title1->show) ? $report->title1->show : '';
+        $report->title1text  = !empty($report->title1->text) ? $report->title1->text : '%reportname%';
+        $report->title1font  = !empty($report->title1->font) ? $report->title1->font : 'helvetica';
+        $report->title1size  = !empty($report->title1->size) ? $report->title1->size : '10';
+        $report->title1color = !empty($report->title1->color)? $report->title1->color: '#000000';
+        $report->title1align = !empty($report->title1->align)? $report->title1->align: 'L';
         // Title2
-        $report->title2show  = $report->title2->show;
-        $report->title2text  = $report->title2->text;
-        $report->title2font  = $report->title2->font;
-        $report->title2size  = $report->title2->size;
-        $report->title2color = $report->title2->color;
-        $report->title2align = $report->title2->align;
+        $report->title2show  = !empty($report->title2->show) ? $report->title2->show : '';
+        $report->title2text  = !empty($report->title2->text) ? $report->title2->text : 'Report Generated %date%';
+        $report->title2font  = !empty($report->title2->font) ? $report->title2->font : 'helvetica';
+        $report->title2size  = !empty($report->title2->size) ? $report->title2->size : '10';
+        $report->title2color = !empty($report->title2->color)? $report->title2->color: '#000000';
+        $report->title2align = !empty($report->title2->align)? $report->title2->align: 'L';
         // Filters
-        $report->filterfont  = $report->filter->font;
-        $report->filtersize  = $report->filter->size;
-        $report->filtercolor = $report->filter->color;
-        $report->filteralign = $report->filter->align;
+        $report->filterfont  = !empty($report->filter->font) ? $report->filter->font : 'helvetica';
+        $report->filtersize  = !empty($report->filter->size) ? $report->filter->size : '10';
+        $report->filtercolor = !empty($report->filter->color)? $report->filter->color: '#000000';
+        $report->filteralign = !empty($report->filter->align)? $report->filter->align: 'L';
         // Data
-        $report->datafont    = $report->data->font;
-        $report->datasize    = $report->data->size;
-        $report->datacolor   = $report->data->color;
-        $report->dataalign   = $report->data->align;
+        $report->datafont    = !empty($report->data->font) ? $report->data->font : 'helvetica';
+        $report->datasize    = !empty($report->data->size) ? $report->data->size : '10';
+        $report->datacolor   = !empty($report->data->color)? $report->data->color: '#000000';
+        $report->dataalign   = !empty($report->data->align)? $report->data->align: 'L';
         // Totals
-        $report->totalfont   = $report->total->font;
-        $report->totalsize   = $report->total->size;
-        $report->totalcolor  = $report->total->color;
-        $report->totalalign  = $report->total->align;
+        $report->totalfont   = !empty($report->total->font) ? $report->total->font : 'helvetica';
+        $report->totalsize   = !empty($report->total->size) ? $report->total->size : '10';
+        $report->totalcolor  = !empty($report->total->color)? $report->total->color: '#000000';
+        $report->totalalign  = !empty($report->total->align)? $report->total->align: 'L';
     } // clean up phreebooks report format to new format
     // Page setup - Need to flatten out the fields
     $report->pagesize    = $report->page->size;
@@ -813,7 +827,7 @@ function migrateReports(&$report, $row, $rptMap, $security)
     $report->marginright = $report->page->margin->right;
     // The rest
 //  $report->id         = $row['id'];
-    $report->dateperiod = $row['dateperiod'];
+    $report->dateperiod = !empty($row['dateperiod']) ? $row['dateperiod'] : 'd';
     $report->datelist   = str_split($report->datelist);
     $report->type       = trim($report->reporttype, ':');
     $report->group_id   = $row['group_id'];
@@ -1245,6 +1259,7 @@ function migrate_prod_journal(&$cron=[], $cntOnly=false) // Map srvBuilder_journ
         $mID = dbWrite(BIZUNO_DB_PREFIX.'journal_main', $main);
         $item= ['ref_id'=>$mID, 'qty'=>$row['qty'], 'sku'=>dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id={$row['sku_id']}"), 'post_date'=> $row['create_date']];
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $item);
+        if (empty($row['steps'])) { $row['steps'] = []; }
         foreach ($row['steps'] as $idx => $step) { // field $row['steps'] - {"1":{"step":1,"task_id":"1","mfg":"0","mfg_id":0,"qa":"0","qa_id":0,"data_entry":"0","erp_entry":"0","admin_id":"18","complete":"1"},"2":{"step":2,"task_id":"33","mfg":"1","mfg_id":17,"qa":"0","qa_id":0,"data_entry":"0","erp_entry":"0","admin_id":"18","complete":"1","mfg_date":"2016-01-05 14:30:46"},"3":{"step":3,"task_id":"2","mfg":"1","mfg_id":17,"qa":"0","qa_id":0,"data_entry":"1","erp_entry":"0","admin_id":"18","complete":"1","mfg_date":"2016-01-05 14:31:04","data_value":"72:150629A"},"4":{"step":4,"task_id":"12","mfg":"1","mfg_id":17,"qa":"0","qa_id":0,"data_entry":"0","erp_entry":"0","admin_id":"18","complete":"1","mfg_date":"2016-01-05 14:31:10"},"5":{"step":5,"task_id":"34","mfg":"1","mfg_id":17,"qa":"0","qa_id":0,"data_entry":"1","erp_entry":"0","admin_id":"18","complete":"1","mfg_date":"2016-01-05 14:31:20","data_value":"pass"},"6":{"step":6,"task_id":"8","mfg":"0","mfg_id":0,"qa":"0","qa_id":0,"data_entry":"1","erp_entry":"0","admin_id":"18","complete":"1","data_value":"1602"},"7":{"step":7,"task_id":"9","mfg":"0","mfg_id":0,"qa":"0","qa_id":0,"data_entry":"0","erp_entry":"0","admin_id":"18","complete":"1"},"8":{"step":8,"task_id":"30","mfg":"0","mfg_id":0,"qa":"1","qa_id":18,"data_entry":"0","erp_entry":"1","admin_id":"18","complete":"1","qa_date":"2016-01-05 14:39:41"}}
             $row['steps'][$idx]['task_id'] = isset($taskMap['r'.$step['task_id']]) ? $taskMap['r'.$step['task_id']] : $step['task_id'];
         }
@@ -1522,6 +1537,7 @@ function migrateDashData($data, $refID)
                 $data[$dashID]['opts'] = [];
                 break;
             case 'favorite_reports':
+                if (empty($values['opts']['data'])) { $values['opts']['data'] = []; }
                 foreach (array_keys((array)$values['opts']['data']) as $rptID) {
                     if (empty($rptID)) { continue; }
                     $newVals[] = $mapRpts['r'.$rptID];
@@ -1546,6 +1562,7 @@ function migrateDashData($data, $refID)
             case 'reminder':
                 $rmdrC= dbMetaGet(0, 'reminder_list', 'contacts', $refID);
                 $cIdx = metaIdxClean($rmdrC);
+                if (!empty($cIdx)) { break; } // only do this once per user. Causes duplicates.
                 foreach ((array)$values['opts']['current'] as $row) { $current[] = ['title'=>$row['title'], 'date'=>$row['date']]; }
                 dbMetaSet($cIdx, 'reminder_list', $current, 'contacts', $refID);
                 foreach ((array)$values['opts']['source'] as $row) { 
