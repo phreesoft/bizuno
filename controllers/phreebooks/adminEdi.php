@@ -67,10 +67,14 @@ class phreebooksAdminEdi
     }
     public function managerRows(&$layout=[])
     {
+        msgTrap();
         if (!$security = validateAccess('admin', 1)) { return; }
+        $creds  = getMetaCommon('edi');
+        msgDebug("\nRetrieved creds from meta = ".print_r($creds, true));
+
         $clients= getModuleCache($this->moduleID, 'clients');
         msgDebug("\nread client list: ".print_r($clients, true));
-        $layout = array_replace_recursive($layout, ['content'=>['total'=>sizeof($clients),'rows'=>array_values($clients)]]);
+        $layout = array_replace_recursive($layout, ['content'=>['total'=>sizeof($creds),'rows'=>array_values($creds)]]);
     }
     private function managerSettings()
     {

@@ -168,7 +168,7 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
         return; */
 
         $rID = clean('rID', 'integer', 'request'); // to work with either get or post
-return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num to fetch fileas the passed ID needs to be from the journal main table.");
+return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num to fetch file as the passed ID needs to be from the journal main table.");
         if (empty($rID)) { return msgAdd('Bad record ID'); }
         // get the rcv file from the db
         $row = dbGetRow(BIZUNO_DB_PREFIX.'edi_log', "id=$rID");

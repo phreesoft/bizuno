@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /model/io.php
  */
 
@@ -547,7 +547,7 @@ final class io
     public function getGravatarURL($email='', $size=150)
     {
         msgDebug("\nBuilding Gravatar URL for email $email with size = $size");
-        $default = "https://www.bizuno.com/view/images/bizuno_icon.png";
+        $default = BIZUNO_ICON;
         if (empty($email)) { return $default; }
         $grav_url = "https://www.gravatar.com/avatar/" . hash( "sha256", strtolower( trim( $email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
         return $grav_url;

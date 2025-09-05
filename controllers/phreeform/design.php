@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-04
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -394,7 +394,7 @@ function pfTableUpdate() {
                     'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
                     'actions' => [
                         'tblEdit' =>['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
-                        'tblTrash'=>['order'=>80,'icon'=>'trash','events'=>['onClick'=>"alert('destroying row'); jqBiz('#$name').edatagrid('destroyRow');"]]]],
+                        'tblTrash'=>['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'join_type'   => ['order'=>10, 'label'=>$this->lang['join_type'], 'attr'=>['width'=>100, 'resizable'=>true],
                     'events'  => ['editor'=>"{type:'combobox',options:{editable:false,mode:'remote',url:'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getTablesJoin',valueField:'id',textField:'text'}}"]],
                 'tablename'   => ['order'=>20, 'label'=>$this->lang['table_name'], 'attr'=>['width'=>200, 'resizable'=>true],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-05
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -550,7 +550,6 @@ class inventoryTools
      */
     public function priceAssyNext(&$layout=[])
     {
-//      global $io;
         $blockCnt = 100;
         $cron = getUserCron('priceAssy');
         while ($blockCnt > 0) {
@@ -754,7 +753,7 @@ class inventoryTools
             if (empty($row['sku'])) { continue; }
             if (empty($GLOBALS['inventory'][$row['sku']]['unit_cost'])) {
                 $skuDtl = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type','item_cost'], "sku='".addslashes($row['sku'])."'");
-                if (!in_array($skuDtl, $this->inv_types)) { continue; } // not tracked so ignore cost
+                if (!in_array($skuDtl['inventory_type'], $this->inv_types)) { continue; } // not tracked so ignore cost
                 if (empty($skuDtl['item_cost'])) {
                     $cron['noCost'][] = $row['sku'];
                     $skip = true;

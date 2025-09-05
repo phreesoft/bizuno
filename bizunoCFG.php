@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-21
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /src/bizunoCFG.php
  */
 
@@ -41,6 +41,8 @@ define('BIZBOOKS_ROOT',     BIZUNO_REPO); // file system path to bizuno root ind
 // PhreeSoft Images
 define('PHREESOFT_LOGO',    BIZBOOKS_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
 define('BIZUNO_LOGO',       BIZBOOKS_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
+define('BIZUNO_ICON',       BIZBOOKS_URL_FS.'0/view/images/bizuno_icon.png'); // URL to default Bizuno icon
+//// bizuno_icon.png
 // Set support ticket email, this makes the menu option show
 if (!defined('BIZUNO_SUPPORT_NAME'))  { define('BIZUNO_SUPPORT_NAME', 'Bizuno Support'); }
 if (!defined('BIZUNO_SUPPORT_EMAIL')) { define('BIZUNO_SUPPORT_EMAIL','support@phreesoft.com'); }

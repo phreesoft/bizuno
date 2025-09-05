@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-09-02
  * @filesource /view/main.php
  */
 
@@ -138,7 +138,7 @@ final class view
         $data['head']['metaTitle']   = ['order'=>22,'type'=>'html','html'=>'<meta name="robots" content="noindex">'];
         $data['head']['metaContent'] = ['order'=>24,'type'=>'html','html'=>'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'];
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];
-        $data['head']['metaIcon']    = ['order'=>28,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.BIZUNO_LOGO.'" />'];
+        $data['head']['metaIcon']    = ['order'=>28,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.BIZUNO_ICON.'" />'];
         // Page head CSS
         $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/portal.css" />'];
         // Page head JavaScript 
@@ -192,7 +192,7 @@ final class view
         $icons   = getUserCache('profile', 'icons', false, 'default');
         $theme   = getUserCache('profile', 'theme', false, 'bizuno');
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
-        $favicon = $logoPath ? BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_LOGO;
+        $favicon = $logoPath ? BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
 //        $cssPath = defined('BIZUNO_SHARED') && !empty(BIZUNO_SHARED) ? 'myPortal' : 'ispPortal';
         $js  = "var bizID = '".getUserCache('business','bizID', false, 0)."';\n";
         $js .= "var bizunoHome = '".BIZUNO_HOME."';\n";
