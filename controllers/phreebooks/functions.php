@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-15
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -520,7 +520,7 @@ function mapContactToJournal($cID = 0, $suffix='_b')
         'telephone1'.$suffix  => $aData['telephone1'],
         'email'.$suffix       => $aData['email']];
     $cData = dbGetRow(BIZUNO_DB_PREFIX."contacts", "id='$cID'");
-    $output['type']    = $cData['type'];
+    $output['type']    = !empty($cData['type']) ? $cData['type'] : 'c';
     $output['terms']   = isset($cData['terms']) && $cData['terms'] ? $cData['terms'] : '0';
     $output['currency']= isset($cData['currencyISO']) && $cData['currencyISO'] ? $cData['currencyISO'] : getDefaultCurrency();
     return $output;

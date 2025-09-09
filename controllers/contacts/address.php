@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/contacts/address.php
  */
 
@@ -81,7 +81,7 @@ class contactsAddress extends mgrJournal
     protected function managerGrid($security=0, $args=[])
     {
         msgDebug("\nEntering contacts:address:managerGrid with args = ".print_r($args, true));
-        $defs = array_replace(['_refID'=>clean('refID', 'integer', 'get'), '_table'=>'contacts'], $args);
+        $defs = array_replace(['_refID'=>clean('refID', 'integer', 'get'), '_table'=>'contacts', 'dom'=>''], $args);
         $data = array_replace_recursive(parent::gridBase($security, $defs), [
             'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&aType=$this->aType&cType=$this->cType&dom={$defs['dom']}&refID={$defs['_refID']}"],
             'source' => [

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-31
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /model/functions.php
  */
 
@@ -724,7 +724,7 @@ function getMailCreds()
     msgDebug("\nRead creds for the business = ".print_r($creds, true));
     $user = getMetaContact(getUserCache('profile', 'userID'), 'user_profile'); // user settings
     msgDebug("\nRead profile for the user = ".print_r($user, true));
-    if (in_array($user['mail_mode'], ['smtp', 'gmail'])) { $creds = $user; }
+    if (!empty($user['mail_mode']) && in_array($user['mail_mode'], ['smtp', 'gmail'])) { $creds = $user; }
     return $creds;
 }
 

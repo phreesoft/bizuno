@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -50,7 +50,7 @@ class shippingShip extends shippingCommon
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $rID     = clean('rID', 'integer', 'get');
         $dbData  = $this->getShipmentData($rID);
-        if (empty($dbData['email_s'])) { $dbData['email_s'] = $dbData['email_b']; } // If shipping email is empty, use billing
+        if (empty($dbData['email_s'])) { $dbData['email_s'] = !empty($dbData['email_b']) ? $dbData['email_b']  : ''; } // If shipping email is empty, use billing
         $shipper = $this->loadCarrier($dbData['carrier']);
         if ($rID && !method_exists($shipper, 'labelGet')) {
             msgDebug("\nNo label method, just a log entry");

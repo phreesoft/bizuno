@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/phreebooks/totals/discountChk/discountChk.php
  */
 
@@ -35,6 +35,7 @@ class discountChk
     public $required = true;
     public $jID;
     public $settings;
+    public $fields;
     public $lang     = ['title'=>'Discount (Line Checked)',
         'label'      => 'Discount',
         'description'=> 'This method will apply a discount based on each line that is checked. Typically used for banking transactions, Customer Receipts and Vendor Payments.'];

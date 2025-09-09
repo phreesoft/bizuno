@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-06
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -33,6 +33,9 @@ class fedexShip extends fedexCommon
     private $fedex_results= [];
     private $delDate      = 0;
     private $pkgNotes     = '';
+    public  $is_freight;
+    public  $labeltypes;
+    public  $labels;
 
     function __construct()
     {

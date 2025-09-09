@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/shipping/common.php
  */
 
@@ -124,20 +124,20 @@ class shippingCommon
             $shipper->lang['GND'] = $this->lang['GND'];
         }
         if (!isset($shipper->options)) { $shipper->options = []; }
-        $shipper->weightUOM    = !empty($this->settings['weight_uom'])    ? $this->settings['weight_uom']: 'LBS';
-        $shipper->dimUOM       = !empty($this->settings['dim_uom'])       ? $this->settings['dim_uom']   : 'IN';
-        $shipper->ship_pkg     = !empty($shipper->options['PackageMap'])  ? array_shift(array_keys((array)$shipper->options['PackageMap'])) : '';
-        $shipper->ship_pickup  = !empty($shipper->options['PickupMap'])   ? array_shift(array_keys((array)$shipper->options['PickupMap'])) : '';
-        $shipper->ship_cod_type= !empty($shipper->options['CODMap'])      ? array_shift(array_keys((array)$shipper->options['CODMap'])) : '';
-        $shipper->confirm_type = !empty($shipper->options['SignatureMap'])? array_shift(array_keys((array)$shipper->options['SignatureMap'])) : '';
 
-        if (!isset($shipper->options['rateCodes']))    { $shipper->options['rateCodes']    = [''=>lang('none')]; }
-        if (!isset($shipper->options['PaymentMap']))   { $shipper->options['PaymentMap']   = [''=>lang('none')]; }
         if (!isset($shipper->options['PackageMap']))   { $shipper->options['PackageMap']   = [''=>lang('none')]; }
         if (!isset($shipper->options['PickupMap']))    { $shipper->options['PickupMap']    = [''=>lang('none')]; }
         if (!isset($shipper->options['CODMap']))       { $shipper->options['CODMap']       = [''=>lang('none')]; }
         if (!isset($shipper->options['SignatureMap'])) { $shipper->options['SignatureMap'] = [''=>lang('none')]; }
+        if (!isset($shipper->options['rateCodes']))    { $shipper->options['rateCodes']    = [''=>lang('none')]; }
+        if (!isset($shipper->options['PaymentMap']))   { $shipper->options['PaymentMap']   = [''=>lang('none')]; }
         if (!isset($shipper->options['LTLClasses']))   { $shipper->options['LTLClasses']   = [''=>lang('none')]; }
+        $shipper->weightUOM    = !empty($this->settings['weight_uom'])    ? $this->settings['weight_uom']: 'LBS';
+        $shipper->dimUOM       = !empty($this->settings['dim_uom'])       ? $this->settings['dim_uom']   : 'IN';
+        $shipper->ship_pkg     = !empty($shipper->options['PackageMap'])  ? array_shift(array_keys((array)$shipper->options['PackageMap']))   : '';
+        $shipper->ship_pickup  = !empty($shipper->options['PickupMap'])   ? array_shift(array_keys((array)$shipper->options['PickupMap']))    : '';
+        $shipper->ship_cod_type= !empty($shipper->options['CODMap'])      ? array_shift(array_keys((array)$shipper->options['CODMap']))       : '';
+        $shipper->confirm_type = !empty($shipper->options['SignatureMap'])? array_shift(array_keys((array)$shipper->options['SignatureMap'])) : '';
         return $shipper;
     }
 

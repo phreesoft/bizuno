@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-02
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /view/main.php
  */
 
@@ -874,6 +874,7 @@ function viewSubMenu($menuID=false) {
  */
 function viewText($text, $length=25)
 {
+    if (empty($text)) { $text=''; }
     return strlen($text)>$length ? substr($text, 0, $length).'...' : $text;
 }
 

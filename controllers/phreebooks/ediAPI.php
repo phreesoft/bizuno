@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-09-09
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -76,7 +76,9 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     public $items;
     public $contact;
     public $orderTotal;
-
+    public $ediSONum;
+    public $ediResponse;
+    
     function __construct()
     {
         $this->lang   = getLang($this->moduleID);
@@ -449,7 +451,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
         } else {
             $layout['args'] = ['sku'=>$skuInfo['sku'], 'qty'=>$qty, 'cID'=>$this->cID];
             compose('inventory', 'prices', 'quote', $layout);
-            $skuInfo['price'] = $layout['content']['price'];
+            $skuInfo['price'] = !empty($layout['content']['price']) ? $layout['content']['price'] : 0;
         }
         return $skuInfo;
     }
