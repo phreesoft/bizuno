@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -505,6 +505,7 @@ class jCommon
     {
         msgDebug("\n    Calculating COGS, item data = ".print_r($item, true));
         $cogs = 0;
+        if (!isset($item['trans_code'])) { $item['trans_code'] = ''; }
         // fetch the additional inventory item fields we need
         $defaults = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "sku='{$item['sku']}'");
         // catch sku's that are not in the inventory database but have been requested to post, error

@@ -231,7 +231,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $refID= clean('rID', 'integer', 'get'); // this is the journal_main id field
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
-        $args = ['_rID'=>$meta['_rID'], '_refID'=>$refID, '_table'=>'journal', 'tabID'=>2];
+        $args = ['_rID'=>!empty($meta['_rID'])?$meta['_rID']:0, '_refID'=>$refID, '_table'=>'journal', 'tabID'=>2];
         parent::editMeta($layout, $security, $args);
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow copy here
         if (!empty($meta['_rID'])) { // customize JavaScript

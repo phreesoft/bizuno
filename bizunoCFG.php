@@ -38,7 +38,7 @@ define('BIZBOOKS_URL_ROOT', BIZUNO_SRVR); // full url to Bizuno root folder
 define('BIZBOOKS_URL_FS',   BIZBOOKS_URL_ROOT.'?bizRt=portal/api/fs&src='); // full url to Bizuno portal file system access script
 // File system paths
 define('BIZBOOKS_ROOT',     BIZUNO_REPO); // file system path to bizuno root index file
-// PhreeSoft Images
+// URLs to PhreeSoft Images
 define('PHREESOFT_LOGO',    BIZBOOKS_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
 define('BIZUNO_LOGO',       BIZBOOKS_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
 define('BIZUNO_ICON',       BIZBOOKS_URL_FS.'0/view/images/bizuno_icon.png'); // URL to default Bizuno icon

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -297,7 +297,8 @@ class journal
      */
     private function jrnlGetPaymentData($rID=0, $cID=0)
     {
-        $preChecked= (array)explode(":", clean('iID', 'text', 'get'));
+        $iID    = clean('iID', ['format'=>'text', 'default'=>''], 'get');
+        $preChecked= (array)explode(":", $iID);
         $output = ['main'=>[],'items'=>[]];
         $itemIdx= 0;
         $type   = in_array($this->journalID, [17, 20, 21]) ? 'v' : 'c';

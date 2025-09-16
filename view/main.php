@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /view/main.php
  */
 
@@ -1254,6 +1254,7 @@ function customTabs(&$data, $module, $tabID)
 {
     msgDebug("\nEntering customTabs with module = $module and tabID = $tabID");
     $metas = dbMetaGet('%', 'tabs');
+    $tabs = [];
     metaIdxClean($metas);
     foreach ($metas as $meta) {
         if ($meta['table']<>$module) { continue; }

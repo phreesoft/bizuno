@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -508,7 +508,7 @@ function mapContactToJournal($cID = 0, $suffix='_b')
     $output = ['post_date'    => biz_date('Y-m-d'),
         'rep_id'              => getUserCache('profile', 'userID', false, 0),
         'contact_id'.$suffix  => $cID,
-        'address_id'.$suffix  => $aData['address_id'],
+        'address_id'.$suffix  => !empty($aData['address_id']) ? $aData['address_id'] : 0,
         'primary_name'.$suffix=> $aData['primary_name'],
         'contact'.$suffix     => $aData['contact'],
         'address1'.$suffix    => $aData['address1'],

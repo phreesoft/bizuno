@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /controllers/phreebooks/journals/j16.php
  */
 
@@ -34,6 +34,7 @@ class j16 extends jCommon
     protected $journalID = 16;
     public $main;
     public $items;
+    public $dgDataItem;
     public $type;
     public $lang;
     public $rID;

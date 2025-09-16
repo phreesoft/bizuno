@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-02
+ * @version    7.x Last Update: 2025-09-11
  * @filesource /controllers/phreeform/dashboards/favorite_reports/favorite_reports.php
  */
 
@@ -61,6 +61,7 @@ class favorite_reports
         if ( empty($opts['data'])) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }
         else { 
             foreach ($opts['data'] as $rptID) {
+                if (empty($rptID)) { msgDebug("\nrptID is empty? Skipping"); continue; }
                 $rpt = $this->allRpts['r'.$rptID];
                 if (empty($rpt)) { msgDebug("\nReport ID $rptID not found"); continue; } // report is missing?
                 $theList[] = $rpt;

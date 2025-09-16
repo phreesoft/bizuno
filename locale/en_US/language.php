@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /local/en_US/language.php
  */
 
@@ -35,6 +35,7 @@ $langCore = [
     'tbd_prices' => '%s Prices',
     'tbd_bill' => 'Bill %s',
     'tbd_ship' => 'Ship %s',
+    'tbd_settings' => '%s Settings',
     'tbd_summary' => '%s Summary',
     'tbd_task' => '%s Task',
     'tbd_tasks' => '%s Tasks',

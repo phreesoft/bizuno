@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-09-11
  * @filesource /controllers/phreebooks/journals/j04.php
  */
 
@@ -38,6 +38,7 @@ class j04 extends jCommon
     public $lang;
     public $rID;
     public $totals;
+    public $dgDataItem;
 
     function __construct($main=[], $item=[])
     {

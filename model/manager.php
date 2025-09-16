@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-09-11
  * @filesource /model/manager.php
  */
 
@@ -361,7 +361,7 @@ class mgrJournal
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'1'], 'update', "id=$rID");
         }
         msgAdd(lang('msg_record_saved'), 'success');
-        msgLog("$this->mgrTitle - ".lang('save')." - {$values['title']} ($rID)");
+        msgLog("$this->mgrTitle - ".lang('save')." - {$values['invoice_num']} ($rID)");
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select', 0); bizGridReload('dg{$this->domSuffix}'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]]);
     }
 
@@ -382,7 +382,7 @@ class mgrJournal
         if (empty($defs['_rID'])) { $defs['_rID'] = $_POST['_rID'] = $result; } // only for inserts
         $io->uploadSave("atch{$this->domSuffix}", "{$this->attachPath}{$output['ref_num']}_{$defs['_rID']}_");
         msgAdd(lang('msg_record_saved'), 'success');
-        msgLog("$this->mgrTitle - ".lang('save').": {$output['title']}");
+        msgLog("$this->mgrTitle - ".lang('save').": ".(!empty($output['title']) ? $output['title'] : ''));
         $data  = ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select',{$defs['tabID']}); bizGridReload('dg{$this->domSuffix}'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]];
         $layout= array_replace_recursive($layout, $data);
     }

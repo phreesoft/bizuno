@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-14
  * @filesource /controllers/shipping/common.php
  */
 
@@ -123,21 +123,17 @@ class shippingCommon
             $shipper->code = '';
             $shipper->lang['GND'] = $this->lang['GND'];
         }
-        if (!isset($shipper->options)) { $shipper->options = []; }
-
-        if (!isset($shipper->options['PackageMap']))   { $shipper->options['PackageMap']   = [''=>lang('none')]; }
-        if (!isset($shipper->options['PickupMap']))    { $shipper->options['PickupMap']    = [''=>lang('none')]; }
-        if (!isset($shipper->options['CODMap']))       { $shipper->options['CODMap']       = [''=>lang('none')]; }
-        if (!isset($shipper->options['SignatureMap'])) { $shipper->options['SignatureMap'] = [''=>lang('none')]; }
-        if (!isset($shipper->options['rateCodes']))    { $shipper->options['rateCodes']    = [''=>lang('none')]; }
-        if (!isset($shipper->options['PaymentMap']))   { $shipper->options['PaymentMap']   = [''=>lang('none')]; }
-        if (!isset($shipper->options['LTLClasses']))   { $shipper->options['LTLClasses']   = [''=>lang('none')]; }
-        $shipper->weightUOM    = !empty($this->settings['weight_uom'])    ? $this->settings['weight_uom']: 'LBS';
-        $shipper->dimUOM       = !empty($this->settings['dim_uom'])       ? $this->settings['dim_uom']   : 'IN';
-        $shipper->ship_pkg     = !empty($shipper->options['PackageMap'])  ? array_shift(array_keys((array)$shipper->options['PackageMap']))   : '';
-        $shipper->ship_pickup  = !empty($shipper->options['PickupMap'])   ? array_shift(array_keys((array)$shipper->options['PickupMap']))    : '';
-        $shipper->ship_cod_type= !empty($shipper->options['CODMap'])      ? array_shift(array_keys((array)$shipper->options['CODMap']))       : '';
-        $shipper->confirm_type = !empty($shipper->options['SignatureMap'])? array_shift(array_keys((array)$shipper->options['SignatureMap'])) : '';
+        if (!isset($shipper->options) || !is_array($shipper->options)) { $shipper->options = []; }
+        $shipper->options = array_replace_recursive([ // make sure all options have a value
+            'PackageMap'  =>[''=>lang('none')], 'PickupMap' =>[''=>lang('none')], 'CODMap'    =>[''=>lang('none')],
+            'SignatureMap'=>[''=>lang('none')], 'rateCodes' =>[''=>lang('none')], 'PaymentMap'=>[''=>lang('none')],
+            'LTLClasses'  =>[''=>lang('none')], 'paperTypes'=>[''=>lang('none')]], $shipper->options, );
+        $shipper->ship_pkg     = array_shift(array_keys($shipper->options['PackageMap']));
+        $shipper->ship_pickup  = array_shift(array_keys($shipper->options['PickupMap']));
+        $shipper->ship_cod_type= array_shift(array_keys($shipper->options['CODMap']));
+        $shipper->confirm_type = array_shift(array_keys($shipper->options['SignatureMap']));
+        $shipper->weightUOM    = !empty($this->settings['weight_uom'])? $this->settings['weight_uom']: 'LBS';
+        $shipper->dimUOM       = !empty($this->settings['dim_uom'])   ? $this->settings['dim_uom']   : 'IN';
         return $shipper;
     }
 
@@ -306,8 +302,9 @@ class shippingCommon
             $ttlIns+= $sku['item_cost'] * $row['qty'];
         }
         if ($weight > $this->freightWt) { // palletize
+            $pltWt = !empty($this->settings['pallet_weight']) ? $this->settings['pallet_weight'] : $this->defaults['pallet_weight'];
             $this->shipment['Qty'] = max(ceil($ttlWt/$this->palletWt), 1);
-            $this->shipment['Wt']  = ceil($ttlWt) + ($this->shipment['Qty'] * $this->settings['pallet_weight']);
+            $this->shipment['Wt']  = ceil($ttlWt) + ($this->shipment['Qty'] * $pltWt);
             $this->guessPallet($sku, $volume, $weight); // recalculate the dims
         } else {
             $this->shipment['Qty'] = max($ttlBox, 1);

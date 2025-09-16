@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-09-14
  * @filesource /controllers/shipping/carriers/best_way/best_way.php
  */
 
@@ -105,11 +105,8 @@ class best_way {
             'rateCodes'   => ['BESTWAY'=> 'GND'],
             'PickupMap'   => ['OTHER'  => lang('Other')],
             'PackageMap'  => ['CUSTOM' => lang('custom')],
-            'CODMap'      => [],
             'PaymentMap'  => ['OTHER' => lang('collect')],
-            'SignatureMap'=> [],
             'LTLClasses'  => ['0'=>lang('select'),'050'=>'50','055'=>'55','060'=>'60','065'=>'65','070'=>'70','077'=>'77.5','085'=>'85',
-                '092'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300'],
-            'paperTypes'  => []];
+                '092'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300']];
     }
 }

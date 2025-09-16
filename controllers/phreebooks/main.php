@@ -43,12 +43,14 @@ class phreebooksMain
     public $type;
     public $isACH;
     public $restrict = false;
+    public $blocked_journals;
 
     function __construct()
     {
-        $this->lang  = getLang($this->moduleID);
-        $this->rID   = clean('rID', 'integer', 'get');
-        $this->action= clean('bizAction', 'text', 'get');
+        $this->lang   = getLang($this->moduleID);
+        $this->myStore= getUserCache('profile', 'store_id', '', 0);
+        $this->rID    = clean('rID', 'integer', 'get');
+        $this->action = clean('bizAction', 'text', 'get');
         if ($this->rID && !in_array($this->action, ['inv','ord'])) { $_GET['jID'] = $this->journalID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'journal_id', "id=$this->rID"); }
         else { $this->journalID = clean('jID', 'integer', 'get'); }
         if (!defined('JOURNAL_ID')) { define('JOURNAL_ID', $this->journalID); }

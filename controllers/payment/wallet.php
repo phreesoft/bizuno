@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-09-13
  * @filesource /controllers/payment/wallet.php
  */
 
@@ -40,6 +40,7 @@ class paymentWallet
     public $props;
     public $cID;
     public $type;
+    public $payfabric;
     public $pfID;
 
     function __construct()
@@ -109,7 +110,7 @@ class paymentWallet
             $dtlACH = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['ach_bank', 'ach_routing', 'ach_account'], "id=$this->cID"); // 'ach_enable',
 //          $layout['fields']['ach_enable'] = ['order'=>10,'label'=>lang('ach_enable'), 'attr'=>['type'=>'checkbox','checked'=>$dtlACH['ach_enable']]];
             $layout['fields']['ach_bank']   = ['order'=>20,'label'=>lang('ach_bank'),   'attr'=>['value'=>$dtlACH['ach_bank']]];
-            $layout['fields']['ach_routing']= ['order'=>30,'label'=>lang('ach_routing'),'attr'=>['value'=>str_pad($dtlACH['ach_routing'], 9, '0', STR_PAD_LEFT)]];
+            $layout['fields']['ach_routing']= ['order'=>30,'label'=>lang('ach_routing'),'attr'=>['value'=>str_pad((string)$dtlACH['ach_routing'], 9, '0', STR_PAD_LEFT)]];
             $layout['fields']['ach_account']= ['order'=>40,'label'=>lang('ach_account'),'attr'=>['value'=>$dtlACH['ach_account']]];
             $layout['panels']['vendACH']    = ['title'=>"ACH Payment Details",'opts'=>['icon'=>'edi'],
                 'divs' => ['ediInfo'=>['order'=>30,'type'=>'fields','keys'=>['ach_enable','ach_bank','ach_routing','ach_account']]]];

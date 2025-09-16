@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-11
  * @filesource /model/functions.php
  */
 
@@ -781,9 +781,9 @@ function clearUserCache($group='', $lvl1='')
     elseif ($group)          { unset($bizunoUser[$group]); }
 }
 
-function getMimeType($filename)
+function getMimeType($filename='')
 {
-    $ext = strtolower(substr($filename, strrpos($filename, '.')+1));
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     switch ($ext) {
         case "aiff":
         case "aif":  return "audio/aiff";
@@ -855,6 +855,7 @@ function getMimeType($filename)
             if (function_exists(__NAMESPACE__.'\mime_content_type')) { # if mime_content_type exists use it.
                 $m = mime_content_type($filename);
             } else {    # if nothing left try shell
+                if (!isset($_SERVER['HTTP_USER_AGENT'])) { return ''; } // probably a spam bot or malicious request
                 if (strstr($_SERVER['HTTP_USER_AGENT'], 'Windows')) { # Nothing to do on windows
                     return ""; # Blank mime display most files correctly especially images.
                 }
