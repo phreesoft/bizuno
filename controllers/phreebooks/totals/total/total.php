@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/totals/total/total.php
  */
 
@@ -105,6 +105,7 @@ class total
             'credit_amount'=> in_array($main['journal_id'], [3,4, 6,13,16,20,21,22]) ? $total : 0,
             'gl_account'   => clean('gl_acct_id', ['format'=>'text','default'=>$this->settings['gl_account']], 'post'),
             'trans_code'   => $txID,
+            'tax_rate_id'  => 0,
             'post_date'    => $main['post_date'],
             'date_1'       => $main['post_date'].' '.biz_date('H:i:s')]; // timestamp for time of day information
         $main['total_amount'] = $total;

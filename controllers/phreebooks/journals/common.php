@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -56,6 +56,7 @@ class jCommon
             if (!isset($row['debit_amount']))  { $this->items[$key]['debit_amount'] = 0; }
             if (!isset($row['credit_amount'])) { $this->items[$key]['credit_amount']= 0; }
             if (!isset($row['trans_code']))    { $this->items[$key]['trans_code']   = '';}
+            if (!isset($row['tax_rate_id']))   { $this->items[$key]['tax_rate_id']  = 0; }
             if (!isset($row['serialize']))     { $this->items[$key]['serialize']    = 0; }
         }
     }
@@ -167,13 +168,14 @@ class jCommon
     {
         foreach ($this->cogs_entry as $gl_acct => $values) {
             $temp_array = [
-                'ref_id'        => $this->main['id'],
-                'gl_type'       => 'cog',        // code for cost of goods charges
-                'description'   => lang('inventory_cogs').' - '.$this->main['invoice_num'],
-                'gl_account'    => $gl_acct,
-                'credit_amount' => isset($values['credit']) ? $values['credit'] : 0,
-                'debit_amount'  => isset($values['debit'])  ? $values['debit']  : 0,
-                'post_date'     => $this->main['post_date']];
+                'ref_id'       => $this->main['id'],
+                'gl_type'      => 'cog',        // code for cost of goods charges
+                'description'  => lang('inventory_cogs').' - '.$this->main['invoice_num'],
+                'gl_account'   => $gl_acct,
+                'credit_amount'=> isset($values['credit']) ? $values['credit'] : 0,
+                'debit_amount' => isset($values['debit'])  ? $values['debit']  : 0,
+                'tax_rate_id'  => 0,
+                'post_date'    => $this->main['post_date']];
             $temp_array['id'] = dbWrite(BIZUNO_DB_PREFIX.'journal_item', $temp_array);
             $this->items[] = $temp_array;
         }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-09-19
  * @filesource /controllers/inventory/attributes.php
  */
 
@@ -31,7 +31,9 @@ namespace bizuno;
 
 class inventoryAttributes
 {
-    public  $moduleID   = 'inventory';
+    public  $moduleID = 'inventory';
+    public  $lang;
+    private $template;
 
     function __construct()
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-02
+ * @version    7.x Last Update: 2025-09-19
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -144,16 +144,16 @@ class inventoryTools
                 $changed = true;
                 $row['receive_details'] = ['total'=>sizeof($row['receive_details']), 'rows'=>$row['receive_details']];
             }
-            foreach ($row['receive_details']['rows'] as $idx => $item ) {
+            if (!empty($row['receive_details']['rows'])) { foreach ($row['receive_details']['rows'] as $idx => $item ) {
                 if ($item['sku']==$srcSKU) { $row['receive_details']['rows'][$idx]['sku'] = $destSKU; $changed = true; }
-            }
+            } }
             if (!empty($row['close_details']) && is_array($row['close_details']) && empty($row['close_details']['rows'])) {  // bring the structure current
                 $changed = true;
                 $row['close_details'] = ['total'=>sizeof($row['close_details']), 'rows'=>$row['close_details']];
             }
-            foreach ($row['close_details']['rows'] as $idx => $item ) {
+            if (!empty($row['close_details']['rows'])) { foreach ($row['close_details']['rows'] as $idx => $item ) {
                 if ($item['sku']==$srcSKU) { $row['close_details']['rows'][$idx]['sku'] = $destSKU; $changed = true; }
-            }
+            } }
             if ($changed) {
                 $refID = $row['_refID'];
                 $metaID= metaIdxClean($row);

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/totals/discountChk/discountChk.php
  */
 
@@ -84,6 +84,7 @@ class discountChk
                 'debit_amount' => in_array($this->jID, [17,18]) ? $discount : 0,
                 'credit_amount'=> in_array($this->jID, [20,22]) ? $discount : 0,
                 'gl_account'   => clean('totals_discount_gl', ['format'=>'text','default'=>$this->settings['gl_account']], 'post'),
+                'tax_rate_id'  => 0,
                 'post_date'    => $main['post_date']];
             $totalDisc += $discount;
         }

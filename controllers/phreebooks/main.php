@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -36,6 +36,7 @@ class phreebooksMain
     public $journalID= 0;
     public $gl_type  = '';
     public $lang;
+    public $myStore;
     public $defaults;
     public $rID;
     public $action;
@@ -924,8 +925,8 @@ function bizUnitDiscDisc(newValue) {
         $newLdgr->main = $origLdgr->main;
         // retained: all address info plus 'purch_order_id','rep_id','admin_id'
         unset($newLdgr->main['id'],$newLdgr->main['discount'],$newLdgr->main['sales_tax'],$newLdgr->main['freight'],$newLdgr->main['waiting']);
-        unset($newLdgr->main['closed'],$newLdgr->main['terms'],$newLdgr->main['notes'],$newLdgr->main['tax_rate_id'],$newLdgr->main['drop_ship']);
-        unset($newLdgr->main['method_code'],$newLdgr->main['currency'],$newLdgr->main['currency_rate'],$newLdgr->main['so_po_ref_id'],$newLdgr->main['closed_date']);
+        unset($newLdgr->main['closed'],$newLdgr->main['terms'],$newLdgr->main['notes'],$newLdgr->main['drop_ship'],$newLdgr->main['method_code']);
+        unset($newLdgr->main['currency'],$newLdgr->main['currency_rate'],$newLdgr->main['so_po_ref_id'],$newLdgr->main['closed_date']);
         unset($newLdgr->main['recur_id'],$newLdgr->main['printed'],$newLdgr->main['attach']);
         $newLdgr->main['journal_id']  = $jID;
         $newLdgr->main['post_date']   = $newLdgr->main['terminal_date'] = biz_date(); // today
@@ -947,6 +948,7 @@ function bizUnitDiscDisc(newValue) {
             'debit_amount' => in_array($jID, [6,13]) ? $amount : 0,
             'credit_amount'=> in_array($jID, [7,12]) ? $amount : 0,
             'gl_account'   => $itmGlAcct,
+            'tax_rate_id'  => 0,
             'post_date'    => $newLdgr->main['post_date']];
         $newLdgr->items[] = [ // gl account needs to be the default purchases/sales account
             'gl_type'      => 'ttl',
@@ -955,6 +957,7 @@ function bizUnitDiscDisc(newValue) {
             'debit_amount' => in_array($jID, [7,12]) ? $amount : 0,
             'credit_amount'=> in_array($jID, [6,13]) ? $amount : 0,
             'gl_account'   => $ttlGlAcct,
+            'tax_rate_id'  => 0,
             'post_date'    => $newLdgr->main['post_date']];
     }
 
@@ -1059,6 +1062,7 @@ function bizUnitDiscDisc(newValue) {
                 $row['item_cnt']     = $item_cnt;
                 $row['debit_amount'] = roundAmount($row['debit_amount']);
                 $row['credit_amount']= roundAmount($row['credit_amount']);
+                if (!isset($row['tax_rate_id'])) { $row['tax_rate_id'] = 0; }
                 $ledger->items[] = $row;
             }
             $item_cnt++;

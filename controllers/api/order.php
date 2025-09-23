@@ -125,6 +125,7 @@ class apiOrder extends apiCommon
                 'gl_account' => $this->setDefGLItem(),
 //              'notUsed0'   => $item['UnitPrice'],
 //              'notUsed1'   => $item['SalesTaxAmount'],
+                'tax_rate_id'=> 0,
                 'total'      => $item['TotalPrice']];
             $subTotal += $item['TotalPrice'];
             $itmCnt++;

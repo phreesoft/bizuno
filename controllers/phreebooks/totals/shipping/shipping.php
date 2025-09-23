@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/totals/shipping/shipping.php
  */
 
@@ -92,6 +92,7 @@ class shipping
             'debit_amount' => in_array($main['journal_id'], [3, 4, 6,13,21]) ? $shipping : 0,
             'credit_amount'=> in_array($main['journal_id'], [7, 9,10,12,19]) ? $shipping : 0,
             'gl_account'   => clean("totals_{$this->code}_gl", ['format'=>'text','default'=>$this->settings['gl_account']], 'post'),
+            'tax_rate_id'  => 0,
             'post_date'    => $main['post_date']];
         $main['freight']    = $shipping;
         $main['method_code']= clean('method_code', ['format'=>'cmd','default'=>''], 'post');

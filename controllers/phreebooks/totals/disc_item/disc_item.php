@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/totals/disc_item/disc_item.php
  */
 
@@ -87,6 +87,7 @@ class disc_item
                 'debit_amount' => in_array($this->jID, [7, 9,10,12,19]) ? $row['unit_discount'] : 0,
                 'credit_amount'=> in_array($this->jID, [3, 4, 6,13,21]) ? $row['unit_discount'] : 0,
                 'gl_account'   => clean("totals_{$this->code}_gl", ['format'=>'text','default'=>$this->settings['gl_account']], 'post'),
+                'tax_rate_id'  => 0,
                 'post_date'    => $main['post_date']];
             $totalDisc += $row['unit_discount'];
         }

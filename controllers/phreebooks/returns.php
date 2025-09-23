@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-09-19
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -36,6 +36,13 @@ class phreebooksReturns extends mgrJournal
     protected $secID     = 'returns';
     protected $nextRefIdx= 'next_return_num';
     protected $journalID = 12;
+    public $lang;
+    public $struc;
+    public $settings;
+    public $myStore;
+    public $reps;
+    public $return_status;
+    public $return_codes;
 
     function __construct()
     {

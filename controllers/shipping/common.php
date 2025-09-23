@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-14
+ * @version    7.x Last Update: 2025-09-19
  * @filesource /controllers/shipping/common.php
  */
 
@@ -128,10 +128,14 @@ class shippingCommon
             'PackageMap'  =>[''=>lang('none')], 'PickupMap' =>[''=>lang('none')], 'CODMap'    =>[''=>lang('none')],
             'SignatureMap'=>[''=>lang('none')], 'rateCodes' =>[''=>lang('none')], 'PaymentMap'=>[''=>lang('none')],
             'LTLClasses'  =>[''=>lang('none')], 'paperTypes'=>[''=>lang('none')]], $shipper->options, );
-        $shipper->ship_pkg     = array_shift(array_keys($shipper->options['PackageMap']));
-        $shipper->ship_pickup  = array_shift(array_keys($shipper->options['PickupMap']));
-        $shipper->ship_cod_type= array_shift(array_keys($shipper->options['CODMap']));
-        $shipper->confirm_type = array_shift(array_keys($shipper->options['SignatureMap']));
+        $ship_pkg     = array_keys($shipper->options['PackageMap']);
+        $ship_pickup  = array_keys($shipper->options['PickupMap']);
+        $ship_cod_type= array_keys($shipper->options['CODMap']);
+        $confirm_type = array_keys($shipper->options['SignatureMap']);
+        $shipper->ship_pkg     = array_shift($ship_pkg);
+        $shipper->ship_pickup  = array_shift($ship_pickup);
+        $shipper->ship_cod_type= array_shift($ship_cod_type);
+        $shipper->confirm_type = array_shift($confirm_type);
         $shipper->weightUOM    = !empty($this->settings['weight_uom'])? $this->settings['weight_uom']: 'LBS';
         $shipper->dimUOM       = !empty($this->settings['dim_uom'])   ? $this->settings['dim_uom']   : 'IN';
         return $shipper;

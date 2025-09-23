@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-09-19
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -126,7 +126,7 @@ class shippingShip extends shippingCommon
         $shippers    = viewDropdown($this->myCarriers, 'id', 'title', true);
         $shipMethod  = '';
         foreach ($shipper->options['rateCodes'] as $shortCode) {
-            $shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : $this->lang[$shortCode]];
+            $shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : (!empty($this->lang[$shortCode]) ? $this->lang[$shortCode] : lang('none'))];
             if ($shortCode == $method[1]) { $shipMethod = $shortCode; }
         }
         $residential = false;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/phreebooks/totals/tax_item/tax_item.php
  */
 
@@ -105,6 +105,7 @@ class tax_item
                 'debit_amount' => in_array($main['journal_id'], [3,4, 6,13,20,21,22])       ? $value['amount'] : 0,
                 'credit_amount'=> in_array($main['journal_id'], [7,9,10,12,14,16,17,18,19]) ? $value['amount'] : 0,
                 'gl_account'   => $glAcct,
+                'tax_rate_id'  => 0,
                 'post_date'    => $main['post_date']];
             $totalTax += $value['amount'];
         }

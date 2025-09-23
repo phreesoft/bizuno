@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-09-22
  * @filesource /controllers/inventory/build.php
  */
 
@@ -219,9 +219,11 @@ class inventoryBuild extends mgrJournal
             'invoice_num'=> getNextReference($this->nextRefIdx),
             'post_date'  => biz_date(),
             'store_id'   => getUserCache('profile', 'store_id'),
-            'description'=> $sku['description_short']];
+            'description'=> $sku['description_short'],
+            'tax_rate_id'=> 0,
+            'rep_id'     => 0];
         $mID = $_GET['rID'] = dbWrite(BIZUNO_DB_PREFIX.'journal_main', $main);
-        $item= ['ref_id'=>$mID, 'qty'=>0, 'sku'=>$sku['sku'], 'post_date'=>biz_date()];
+        $item= ['ref_id'=>$mID, 'qty'=>0, 'sku'=>$sku['sku'], 'tax_rate_id'=>0, 'post_date'=>biz_date()];
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $item);
         $job = getMetaInventory($skuID, 'production_job');
         msgDebug("\nRead job from sku = ".print_r($job, true));
@@ -443,6 +445,7 @@ class inventoryBuild extends mgrJournal
             'description'=> $main['description'],
             'gl_account' => $glInv,
 //          'trans_code' => $serial,
+            'tax_rate_id'=> 0,
             'post_date'  => biz_date()];
         $_POST['description'] = $glEntry->main['description'];
         if ($glEntry->Post()) { return true; }
