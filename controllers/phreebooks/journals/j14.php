@@ -336,7 +336,7 @@ class j14 extends jCommon
         }
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $fields, 'update', "id=$id");
         $item['qty'] = $qty;
-        $item['price'] = $assy_cost / $qty; // insert the assembly cost of materials - unit price
+        $item['price'] = !empty($qty) ? $assy_cost / $qty : 0; // insert the assembly cost of materials - unit price
         // Adjust inventory levels for assembly, if unbuild, also calcuate COGS differences
         if ($this->calculateCOGS($item, $return_cogs = ($qty < 0) ? false : true) === false) { return false; }
         return true;
