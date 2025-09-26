@@ -30,6 +30,10 @@ namespace bizuno;
 class contactsTools
 {
     public $moduleID = 'contacts';
+    public $srcID = 0;
+    public $destID = 0;
+    public $srcC = 0;
+    public $ddestC = 0;
 
     function __construct()
     {
@@ -83,6 +87,7 @@ class contactsTools
         $this->mergeChangeCID();
         $this->mergeSpecial();
         $this->mergeWallet();
+        dbSanitizeDates($this->destC, ['first_date', 'date_last', 'last_date_1', 'last_date_2']);
         dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->destC, 'update', "id=$this->destID"); // save all of the changes
         msgAdd("deleted contact {$this->srcC['short_name']} (ID: {$this->srcID})", 'info');
         // Move attachments

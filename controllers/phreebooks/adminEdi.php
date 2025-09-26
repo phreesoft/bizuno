@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-21
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/phreebooks/adminEdi.php
  */
 
@@ -67,7 +67,6 @@ class phreebooksAdminEdi
     }
     public function managerRows(&$layout=[])
     {
-        msgTrap();
         if (!$security = validateAccess('admin', 1)) { return; }
         $creds  = getMetaCommon('edi');
         msgDebug("\nRetrieved creds from meta = ".print_r($creds, true));

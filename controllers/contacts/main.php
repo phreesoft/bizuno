@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-13
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/contacts/main.php
  */
 
@@ -655,6 +655,7 @@ class contactsMain
         if (empty($args['cID']) || (empty($opts['aID']) && $opts['aType']=='b')) { // new/update contact record address
             foreach ($this->addFields as $field) { $this->contact[$field] = clean($field.$opts['suffix'], 'text', 'post'); }
             if (empty($args['cID'])) { $this->contact['rep_id'] = clean('rep_id', 'integer', 'post'); } // if new record, set the rep_id
+            dbSanitizeDates($this->contact, ['first_date', 'date_last', 'last_date_1', 'last_date_2']);
             msgDebug("\nReady to write updated contact record = ".print_r($this->contact, true));
             dbWrite(BIZUNO_DB_PREFIX.'contacts', $this->contact, 'update', "id={$opts['cID']}");
         } else { // update address meta

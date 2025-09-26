@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-09-26
  * @filesource /model/db.php
  */
 
@@ -369,6 +369,25 @@ function dbWritePrep($table, $data, $action='insert', $parameters='', $quote=tru
         $query = "UPDATE $table SET ".implode(', ', $columns) . ($parameters<>'' ? " WHERE $parameters" : '');
     }
     return $query;
+}
+
+/*
+ * Sanitizes date fields to meet db formatting criteria
+ * @param array data - List fo field values to modify, will become the sql field list
+ * @param array $fields - Specific fields to test for invalid values
+ */
+function dbSanitizeDates(&$data, $fields)
+{
+    msgDebug("\nEntering dbSanitizeDates");
+    foreach ($fields as $field) {
+        msgDebug("\nWorking with field: $field and data = ".$data[$field]);
+        if (!array_key_exists($field, $data)) { continue; }
+        msgDebug(" ... Field is set");
+        if (empty($data[$field]) || '0000-00-00'==$data[$field] || '0000-00-00 00:00:00'==$data[$field]) {
+            $data[$field] = 'NULL';
+            msgDebug(" ... Fixed to be = ".$data[$field]);
+        }
+    }
 }
 
 /**

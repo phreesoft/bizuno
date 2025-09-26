@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-25
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/quality/dashboards/audit_tasks/audit_tasks.php
  */
 
@@ -91,7 +91,7 @@ class audit_tasks
             $task['due_date'] = localePeriodicDate($task['due_date'], $task['frequency']);
             dbMetaSet($rID, $this->metaPrefix, $task);
             $jEntry= [ // set the journal entry
-                'journal_id'=>$this->journalID, 'so_po_ref_id'=>$rID, 'invoice_num'=>$task['ref_num'], 'description'=>$jTitle, 'store_id'=>$task['store_id'],
+                'journal_id'=>$this->journalID, 'so_po_ref_id'=>$rID, 'invoice_num'=>$task['ref_num'], 'description'=>$jTitle, 'store_id'=>$task['store_id'], 'tax_rate_id'=>0,
                 'rep_id'    =>!empty($task['rep_id'])?$task['rep_id']:0, 'admin_id'=>getUserCache('profile', 'userID'),'contact_id_b'=>!empty($task['contact_id'])?$task['contact_id']:0,
                 'post_date' =>'NULL']; // Notes are stored in the meta, this CLUTTERS the journal
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', $jEntry); // add a new journal entry

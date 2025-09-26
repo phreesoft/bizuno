@@ -27,9 +27,6 @@
 
 namespace bizuno;
 
-//use phpseclib3\Net\SSH2;
-//use phpseclib3\Net\SFTP;
-
 function bizzErrorHandler($errno, $errstr, $errfile, $errline) {
     msgDebug("\nerrorno = $errno, errstr = $errstr, efffile = $errfile, errline = $errline");
 }

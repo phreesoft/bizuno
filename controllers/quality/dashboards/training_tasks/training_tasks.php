@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/quality/dashboards/training_tasks/training_tasks.php
  */
 
@@ -94,9 +94,9 @@ class training_tasks
             dbMetaSet($rID, $this->metaPrefix, $task);
             // set the journal entry
             $jEntry= [
-                'journal_id'  =>$this->journalID, 'so_po_ref_id'=>$rID,'invoice_num'=>$task['ref_num'], 'description'=>$jTitle, 'store_id'=>$task['store_id'],
-                'contact_id_b'=>!empty($task['rep_id'])?$task['rep_id']:0,   'admin_id'   =>getUserCache('profile', 'userID'), 'rep_id'=>$task['contact_id'],
-                'post_date'   =>'NULL']; // Notes are stored in the meta, this CLUTTERS the journal
+                'journal_id'  =>$this->journalID, 'so_po_ref_id'=>$rID, 'invoice_num'=>$task['ref_num'], 'description'=>$jTitle, 'store_id'=>$task['store_id'],
+                'contact_id_b'=>!empty($task['rep_id'])?$task['rep_id']:0, 'admin_id'=>getUserCache('profile', 'userID'), 'rep_id'=>$task['contact_id'],
+                'tax_rate_id' =>0, 'post_date'=>'NULL']; // Notes are stored in the meta, this CLUTTERS the journal
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', $jEntry); // add a new journal entry
         }
         $filter= "journal_id={$this->journalID} AND post_date IS NULL";

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-11
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/bizuno/dashboards/maint_tasks/maint_tasks.php
  */
 
@@ -93,7 +93,7 @@ class maint_tasks
             dbMetaSet($rID, $this->metaPrefix, $task);
             $jEntry= [ // set the journal entry
                 'journal_id' =>$this->journalID,'so_po_ref_id'=>$rID, 'contact_id_b'=>!empty($task['rep_id'])?$task['rep_id']:0, 'description'=>$jTitle, 'store_id'=>$task['store_id'],
-                'invoice_num'=>$task['ref_num'],'rep_id'=>getUserCache('profile', 'userID'), 'admin_id'=>getUserCache('profile', 'userID'), 'post_date'=>'NULL']; // , 'notes'=>$task['notes']
+                'invoice_num'=>$task['ref_num'],'rep_id'=>getUserCache('profile', 'userID'), 'admin_id'=>getUserCache('profile', 'userID'), 'post_date'=>'NULL', 'tax_rate_id'=>0]; // , 'notes'=>$task['notes']
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', $jEntry); // add a new journal entry
         }
         $filter= "journal_id={$this->journalID} AND post_date IS NULL";

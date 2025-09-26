@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -217,7 +217,7 @@ class ifAmazon {
         if ($jID==18 && $cID==$this->settings['contact_id']) {
             $layout['jsHead'][$this->moduleID] = "var AmazonGlAr = '{$this->settings['gl_acct_ar']}';\nvar AmazonGlTax = '{$this->settings['gl_acct_tax']}'";
             $layout['toolbars']['tbPhreeBooks']['icons']['ifAmazon'] = ['order'=>80,'label'=>$this->lang['import_payment'],'events'=>['onClick'=>"reconcileAmazon();"]];
-            $layout['jsBody']['ifAmazon'] =  "jqBiz.cachedScript('".BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+            $layout['jsBody']['ifAmazon'] = "jqBiz.cachedScript('".BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
         }
     }
 
@@ -651,7 +651,7 @@ class ifAmazon {
         $layout['fields']['tplDescAm'] = ['order'=>10,'html'=>$this->lang['amazon_template_desc'],   'attr'=>['type'=>'raw']];
         $layout['fields']['selTempAm'] = ['order'=>20,'values'=>$templAm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifAmazon', 0, bizSelGet('selTempAm'));"], 'attr'=>['type'=>'select']];
         $layout['fields']['divMapAm']  = ['order'=>90,'html'=>'<div id="divAmazonMap">&nbsp;</div>', 'attr'=>['type'=>'raw']];
-        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
     }
 
   /**
@@ -728,7 +728,7 @@ class ifAmazon {
                 'amazon_field' => $this->lang['amazon_field'],
                 'bizuno_field' => $this->lang['bizuno_field']],
             'fields' => [], // filled below
-            'jsHead' => ['initAmazon'=>"jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');"]];
+            'jsHead' => ['initAmazon'=>"jqBiz.cachedScript('".BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');"]];
         foreach ($fields['fields'] as $key => $value) {
             $data['fields'][$key] = [
                 'group' => $value['group']>0 ? $fields['groups'][$value['group']] : '',
@@ -761,7 +761,6 @@ class ifAmazon {
         $lastGroup = '';
         if (isset($viewData['fields'])) { foreach ($viewData['fields'] as $idx => $settings) {
             if (!empty($settings['help'])) {
-//          if ($settings['title'] == '(Optional) Update Delete') { msgAdd("help = ".htmlentities($settings['help'])); }
                 $icnHelp = ['icon'=>'tip','size'=>'small', 'events'=>['onClick'=>"jqBiz('#win_$idx').window({title:'".$settings['title']."',content:'".$settings['help']."',width:450,height:200});"]];
             } else {
                 $icnHelp = ['icon'=>'blank','size'=>'small'];

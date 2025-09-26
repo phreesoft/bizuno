@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2025-09-26
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -134,7 +134,7 @@ $tables = [
                 'import'=>true, 'export'=>false,'required'=>false,'desc'=>"Set the contact up for invoice payments via electronic ACH payments with you bank"],
             'ach_bank'      => ['format'=>"VARCHAR(32)",  'attr'=>"DEFAULT NULL",           'comment'=> 'order:12;tag:ACHBankName',
                 'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank name"],
-            'ach_routing'   => ['format'=>"INT(11)",      'attr'=>"DEFAULT NULL",           'comment'=> 'type:integer;order:14;tag:ACHRouting',
+            'ach_routing'   => ['format'=>"INT(11)",      'attr'=>"DEFAULT '0'",            'comment'=> 'type:integer;order:14;tag:ACHRouting',
                 'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank routing number"],
             'ach_account'=> ['format'=>"VARCHAR(16)",     'attr'=>"DEFAULT NULL",           'comment'=> 'type:integer;order:16;tag:ACHAccount',
                 'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank account number"],
@@ -223,7 +223,7 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"[Default: 0] Tax Rate ID for customers from the db table"],
             'price_sheet_c'       => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",             'comment'=>'type:select;tag:DefPriceSheetIDSales;order:30',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"[Default: 0] Default price sheet for customers"],
-            'block_discount'      => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",             'comment'=>'type:hidden;tag:BlockDiscount;order:35',
+            'block_discount'      => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",             'comment'=>'type:selNoYes;tag:BlockDiscount;order:35',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Block customer discounts from being applied to this specific product, valid values are 0 - No, or 1 - Discounts will not be applied"],
             'full_price'          => ['format'=>'DOUBLE',       'attr'=>"DEFAULT '0'",             'comment'=>'type:currency;tag:FullPrice;order:40',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Retail or List price for the item"],

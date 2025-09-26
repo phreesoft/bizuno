@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-10
+ * @version    7.x Last Update: 2025-09-26
  * @filesource /bizunoCFG.php
  */
 
@@ -29,7 +29,7 @@ namespace bizuno;
 
 if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)); }
 
-define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7'); // Pull form 
+define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.1'); // Pull from file 
 
 // URL paths
 if (!defined('BIZUNO_HOME')) { define('BIZUNO_HOME', strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); } // Full URL path to Bizuno Home
@@ -41,7 +41,7 @@ define('BIZBOOKS_ROOT',     BIZUNO_REPO); // file system path to bizuno root ind
 // URLs to PhreeSoft Images
 define('PHREESOFT_LOGO',    BIZBOOKS_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
 define('BIZUNO_LOGO',       BIZBOOKS_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
-define('BIZUNO_ICON',       BIZBOOKS_URL_FS.'0/view/images/bizuno_icon.png'); // URL to default Bizuno icon
+define('BIZUNO_ICON',       'https://www.bizuno.com/bizuno_icon.png'); // URL to default Bizuno icon on the bizuno.com site
 
 // Set support ticket email, this makes the menu option show
 if (!defined('BIZUNO_SUPPORT_NAME'))  { define('BIZUNO_SUPPORT_NAME', 'Bizuno Support'); }

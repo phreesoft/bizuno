@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-09-26
  * @filesource /controllers/phreebooks/journals/j14.php
  */
 
@@ -315,6 +315,7 @@ class j14 extends jCommon
                 'gl_account'   => $this->getCOGSInvGLAcct($sku['gl_inv']),
                 'debit_amount' => $qty<0 ? -$item_cost : 0,
                 'credit_amount'=> $qty>0 ?  $item_cost : 0,
+                'tax_rate_id'  => 0,
                 'post_date'    => $this->main['post_date']];
             $temp_array['id'] = dbWrite(BIZUNO_DB_PREFIX.'journal_item', $temp_array);
             msgDebug("\nAdding to assembly item to this->items = ".print_r($temp_array, true));

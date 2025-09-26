@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-30
+ * @version    7.x Last Update: 2025-09-26
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -167,56 +167,6 @@ class administrateTools {
      */
     public function repairComments($verbose=true)
     {
-        // get the user map
-/*      $userMap = dbMetaGet(0, '_ADMIN_ID_MAP');
-        metaIdxClean($userMap);
-        msgDebug("\nUser map = ".print_r($userMap, true));
-        $contMap = dbMetaGet(0, '_CONTACT_MAP');
-        msgDebug("\nContact map = ".print_r($contMap, true));
-        metaIdxClean($contMap);
-        // iterrate through the users and update the appropriate db
-        foreach ($userMap as $key => $newIdx) {
-            $oldIdx = substr($key, 1);
-            if (!isset($contMap[$key])) { continue; }
-            msgDebug("\nExecuting sql = "."UPDATE ".BIZUNO_DB_PREFIX."contacts_log SET entered_by=$newIdx WHERE entered_by={$contMap[$key]}");
-            dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."contacts_log SET entered_by=$newIdx WHERE entered_by={$contMap[$key]}");
-        } */
-
-        // OTHERS
-        // "UPDATE ".BIZUNO_DB_PREFIX."audit_log SET user_id=$newIdx WHERE user_id=$oldIdx" // for users table ID's
-        // "UPDATE ".BIZUNO_DB_PREFIX."journal_main SET admin_id=$newIdx WHERE admin_id=$oldIdx" // 
-        // "UPDATE ".BIZUNO_DB_PREFIX."contacts_log SET entered_by=$newIdx WHERE entered_by={$contMap[$key]}" // for contacts able ID's
-        // "UPDATE ".BIZUNO_DB_PREFIX."tnr_gp_history SET rep_id=$newIdx WHERE rep_id={$contMap[$key]}" // for contacts able ID's
-        // returns meta uses user ID and it's buried in the meta
-
-        
-        
-//dbMetaSet(0, '_CONTACT_MAP', $contMap);
-/*      $userMap = dbMetaGet(0, '_ADMIN_ID_MAP');
-        metaIdxClean($userMap);
-        msgDebug("\nUser map = ".print_r($userMap, true));
-
-        $taskMap = dbMetaGet(0, '_PROD_TASK_ID_MAP');
-        metaIdxClean($taskMap);
-        msgDebug("\nTask map = ".print_r($taskMap, true));
-        $rows = dbMetaGet(0, 'production_steps', 'journal', '%');
-        if (empty($rows)) { return msgAdd("No rows returned."); }
-//      $runaway = 0;
-        foreach ($rows as $meta) {
-            msgDebug("\nWorking with meta = ".print_r($meta, true));
-            $mRefID = $meta['_refID'];
-            $metaID = metaIdxClean($meta);
-            foreach ($meta as $idx => $step) {
-                $meta[$idx]['task_id'] = isset($taskMap['r'.$step['task_id']]) ? $taskMap['r'.$step['task_id']] : $step['task_id'];
-                $meta[$idx]['admin_id']= isset($userMap['r'.$step['admin_id']])? $userMap['r'.$step['admin_id']]: $step['admin_id'];
-            }
-            msgDebug("\nReady to write updated meta rID = $metaID and refID = $mRefID with values = ".print_r($meta, true));
-            dbMetaSet($metaID, 'production_steps', $meta, 'journal', $mRefID);
-//          $runaway++;
-//          if ($runaway > 10) { break; }
-        }
-        msgAdd('Finished ...', 'success');  
-return; */
         msgDebug("\nEntering repairComments with path to tables = ".BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php');
         $tables = [];
         include(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php'); // loads $tables

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-09-24
  * @filesource /controllers/inventory/main.php
  */
 
@@ -711,9 +711,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         }
         msgLog(lang('inventory').'-'.lang('copy')." - $oldSKU => $newSKU");
         $layout = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"bizGridReload('dgInventory'); accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', $nID);"]]);
-
-        // Copy Pro stuff
-        msgAdd("Hook for copying work order from Inventory screen, Code doesn't exist!");
         if ('ms' <> dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "id=$rID")) { return; }
         if (!$newID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='$newSKU'")) { return; } // must have been an error
         $this->save();
