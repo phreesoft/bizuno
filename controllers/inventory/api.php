@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-10-02
  * @filesource /controllers/inventory/api.php
  */
 
@@ -107,19 +107,13 @@ class inventoryApi
                 if (!empty($structure[$tag]))      { $sqlData[$tag]                 = trim(str_replace('""', '"', $value)); } // if field names are used
             }
             if (!isset($sqlData['sku'])) { return msgAdd("The SKU field cannot be found and is a required field. The operation was aborted!"); }
-            if (!$sqlData['sku']) { msgAdd(sprintf("Missing SKU on row: %s. The row will be skipped", $cnt+1)); continue; }
-            if (empty($sqlData['inventory_type'])) { $sqlData['inventory_type'] = 'si'; }
-// @todo - remove after inventory sku field in new business is reduced to less than 24 characters
-//            if (strlen($sqlData['sku']) > 24) {
-//                $tmp = substr($sqlData['sku'], 0, 24);
-//                msgAdd ("SKU: {$sqlData['sku']} is greater than 24 characters, it has been truncated to $tmp", 'info');
-//                $sqlData['sku'] = $tmp;
-//            }
+            if ( empty($sqlData['sku'])) { msgAdd(sprintf("Missing SKU on row: %s. The row will be skipped", $cnt+1)); continue; }
+            if ( empty($sqlData['inventory_type'])) { $sqlData['inventory_type'] = 'si'; }
             // clean out the un-importable fields
             foreach ($map as $field => $settings) { if (empty($settings['import'])) { unset($sqlData[$field]); } }
             $rID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sqlData['sku'])."'");
-            $sqlData['item_cost']   = clean($sqlData['item_cost'], 'currency');
-            $sqlData['full_price']  = clean($sqlData['full_price'], 'currency');
+            if (isset($sqlData['item_cost'])) { $sqlData['item_cost']   = clean($sqlData['item_cost'], 'currency'); }
+            if (isset($sqlData['full_price'])){ $sqlData['full_price']  = clean($sqlData['full_price'], 'currency'); }
             $sqlData['last_update'] = biz_date('Y-m-d');
             if ($rID) {
                 $sqlData['id'] = $rID;
