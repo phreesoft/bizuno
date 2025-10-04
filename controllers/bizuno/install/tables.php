@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-26
+ * @version    7.x Last Update: 2025-10-04
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -166,7 +166,7 @@ $tables = [
             'log_date'  => ['format'=>'DATETIME',   'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:LogDate;order:10'],
             'entered_by'=> ['format'=>'INT(11)',    'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'tag:UserID;order:20'],
             'action'    => ['format'=>'VARCHAR(32)','attr'=>"DEFAULT NULL",           'comment'=>'tag:Action;order:30'],
-            'notes'     => ['format'=>'TEXT',       'attr'=>"",                       'comment'=>'tag:Notes;order:40']],
+            'notes'     => ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:Notes;order:40']],
         'keys' => 'PRIMARY KEY (id)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'contacts_meta' => ['module' => 'contacts',
@@ -290,7 +290,7 @@ $tables = [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
             'ref_id'    => ['format'=>'INT(11)',    'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:ReferenceID;order:20'],
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
-            'meta_value'=> ['format'=>'TEXT',       'attr'=>"",                       'comment'=>'tag:MetaValue;order:40']],
+            'meta_value'=> ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'journal_cogs_owed' => ['module' => 'phreebooks',
@@ -366,7 +366,7 @@ $tables = [
             'terminal_date' => ['format'=>'DATE',         'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:TerminalDate;order:60'],
             'rep_id'        => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:select;tag:SalesRepID;order:70'],
             'terms'         => ['format'=>'VARCHAR(32)',  'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:Terms;order:80'],
-            'notes'         => ['format'=>'TEXT',         'attr'=>"",                       'comment'=>'tag:Notes;order:90'],
+            'notes'         => ['format'=>'TEXT',         'attr'=>"DEFAULT NULL",           'comment'=>'tag:Notes;order:90'],
             'contact_id_b'  => ['format'=>'INT(11)',      'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:BillingContactID;order:2'],
             'address_id_b'  => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:BillingAddressID;order:3'],
             'primary_name_b'=> ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingPrimaryName;order:10'],
