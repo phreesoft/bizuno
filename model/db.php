@@ -389,7 +389,7 @@ function dbSanitizeDates(&$data, $fields)
         }
     }
     // Temp patch for older db's with non-strict types
-    if (isset($data['ach_routing']) && empty($data['ach_routing'])) { $data['ach_routing'] = 0; }
+    if (array_key_exists('ach_routing', $data) && empty($data['ach_routing'])) { $data['ach_routing'] = 0; }
 }
 
 /**
