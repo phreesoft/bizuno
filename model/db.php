@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-26
+ * @version    7.x Last Update: 2025-10-05
  * @filesource /model/db.php
  */
 
@@ -388,6 +388,8 @@ function dbSanitizeDates(&$data, $fields)
             msgDebug(" ... Fixed to be = ".$data[$field]);
         }
     }
+    // Temp patch for older db's with non-strict types
+    if (isset($data['ach_routing']) && empty($data['ach_routing'])) { $data['ach_routing'] = 0; }
 }
 
 /**
