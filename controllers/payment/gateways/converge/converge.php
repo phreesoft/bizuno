@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-10-08
  * @filesource /controllers/payment/gateways/converge.php
  *
  * Source Information:
@@ -128,8 +128,7 @@ class converge
             $checked     = 'n';
             $cID         = isset($data['fields']['contact_id_b']['attr']['value']) ? $data['fields']['contact_id_b']['attr']['value'] : 0;
             if ($cID) { // find if stored values
-                $encrypt = new encryption();
-                $this->viewData['selCards']['values'] = $encrypt->viewCC('contacts', $cID);
+                $this->viewData['selCards']['values'] = [];
                 if (sizeof($this->viewData['selCards']['values']) == 0) {
                     $this->viewData['selCards']['hidden'] = true;
                     $show_s      = false;

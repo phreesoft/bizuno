@@ -460,13 +460,7 @@ function viewFormat($value, $format = '')
         case 'dateNoY':    return viewDate($value, false, $format);
         case 'datetime':   return viewDate($value, true);
         case 'dateLong':   return viewDate($value).' '.substr($value, strpos($value, ' '));
-        case 'encryptName':if (empty(getUserCache('profile', 'admin_encrypt'))) { return ''; }
-            bizAutoLoad(BIZBOOKS_ROOT."model/encrypter.php", 'encryption');
-            $enc = new encryption();
-            $result = $enc->decrypt(getUserCache('profile', 'admin_encrypt'), $value);
-            msgDebug("\nDecrypted: ".print_r($result, true));
-            $values = explode(':', $result);
-            return is_array($values) ? $values[0] : '';
+        case 'encryptName':return ''; // no longer supported
         case 'glActive':  return !empty(getModuleCache('phreebooks', 'chart', $value, 'inactive')) ? lang('yes') : '';
         case 'glType':    $acct = getModuleCache('phreebooks', 'chart', $value, $value);
             if (!isset($acct['type'])) { return $value; }

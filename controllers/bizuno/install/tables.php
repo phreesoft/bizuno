@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-04
+ * @version    7.x Last Update: 2025-10-07
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -128,6 +128,8 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Telephone number 1 (Primary)"],
             'website'       => ['format'=>'VARCHAR(48)',   'attr'=>"NULL DEFAULT ''",       'comment'=>'tag:Website;order:62',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Website address"],
+            'newsletter'    => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",            'comment'=> 'type:checkbox;order:10;tag:Newsletter',
+                'import'=>true, 'export'=>false,'required'=>false,'desc'=>"Enable the newsletter from your business."],
             'account_number'=> ['format'=>'VARCHAR(16)',  'attr'=>"DEFAULT NULL",           'comment'=> 'tag:AccountNumber;order:64',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Account Number for vendors this would be your account number assigned by the vendor"],
             'ach_enable'    => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",            'comment'=> 'type:checkbox;order:10;tag:ACHEnable',

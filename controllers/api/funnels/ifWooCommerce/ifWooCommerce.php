@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -36,7 +36,7 @@ class ifWooCommerce extends apiExport
     public    $code       = 'ifWooCommerce';
     protected $domSuffix  = 'wpWoo';
     protected $metaPrefix = 'woocommerce';
-    private   $refreshRows= 10; // number of inventory items to pass in a single cron call
+    private   $refreshRows= 20; // number of inventory items to pass in a single cron call
     private   $psServer   = 'https://www.phreesoft.com';
     private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
     public    $settings;
@@ -342,8 +342,8 @@ function productUpload(rID) {
         $pDetails['args'] = ['iID'=>$skuID];
         compose('inventory', 'prices', 'quote', $pDetails);
         msgDebug("\nAfter compose with pDetails = ".print_r($pDetails, true));
-        $product= ['RecordID'=>$skuID, 'SKU'=>$result['sku'], 'QtyStock'=>$stock, 'Weight'=>$result['item_weight'],
-            'FullPrice'=>$result['full_price'],'Price'=>$pDetails['content']['price']];
+        $product= ['RecordID'=>$skuID, 'SKU'=>$result['sku'], 'QtyStock'=>$stock, 'Weight'=>$result['item_weight'], 'Type'=>$result['inventory_type'],
+            'FullPrice'=>$result['full_price'], 'Price'=>$pDetails['content']['price']];
         $product['RegularPrice'] = $product['price']; // for Woo both need to be the same
         if (!empty($pDetails['content']['sale_price'])){ $product['SalePrice']   = $pDetails['content']['sale_price']; }
         $variations = $this->updateByItem($pDetails, $stock);

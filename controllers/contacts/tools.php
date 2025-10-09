@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2025-10-07
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -33,7 +33,7 @@ class contactsTools
     public $srcID = 0;
     public $destID = 0;
     public $srcC = 0;
-    public $ddestC = 0;
+    public $destC = 0;
 
     function __construct()
     {

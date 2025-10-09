@@ -125,6 +125,21 @@ function bizunoUpgrade()
         }
     }
 
+    if (version_compare($dbVer, '7.3.3') < 0) {
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'newsletter'))    {
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD newsletter ENUM('0','1') DEFAULT '0' COMMENT 'type:checkbox;order:10;tag:Newsletter' AFTER `website`");
+        }
+        if ( dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'newsletter')) { // fix nulls to enums or integers as needed, prevents strict errors
+            dbGetResult("UPDATE `".BIZUNO_DB_PREFIX."contacts` set newsletter='0' WHERE newsletter IS NULL;");
+        }
+        if ( dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'ach_routing')) { // fix nulls to enums or integers as needed, prevents strict errors
+            dbGetResult("UPDATE `".BIZUNO_DB_PREFIX."contacts` set ach_routing=0 WHERE ach_routing IS NULL;");
+        }
+        if ( dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'woocommerce_sync') ) {
+            dbGetResult("UPDATE `".BIZUNO_DB_PREFIX."inventory` set woocommerce_sync=0 WHERE woocommerce_sync IS NULL;");
+        }
+    }
+
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
     require_once(BIZBOOKS_ROOT.'controllers/administrate/tools.php');
     $ctl = new administrateTools();

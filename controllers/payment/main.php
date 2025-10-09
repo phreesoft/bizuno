@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-10-09
  * @filesource /controllers/payment/main.php
  */
 
@@ -50,7 +50,7 @@ class paymentMain
         $meta = getMetaMethod('gateways');
         foreach ($meta as $row) {
             if (empty($row['status'])) { continue; }
-            $values[] = ['id'=>$row['id'], 'text'=>$row['title'], 'order'=>!empty($row['order']) ? $row['order'] : 0];
+            $values[] = ['id'=>$row['id'], 'text'=>$row['title'], 'order'=>!empty($row['settings']['order']) ? $row['settings']['order'] : 99];
         }
         $values = sortOrder($values);
         msgDebug("\nread meta payments = ".print_r($values, true));

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -109,14 +109,14 @@ class shippingManager extends mgrJournal
                     'actions' => [
                         'print'    => ['order'=>10,'icon'=>'print','label'=>lang('print'),                  'events'=>['onClick'=>"winOpen('shippingLabel', '$this->moduleID/ship/labelView&refID=$refID&rID=idTBD');"]],
                         'reconcile'=> ['order'=>70,'icon'=>'apply','label'=>$this->lang['toggle_reconcile'],'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/toggleReconcile&refID=$refID', idTBD);"]]]],
-                'ref_num'     => ['order'=>10,'field'=>'journal_meta.id','label'=>lang('shipment_id'),   'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'process'=>'meta:ref_num:journal'],
+                'ref_num'     => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('shipment_id'),   'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'process'=>'meta:ref_num:journal'],
                 'invoice_num' => ['order'=>15,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]],
                 'store_id'    => ['order'=>20,'field'=>'store_id',       'label'=>lang('store_id'),      'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'format'=>'storeID'],
-                'primary_name_b'=> ['order'=>30,'field'=>'primary_name_b','label'=>lang('primary_name'), 'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],
-                'method_code' => ['order'=>35,'field'=>'journal_meta.id','label'=>lang('method_code_12'),'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true],'process'=>'meta:method_code:journal', 'format'=>'shipInfo'],
-                'ship_date'   => ['order'=>40,'field'=>'journal_meta.id','label'=>lang('ship_date'),     'attr'=>['width'=>110,'sortable'=>true,'resizable'=>true],'process'=>'meta:ship_date:journal',   'format'=>'datetime'],
-                'deliver_date'=> ['order'=>45,'field'=>'journal_meta.id','label'=>lang('date_deliver'),  'attr'=>['width'=>110,'sortable'=>true,'resizable'=>true],'process'=>'meta:deliver_date:journal','format'=>'datetime'],
-                'reconciled'  => ['order'=>55,'field'=>'journal_meta.id','label'=>lang('reconciled'),    'attr'=>['width'=> 75,'sortable'=>true,'resizable'=>true, 'align'=>'center'],'process'=>'shipRecon']]]);
+                'primary_name_b'=>['order'=>30,'field'=>'primary_name_b','label'=>lang('primary_name'),  'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],
+                'method_code' => ['order'=>35,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('method_code_12'),'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true],'process'=>'meta:method_code:journal', 'format'=>'shipInfo'],
+                'ship_date'   => ['order'=>40,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('ship_date'),     'attr'=>['width'=>110,'sortable'=>true,'resizable'=>true],'process'=>'meta:ship_date:journal',   'format'=>'datetime'],
+                'deliver_date'=> ['order'=>45,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('date_deliver'),  'attr'=>['width'=>110,'sortable'=>true,'resizable'=>true],'process'=>'meta:deliver_date:journal','format'=>'datetime'],
+                'reconciled'  => ['order'=>55,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('reconciled'),    'attr'=>['width'=> 75,'sortable'=>true,'resizable'=>true, 'align'=>'center'],'process'=>'shipRecon']]]);
         if (!empty(getUserCache('profile', 'restrict_store'))) {
             $data['source']['filters']['store'] = ['order'=>0,'hidden'=>true,'sql'=>'store_id='.getUserCache('profile', 'store_id', false, 0)];
         }
@@ -226,11 +226,35 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         }
         $layout = array_replace_recursive($layout, ['type'=>'raw','content'=>json_encode(['total'=>sizeof($output),'rows'=>array_values($output)])]);
     }
+    /**
+     * Adds a shipping record with partial information from the journal entry
+     * @param type $refID - journal_main record ID 
+     */
+    public function addRecord($refID=0)
+    {
+        if (empty($refID)) { return; }
+        $main = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "id=$refID");
+        $meta = [
+            '_table'      => 'journal',
+            '_refID'      => $refID,
+            'ref_num'     => getNextReference($this->nextRefIdx),
+            'invoice_num' => $main['invoice_num'],
+            'store_id'    => $main['store_id'],
+            'method_code' => $main['method_code'],
+            'ship_date'   => biz_date(),
+            'total_billed'=> $main['freight']];
+        return dbMetaSet(0, $this->metaPrefix, $meta, 'journal', $refID);
+    }
     public function edit(&$layout=[])
     {
+msgTrap();
         $refID= clean('rID', 'integer', 'get'); // this is the journal_main id field
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
+        if (!empty($refID) && empty($meta)) { // We're here because an order was shipped but the method had no label method. Create and pre-load the record.
+            $rID  = $_GET['rID'] = $this->addRecord($refID);
+            $meta = dbMetaGet($rID, $this->metaPrefix, 'journal', $refID);
+        }
         $args = ['_rID'=>!empty($meta['_rID'])?$meta['_rID']:0, '_refID'=>$refID, '_table'=>'journal', 'tabID'=>2];
         parent::editMeta($layout, $security, $args);
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow copy here

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-23
+ * @version    7.x Last Update: 2025-10-09
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -278,7 +278,7 @@ class phreebooksAdmin {
             'btnPruneCogs' => ['order'=>20,'attr'=>['type'=>'button', 'value'=>lang('start')],'events'=>['onClick'=>"jsonAction('phreebooks/tools/pruneCogs');"]],
             'cleanAtchDesc'=> ['order'=>10,'html'=>$this->lang['pb_attach_clean_desc'],'attr'=>['type'=>'raw']],
             'btnAtchCln'   => ['order'=>80,'attr'=> ['type'=>'button','value'=>lang('start')],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['pb_attach_clean_confirm']."')) jsonAction('phreebooks/tools/cleanAttach', 0, jqBiz('#dateAtchCln').datebox('getValue'));"]],
+                'events' => ['onClick'=>"if (confirm('".$this->lang['pb_attach_clean_confirm']."')) { getPurgeDates(); }"]],
             'purgeGlDesc'  => ['order'=>10,'html'=>$this->lang['msg_gl_db_purge_confirm'],'attr'=>['type'=>'raw']],
             'purge_db'     => ['order'=>20,'styles'=>['text-align'=>'right'],'attr'=>['size'=>7]],
             'btn_purge'    => ['order'=>30,'attr'=>['type'=>'button', 'value'=>$this->lang['phreebooks_purge_db_journal']],
@@ -324,7 +324,7 @@ class phreebooksAdmin {
                 'frmEdiMan'  => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
                 'frmCurrency'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/currency/save"]]],
             'fields'  => $fields,
-            'jsHead'  => [
+            'jsHead'  => ['purgeAttch' => $this->getViewPurgeAttach(),
                 'dataCurrency'=> "var dataCurrency = ".json_encode(array_values(getModuleCache('phreebooks','currency','iso'))).";",
                 'dataEDI'     => "var dataEDI = "     .json_encode(array_values(getModuleCache($this->moduleID,'edi'))).";"],
             'jsBody'  => ['init'=>"jqBiz('#repost_begin').datebox({ required:true }); jqBiz('#repost_end').datebox({ required:true });"],
@@ -338,6 +338,17 @@ class phreebooksAdmin {
             $order++;
         }
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+    }
+
+    private function getViewPurgeAttach()
+    {
+        return "
+function getPurgeDates() {
+    jIDs = [2,3,4,6,7,9,10,12,13,14,15,16,17,18,20,22];
+    purgeDates = {};
+    jqBiz.each(jIDs, function (index, value) { purgeDates['j'+value] = bizDateGet('atchCln_'+value); });
+    jsonAction('phreebooks/tools/cleanAttach', 0, JSON.stringify(purgeDates));
+}";
     }
 
     private function getViewRepost()

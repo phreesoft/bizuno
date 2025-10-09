@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-03
+ * @version    7.x Last Update: 2025-10-09
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -32,6 +32,8 @@ bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksPro
 class phreebooksTools
 {
     public $moduleID = 'phreebooks';
+    public $lang;
+    public $dirUploads;
 
     function __construct()
     {
@@ -767,16 +769,15 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
     public function cleanAttach()
     {
         global $io;
-        return msgAdd("\nThis needs to be tested.");
         if (!$security = validateAccess('admin', 3)) { return; }
-        $jIDs = [2,3,4,6,7,9,10,12,13,14,15,16,17,18,20,22]; // 19, 21 - POS, POP
+        $jIDs = clean('data', 'json', 'get');
         $jrnl = $mains = [];
         $dateLast='';
-        foreach ($jIDs as $jID) { 
-            $jrnl['j'.$jID] = clean("atchCln_{$jID}", 'date', 'post');
-            $dateLast = max($dateLast, $jrnl['j'.$jID]);
+        foreach ($jIDs as $jID => $dateEnd) { 
+            $jrnl[$jID] = clean($dateEnd, 'date');
+            $dateLast = max($dateLast, $jrnl[$jID]);
         }   
-        $results = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "post_date<'$dateLast' AND attach='1'", 'id', ['id', 'journal_id', 'post_date']);
+        $results = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "post_date<'$dateLast' AND journal_id<23 AND attach='1'", 'id', ['id', 'journal_id', 'post_date']);
         msgDebug("\nFound total number of db attach flags = ".sizeof($results));
         // Filter the mains based on post_date and journal specific requested dedlete date to trim to just the delete list
         foreach ($results as $row) {
@@ -790,12 +791,12 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
             $mainID = explode('_', $fn)[1];
             if (in_array($mainID, $mains)) {
                 msgDebug("Deleting file: $fn");
-//                unlink(BIZUNO_DATA."$this->dirUploads{$fn}");
+                unlink(BIZUNO_DATA."$this->dirUploads{$fn}");
             }
         }
         if (sizeof($mains) > 0) {
             msgDebug("\nUpdating table phreebooks, removing attach for id = ".print_r($mains, true));
-//          dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'0'], 'update', "id IN (".implode(',', $mains).")");
+            dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'0'], 'update', "id IN (".implode(',', $mains).")");
             msgAdd(sprintf($this->lang['msg_attach_clean_success'], sizeof($mains)), 'success');
         } else {
             msgAdd($this->lang['msg_attach_clean_empty'], 'info');

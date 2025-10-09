@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2025-10-09
  * @filesource /controllers/phreebooks/journals/j18.php
  */
 
@@ -68,7 +68,6 @@ class j18 extends jCommon
             'purch_order_id','invoice_num','waiting','closed','terms_text','post_date','rep_id','currency','currency_rate'];
         $fldAddr = ['contact_id','address_id','primary_name','contact','address1','address2','city','state','postal_code','country','telephone1','email'];
         $data['fields']['currency']['callback'] = 'totalsCurrency';
-        $data['payments'] = getMetaMethod('gateways');
         if (!empty($data['bulk']) || !empty($data['fields']['contact_id_b']['attr']['value'])) {
             $data['fields']['purch_order_id']['attr']['type']= 'hidden';
             $data['fields']['terminal_date']['attr']['type'] = 'hidden';

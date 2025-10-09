@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-19
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -54,7 +54,7 @@ class shippingShip extends shippingCommon
         $shipper = $this->loadCarrier($dbData['carrier']);
         if ($rID && !method_exists($shipper, 'labelGet')) {
             msgDebug("\nNo label method, just a log entry");
-            $js  = "accordionEdit('accShipping', 'dgShipping', 'divDetail', '".$this->lang['shipping_entry']."', '$this->moduleID/manager/edit&jID=$rID', 0);";
+            $js  = "accordionEdit('accShipping', 'dgShipping', 'dtlShipping', '".jslang('details')."', '$this->moduleID/manager/edit', '$rID');";
             $layout = array_replace_recursive($layout, ['type'=>'divHTML',
                 'divs'   => ['divLabel'=>['order'=>50,'label'=>lang('shipment'),'type'=>'html','html'=>'<div id="divLabel">&nbsp;</div>']],
                 'jsReady'=> ['jsLabel'=>$js]]);

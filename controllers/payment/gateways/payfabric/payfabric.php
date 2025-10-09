@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -311,8 +311,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
         $tOptions = [];
         $invAmount= 0;
         $invID    = '';
-        // @TODO - Where does this come from? 
-        $txID     = '';
+        $txID     = clean($this->code.'trans_code', 'integer', 'post');
         foreach ($ledger->items as $item) { // test for partial payment, assume only the first is captured
             if ($item['gl_type']=='pmt') {
                 $invID = $item['trans_code'];
@@ -334,7 +333,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
             $saleUrl = 'payment/api/transaction/process';
         } else { // process full capture
             msgDebug("\nProcessing full payment for invID = $invID");
-            $saleUrl = "payment/api/reference/{$fields['txID']}?trxtype=Capture";
+            $saleUrl = "payment/api/reference/$txID?trxtype=Capture";
         }
         msgDebug("\nReady to send sale request to url $saleUrl with options: ".print_r($tOptions, true));
         $resp   = $this->queryAPI($saleUrl, $tOptions);

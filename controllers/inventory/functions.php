@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -175,7 +175,8 @@ function availableQty($item=[], $args=[])
         msgDebug("\nAssy parts = ".print_r($bom, true));
         $min_qty= 999999;
         foreach ($bom as $row) {
-            $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock'], "sku='".addslashes($row['sku'])."'");
+            $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
+            if (strpos(COG_ITEM_TYPES, $inv['inventory_type']) === false) { continue; } // non-stock stuff so move along
             $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
             $min_qty= $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
         }

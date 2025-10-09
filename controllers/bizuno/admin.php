@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-10-07
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -162,16 +162,11 @@ class bizunoAdmin
 
     public function install()
     {
-        $roleID = getuserCache('profile', 'userRole');
-        msgDebug("\nEntering bizuno::install, setting role = $roleID");
+        msgDebug("\nEntering bizuno::install");
         setNextReference('next_maint_num', 'PM00001');
         setNextReference('next_fxdast_num','FA00001');
         setNextReference('next_edi_num',   '100000000');
-        $id = validateTab('contacts', $this->lang['marketing'], 60);
-        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'newsletter'))    {
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD newsletter ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;label:{$this->lang['newsletter']};tag:Newsletter;tab:$id;order:50;group:General'");
-        }
-        setNextReference('next_return_num', 'RTN00001');
+        setNextReference('next_return_num','RTN00001');
         setNextReference('next_cproj_num', 'Cust00001');
         return true;
     }

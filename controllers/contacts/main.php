@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-24
+ * @version    7.x Last Update: 2025-10-06
  * @filesource /controllers/contacts/main.php
  */
 
@@ -236,6 +236,8 @@ class contactsMain
             $structure['date_last']['attr']['readonly']= true;
         } else {
             $title = lang('new');
+            $type  = $this->type=='v' ? 'next_vend_id_num' : 'next_cust_id_num';
+            $structure['short_name']['attr']['value'] = getNextReference($type);
             $structure['first_date']['attr']['type'] = 'hidden';
             $structure['date_last']['attr']['type']= 'hidden';
             $structure['country']['attr']['value']   = getModuleCache('bizuno','settings','company','country');
