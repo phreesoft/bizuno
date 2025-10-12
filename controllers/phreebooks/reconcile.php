@@ -73,6 +73,7 @@ class phreebooksReconcile
      */
     public function managerRows(&$layout=[])
     {
+msgTrap();
         if (!$security = validateAccess('recon', 3)) { return; }
         $sort   = clean('sort',  'text',   'post');
         $order  = clean('order', 'text',   'post');
@@ -138,13 +139,16 @@ class phreebooksReconcile
             array_multisort($temp, $order=='desc' ? SORT_DESC : SORT_ASC, $rows);
         }
         // build the footer
-        $stmt_balance= dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'stmt_balance', "gl_account='$glAcct' AND period=$period", false);
-        $gl_balance  = dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'beginning_balance+debit_amount-credit_amount AS gl', "gl_account='$glAcct' AND period=".getModuleCache('phreebooks', 'fy', 'period'), false);
+        $stmt_balance= dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'stmt_balance', "gl_account='$glAcct' AND period=$period", false);
+msgDebug("\nRead statement balance = ".print_r($stmt_balance, true));
+        $gl_balance  = dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'beginning_balance+debit_amount-credit_amount AS gl', "gl_account='$glAcct' AND period=".getModuleCache('phreebooks', 'fy', 'period'), false);
+msgDebug("\nRead gl balance balance = ".print_r($gl_balance, true));
         $sql = "SELECT SUM(i.debit_amount - i.credit_amount) AS total
             FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id = i.ref_id
             WHERE i.gl_account='$glAcct' AND i.reconciled>$period AND i.reconciled<>0";
         $stmt = dbGetResult($sql);
         $not_in_period = $stmt->fetch(\PDO::FETCH_ASSOC);
+msgDebug("\nRead not in period = ".print_r($not_in_period, true));
         $footer = [
             ['title'=>lang('statement_balance'),  'total'=>$stmt_balance],
             ['title'=>lang('cleared_this_period'),'total'=>0],
@@ -230,7 +234,7 @@ class phreebooksReconcile
             'glAcct'=> getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')];
         $stmt_balance = dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'stmt_balance', "period='{$this->defaults['period']}' AND gl_account='{$this->defaults['glAcct']}'");
         return ['id'=>$name, 'type'=>'treegrid', 'title'=>lang('bank_recon'),
-            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'treeField'=>'title', 'singleSelect'=>false, 'showFooter'=>true, 'animate'=>true, 'pagination'=>false, 'width'=>1000,
+            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'treeField'=>'title', 'singleSelect'=>false, 'showFooter'=>true, 'animate'=>true, 'pagination'=>false,
                 'url' => BIZUNO_AJAX."&bizRt=phreebooks/reconcile/managerRows"],
             'events' => [
                 'onLoadSuccess'=> "function(row, data){ reconInit(row, data); }",
@@ -246,14 +250,14 @@ class phreebooksReconcile
             'columns'=> [
                 'id'         => ['order'=> 0,'attr'=>['hidden'=>true]],
                 'reconciled' => ['order'=> 0,'attr'=>['hidden'=>true]],
-                'reference'  => ['order'=>20,'label'=>lang('reference'),  'attr'=>['width'=>120,'resizable'=>true,'sortable'=>true]],
-                'post_date'  => ['order'=>30,'label'=>lang('date'),       'attr'=>['width'=> 80,'resizable'=>true,'sortable'=>true]],
+                'reference'  => ['order'=>20,'label'=>lang('reference'),  'attr'=>['width'=>150,'resizable'=>true,'sortable'=>true]],
+                'post_date'  => ['order'=>30,'label'=>lang('date'),       'attr'=>['width'=>100,'resizable'=>true,'sortable'=>true]],
                 'deposit'    => ['order'=>40,'label'=>lang('deposit'),    'attr'=>['width'=>100,'resizable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
                 'withdrawal' => ['order'=>50,'label'=>lang('withdrawal'), 'attr'=>['width'=>100,'resizable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
                 'title'      => ['order'=>60,'label'=>lang('description'),'attr'=>['width'=>275,'resizable'=>true]],
-                'total'      => ['order'=>70,'label'=>lang('total'),      'attr'=>['width'=>100,'resizable'=>true,'sortable'=>true,'align'=>'right'],
+                'total'      => ['order'=>70,'label'=>lang('total'),      'attr'=>['width'=>125,'resizable'=>true,'sortable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
                 'cleared'    => ['order'=>80,'attr'=>['checkbox'=>true]]]];
     }

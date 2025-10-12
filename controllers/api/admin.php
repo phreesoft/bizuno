@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-26
+ * @version    7.x Last Update: 2025-10-11
  * @filesource /controllers/api/admin.php
  */
 
@@ -252,62 +252,6 @@ $meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $m
     {
         $chan = $this->getMethod();
         $chan->reconcileGrid($layout);
-    }
-
-    /**
-     * Generates the css for the users theme preference, also adds myExt icons
-     * This needs to be 
-     * @param type $layout
-     */
-    public function viewCSS()
-    {
-        $icnSet = clean('icons', ['format'=>'cmd','default'=>'default'], 'get');
-        $path   = BIZBOOKS_ROOT  .'view/icons/';
-        $pathURL= BIZBOOKS_URL_FS.'0/view/icons/';
-        if (!file_exists("{$path}$icnSet.php")) { $icnSet = 'default'; }// icons cannot be found, use default
-        $icons = [];
-        $output="/* $icnSet */\n";
-        require("{$path}$icnSet.php");
-        foreach ($icons as $idx => $icon) {
-            $output .= ".icon-$idx  { background:url('{$pathURL}$icnSet/16x16/{$icon['path']}') no-repeat; }\n";
-            $output .= ".iconM-$idx { background:url('{$pathURL}$icnSet/24x24/{$icon['path']}') no-repeat; }\n";
-            $output .= ".iconL-$idx { background:url('{$pathURL}$icnSet/32x32/{$icon['path']}') no-repeat; }\n";
-        }
-        if (defined('BIZUNO_DATA')) {
-            $this->addCSS($output, 'custom', '16');
-            $this->addCSS($output, 'custom', '32');
-        }
-        header("Content-type: text/css; charset: UTF-8");
-        header("Content-Length: ".strlen($output));
-        echo $output;
-        exit();
-    }
-
-    /**
-     * 
-     * @param type $output
-     * @param type $type
-     * @param type $size
-     */
-    private function addCSS(&$output, $type='pro', $size=32)
-    {
-        switch ($type) {
-            default:
-            case 'custom':
-                $dirPath= BIZUNO_DATA    ."myExt/view/icons/{$size}x{$size}/";
-                $dirURL = BIZBOOKS_URL_FS.getUserCache('business','bizID')."/myExt/view/icons/{$size}x{$size}/";
-                break;
-        }
-        $suffix = $size == 32 ? 'L' : '';
-        $output .= "/* $dirURL */\n";
-        if (is_dir($dirPath)) {
-            $icons = scandir($dirPath);
-            foreach ($icons as $icon) {
-                if ($icon=='.' || $icon=='..') { continue; }
-                $path_parts = pathinfo($icon);
-                $output .= ".icon{$suffix}-{$path_parts['filename']} { background:url('{$dirURL}$icon') no-repeat; }\n";
-            }
-        }
     }
 
     /**

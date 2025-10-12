@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-06
+ * @version    7.x Last Update: 2025-10-11
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -247,7 +247,6 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     }
     public function edit(&$layout=[])
     {
-msgTrap();
         $refID= clean('rID', 'integer', 'get'); // this is the journal_main id field
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
