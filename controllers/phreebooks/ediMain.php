@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-10-12
  * @filesource /controllers/phreebooks/ediMain.php
  *
  * Handles specs:
@@ -37,7 +37,7 @@ namespace bizuno;
 class phreebooksEdiMain extends mgrJournal
 {
     public    $moduleID  = 'phreebooks';
-    public    $pageID    = 'main';
+    public    $pageID    = 'ediMain';
     protected $domSuffix = 'Edi';
     protected $metaPrefix= 'edi_spec_'; // then append spec number
     protected $secID     = 'edi';
@@ -72,31 +72,40 @@ class phreebooksEdiMain extends mgrJournal
     }
     protected function managerGrid($security=0, $args=[])
     {
-        $data = array_replace_recursive(parent::gridBase($security, $args), ['metaTable'=>'journal',
+        $dateRange= dbSqlDates($this->defaults['period']);
+        $sqlPeriod= $dateRange['sql'];
+        $stores   = getModuleCache('bizuno', 'stores');
+        $data     = array_replace_recursive(parent::gridBase($security, $args), ['metaTable'=>'journal',
+            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows"],
             'source' => [
-                'tables' => [
-                    'journal_meta'=>['table'=>BIZUNO_DB_PREFIX.'journal_meta','join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_meta.ref_id"]],
-                'search'  => ['edi_source', 'spec', 'control_num', 'main_id'],
-                'filters' => [
-                    'metaKey'=> ['order'=> 1,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.meta_key LIKE '{$this->metaPrefix}%'", 'hidden'=>true], // m.meta_key LIKE 'shipment_%'
-                    'spec'   => ['order'=>30,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.spec='{$this->defaults['spec']}'",'label'=>$this->lang['edi_spec'],
-                        'values'=>$this->specs,   'attr'=>['type'=>'select','value'=>$this->defaults['spec']]],
-                    'status' => ['order'=>40,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.status='{$this->defaults['status']}'",'label'=>lang('status'),
-                        'values'=>$this->statuses,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
-            'columns' => [
+                'tables' => ['journal_meta'=>['table'=>BIZUNO_DB_PREFIX.'journal_meta','join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_meta.ref_id"]],
+                'search' => ['edi_source', 'spec', 'control_num', 'main_id'],
+                'filters'=> [
+                    'metaKey' => ['order'=> 1,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.meta_key LIKE '{$this->metaPrefix}%'", 'hidden'=>true], // m.meta_key LIKE 'shipment_%'
+//                    'status'  => ['order'=>40,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.status='{$this->defaults['status']}'",'label'=>lang('status'),
+//                        'values'=>$this->statuses,'attr'=>['type'=>'select','value'=>$this->defaults['status']]],
+                    'period'  => ['order'=>10,'break'=>true,'label'=>lang('period'), 'options'=>['width'=>300],'sql'=>$sqlPeriod,
+                        'values'=>viewKeyDropdown(localeDates(true, true, true, true, true)),'attr'=>['type'=>'select','value'=>$this->defaults['period']]],
+                    'spec'    => ['order'=>20,'break'=>true,'label'=>$this->lang['edi_spec'],
+                        'values'=>$this->specs, 'attr'=>['type'=>'select','value'=>$this->defaults['spec']]],
+                    'store_id'=> ['order'=>30,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
+                        'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]]]],
+            'columns'=> [
+                'id'     => ['order'=>0, 'field'=>'DISTINCT '.BIZUNO_DB_PREFIX.'journal_main.id','attr'=>['hidden'=>true]], // need to override gridBase
                 'action' => [
                     'actions'=> [
                         'view'  => ['order'=>30,'icon'=>'search','label'=>lang('view'),
-                            'events'=> ['onClick' => "jsonAction('$this->moduleID/main/view', idTBD);"]], //
+                            'events'=> ['onClick' => "jsonAction('$this->moduleID/main/view', idTBD);"], //
                         'sales' => ['order'=>50,'icon'=>'sales', 'label'=>lang('fill_sale'), 'display'=> "row.spec=='850'",
-                            'events'=> ['onClick' => "jsonAction('$this->moduleID/main/ediManual()', idTBD);"]]]],
-                'edi_source' => ['order'=>10,'field'=>'edi_source', 'label'=>$this->lang['edi_ed_title'],'attr'=>['width'=>240,'sortable'=>true,'resizable'=>true]],
-                'spec'       => ['order'=>20,'field'=>'spec',       'label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true]],
-                'edi_date'   => ['order'=>30,'field'=>'edi_date',   'label'=>$this->lang['edi_rcv_date'],'format'=>'datetime','attr'=>['width'=>150,'sortable'=>true,'resizable'=>true]],
-                'ack_date'   => ['order'=>40,'field'=>'ack_date',   'label'=>$this->lang['edi_ack_date'],'format'=>'datetime','attr'=>['width'=>150,'sortable'=>true,'resizable'=>true]],
-                'status'     => ['order'=>50,'field'=>'status',     'label'=>lang('status'),             'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true]],
-                'control_num'=> ['order'=>60,'field'=>'control_num','label'=>$this->lang['edi_ctl_num'], 'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true]],
-                'main_id'    => ['order'=>70,'field'=>'main_id',    'label'=>$this->lang['edi_jrnl_id'], 'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true]]]]);
+                            'events'=> ['onClick' => "jsonAction('$this->moduleID/main/ediManual()', idTBD);"]]]]],
+                'edi_source' => ['order'=>10,'field'=>'journal_meta.id','label'=>$this->lang['edi_ed_title'],'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_source:journal'],
+                'edi_date'   => ['order'=>60,'field'=>'journal_meta.id','label'=>$this->lang['edi_rcv_date'],'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_date:journal','format'=>'date'],
+                'ack_date'   => ['order'=>70,'field'=>'journal_meta.id','label'=>$this->lang['edi_ack_date'],'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:ack_date:journal','format'=>'date'],
+                'store_id'   => ['order'=>20,'field'=>'store_id',       'label'=>lang('store_id'),           'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'format'=> 'storeID'],
+                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal'],
+                'invoice_num'=> ['order'=>50,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),     'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true]],
+                'control_num'=> ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_ctl_num'], 'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:control_num:journal'],
+                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal']]]);
         if ($GLOBALS['myDevice'] == 'mobile') {
             $data['columns']['ack_date']['attr']['hidden']   = true;
             $data['columns']['control_num']['attr']['hidden']= true;
@@ -107,9 +116,11 @@ class phreebooksEdiMain extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['sort']  = clean('sort',  ['format'=>'date',    'default'=>'edi_date'],'post');
-        $this->defaults['spec']  = clean('spec',  ['format'=>'integer', 'default'=>0],         'post');
-        $this->defaults['status']= clean('status',['format'=>'db_field','default'=>''],        'post');
+        $this->defaults['sort']    = clean('sort',    ['format'=>'cmd',     'default'=>'post_date'],'post');
+        $this->defaults['status']  = clean('status',  ['format'=>'db_field','default'=>''],         'post');
+        $this->defaults['spec']    = clean('spec',    ['format'=>'integer', 'default'=>0],          'post');
+        $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>getUserCache('profile', 'def_periods', '', 'l')], 'post');
+        $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1],         'post');
     }
 
     /******************************** Journal Manager ********************************/
@@ -123,20 +134,21 @@ class phreebooksEdiMain extends mgrJournal
     }
     public function managerRows(&$layout=[])
     {
+        msgTrap();
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $grid = $this->managerGrid($security, ['refID'=>'%', 'type'=>'journal']);
-        if ($this->defaults['status']=='') { unset($grid['source']['filters']['status']); } // all statuses
-        if (empty($this->defaults['spec'])){ unset($grid['source']['filters']['spec']); } // all specs
-        $meta = $this->mgrRowsDBPrep($grid);
-        unset($grid['source']['filters']['metaKey'], $grid['source']['filters']['jID'], $grid['source']['filters']['period']);
-        $this->mgrRowsDBFltr($layout, $grid, $meta);
+        $layout = array_replace_recursive($layout, ['type'=>'datagrid','key'=>"dg{$this->domSuffix}",'datagrid'=>["dg{$this->domSuffix}"=>$grid]]);
     }
     public function edit(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
-        $args = ['_table'=>'journal', 'title'=>'view_edi_record'];
+        $refID= $_GET['refID']= clean('rID', 'integer', 'get'); // map journal_main.id to refID
+        $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
+//        $rID  = $_GET['rID']  = metaIdxClean($meta);
+        $args = ['_table'=>'journal', 'title'=>$this->lang['view_edi_record']];
         parent::editMeta($layout, $security, $args);
-        unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['save'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'],
+        unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['save'],
+              $layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'],
               $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']);
     }
     public function view()

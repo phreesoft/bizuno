@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-19
+ * @version    7.x Last Update: 2025-10-12
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -116,7 +116,7 @@ class phreebooksReturns extends mgrJournal
                         'values'=>viewKeyDropdown(localeDates(true, true, true, true, true)),'attr'=>['type'=>'select','value'=>$this->defaults['period']]],
                     'store_id'=> ['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]],
-                    'status'    => ['order'=>40,'break'=>true,'label'=>lang('status'), 'values'=>$this->return_status, 'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
+                    'status'  => ['order'=>40,'break'=>true,'label'=>lang('status'), 'values'=>$this->return_status, 'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
             'columns'=> [
                 'id'          => ['order'=>0, 'field'=>'DISTINCT '.BIZUNO_DB_PREFIX.'journal_main.id','attr'=>['hidden'=>true]], // need to override gridBase
                 'action' => ['order'=>1, 'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return dg{$this->domSuffix}Formatter(value,row,index); }"],
