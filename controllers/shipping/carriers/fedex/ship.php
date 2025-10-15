@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-10-13
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -338,9 +338,12 @@ class fedexShip extends fedexCommon
         foreach ($request['pkgs'] as $row) {
             for ($i=0; $i<$row['qty']; $i++) {
                 if ($row['weight'] == 0) { continue; }
-                $wt       = max(1, ceil($row['weight']));
+                $wt       = max(1, ceil(!empty($row['weight']) ? floatval($row['weight']) : 0));
                 $ins      = !empty($row['value']) ? intval($row['value']) : $this->default_insurance_value;
-                $request['packages'][] = ['weight'=>$wt, 'length'=>ceil($row['length']), 'width'=>ceil($row['width']), 'height'=>ceil($row['height']), 'value'=>$ins];
+                $request['packages'][] = ['weight'=>$wt, 'value'=>$ins,
+                    'length'=> ceil(!empty($row['length'])? floatval($row['length']): 8),
+                    'width' => ceil(!empty($row['width']) ? floatval($row['width']) : 6),
+                    'height'=> ceil(!empty($row['height'])? floatval($row['height']): 4)];
                 $totalWt += $wt;
                 $totalIns+= $ins;
             }
