@@ -527,7 +527,7 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $tolerance = 0.0001;
         dbTransactionStart();
         // get journal_history for given period
-        $curHistory = dbGetMulti(BIZUNO_DB_PREFIX."journal_history", "period=$period");
+        $curHistory = dbGetMulti(BIZUNO_DB_PREFIX.'journal_history', "period=$period");
         msgDebug("\nFound ".sizeof($curHistory)." history records (GL Accounts) in period $period");
         // set beginning balance values for current period, test for zero
         $trialBalance = 0;
@@ -554,9 +554,13 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         // for each ref_id, make sure each main record is in balance, add to beginning_balance, flag ID's not in balance, these need to be fixed manually
         $mID = 0;
         $mains = [];
+$skips = [];
         $rID = ['debit'=>0, 'credit'=>0];
         foreach ($glPosts as $row) {
-            if (in_array($row['journal_id'], [3,4,9,10])) { continue; }
+            if (!in_array($row['journal_id'], [2,6,7,12,13,14,15,16,17,18,19,20,21,22])) {
+if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row['journal_id'], 'debit'=>$row['debit_amount'], 'credit'=>$row['credit_amount']]; }
+                continue;
+            } // doesn't affect journal
             if ($row['id'] <> $mID) { // if new main id, test for balance of previous id and reset values
                 if (abs($rID['debit']-$rID['credit']) > $tolerance) {
                     if (!$this->glRepairEntry($mID)) {
@@ -575,10 +579,12 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
             $mains[$row['gl_account']]['debit']  += $row['debit_amount'];
             $mains[$row['gl_account']]['credit'] += $row['credit_amount'];
         }
+if (!empty($skips)) { msgTrap(); }
+msgDebug("\nskips = ".print_r($skips, true));
         // get gl accounts that close at end of FY
         $closedGL = $this->getGLtoClose();
         // get journal_history beginning balances for next period
-        $nextHistory= dbGetMulti(BIZUNO_DB_PREFIX."journal_history", "period=".($period+1));
+        $nextHistory= dbGetMulti(BIZUNO_DB_PREFIX.'journal_history', "period=".($period+1));
         // test ending balance with next period beginning balance (except FY boundaries), correct next beginning balance here if out of whack
         $retainedEarnings = 0;
         $updateEndFY = false;
@@ -622,7 +628,7 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         if ($endFY) {
             $acct_string = implode("','", $closedGL);
             msgDebug("\nUpdating end of FY balances for period $period, gl account=$re_acct and history was $historyRE and will be set to = $retainedEarnings");
-            if ($nextPerFY) { dbWrite(BIZUNO_DB_PREFIX."journal_history", ['beginning_balance'=>0], 'update', "period=".($period+1)." AND gl_account IN ('$acct_string')"); }
+            if ($nextPerFY) { dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['beginning_balance'=>0], 'update', "period=".($period+1)." AND gl_account IN ('$acct_string')"); }
             if ($nextPerFY) { dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['beginning_balance'=>$retainedEarnings], 'update', "period=".($period+1)." AND gl_account='$re_acct'"); }
         }
         $cron['cnt']++;

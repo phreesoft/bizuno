@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-10-12
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -53,7 +53,8 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     public $lang;
     public $struc;
     public $prices;
-    public $creds;
+    public $creds = [];
+    public $key;
     public $cID;
     public $cTitle;
     public $ediID;
@@ -84,8 +85,9 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
         $this->lang   = getLang($this->moduleID);
         $this->prices = new inventoryPrices();
         $this->prices->type = 'c';
-        $this->creds  = getMetaCommon('edi');
-        msgDebug("\nRetrieved creds from meta = ".print_r($this->creds, true));
+        $creds  = dbMetaGet('%','edi_client');
+        msgDebug("\nRetrieved creds from meta = ".print_r($creds, true));
+        foreach ($creds as $cred) { $this->creds['C'.$cred['cID']] = $cred; } // take individual meta and put them together for processing
         parent::__construct();
     }
 
@@ -482,7 +484,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
         validateData($struc, $journal->main);
         $journal->items = $this->items;
         $journal->main['contact_id_b'] = $this->cID;
-        $journal->main['store_id']     = $this->creds['C'.$this->cID]['store_id']; // set the prefered store based on the EDI client settings
+//      $journal->main['store_id']     = $this->creds['C'.$this->cID]['store_id']; // store_id needs to be set manually as it's not in the record
         msgDebug("\nReady to post order, main = ".print_r($journal->main, true));
         msgDebug("\nitems = ".print_r($journal->items, true));
         if (!$journal->Post()) { dbTransactionRollback(); return; }

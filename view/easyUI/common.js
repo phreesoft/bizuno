@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-10
+ * @version    7.x Last Update: 2025-10-11
  * @filesource /view/easyUI/common.js
  */
 
@@ -898,7 +898,9 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, {
 });
 
 function bizLangJS(index) {
-    return typeof bizDefaults.dictionary[index] != 'undefined' ? bizDefaults.dictionary[index] : index;
+    if (typeof bizDefaults === 'undefined')            { return index; }
+    if (typeof bizDefaults.dictionary === 'undefined') { return index; }
+    return typeof bizDefaults.dictionary[index] !== 'undefined' ? bizDefaults.dictionary[index] : index;
 }
 
 /*

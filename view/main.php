@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2025-10-11
  * @filesource /view/main.php
  */
 
@@ -210,7 +210,8 @@ final class view
         $data['head']['cssTheme']    = ['order'=>40,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/'.$theme.'/easyui.css" />'];
         $data['head']['cssIcon']     = ['order'=>42,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/icon.css" />'];
         $data['head']['cssStyle']    = ['order'=>44,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/easyUI/stylesheet.css&ver='.MODULE_BIZUNO_VERSION.'" />'];
-        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_AJAX    .'&bizRt=api/admin/viewCSS&icons='.$icons.'" />'];
+        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/viewCSS&icons='.$icons.'" />'];
+//      $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_AJAX    .'&bizRt=api/admin/viewCSS&icons='.$icons.'" />'];
         $data['head']['cssMobile']   = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/mobile.css" />'];
         $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiCSS" />']; // combines all of the easyUI extension css
         // JavaScript Links 

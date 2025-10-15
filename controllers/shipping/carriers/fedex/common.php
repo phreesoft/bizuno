@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-10-12
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -629,17 +629,32 @@ return '';
 
     public function addEmailNotifications(&$payload, $pkg)
     {
+        // notificationEventType values: "ON_DELIVERY" "ON_EXCEPTION" "ON_SHIPMENT" "ON_TENDER" "ON_ESTIMATED_DELIVERY"
+        // "ON_PICKUP_DRIVER_ARRIVED" "ON_PICKUP_DRIVER_ASSIGNED" "ON_PICKUP_DRIVER_DEPARTED" "ON_PICKUP_DRIVER_EN_ROUTE"
+        // maybe more at https://developer.fedex.com/api/en-us/guides/api-reference.html#notificationeventtypes
         $payload['requestedShipment']['emailNotificationDetail'] = [
-            'recipients'      => [[
-                'emailAddress'                  => !empty($pkg['destination']['email']) ? $pkg['destination']['email'] : '',
-//              'smsDetail'                     => ['phoneNumber'=>'string','phoneNumberCountryCode'=>'string'],
-                'notificationEventType'         => ['ON_PICKUP', 'ON_ESTIMATED_DELIVERY', 'ON_DELIVERY'], // ON_BILL_OF_LADING
-                'notificationFormatType'        => 'HTML',
-                'emailNotificationRecipientType'=> 'RECIPIENT',
-                'notificationType'              => 'EMAIL',
-                'locale'                        => 'en_US']],
-            'personalMessage' => 'Your order from Battery Store is on it\'s way!',
-            'printed0'=> ['printedReferenceType'=>'PO_NUMBER', 'value'=> !empty($pkg['ship_ref_1']) ? $pkg['ship_ref_1'] : '']];
+            'aggregationType'=> 'PER_SHIPMENT', // PER_SHIPMENT, PER_PACKAGE
+            'personalMessage'=> 'Shipment update for your order from '.getModuleCache('bizuno', 'settings', 'company', 'primary_name').'!'];
+        if (!empty($pkg['destination']['email'])) {
+            $payload['requestedShipment']['emailNotificationDetail']['emailNotificationRecipients'][] = [
+                'name' => $pkg['destination']['primary_name'],
+                'emailNotificationRecipientType'=> 'RECIPIENT', // "BROKER" "OTHER" "RECIPIENT" "SHIPPER" "THIRD_PARTY"
+                'emailAddress' => $pkg['destination']['email'],
+                'notificationFormatType' => 'HTML', // "HTML" "TEXT"
+                'notificationType' => 'EMAIL',
+                'locale' => 'en_US', // en_US, fr_CA, es_MX, 
+                'notificationEventType'=> ['ON_PICKUP', 'ON_ESTIMATED_DELIVERY', 'ON_DELIVERY']];
+        }
+        if (!empty($pkg['shipper']['email'])) {
+            $payload['requestedShipment']['emailNotificationDetail']['emailNotificationRecipients'][] = [
+                'name'=> $pkg['shipper']['primary_name'],
+                'emailNotificationRecipientType'=> 'SHIPPER',
+                'emailAddress'=> $pkg['shipper']['email'],
+                'notificationFormatType'=> 'HTML',
+                'notificationType'=> 'EMAIL',
+                'locale'=> 'en_US', // en_US, fr_CA, es_MX, 
+                'notificationEventType'=> ['ON_PICKUP', 'ON_EXCEPTION', 'ON_DELIVERY']];
+        }
     }
 
     public function addCustoms(&$payload, $pkg)

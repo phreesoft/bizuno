@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-02
+ * @version    7.x Last Update: 2025-10-11
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -127,6 +127,8 @@ function migrate_tables_part_1(&$cron=[])
     msgDebug("\nEntering migrate_tables_part_1.");
     // ************************ Bizuno-core tables - Part 1 ********************************** //
     dbTransactionStart();
+    // Fix some strict issues with the db tables
+    dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts CHANGE tax_rate_id tax_rate_id INT(11) DEFAULT '0' COMMENT 'type:tax;tag:TaxRateID;order:16'");
     // change table address_book type to default to m
     dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."address_book` CHANGE `type` `type` CHAR(1) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL DEFAULT 'm' COMMENT 'type:hidden;tag:AddressType;order:3';");
     // Add address fields to contacts table

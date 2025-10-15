@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-11
+ * @version    7.x Last Update: 2025-10-12
  * @filesource /model/manager.php
  */
 
@@ -150,7 +150,7 @@ class mgrJournal
         $order = ''; // dbTableReadOrder   ($grid['source']['sort']); // no order here
         $fields= [BIZUNO_DB_PREFIX.'journal_meta.id', BIZUNO_DB_PREFIX.'journal_meta.meta_value'];
         $rows  = dbGetMulti($tables, $crit, $order, $fields, 0, false);
-        $grid['source']['filters']['search']['attr']['value'] = $his->defaults['search'] = getSearch();
+        $grid['source']['filters']['search']['attr']['value'] = $this->defaults['search'] = getSearch();
         $meta  = [];
         foreach ($rows as $row) {
             $value = json_validate($row['meta_value']) ? json_decode($row['meta_value'], true) : ['value'=>$row['meta_value']];
