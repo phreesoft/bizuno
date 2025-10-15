@@ -629,6 +629,7 @@ return '';
 
     public function addEmailNotifications(&$payload, $pkg)
     {
+//        msgDebug("\nEntering fedex:common:addEmailNotifications");
         // notificationEventType values: "ON_DELIVERY" "ON_EXCEPTION" "ON_SHIPMENT" "ON_TENDER" "ON_ESTIMATED_DELIVERY"
         // "ON_PICKUP_DRIVER_ARRIVED" "ON_PICKUP_DRIVER_ASSIGNED" "ON_PICKUP_DRIVER_DEPARTED" "ON_PICKUP_DRIVER_EN_ROUTE"
         // maybe more at https://developer.fedex.com/api/en-us/guides/api-reference.html#notificationeventtypes
@@ -643,7 +644,7 @@ return '';
                 'notificationFormatType' => 'HTML', // "HTML" "TEXT"
                 'notificationType' => 'EMAIL',
                 'locale' => 'en_US', // en_US, fr_CA, es_MX, 
-                'notificationEventType'=> ['ON_PICKUP', 'ON_ESTIMATED_DELIVERY', 'ON_DELIVERY']];
+                'notificationEventType'=> ['ON_ESTIMATED_DELIVERY', 'ON_DELIVERY']];
         }
         if (!empty($pkg['shipper']['email'])) {
             $payload['requestedShipment']['emailNotificationDetail']['emailNotificationRecipients'][] = [
@@ -653,7 +654,7 @@ return '';
                 'notificationFormatType'=> 'HTML',
                 'notificationType'=> 'EMAIL',
                 'locale'=> 'en_US', // en_US, fr_CA, es_MX, 
-                'notificationEventType'=> ['ON_PICKUP', 'ON_EXCEPTION', 'ON_DELIVERY']];
+                'notificationEventType'=> ['ON_PICKUP_DRIVER_ARRIVED', 'ON_EXCEPTION', 'ON_DELIVERY']];
         }
     }
 

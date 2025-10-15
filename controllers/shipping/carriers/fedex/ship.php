@@ -47,6 +47,7 @@ class fedexShip extends fedexCommon
 // ***************************************************************************************************************
     public function labelGet($request=[])
     {
+msgTrap();
         $this->is_freight = (in_array($request['ship_method'], ['GDF','ECF'])) ? true : false;
         $this->prepShipment($request);
         $this->addCreds($request);
