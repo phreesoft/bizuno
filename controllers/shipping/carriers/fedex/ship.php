@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-13
+ * @version    7.x Last Update: 2025-10-15
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -47,7 +47,6 @@ class fedexShip extends fedexCommon
 // ***************************************************************************************************************
     public function labelGet($request=[])
     {
-msgTrap();
         $this->is_freight = (in_array($request['ship_method'], ['GDF','ECF'])) ? true : false;
         $this->prepShipment($request);
         $this->addCreds($request);
