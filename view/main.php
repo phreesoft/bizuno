@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-11
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /view/main.php
  */
 
@@ -485,6 +485,12 @@ function viewFormat($value, $format = '')
             return ($output == '-'.$zero) ? $zero : $output;
         case 'rep_id':    $result = getContactById($value);
             return !empty($result['text']) ? $result['text'] : $value;
+        case 'roleName':   $rID = intval($value); // pulls the role name from the contact ID
+            $meta  = dbMetaGet(0, 'user_profile', 'contacts', $rID);
+            $roleID= !empty($meta['role_id']) ? $meta['role_id'] : 0;
+            if (!isset($GLOBALS['BIZUNO_ROLES'])) { $GLOBALS['BIZUNO_ROLES'] = dbMetaGet('%', 'bizuno_role'); }
+            foreach ($GLOBALS['BIZUNO_ROLES'] as $row) { if ($roleID==$row['_rID']) { return $row['title']; } }
+            return $rID;
         case 'rmaStatus': // pass the record status field and go from there
 return "Needs Fixin: $value";
             // Get the meta from the journal Main ID, then the status code and map to getModulecache value
@@ -820,6 +826,18 @@ function viewProcess($strData, $Process=false)
     }
     msgDebug(" ... function not found!");
     return $strData;
+}
+
+/**
+ * Builds the select values of current active role in the system.
+ */
+function viewRoles()
+{
+    $roles = [];
+    $result= dbMetaGet('%', 'bizuno_role');
+    if (!empty($result)) { foreach ($result as $row) { $roles[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; } }
+    array_unshift($roles, ['roleID'=>0, 'label'=>lang('select')]);
+    return sortOrder($roles, 'text');
 }
 
 /**

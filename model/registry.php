@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /model/registry.php
  */
 
@@ -309,10 +309,10 @@ unset($bizunoMod[$module]['dashboards']);
         $roleID= getUserCache('profile', 'userRole');
         msgDebug("\nEntering setRoleMenus with roleID = $roleID");
         if (empty($roleID)) { return; } // if empty, then not logged
-        $this->roles = dbMetaGet('%', 'bizuno_role');
-        msgDebug("\nFetched role count from meta = ".sizeof($this->roles));
+        $roles = dbMetaGet('%', 'bizuno_role');
+        msgDebug("\nFetched role count from meta = ".sizeof($roles));
         $this->userInfo = [];
-        foreach ($this->roles as $role) {
+        foreach ($roles as $role) {
             unset($role['_refID'], $role['_table']); // don't need these
             $tmpMenu = $this->menuBar['child'];
             $this->removeOrphanMenus($tmpMenu, !empty($role['security']) ? $role['security'] : []);

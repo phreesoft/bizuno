@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /locale/en_US/module/administrate/language.php
  */
 
@@ -41,6 +41,8 @@ $lang = [
     'bizuno_upgrade' => 'Bizuno Upgrade',
     'bizuno_upgrade_desc' => 'Upgrade to the latest version of Bizuno with a push of a button. Before doing this, please make a backup of your business, download it to your local machine and make sure all users are not using the system.',
     'desc_security_fill' => 'Fill ALL Security Settings To:',
+    // Error messages
+    'err_delete_role' => 'This role cannot be deleted, the following users are assigned to this role: %s',
     // Extra tabs
     'new_tab_desc' => 'Select the Module/Table to create a new tab in and click Next.',
     'err_tab_in_use' => 'This tab has custom fields assigned to it, the fields must be deleted before this tab can be deleted! The fields are: ',

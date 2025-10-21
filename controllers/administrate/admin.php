@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -65,26 +65,28 @@ class administrateAdmin
             $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
             $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
         }
-        if (!in_array($type, ['u']) || (empty($rID) && method_exists($portal, 'contactTypeUser')) ||
+        if (!in_array($type, ['u']) || // (empty($rID) && method_exists($portal, 'contactTypeUser')) ||
             !validateAccess('admin', 4, false)) { return; } // Only existing records, admins and type user
         // unset some panels
-        msgDebug("\nPassed security");
         unset($layout['tabs']['tabContacts']['divs']['history'],$layout['tabs']['tabContacts']['divs']['wallet'],
               $layout['tabs']['tabContacts']['divs']['prices'], $layout['tabs']['tabContacts']['divs']['bill_add'],
               $layout['tabs']['tabContacts']['divs']['ship_add']);
-        unset($layout['tabs']['tabContacts']['divs']['general']['divs']['genAddA'], $layout['tabs']['tabContacts']['divs']['general']['divs']['genProp'],
+        unset($layout['tabs']['tabContacts']['divs']['general']['divs']['genProp'], // $layout['tabs']['tabContacts']['divs']['general']['divs']['genAddA'], 
               $layout['tabs']['tabContacts']['divs']['general']['divs']['genStat'], $layout['tabs']['tabContacts']['divs']['general']['divs']['genAtch']);
+        $layout['tabs']['tabContacts']['divs']['general']['divs']['genAddA']['order'] = 25;
+        $layout['fields']['email']['order'] = 5;
+        $fldAddr = ['telephone2','telephone3','telephone4','website'];
+        $layout['panels']['genCont']['keys'] = array_diff($layout['panels']['genCont']['keys'], $fldAddr);
+        $fldAcct = ['rep_id','tax_rate_id','price_sheet','terms','terms_text','terms_edit','last_date_1','last_date_2','histPay'];
+        $layout['panels']['genAcct']['keys'] = array_diff($layout['panels']['genAcct']['keys'], $fldAcct);
         // Get the meta to add the new options and process
-        $meta   = getMetaContact($rID, 'user_profile');
-        msgDebug("\nRead meta = ".print_r($meta, true));
-        $opts = array_replace_recursive($this->defaults, $meta);
-        msgDebug("\nAfter replace, meta = ".print_r($opts, true));
+        $meta    = getMetaContact($rID, 'user_profile');
+        $opts    = array_replace_recursive($this->defaults, $meta);
         // Adjust fields and add role select
-        $roleMeta = dbMetaGet($opts['role_id'], 'bizuno_role');
-        $rFields= ['role_id'=>['order'=>80,'label'=>lang('role'),'attr'=>['value'=>$roleMeta['title'], 'readonly'=>true]]];
-        $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id', 'primary_name'];
+        $rFields = ['role_id'=>['order'=>80,'label'=>lang('role'),'attr'=>['type'=>'select', 'value'=>$opts['role_id']], 'values'=>listRoles(true, true, false)]];
+        $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id'];
         // Add phreebooks panel
-        $pbFields = [
+        $pbFields= [
             'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
             'restrict_store' => ['order'=>20,'label'=>$this->lang['restrict_store_lbl'], 'tip'=>$this->lang['restrict_store_tip'], 'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_store'])?true:false]],
             'restrict_user'  => ['order'=>30,'label'=>$this->lang['restrict_user_lbl'],  'tip'=>$this->lang['restrict_user_tip'],  'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_user']) ?true:false]],
@@ -93,7 +95,7 @@ class administrateAdmin
             'ar_acct'        => ['order'=>60,'label'=>$this->lang['gl_receivables_lbl'], 'tip'=>$this->lang['gl_receivables_tip'], 'attr'=>['type'=>'ledger',  'value'=>$opts['ar_acct']]],
             'ap_acct'        => ['order'=>70,'label'=>$this->lang['gl_purchases_lbl'],   'tip'=>$this->lang['gl_purchases_tip'],   'attr'=>['type'=>'ledger',  'value'=>$opts['ap_acct']]]];
         $layout['tabs']['tabContacts']['divs']['general']['divs']['genPB'] = ['order'=>75,'type'=>'panel','key'=>'genPB','classes'=>['block33']];
-        $layout['panels']['genPB'] = ['label'=>lang('phreebooks_defaults'), 'type'=>'fields', 'keys'=>array_keys($pbFields)];
+        $layout['panels']['genPB'] = ['label'=>lang('phreebooks'), 'type'=>'fields', 'keys'=>array_keys($pbFields)];
         $layout['fields'] = array_merge($layout['fields'], $pbFields, $rFields);
     }
 
@@ -110,7 +112,7 @@ class administrateAdmin
         $meta= dbMetaGet(0, 'user_profile', 'contacts', $cID);
         $rID = metaIdxClean($meta);
         $data= [
-//          'role_id'        => clean('role_id',        'integer','post'), // Do not allow role changes here.
+            'role_id'        => clean('role_id',        'integer','post'),
             'store_id'       => clean('store_id',       'integer','post'),
             'restrict_store' => clean('restrict_store', 'boolean','post'),
             'restrict_user'  => clean('restrict_user',  'boolean','post'),

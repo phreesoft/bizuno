@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /locale/en_US/modules/bizuno/language.php
  */
 
@@ -102,7 +102,6 @@ $lang = [
     'err_install_module_exists' => 'Module %s is already installed! The installation was skipped.',
     'err_role_undefined' => 'The role is a required field! Please select a role for this user.',
     'err_delete_user' => 'You cannot delete the user account that you are logged in as!',
-    'err_delete_role' => 'This role cannot be deleted, the following users are assigned to this role: %s',
     'err_encryption_not_set' => 'The encryption key has not been set! To set a key, go to My Company -> Settings -> Bizuno tab -> Bizuno Settings -> Tools tab.',
     // General
     'table_stats' => 'Table Statistics',

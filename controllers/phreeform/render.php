@@ -550,7 +550,7 @@ class phreeformRender
                 }
             }
         } else { // we have a problem
-            $data = !empty($bizMail->bizData) ? $bizMail->bizData : []; // special instructions, else errorfs should be in the msgStack
+            $data = !empty($bizMail->bizData) ? $bizMail->bizData : []; // special instructions, else errors should be in the msgStack
         }
         msgDebug("\nFinished sending email.");
         return $data; // which becomes layout
