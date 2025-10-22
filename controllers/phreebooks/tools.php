@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-09
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -579,8 +579,6 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
             $mains[$row['gl_account']]['debit']  += $row['debit_amount'];
             $mains[$row['gl_account']]['credit'] += $row['credit_amount'];
         }
-if (!empty($skips)) { msgTrap(); }
-msgDebug("\nskips = ".print_r($skips, true));
         // get gl accounts that close at end of FY
         $closedGL = $this->getGLtoClose();
         // get journal_history beginning balances for next period

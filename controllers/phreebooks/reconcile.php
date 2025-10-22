@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-21
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /controllers/phreebooks/reconcile.php
  */
 
@@ -73,7 +73,6 @@ class phreebooksReconcile
      */
     public function managerRows(&$layout=[])
     {
-msgTrap();
         if (!$security = validateAccess('recon', 3)) { return; }
         $sort   = clean('sort',  'text',   'post');
         $order  = clean('order', 'text',   'post');

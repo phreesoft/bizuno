@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2025-10-21
  * @filesource /controllers/phreebooks/ediMain.php
  *
  * Handles specs:
@@ -134,7 +134,6 @@ class phreebooksEdiMain extends mgrJournal
     }
     public function managerRows(&$layout=[])
     {
-        msgTrap();
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $grid = $this->managerGrid($security, ['refID'=>'%', 'type'=>'journal']);
         $layout = array_replace_recursive($layout, ['type'=>'datagrid','key'=>"dg{$this->domSuffix}",'datagrid'=>["dg{$this->domSuffix}"=>$grid]]);
