@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-10-23
  * @filesource /view/easyui/stylesheet.css
  */
 
@@ -52,7 +52,7 @@ body.loading .modal      { display:block; }
 .menuHide                { display:none; }
 .fldLabel                { }
 
-.journal-waiting         { background-color:#FFFF00; }
+.journal-waiting         { background-color:#FFFF00; color:#444; }
 .row-inactive            { background-color:#6293BB; }
 .row-default             { background-color:#90EE90; }
 

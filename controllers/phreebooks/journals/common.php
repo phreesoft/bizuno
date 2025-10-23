@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2025-10-23
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -944,7 +944,7 @@ class jCommon
                 'contact_id'  => ['order'=> 0,'attr' =>['hidden'=>'true']],
                 'inv_date'    => ['order'=>10,'label'=>pullTableLabel('journal_main', 'post_date', '12'),'attr'=>['type'=>'date','width'=>100,'sortable'=>true,'resizable'=>true,'align'=>'center']],
                 'primary_name'=> ['order'=>20,'label'=>pullTableLabel('journal_main', 'primary_name_b', '12'),'attr'=>['width'=>220,'sortable'=>true,'resizable'=>true],
-                    'events'=> ['styler'=>"function(value,row){ if (row.is_ach=='1') { return {style:'background-color:lightgreen'}; } }"]],
+                    'events'=> ['styler'=>"function(value,row){ if (row.is_ach=='1') { return {style:'background-color:lightgreen;color:#444;'}; } }"]],
                 'inv_num'     => ['order'=>30,'label'=>pullTableLabel('journal_main', 'invoice_num', '12'),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true, 'align'=>'center']],
                 'amount'      => ['order'=>40,'label'=>lang('amount_due'),'attr'=>['type'=>'currency', 'width'=>100,'resizable'=>true, 'align'=>'right'],
                     'events'=> ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
