@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /controllers/administrate/fields.php
  */
 
@@ -54,6 +54,7 @@ class administrateFields extends mgrJournal
     protected function managerGrid($security=0, $args=[])
     {
         $data = array_replace_recursive(parent::gridBase($security, $args), [
+//            'source' => ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/add')"]]]],
             'columns'=> [
                 'table'  => ['label'=>lang('table'),  'order'=>10,'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true]],
                 'field'  => ['label'=>lang('field'),  'order'=>10,'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true]],
@@ -71,7 +72,10 @@ class administrateFields extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        parent::managerMain($layout, $security, ['dom'=>'div']);
+        parent::managerMain($layout, $security, ['dom'=>'div', 'work'=>true]);
+        unset($layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['new']);
+        $layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['newJ']['icon'] = 'add';
+        $layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['newJ']['label']= lang('add');
     }
     public function managerRows(&$layout=[])
     {
@@ -91,17 +95,33 @@ class administrateFields extends mgrJournal
         $slice  = array_slice($sorted, ($this->defaults['page']-1)*$this->defaults['rows'], $this->defaults['rows']);
         $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode(['total'=>sizeof($output), 'rows'=>$slice])]);
     }
+    public function add(&$layout=[])
+    {
+        if (!$security = validateAccess($this->secID, 2)) { return; }
+        $options= [['id'=>'', 'text'=>lang('select')]];
+        foreach ($this->cstmFields as $table) {  $options[] = ['id'=>$table, 'text'=>lang($table)]; }
+        $fldSel = ['id'=>'table', 'props'=>['values'=>$options, 'attr'=>['type'=>'select']]];
+        $args   = ['fldSel'=>$fldSel, 'desc'=>$this->lang['new_field_desc']];
+        parent::addDB($layout, $security, $args);
+    }
+    
     public function edit(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
         $dbFld = clean('rID', 'text', 'get'); // format table.field
-        $parts = explode('.', $dbFld, 2);
-        $table = $parts[0];
-        $field = $parts[1];
-        if (empty($table) || empty($field)) { return msgAdd("Table and/or field information is missing!"); }
-        if ($field) { msgAdd($this->lang['xf_msg_edit_warn'], 'caution'); }
+        if (empty($dbFld)) { // it's an add
+            $table = clean('table', 'db_field', 'get');
+            $field = '';
+            if (!in_array($table, $this->cstmFields)) { return msgAdd($this->lang['err_new_field_add']);}
+        } else {
+            $parts = explode('.', $dbFld, 2);
+            $table = $parts[0];
+            $field = $parts[1];
+            if (empty($table) || empty($field)) { return msgAdd($this->lang['err_new_field_edit']); }
+            msgAdd($this->lang['xf_msg_edit_warn'], 'caution');
+        }
         $struc = dbLoadStructure(BIZUNO_DB_PREFIX.$table);
-        $props = $field ? $struc[$field] : ['attr'=>['type'=>'text']];
+        $props = !empty($field) ? $struc[$field] : ['attr'=>['type'=>'text']];
         msgDebug("\n Working with field properties: ".print_r($props, true));
         $gList = [];
         $groups= [['id'=>'', 'text'=>'']];
@@ -128,7 +148,7 @@ class administrateFields extends mgrJournal
                 'body'   => ['order'=>50,'type'=>'html',   'html'=>$this->getViewFields($props, $table, $field)],
                 'formEOF'=> ['order'=>85,'type'=>'html',   'html'=>"</form>"]]]],
             'toolbars'=> ['tbField'=>['icons' =>[
-                'new' => ['order'=>20,'events'=>['onClick'=>"accordionEdit('accFields','dgFields','detail','".lang('details')."','bizuno/administrate/edit&module=$module&table=$table', 0);"]],
+                'new' => ['order'=>20,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}','dg{$this->domSuffix}','dtl{$this->domSuffix}','".lang('details')."','$this->moduleID/$this->page/add', 0);"]],
                 'save'=> ['order'=>40,'events'=>['onClick'=>"jqBiz('#frmField').submit();"]]]]],
             'forms'   => ['frmField'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/fields/save"]]],
             'jsHead'  => ['grpData' => "var grpData=".json_encode($groups).";"],
@@ -144,7 +164,7 @@ class administrateFields extends mgrJournal
         $type  = isset($props['attr']['type']) ? $props['attr']['type'] : 'text';
         if (in_array($type, ['textarea', 'varchar'])) { $type = 'text'; } // variations of text field
         $metaTabs = dbMetaGet('%', 'tabs');
-        msgDebug("\nRead tabs = ".print_r($metaTabs, true));
+//      msgDebug("\nRead tabs = ".print_r($metaTabs, true));
         foreach ($metaTabs as $meta) { $tabs[] = ['id'=>$meta['_rID'], 'text'=>$meta['title']]; }
         $ints  = viewKeyDropdown(['tinyint'=>'-127 '.lang('to').' 127', 'smallint'=>'-32,768 '.lang('to').' 32,768',
             'mediumint'=>'-8,388,608 '.lang('to').' 8,388,607', 'int'=>'-2,147,483,648 '.lang('to').' 2,147,483,647',
@@ -206,7 +226,7 @@ class administrateFields extends mgrJournal
                 break;
             default:
         }
-        $output  = html5('module',$fields['module']);
+//        $output  = html5('module',$fields['module']);
         $output .= html5('table', $fields['table']);
         $output .= html5('id',    $fields['id']);
         $output .= '<table>
@@ -378,13 +398,13 @@ class administrateFields extends mgrJournal
                 break;
             case 'float': $comment[] ='type:float';
                 $select  = clean('float_select', 'text', 'post');
-//                $format  = clean($request['float_format'], 'text');
+//              $format  = clean($request['float_format'], 'text');
                 $default = clean('float_default','float', 'post');
                 switch ($select) {
                     default:
                     case 'float':  $fieldType = "FLOAT DEFAULT '$default'"; break;
                     case 'double': $fieldType = "DOUBLE DEFAULT '$default'";break;
-//                    case 2: $fieldType = "DECIMAL($format) DEFAULT '$default'";break;
+//                  case 2: $fieldType = "DECIMAL($format) DEFAULT '$default'";break;
                 }
                 break;
             case 'select':         $comment[] ='type:select'; // default selection is asssumed to be listed first

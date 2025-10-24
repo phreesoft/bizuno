@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /controllers/quality/audits.php
  */
 
@@ -34,8 +34,8 @@ class qualityAudits extends mgrJournal
     protected $secID     = 'qa_audit';
     protected $domSuffix = 'Audits';
     protected $metaPrefix= 'quality_audit';
-//    protected $nextRefIdx= 'next_audit_num'; // Should only be needed for the meta
     protected $journalID = 31;
+    private   $attachPath;
 
     function __construct()
     {
@@ -45,6 +45,7 @@ class qualityAudits extends mgrJournal
         $this->freqs      = getModuleCache('bizuno', 'options', 'frequencies');
         $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');
         $this->leadTimes  = getModuleCache('bizuno', 'options', 'lead_times');
+        $this->attachPath = getModuleCache($this->moduleID, 'properties', 'attachPath', 'audits');
         $this->managerSettings();
         $this->fieldStructure();
     }

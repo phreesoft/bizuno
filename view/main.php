@@ -407,7 +407,7 @@ function resizeEverything() { ".implode(" ", $jsResize)." }"; }
             default:
                 $data['content']['action']= 'window';
                 $data['content']['title'] = $data['title'];
-                $data['content'] = array_merge($data['content'], $data['attr']);
+                $data['content'] = array_merge($data['content'], !empty($data['attr']) ? $data['attr'] : []);
                 $this->renderDivs($data);
                 $this->html .= $this->renderJS($data, false);
                 $data['content']['html']  = empty($data['content']['html']) ? $this->html : $data['content']['html'].$this->html;

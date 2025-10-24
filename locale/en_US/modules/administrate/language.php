@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /locale/en_US/module/administrate/language.php
  */
 
@@ -47,6 +47,8 @@ $lang = [
     'new_tab_desc' => 'Select the Module/Table to create a new tab in and click Next.',
     'err_tab_in_use' => 'This tab has custom fields assigned to it, the fields must be deleted before this tab can be deleted! The fields are: ',
     // Extra fields
+    'new_field_lbl' => 'Add Custom Field',
+    'new_field_desc' => 'Custom fields can be added to select database tables. Please select the table to add a new database field to and press next.',
     'custom_field_manager' => 'Custom Field Manager',
     'xf_lbl_field' => 'Field Name',
     'xf_lbl_field_tip' => 'Fieldnames must be database compliant, they cannot contain spaces or special characters and must be 64 characters or less.',
@@ -74,6 +76,8 @@ $lang = [
     'xf_lbl_checkbox' => 'Check Box<br />(Yes or No Choice)',
     'xf_lbl_datetime' => 'Date and Time',
     'xf_lbl_timestamp' => 'DB Timestamp',
+    'err_new_field_add' => 'Error! This table cannot be customizaed!',
+    'err_new_field_edit' => 'Error! Table and/or field information is missing!',
     'xf_err_field_exists' => 'Cannot rename field as the new field name already exists in the table!',
     'xf_msg_edit_warn' => 'WARNING: If the field type or properties of the field type are changed, data loss may occur! Specifically, shortening text field lengths (will truncate data) or changing types (e.g. text to integer will drop all non-numeric characters) may result in data loss.',
     // Support Ticket

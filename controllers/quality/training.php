@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /controllers/quality/training.php
  */
 
@@ -34,8 +34,8 @@ class qualityTraining extends mgrJournal
     protected $secID     = 'qa_train';
     protected $domSuffix = 'Training';
     protected $metaPrefix= 'training';
-//    protected $nextRefIdx= 'next_training_num'; // Should only be needed with meta
     protected $journalID = 34;
+    private   $attachPath;
 
     public function __construct()
     {
@@ -43,8 +43,7 @@ class qualityTraining extends mgrJournal
         $this->stores    = getModuleCache('bizuno', 'stores');
         $this->freqs     = getModuleCache('bizuno', 'options', 'frequencies');
         $this->leadTime  = getModuleCache('bizuno', 'options', 'lead_times');
-        msgDebug("\nlead time = ".print_r($this->leadTime, true));
-        $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', $this->pageID);
+        $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', 'training');
         $this->managerSettings();
         $this->fieldStructure();
     }

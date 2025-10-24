@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -37,12 +37,14 @@ class qualityTickets extends mgrJournal
     protected $metaPrefix= 'qa_ticket';
     protected $nextRefIdx= 'next_ticket_num';
     protected $journalID = 30;
+    private   $attachPath;
 
     function __construct()
     {
         parent::__construct();
         $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');
-        $this->mapPanel = ['title0'=>lang('stop_work'), 'title1'=>lang('work_around'), 'title2'=>lang('root_cause'), 'title3'=>lang('action_corr')];
+        $this->mapPanel   = ['title0'=>lang('stop_work'), 'title1'=>lang('work_around'), 'title2'=>lang('root_cause'), 'title3'=>lang('action_corr')];
+        $this->attachPath = getModuleCache($this->moduleID, 'properties', 'attachPath', 'correctives');
         $this->managerSettings();
         $this->fieldStructure();
     }

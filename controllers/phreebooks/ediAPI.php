@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2025-10-24
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -515,7 +515,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
         $subject  = "Purchase Order ".$this->main['purch_order_id']." from ".$this->main['primary_name_b'];
         $body     = "The purchase order should already be in Bizuno but here are the details anyway: ".print_r($this->main, true);
         $mail     = new bizunoMailer($toEmail, $toName, $subject, $body, $fromEmail, $fromName);
-        $mail->sendMail();
+        if (!$mail->sendMail()) { msgAdd("The email failed to send for the errors mentions above.", 'trap'); }
     }
     protected function emailError($subject) {
         $toEmail  = getModuleCache($this->moduleID, 'settings', 'edi', 'email_error', getModuleCache('bizuno', 'settings', 'company', 'email'));
@@ -525,6 +525,6 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
         $body     = "The EDI proccessing team found the following errrors: ".implode("<br />", $this->errors)."<br /><br />";
         $body    .= "The failed EDI file read contained: <br />".str_replace("\n", "<br />", print_r($this->ediLines, true));
         $mail     = new bizunoMailer($toEmail, $toName, $subject, $body, $fromEmail, $fromName);
-        $mail->sendMail();
+        if (!$mail->sendMail()) { msgAdd("The email failed to send for the errors mentions above.", 'trap'); }
     }
 }
