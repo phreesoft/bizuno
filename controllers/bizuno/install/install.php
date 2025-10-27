@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-31
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -30,10 +30,31 @@ namespace bizuno;
 class bizInstall // Checking users:
 {
     public  $moduleID = 'common';
-    private $references = ['next_cust_id_num'=> 'C10000', 'next_vend_id_num'=> 'V10000',
-            'next_ref_j2' => 'GL000001','next_ref_j3' => 'RFQ1000','next_ref_j4' => 'PO5000', 'next_ref_j7' => 'VCM1000',
-            'next_ref_j9' => 'QU1000',  'next_ref_j10'=> 'SO0001', 'next_ref_j12'=> '200000', 'next_ref_j13'=> 'CM1000',
-            'next_ref_j18'=> 'DP00001', 'next_ref_j20'=> '100'];
+    public $refs = [
+            'next_audit_num'   => 'QA00001',
+            'next_cproj_num'   => 'PJ00001',
+            'next_cust_id_num' => 'C000001',
+            'next_edi_num'     => 'EDI0000001',
+            'next_fxdast_num'  => 'FA00001',
+            'next_maint_num'   => 'PM00001',
+            'next_promo_num'   => 'PR00001',
+            'next_qaobj_num'   => 'QO00001',
+            'next_ref_j2'      => 'GL00001',
+            'next_ref_j3'      => 'VQ00001',
+            'next_ref_j4'      => 'VPO00001',
+            'next_ref_j7'      => 'VCM00001',
+            'next_ref_j9'      => 'QU00001',
+            'next_ref_j10'     => 'SO00001',
+            'next_ref_j12'     => 'INV00001',
+            'next_ref_j13'     => 'CM00001',
+            'next_ref_j18'     => 'INV00001',
+            'next_ref_j20'     => 'CK00001',
+            'next_return_num'  => 'RMA00001',
+            'next_shipment_num'=> 'SH00001',
+            'next_ticket_num'  => 'QT00001',
+            'next_training_num'=> 'TR00001',
+            'next_vend_id_num' => 'V000001',
+            'next_wo_num'      => 'WO00001'];
 
     function __construct()
     {
@@ -84,20 +105,19 @@ class bizInstall // Checking users:
         // set some meta to force the position of the row ID's
         $roleID   = 10; // needs to sync with phreesoft.com for new installs or menus don't show
         $roleMeta = ['title'=>lang('administrator'), 'administrate'=>1, 'security'=>[]];
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 1, 'meta_key'=>'bizuno_cache_expires','meta_value'=> 0  ]);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 2, 'meta_key'=>'chart_of_accounts',   'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 3, 'meta_key'=>'methods_totals',      'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 4, 'meta_key'=>'methods_gateways',    'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 5, 'meta_key'=>'methods_carriers',    'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 6, 'meta_key'=>'methods_funnels',     'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 7, 'meta_key'=>'dashboards',          'meta_value'=>'{}']);
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']);
-//      dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'spare',               'meta_value'=>'[]']); // spare
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 1, 'meta_key'=>'bizuno_cache_expires','meta_value'=> 0  ]); // cache timestamp to trigger reload
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 2, 'meta_key'=>'chart_of_accounts',   'meta_value'=>'{}']); // Your chart of accounts
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 3, 'meta_key'=>'methods_totals',      'meta_value'=>'{}']); // Collected list of Phrebooks total methods
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 4, 'meta_key'=>'methods_gateways',    'meta_value'=>'{}']); // Collected list of payment gateways
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 5, 'meta_key'=>'methods_carriers',    'meta_value'=>'{}']); // Collected list of shipping carriers
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 6, 'meta_key'=>'methods_funnels',     'meta_value'=>'{}']); // Collected lsit of API funnels 
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 7, 'meta_key'=>'dashboards',          'meta_value'=>'{}']); // Collected list of dashbaords from all modules
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']); // Cache to store phreeform reports and forms to speed things up
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>'[]']); // Phreebooks references for journal entries
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=>$roleID,'meta_key'=>'bizuno_role',     'meta_value'=>json_encode($roleMeta)]);
         setUserCache('profile', 'userRole', $roleID);
         $user = ['userID'=>$userID, 'psID'=>getUserCache('profile', 'psID'), 'userEmail'=>getUserCache('profile', 'email'), 'userRole'=>$roleID];
         setUserCookie($user);
-        setModuleCache('bizuno', 'references', '', $this->references);
         // Load PhreeBooks defaults
         $pbAdmin = new phreebooksAdmin();
         $pbAdmin->installFirst(); // load the chart and initialize PhreeBooks stuff
@@ -115,6 +135,7 @@ class bizInstall // Checking users:
         $cID     = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['ctype_u'=>'1', 'email'=>$usrEmail, 'primary_name'=>$usrEmail, 'short_name'=>$usrEmail, 'first_date'=>biz_date()]);
         dbMetaSet(0, 'user_profile', ['email'=>$usrEmail, 'role_id'=>$roleID], 'contacts', $cID);
         $this->initDashboards($cID, $bAdmin->notes); // create some starting dashboards
+        $this->installRefs();  // Pre set the references for the journal entries
         $company = getModuleCache('bizuno', 'settings', 'company'); // set the business title and id
         $company['id'] = $company['primary_name'] = clean('biz_title', 'text', 'post');
         setModuleCache('bizuno', 'settings', 'company', $company);
@@ -169,6 +190,15 @@ class bizInstall // Checking users:
         dbMetaSet(0, 'dashboard_home', $panels, 'contacts', $cID);
     }
     
+    private function installRefs()
+    {
+        $meta = [];
+        foreach ($this->refs as $key => $value) { $meta[$key] = $value; }
+        $null= dbMetaGet(0, 'bizuno_refs');
+        $rID = metaIdxClean($null);
+        dbMetaSet($rID, 'bizuno_refs', $meta);
+    }
+
     public function installReports() // Adds full suite of default reports and forms
     {
         msgDebug("\nEntering installReports, building phreeForm folder tree");

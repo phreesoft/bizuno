@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -73,15 +73,11 @@ class bizunoMain
 
     public function dashboard(&$layout=[])
     {
-        $data = [];
+        $data  = [];
         viewDashJS($data);
         $menuID= clean('menuID', ['format'=>'text','default'=>'home'], 'get');
         $data['jsHead']['menu_id'] = "var menuID='$menuID';";
-        if ($GLOBALS['myDevice'] != 'mobile') { // text and link to add dashboards
-//          $linkDash = ['attr'=>['type'=>'a','value'=>lang('add_dashboards'),'href'=>BIZUNO_HOME.'&bizRt=bizuno/dashboard/manager&menuID='.$menuID]];
-//          $data['divs']['tbDash'] = ['order'=>10,'classes'=>['datagrid-toolbar'],'styles'=>['min-height'=>'32px'],'attr'=>['id'=>'tbDash'],'type'=>'html','html'=>html5('', $linkDash)];
-        }
-        $cols = getColumns();
+        $cols  = getColumns();
         $width = round(100/$cols, 0);
         $html  = '';
         for ($i=0; $i<$cols; $i++) { $html .= "\n".'<div style="width:'.$width.'%"></div>'; }

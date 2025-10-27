@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -106,7 +106,7 @@ class contactsAdmin
         $metaCRM= dbMetaGet('%', 'options_crm_actions');
         $idxFreq= metaIdxClean($metaCRM); // remove the indexes
         $crm0   = ['new' =>$this->lang['contacts_crm_new_call'], 'ret' =>$this->lang['contacts_crm_call_back'], 'flw' =>$this->lang['contacts_crm_follow_up'],
-                   'lead'=>$this->lang['contacts_crm_new_lead'], 'inac'=>lang('inactive')];
+                   'lead'=>$this->lang['contacts_crm_new_lead'], 'trn' =>lang('training'), 'inac'=>lang('inactive')];
         asort($crm0);
         dbMetaSet($idxFreq, 'options_crm_actions', $crm0);
         // Put them in the cache for runtime access

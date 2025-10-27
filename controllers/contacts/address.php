@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/contacts/address.php
  */
 
@@ -99,7 +99,6 @@ class contactsAddress extends mgrJournal
                 'postal_code' => ['order'=>45, 'label'=>lang('postal_code'), 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true, 'hidden'=>$this->aType=='i'?true:false]],
                 'email'       => ['order'=>50, 'label'=>lang('email'),       'attr'=>['width'=>160, 'sortable'=>true, 'resizable'=>true, 'hidden'=>$this->aType=='i'?false:true]],
                 'telephone1'  => ['order'=>55, 'label'=>lang('telephone'),   'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=>$this->aType=='i'?false:true]]]]);
-//      if (in_array($GLOBALS['myDevice'], ['mobile', 'tablet'])) { $data['columns']['address1']['attr']['hidden']= true; }
         return $data;
     }
     public function manager(&$layout=[])

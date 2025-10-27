@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /view/main.php
  */
 
@@ -32,13 +32,13 @@ final class view
     private $server = 'https://www.bizuno.com';
     private $fontAwe= 'https://kit.fontawesome.com/302352c521.js';
     public  $html   = ''; // fuly formed HTML/data to send to client
-    private $myDevice = 'desktop';
+    private $myDevice;
 
     function __construct($data=[])
     {
         // declare global data until all modules are converted to new nested structure
         global $viewData;
-        $this->myDevice = !empty($GLOBALS['myDevice']) ? $GLOBALS['myDevice'] : 'desktop'; // options are desktop [default], tablet, or mobile
+        $this->myDevice = !empty(getUserCache('profile', 'device')) ? getUserCache('profile', 'device') : 'desktop'; // options are desktop [default], tablet, or mobile
         $viewData = $data;
         $this->render($data); // dies after complete
     }
@@ -130,9 +130,6 @@ final class view
     {
         msgDebug("\nEntering viewGuestDOM");
         $dom = '';
-        $js  = "var jqBiz = $.noConflict();\n";
-        $js .= "var bizID = 0;\n";
-        $js .= "var myDevice = '{$GLOBALS['myDevice']}';\n";
         // Page head Meta 
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.'Bizuno'.'</title>'];
         $data['head']['metaTitle']   = ['order'=>22,'type'=>'html','html'=>'<meta name="robots" content="noindex">'];
@@ -142,8 +139,9 @@ final class view
         // Page head CSS
         $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/portal.css" />'];
         // Page head JavaScript 
-        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'jQuery-3.7.1.js"></script>'];
-        $data['head']['jsFontAwe']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->fontAwe.'" crossorigin="anonymous"></script>'];
+        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'jQuery-3.7.1.js" />'];
+        $data['head']['cssBizuno']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZBOOKS_URL_FS.'0/view/portal.js" />'];
+//      $data['head']['jsFontAwe']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->fontAwe.'" crossorigin="anonymous" />'];
         $data['head']['jsBizuno']    = ['order'=>64,'type'=>'html','html'=>'<script type="text/javascript">'.$js."</script>"];
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
@@ -191,6 +189,7 @@ final class view
     {
         $icons   = getUserCache('profile', 'icons', false, 'default');
         $theme   = getUserCache('profile', 'theme', false, 'bizuno');
+        if ($theme=='bizuno' && getuserCache('profile', 'mode')=='dark') { $theme='black'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
 //        $cssPath = defined('BIZUNO_SHARED') && !empty(BIZUNO_SHARED) ? 'myPortal' : 'ispPortal';
@@ -198,7 +197,6 @@ final class view
         $js .= "var bizunoHome = '".BIZUNO_HOME."';\n";
         $js .= "var bizunoAjax = '".BIZUNO_AJAX."';\n";
         $js .= "var bizunoAjaxFS = '".BIZBOOKS_URL_FS."';\n";
-        $js .= "var myDevice = '{$GLOBALS['myDevice']}';\n";
         // Create page Head HTML
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.(!empty($data['title']) ? $data['title'] : getModuleCache('bizuno', 'properties', 'title')).'</title>'];
         $data['head']['metaPath']    = ['order'=>22,'type'=>'html','html'=>'<!-- route:'.clean('bizRt',['format'=>'path_rel','default'=>''],'get').' -->'];
@@ -383,7 +381,7 @@ function resizeEverything() { ".implode(" ", $jsResize)." }"; }
     public function renderPopup($data)
     {
         global $msgStack, $html5;
-        switch($GLOBALS['myDevice']) {
+        switch($this->myDevice) {
             case 'mobile': // set a new panel
                 if (biz_validate_user()) {
                     $data['header'] = ['classes'=>['m-toolbar'],'type'=>'divs','divs'=>[
@@ -1181,7 +1179,7 @@ function viewMain()
 {
     global $html5;
     $menuID = clean('menuID', ['format'=>'cmd', 'default'=>'home'], 'get');
-    switch ($GLOBALS['myDevice']) {
+    switch ($this->myDevice) {
         case 'mobile':  $data = $html5->layoutMobile($menuID);  break;
         case 'tablet': // use desktop layout as the screen is big enough
         default:

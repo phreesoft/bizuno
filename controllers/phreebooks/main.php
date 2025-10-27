@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1647,7 +1647,7 @@ function bizUnitDiscDisc(newValue) {
      */
     private function dgPhreeBooksMobile(&$data=[])
     {
-        if ($GLOBALS['myDevice']=='mobile') {
+        if (getUserCache('profile', 'device')=='mobile') {
             $data['columns']['post_date']['label']              = lang('date');
             $data['columns']['total_amount']['label']           = lang('total');
             $data['columns']['post_date']['format']             = 'dateNoY';

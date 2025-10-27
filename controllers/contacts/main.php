@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/contacts/main.php
  */
 
@@ -752,7 +752,7 @@ class contactsMain
             $uID = getUserCache('profile', 'userID', false, 0);
             $data['source']['filters']['restrict_user'] = ['order'=>99, 'hidden'=>true, 'sql'=>"rep_id='$uID'"];
         }
-        if ($GLOBALS['myDevice'] == 'mobile') {
+        if (getUserCache('profile', 'device') == 'mobile') {
             $data['columns']['short_name']['attr']['hidden']  = true;
             $data['columns']['flex_field_1']['attr']['hidden']= true;
             $data['columns']['address1']['attr']['hidden']    = true;

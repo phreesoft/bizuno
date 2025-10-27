@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-11
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /view/easyUI/common.js
  */
 
@@ -933,8 +933,21 @@ function glComboSearch(q) {
  * @returns {undefined}
  */
 function isMobile() {
-    if (myDevice == 'mobile') { return true; }
-    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    if (/android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) { // Mobile devices
+        // Further differentiate between phone and tablet based on screen size or specific keywords
+        if (/ipad/i.test(userAgent) || (window.innerWidth > 768 && window.innerWidth <= 1024)) {
+            return false; // tablet
+        } else {
+            return true; // mobile
+        }
+    }
+    // Tablets (additional checks beyond user agent)
+    // This can be less reliable due to varying screen sizes and user agents
+    if (/tablet|ipad/i.test(userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth > 768 && window.innerWidth <= 1024)) {
+        return false; // Tablet
+    }
+    return false; // Desktop
 }
 
 function hrefClick(path, rID, jData) {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-11
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /model/functions.php
  */
 
@@ -307,52 +307,10 @@ function langFillLabels(&$data, $lang=[])
     }
 }
 
-/**
- * Detects device to set screen size and menu structure
- * @return string - device type, [mobile, tablet, desktop]
- */
-function detectDevice()
-{
-    $tablet_browser = $mobile_browser = 0;
-    $agent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-    if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', strtolower($agent))) { $tablet_browser++; }
-    if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', strtolower($agent))) { $mobile_browser++; }
-    $accept = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '';
-    if ((strpos(strtolower($accept),'application/vnd.wap.xhtml+xml') > 0) || ((isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])))) { $mobile_browser++; }
-    $mobile_ua = strtolower(substr($agent, 0, 4));
-    $mobile_agents = [
-        'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-        'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-        'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-        'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-        'newt','noki','palm','pana','pant','phil','play','port','prox',
-        'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
-        'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
-        'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
-        'wapr','webc','winw','winw','xda ','xda-'];
-    if (in_array($mobile_ua,$mobile_agents)) { $mobile_browser++; }
-    if (strpos(strtolower($agent),'opera mini') > 0) {
-        $mobile_browser++;
-        //Check for tablets on opera mini alternative headers
-        $stock_ua = strtolower(isset($_SERVER['HTTP_X_OPERAMINI_PHONE_UA'])?$_SERVER['HTTP_X_OPERAMINI_PHONE_UA']:(isset($_SERVER['HTTP_DEVICE_STOCK_UA'])?$_SERVER['HTTP_DEVICE_STOCK_UA']:''));
-        if (preg_match('/(tablet|ipad|playbook)|(android(?!.*mobile))/i', $stock_ua)) { $tablet_browser++; }
-    }
-    if ($tablet_browser > 0) { // actually a tablet but we'll treat as mobile and try to set width by device
-        $device = 'mobile';
-        setUserCache('profile', 'cols', 2);
-    } else if ($mobile_browser > 0) {
-        $device = 'mobile';
-        setUserCache('profile', 'cols', 1);
-    } else {
-       $device = 'desktop';
-    }
-    return $device;
-}
-
 function getColumns()
 {
     $jsCols = clean('numCols', 'integer', 'get');
-    switch ($GLOBALS['myDevice']) {
+    switch (getUserCache('profile', 'device')) {
         case 'mobile':  $default = 1;
         case 'tablet':  $default = 2;
         default:
@@ -1101,28 +1059,23 @@ function getSearch($indices=['q', 'search']) {
  */
 function getNextReference($idx, $default='R1000')
 {
-    $refs = getModuleCache('bizuno', 'references');
-    $ref = !empty($refs[$idx]) ? $refs[$idx] : $default;
+    $meta= dbMetaGet(0, 'bizuno_refs');
+    $rID = metaIdxClean($meta);
+    $ref = !empty($meta[$idx]) ? $meta[$idx] : $default;
     $output = $ref;
     $ref++;
-    msgDebug("\nRetrieved for field: $idx value: $output and incremented to get $ref");
-    $refs[$idx] = $ref;
-    setModuleCache('bizuno', 'references', '', $refs);
+    msgDebug("\nIn getNextReference, retrieved for field: $idx value: $output and incremented to get $ref");
+    $meta[$idx] = $ref;
+    dbMetaSet($rID, 'bizuno_refs', $meta);
     return $output;
 }
 
 function setNextReference($idx, $value='R1000')
 {
-    $refs = getModuleCache('bizuno', 'references');
-    $refs[$idx] = $value;
-    setModuleCache('bizuno', 'references', '', $refs);
-}
-
-function clearNextReference($idx)
-{
-    $refs = getModuleCache('bizuno', 'references');
-    unset($refs[$idx]);
-    setModuleCache('bizuno', 'references', '', $refs);
+    $meta= dbMetaGet(0, 'bizuno_refs');
+    $rID = metaIdxClean($meta);
+    $meta[$idx] = $value;
+    dbMetaSet($rID, 'bizuno_refs', $meta);
 }
 
 /**

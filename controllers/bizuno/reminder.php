@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/bizuno/reminder.php
  */
 
@@ -62,7 +62,7 @@ class bizunoReminder extends mgrJournal
                 'recur'    => ['order'=>20,'label'=>lang('frequency'),   'attr'=>['width'=>100,'resizable'=>true],'events'=>['formatter'=>"function(value,row) { return fmtFreqs[value]; }"]],
                 'dateStart'=> ['order'=>30,'label'=>lang('date_created'),'attr'=>['width'=>100,'resizable'=>true], 'format'=>'date'],
                 'dateNext' => ['order'=>50,'label'=>lang('next_date'),   'attr'=>['width'=>100,'resizable'=>true], 'format'=>'date']]]);
-        if ($GLOBALS['myDevice'] == 'mobile') {
+        if (getUserCache('profile', 'device') == 'mobile') {
             $data['columns']['recur']['attr']['hidden']     = true;
             $data['columns']['dateStart']['attr']['hidden'] = true;
         }

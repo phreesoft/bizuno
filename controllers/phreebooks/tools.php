@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 class phreebooksTools
 {
@@ -193,14 +193,14 @@ class phreebooksTools
     {
         if (!$security = validateAccess('admin', 4)) { return; }
         $title = getModuleCache('phreebooks', 'properties', 'title');
-        $fy    = dbGetValue(BIZUNO_DB_PREFIX."journal_periods", 'fiscal_year', '', false);
+        $fy    = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', 'fiscal_year', '', false);
         $layout= array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'    => ['fyClose'=>['order'=>10,'type'=>'divs','attr'=>['id'=>"divCloseFY"],'divs'=>[
                 'tbClose'=> ['order'=>10,'type'=>'toolbar','key' =>'tbFyClose'],
                 'head'   => ['order'=>20,'type'=>'html',   'html'=>"<p>".sprintf($this->lang['fy_del_instr'], $fy)."</p>"],
                 'body'   => ['order'=>50,'type'=>'tabs',   'key' =>'tabFyClose'],
             ]]],
-            'toolbars'=> ['tbFyClose' =>['icons'=>['start'=>['order'=>10,'title'=>lang('Start'),'icon'=>'next','type'=>'menu','events'=>['onClick'=>"divSubmit('phreebooks/tools/fyClose', 'divCloseFY');"]]]]],
+            'toolbars'=> ['tbFyClose' =>['icons'=>['start'=>['order'=>10,'title'=>lang('start'),'icon'=>'next','type'=>'menu','events'=>['onClick'=>"divSubmit('phreebooks/tools/fyClose', 'divCloseFY');"]]]]],
             'tabs'    => ['tabFyClose'=>['attr'=>['tabPosition'=>'left', 'headerWidth'=>200],'divs'=>[
                 'phreebooks' => ['order'=>10,'label'=>$title,'type'=>'html','html'=>$this->getViewFyClose()]]]]]);
     }
@@ -229,12 +229,12 @@ The following is a summary of the PhreeBooks module closing task list:
 <li>Delete bank reconciliation records within the range of closed fiscal year, re-sequence periods periods</li>
 </ul>
 <h3>Post-close Clean-up</h3><br />
-<p>Following the journal deletion and other PhreeBooks module close tasks discussed above, each module will clean orphaned table records. See the instructions
+<p>Following the journal deletion and other PhreeBooks module close tasks discussed above, each module will clean orphaned table records as necessary. See the instructions
 within each module tab for details on what is performed.</p>
 <p>The PhreeBooks post close process will be to re-run the journal tools to validate the journal balance and history table are in sync.
 Other tools are also run to removed orphaned transactions, attachments and other general maintenance activities.
 Most of these are available in the Journal Tools tab in the PhreeBooks module settings.</p>';
-        $html .= "<p>"."To prevent the pre-flight test from halting the close process, check the box below."."</p>";
+        $html .= "<p>To prevent the pre-flight test from halting the close process, check the box below.</p>";
         $html .= html5('phreebooks_skip', ['label'=>'Do not perform the pre-flight check, I understand that this may affect my financial statements and inventory balances', 'position'=>'after','attr'=>['type'=>'checkbox','value'=>1]]);
         return $html;
     }
@@ -253,16 +253,16 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $fyInfo    = dbGetPeriodInfo(1);
         $minPeriod = $fyInfo['period_min'];
         $maxPeriod = $fyInfo['period_max'];
-//      $firstDate = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', 'start_date', "period=$minPeriod");
         $lastDate  = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', 'end_date',   "period=$maxPeriod");
         // make sure the FY selected is not the current or future FY
         if ($fyInfo['fiscal_year'] == getModuleCache('phreebooks', 'fy', 'fiscal_year')) { return; }
         // generate three parts, preflight check [taskPre], action (phreebooks first) [taskClose], post action [taskPost] validations (journal validation, inventory tools, etc)
         $cron = ['fy'=>$fyInfo['fiscal_year'], 'fyStartDate'=>$fyInfo['period_start'], 'fyEndDate'=>$lastDate,
-            'periodStart'=>$minPeriod, 'periodEnd'=>$maxPeriod, 'taskPre'=>[], 'taskClose'=>[], 'taskPost'=>[]];
-        $cron['taskPre'][]   = ['mID'=>$this->moduleID, 'method'=>'fYCloseStart'];
-        $cron['taskClose'][] = ['mID'=>$this->moduleID, 'method'=>'fYCloseJournal']; // assumed page=tools, method=fyCloseNext, settings=[]
-        $cron['taskPost'][]  = ['mID'=>$this->moduleID, 'method'=>'fYClosePost'];
+            'periodStart'=>$minPeriod, 'periodEnd'=>$maxPeriod, // 'taskPre'=>[], 'taskClose'=>[], 'taskPost'=>[],
+            'curStep'=>0, 'ttlSteps'=>0, 'curBlk'=>0, 'ttlBlk'=>0, 'ttlRecord'=>0];
+//        $cron['taskPre'][]   = ['mID'=>$this->moduleID, 'method'=>'fYCloseStart'];
+//        $cron['taskClose'][] = ['mID'=>$this->moduleID, 'method'=>'fYCloseJournal']; // assumed page=tools, method=fyCloseNext, settings=[]
+//        $cron['taskPost'][]  = ['mID'=>$this->moduleID, 'method'=>'fYClosePost'];
         $msg  = "Log file for closing fiscal year {$fyInfo['fiscal_year']}. Bizuno release ".MODULE_BIZUNO_VERSION.", generated ".biz_date('Y-m-d H:i:s');
         setUserCron('fyClose', $cron);
         $io->fileWrite("$msg\n\n", "backups/fy_{$cron['fy']}_close_log.txt", false, false, true);
@@ -281,6 +281,50 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         set_time_limit(1800); // 30 minutes
         $finished  = false;
         $cron = getUserCron('fyClose');
+        msgDebug("\nEntering fyCloseNext with cron = ".print_r($cron, true));
+        switch ($cron['curStep']) {
+            case  0: $this->fyCloseHistorySales(); break; // add to the contacts history meta for sales
+            case  1: $this->fyCloseHistoryPurch(); break; // add to the contacts history meta for purchases
+            case  2: $this->fyCloseTableInvHist(); break;
+            case  3: $this->fyCloseTableCOGOwed(); break;
+            case  4: $this->fyCloseTableJrnlMain(); break; // journal_cogs_usage, journal_meta
+            case  5: $this->fyCloseTableJrnlItem(); break;
+            case  6: $this->fyCloseTableJrnlHist(); break;
+            case  7: $this->fyCloseTableJrnlPeriod(); break;
+            case  8: $this->fyCloseCleanAudit(); break;
+            case  9: $this->fyCloseCleanContact(); break; // contacts_log, contacts_meta
+            case 10: $this->fyCloseCleanInventory(); break; // inventory_meta
+            case 11: $this->fyCloseReindexJrnlMain(); break;
+            case 12: $this->fyCloseReindexJrnlItem(); break;
+            case 13: $this->fyCloseReindexJrnlHist(); break;
+            case 14: $this->fyCloseReindexJrnlPeriod(); break;
+            default: $cron['curStep']++; $cron['curBlk']++; break; // for missing steps
+        }
+        msgDebug("\nBack from current step with cron = ".print_r($cron, true));
+        $ttlRecords= number_format($cron['ttlRecord']);
+        $ttlSteps  = $cron['ttlSteps']+1; // because we go past it to stop
+        $msg = "Completed Step: {$cron['curStep']} of $ttlSteps<br />Block {$cron['curBlk']} of {$cron['ttlBlk']}<br />Total of $ttlRecords records.<br />";
+        if ($cron['curStep']>$cron['ttlSteps']) { // wrap up this iteration
+            $msg .= "<p>Database table migrate completed! Press OK to go to your business.</p>";
+            $msg .= html5('btnGo', ['events'=>['onClick'=>"window.location='https://".BIZUNO_PORTAL."';"], 'attr'=>['type'=>'button','value'=>lang('finish')], 'styles'=>['cursor'=>'pointer']]);
+            msgLog($msg);
+            $data = ['content'=>['percent'=>100,'msg'=>$msg,'baseID'=>'migrateBizuno','urlID'=>"&migrate=1&inStep=1"]];
+            setModuleCache('bizuno', 'properties', 'version', '7.0');
+            bizClrCookie('bizunoSession'); // forces a logout
+            bizCacheExpClear();
+            clearModuleCache('bizuno', 'cron', 'migrateBizuno');
+            dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'address_book'); // Drop this table here as we use it to determine if we need to migrate
+        } else { // return to update progress bar and start next step
+            $blkPrcnt= floor(100*($cron['curBlk'])/$cron['ttlBlk']);
+            $data = ['content'=>['percent'=>$blkPrcnt,'msg'=>$msg,'baseID'=>'migrateBizuno','urlID'=>"&migrate=1&inStep=1"]];
+            setModuleCache('bizuno', 'cron', 'migrateBizuno', $cron);
+        }
+        $io->fileWrite("\n".implode("\n", $cron['msg']), "backups/fy_{$cron['fy']}_close_log.txt", false, true, false);
+        if ($finished) { clearUserCron('fyClose'); }
+        else           { setUserCron('fyClose', $cron); }
+        $layout = array_replace_recursive($layout, $data);
+
+/*
         msgDebug("\ncron array now looks like: ".print_r($cron, true));
         if (empty($cron)) { return msgAdd("Oh Snap! It appears that the cron session variable was erased. The process was interrupted without completing!"); }
         $numTasks  = sizeof($cron['taskPre']);
@@ -331,8 +375,132 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $layout = array_replace_recursive($layout, $data);
         // uncomment to create running debug trace file, can get quite large!
 //      msgDebugWrite('fyClose.txt', true, true); // first true adds to existing file, second true forces the file write without msgTrap
+*/
     }
 
+    private function fyCloseHistorySales(&$cron=[], $cntOnly=false) // add to the contacts history meta for sales
+    {
+msgTrap();
+        msgDebug("\nEntering fyCloseHistorySales.");
+        $this->setHistoryContact($cron, $cntOnly, 'c', 12);
+    }
+    private function fyCloseHistoryPurch(&$cron=[], $cntOnly=false) // add to the contacts history meta for purchases
+    {
+msgTrap();
+        msgDebug("\nEntering fyCloseHistorySales.");
+        $this->setHistoryContact($cron, $cntOnly, 'v', 6);
+    }
+    private function setHistoryContact(&$cron, $cntOnly, $type, $journal)
+    {
+        $jIDs   = $type=='v' ? '6, 7'              : '12, 13';
+        $msg    = $type=='v' ? 'Purchases'         : 'Sales';
+        $metaKey= $journal==6? 'contact_purchases' : 'contact_sales';
+        $chunk  = 200;
+        $cnt    = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'COUNT(*) AS cnt', "post_date <='{$cron['fyEndDate']}' AND journal_id IN ($jIDs)", false);
+        msgDebug("\nRead number of $msg/credits for FY ending {$cron['fyEndDate']} = $cnt");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
+        if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
+        $cron['curBlk']++;
+        if (empty($cron['ttlBlk'])) { $cron['ttlBlk'] = ceil($cnt/$chunk); }
+        $cron['msg'] = "Processing $msg History: Block {$cron['curBlk']} ($chunk records) of {$cron['ttlBlk']} blocks.";
+
+        // Let's go
+        dbTransactionStart();
+        $rIDs = [];
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "post_date <='{$cron['fyEndDate']}' AND journal_id IN ($jIDs)", 'id', '', $chunk);
+        foreach ($rows as $row) {
+//          msgDebug("\nFetched row = ".print_r($row, true));
+            $rIDs[] = $row['id'];
+            $exists = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "id={$row['contact_id_b']}");
+            if (empty($exists)) { // orphaned, save to duplicate table
+                $cron['msg'] .= "\n    Found an orphaned record id = {$row['contact_id_b']} and primary_name = {$row['primary_name_b']}.";
+                continue;
+            }
+            $meta = dbMetaGet(0, $metaKey, 'contacts', $row['cID']);
+            $mIdx = metaIdxClean($meta);
+            $postDate = 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
+            if (array_key_exists("m{$row['date']}", $meta)) {
+                $meta[$postDate] += floatval($row['total_amount']);
+            } else {
+                $meta[$postDate]  = floatval($row['total_amount']);
+                ksort($meta);
+            }
+            dbMetaSet($mIdx, $metaKey, $row, 'contacts', $row['cID']);
+            
+            // Update inventory history
+            $this->setHistoryInventory($row['id']);
+            
+            
+        }
+        if (!empty($rIDs)) { // remove records, all finished here for this block
+        }
+        dbTransactionCommit();
+    }
+    private function setHistoryInventory($mID)
+    {
+        // pull item row for type==itm
+        // do the same as contacts above but with inventory
+        // save qtys and price, buying and selling
+        
+    }
+
+    private function fyCloseTableJrnlMain(&$cron=[], $cntOnly=false) // journal_cogs_usage, journal_meta
+    {
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_main WHERE id IN ("                   .implode(',', $rIDs).")");
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_meta WHERE ref_id IN ("               .implode(',', $rIDs).")");
+    }
+    private function fyCloseTableJrnlItem(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_item WHERE ref_id IN ("               .implode(',', $rIDs).")");
+    }
+    private function fyCloseTableInvHist(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_history WHERE ref_id IN ("          .implode(',', $rIDs).")");
+    }
+    private function fyCloseTableCOGOwed(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_owed WHERE journal_main_id IN (" .implode(',', $rIDs).")");
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_usage WHERE journal_main_id IN (".implode(',', $rIDs).")");
+    }
+    private function fyCloseTableJrnlHist(&$cron=[], $cntOnly=false)
+    {
+        $this->fyCloseDbAction('journal_history',  "period   <= {$cron['periodEnd']}",  $cron);
+    }
+    private function fyCloseTableJrnlPeriod(&$cron=[], $cntOnly=false)
+    {
+        
+    }
+    private function fyCloseCleanAudit(&$cron=[], $cntOnly=false)
+    {
+        
+    }
+    private function fyCloseCleanContact(&$cron=[], $cntOnly=false) // contacts_log, contacts_meta
+    {
+        
+    }
+    private function fyCloseCleanInventory(&$cron=[], $cntOnly=false) // inventory_meta
+    {
+        
+    }
+    private function fyCloseReindexJrnlMain(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_main    SET period = period - {$cron['periodEnd']}");
+    }
+    private function fyCloseReindexJrnlItem(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_item    SET reconciled = reconciled - {$cron['periodEnd']} WHERE reconciled > 0");
+    }
+    private function fyCloseReindexJrnlHist(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_history SET period = period - {$cron['periodEnd']}");
+    }
+    private function fyCloseReindexJrnlPeriod(&$cron=[], $cntOnly=false)
+    {
+        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_periods SET period = period - {$cron['periodEnd']}");
+    }
+
+    
+    
     public function fYCloseStart($settings=[], &$cron=[])
     {
         return "Starting to clean fiscal year, now cleaning journals. This may take a while!";
@@ -353,7 +521,6 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $this->fyCloseDbAction('journal_item',     "post_date<='{$cron['fyEndDate']}'", $cron);
         $this->fyCloseDbAction('journal_history',  "period   <= {$cron['periodEnd']}",  $cron);
         $this->fyCloseDbAction('journal_periods',  "period   <= {$cron['periodEnd']}",  $cron);
-        $this->fyCloseDbAction('tax_rates',        "end_date <='{$cron['fyEndDate']}'", $cron);
         // renumber periods
         dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_main    SET period = period - {$cron['periodEnd']}");
         dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_periods SET period = period - {$cron['periodEnd']}");

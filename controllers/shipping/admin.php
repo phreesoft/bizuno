@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-17
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -142,7 +142,7 @@ class shippingAdmin extends shippingCommon
                 break;
             default:
         }
-        if ($GLOBALS['myDevice']=='mobile') {
+        if (getUserCache('profile', 'device')=='mobile') {
             $layout['datagrid']['manager']['columns']['method_code']['attr']['hidden'] = true;
         }
     }
@@ -238,7 +238,6 @@ class shippingAdmin extends shippingCommon
         setModuleCache($this->moduleID, 'properties', false, $registry);
         $bAdmin = new bizunoSettings();
         foreach ($this->structure['dirMethods'] as $dirMeth) { $bAdmin->adminInstMethods($this->moduleID, $dirMeth, $this->defMethods); }
-        setNextReference('next_shipment_num', '2000001');
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'bizProShip')) {
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD bizProShip TEXT DEFAULT NULL COMMENT 'label:Bizuno Pro Shipping;tag:bizProShip'");
         }
@@ -260,8 +259,7 @@ class shippingAdmin extends shippingCommon
                 if (method_exists($properties, 'remove')) { $properties->remove(); }
             }
         }
-        clearNextReference('next_shipment_num');
-        if (dbFieldExists(BIZUNO_DB_PREFIX."inventory", 'bizProShip')) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP `bizProShip`"); }
+        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'bizProShip')) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP `bizProShip`"); }
         // @todo remove all labels and files? Probably should ask first!
         return true;
     }

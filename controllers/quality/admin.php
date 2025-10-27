@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/quality/admin.php
  */
 
@@ -135,44 +135,6 @@ class qualityAdmin
         $data = ['type'=>'divHTML','title'=>'Document','attr'=>['id'=>'qaDocs'],
             'divs'=>['iframe'=>['order'=>50,'type'=>'html','html'=>$html]]];
         $layout = array_replace_recursive($layout, $data);
-    }
-
-    /**
-     * DEPRECATED
-     */
-    public function fyCloseHome() { }
-    public function fyClose() { }
-    public function fyCloseNext() { }
-
-    /**
-     * Special install operations
-     * @return boolean - true if no errors
-     */
-    public function install()
-    {
-        setNextReference('next_qaobj_num',   'QO-10001');
-        setNextReference('next_ticket_num',  'QT-10001');
-        setNextReference('next_audit_num',   'Audit-1001');
-        setNextReference('next_training_num','TR-10001');
-        // add to crm actions
-        $actions       = getModuleCache('contacts', 'actions_crm');
-        $actions['trn']= $this->lang['training'];
-        asort($actions);
-        setModuleCache('contacts', 'actions_crm', false, $actions);
-        return true;
-    }
-
-    /**
-     * Remove actions for this extension
-     * @return true
-     */
-    public function remove()
-    {
-        clearNextReference('next_qaobj_num');
-        clearNextReference('next_ticket_num');
-        clearNextReference('next_audit_num');
-        clearNextReference('next_training_num');
-        return true;
     }
 
     public function invBld(&$layout=[])

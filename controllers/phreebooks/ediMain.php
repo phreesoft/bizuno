@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/phreebooks/ediMain.php
  *
  * Handles specs:
@@ -103,7 +103,7 @@ class phreebooksEdiMain extends mgrJournal
                 'invoice_num'=> ['order'=>50,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),     'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true]],
                 'control_num'=> ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_ctl_num'], 'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:control_num:journal'],
                 'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal']]]);
-        if ($GLOBALS['myDevice'] == 'mobile') {
+        if (getUserCache('profile', 'device') == 'mobile') {
             $data['columns']['ack_date']['attr']['hidden']   = true;
             $data['columns']['control_num']['attr']['hidden']= true;
             $data['columns']['main_id']['attr']['hidden']    = true;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-25
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -113,7 +113,9 @@ class inventoryPrices extends mgrJournal
                 'iName'      => ['order'=>50, 'label'=>lang('SKU'),         'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true]],
                 'postCalc'   => ['order'=>50, 'label'=>lang('discount'),    'attr'=>['size'=> 60,'sortable'=>true,'resizable'=>true],'format'=>'noYes'],
                 'last_update'=> ['order'=>70, 'label'=>lang('date_last'),   'attr'=>['size'=>120,'sortable'=>true,'resizable'=>true],'format'=>'date']]]);
-        if (in_array($GLOBALS['myDevice'], ['mobile', 'tablet'])) { $data['columns']['last_update']['attr']['hidden']= true; }
+        if (in_array(getUserCache('profile', 'device'), ['mobile', 'tablet'])) {
+            $data['columns']['last_update']['attr']['hidden']= true;
+        }
         return $data;
     }
     private function managerSettings()

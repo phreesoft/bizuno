@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-31
+ * @version    7.x Last Update: 2025-10-26
  * @filesource /view/easyUI/html5.php
  */
 
@@ -444,7 +444,7 @@ final class html5 {
             if (empty($submenu['attr']['id'])) { $submenu['attr']['id'] = $subid; }
             if ($orient == 'h') {
                 if (empty($submenu['child'])) { $submenu['classes'][] = 'easyui-linkbutton'; }
-                elseif ($GLOBALS['myDevice']=='mobile' || empty($submenu['events']['onClick'])) {
+                elseif (getUserCache('profile', 'device')=='mobile' || empty($submenu['events']['onClick'])) {
                     $submenu['classes'][] = 'easyui-menubutton';
                     $options['plain'] = 'true';
                     $options['hasDownArrow'] = 'false';
