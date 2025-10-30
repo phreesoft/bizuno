@@ -59,6 +59,7 @@ if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
 
 // set some sitewide constants
 define('COG_ITEM_TYPES', 'ma,mi,ms,sa,si,sr');
+define('INVENTORY_COGS_TYPES', ['ma','mi','ms','sa','si','sr']); // Inventory types that track costs in the gl
 define('PHREEBOOKS_CHART_TYPES', [
     '0' => ['id'=>'0',  'account'=>'', 'title'=>'gl_acct_type_0'],    // Cash
     '2' => ['id'=>'2',  'account'=>'', 'title'=>'gl_acct_type_2'],    // Accounts Receivable

@@ -260,9 +260,18 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $cron = ['fy'=>$fyInfo['fiscal_year'], 'fyStartDate'=>$fyInfo['period_start'], 'fyEndDate'=>$lastDate,
             'periodStart'=>$minPeriod, 'periodEnd'=>$maxPeriod, // 'taskPre'=>[], 'taskClose'=>[], 'taskPost'=>[],
             'curStep'=>0, 'ttlSteps'=>0, 'curBlk'=>0, 'ttlBlk'=>0, 'ttlRecord'=>0];
-//        $cron['taskPre'][]   = ['mID'=>$this->moduleID, 'method'=>'fYCloseStart'];
-//        $cron['taskClose'][] = ['mID'=>$this->moduleID, 'method'=>'fYCloseJournal']; // assumed page=tools, method=fyCloseNext, settings=[]
-//        $cron['taskPost'][]  = ['mID'=>$this->moduleID, 'method'=>'fYClosePost'];
+//      $cron['taskPre'][]   = ['mID'=>$this->moduleID, 'method'=>'fYCloseStart'];
+//      $cron['taskClose'][] = ['mID'=>$this->moduleID, 'method'=>'fYCloseJournal']; // assumed page=tools, method=fyCloseNext, settings=[]
+//      $cron['taskPost'][]  = ['mID'=>$this->moduleID, 'method'=>'fYClosePost'];
+        $this->fyCloseHistorySales($cron, true);
+        $this->fyCloseHistoryPurch($cron, true);
+        $this->fyCloseTableGenJournal($cron, true);
+        $this->fyCloseCleanAudit($cron, true);
+        $this->fyCloseCleanContact($cron, true);
+        $this->fyCloseCleanInventory($cron, true);
+        $this->fyCloseReindexJrnlMain($cron, true);
+        $this->fyCloseReindexJrnlItem($cron, true);
+        $this->fyCloseReindexGenJournal($cron, true);
         $msg  = "Log file for closing fiscal year {$fyInfo['fiscal_year']}. Bizuno release ".MODULE_BIZUNO_VERSION.", generated ".biz_date('Y-m-d H:i:s');
         setUserCron('fyClose', $cron);
         $io->fileWrite("$msg\n\n", "backups/fy_{$cron['fy']}_close_log.txt", false, false, true);
@@ -283,21 +292,15 @@ Most of these are available in the Journal Tools tab in the PhreeBooks module se
         $cron = getUserCron('fyClose');
         msgDebug("\nEntering fyCloseNext with cron = ".print_r($cron, true));
         switch ($cron['curStep']) {
-            case  0: $this->fyCloseHistorySales(); break; // add to the contacts history meta for sales
-            case  1: $this->fyCloseHistoryPurch(); break; // add to the contacts history meta for purchases
-            case  2: $this->fyCloseTableInvHist(); break;
-            case  3: $this->fyCloseTableCOGOwed(); break;
-            case  4: $this->fyCloseTableJrnlMain(); break; // journal_cogs_usage, journal_meta
-            case  5: $this->fyCloseTableJrnlItem(); break;
-            case  6: $this->fyCloseTableJrnlHist(); break;
-            case  7: $this->fyCloseTableJrnlPeriod(); break;
-            case  8: $this->fyCloseCleanAudit(); break;
-            case  9: $this->fyCloseCleanContact(); break; // contacts_log, contacts_meta
-            case 10: $this->fyCloseCleanInventory(); break; // inventory_meta
-            case 11: $this->fyCloseReindexJrnlMain(); break;
-            case 12: $this->fyCloseReindexJrnlItem(); break;
-            case 13: $this->fyCloseReindexJrnlHist(); break;
-            case 14: $this->fyCloseReindexJrnlPeriod(); break;
+            case 0: $this->fyCloseHistorySales($cron);      break; // add to the contacts history meta for sales
+            case 1: $this->fyCloseHistoryPurch($cron);      break; // add to the contacts history meta for purchases
+            case 2: $this->fyCloseTableGenJournal($cron);   break;
+            case 3: $this->fyCloseCleanAudit($cron);        break;
+            case 4: $this->fyCloseCleanContact($cron);      break; // contacts_log, contacts_meta
+            case 5: $this->fyCloseCleanInventory($cron);    break; // inventory_meta
+            case 6: $this->fyCloseReindexJrnlMain($cron);   break;
+            case 7: $this->fyCloseReindexJrnlItem($cron);   break;
+            case 8: $this->fyCloseReindexGenJournal($cron); break;
             default: $cron['curStep']++; $cron['curBlk']++; break; // for missing steps
         }
         msgDebug("\nBack from current step with cron = ".print_r($cron, true));
@@ -418,99 +421,243 @@ msgTrap();
             }
             $meta = dbMetaGet(0, $metaKey, 'contacts', $row['cID']);
             $mIdx = metaIdxClean($meta);
-            $postDate = 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
-            if (array_key_exists("m{$row['date']}", $meta)) {
-                $meta[$postDate] += floatval($row['total_amount']);
+            $mDate= 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
+            if (array_key_exists($mDate, $meta)) {
+                $meta[$mDate] += floatval(in_array($journal, [7,13])?-$row['total_amount']:$row['total_amount']);
             } else {
-                $meta[$postDate]  = floatval($row['total_amount']);
+                $meta[$mDate]  = floatval(in_array($journal, [7,13])?-$row['total_amount']:$row['total_amount']);
                 ksort($meta);
             }
             dbMetaSet($mIdx, $metaKey, $row, 'contacts', $row['cID']);
-            
-            // Update inventory history
-            $this->setHistoryInventory($row['id']);
-            
-            
+            $this->setHistoryInventory($row['id'], $journal, $cron); // Update inventory history meta
         }
         if (!empty($rIDs)) { // remove records, all finished here for this block
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_main WHERE id IN ("                   .implode(',', $rIDs).")");
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_meta WHERE ref_id IN ("               .implode(',', $rIDs).")");
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_item WHERE ref_id IN ("               .implode(',', $rIDs).")");
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_history WHERE ref_id IN ("          .implode(',', $rIDs).")");
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_owed WHERE journal_main_id IN (" .implode(',', $rIDs).")");
+            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_usage WHERE journal_main_id IN (".implode(',', $rIDs).")");
         }
         dbTransactionCommit();
     }
-    private function setHistoryInventory($mID)
+    private function setHistoryInventory($mID, $journal, &$cron)
     {
-        // pull item row for type==itm
-        // do the same as contacts above but with inventory
-        // save qtys and price, buying and selling
-        
+        $metaKey= $journal==6? 'inventory_purchases' : 'inventory_sales';
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$mID AND gl_type='itm", '', ['qty', 'sku', 'credit_amount', 'debit_amount']);
+        foreach ($rows as $row) {
+//          msgDebug("\nFetched row = ".print_r($row, true));
+            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
+            if (empty($inv)) { // orphaned, save to duplicate table
+                $cron['msg'] .= "\n    Found an orphaned sku = {$row['sku']} and primary_name = {$row['primary_name_b']}.";
+                continue;
+            }
+            if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // if not in tracked inventory, skip
+            $meta = dbMetaGet(0, $metaKey, 'inventory', $inv['id']);
+            $mIdx = metaIdxClean($meta);
+            $mDate= 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
+            $total= $row['debit_amount'] + $row['credit_amount'];
+            if (array_key_exists($mDate, $meta)) {
+                $meta[$mDate] += floatval(in_array($journal, [7,13])?-$total:$total);
+            } else {
+                $meta[$mDate]  = floatval(in_array($journal, [7,13])?-$total:$total);
+                ksort($meta);
+            }
+            dbMetaSet($mIdx, $metaKey, $row, 'inventory', $inv['id']);
+        }
     }
 
-    private function fyCloseTableJrnlMain(&$cron=[], $cntOnly=false) // journal_cogs_usage, journal_meta
+    private function fyCloseTableGenJournal(&$cron=[], $cntOnly=false)
     {
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_main WHERE id IN ("                   .implode(',', $rIDs).")");
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_meta WHERE ref_id IN ("               .implode(',', $rIDs).")");
-    }
-    private function fyCloseTableJrnlItem(&$cron=[], $cntOnly=false)
-    {
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_item WHERE ref_id IN ("               .implode(',', $rIDs).")");
-    }
-    private function fyCloseTableInvHist(&$cron=[], $cntOnly=false)
-    {
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_history WHERE ref_id IN ("          .implode(',', $rIDs).")");
-    }
-    private function fyCloseTableCOGOwed(&$cron=[], $cntOnly=false)
-    {
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_owed WHERE journal_main_id IN (" .implode(',', $rIDs).")");
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."journal_cogs_usage WHERE journal_main_id IN (".implode(',', $rIDs).")");
-    }
-    private function fyCloseTableJrnlHist(&$cron=[], $cntOnly=false)
-    {
-        $this->fyCloseDbAction('journal_history',  "period   <= {$cron['periodEnd']}",  $cron);
-    }
-    private function fyCloseTableJrnlPeriod(&$cron=[], $cntOnly=false)
-    {
-        
+        $crit  = "period <= {$cron['periodEnd']}";
+        $tableH= BIZUNO_DB_PREFIX.'journal_history';
+        $cntH  = dbGetValue($tableH, 'COUNT(*) AS cnt', $crit, false);
+        msgDebug("\nRead number of $tableH records for FY ending {$cron['fyEndDate']} = $cntH");
+        $tableP= BIZUNO_DB_PREFIX.'journal_periods';
+        $cntP  = dbGetValue($tableP, 'COUNT(*) AS cnt', $crit, false);
+        msgDebug("\nRead number of $tableP records for FY ending {$cron['fyEndDate']} = $cntP");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=1; $cron['ttlRecord']+=$cntH; $cron['ttlRecord']+=$cntP; return; }
+
+        // Let's go
+        dbTransactionStart();
+        $cron['msg'][] = "Read $cntH records to delete from table: $tableH";
+        $cron['msg'][] = "Executing SQL: DELETE FROM $tableH WHERE $crit";
+        dbGetResult("DELETE FROM $tableH WHERE $crit");
+        $cron['msg'][] = "Read $cntP records to delete from table: $tableP";
+        $cron['msg'][] = "Executing SQL: DELETE FROM $tableP WHERE $crit";
+        dbGetResult("DELETE FROM $tableP WHERE $crit");
+        $cron['curStep']++;
+        dbTransactionCommit();
     }
     private function fyCloseCleanAudit(&$cron=[], $cntOnly=false)
     {
+        $table= BIZUNO_DB_PREFIX.'audit_log';
+        $crit = "`date`<='{$cron['fyEndDate']}'";
+        $cnt  = dbGetValue($table, 'COUNT(*) AS cnt', $crit, false);
+        msgDebug("\nRead number of $table records for FY ending {$cron['fyEndDate']} = $cnt");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=1; $cron['ttlRecord']+=$cnt; return; }
         
+        // Let's go
+        dbTransactionStart();
+        $cron['msg'][] = "Read $cnt records to delete from table: $table";
+        $cron['msg'][] = "Executing SQL: DELETE FROM $crit";
+        dbGetResult("DELETE FROM $table WHERE $crit");
+        $cron['curStep']++;
+        dbTransactionCommit();
     }
     private function fyCloseCleanContact(&$cron=[], $cntOnly=false) // contacts_log, contacts_meta
     {
-        
+        $chunk  = 200;
+        $cnt    = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'COUNT(*) AS cnt', "ctype_c='1' OR ctype_v='1'", false);
+        msgDebug("\nRead $cnt contacts for cleaning and verifying journal activity.");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
+        if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
+        $cron['curBlk']++;
+        if (empty($cron['ttlBlk'])) { $cron['ttlBlk'] = ceil($cnt/$chunk); }
+        $cron['msg'] = "Validating contacts usage: Block {$cron['curBlk']} ($chunk records) of {$cron['ttlBlk']} blocks.";
+
+        // Let's go
+        dbTransactionStart();
+        if (empty($cron['clnCID'])) { $cron['clnCID'] = $cron['clnCIDcnt'] = 0; }
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "id>{$cron['clnCID']} AND (ctype_c='1' OR ctype_v='1')", 'id', '', $chunk);
+        if (empty($rows)) { 
+            $cron['msg'][] = "Finished fyCloseCleanContact, total records marked as No Activity = {$cron['clnCIDcnt']}";
+            $cron['curStep']++; 
+            return;
+        }
+        foreach ($rows as $row) {
+            $cron['clnCID'] = $row['id'];
+//          msgDebug("\nFetched row = ".print_r($row, true));
+            $hit = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "contact_id_b={$row['id']}");
+            if (empty($hit) && $row['ctype_b']=='0' && $row['ctype_e']=='0' && $row['ctype_u']=='0' &&
+                    !in_array($row['inactive'], ['2'])) { // not active c, active v, u, e, b or locked, flag not used
+                msgDebug("\nContact {$row['primary_name']} has no activity, marking them with type n.");
+//              dbWrite(BIZUNO_DB_PREFIX.'contacts', ['inactive'=>'n'], 'update', "id={$row['id']}");
+                $cron['clnCIDcnt']++;
+            }
+        }
+        dbTransactionCommit();
     }
     private function fyCloseCleanInventory(&$cron=[], $cntOnly=false) // inventory_meta
     {
-        
+        $chunk  = 200;
+        $cnt    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'COUNT(*) AS cnt', "inactive='1'", false);
+        msgDebug("\nRead $cnt inventory items for cleaning and verifying journal activity.");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
+        if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
+        $cron['curBlk']++;
+        if (empty($cron['ttlBlk'])) { $cron['ttlBlk'] = ceil($cnt/$chunk); }
+        $cron['msg'] = "Validating inventory usage: Block {$cron['curBlk']} ($chunk records) of {$cron['ttlBlk']} blocks.";
+
+        // Let's go
+        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/main.php', 'inventoryMain');
+        $inventory = new inventoryMain();
+        dbTransactionStart();
+        if (empty($cron['clnIID'])) { $cron['clnIID'] = $cron['clnIIDcnt'] = 0; }
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "id>{$cron['clnIID']} AND inactive='1'", 'id', '', $chunk);
+        if (empty($rows)) { 
+            $cron['msg'][] = "Finished fyCloseCleanInventory, total records deleted = {$cron['clnIIDcnt']}";
+            $cron['curStep']++; 
+            return;
+        }
+        foreach ($rows as $row) {
+            $cron['clnIID'] = $row['id'];
+//          msgDebug("\nFetched row = ".print_r($row, true));
+            $hit = dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "sku='".addslashes($row['sku'])."'");
+            if (empty($hit)) { // flag not used
+                msgDebug("\nInventory {$row['sku']} has no activity, deleting.");
+                $_GET['rID'] = $row['id'];
+//              $inventory->delete();
+                $cron['clnCIDcnt']++;
+            }
+        }
+        dbTransactionCommit();
     }
     private function fyCloseReindexJrnlMain(&$cron=[], $cntOnly=false)
     {
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_main    SET period = period - {$cron['periodEnd']}");
+        $table= BIZUNO_DB_PREFIX.'journal_main';
+        $cnt  = dbGetValue($table, 'COUNT(*) AS cnt', '', false);
+        msgDebug("\nRead number of $table records for FY ending {$cron['fyEndDate']} = $cnt");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=1; $cron['ttlRecord']+=$cnt; return; }
+        
+        // Let's go
+        dbTransactionStart();
+        $sql = "UPDATE $table SET period = period - {$cron['periodEnd']}";
+        $cron['msg'][] = "Reindexing table $table to align with new periods.";
+        $cron['msg'][] = "    Executing SQL: $sql";
+        dbGetResult($sql);
+        $cron['curStep']++;
+        dbTransactionCommit();
     }
     private function fyCloseReindexJrnlItem(&$cron=[], $cntOnly=false)
     {
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_item    SET reconciled = reconciled - {$cron['periodEnd']} WHERE reconciled > 0");
+        $table= BIZUNO_DB_PREFIX.'journal_item';
+        $cnt  = dbGetValue($table, 'COUNT(*) AS cnt', '', false);
+        msgDebug("\nRead number of $table records for FY ending {$cron['fyEndDate']} = $cnt");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=1; $cron['ttlRecord']+=$cnt; return; }
+        
+        // Let's go
+        dbTransactionStart();
+        $sql = "UPDATE $table SET reconciled = reconciled - {$cron['periodEnd']} WHERE reconciled > 0";
+        $cron['msg'][] = "Reindexing table $table to align with new periods.";
+        $cron['msg'][] = "    Executing SQL: $sql";
+        dbGetResult($sql);
+        $cron['curStep']++;
+        dbTransactionCommit();
     }
-    private function fyCloseReindexJrnlHist(&$cron=[], $cntOnly=false)
+    private function fyCloseReindexGenJournal(&$cron=[], $cntOnly=false)
     {
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_history SET period = period - {$cron['periodEnd']}");
+        $tableH= BIZUNO_DB_PREFIX.'journal_history';
+        $cntH  = dbGetValue($tableH, 'COUNT(*) AS cnt', '', false);
+        msgDebug("\nRead number of $tableH records for FY ending {$cron['fyEndDate']} = $cntH");
+        $tableP= BIZUNO_DB_PREFIX.'journal_periods';
+        $cntP  = dbGetValue($tableP, 'COUNT(*) AS cnt', '', false);
+        msgDebug("\nRead number of $tableP records for FY ending {$cron['fyEndDate']} = $cntP");
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=1; $cron['ttlRecord']+=$cntH+$cntP; return; }
+        
+        // Let's go
+        dbTransactionStart();
+        $sqlH = "UPDATE $tableH SET SET period = period-{$cron['periodEnd']}";
+        $cron['msg'][] = "Reindexing table $tableH to align with new periods.";
+        $cron['msg'][] = "    Executing SQL: $sqlH";
+        dbGetResult($sqlH);
+        $sqlP = "UPDATE $tableP SET SET period = period-{$cron['periodEnd']}";
+        $cron['msg'][] = "Reindexing table $tableP to align with new periods.";
+        $cron['msg'][] = "    Executing SQL: $sqlP";
+        dbGetResult($sqlP);
+        $props = dbGetPeriodInfo(getModuleCache('phreebooks', 'fy', 'period') - $cron['periodEnd']);
+        setModuleCache('phreebooks', 'fy', false, $props);
+        $cron['curStep']++;
+        dbTransactionCommit();
     }
-    private function fyCloseReindexJrnlPeriod(&$cron=[], $cntOnly=false)
+    /**
+     * Generically executes a delete SQL based on specified criteria
+     * @param string $table - database table name
+     * @param string $crit - SQL criteria to append to the SQL
+     */
+/*    private function fyCloseDbAction($table, $crit, &$cron)
     {
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_periods SET period = period - {$cron['periodEnd']}");
-    }
+        $cnt = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', $crit, false);
+        $cron['msg'][] = "Read $cnt records to delete from table: $table";
+        $cron['msg'][] = "Executing SQL: DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit";
+        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit");
+    } */
+
 
     
     
-    public function fYCloseStart($settings=[], &$cron=[])
+    
+    
+/*    public function fYCloseStart($settings=[], &$cron=[])
     {
         return "Starting to clean fiscal year, now cleaning journals. This may take a while!";
-    }
+    } */
 
     /**
      * Executes fiscal year close through a specified period
      * @return string - HTML user status message
      */
-    public function fYCloseJournal($settings=[], &$cron=[])
+/*    public function fYCloseJournal($settings=[], &$cron=[])
     {
         if (!$cron['fyEndDate']) { return; }
         $cron['msg'][] = "Looking at journal tables to prune for fiscal year ending date: {$cron['fyEndDate']} and ending period = {$cron['periodEnd']}";
@@ -531,27 +678,14 @@ msgTrap();
         setModuleCache('phreebooks', 'fy', false, $props);
         array_unshift($cron['taskClose'], ['mID'=>$this->moduleID, 'method'=>'fyCloseHistory', 'settings'=>['cnt'=>1]]);
         return "Finished closing journal.";
-    }
-
-    /**
-     * Generically executes a delete SQL based on specified criteria
-     * @param string $table - database table name
-     * @param string $crit - SQL criteria to append to the SQL
-     */
-    private function fyCloseDbAction($table, $crit, &$cron)
-    {
-        $cnt = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', $crit, false);
-        $cron['msg'][] = "Read $cnt records to delete from table: $table";
-        $cron['msg'][] = "Executing SQL: DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit";
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit");
-    }
+    } */
 
     /**
      * Closes the fiscal year in the database
      * @param array $settings - operating constraints and settings
      * @return string - HTML status to user
      */
-    public function fyCloseHistory($settings=[], &$cron=[])
+/*    public function fyCloseHistory($settings=[], &$cron=[])
     {
         $blockSize = 500;
         $rowCnt    = 0;
@@ -582,18 +716,18 @@ msgTrap();
             return "Finished processing block $thisBlock of $totalBlock for module $this->moduleID: processed ".sizeof($toClose)." records, deleted $rowCnt";
         }
         return "Finished processing COGS Usage history table";
-    }
+    } */
 
     /**
      * THIS ROUTINE NEEDS TO BE WRITTEN
      * @return string - HTML status message
      */
-    public function fYClosePost($settings=[], &$cron=[])
+/*    public function fYClosePost($settings=[], &$cron=[])
     {
         // run the journal validation tools
         // need to call glRepair($layout=[]) from browser with auto close window.
         return "Running glRepair tool to validate journal values.";
-    }
+    } */
 
     /**
      * This method reposts a single journal entry

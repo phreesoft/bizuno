@@ -754,6 +754,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         msgLog(lang('inventory').' '.lang('delete')." - $sku ($rID)");
         $layout = array_replace_recursive($layout, $data);
         
+// @TODO - This needs to be merged in with above
         // Add Pro Stuff
         if ('ms' <> $item['inventory_type']) { return; }
         $cancelDelete = false;
