@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-23
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -214,9 +214,8 @@ class jCommon
         $item_array = [];
         if (empty($rID)) { return $item_array; } // nothing to do here
         // start by retrieving the po/so item list
-        $invTypes = implode("','", explode(',', COG_ITEM_TYPES));
         $sql0 = "SELECT j.id, j.sku, j.qty FROM ".BIZUNO_DB_PREFIX."journal_item j JOIN ".BIZUNO_DB_PREFIX."inventory i ON j.sku=i.sku
-             WHERE j.ref_id=$rID AND j.gl_type='itm' AND i.inventory_type IN ('$invTypes')";
+             WHERE j.ref_id=$rID AND j.gl_type='itm' AND i.inventory_type IN ('".implode("','", INVENTORY_COGS_TYPES)."')";
         $stmt1  = dbGetResult($sql0);
         $result1= $stmt1->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($result1 as $row) {
@@ -474,7 +473,7 @@ class jCommon
     function setInvStatus($sku, $field, $adjustment, $item_cost=0, $desc='', $full_price=0)
     {
         if (empty($sku)) { return true; }
-        $invTypes = explode(',', COG_ITEM_TYPES);
+        $invTypes = INVENTORY_COGS_TYPES;
         if (in_array($field, ['qty_po','qty_so'])) { $invTypes[] = 'ns'; } // add non-stock for tracking purposes on po/so
         msgDebug("\n    setInvStatus, SKU = $sku, field = $field, adjustment = $adjustment, and item_cost = $item_cost");
         // catch sku's that are not in the inventory database but have been requested to post
@@ -526,9 +525,8 @@ class jCommon
             $defaults = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$id"); // re-load now that item was created
         }
         // only calculate cogs for certain inventory_types
-        msgDebug("\nCOG_ITEM_TYPES = ".COG_ITEM_TYPES." and inventory_type = {$defaults['inventory_type']}");
-        if (strpos(COG_ITEM_TYPES, $defaults['inventory_type']) === false) {
-            msgDebug(". Exiting COGS, no work to be done with this SKU.");
+        if (!in_array($defaults['inventory_type'], INVENTORY_COGS_TYPES)) {
+            msgDebug("\nExiting COGS, no work to be done with this SKU.");
             return true;
         }
         if ($this->isolate_cogs) { $defaults['qty_stock'] = dbGetStoreQtyStock($item['sku'], $this->main['store_id']); }
@@ -716,7 +714,7 @@ class jCommon
         $cogs = 0;
         $defaults = dbGetRow(BIZUNO_DB_PREFIX."inventory", "sku='$sku'");
         if (sizeof($defaults) == 0) { return $cogs; } // not in inventory, return no cost
-        if (strpos(COG_ITEM_TYPES, $defaults['inventory_type']) === false) { return $cogs; }// this type not tracked in cog, return no cost
+        if (!in_array($defaults['inventory_type'], INVENTORY_COGS_TYPES)) { return $cogs; }// this type not tracked in cog, return no cost
         if ($defaults['cost_method'] == 'a') { return $qty * $this->getAvgCost($sku, $qty); }
         if ($defaults['serialize']) { // there should only be one record
             $unit_cost = dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'unit_cost', "sku='$sku' AND trans_code='$serial_num'");

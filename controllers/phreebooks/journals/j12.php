@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/journals/j12.php
  */
 
@@ -229,7 +229,7 @@ class j12 extends jCommon
                 $bal = $row['ordered'] - $row['processed'];
                 if ($bal <= 0 || empty($row['sku'])) { continue; }
                 $type= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-                if (strpos(COG_ITEM_TYPES, $type) === false) { continue; }
+                if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
                 // if we are here then there are unfulfilled balances, correct to original SoPo balances 
                 if ($closed) {
                     $this->forceCloseSoPO = true;
@@ -256,7 +256,7 @@ class j12 extends jCommon
                 $bal = $row['ordered'] - $row['processed'];
                 if ($bal <= 0 || empty($row['sku'])) { continue; }
                 $type = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-                if (strpos(COG_ITEM_TYPES, $type) === false) { continue; }
+                if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
                 $cnt++;
                 if ($this->forceCloseSoPO && $action<>'delete') { // readjust balance
                     dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_so=qty_so-$bal WHERE sku='".addslashes($row['sku'])."'");

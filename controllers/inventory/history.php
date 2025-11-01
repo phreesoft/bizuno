@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-11
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/history.php
  */
 
@@ -341,7 +341,7 @@ class inventoryHistory
         // find the restock levels that need adjustment
         if (getModuleCache('inventory', 'settings', 'general', 'stock_usage')
                 && validateAccess('j6_mgr', 3, false)
-                && in_array($skuInfo['inventory_type'], explode(',', COG_ITEM_TYPES))) {
+                && in_array($skuInfo['inventory_type'], INVENTORY_COGS_TYPES)) {
 //          $inv = dbGetValue(BIZUNO_DB_PREFIX."inventory", ['qty_min', 'lead_time'], "sku='{$skuInfo['sku']}'");
             sort($sales);
             $months        = substr('0'.$this->months_of_data, -2);

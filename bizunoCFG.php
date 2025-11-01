@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /bizunoCFG.php
  */
 
@@ -58,7 +58,7 @@ if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
 }
 
 // set some sitewide constants
-define('COG_ITEM_TYPES', 'ma,mi,ms,sa,si,sr');
+//define('COG_ITEM_TYPES', 'ma,mi,ms,sa,si,sr'); // DEPRECATED
 define('INVENTORY_COGS_TYPES', ['ma','mi','ms','sa','si','sr']); // Inventory types that track costs in the gl
 define('PHREEBOOKS_CHART_TYPES', [
     '0' => ['id'=>'0',  'account'=>'', 'title'=>'gl_acct_type_0'],    // Cash

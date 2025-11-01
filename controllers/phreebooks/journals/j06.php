@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/journals/j06.php
  */
 
@@ -218,7 +218,7 @@ class j06 extends jCommon
                 $bal = $row['ordered'] - $row['processed'];
                 if ($bal <= 0 || empty($row['sku'])) { continue; }
                 $type= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-                if (strpos(COG_ITEM_TYPES, $type) === false) { continue; }
+                if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
                 // if we are here then there are unfulfilled balances, correct to original SoPo balances 
                 if ($closed) {
                     $this->forceCloseSoPO = true;
@@ -245,7 +245,7 @@ class j06 extends jCommon
                 $bal = $row['ordered'] - $row['processed'];
                 if ($bal <= 0 || empty($row['sku'])) { continue; }
                 $type = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-                if (strpos(COG_ITEM_TYPES, $type) === false) { continue; }
+                if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
                 $cnt++;
                 if ($this->forceCloseSoPO && $action<>'delete') { // readjust balance
                     dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_po=qty_po-$bal WHERE sku='".addslashes($row['sku'])."'");
@@ -288,10 +288,9 @@ class j06 extends jCommon
     {
         $output= [];
         $skus  = [];
-        $cogsTypes = explode(',',COG_ITEM_TYPES);
         foreach ($this->items as $row) { if (!empty($row['sku']) && $row['gl_type'] == 'itm') { $skus[] = $row['sku']; } }
         if (sizeof($skus) > 0) {
-            $result = dbGetMulti(BIZUNO_DB_PREFIX."inventory", "sku IN ('".implode("','", $skus)."') AND inventory_type IN ('".implode("','", $cogsTypes)."') AND cost_method='a'");
+            $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "sku IN ('".implode("','", $skus)."') AND inventory_type IN ('".implode("','", INVENTORY_COGS_TYPES)."') AND cost_method='a'");
             $askus = [];
             foreach ($result as $row) { $askus[] = $row['sku']; }
             if (!sizeof($askus)) { return $output; }

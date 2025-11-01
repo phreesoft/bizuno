@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-06
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -148,12 +148,6 @@ function inventoryView($value, $format='') {
     }
 }
 
-function invIsTracked($type) {
-    $tracked = explode(',', COG_ITEM_TYPES);
-    msgDebug("\nIn invIsTracked with type = $type and is tracked = ".(in_array($type, $tracked) ? 'true' : 'false'));
-    return in_array($type, $tracked) ? true : false;
-}
-
 /**
  * Calculates the quantity of a given SKU available to sell
  * @param array $item - pulled directly from the inventory db
@@ -168,7 +162,7 @@ function availableQty($item=[], $args=[])
     if (empty($item['qty_so']))        { $item['qty_so']         = 0; }
     if (empty($item['qty_alloc']))     { $item['qty_alloc']      = 0; }
     if (empty($item['inventory_type'])){ $item['inventory_type'] = 'si'; }
-    if (strpos(COG_ITEM_TYPES, $item['inventory_type']) === false) { $item['qty_stock'] = 1; } // Fix some special cases, non-stock types need qty > 0
+    if (!in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { $item['qty_stock'] = 1; } // Fix some special cases, non-stock types need qty > 0
     msgDebug("\nIn availableQty with incAssy = $incAssy and incCommit = $incCommit");
     if ($incAssy && in_array($item['inventory_type'], ['ma', 'sa'])) { // for assemblies, see how many we can build
         $bom = getMetaInventory($item['id'], 'bill_of_materials');
@@ -176,7 +170,7 @@ function availableQty($item=[], $args=[])
         $min_qty= 999999;
         foreach ($bom as $row) {
             $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
-            if (strpos(COG_ITEM_TYPES, $inv['inventory_type']) === false) { continue; } // non-stock stuff so move along
+            if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // non-stock stuff so move along
             $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
             $min_qty= $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
         }

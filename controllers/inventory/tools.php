@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-19
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -37,7 +37,7 @@ class inventoryTools
     function __construct()
     {
         $this->lang = getLang($this->moduleID);
-        $this->inv_types = explode(",", COG_ITEM_TYPES);
+        $this->inv_types = INVENTORY_COGS_TYPES;
     }
 
     /**
@@ -586,8 +586,7 @@ class inventoryTools
     {
         global $io;
         $fn    = 'temp/invAnalysis.csv';
-        $types = explode(',', COG_ITEM_TYPES);
-        $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", $types)."')", 'sku', ['id']);
+        $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", $this->inv_types)."')", 'sku', ['id']);
         if (sizeof($result) == 0) { return msgAdd('No rows to process!'); }
         foreach ($result as $row) { $skus[] = $row['id']; }
 //$skus = array_slice($skus, 500, 10);

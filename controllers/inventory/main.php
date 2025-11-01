@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-24
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/main.php
  */
 
@@ -206,8 +206,8 @@ class inventoryMain
         else { foreach ($result as $key => $row) {
             if (empty($row['sku'])) { unset($result[$key]); continue; } // non-data rows
             $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type','item_cost'], "sku='{$row['sku']}'");
-            $result[$key]['qty_stock']= invIsTracked($inv['inventory_type']) ? dbGetStoreQtyStock($row['sku'], $storeID) : '-'; // only show stock if tracked in inventory else '-'
-            $result[$key]['item_cost']= invIsTracked($inv['inventory_type']) ? $row['qty'] * $inv['item_cost'] : 0;
+            $result[$key]['qty_stock']= in_array($inv['inventory_type'], INVENTORY_COGS_TYPES) ? dbGetStoreQtyStock($row['sku'], $storeID) : '-'; // only show stock if tracked in inventory else '-'
+            $result[$key]['item_cost']= in_array($inv['inventory_type'], INVENTORY_COGS_TYPES) ? $row['qty'] * $inv['item_cost'] : 0;
             $result[$key]['qty']      = $row['qty'];
             $totCost+= $row['qty'] * $inv['item_cost'];
             $totQty += $row['qty'];
@@ -744,7 +744,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
 
         if (!empty($cnt)) { return msgAdd($this->lang['err_inv_delete_assy']); }
         $block1= dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku='$sku'");
-        if ($sku && $block1 && strpos(COG_ITEM_TYPES, $item['inventory_type']) !== false) { return msgAdd($this->lang['err_inv_delete_gl_entry']); }
+        if ($sku && $block1 && in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd($this->lang['err_inv_delete_gl_entry']); }
         $data  = ['content' => ['action'=>'eval','actionData'=>$action],
             'dbAction'=> [
                 'inventory'     => "DELETE FROM ".BIZUNO_DB_PREFIX."inventory WHERE id=$rID",
@@ -813,9 +813,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 $stock = !empty($row['stock']['b'.$store['id']]['stock']) ? $row['stock']['b'.$store['id']]['stock'] : 0;
                 $html .= '<td style="border:1px solid black;text-align: center;">'.$stock.'</td>';
                 if (!isset($mins['b'.$store['id']])) { $mins['b'.$store['id']] = $stock; }
-                if (strpos(COG_ITEM_TYPES, $invType) !== false) {
-                    $mins['b'.$store['id']] = intval(min($mins['b'.$store['id']], $stock/$row['qty']));
-                }
+                if (in_array($invType, INVENTORY_COGS_TYPES)) { $mins['b'.$store['id']] = intval(min($mins['b'.$store['id']], $stock/$row['qty'])); }
             }
             $html .= '</tr>';
         }

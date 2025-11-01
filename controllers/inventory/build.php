@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/build.php
  */
 
@@ -495,7 +495,7 @@ class inventoryBuild extends mgrJournal
         foreach ($invMeta as $row) { // if not tracked in cogs then skip
             $type = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='".addslashes($row['sku'])."'");
             $total= $qty * $row['qty'];
-            if (!empty($total) && strpos(COG_ITEM_TYPES, $type)!==false) { dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_alloc=qty_alloc+$total WHERE sku='{$row['sku']}'"); }
+            if (!empty($total) && in_array($type, INVENTORY_COGS_TYPES)) { dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_alloc=qty_alloc+$total WHERE sku='{$row['sku']}'"); }
         }
     }
 }

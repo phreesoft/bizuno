@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-11
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/journals/j04.php
  */
 
@@ -219,7 +219,7 @@ class j04 extends jCommon
             $bal = $row['ordered'] - $row['processed'];
             if ($bal <= 0 || empty($row['sku'])) { continue; }
             $type = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-            if (strpos(COG_ITEM_TYPES, $type) === false) { continue; }
+            if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
             $amt = $force=='open' ? $bal : -$bal;
             dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_po = qty_po + $amt WHERE sku='{$row['sku']}'");
         }

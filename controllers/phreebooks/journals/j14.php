@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-26
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/journals/j14.php
  */
 
@@ -288,14 +288,14 @@ class j14 extends jCommon
             if (empty($row['sku']) || empty($row['qty'])) { continue; } // if the bom has empty rows
             $row['trans_code'] = ''; // don't know if this is needed but can cause undefined error if not present
             $sku = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type', 'qty_stock', 'gl_inv', 'item_cost'], "sku='".addslashes($row['sku'])."'");
-            if ($sku['qty_stock'] < ($qty * $row['qty']) && strpos(COG_ITEM_TYPES, $sku['inventory_type']) !== false) {
-                msgDebug("\n    Not enough of SKU = {$row['sku']} needed ".($qty * $row['qty'])." and had ".$sku['qty_stock']);
+            if ($sku['qty_stock'] < ($qty * $row['qty']) && in_array($sku['inventory_type'], INVENTORY_COGS_TYPES)) {
+                msgDebug("\n    Not enough of SKU = {$row['sku']} needed ".($qty * $row['qty']).' and had '.$sku['qty_stock']);
                 return $this->msgPostError(lang('err_gl_inv_low_stock') . $row['sku']);
             }
             $row['qty']  = -($qty * $row['qty']);
             $row['id']   = $this->items[0]['id'];  // placeholder ref_id
             $row['price']= $sku['item_cost'];
-            if (strpos(COG_ITEM_TYPES, $sku['inventory_type']) === false) { // not tracked in cogs
+            if (!in_array($sku['inventory_type'], INVENTORY_COGS_TYPES)) { // not tracked in cogs
                 msgDebug("\n    NOT tracked in inventory, do not generate item record");
                 continue;
             }

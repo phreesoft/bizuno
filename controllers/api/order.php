@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-26
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/api/order.php
  */
 
@@ -164,7 +164,7 @@ class apiOrder extends apiCommon
     {
         $stock = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type', 'qty_stock'], "sku='".addslashes($sku)."'");
         msgDebug("\nEntering getStockLevels with sku = $sku and Qty = $qty and in stock = $stock");
-        if (strpos(COG_ITEM_TYPES, $stock['inventory_type'])!==false && $qty > $stock['qty_stock']) { $this->jID = 10; }
+        if (in_array($stock['inventory_type'], INVENTORY_COGS_TYPES) && $qty > $stock['qty_stock']) { $this->jID = 10; }
     }
     private function guessPaymentMethod($fromCart='creditcard')
     {

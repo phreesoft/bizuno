@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -335,7 +335,7 @@ function preSubmitPrices() {
         $sku   = clean('sku', 'text', 'get');
         if (empty($sku)) { return msgAdd("Bad SKU sent!"); }
         $inv   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($sku)."'");
-        if (strpos(COG_ITEM_TYPES, $inv['inventory_type']) === false) { return msgAdd("This SKU is not tracked in inventory! The aging is not recorded."); }
+        if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd("This SKU is not tracked in inventory! The aging is not recorded."); }
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND remaining>0", 'post_date', ['sku', 'post_date', 'remaining', 'store_id']);
         msgDebug("\nFound hits = ".print_r($rows, true));
         $stores= $list = [];

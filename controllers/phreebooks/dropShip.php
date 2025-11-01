@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-11-01
  * @filesource /controllers/phreebooks/dropShip.php
  */
 
@@ -46,7 +46,7 @@ class phreebooksDropShip
         foreach ($items as $row) {
             if (!isset($row['sku'])) { continue; }
             $skus[$row['sku']] = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "sku='{$row['sku']}'");
-            if (empty($skus[$row['sku']]) || strpos(COG_ITEM_TYPES, $skus[$row['sku']]['inventory_type']) === false) { continue; } // sku must be a stockable type
+            if (empty($skus[$row['sku']]) || !in_array($skus[$row['sku']]['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // sku must be a stockable type
             if (!$vID && $skus[$row['sku']]['vendor_id']) { $vID = $skus[$row['sku']]['vendor_id']; }
             elseif ($vID && $vID <> $skus[$row['sku']]['vendor_id']) { return msgAdd($this->lang['err_multiple_vendors']); }
         }
