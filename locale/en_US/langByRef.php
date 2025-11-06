@@ -23,7 +23,7 @@
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
  * @version    7.x Last Update: 2025-04-24
- * @filesource /local/en_US/locale.php
+ * @filesource /local/en_US/langByRef.php
  */
 
 namespace bizuno;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2025-11-05
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -654,7 +654,7 @@ return '';
                 'notificationFormatType'=> 'HTML',
                 'notificationType'=> 'EMAIL',
                 'locale'=> 'en_US', // en_US, fr_CA, es_MX, 
-                'notificationEventType'=> ['ON_PICKUP_DRIVER_ARRIVED', 'ON_EXCEPTION', 'ON_DELIVERY']];
+                'notificationEventType'=> ['ON_EXCEPTION']]; // 'ON_PICKUP_DRIVER_ARRIVED', 'ON_DELIVERY'
         }
     }
 
