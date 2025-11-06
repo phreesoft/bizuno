@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-06
  * @filesource /model/functions.php
  */
 
@@ -1366,6 +1366,26 @@ function addressLoad($cID=0, $suffix='')
     foreach ($fields as $key) {
         if (isset($result[$key])) { $output[$key.$suffix] = $result[$key]; }
     }
+    return $output;
+}
+
+/**
+ * Returns the pull down list of skins from the bizuno-skins plugin if installed and enabled.
+ */
+function portalSkins() {
+    if (!defined('BIZTHEMES_EASYUI')) { return [['id'=>'default', 'text'=>ucwords('default')]]; }
+    $output = [];
+    foreach (BIZTHEMES_EASYUI as $choice) { $output[] = ['id'=>$choice, 'text'=>$choice=='auto'?lang('auto_detect'):ucwords(str_replace('-', ' ', $choice))]; }
+    return $output;
+}
+
+/**
+ * Returns the pull down list of icons from the bizuno-icons plugin if installed and enabled.
+ */
+function portalIcons(&$icons=[]) {
+    if (!defined('BIZTHEMES_ICONS')) { return [['id'=>'default', 'text'=>lang('default')]]; }
+    $output = [];
+    foreach (BIZTHEMES_ICONS as $choice) { $output[] = ['id'=>$choice, 'text'=>ucwords(str_replace('-', ' ', $choice))]; }
     return $output;
 }
 

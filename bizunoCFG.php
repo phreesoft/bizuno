@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-11-06
  * @filesource /bizunoCFG.php
  */
 
@@ -78,7 +78,7 @@ define('PHREEBOOKS_CHART_TYPES', [
    '42' => ['id'=>'42', 'account'=>'', 'title'=>'gl_acct_type_42'],   // Equity - Gets Closed
    '44' => ['id'=>'44', 'account'=>'', 'title'=>'gl_acct_type_44']]); // Equity - Retained Earnings
 define('BIZTHEMES_ICONS', ['default', 'nuvola']);
-define('BIZTHEMES_EASYUI', [
+define('BIZTHEMES_EASYUI', ['auto', // Auto Detect, chooses either Bizuno theme or Black theme depending on theusers default browser choice
     'bizuno', 'black', 'bootstrap', 'default', 'gray', 'material', 'material-blue', 'material-teal', 'metro', // Standard themes
     'metro', 'metro-blue', 'metro-gray', 'metro-green', 'metro-orange', 'metro-red', // Metro themes
     'ui-cupertino', 'ui-dark-hive', 'ui-pepper-grinder', 'ui-sunny']); // jQuery UI themes 

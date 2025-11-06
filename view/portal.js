@@ -20,14 +20,14 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-06
  * @filesource /view/portal.js
  */
 
 var jqBiz = $.noConflict();
 var bizID = 0;
 
-const isDarkMode    = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const isDarkMode    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';
 const screenWidth   = screen.width; // screen dims
 const screenHeight  = screen.height;
 const viewportWidth = window.innerWidth; // window dims
