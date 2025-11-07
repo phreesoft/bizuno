@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-14
+ * @version    7.x Last Update: 2025-11-07
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -63,7 +63,8 @@ class inventoryAdmin
                     'rpt_inv'    => ['order'=>99, 'label'=>('reports'),           'icon'=>'mimeDoc',  'route'=>'phreeform/main/manager&gID=inv']]]]],
             'hooks' => [
                 'administrate'=>['roles'=>['edit'=>['order'=>10,'method'=>'rolesEdit'], 'save'=>['order'=>10,'method'=>'rolesSave']]],
-                'phreebooks'  =>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]]];
+//              'phreebooks'  =>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]],
+                ]];
         $this->phreeformProcessing = [
             'image_sku' => ['text'=>lang('image')." (".lang('sku').")"],
             'inv_image' => ['text'=>lang('image')." (".lang('id').")"],

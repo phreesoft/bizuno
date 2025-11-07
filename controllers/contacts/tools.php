@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-07
+ * @version    7.x Last Update: 2025-11-07
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -339,13 +339,14 @@ class contactsTools
      */
     public function fyCloseHome(&$layout=[])
     {
-        if (!$security = validateAccess('admin', 4)) { return; }
+/*      if (!$security = validateAccess('admin', 4)) { return; }
         $html  = "<p>"."Closing the fiscal year for the contacts module consist of deleting contacts (all contact types) that are not referenced in the general journal during or before the fiscal year being closed. "
                 . "For customers, only active records will be removed. For vendors, only inacitve records will be removed. "
                 . "Address books entries for deleted contacts will be removed, contact log entries for ALL contacts will be removed. Expired stored credit cards for all periods will be removed."
                 . "To prevent the these contact records from being removed, check the box below."."</p>";
         $html .= html5('contacts_keep', ['label' => 'Do not delete contact records that have no journal reference during or before this closing fiscal year', 'position'=>'after','attr'=>['type'=>'checkbox','value'=>1]]);
         $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>50,'label'=>$this->lang['title'],'type'=>'html','html'=>$html];
+*/
     }
 
     /**
@@ -354,12 +355,12 @@ class contactsTools
      */
     public function fyClose()
     {
-        if (!$security = validateAccess('admin', 4)) { return; }
+/*        if (!$security = validateAccess('admin', 4)) { return; }
         $skip = clean('contacts_keep', 'boolean', 'post');
         if ($skip) { return; } // user wants to keep all records, nothing to do here, move on
         $cron = getUserCron('fyClose');
         $cron['taskPost'][] = ['mID'=>$this->moduleID, 'settings'=>['type'=>'c','cnt'=>1,'rID'=>0]];
-        setUserCron('fyClose', $cron);
+        setUserCron('fyClose', $cron); */
     }
 
     /**
@@ -369,7 +370,7 @@ class contactsTools
      */
     public function fyCloseNext($settings=[], &$cron=[])
     {
-        $blockSize = 25;
+/*        $blockSize = 25;
         if (!$security = validateAccess('admin', 4)) { return; }
         if (!isset($cron[$this->moduleID]['total'])) {
             foreach (['c','v'] as $type) {
@@ -394,6 +395,7 @@ class contactsTools
         // Need to add these results to a log that can be downloaded from the backup folder.
         msgDebug("\nReturned from contacts step with type = $origType and rID = {$settings['rID']} and number of deleted records = $deleted");
         return "Finished processing block $thisBlock of $totalBlock for module $this->moduleID type $origType: deleted $deleted records";
+ */
     }
 
     /**
@@ -406,7 +408,7 @@ class contactsTools
      */
     private function fyCloseStep(&$cnt, &$type, &$rID, $blockSize, &$msg=[])
     {
-        $crit = "id>$rID AND type='$type' AND inactive<>'2'"; // inactive<>2 prevents the locked records from being deleted
+/*        $crit = "id>$rID AND type='$type' AND inactive<>'2'"; // inactive<>2 prevents the locked records from being deleted
 //      if ($type == 'c') { $crit .= " AND inactive='0'"; } // for customers, the inactive flag must be set also
         if ($type == 'v') { $crit .= " AND inactive='1'"; } // for vendors, the inactive flag must be set also
         if ($type == 'i') { $crit .= " AND inactive='1'"; } // for contacts, the inactive flag must be set also
@@ -428,7 +430,7 @@ class contactsTools
             elseif ($type == 'v') { $cnt=0; $type = 'i'; $rID=0; } // move on to contacts
             elseif ($type == 'i') { $cnt=0; $type = '';  $rID=0; } // finished
         }
-        return $count;
+        return $count; */
     }
 
     /**
@@ -436,7 +438,7 @@ class contactsTools
      */
     public function syncAttachments()
     {
-        global $io;
+/*        global $io;
         $verbose = clean('verbose', 'integer', 'get');
         $deleted = $repaired = 0;
         $files = $io->folderRead(getModuleCache('contacts', 'properties', 'attachPath', 'contacts'));
@@ -457,6 +459,6 @@ class contactsTools
         }
         if ($verbose) {
             msgAdd("Done! Deleted $deleted attachments and repaired $repaired links to contact records.", 'caution');
-        }
+        } */
     }
 }

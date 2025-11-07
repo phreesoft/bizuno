@@ -82,7 +82,7 @@ $lang = [
     'del_fiscal_year_btn' => 'Close/Delete Fiscal Year',
     'fy_del_title' => 'Close Fiscal Year',
     'fy_del_desc' => 'This tool deletes a fiscal year from the database.<br /><br />NOTE: ALL DATA WILL BE LOST! You should make a backup before performing this operation.<br /><br />This process can take several minutes and no one should be accessing your business data when it is running. Further instructions will be provided along with options for each module that may be affected.',
-    'fy_del_instr' => '<p style="color:red">WARNING: THIS OPERATION WILL CLOSE FISCAL YEAR %s.</p><p>Please review the settings for each tab below and adjust accordingly. Bizuno has selected defaults settings for each module that is impacted by fiscal years, you may change them to meet your business preferences.</p><p><b>When you are ready, press the Start button in the toolbar.</b></p>',
+    'fy_del_instr' => '<p style="color:red">WARNING: THIS OPERATION WILL CLOSE FISCAL YEAR %s.</p><p>Please review the settings for each tab below and adjust accordingly. Bizuno has selected defaults settings for each module that is impacted by fiscal years.</p><p><b>When you are ready, press the Start button above to proceed.</b></p>',
     'fy_del_btn_go' => 'Yes I am ready! lets proceed ...',
     'fy_del_btn_cancel' => 'Not Now, thanks.',
     'msg_gl_repost_journals_confirm' => '<b>BE SURE TO BACKUP YOUR DATA BEFORE YOU RE-POST ANY JOURNALS!</b><br />Note 1: Re-posting journals can take some time, you may want to limit the re-posts by entering a smaller date range or a limited number of journals.',

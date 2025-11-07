@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-11-07
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -877,11 +877,11 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
      */
     public function fyCloseHome(&$layout=[])
     {
-        if (!$security = validateAccess('admin', 4)) { return; }
+/*        if (!$security = validateAccess('admin', 4)) { return; }
         $html  = "<p>Closing the fiscal year for the Inventory module consist of deleting inventory items that are no longer referenced in the general journal during or before the fiscal year being closed. "
                . "To prevent the these inventory items from being removed, check the box below.</p>";
         $html .= html5('inventory_keep', ['label' => 'Do not delete inventory items that are not referenced during or before this closing fiscal year', 'position'=>'after','attr'=>['type'=>'checkbox','value'=>'1']]);
-        $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>55,'label'=>$this->lang['title'],'type'=>'html','html'=>$html];
+        $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>55,'label'=>$this->lang['title'],'type'=>'html','html'=>$html]; */
     }
 
     /**
@@ -891,12 +891,12 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
      */
     public function fyClose()
     {
-        if (!$security = validateAccess('admin', 4)) { return; }
+/*      if (!$security = validateAccess('admin', 4)) { return; }
         $skip = clean('inventory_keep', 'boolean', 'post');
         if ($skip) { return; } // user wants to keep all records, nothing to do here, move on
         $cron = getUserCron('fyClose');
         $cron['taskPost'][] = ['mID'=>$this->moduleID, 'settings'=>['cnt'=>1, 'rID'=>0]]; // ,'method'=>'fyCloseNext']; // assumed method == fyCloseNext, no settings
-        setUserCron('fyClose', $cron);
+        setUserCron('fyClose', $cron); */
     }
 
     /**
@@ -906,7 +906,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
      */
     public function fyCloseNext($settings=[], &$cron=[])
     {
-        $blockSize = 25;
+/*        $blockSize = 25;
         if (!$security = validateAccess('admin', 4)) { return; }
         if (!isset($cron[$this->moduleID]['total'])) {
             $cron[$this->moduleID]['total'] = dbGetValue(BIZUNO_DB_PREFIX."inventory", 'COUNT(*) AS cnt', "", false);
@@ -923,7 +923,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
             $this->syncAttachments();
         }
         // Need to add these results to a log that can be downloaded from the backup folder.
-        return "Finished processing block {$settings['cnt']} of $totalBlock for module $this->moduleID: deleted {$output['deleted']} records";
+        return "Finished processing block {$settings['cnt']} of $totalBlock for module $this->moduleID: deleted {$output['deleted']} records"; */
     }
 
     /**
@@ -934,7 +934,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
      */
     private function fyCloseStep($rID, $blockSize, &$msg=[])
     {
-        $count = 0;
+/*        $count = 0;
         $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "id>$rID", 'id', ['id','sku','inactive','description_short'], $blockSize);
         foreach ($result as $row) {
             $rID = $row['id']; // set the highest rID for next iteration
@@ -953,7 +953,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
                 $count++;
             }
         }
-        return ['rID'=>$rID, 'finished'=>sizeof($result)<$blockSize ? true : false, 'deleted'=>$count];
+        return ['rID'=>$rID, 'finished'=>sizeof($result)<$blockSize ? true : false, 'deleted'=>$count]; */
     }
 
     /**
@@ -961,7 +961,7 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
      */
     private function syncAttachments()
     {
-        global $io;
+/*        global $io;
         $files = $io->folderRead(getModuleCache('inventory', 'properties', 'attachPath', 'inventory'));
         foreach ($files as $attachment) {
             $tID = substr($attachment, 4); // remove rID_
@@ -975,6 +975,6 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
                 msgDebug("\nSetting attachment flag for id = $rID and file: $attachment");
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['attach'=>'1'], 'update', "id=$rID");
             }
-        }
+        } */
     }
 }

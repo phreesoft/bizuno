@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-07
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -54,7 +54,8 @@ class contactsAdmin
                     'mgr_v'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_v')),'icon'=>'users','route'=>"contacts/main/manager&type=v"],
                     'prices_v'=> ['order'=>70,'label'=>('ctype_v_prc'),'icon'=>'price',  'route'=>'inventory/prices/manager&type=v'],
                     'rpt_v'   => ['order'=>99,'label'=>('reports'),    'icon'=>'mimeDoc','route'=>'phreeform/main/manager&gID=vend']]]]],
-            'hooks'     => ['phreebooks'=>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]]];
+//          'hooks'     => ['phreebooks'=>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]],
+            ];
         $this->phreeformProcessing = [
             'qtrNeg0'    => ['text'=>lang('dates_quarter').' (contact_id_b)'],
             'qtrNeg1'    => ['text'=>lang('dates_lqtr')   .' (contact_id_b)'],
