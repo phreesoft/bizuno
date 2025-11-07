@@ -185,7 +185,7 @@ final class view
     private function setEnvHTML(&$data=[])
     {
         $icons   = getUserCache('profile', 'icons', false, 'default');
-        $theme   = getUserCache('profile', 'theme', false, 'bizuno');
+        $theme   = getUserCache('profile', 'theme', false, 'auto');
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'black' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;

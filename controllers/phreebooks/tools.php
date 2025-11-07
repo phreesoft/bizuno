@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-11-06
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -390,7 +390,7 @@ msgTrap();
     private function fyCloseHistoryPurch(&$cron=[], $cntOnly=false) // add to the contacts history meta for purchases
     {
 msgTrap();
-        msgDebug("\nEntering fyCloseHistorySales.");
+        msgDebug("\nEntering fyCloseHistoryPurch.");
         $this->setHistoryContact($cron, $cntOnly, 'v', 6);
     }
     private function setHistoryContact(&$cron, $cntOnly, $type, $journal)
@@ -421,14 +421,17 @@ msgTrap();
             }
             $meta = dbMetaGet(0, $metaKey, 'contacts', $row['cID']);
             $mIdx = metaIdxClean($meta);
-            $mDate= 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
+            $mDate= substr($row['post_date'], 0, 7).'-01';
+            $total= round(in_array($journal, [7,13])?-$row['total_amount']:$row['total_amount']);
             if (array_key_exists($mDate, $meta)) {
-                $meta[$mDate] += floatval(in_array($journal, [7,13])?-$row['total_amount']:$row['total_amount']);
+                $meta[$mDate]['qty']++;
+                $meta[$mDate]['total']+= $total;
             } else {
-                $meta[$mDate]  = floatval(in_array($journal, [7,13])?-$row['total_amount']:$row['total_amount']);
+                $meta[$mDate]['qty']   = 1;
+                $meta[$mDate]['total'] = $total;
                 ksort($meta);
             }
-            dbMetaSet($mIdx, $metaKey, $row, 'contacts', $row['cID']);
+            dbMetaSet($mIdx, $metaKey, $meta, 'contacts', $row['cID']);
             $this->setHistoryInventory($row['id'], $journal, $cron); // Update inventory history meta
         }
         if (!empty($rIDs)) { // remove records, all finished here for this block
@@ -444,29 +447,31 @@ msgTrap();
     private function setHistoryInventory($mID, $journal, &$cron)
     {
         $metaKey= $journal==6? 'inventory_purchases' : 'inventory_sales';
-        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$mID AND gl_type='itm", '', ['qty', 'sku', 'credit_amount', 'debit_amount']);
+        $rows   = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$mID AND gl_type='itm", '', ['qty', 'sku', 'credit_amount', 'debit_amount']);
         foreach ($rows as $row) {
 //          msgDebug("\nFetched row = ".print_r($row, true));
-            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
+            $inv   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
             if (empty($inv)) { // orphaned, save to duplicate table
                 $cron['msg'] .= "\n    Found an orphaned sku = {$row['sku']} and primary_name = {$row['primary_name_b']}.";
                 continue;
             }
             if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // if not in tracked inventory, skip
-            $meta = dbMetaGet(0, $metaKey, 'inventory', $inv['id']);
-            $mIdx = metaIdxClean($meta);
-            $mDate= 'm' . substr($row['post_date'], 0, 4) . substr($row['post_date'], 5, 2);
-            $total= $row['debit_amount'] + $row['credit_amount'];
+            $meta  = dbMetaGet(0, $metaKey, 'inventory', $inv['id']);
+            $mIdx  = metaIdxClean($meta);
+            $mDate = substr($row['post_date'], 0, 7).'-01';
+            $itmTtl= $row['debit_amount']+$row['credit_amount'];
+            $total = round(in_array($journal, [7,13])?-$itmTtl:$itmTtl);
             if (array_key_exists($mDate, $meta)) {
-                $meta[$mDate] += floatval(in_array($journal, [7,13])?-$total:$total);
+                $meta[$mDate]['qty']  += $row['qty'];
+                $meta[$mDate]['total']+= $total;
             } else {
-                $meta[$mDate]  = floatval(in_array($journal, [7,13])?-$total:$total);
+                $meta[$mDate]['qty']   = $row['qty'];
+                $meta[$mDate]['total'] = $total;
                 ksort($meta);
             }
-            dbMetaSet($mIdx, $metaKey, $row, 'inventory', $inv['id']);
+            dbMetaSet($mIdx, $metaKey, $meta, 'inventory', $inv['id']);
         }
     }
-
     private function fyCloseTableGenJournal(&$cron=[], $cntOnly=false)
     {
         $crit  = "period <= {$cron['periodEnd']}";
