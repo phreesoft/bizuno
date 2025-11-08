@@ -209,9 +209,12 @@ class inventoryAdmin
             'invPriceDesc' => ['order'=>10,'html'=>$this->lang['inv_tools_price_assy_desc'],'attr'=>['type'=>'raw']],
             'btnPriceAssy' => ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>lang('go')],
                 'events' => ['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/priceAssy');"]],
-            'analyzeDesc'=> ['order'=>10,'html' =>$this->lang['inv_analyze_desc'],'attr'=>['type'=>'raw']],
-            'analyzeBtn' => ['order'=>20,'attr'=>['type'=>'button', 'value'=>lang('go')],
-                'events' => ['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/invBalance');"]]];
+//            'analyzeDesc'=> ['order'=>10,'html' =>$this->lang['inv_analyze_desc'],'attr'=>['type'=>'raw']],
+//            'analyzeBtn' => ['order'=>20,'attr'=>['type'=>'button', 'value'=>lang('go')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/invBalance');"]],
+//            'syncAtchDesc' => ['order'=>10,'html'=>lang('sync_attach_desc'),'attr'=>['type'=>'raw']],
+//            'btnSyncAttach'=> ['order'=>20,'events'=>['onClick' => "jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/syncAttachments&verbose=1');"],
+//                'attr' => ['type'=>'button','value'=>lang('go')]],
+            ];
         $data = [
             'tabs' => ['tabAdmin'=> ['divs'=>[
                 'woTasks'=> ['order'=>60,'label'=>sprintf(lang('tbd_tasks'), lang('work_order')),'type'=>'html','html'=>'',
@@ -226,25 +229,21 @@ class inventoryAdmin
                         'invAlloc' => ['order'=>40,'type'=>'panel','classes'=>['block50'],'key'=>'invAlloc'],
                         'invSoPo'  => ['order'=>50,'type'=>'panel','classes'=>['block50'],'key'=>'invSoPo'],
                         'invPrice' => ['order'=>60,'type'=>'panel','classes'=>['block50'],'key'=>'invPrice'],
-                        'analyze'  => ['order'=>70,'type'=>'panel','classes'=>['block50'],'key'=>'analyze']]]]]]]],
-            'panels'  => [
+//                      'analyze'  => ['order'=>70,'type'=>'panel','classes'=>['block50'],'key'=>'analyze'],
+                        ]]]]]]],
+            'panels' => [
                 'invVal'   => ['label'=>$this->lang['inv_tools_val_inv'],     'type'=>'fields','keys'=>['invValDesc',   'btnHistTest','btnHistFix']],
                 'invDrill' => ['label'=>$this->lang['inv_sku_drill_title'],   'type'=>'fields','keys'=>['invDrillDesc', 'invDrillSku','invDrillDate','btnDrillGo']],
                 'invRecalc'=> ['label'=>$this->lang['inv_sku_recalc_title'],  'type'=>'fields','keys'=>['invRecalcDesc','btnRecalcGo']],
                 'invAlloc' => ['label'=>$this->lang['inv_tools_qty_alloc'],   'type'=>'fields','keys'=>['invAllocDesc', 'btnAllocFix']],
-                'invSoPo'  => ['label'=>$this->lang['inv_tools_repair_so_po'],'type'=>'fields','keys'=>['invSoPoDesc','btnJournalFix']],
-                'invPrice' => ['label'=>$this->lang['inv_tools_price_assy'],  'type'=>'fields','keys'=>['invPriceDesc', 'btnPriceAssy']]],
+                'invSoPo'  => ['label'=>$this->lang['inv_tools_repair_so_po'],'type'=>'fields','keys'=>['invSoPoDesc',  'btnJournalFix']],
+                'invPrice' => ['label'=>$this->lang['inv_tools_price_assy'],  'type'=>'fields','keys'=>['invPriceDesc', 'btnPriceAssy']],
+//              'analyze'  => ['label'=>$this->lang['inv_sku_drill_title'],   'type'=>'fields','keys'=>['analyzeDesc',  'analyzeBtn']],
+                ],
             'fields' => $fields];
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
-        // Inv Pro Tools
-        if (!$security = validateAccess('admin', 1)) { return; }
-        // dd tab for work order tasks
-        $layout['panel']['analyze'] = ['label'=>$this->lang['inv_sku_drill_title'], 'type'=>'fields', 'keys'=>['analyzeDesc', 'analyzeBtn']];
     }
 
-    /**
-     *
-     */
     public function adminSave()
     {
         readModuleSettings($this->moduleID, $this->settingsStructure());

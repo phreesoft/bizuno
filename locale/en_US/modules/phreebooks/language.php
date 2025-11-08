@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-11-08
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -115,7 +115,7 @@ $lang = [
 //  'roles_return_mgmt' => 'Checking this box will list users from this role to appear on signoff locations on the returns manager.',
 
     // Error Messages
-    'err_gl_chart_delete' => 'The GL account cannot be deleted if there are entries assigned to the account. There is at least one entry in table %s using this account!',
+    'err_gl_chart_delete' => 'The GL account %s cannot be deleted if there are entries assigned to the account. There is at least one entry in table %s using this account!',
     'err_tax_rate_delete' => 'The tax rate cannot be deleted if there are gl entries posted against it!',
     'err_currency_change' => 'The default currency cannot be changed once entries have been entered in the system!',
     'err_currency_delete_default' => 'The default currency cannot be deleted! Set another currency as default and then retry deleting this one.',

@@ -536,7 +536,7 @@ class inventoryTools
      */
     public function priceAssy(&$layout=[])
     {
-        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('ma','sa')", 'sku', ['id', 'sku']);
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('ma','sa') AND inactive='0'", 'sku', ['id', 'sku']);
         if (sizeof($result) == 0) { return msgAdd("No assemblies found to process!"); }
         foreach ($result as $row) { $rows[] = ['id'=>$row['id']]; }
         msgDebug("\nRows to process = ".print_r($rows, true));
@@ -871,110 +871,4 @@ if ($row['post_date']<'2020-01-01') { $row['so_po_ref_id'] = 2; } // patch for t
         msgDebug("\nLeaving getCurrentStock with output = ".print_r($output, true));
         return $output;
    }
-
-    /**
-     * This function extends the PhreeBooks module close fiscal year method
-     */
-    public function fyCloseHome(&$layout=[])
-    {
-/*        if (!$security = validateAccess('admin', 4)) { return; }
-        $html  = "<p>Closing the fiscal year for the Inventory module consist of deleting inventory items that are no longer referenced in the general journal during or before the fiscal year being closed. "
-               . "To prevent the these inventory items from being removed, check the box below.</p>";
-        $html .= html5('inventory_keep', ['label' => 'Do not delete inventory items that are not referenced during or before this closing fiscal year', 'position'=>'after','attr'=>['type'=>'checkbox','value'=>'1']]);
-        $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>55,'label'=>$this->lang['title'],'type'=>'html','html'=>$html]; */
-    }
-
-    /**
-     * Hook to PhreeBooks Close FY method, adds tasks to the queue to execute AFTER PhreeBooks processes the journal
-     * @param array $layout - structure coming in
-     * @return array - modified $layout
-     */
-    public function fyClose()
-    {
-/*      if (!$security = validateAccess('admin', 4)) { return; }
-        $skip = clean('inventory_keep', 'boolean', 'post');
-        if ($skip) { return; } // user wants to keep all records, nothing to do here, move on
-        $cron = getUserCron('fyClose');
-        $cron['taskPost'][] = ['mID'=>$this->moduleID, 'settings'=>['cnt'=>1, 'rID'=>0]]; // ,'method'=>'fyCloseNext']; // assumed method == fyCloseNext, no settings
-        setUserCron('fyClose', $cron); */
-    }
-
-    /**
-     * Executes a step in the fiscal close procedure, controls all steps for this module
-     * @param array $settings - Properties for the fiscal year close operation
-     * @return string - message with current status
-     */
-    public function fyCloseNext($settings=[], &$cron=[])
-    {
-/*        $blockSize = 25;
-        if (!$security = validateAccess('admin', 4)) { return; }
-        if (!isset($cron[$this->moduleID]['total'])) {
-            $cron[$this->moduleID]['total'] = dbGetValue(BIZUNO_DB_PREFIX."inventory", 'COUNT(*) AS cnt', "", false);
-        }
-        $totalBlock = ceil($cron[$this->moduleID]['total'] / $blockSize);
-        $output = $this->fyCloseStep($settings['rID'], $blockSize, $cron['msg']);
-//if ($settings['cnt'] > 4) { $output['finished'] = true; }
-        if (!$output['finished']) { // more to process, re-queue
-            $settings['cnt']++;
-            msgDebug("\nRequeuing inventory with rID = {$output['rID']}");
-            array_unshift($cron['taskPost'], ['mID'=>$this->moduleID, 'settings'=>['cnt'=>$settings['cnt'], 'rID'=>$output['rID']]]);
-        } else { // we're done, run the sync attachments tool
-            msgDebug("\nFinished inventory, checking attachments");
-            $this->syncAttachments();
-        }
-        // Need to add these results to a log that can be downloaded from the backup folder.
-        return "Finished processing block {$settings['cnt']} of $totalBlock for module $this->moduleID: deleted {$output['deleted']} records"; */
-    }
-
-    /**
-     * Just executes a single step
-     * @param integer $rID - starting record id for this step
-     * @param integer $blockSize - number of records to delete in a single step
-     * @return array - status and data for the next step, number of records deleted
-     */
-    private function fyCloseStep($rID, $blockSize, &$msg=[])
-    {
-/*        $count = 0;
-        $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "id>$rID", 'id', ['id','sku','inactive','description_short'], $blockSize);
-        foreach ($result as $row) {
-            $rID = $row['id']; // set the highest rID for next iteration
-            if (!$row['inactive']) { continue; }
-            if (!$row['sku']) {
-                msgAdd("There is not SKU value for record {$row['id']}, This should never happen! The record will be skipped.");
-                continue;
-            }
-            $exists = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'ref_id', "sku='{$row['sku']}'");
-            if (!$exists) {
-                $msg[] = "Deleting inventory id={$row['id']}, {$row['sku']} - {$row['description_short']}";
-                msgDebug("\nDeleting inventory id={$row['id']}, {$row['sku']} - {$row['description_short']}");
-                dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_history WHERE sku='{$row['sku']}'");
-                dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta    WHERE ref_id={$row['id']}");
-                dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory         WHERE id={$row['id']}");
-                $count++;
-            }
-        }
-        return ['rID'=>$rID, 'finished'=>sizeof($result)<$blockSize ? true : false, 'deleted'=>$count]; */
-    }
-
-    /**
-     * Synchronizes actual attachment files with the flag in the inventory table
-     */
-    private function syncAttachments()
-    {
-/*        global $io;
-        $files = $io->folderRead(getModuleCache('inventory', 'properties', 'attachPath', 'inventory'));
-        foreach ($files as $attachment) {
-            $tID = substr($attachment, 4); // remove rID_
-            $rID = substr($tID, 0, strpos($tID, '_'));
-            if (empty($rID)) { continue; }
-            $exists = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
-            if (!$exists) {
-                msgDebug("\nDeleting attachment for rID = $rID and file: $attachment");
-                $io->fileDelete(getModuleCache('inventory', 'properties', 'attachPath', 'inventory')."/$attachment");
-            } elseif (!$exists['attach']) {
-                msgDebug("\nSetting attachment flag for id = $rID and file: $attachment");
-                dbWrite(BIZUNO_DB_PREFIX.'inventory', ['attach'=>'1'], 'update', "id=$rID");
-            }
-        } */
-    }
 }

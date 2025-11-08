@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-11-08
  * @filesource controllers/inventory/locale/en_US/language.php
  */
 
@@ -86,8 +86,8 @@ $lang = [
     'msg_inv_median' => 'Check monthly usage, median value (%s) is out of range to average sales (%s).',
     // Error Messages
     'err_inv_sku_blank' => 'The SKU Field is required!',
-    'err_inv_delete_assy' => 'The inventory item cannot be deleted since it is part of an assembly. This SKU must be removed from the assembly before it can be deleted.',
-    'err_inv_delete_gl_entry' => 'The inventory item cannot be deleted if there are journal entries assigned to it. Either repost the entries assigned to this item or set the item inactive.',
+    'err_inv_delete_assy' => 'The inventory item %s cannot be deleted since it is part of an assembly. This SKU must be removed from the assembly before it can be deleted.',
+    'err_inv_delete_gl_entry' => 'The inventory item %s cannot be deleted if there are journal entries assigned to it. Either repost the entries assigned to this item or set the item inactive.',
     'err_inv_assy_error' => 'Either this is not an assembly or no there are no parts in this assembly!',
     'err_inv_assy_low_stock' => 'There are not enough parts to build %s of this SKU!',
     'err_inv_assy_low_list' => '(%s) %s: Stock: %s, %s are needed.',

@@ -226,6 +226,7 @@ The following is a summary of the PhreeBooks module closing task list:
 <li>Change status of customers and vendors to inactive if they have no journal activity after removal of fiscal year</li>
 <li>Delete any inventory item that has status of inactive and has no journal activity after removal of fiscal year</li>
 </ul>
+<p>Upon completion, a log file can be found in your backup folder and should be downloaded and retained for historical record keeping.</p>
 <h3>Post-close Clean-up</h3>
 <p>Following the fiscal year close process, the following tools should be run to complete the process:</p>
 <ul>
@@ -233,7 +234,7 @@ The following is a summary of the PhreeBooks module closing task list:
 <li>Contact attachment sync</li>
 <li>Inventory attachment sync</li>
 <li>Journal attachment sync</li>
-<li></li>
+<li>Run all inventory tools</li>
 <li></li>
 </ul>';
         return $html;
@@ -269,6 +270,8 @@ The following is a summary of the PhreeBooks module closing task list:
         $this->fyCloseCleanChart($cron, true);
         $this->fyCloseCleanContact($cron, true);
         $this->fyCloseCleanInventory($cron, true);
+        $this->fyCloseCleanInvUsage($cron, true);
+        $this->fyCloseCleanInvHist($cron, true);
         $msg  = "Log file for closing fiscal year {$fyInfo['fiscal_year']}. Bizuno release ".MODULE_BIZUNO_VERSION.", generated ".biz_date('Y-m-d H:i:s');
 $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         setUserCron('fyClose', $cron);
@@ -292,16 +295,18 @@ msgTrap();
         msgDebug("\nEntering fyCloseNext with cron = ".print_r($cron, true));
         $cron['msg'][] = "\nEntering step: {$cron['curStep']} of {$cron['ttlSteps']}<br />Block {$cron['curBlk']} of {$cron['ttlBlk']}<br />Total of $ttlRecords records.<br />";
         switch ($cron['curStep']) {
-            case 0: $this->fyCloseHistorySales($cron);      break; // add to the contacts history meta for sales
-            case 1: $this->fyCloseHistoryPurch($cron);      break; // add to the contacts history meta for purchases
-            case 2: $this->fyCloseTableGenJournal($cron);   break;
-            case 3: $this->fyCloseReindexJrnlMain($cron);   break;
-            case 4: $this->fyCloseReindexJrnlItem($cron);   break;
-            case 5: $this->fyCloseReindexGenJournal($cron); break;
-            case 6: $this->fyCloseCleanAudit($cron);        break;
-            case 7: $this->fyCloseCleanChart($cron);        break;
-            case 8: $this->fyCloseCleanContact($cron);      break; // contacts_log, contacts_meta
-            case 9: $this->fyCloseCleanInventory($cron);    break; // inventory_meta
+            case  0: $this->fyCloseHistorySales($cron);      break; // add to the contacts history meta for sales
+            case  1: $this->fyCloseHistoryPurch($cron);      break; // add to the contacts history meta for purchases
+            case  2: $this->fyCloseTableGenJournal($cron);   break;
+            case  3: $this->fyCloseReindexJrnlMain($cron);   break;
+            case  4: $this->fyCloseReindexJrnlItem($cron);   break;
+            case  5: $this->fyCloseReindexGenJournal($cron); break;
+            case  6: $this->fyCloseCleanAudit($cron);        break;
+            case  7: $this->fyCloseCleanChart($cron);        break;
+            case  8: $this->fyCloseCleanContact($cron);      break; // contacts_log, contacts_meta
+            case  9: $this->fyCloseCleanInventory($cron);    break; // inventory_meta
+            case 10: $this->fyCloseCleanInvUsage($cron);     break; // journal_cogs_usage
+            case 11: $this->fyCloseCleanInvHist($cron);      break; // inventory_history
             default: $cron['msg'][] = "\nMissing step increment..."; $cron['curStep']++; $cron['curBlk']++; break; // for missing steps
         }
         msgDebug("\nBack from current step with cron = ".print_r($cron, true));
@@ -625,106 +630,49 @@ msgTrap();
         }
         dbTransactionCommit();
     }
-
-
-    /**
-     * Generically executes a delete SQL based on specified criteria
-     * @param string $table - database table name
-     * @param string $crit - SQL criteria to append to the SQL
-     */
-/*    private function fyCloseDbAction($table, $crit, &$cron)
+    private function fyCloseCleanInvUsage(&$cron=[], $cntOnly=false)
     {
-        $cnt = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', $crit, false);
-        $cron['msg'][] = "Read $cnt records to delete from table: $table";
-        $cron['msg'][] = "Executing SQL: DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit";
-        dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."$table WHERE $crit");
-    } */
-
-
-    
-    
-    
-    
-/*    public function fYCloseStart($settings=[], &$cron=[])
-    {
-        return "Starting to clean fiscal year, now cleaning journals. This may take a while!";
-    } */
-
-    /**
-     * Executes fiscal year close through a specified period
-     * @return string - HTML user status message
-     */
-/*    public function fYCloseJournal($settings=[], &$cron=[])
-    {
-        if (!$cron['fyEndDate']) { return; }
-        $cron['msg'][] = "Looking at journal tables to prune for fiscal year ending date: {$cron['fyEndDate']} and ending period = {$cron['periodEnd']}";
+        msgDebug("\nEntering fyCloseCleanInvUsage");
+        $cron['msg'][] = "Entering Step 10: fyCloseCleanInvUsage with curBlk={$cron['curBlk']} and ttlBlk={$cron['ttlBlk']}.";
+        $table= BIZUNO_DB_PREFIX.'journal_cogs_usage';
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=1; return; }
+        
+        // Let's go
         dbTransactionStart();
-        $this->fyCloseDbAction('inventory_history',"post_date<='{$cron['fyEndDate']}' AND remaining=0", $cron);
-        $this->fyCloseDbAction('journal_cogs_owed',"post_date<='{$cron['fyEndDate']}'", $cron);
-        $this->fyCloseDbAction('journal_main',     "post_date<='{$cron['fyEndDate']}'", $cron);
-        $this->fyCloseDbAction('journal_item',     "post_date<='{$cron['fyEndDate']}'", $cron);
-        $this->fyCloseDbAction('journal_history',  "period   <= {$cron['periodEnd']}",  $cron);
-        $this->fyCloseDbAction('journal_periods',  "period   <= {$cron['periodEnd']}",  $cron);
-        // renumber periods
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_main    SET period = period - {$cron['periodEnd']}");
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_periods SET period = period - {$cron['periodEnd']}");
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_history SET period = period - {$cron['periodEnd']}");
-        dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_item    SET reconciled = reconciled - {$cron['periodEnd']} WHERE reconciled > 0");
+        $cron['msg'][] = "Cleaning up orphaned records from table: $table";
+        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table jcu LEFT JOIN journal_main jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL";
+        $stmt = dbGetResult("SELECT jm.id FROM $table jcu LEFT JOIN journal_main jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL");
+        $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
+        msgDebug("\nFinding orphaned cogs_usage records and fetched ".sizeof($rows)." rows.");
+        $cron['msg'][] = "Read ".sizeof($rows)." records to delete from table: $table";
+        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM journal_main jm WHERE jm.id = $table.journal_main_id)");
+        $cron['curStep']++;
+        $cron['curBlk']++;
+        $cron['msg'][] = "Completed Step 10: fyCloseCleanInvUsage.";
         dbTransactionCommit();
-        $props = dbGetPeriodInfo(getModuleCache('phreebooks', 'fy', 'period') - $cron['periodEnd']);
-        setModuleCache('phreebooks', 'fy', false, $props);
-        array_unshift($cron['taskClose'], ['mID'=>$this->moduleID, 'method'=>'fyCloseHistory', 'settings'=>['cnt'=>1]]);
-        return "Finished closing journal.";
-    } */
+    }
 
-    /**
-     * Closes the fiscal year in the database
-     * @param array $settings - operating constraints and settings
-     * @return string - HTML status to user
-     */
-/*    public function fyCloseHistory($settings=[], &$cron=[])
+    private function fyCloseCleanInvHist(&$cron=[], $cntOnly=false)
     {
-        $blockSize = 500;
-        $rowCnt    = 0;
-        $finished  = false;
-        if (!$security = validateAccess('admin', 4)) { return; }
-        if (!isset($cron['fyPBHistCnt'])) {
-            $count = dbGetValue(BIZUNO_DB_PREFIX."journal_cogs_usage", 'count(*) AS cnt', '', false);
-            $cron['fyPBHistCnt'] = ceil($count/$blockSize);
-        }
-        $totalBlock = $cron['fyPBHistCnt'];
-        $thisBlock  = ceil($settings['cnt']/$blockSize);
-        $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_cogs_usage', '', 'id', ['id', 'journal_main_id'], "{$settings['cnt']}, $blockSize");
-        if (!sizeof($result)) { $finished = true; }
-        else                  { $settings['cnt'] += $blockSize;}
-        $toClose = [];
-        foreach ($result as $row) {
-            $exists = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "id={$row['journal_main_id']}");
-            if (!$exists) { $toClose[] = $row['id']; }
-        }
-        if (sizeof($toClose)) {
-            msgDebug("\nDeleting journal_cogs_usage ids = ".implode(',', $toClose));
-            $rowCnt = dbDelete(BIZUNO_DB_PREFIX.'journal_cogs_usage', "id IN (".implode(',', $toClose).")");
-            $cron['msg'][] = "DB Action completed, deleted $rowCnt records from table journal_cogs_usage.";
-        }
-//if ($thisBlock > 5) { $finished = true; }
-        if (!$finished) { // more to process, re-queue
-            array_unshift($cron['taskClose'], ['mID'=>$this->moduleID, 'method'=>'fyCloseHistory', 'settings'=>['cnt'=>$settings['cnt']]]);
-            return "Finished processing block $thisBlock of $totalBlock for module $this->moduleID: processed ".sizeof($toClose)." records, deleted $rowCnt";
-        }
-        return "Finished processing COGS Usage history table";
-    } */
-
-    /**
-     * THIS ROUTINE NEEDS TO BE WRITTEN
-     * @return string - HTML status message
-     */
-/*    public function fYClosePost($settings=[], &$cron=[])
-    {
-        // run the journal validation tools
-        // need to call glRepair($layout=[]) from browser with auto close window.
-        return "Running glRepair tool to validate journal values.";
-    } */
+        msgDebug("\nEntering fyCloseCleanInvHist");
+        $cron['msg'][] = "Entering Step 11: fyCloseCleanInvHist with curBlk={$cron['curBlk']} and ttlBlk={$cron['ttlBlk']}.";
+        $table= BIZUNO_DB_PREFIX.'inventory_history';
+        if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=1; return; }
+        
+        // Let's go
+        dbTransactionStart();
+        $cron['msg'][] = "Cleaning up orphaned records from table: $table";
+        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table ih LEFT JOIN journal_main jm ON ih.ref_id = jm.id WHERE jm.id IS NULL";
+        $stmt = dbGetResult("SELECT jm.id FROM $table ih LEFT JOIN journal_main jm ON ih.ref_id = jm.id WHERE jm.id IS NULL");
+        $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
+        msgDebug("\nFinding orphaned inventory history records and fetched ".sizeof($rows)." rows.");
+        $cron['msg'][] = "Read ".sizeof($rows)." records to delete from table: $table";
+        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM journal_main jm WHERE jm.id = $table.ref_id)");
+        $cron['curStep']++;
+        $cron['curBlk']++;
+        $cron['msg'][] = "Completed Step 10: fyCloseCleanInvHist.";
+        dbTransactionCommit();
+    }
 
     /**
      * This method reposts a single journal entry

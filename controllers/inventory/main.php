@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-11-08
  * @filesource /controllers/inventory/main.php
  */
 
@@ -727,7 +727,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd('Bad Record ID!'); }
         $action= "jqBiz('#accInventory').accordion('select', 0); bizGridReload('dgInventory'); jqBiz('#divInventoryDetail').html('&nbsp;');";
-        $item  = dbGetRow(BIZUNO_DB_PREFIX."inventory", "id=$rID");
+        $item  = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
         if (!$item) { return ['content'=>['action'=>'eval','actionData'=>$action]]; }
         $sku   = clean($item['sku'], 'text');
         // Check to see if this item is part of an assembly
@@ -742,9 +742,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             }
         }
 
-        if (!empty($cnt)) { return msgAdd($this->lang['err_inv_delete_assy']); }
-        $block1= dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku='$sku'");
-        if ($sku && $block1 && in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd($this->lang['err_inv_delete_gl_entry']); }
+        if (!empty($cnt)) { return msgAdd(sprintf($this->lang['err_inv_delete_assy'], $sku)); }
+        $block1= dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "sku='".addslashes($sku)."'");
+        if ($sku && $block1 && in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd(sprintf($this->lang['err_inv_delete_gl_entry'], $sku)); }
         $data  = ['content' => ['action'=>'eval','actionData'=>$action],
             'dbAction'=> [
                 'inventory'     => "DELETE FROM ".BIZUNO_DB_PREFIX."inventory WHERE id=$rID",
@@ -766,7 +766,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         // make sure SKU is not part of an assembly
         // @TODO - if it is and the other SKU's are not in journal then let delete AND remove sku from all assembly BOMs
 
-//      if (dbGetValue(BIZUNO_DB_PREFIX."inventory_assy_list", 'id', "sku LIKE '$sku-%'")) { $cancelDelete = msgAdd($this->lang['err_inv_delete_assy']); }
         if (dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku LIKE '$sku-%'"))        { $cancelDelete = msgAdd($this->lang['err_inv_delete_gl_entry']); }
         if ($cancelDelete) { unset($layout['dbAction']); }
         else { // get all ID's for the children

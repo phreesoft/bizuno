@@ -438,7 +438,7 @@ class contactsTools
      */
     public function syncAttachments()
     {
-/*        global $io;
+        global $io;
         $verbose = clean('verbose', 'integer', 'get');
         $deleted = $repaired = 0;
         $files = $io->folderRead(getModuleCache('contacts', 'properties', 'attachPath', 'contacts'));
@@ -459,6 +459,6 @@ class contactsTools
         }
         if ($verbose) {
             msgAdd("Done! Deleted $deleted attachments and repaired $repaired links to contact records.", 'caution');
-        } */
+        }
     }
 }

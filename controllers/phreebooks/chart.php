@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-23
+ * @version    7.x Last Update: 2025-11-08
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -359,14 +359,14 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         if (!$security = validateAccess($this->secID, 4)) { return; }
         if (empty($rID) || !isset($this->chartMeta[$rID])) { return msgAdd(lang('illegal_access')); }
         // Can't delete gl account if it was used in a journal entry
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "gl_acct_id='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'journal_main')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'journal_item')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_v='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'contacts')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_c='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "gl_acct_id='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'journal_main')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'journal_item')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_v='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_c='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
         // @TODO - BOF - DEPRECATED
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
         // EOF - DEPRECATED
-        if (dbGetValue(BIZUNO_DB_PREFIX.'inventory',    'id', "gl_sales='$rID' OR gl_inv='$rID' OR gl_cogs='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], 'inventory')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'inventory',    'id', "gl_sales='$rID' OR gl_inv='$rID' OR gl_cogs='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'inventory')); }
         if ($this->chartMeta[$rID]['type']==44)                                   { return msgAdd('Sorry, you cannot delete your retained earnings account.'); }
         $maxPeriod = dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'MAX(period) as period', "", false);
         if (dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'beginning_balance', "gl_account='$rID' AND period=$maxPeriod")) { return msgAdd("The GL account cannot be deleted if the last fiscal year ending balance is not zero!"); }

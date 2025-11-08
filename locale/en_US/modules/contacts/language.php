@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-11-08
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -66,8 +66,6 @@ $lang = [
     'close_j9_desc' => 'This tool closes all Customer Quotes prior to the date specified. ',
     'close_j9_label' => 'Close all Customer Quotes Before: ',
     'close_j9_success' => 'The number of journal entries closed was: %s',
-    'sync_attach_title' => 'Remove/Repair Attachments',
-    'sync_attach_desc' => 'Clean orphaned attachments and repair attachment flag.',
     // Returns
     'returns_title' => 'Returns Manager',
     'returns_desc' => 'The Returns Manager extension provides the ability to track products returned by customers.',
