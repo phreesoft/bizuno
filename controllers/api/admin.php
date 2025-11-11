@@ -93,9 +93,7 @@ class apiAdmin extends apiCommon
         $modID = clean('modID', 'cmd', 'get');
         $meta  = dbMetaGet(0, "methods_{$this->methodDir}");
         if (empty($meta[$modID])) { return msgAdd('Bad channel ID!'); }
-// @TODO - remove after release of 7.1
-$meta[$modID]['path'] = str_replace('bizuno-core', 'vendor/phreesoft/bizuno', $meta[$modID]['path']);
-        msgDebug("\nEntering getMetehod with search pth = ".$meta[$modID]['path']."$modID.php");
+        msgDebug("\nEntering getMetehod with search path = ".$meta[$modID]['path']."$modID.php");
         bizAutoLoad($meta[$modID]['path']."$modID.php");
         $fqdn = "\\bizuno\\$modID";
         $chan = new $fqdn();

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-10
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -141,15 +141,18 @@ function bizunoUpgrade()
     }
 
     if (version_compare($dbVer, '7.3.4') < 0) {
-        // convert the references to common meta
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/bizuno/install/install.php', 'bizInstall');
-        $crnt = getModuleCache('bizuno', 'references');
-        $inst = new bizInstall();
-        $meta = [];
-        foreach ($inst->refs as $key => $value) { $meta[$key] = isset($crnt[$key]) ? $crnt[$key] : $value; }
-        $null= dbMetaGet(0, 'bizuno_refs');
-        $rID = metaIdxClean($null);
-        dbMetaSet($rID, 'bizuno_refs', $meta);
+        $exists = dbMetaGet(0, 'bizuno_refs');
+        if (empty($exists)) {
+            // convert the references to common meta
+            bizAutoLoad(BIZBOOKS_ROOT.'controllers/bizuno/install/install.php', 'bizInstall');
+            $crnt = getModuleCache('bizuno', 'references');
+            $inst = new bizInstall();
+            $meta = [];
+            foreach ($inst->refs as $key => $value) { $meta[$key] = isset($crnt[$key]) ? $crnt[$key] : $value; }
+            $null= dbMetaGet(0, 'bizuno_refs');
+            $rID = metaIdxClean($null);
+            dbMetaSet($rID, 'bizuno_refs', $meta);
+        }
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
