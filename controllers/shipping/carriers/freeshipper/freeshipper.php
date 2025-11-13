@@ -79,10 +79,10 @@ class freeshipper {
         return [
             'gl_acct_c'=> ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
             'gl_acct_v'=> ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
-            'rate' => ['label'=>$this->lang['rate'], 'position'=>'after','attr' =>['type'=>'float', 'size'=>10, 'value'=>$this->settings['rate']]],
-            'order' => ['label'=>lang('sort_order'), 'position'=>'after', 'attr'=>['type'=>'integer', 'size'=>3, 'value'=>$this->settings['order']]],
+            'rate'     => ['label'=>$this->lang['rate'], 'position'=>'after','attr' =>['type'=>'float', 'size'=>10, 'value'=>$this->settings['rate']]],
+            'order'    => ['label'=>lang('sort_order'), 'position'=>'after', 'attr'=>['type'=>'integer', 'size'=>3, 'value'=>$this->settings['order']]],
             'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'], 'position'=>'after', 'values'=>$services,'attr'=>['type'=>'select', 'size'=>15, 'multiple'=>'multiple', 'format'=>'array', 'value'=>$this->settings['service_types']]],
-            'default' => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
+            'default'  => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
     }
 
     public function settingSave()

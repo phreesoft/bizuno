@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-07
+ * @version    7.x Last Update: 2025-11-12
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -406,7 +406,7 @@ $tables = [
             'printed'       => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:Printed;order:8'],
             'attach'        => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:Attachment;order:9']],
         'keys' => 'PRIMARY KEY (id), KEY period (period), KEY journal_id (journal_id),
-            KEY post_date (post_date), KEY closed (closed), KEY contact_id_b (contact_id_b), KEY contact_id_s (contact_id_s),
+            KEY post_date (post_date), KEY closed (closed), KEY store_id (store_id), KEY contact_id_b (contact_id_b), KEY contact_id_s (contact_id_s),
             KEY invoice_num (invoice_num), KEY so_po_ref_id (so_po_ref_id)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'journal_meta' => ['module' => 'phreebooks',

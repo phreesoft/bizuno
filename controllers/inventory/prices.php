@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-11-12
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -299,7 +299,10 @@ function preSubmitPrices() {
         $cID  = clean('cID',   'integer', 'post');
         $iID  = clean('iID',   'integer', 'post');
         $newTable= !empty($cID) ? 'contacts' : (!empty($iID) ? 'inventory' : 'common');
-        if (!empty($rID) && $table<>$newTable) { // edit existing record, table may change
+        if ( empty($rID)) { // Set the proper table
+            $_POST['_table'] = $newTable;
+            $_POST['_refID'] = !empty($cID) ? $cID : (!empty($iID) ? $iID : 0);
+        } elseif (!empty($rID) && $table<>$newTable) { // edit existing record, table may change
             $meta = dbMetaGet($rID, $this->metaPrefix, $table, $refID); // get the current value
             msgDebug("\nTable change, resetting input variables from table $table to $newTable.");
             dbMetaDelete($rID, $meta['_table']);
@@ -309,19 +312,6 @@ function preSubmitPrices() {
         }
         parent::saveMeta($layout);
     }
-
-/* DEPRECATED
-    public function saveSellPkgs()
-    {
-        msgDebug("\nentering saveSellPkgs");
-        $iID = clean('rID' , 'integer','get');
-        $data= clean('data', 'json',   'get');
-        if (empty($iID)) { return ("Invalid SKU ID!"); }
-//      dbWrite(BIZUNO_DB_PREFIX.'inventory', ['price_byItem'=>json_encode($data)], 'update', "id=$iID");
-        $sku = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$iID");
-        msgLog(lang('prices').'-'.lang('save')." for SKU: $sku");
-        msgAdd("Sell package levels saved for SKU: $sku!", 'success');
-    } */
 
     public function delete(&$layout=[])
     {

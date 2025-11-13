@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-10
+ * @version    7.x Last Update: 2025-11-12
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -153,6 +153,7 @@ function bizunoUpgrade()
             $rID = metaIdxClean($null);
             dbMetaSet($rID, 'bizuno_refs', $meta);
         }
+        dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."journal_main` ADD INDEX(`store_id`)");
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories

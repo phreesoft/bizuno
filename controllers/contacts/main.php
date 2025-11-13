@@ -488,9 +488,9 @@ class contactsMain
         $action= clean('data', 'text', 'get');
         if (!$rID) { return msgAdd('The record was not deleted, the proper id was not passed!'); }
         // error check, no delete if a journal entry exists
-        $block = dbGetValue(BIZUNO_DB_PREFIX."journal_main", 'id', "contact_id_b='$rID' OR contact_id_s='$rID' OR store_id='$rID'");
+        $block = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "contact_id_b='$rID' OR contact_id_s='$rID' OR store_id='$rID'");
         if ($block) { return msgAdd($this->lang['err_contacts_delete']); }
-        $short_name = dbGetValue(BIZUNO_DB_PREFIX."contacts", 'short_name', "id='$rID'");
+        $short_name = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'short_name', "id='$rID'");
         $actionData = "bizGridReload('dgContacts'); accordionEdit('accContacts','dgContacts','divContactsDetail','".jsLang('details')."','$this->moduleID/$this->pageID/edit&type=$this->type', 0);";
         if (!empty($action)) {
             $parts = explode(':', $action);

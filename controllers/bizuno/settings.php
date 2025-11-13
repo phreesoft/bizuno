@@ -130,6 +130,7 @@ class bizunoSettings
      */
     public function adminMethods(&$layout=[])
     {
+        msgTrap();
         $module = clean('module', 'db_field', 'get');
         $folder = clean('folder', 'db_field', 'get');
         msgDebug("\nEntering adminMethods for module $module, folder $folder");
@@ -141,6 +142,7 @@ class bizunoSettings
         $html  = '<table style="border-collapse:collapse;width:100%">'."\n".' <thead class="panel-header">'."\n";
         $html .= '  <tr><th>&nbsp;</th><th>'.lang('method').'</th><th>'.lang('description').'</th><th>'.lang('action')."</th></tr>\n </thead>\n <tbody>\n";
         $props = getMetaMethod($folder);
+        msgDebug("\nRead meta from folder $folder: ".print_r($props, true));
         foreach ($props as $method => $settings) {
             $fqcn = "\\bizuno\\$method";
             bizAutoLoad("{$settings['path']}$method.php", $fqcn);
@@ -221,6 +223,7 @@ class bizunoSettings
      */
     public function methodSettingsSave(&$layout=[])
     {
+        msgTrap();
         if (!$security=validateAccess('admin', 3)) { return; }
         $subDir   = clean('type',  'text', 'get');
         $method   = clean('method','text', 'get');

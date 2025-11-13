@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
+bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 /**
  * Main journal class wrapper, calls appropriate journal class as needed

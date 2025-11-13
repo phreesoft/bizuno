@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-06
+ * @version    7.x Last Update: 2025-11-12
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -390,7 +390,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
     private function setHistoryInventory($mID, $journal, &$cron)
     {
         $metaKey= $journal==6? 'inventory_purchases' : 'inventory_sales';
-        $rows   = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$mID AND gl_type='itm'", '', ['qty', 'sku', 'credit_amount', 'debit_amount']);
+        $rows   = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$mID AND gl_type='itm'", '', ['qty', 'sku', 'credit_amount', 'debit_amount', 'post_date']);
         foreach ($rows as $row) {
 //          msgDebug("\nFetched row = ".print_r($row, true));
             $inv   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'inventory_type'], "sku='".addslashes($row['sku'])."'");

@@ -178,6 +178,12 @@ class apiAdmin extends apiCommon
         $chan->invRefreshNext($layout);
     }
 
+    public function OAuthCallBack(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $chan->OAuthCallBack($layout);
+    }
+
     public function ordersGo(&$layout=[])
     {
         $chan = $this->getMethod();
