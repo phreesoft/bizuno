@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-24
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -37,7 +37,7 @@ class qualityTickets extends mgrJournal
     protected $metaPrefix= 'qa_ticket';
     protected $nextRefIdx= 'next_ticket_num';
     protected $journalID = 30;
-    private   $attachPath;
+    public    $attachPath;
 
     function __construct()
     {
@@ -160,9 +160,20 @@ class qualityTickets extends mgrJournal
     /******************************** Journal Manager ********************************/
     public function manager(&$layout=[])
     {
+        msgTrap();
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::managerMain($layout, $security, ['type'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('ticket'))]);
         $layout['jsHead']['vars'] = "var bizQualStatuses = ".json_encode($this->qual_status).";";
+        $qSettings = getModuleCache($this->moduleID, 'settings');
+        if (!empty($qSettings['general']['proc_inv_mgr'])) {
+            $layout['datagrid']['dgTickets']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/admin/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
+        }
+        if (!empty($qSettings['general']['stnd_inv_mgr'])) {
+            $layout['datagrid']['dgTickets']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/admin/renderQA&qaIdx=stnd_qa_ticket', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
+        }
+        if (!empty($qSettings['general']['inst_inv_mgr'])) {
+            $layout['datagrid']['dgTickets']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/admin/renderQA&qaIdx=inst_qa_ticket', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
+        }
     }
     public function managerRows(&$layout=[])
     {

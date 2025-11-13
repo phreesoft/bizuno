@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /controllers/quality/dashboards/qa_stop_work/qa_stop_work.php
  */
 
@@ -75,7 +75,7 @@ class qa_stop_work
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('export_data')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
         $filter = "journal_id=30 AND closed='0'"; // AND printed=2
         $order  = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';
-        $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','invoice_num','description','post_date']);
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','invoice_num','description','post_date','printed']);
         foreach ($result as $entry) { // build the list
             if (!in_array($entry['printed'], ['2'])) { continue; } // printed is db version of status
             $left   = viewDate($entry['post_date'])." - ".viewText($entry['description'], $opts['trim']);

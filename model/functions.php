@@ -602,7 +602,7 @@ function getMetaMethod($folder, $method='')
  * @param string #field - field within the located index
  * @return value if found, index of not
  */
-function getMetavalue($key, $index='', $field='')
+function getMetaValue($key, $index='', $field='')
 {
     msgDebug("\nEntering getMetaMethods with key = $key, index = $index and field = $field");
     if (empty($GLOBALS["BIZ_{$key}"])) { 

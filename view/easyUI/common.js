@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /view/easyUI/common.js
  */
 
@@ -967,6 +967,17 @@ function jsonAction(path, rID, jData) {
     if (typeof jData != 'undefined') remoteURL += '&data='+encodeURIComponent(jData);
     jqBiz.ajax({ type:'GET', url:remoteURL, success:function (data) { processJson(data); } });
     return false;
+}
+
+function menuAction(item) {
+    if (typeof item.action === 'undefined') { item.action = 'page'; }
+    switch (item.action) {
+        default:
+        case 'page':   hrefClick(item.route);                                   break;
+        case 'iframe': windowEdit(item.route, 'myFrame', item.text, 1000, 500); break;
+        case 'window': alert('Redirecting to a new window');                    break;
+        case 'popup':  alert('GFenerating a popup');                            break;
+    }
 }
 
 function jsonPortal(path, rID, jData) {

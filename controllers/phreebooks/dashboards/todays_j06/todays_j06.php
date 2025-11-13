@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /controllers/phreebooks/dashboards/todays_j06/todays_j06.php
  */
 
@@ -36,7 +36,8 @@ class todays_j06
     public  $secID    = 'j6_mgr';
     public  $struc;
     public  $lang     = ['title'=>'Today\'s Purchases',
-        'description'=> 'Lists todays vendor Purchases. A link to review each entry in a separate window is also provided. Settings are available for enhanced security and control.'];
+        'description'=> 'Lists todays vendor Purchases. A link to review each entry in a separate window is also provided. Settings are available for enhanced security and control.',
+        'enter_invoice_num' => 'Enter the Invoice number, the waiting flag will also be cleared.'];
     private $journalID= 6;
     
     function __construct()

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /view/easyUI/html5.php
  */
 
@@ -536,7 +536,7 @@ final class html5 {
         }
         // addOptions($props=[])
         $options= ['data'=>'menu_'.$id, 'multiple'=>'false', 'collapsed'=>!empty($meta['menuSize']) && $meta['menuSize']=='min'?'true':'false'];
-        $options['onSelect'] = !empty($prop['options']['dom']) && $prop['options']['dom']=='div' ? "function (item) { bizPanelReload('bizBody', item.route); }" : "function (item) { hrefClick(item.route); }";
+        $options['onSelect'] = !empty($prop['options']['dom']) && $prop['options']['dom']=='div' ? "function (item) { bizPanelReload('bizBody', item.route); }" : "function (item) { item.action=='' ? hrefClick(item.route) : menuAction(item); }";
         msgDebug("\nSetting options = ".print_r($options, true));
         $output.= '<div id="'.$id.'" class="easyui-sidemenu" style="width:'.$divWid.'px" data-options="'.$this->addOptions($options).'"></div>'."\n";
     }
@@ -553,17 +553,18 @@ final class html5 {
         global $bizunoLang;
         $tree = [];
         foreach ($branches as $idx => $branch) {
-            $text = jsLang(isset($bizunoLang[$idx]) ? $bizunoLang[$idx] : $branch['label']);
+            $text  = jsLang(isset($bizunoLang[$idx]) ? $bizunoLang[$idx] : $branch['label']);
             if (1==$level && !$noDash) { // add the dashboard, level 1 only
                 $branch['child'][] = ['order'=>0, 'label'=>lang('dashboard'), 'icon'=>'apps', 'size'=>'large', 'route'=>"bizuno/main/bizunoHome&menuID=$idx"];
             }
-            $event= !empty($branch['route']) ? $branch['route'] : '';
             $state = $curSec==$idx?'open':'closed';
+            $event = !empty($branch['route']) ? $branch['route'] : '';
+            $action= !empty($branch['action'])? $branch['action']: '';
             if (empty($branch['child']) || $level>1) { // limit the menu to 2 levels
-                $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'route'=>$event];
+                $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'action'=>$action, 'route'=>$event];
             } else {
                 $branch['child'] = sortOrder($branch['child']);
-                $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'route'=>$event, 'children'=>$this->sideMenuStruc($branch['child'], $curSec, $level+1)];
+                $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'action'=>$action, 'route'=>$event, 'children'=>$this->sideMenuStruc($branch['child'], $curSec, $level+1)];
             }
         }
         return $tree;

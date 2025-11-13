@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-13
  * @filesource /controllers/quality/admin.php
  */
 
@@ -39,7 +39,10 @@ class qualityAdmin
     function __construct()
     {
         $this->lang     = getLang($this->moduleID);
-        $this->settings = getModuleCache($this->moduleID, 'settings', false, false, []);
+        $this->defaults = ['manual'=>['manual_title'=>lang('quality_manual')]];
+        msgDebug("\nModule Cache = ".print_r(getModuleCache($this->moduleID, 'settings'), true));
+        $this->settings = array_replace_recursive($this->defaults, getModuleCache($this->moduleID, 'settings'));
+        msgDebug("\nAfter replace = ".print_r($this->settings, true));
         $this->structure= [
             'attachPath'=> ['audits'=>'data/quality/audits/', 'correctives'=>'data/quality/tickets/', 'training'=>'data/quality/objectives/'],
             'menuBar'   => ['child'=>[
@@ -50,21 +53,14 @@ class qualityAdmin
                     'qa_train' => ['order'=>80,'label'=>sprintf(lang('tbd_manager'), lang('training')),  'icon'=>'mimePpt','route'=>"$this->moduleID/training/manager"],
                     'rpt_qa'   => ['order'=>99,'label'=>('reports'),                                     'icon'=>'mimeDoc','route'=>"phreeform/main/manager&gID=qa"]]]]],
             'hooks'     => [
-                'administrate'=>['roles'      =>['edit'       =>['order'=>70,'method'=>'rolesEdit'], 'save'=>['order'=>70,'method'=>'rolesSave']]],
-                'inventory'   =>['build'      =>['manager'    =>['order'=>80,'method'=>'invBld']]],
-                'inventory'   =>['main'       =>['manager'    =>['order'=>80,'method'=>'invMgr']]],
-                'phreebooks'  =>['fulfillment'=>['fulfillEdit'=>['order'=>80,'method'=>'pbRcv']]],
-                'phreebooks'  =>['main'       =>['manager'    =>['order'=>80,'method'=>'pbMgr']]],
-                'quality'     =>['tickets'    =>['manager'    =>['order'=>80,'method'=>'qaMgr']]],
-                'shipping'    =>['manager'    =>['manager'    =>['order'=>80,'method'=>'shipMgr']]]],
-//            'lang'      => [
-//                'next_qaobj_num'   => $this->lang['cor_mgr'].' - '.$this->lang['ca_num'],
-//                'next_ticket_num'  => $this->lang['obj_mgr'].' - '.$this->lang['pa_num'],
-//                'next_audit_num'   => $this->lang['aud_mgr'].' - '.$this->lang['task_num'],
-//                'next_training_num'=> $this->lang['training_title'].' - '.$this->lang['task_num']],
+                'administrate'=>['roles'  =>['edit'   =>['order'=>70,'method'=>'rolesEdit'],'save'       =>['order'=>70,'method'=>'rolesSave']]],
+                'inventory'   =>['build'  =>['manager'=>['order'=>80,'method'=>'invBld']],  'main'       =>['manager'=>['order'=>80,'method'=>'invMgr']]],
+                'phreebooks'  =>['main'   =>['manager'=>['order'=>80,'method'=>'pbMgr']],   'fulfillment'=>['fulfillEdit'=>['order'=>80,'method'=>'pbRcv']]],
+                'quality'     =>['tickets'=>['manager'=>['order'=>80,'method'=>'qaMgr']]],
+                'shipping'    =>['manager'=>['manager'=>['order'=>80,'method'=>'shipMgr']]]],
             ];
         if (!empty($this->settings['manual']['manual_link'])) {
-            $this->structure['menuBar']['child']['quality']['child']['QualManual'] = ['order'=>5,'label'=>lang('quality_manual'),'required'=>true,'icon'=>'quality','events'=>['onClick'=>"winHref('{$this->settings['manual']['manual_link']}');"]];
+            $this->structure['menuBar']['child']['quality']['child']['QualManual'] = ['order'=>5,'label'=>lang('quality_manual'),'required'=>true,'icon'=>'quality','action'=>'iframe','route'=>"$this->moduleID/$this->pageID/renderQA&qaIdx=qa_manual",'title'=>lang('quality_manual')];
         }
     }
 
@@ -75,30 +71,30 @@ class qualityAdmin
     public function settingsStructure()
     {
         $fields = [
-            'proc_sales'    => ['label'=>$this->lang['proc_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_sales'    => ['label'=>$this->lang['stnd_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_sales'    => ['label'=>$this->lang['inst_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'proc_inv_mgr'  => ['label'=>$this->lang['proc_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_inv_mgr'  => ['label'=>$this->lang['stnd_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_inv_mgr'  => ['label'=>$this->lang['inst_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'proc_receiving'=> ['label'=>$this->lang['proc_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_receiving'=> ['label'=>$this->lang['stnd_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_receiving'=> ['label'=>$this->lang['inst_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'proc_woProd'   => ['label'=>$this->lang['proc_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_woProd'   => ['label'=>$this->lang['stnd_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_woProd'   => ['label'=>$this->lang['inst_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
-            'proc_qa_ticket'=> ['label'=>$this->lang['proc_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_qa_ticket'=> ['label'=>$this->lang['stnd_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_qa_ticket'=> ['label'=>$this->lang['inst_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
-            'proc_shipping' => ['label'=>$this->lang['proc_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']],
-            'stnd_shipping' => ['label'=>$this->lang['stnd_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']],
-            'inst_shipping' => ['label'=>$this->lang['inst_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']]];
+            'proc_sales'    => ['label'=>$this->lang['proc_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_sales']]],
+            'stnd_sales'    => ['label'=>$this->lang['stnd_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_sales']]],
+            'inst_sales'    => ['label'=>$this->lang['inst_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_sales']]],
+            'proc_inv_mgr'  => ['label'=>$this->lang['proc_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_inv_mgr']]],
+            'stnd_inv_mgr'  => ['label'=>$this->lang['stnd_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_inv_mgr']]],
+            'inst_inv_mgr'  => ['label'=>$this->lang['inst_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_inv_mgr']]],
+            'proc_receiving'=> ['label'=>$this->lang['proc_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_receiving']]],
+            'stnd_receiving'=> ['label'=>$this->lang['stnd_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_receiving']]],
+            'inst_receiving'=> ['label'=>$this->lang['inst_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_receiving']]],
+            'proc_woProd'   => ['label'=>$this->lang['proc_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_woProd']]],
+            'stnd_woProd'   => ['label'=>$this->lang['stnd_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_woProd']]],
+            'inst_woProd'   => ['label'=>$this->lang['inst_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_woProd']]],
+            'proc_qa_ticket'=> ['label'=>$this->lang['proc_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_qa_ticket']]],
+            'stnd_qa_ticket'=> ['label'=>$this->lang['stnd_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_qa_ticket']]],
+            'inst_qa_ticket'=> ['label'=>$this->lang['inst_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_qa_ticket']]],
+            'proc_shipping' => ['label'=>$this->lang['proc_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_shipping']]],
+            'stnd_shipping' => ['label'=>$this->lang['stnd_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_shipping']]],
+            'inst_shipping' => ['label'=>$this->lang['inst_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_shipping']]]];
         $data = [
             'manual' => ['order'=>20,'label'=>lang('quality_manual'),'fields'=>[
-                'manual_title'=> ['label'=>$this->lang['manual_title'],'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>lang('quality_manual')]],
-                'manual_link' => ['label'=>$this->lang['manual_link'], 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']]]],
+                'manual_title'=> ['label'=>$this->lang['manual_title'],'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_title']]],
+                'manual_link' => ['label'=>$this->lang['manual_link'], 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_link']]]]],
             'general'=> ['order'=>30,'label'=>lang('general'),'fields'=>$fields]];
-        settingsFill($data, $this->moduleID);
+//        settingsFill($data, $this->moduleID);
         return $data;
     }
 
@@ -127,11 +123,14 @@ class qualityAdmin
     public function renderQA(&$layout=[])
     {
         $qaIdx = clean('qaIdx', 'cmd', 'get');
-        $fields= $this->settingsStructure()['general']['fields'];
-        if (!array_key_exists($qaIdx, $fields)) {
-            return msgAdd("The document you are looking for cannot be found", 'caution');
+        if ('qa_manual'==$qaIdx) {
+            $link = $this->settingsStructure()['manual']['fields']['manual_link']['attr']['value'];
+        } else {
+            $fields= $this->settingsStructure()['general']['fields'];
+            if (!array_key_exists($qaIdx, $fields)) { return msgAdd("The document you are looking for cannot be found", 'caution'); }
+            $link = $fields[$qaIdx]['attr']['value'];
         }
-        $html = '<iframe src="'.$fields[$qaIdx]['attr']['value'].'" width="600" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>';
+        $html = '<iframe src="'.$link.'" width="1000" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>';
         $data = ['type'=>'divHTML','title'=>'Document','attr'=>['id'=>'qaDocs'],
             'divs'=>['iframe'=>['order'=>50,'type'=>'html','html'=>$html]]];
         $layout = array_replace_recursive($layout, $data);
@@ -140,73 +139,73 @@ class qualityAdmin
     public function invBld(&$layout=[])
     {
         if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['dgBuild']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_woProd', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgBuild']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_woProd', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['dgBuild']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_woProd', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgBuild']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_woProd', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['dgBuild']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_woProd', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgBuild']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_woProd', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function invMgr(&$layout=[])
     {
         if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_inv_mgr', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_inv_mgr', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_inv_mgr', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_inv_mgr', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_inv_mgr', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_inv_mgr', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function pbRcv(&$layout=[])
     {
         if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_receiving', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_receiving', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_receiving', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_receiving', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_receiving', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_receiving', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function pbMgr(&$layout=[])
     {
         if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_sales', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_sales', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_sales', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_sales', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_sales', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+            $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_sales', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function qaMgr(&$layout=[])
     {
         if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['dgTicket']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgTickets']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['dgTicket']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_qa_ticket', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgTickets']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_qa_ticket', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
         if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['dgTicket']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_qa_ticket, 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+            $layout['datagrid']['dgTickets']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_qa_ticket, 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function shipMgr(&$layout=[])
     {
-        if (!empty($this->settings['general']['proc_inv_mgr'])) {
-            $layout['datagrid']['dgShipping']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_shipping', 'qaDoc', '{$this->lang['proc_inventory']}', 600, 500);"]];
+        if (!empty($this->settings['general']['proc_shipping'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_shipping', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
-            $layout['datagrid']['dgShipping']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_shipping', 'qaDoc', '{$this->lang['stnd_inventory']}', 600, 500);"]];
+        if (!empty($this->settings['general']['stnd_shipping'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_shipping', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['inst_inv_mgr'])) {
-            $layout['datagrid']['dgShipping']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_shipping', 'qaDoc', '{$this->lang['inst_inventory']}', 600, 500);"]];
+        if (!empty($this->settings['general']['inst_shipping'])) {
+            $layout['datagrid']['dgShipping']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_shipping', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     /**
@@ -255,6 +254,7 @@ class qualityAdmin
      */
     public function adminHome(&$layout=[])
     {
+        msgTrap();
         if (!$security = validateAccess('admin', 1)) { return; }
         $data = ['tabs'=>['tabAdmin'=>['divs'=>[
             'tabTrain' => ['order'=>20,'label'=>lang('tasks_training'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminTraining/manager'"]],
@@ -267,6 +267,8 @@ class qualityAdmin
      */
     public function adminSave()
     {
+        msgTrap();
+        if (!$security = validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
 }
