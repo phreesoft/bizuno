@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
+ * @version    7.x Last Update: 2025-11-14
  * @filesource /controllers/quality/admin.php
  */
 
@@ -138,13 +138,13 @@ class qualityAdmin
 
     public function invBld(&$layout=[])
     {
-        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+        if (!empty($this->settings['general']['proc_woProd'])) {
             $layout['datagrid']['dgBuild']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_woProd', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+        if (!empty($this->settings['general']['stnd_woProd'])) {
             $layout['datagrid']['dgBuild']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_woProd', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+        if (!empty($this->settings['general']['inst_woProd'])) {
             $layout['datagrid']['dgBuild']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_woProd', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
@@ -162,37 +162,37 @@ class qualityAdmin
     }
     public function pbRcv(&$layout=[])
     {
-        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+        if (!empty($this->settings['general']['proc_receiving'])) {
             $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_receiving', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+        if (!empty($this->settings['general']['stnd_receiving'])) {
             $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_receiving', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+        if (!empty($this->settings['general']['inst_receiving'])) {
             $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_receiving', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function pbMgr(&$layout=[])
     {
-        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+        if (!empty($this->settings['general']['proc_sales'])) {
             $layout['datagrid']['manager']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_sales', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+        if (!empty($this->settings['general']['stnd_sales'])) {
             $layout['datagrid']['manager']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_sales', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+        if (!empty($this->settings['general']['inst_sales'])) {
             $layout['datagrid']['manager']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_sales', 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }
     public function qaMgr(&$layout=[])
     {
-        if (!empty($this->settings['general']['proc_inv_mgr'])) {
+        if (!empty($this->settings['general']['proc_qa_ticket'])) {
             $layout['datagrid']['dgTickets']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '".lang('processes')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['stnd_inv_mgr'])) {
+        if (!empty($this->settings['general']['stnd_qa_ticket'])) {
             $layout['datagrid']['dgTickets']['source']['actions']['qaStnd']= ['order'=>96,'icon'=>'mimeTxt','label'=>lang('qa_standards'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=stnd_qa_ticket', 'qaDoc', '".lang('standards')."', 1000, 500);"]];
         }
-        if (!empty($this->settings['general']['inst_inv_mgr'])) {
+        if (!empty($this->settings['general']['inst_qa_ticket'])) {
             $layout['datagrid']['dgTickets']['source']['actions']['qaInst']= ['order'=>97,'icon'=>'mimeDoc','label'=>lang('qa_instructions'),'events'=>['onClick'=>"windowEdit('$this->moduleID/$this->pageID/renderQA&qaIdx=inst_qa_ticket, 'qaDoc', '".lang('instructions')."', 1000, 500);"]];
         }
     }

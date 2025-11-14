@@ -1270,7 +1270,7 @@ function bizRoundCurrency(value)
 }
 
 /**
- * Rounds a number to the proper number of decimal places for currency values
+ * Rounds a number to the proper number of decimal places for number values
  * @returns float
  */
 function bizRoundNumber(value, extend)

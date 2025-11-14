@@ -161,9 +161,19 @@ class apiAdmin extends apiCommon
         $chan = $this->getMethod();
         $security = getUserCache('role', 'security');
         $security['prices_c'] = 1;
-        $security['j12_mgr'] = 1;
+        $security['inv_mgr'] = 1;
         setUserCache('role', 'security', $security);
         $chan->inventoryGo($layout);
+    }
+
+    public function inventoryNew(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $security = getUserCache('role', 'security');
+        $security['prices_c'] = 1;
+        $security['inv_mgr'] = 1;
+        setUserCache('role', 'security', $security);
+        $chan->inventoryNew($layout);
     }
 
     public function invRefresh(&$layout=[])
