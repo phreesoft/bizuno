@@ -1,6 +1,6 @@
 <?php
 /*
- * PhreeSoft Client Hosting - Bizuno Config file
+ * Bizuno Config file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-06
+ * @version    7.x Last Update: 2025-11-16
  * @filesource /bizunoCFG.php
  */
 
@@ -83,3 +83,16 @@ define('BIZTHEMES_EASYUI', ['auto', // Auto Detect, chooses either Bizuno theme 
     'metro', 'metro-blue', 'metro-gray', 'metro-green', 'metro-orange', 'metro-red', // Metro themes
     'ui-cupertino', 'ui-dark-hive', 'ui-pepper-grinder', 'ui-sunny']); // jQuery UI themes 
 
+// Fetch the Bizuno library classes and functions
+require ( BIZBOOKS_ROOT . 'model/functions.php' ); // Core functions, needs to be included first
+require ( BIZBOOKS_ROOT . 'locale/cleaner.php' );
+require ( BIZBOOKS_ROOT . 'locale/currency.php' );
+require ( BIZBOOKS_ROOT . 'model/db.php' );
+require ( BIZBOOKS_ROOT . 'model/encrypter.php' );
+require ( BIZBOOKS_ROOT . 'model/io.php' );
+require ( BIZBOOKS_ROOT . 'model/manager.php' );
+require ( BIZBOOKS_ROOT . 'model/msg.php' );
+require ( BIZBOOKS_ROOT . 'model/mail.php' );
+require ( BIZBOOKS_ROOT . 'view/main.php' );
+require ( BIZBOOKS_ROOT . 'view/easyUI/html5.php' );
+require ( BIZUNO_ASSETS . 'autoload.php' ); // Load the Bizuno thrid party libraries

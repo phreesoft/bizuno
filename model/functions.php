@@ -50,7 +50,6 @@ function bizAutoLoadMap($path='')
     if (empty($path)) { return BIZBOOKS_ROOT; }
     $max = 1;
     if (strpos($path, 'BIZBOOKS_ROOT/')===0)     { return str_replace('BIZBOOKS_ROOT/',    BIZBOOKS_ROOT,    $path, $max); }
-    if (strpos($path, 'BIZUNO_PATH/')  ===0)     { return str_replace('BIZUNO_PATH/',      BIZUNO_PATH,      $path, $max); }
     if (strpos($path, 'BIZUNO_DATA/')  ===0)     { return str_replace('BIZUNO_DATA/',      BIZUNO_DATA,      $path, $max); }
     if (strpos($path, 'BIZBOOKS_URL_ROOT/')===0) { return str_replace('BIZBOOKS_URL_ROOT/',BIZBOOKS_URL_ROOT,$path, $max); }
     if (strpos($path, 'BIZBOOKS_URL_FS/')  ===0) { return str_replace('BIZBOOKS_URL_FS/',  BIZBOOKS_URL_FS,  $path, $max); }
