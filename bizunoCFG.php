@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-16
+ * @version    7.x Last Update: 2025-11-18
  * @filesource /bizunoCFG.php
  */
 
@@ -32,10 +32,10 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.3'); // Pull from file 
 
 // URL paths
-if (!defined('BIZUNO_HOME')) { define('BIZUNO_HOME', strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); } // Full URL path to Bizuno Home
-define('BIZUNO_AJAX',       substr(BIZUNO_SRVR, 0, strlen(BIZUNO_SRVR)-1).'?ajax=1'); // for non-html requests
-define('BIZBOOKS_URL_ROOT', BIZUNO_SRVR); // full url to Bizuno root folder
-define('BIZBOOKS_URL_FS',   BIZBOOKS_URL_ROOT.'?bizRt=portal/api/fs&src='); // full url to Bizuno portal file system access script
+if (!defined('BIZUNO_HOME'))      { define('BIZUNO_HOME', strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); } // Full URL path to Bizuno Home
+if (!defined('BIZUNO_AJAX'))      { define('BIZUNO_AJAX', substr(BIZUNO_SRVR, 0, strlen(BIZUNO_SRVR)-1).'?ajax=1'); } // for non-html requests
+if (!defined('BIZBOOKS_URL_ROOT')){ define('BIZBOOKS_URL_ROOT', BIZUNO_SRVR); } // full url to Bizuno root folder
+if (!defined('BIZBOOKS_URL_FS'))  { define('BIZBOOKS_URL_FS',   BIZBOOKS_URL_ROOT.'?bizRt=portal/api/fs&src='); } // full url to Bizuno portal file system access script
 // File system paths
 define('BIZBOOKS_ROOT',     BIZUNO_REPO); // file system path to bizuno root index file
 // URLs to PhreeSoft Images
@@ -84,15 +84,17 @@ define('BIZTHEMES_EASYUI', ['auto', // Auto Detect, chooses either Bizuno theme 
     'ui-cupertino', 'ui-dark-hive', 'ui-pepper-grinder', 'ui-sunny']); // jQuery UI themes 
 
 // Fetch the Bizuno library classes and functions
-require ( BIZBOOKS_ROOT . 'model/functions.php' ); // Core functions, needs to be included first
-require ( BIZBOOKS_ROOT . 'locale/cleaner.php' );
-require ( BIZBOOKS_ROOT . 'locale/currency.php' );
-require ( BIZBOOKS_ROOT . 'model/db.php' );
-require ( BIZBOOKS_ROOT . 'model/encrypter.php' );
-require ( BIZBOOKS_ROOT . 'model/io.php' );
-require ( BIZBOOKS_ROOT . 'model/manager.php' );
-require ( BIZBOOKS_ROOT . 'model/msg.php' );
-require ( BIZBOOKS_ROOT . 'model/mail.php' );
-require ( BIZBOOKS_ROOT . 'view/main.php' );
-require ( BIZBOOKS_ROOT . 'view/easyUI/html5.php' );
-require ( BIZUNO_ASSETS . 'autoload.php' ); // Load the Bizuno thrid party libraries
+require_once ( BIZBOOKS_ROOT . 'model/functions.php' ); // Core functions, needs to be included first
+require_once ( BIZBOOKS_ROOT . 'locale/cleaner.php' );
+require_once ( BIZBOOKS_ROOT . 'locale/currency.php' );
+require_once ( BIZBOOKS_ROOT . 'model/db.php' );
+require_once ( BIZBOOKS_ROOT . 'model/encrypter.php' );
+require_once ( BIZBOOKS_ROOT . 'model/io.php' );
+require_once ( BIZBOOKS_ROOT . 'model/manager.php' );
+require_once ( BIZBOOKS_ROOT . 'model/msg.php' );
+require_once ( BIZBOOKS_ROOT . 'model/mail.php' );
+require_once ( BIZBOOKS_ROOT . 'view/main.php' );
+require_once ( BIZBOOKS_ROOT . 'view/easyUI/html5.php' );
+
+// @TODO - This needs to be present for hosted but not for WordPRess, move to portal
+// require ( BIZUNO_ASSETS . 'autoload.php' ); // Load the Bizuno thrid party libraries

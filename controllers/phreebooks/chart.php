@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-19
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -450,7 +450,8 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         msgDebug("\nTrying to load chart: $chart");
         if     (file_exists(BIZBOOKS_ROOT."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZBOOKS_ROOT."locale/en_US/modules/phreebooks/charts/$chart"; }
         else { return msgAdd('Bad path to chart!', 'trap'); }
-        if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id')) { return msgAdd(lang('coa_import_blocked')); }
+        unset($GLOBALS['BIZUNO_TABLES']); // need to reset this as most likely the tables were just added.
+        if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || !empty(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))) { return msgAdd($this->lang['coa_import_blocked']); }
         $accounts= $this->prepData($path);
         if (empty($accounts)) { return msgAdd('Invalid chart of accounts. Is the CSV properly formed?'); }
         $output = [];

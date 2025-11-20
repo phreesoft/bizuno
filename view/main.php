@@ -206,7 +206,6 @@ final class view
         $data['head']['cssIcon']     = ['order'=>42,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/icon.css" />'];
         $data['head']['cssStyle']    = ['order'=>44,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/easyUI/stylesheet.css&ver='.MODULE_BIZUNO_VERSION.'" />'];
         $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/viewCSS&icons='.$icons.'" />'];
-//      $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_AJAX    .'&bizRt=api/admin/viewCSS&icons='.$icons.'" />'];
         $data['head']['cssMobile']   = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/mobile.css" />'];
         $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiCSS" />']; // combines all of the easyUI extension css
         // JavaScript Links 
