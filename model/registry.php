@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /model/registry.php
  */
 
@@ -57,7 +57,6 @@ final class bizRegistry
         $this->initLang();
         $bizunoMod = $this->initSettings();
         foreach ($this->validMods as $module => $path) { $this->initModule($module, $path); }
-        if (!$this->initUser($usrEmail, $bizID)) { return; }
         $this->setRoleMenus();
         $this->initBizuno();
         $this->initPayment();
@@ -181,19 +180,6 @@ unset($bizunoMod[$module]['dashboards']);
         $iso = getUserCache('profile', 'language');
         msgDebug("\nin initLangCache, writing lang file to iso = $iso");
         if (!empty($iso)) { $io->fileWrite(json_encode($bizunoLang), "cache/lang_{$iso}.json", false, false, true); }
-    }
-
-    /**
-     * Initializes user registry
-     * @param string $usrEmail
-     * @param integer $bizID
-     * @return boolean
-     */
-    private function initUser($usrEmail, $bizID)
-    {
-        global $portal;
-        if (method_exists($portal, 'initUser')) { return $portal->initUser($usrEmail, $bizID); }
-        return true;
     }
 
     /**

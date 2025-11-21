@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-06
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -112,7 +112,7 @@ class phreebooksRestfulTax
      */
     public function getTaxRate(&$layout=[])
     {
-        global $portal;
+        global $io;
         $layout = array_replace_recursive($layout, ['type'=>'raw','content'=>0]);
         if (!validateAccess('j9_mgr', 2)) { return; }
         $salesTax = 0;
@@ -128,8 +128,8 @@ class phreebooksRestfulTax
         if (!$isTaxable) { return; }
         if (empty($props['postal_code'])) { return msgAdd("Missing or invalid postal code provided."); }
         
-        $portal->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $result = $portal->restRequest('get', $this->server, 'wp-json/phreesoft-api/v1/sales_tax', $props);
+        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $result = $io->restRequest('get', $this->server, 'wp-json/phreesoft-api/v1/sales_tax', $props);
         if (!empty($result['sales_tax'])) { $salesTax = $result['sales_tax']; }
         msgDebug("\nExiting getTaxRate with layout = ".print_r($layout, true));
         $layout['content'] = $salesTax;

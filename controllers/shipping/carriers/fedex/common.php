@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-05
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -216,7 +216,7 @@ Replace the test URL and test credentials with the production URL and production
      */
     protected function queryREST($path, $data=[], $method='post')
     {
-        global $portal;
+        global $io;
         msgDebug("\nEntering queryREST with path = $path and sizeof data = ".sizeof($data));
         if (empty($this->settings['token']) || $this->settings['token_date'] < time()-10) { // get a new token for today
             $this->settings['token'] = $this->getTokenREST();
@@ -227,7 +227,7 @@ Replace the test URL and test credentials with the production URL and production
         $response= false;
         msgDebug("\nSending request to url $url and data:".print_r($data, true));
         for ($i=0; $i<$this->retries; $i++) {
-            $response= json_decode($portal->cURL($url, json_encode($data), $method, $opts), true);
+            $response= json_decode($io->cURL($url, json_encode($data), $method, $opts), true);
             msgDebug("\nLast response is: ".print_r($response, true));
             if (!empty($response)) { break; }
         }
@@ -242,11 +242,11 @@ Replace the test URL and test credentials with the production URL and production
      */
     private function getTokenREST()
     {
-        global $portal;
+        global $io;
         $urlOauth= "$this->urlREST/oauth/token";
         $opts    = ['headers'=>['Content-Type'=>'application/x-www-form-urlencoded']];
         $data    = "grant_type=client_credentials&client_id={$this->settings['rest_api_key']}&client_secret={$this->settings['rest_secret']}";
-        $response= json_decode($portal->cURL($urlOauth, $data, 'post', $opts), true);
+        $response= json_decode($io->cURL($urlOauth, $data, 'post', $opts), true);
         msgDebug("\nReceived back from url $urlOauth with results: ".print_r($response, true));
         if (!empty($response['errors'])) { return msgAdd("FedEx Authentication Error: ".print_r($response['errors'], true)); }
         $this->tokenUpdate($response);

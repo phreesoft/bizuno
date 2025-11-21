@@ -1,20 +1,36 @@
 <?php
-/*
- * PhreeSoft ISP Clients - Portal Controller
+/**
+ * Bizuno Portal entry point
  *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
+ *
+ * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
- * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-11-16
- * @filesource /lib/controller.php
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-11-21
+ * @filesource /portal/controller.php
  */
 
 namespace bizuno;
 
 // Load portal specific classes
-require('lib/model.php'); 
-require('lib/api.php');
-require('lib/view.php');
+require(BIZUNO_FS_LIBRARY . 'portal/model.php'); 
+require(BIZUNO_FS_LIBRARY . 'portal/api.php');
+require(BIZUNO_FS_LIBRARY . 'portal/view.php');
 
 class portalCtl
 {
@@ -28,11 +44,10 @@ class portalCtl
  
     function __construct()
     {
-        global $msgStack, $io, $cleaner, $portal;
+        global $msgStack, $io, $cleaner;
         $msgStack= new messageStack();
         $io      = new io();
         $cleaner = new cleaner();
-        $portal  = new portal();
 
 //bizClrCookie('bizunoUser');
 //bizClrCookie('bizunoSession');
@@ -50,6 +65,7 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
+msgTrap();
         new view($this->layout);
     }
     private function setDOM()
@@ -71,9 +87,9 @@ class portalCtl
         $db   = new db($creds);
         if (!$db->connected) { msgDebug("\nDB not connected, returning guest"); return 'guest'; }
         if ('portal'==$this->route['module'] && 'api'==$this->route['page'])         { msgDebug("\nAPI Request, returning api");         return 'api'; }
-        if ($this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
-        if ($this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'common_meta'))  { msgDebug("\nNormal operation, returning auth");   return 'auth'; }
-        if ($this->userValidated && !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nNeed to install, returning install"); return 'install'; }
+        if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
+        if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'common_meta'))  { msgDebug("\nNormal operation, returning auth");   return 'auth'; }
+        if (!$this->userValidated && !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nNeed to install, returning install"); return 'install'; }
         msgDebug("\nFall through, returning guest.");
         return 'guest';
     }
@@ -83,8 +99,8 @@ class portalCtl
      */
     private function goGuest()
     {
-        $portal = new portalView();
-        $portal->login($this->layout);
+        $view = new portalView();
+        $view->login($this->layout);
     }
     /**
      * Handles requests when user has not been authenticated
@@ -92,11 +108,11 @@ class portalCtl
      */
     private function goAPI()
     {
-        $portal = new portalApi();
+        $view = new portalApi();
         $method = $this->route['method'];
-        if (method_exists($portal, $method)) {
+        if (method_exists($view, $method)) {
             msgDebug("\nProcessing API request {$method}");
-            $portal->$method($this->layout);
+            $view->$method($this->layout);
             return;
         }
         msgDebug("\nAPI request {$method} WAS NOT FOUND!");
@@ -105,13 +121,13 @@ class portalCtl
     }
     private function goInstall()
     {
-        $portal = new portalView();
-        $portal->install($this->layout);
+        $view = new portalView();
+        $view->install($this->layout);
     }
     private function goMigrate()
     {
-        $portal = new portalView();
-        $portal->migrate($this->layout);
+        $view = new portalView();
+        $view->migrate($this->layout);
     }
     private function goAuth()
     {
@@ -120,12 +136,11 @@ class portalCtl
     }
     private function getCodex()
     {
-        global $mixer, $portal, $bizunoUser;
+        global $mixer, $bizunoUser;
         bizAutoLoad(BIZUNO_FS_LIBRARY.'locale/currency.php','currency');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'model/encrypter.php','encryption');
         $this->loadLanguage(); // Just load the minimal language for the portal operation, more can be loaded as needed
-        $mixer   = new encryption();
-        $portal  = new portal();
+        $mixer     = new encryption();
         $bizunoUser= $this->setGuestCache();
         $this->validateCookie(); // Validates sign in status
         $this->initUserCache();

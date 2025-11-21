@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /model/msg.php
  */
 
@@ -43,7 +43,6 @@ final class messageStack
         if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)); }
         $date = function_exists('biz_date') ? biz_date('Y-m-d H:i:s') : date('Y-m-d H:i:s');
         $version = defined('MODULE_BIZUNO_VERSION') ? MODULE_BIZUNO_VERSION : 'unknown';
-        $portal  = explode('.', $_SERVER['SERVER_ADDR']);
         $this->trace  = "Trace information for debug purposes. Bizuno release $version, ip: {$_SERVER['SERVER_ADDR']} and domain {$_SERVER['SERVER_NAME']} - generated $date\n";
         $this->trace .= "Trace Start Time: ".(int)(1000 * (microtime(true) - SCRIPT_START_TIME))." ms\n\n";
         $this->trace .= "GET Vars = " .print_r($_GET, true)."\n";

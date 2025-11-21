@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/shipping/carriers/endicia/common.php
  */
 
@@ -136,15 +136,14 @@ class endiciaCommon
 
     /**
      *
-     * @global type $portal
      * @param type $endpoint
      * @param type $data
      * @return type
      */
     protected function queryREST($endpoint, $data=[]) // , $method='post'
     {
+        global $io;
         msgDebug("\nEntering queryREST with endpoint = $endpoint");
-        global $portal;
         // get PhreeSoft API settings
         $apiUser= getModuleCache('api', 'settings', 'phreesoft_api', 'api_user');
         $apiPass= getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass');
@@ -153,7 +152,7 @@ class endiciaCommon
         $opts   = ['headers'=>['email'=>$apiUser, 'pass'=>$apiPass]];
         $content= ['psKey'  =>$this->settings['client_key'], 'endpoint'=>$endpoint, 'payload'=>$data];
         msgDebug("\nCalling Phreesoft.com with content = ".print_r($content, true));
-        $resp= json_decode($portal->cURL($this->psRequest, $content, 'post', $opts), true);
+        $resp= json_decode($io->cURL($this->psRequest, $content, 'post', $opts), true);
         if (empty($resp)) { msgAdd(sprintf(lang('err_no_communication'), $this->code), 'trap'); }
         if (!empty($resp['message'])) { 
             msgDebug("\nMessage received back from PhreeSoft servers: ".print_r($resp['message'], true));

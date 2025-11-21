@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/bizuno/dashboards/ps_news/ps_news.php
  */
 
@@ -47,8 +47,8 @@ class ps_news
     public function render(&$layout=[])
     {
 /*
-        global $portal;
-        $strXML = $portal->cURL("https://www.phreesoft.com/feed/");
+        global $io;
+        $strXML = $io->cURL("https://www.phreesoft.com/feed/");
         $news   = parseXMLstring($strXML);
         msgDebug("\nNews object = ".print_r($news, true));
         $html   = '';

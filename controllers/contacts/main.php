@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/contacts/main.php
  */
 
@@ -221,10 +221,8 @@ class contactsMain
      */
     public function edit(&$layout=[])
     {
-        global $portal;
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $rID = clean('rID', 'integer', 'get');
-//        if (empty($rID) && method_exists($portal, 'contactTypeUser') && in_array($this->type, ['u'])) { return $portal->contactTypeUser($layout); }
         $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts', $this->type);
         // merge data with structure
         $cData = !empty($rID) ? dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$rID") : $this->contact;

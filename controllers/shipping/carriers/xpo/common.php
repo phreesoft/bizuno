@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/shipping/carriers/xpo/common.php
  *
  * Docs website: http://www.xpo.com/content/xml
@@ -81,7 +81,7 @@ class xpoCommon
     // ***************************************************************************************************************
     protected function getXPO($url='', $data='', $type='auto')
     {
-        global $portal;
+        global $io;
         msgDebug("\nEntering getXPO with settings token = {$this->settings['token']} and token_date = {$this->settings['token_date']}");
         if (empty($this->settings['token']) || $this->settings['token_date'] < time()) { // get a new token for today
             $this->settings['token'] = $this->getToken();
@@ -102,7 +102,7 @@ class xpoCommon
                 $opts = ['headers'=>['Authorization'=>"Bearer {$this->settings['token']}", 'cache-control'=>"no-cache", 'content-type'=>"application/json"]];
                 break;
         }
-        $response= json_decode($portal->cURL($url, $data, $reqType, $opts), true);
+        $response= json_decode($io->cURL($url, $data, $reqType, $opts), true);
         if (empty($response)) { return; }
         msgDebug("\nParsed XPO response = ".print_r($response, true));
         if (!empty($response['error'])) { msgAdd("XPO Error: {$response['error']['errorCode']}: {$response['error']['message']}"); return; }
@@ -113,10 +113,10 @@ class xpoCommon
 
     private function getToken()
     {
-        global $portal;
+        global $io;
         $opts    = ['headers'=>['authorization'=>"Basic {$this->settings['authorization']}"]];
         $request = ['grant_type'=>"password", 'username'=>$this->settings['username'], 'password'=>$this->settings['password']];
-        $response= json_decode($portal->cURL('https://api.ltl.xpo.com/token', $request, 'post', $opts), true);
+        $response= json_decode($io->cURL('https://api.ltl.xpo.com/token', $request, 'post', $opts), true);
         if (!empty($response['error'])) { msgAdd("XPO Error: {$response['error']}: {$response['error_description']}"); return; }
         $this->settings['token']     = $response['access_token'];
         $this->settings['token_date']= time()+$response['expires_in'];

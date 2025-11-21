@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-06
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /model/functions.php
  */
 
@@ -55,18 +55,15 @@ function bizAutoLoadMap($path='')
     if (strpos($path, 'BIZUNO_URL_FS/')  ===0) { return str_replace('BIZUNO_URL_FS/',  BIZUNO_URL_FS,  $path, $max); }
     return $path;
 }
-/**
- * DEPRECATED - Temporary function to fix incorrectly set url's
- * @param type $path
- * @return type
- */
-function bizAutoLoadRemap($path)
+
+function loadBusinessCache()
 {
-    $max = 1;
-    if (strpos($path, BIZUNO_FS_LIBRARY)===0)   { return str_replace(BIZUNO_FS_LIBRARY,'BIZUNO_URL_PORTAL/',   $path, $max); }
-    if (strpos($path,'BIZUNO_FS_LIBRARY/')===0) { return str_replace('BIZUNO_FS_LIBRARY/','BIZUNO_URL_PORTAL/',$path, $max); }
-    return $path;
+    global $bizunoMod;
+    $bizunoMod= [];
+    $rows     = dbGetMulti(BIZUNO_DB_PREFIX.'configuration');
+    foreach ($rows as $row) { $bizunoMod[$row['config_key']] = json_decode($row['config_value'], true); }
 }
+
 /**
  * Composer gathers the module and mods, sorts them and executes in sequence.
  * @param string $module - Module ID
@@ -108,6 +105,35 @@ function compose($module, $page, $method, &$layout=[])
         }
     }
     if (isset($layout['dbAction'])) { dbAction($layout); }  // act on the db, if needed
+}
+
+/**
+ * Sets the paths for the modules, core and extensions needed to build the registry
+ * *** Sequence is important, do not change! ***
+ * @return module keyed array with path the modules requested
+ */
+function portalModuleList() {
+    $modList = [];
+    portalModuleListScan($modList, 'BIZUNO_FS_LIBRARY/controllers/'); // Core
+    portalModuleListScan($modList, 'BIZUNO_DATA/myExt/controllers/'); // Custom
+    msgDebug("\nReturning from portalModuleList with list: ".print_r($modList, true));
+    return $modList;
+}
+
+function portalModuleListScan(&$modList, $path) {
+    $absPath= bizAutoLoadMap($path);
+    msgDebug("\nIn portalModuleListScan with path = $path and mapped path = $absPath");
+    if (!is_dir($absPath)) { return; }
+    $custom = scandir($absPath);
+    msgDebug("\nScanned folders = ".print_r($custom, true));
+    foreach ($custom as $name) {
+        if ($name=='.' || $name=='..' || !is_dir($absPath.$name)) { continue; }
+        if (file_exists($absPath."$name/admin.php")) { $modList[$name] = $path."$name/"; }
+    }
+}
+
+function portalGetBizIDVal() {
+    return defined('BIZUNO_TITLE') ? BIZUNO_TITLE : 'My Business';
 }
 
 /**
@@ -186,6 +212,51 @@ function bizDbConnected()
     return $db->connected ? true : false;
 }
 
+/**
+ * Validates the user is logged in and returns the creds if true
+ */
+function getUserCookie() {
+    if (!isset($_COOKIE['bizunoSession'])) { return false;}
+    $scramble = preg_replace("/[^a-zA-Z0-9\+\/\=]/", '', $_COOKIE['bizunoSession']);
+    msgDebug("\nChecking cookie to validate creds. read scrambled value = $scramble");
+    if (empty($scramble)) { return false; }
+    $creds = json_decode(base64_decode($scramble), true);
+    msgDebug("\nDecoded creds = ".print_r($creds ,true));
+    return !empty($creds) ? $creds : false;
+}
+
+function setUserCookie($user)
+{
+    msgDebug("\nEntering setUserCookie with user = ".print_r($user, true));
+    // get the mapped local contact ID from the db
+    if     (dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { $user['userID'] = 0; } // for migration purposes to avoid errors on log in before migration
+    elseif (empty($user['userID']) && dbTableExists(BIZUNO_DB_PREFIX.'contacts')) { // try to get it from db, if installed
+        $user['userID'] = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='{$user['userEmail']}'");
+        if (empty($user['userID'])) { // record not found in contacts table, create a new one
+            $user['userID'] = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['ctype_u'=>'1', 'email'=>$user['userEmail'], 'primary_name'=>$user['userName'], 'short_name'=>$user['userName'],
+                'inactive'=>0, 'store_id'=>0, 'terms'=>0, 'price_sheet'=>0, 'tax_rate_id'=>0]);
+            dbMetaSet(0, 'user_profile', ['email'=>$user['userEmail'], 'role_id'=>$user['userRole']], 'contacts', $user['userID']);
+        }
+    }
+    if (!empty($user['userID'])) { // set the users preferences
+        $meta   = dbMetaGet(0, 'user_profile', 'contacts', $user['userID']);
+        $metaIdx= metaIdxClean($meta);
+        $mode   = clean('mode',  'alpha_num', 'get');
+        if (!empty($mode) && $mode<>$meta['mode']) { $meta['mode'] = $mode; }
+        $device = clean('screen','alpha_num', 'get');
+        if (!empty($device) && $device<>$meta['screen']) { $meta['screen'] = $device; } // only if device changes
+        dbMetaSet($metaIdx, 'user_profile', $meta, 'contacts', $user['userID']);
+    }
+    setUserCache('profile', 'userID',  $user['userID']); // Local user ID
+    setUserCache('profile', 'email',   $user['userEmail']);
+    setUserCache('profile', 'psID',    $user['psID']); // PhreeSoft user ID
+    setUserCache('profile', 'userRole',$user['userRole']);
+    $args   = [$user['userID'], $user['psID'], $user['userEmail'], $user['userRole'], $_SERVER['REMOTE_ADDR']];
+    msgDebug("\nSetting user session cookie bizunoSession with args = ".print_r($args, true));
+    $cookie = base64_encode(json_encode($args));
+    bizSetCookie('bizunoUser',    $user['userEmail'], time()+(60*60*24*7)); // 7 days
+    bizSetCookie('bizunoSession', $cookie, time()+(60*60*10)); // 10 hours
+}
 
 /**
  *
@@ -1367,6 +1438,17 @@ function addressLoad($cID=0, $suffix='')
     }
     return $output;
 }
+
+/**
+ * Bizuno operates in local time. 
+ * @param string $format - [default: 'Y-m-d'] From the PHP function date()
+ * @param integer $timestamp - Unix timestamp, defaults to now
+ * @return string
+ */
+function biz_date($format='Y-m-d', $timestamp=null) {
+    return !is_null($timestamp) ? date($format, $timestamp) : date($format);
+}
+
 
 /**
  * Returns the pull down list of skins from the bizuno-skins plugin if installed and enabled.

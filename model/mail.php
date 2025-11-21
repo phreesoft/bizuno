@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /model/mail.php
  */
 
@@ -31,7 +31,7 @@ use PHPMailer\PHPMailer\PHPMailer; //Import PHPMailer classes into the global na
 use PHPMailer\PHPMailer\Exception;
 //use PHPMailer\PHPMailer\SMTP;
 
-class bizunoMailer extends portalMail
+class bizunoMailer
 {
     public $struc;
     public $toEmail;
@@ -93,7 +93,18 @@ class bizunoMailer extends portalMail
      * @return boolean - true if successful, false with messageStack errors if not
      */
     public function sendMail() {
-        if ( method_exists( get_parent_class( $this ), 'sendMail' ) ) { return parent::sendMail(); }
+        if ( class_exists( "\\bizuno\\hostMail" ) ) { // If host has special requirements for sending emails.
+            $hostMailer           = new hostMail();
+            $hostMailer->FromName = $this->FromName;
+            $hostMailer->FromEmail= $this->FromEmail;
+            $hostMailer->ToName   = $this->ToName;
+            $hostMailer->ToEmail  = $this->ToEmail;
+            $hostMailer->toCC     = $this->toCC;
+            $hostMailer->attach   = $this->attach;
+            $hostMailer->Subject  = $this->Subject;
+            $hostMailer->Body     = $this->Body;
+            return $hostMailer->sendMail();
+        }
         return $this->bizunoMailerSendMail();
     }
 

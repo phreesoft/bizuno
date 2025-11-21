@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /view/easyUI/html5.php
  */
 
@@ -927,8 +927,8 @@ columns:  [[
         msgDebug("\nEntering layoutDesktop with menuID = $menuID and bizID = $bizID");
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $src     = $logoPath ? BIZUNO_URL_FS."$bizID/images/$logoPath" : BIZUNO_LOGO;
-        $portal  = explode('.', $_SERVER['SERVER_ADDR']);
-        $version = MODULE_BIZUNO_VERSION."-{$portal[3]}-".getUserCache('profile', 'language')."-".getDefaultCurrency();
+        $hostIP  = explode('.', $_SERVER['SERVER_ADDR']);
+        $version = MODULE_BIZUNO_VERSION."-{$hostIP[3]}-".getUserCache('profile', 'language')."-".getDefaultCurrency();
         if (!empty($bizID)) {
             $title = getModuleCache('bizuno', 'settings', 'company', 'primary_name');
             if (empty($title)) { $title = portalGetBizIDVal($bizID, 'title'); }

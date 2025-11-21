@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -56,7 +56,6 @@ class administrateAdmin
      */
     public function contactsEdit(&$layout=[])
     {
-        global $portal;
         $type= clean('type', 'char', 'get');
         $rID = clean('rID', 'integer', 'get');
         msgDebug("\nEntering administrate::contactsEdit with type = $type");
@@ -65,8 +64,7 @@ class administrateAdmin
             $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
             $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
         }
-        if (!in_array($type, ['u']) || // (empty($rID) && method_exists($portal, 'contactTypeUser')) ||
-            !validateAccess('admin', 4, false)) { return; } // Only existing records, admins and type user
+        if (!in_array($type, ['u']) || !validateAccess('admin', 4, false)) { return; } // Only existing records, admins and type user
         // unset some panels
         unset($layout['tabs']['tabContacts']['divs']['history'],$layout['tabs']['tabContacts']['divs']['wallet'],
               $layout['tabs']['tabContacts']['divs']['prices'], $layout['tabs']['tabContacts']['divs']['bill_add'],

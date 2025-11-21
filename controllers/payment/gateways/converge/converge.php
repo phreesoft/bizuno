@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-08
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/payment/gateways/converge.php
  *
  * Source Information:
@@ -351,13 +351,13 @@ html5($this->code.'_action', ['label'=>$this->lang['at_converge'],              
 
     private function queryMerchant($request=[])
     {
-        global $portal;
+        global $io;
         $tags = '';
         foreach ($request as $key => $value) { if ($value <> '') { $tags .= "<$key>".urlencode(str_replace('&', '+', $value))."</$key>"; } }
         $data = "xmldata=<txn>$tags</txn>";
         msgDebug("\nRequest to send to Converge: $data");
         $url = $this->mode=='test' ? PAYMENT_CONVERGE_URL_TEST : PAYMENT_CONVERGE_URL;
-        if (!$strXML = $portal->cURL($url, $data, 'post')) { return; }
+        if (!$strXML = $io->cURL($url, $data, 'post')) { return; }
         msgDebug("\nReceived raw data back from Converge: ".print_r($strXML, true));
         $resp = parseXMLstring($strXML);
         msgDebug("\nReceived back from Converge: ".print_r($resp, true));

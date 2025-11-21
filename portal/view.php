@@ -1,15 +1,28 @@
 <?php
 /**
- * PhreeSoft ISP Clients - Portal View
+ * Bizuno Portal entry point
  *
- * Once users have authenticated, this method is no longer called
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
  *
  * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
- * @author     David Premo, PhreeSoft, Inc.
- * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-10-20
- * @filesource /lib/view.php
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-11-21
+ * @filesource /portal/view.php
  */
 
 namespace bizuno;
@@ -26,7 +39,7 @@ class portalView
     {
         $iso = !empty($_COOKIE['bizunoEnv']['lang']) ? $_COOKIE['bizunoEnv']['lang'] : 'en_US';
         $lang = [];
-        require("lib/locale/$iso.php"); // replace $lang
+        require(BIZUNO_FS_LIBRARY . "locale/$iso/portal.php"); // replace $lang
         $this->lang = $lang;
     }
 
@@ -45,7 +58,7 @@ class portalView
         }
         // Show login form
         $src = BIZUNO_LOGO;
-        if ($db->connected) { // getModuleCache('bizuno', 'settings', 'company', 'logo');
+        if (dbTableExists(BIZUNO_DB_PREFIX.'configuration') && $db->connected) { // getModuleCache('bizuno', 'settings', 'company', 'logo');
             $cfg = dbGetValue(BIZUNO_DB_PREFIX.'configuration', 'config_value', "config_key='bizuno'");
             $stg = !empty($cfg) ? json_decode($cfg, true) : [];
             if (!empty($stg['settings']['company']['logo'])) { $src = BIZUNO_URL_FS.BIZUNO_BIZID."/images/{$stg['settings']['company']['logo']}"; }
@@ -75,7 +88,6 @@ class portalView
 
     /**
      * Validates credentials for a user to log in. ONLY EXECUTED AT THE PORTAL!
-     * @global type $portal
      * @param type $layout
      * @return type
      */
@@ -237,28 +249,17 @@ class portalView
     public function install(&$layout=[])
     {
         msgDebug("\nEntering install");
-        $title = defined('BIZUNO_BIZTITLE') ? BIZUNO_BIZTITLE : $this->lang['my_business'];
-        if (isset($_POST['biz_title']) && isset($_POST['biz_chart'])) { // check for post to start install
-            msgDebug("\nEntering controllers/installBizuno");
-            if ($_SERVER['SERVER_NAME']<>BIZUNO_PORTAL) { return msgAdd("err_illegal_access"); }
-            $creds = getUserCookie();
-            setUserCache('profile', 'psID',  $creds[1]); // PhreeSoft user ID
-            setUserCache('profile', 'email', $creds[2]); // User email
-            if (!$this->installTestDB()) { return; }
-            bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/install.php', 'bizInstall');
-            $installer = new bizInstall();
-            $installer->installBizuno($layout);
-            return;
+        if (isset($_POST['biz_user']) && isset($_POST['biz_pass'])) { // check for post to start install
+            if ($this->installBizuno($layout)) { return; }
         }
         // Show install form
         $logo = ['label'=>getModuleCache('bizuno','properties','title'),'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/view/images/bizuno.png','height'=>48]];
         $html = '<div>'.html5('', $logo).'</div>
     <div class="info">'.$this->lang['install_intro'].'</div><br />
-    <div class="info">'.$this->lang['biz_title'].'</div><div class="field"><input type="text" name="biz_title" value="'.$title.'"> </div>
-    <div class="info">'.$this->lang['currency'].'</div><div class="field">'.$this->getSelCur().'</div>
-    <div class="info">'.$this->lang['fiscal_year'].'</div><div class="field">'.$this->getSelFY().'</div>
-    <div class="info">'.$this->lang['chart_of_accounts'].'</div><div class="field">'.$this->getSelChart().'</div>
-    <div class="info">'.$this->lang['time_zone'].'</div><div class="field">'.$this->getSelZone().'</div>
+    <div class="info">'.$this->lang['biz_user']     .'</div><div class="field"><input type="text" name="biz_user" value=""></div>
+    <div class="info">'.$this->lang['biz_pass']     .'</div><div class="field"><input type="password" name="biz_pass" value=""></div>
+    <div class="info">'.$this->lang['biz_title']    .'</div><div class="field"><input type="text" name="biz_title" value="'.$this->lang['my_business'].'"></div>
+    <div class="info">'.$this->lang['currency']     .'</div><div class="field">'.$this->getSelCur().'</div>
     <button>'.$this->lang['install'].'</button>';
         if (!empty($this->errors)) { $html .= '<div class="error">'.$this->errors.'</div>'; }
         msgDebug("\nStarting to generate layout");
@@ -271,6 +272,46 @@ class portalView
         msgDebug("\nReturning layout ".print_r($layout, true));
     }
 
+    private function installBizuno(&$layout=[])
+    {
+        msgDebug("\nEntering controllers/installBizuno");
+        // Do some error checking
+        if (!file_exists(BIZUNO_DATA)) { // first, try to make it
+            @mkdir(BIZUNO_DATA);
+            if (!file_exists(BIZUNO_DATA) || !is_writable(BIZUNO_DATA)) { 
+                $this->errors .= 'I cannot find your data folder! Does the path exist and is it writeable?';
+                return;
+            }
+        }
+        $email = clean('biz_user', 'email', 'post');
+        if (empty($email)) { 
+            $this->errors .= 'Your email is invalid, please correct and try again!';
+            return;
+        }
+        if (!$this->installTestDB()) {
+            $this->errors .= "I'm having difficulties connecting to your database, Please checkthe credentials in your PortalCFG.php file!";
+            return;
+        }
+        $cookie = base64_encode(json_encode([1, 0, $email, $this->instRole, $_SERVER['REMOTE_ADDR']]));
+        bizSetCookie('bizunoUser',   $email, time()+(60*60*24*7)); // 7 days
+        bizSetCookie('bizunoSession',$cookie,time()+(60*60*10)); // 10 hours
+        setUserCache('profile', 'userID', 1); // Local user ID
+        setUserCache('profile', 'email',  $email);
+        setUserCache('profile', 'psID',   0); // PhreeSoft user ID, zero in this case
+        $_POST['biz_fy']      = biz_date('Y'); // default fiscal year to this year
+        $_POST['biz_chart']   = $this->defChart;
+        $_POST['biz_timezone']= $this->guessTimeZone($this->locale);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/install.php', 'bizInstall');
+        $installer = new bizInstall();
+        $installer->installBizuno($layout);
+        if (isset($GLOBALS['BIZUNO_INSTALL_CID'])) { // since we are local, need to set role and password contact meta
+            $peppered = hash_hmac('sha256', $_POST['biz_pass'], BIZUNO_KEY);
+            $hashed = password_hash($peppered, PASSWORD_DEFAULT);
+            dbMetaSet(0, 'user_auth', $hashed, 'contacts', $GLOBALS['BIZUNO_INSTALL_CID']);
+        }
+        return true;
+    }
+
     private function getSelCur()
     {
         msgDebug("\nEntering getSelCur");
@@ -281,41 +322,6 @@ class portalView
         msgDebug(" ... and returning $html");
         return $html;
     }
-    private function getSelFY()
-    {
-        msgDebug("\nEntering getSelFY");
-        $year = biz_date('Y');
-        for ($i=2; $i>=0; $i--) { $years[] = ['id'=>$year - $i, 'text'=>$year - $i]; }
-        $html = '<select name="biz_fy">';
-        foreach ($years as $opt) { $html .= '<option value="'.$opt['id'].'"'.($opt['id']==$year?' selected':'').'>'.$opt['text'].'</option>'; }
-        $html.= '</select>';
-        msgDebug(" ... and returning $html");
-        return $html;
-    }
-    private function getSelChart()
-    {
-        msgDebug("\nEntering getSelChart");
-        $html = '<select name="biz_chart">';
-        $opts = localeLoadCharts();
-        foreach ($opts as $opt) { $html .= '<option value="'.$opt['id'].'"'.($opt['id']==$this->defChart?' selected':'').'>'.$opt['text'].'</option>'; }
-        $html.= '</select>';
-        msgDebug(" ... and returning $html");
-        return $html;
-    }
-    private function getSelZone()
-    {
-        msgDebug("\nEntering getSelZone");
-        $html = '<select name="biz_timezone">';
-        $opts = viewTimeZoneSel($this->locale);
-        foreach ($opts as $opt) { $html .= '<option value="'.$opt['id'].'"'.($opt['id']==$this->guessTimeZone($this->locale)?' selected':'').'>'.$opt['text'].'</option>'; }
-        $html.= '</select>';
-        msgDebug(" ... and returning $html");
-        return $html;
-    }
-    /**
-     * try to guess time zone by client ip
-     * @return string
-     */
     private function guessTimeZone($locale=[])
     {
         if (empty($locale)) { $locale= localeLoadDB(); }
@@ -328,21 +334,15 @@ class portalView
         }
         return $output;
     }
-    /**
-     * For new installations, tests the user submitted credentials to make a db connection
-     * @global \bizuno\db $db
-     * @param type $creds
-     * @return boolean
-     */
     private function installTestDB()
     {
         global $db;
         if (!defined('BIZUNO_DB_CREDS')) { $this->errors .= 'DB credentials have not been defined, install cannot continue!'; return ;}
-        $db      = new db(BIZUNO_DB_CREDS);
+        $db = new db(BIZUNO_DB_CREDS);
         if (!$db->connected) { $this->errors .= 'Bizuno cannot connect to your DB, please check your credentials!'; return; }
         return true;
     }
-    
+
     /******************************* Migrate Methods *************************************/
     public function migrate(&$layout=[])
     {

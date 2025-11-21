@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-06
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -436,7 +436,7 @@ if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move
 
     public function getTaxVersion(&$layout=[])
     {
-        global $portal;
+        global $io;
 //        if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
         // @TODO - This needs a complete re-write it should:
         // be part of the upgrade polling messaging system, cron operation
@@ -447,8 +447,8 @@ if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move
         $meta = dbMetaGet(0, 'sales_tax_table_ver');
         $curVersion = !empty($meta['value']) ? $meta['value'] : '';
         msgDebug("\nWorking in getTaxVersion with current version = $curVersion");
-        $portal->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $result = $portal->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/sales_tax_ver');
+        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $result = $io->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/sales_tax_ver');
         if (!empty($result['tax_version'])) {
             if (version_compare($result['tax_version'], $curVersion) > 0) {
                 return msgAdd("A new tax table version is available, please download it by clicking the Download Tax button and update your WordPress site.", 'info');
@@ -461,11 +461,11 @@ if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move
 
     public function getTaxTable()
     {
-        global $io, $portal;
+        global $io;
         $output= [];
         if (!$security = validateAccess($this->code, 2)) { return; }
-        $portal->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $result= $portal->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/tax_table_dump');
+        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $result= $io->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/tax_table_dump');
         if (empty($result['data'])) { return msgAdd("Error retrieving the new sales tax data!"); }
         // get the Nexus States
         $nexus = dbMetaGet(0, 'nexus');
@@ -489,9 +489,9 @@ if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move
      */
     public function apiAction($args=[])
     {
-        global $portal;
-        $portal->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
-        $resp = $portal->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
+        global $io;
+        $io->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
+        $resp = $io->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
         if (isset($resp['message'])) { msgMerge($resp['message']); }
         $postID= !empty($resp['ID']) ? $resp['ID'] : 0;

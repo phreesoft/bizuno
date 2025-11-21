@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-20
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /bizunoCFG.php
  */
 
@@ -30,21 +30,6 @@ namespace bizuno;
 if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)); }
 
 define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.3'); // Pull from file 
-
-// Platform Specific - File System Paths
-//if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  WP_PLUGIN_DIR . "/$this->bizLib/" ); }
-//if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_FS_LIBRARY . 'assets/' ); } // for shared access using composer
-// Platform Specific - URL's
-//if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  home_url() . "/$this->bizSlug" ); } // full url to Bizuno root folder
-//if ( !defined( 'BIZUNO_URL_AJAX' ) )    { define( 'BIZUNO_URL_AJAX',    admin_url(). 'admin-ajax.php?action=BIZUNO_URL_AJAX' ); }
-//if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     plugin_dir_url( __FILE__ ) . "portalAPI.php?bizRt=" ); }
-//if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src='); }
-//if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', plugins_url()."/$this->bizLib/scripts/" );  }
-// File system paths
-//if (!defined('BIZUNO_FS_LIBRARY')) { define('BIZUNO_FS_LIBRARY',     BIZUNO_FS_LIBRARY); } // file system path to bizuno root index file
-// URL paths
-//if (!defined('BIZUNO_URL_PORTAL')) { define('BIZUNO_URL_PORTAL', strpos(BIZUNO_URL_PORTAL, '?')===false ? BIZUNO_URL_PORTAL.'?' : BIZUNO_URL_PORTAL); } // Full URL path to Bizuno Home
-//if (!defined('BIZUNO_URL_AJAX'))   { define('BIZUNO_URL_AJAX', substr(BIZUNO_URL_PORTAL, 0, strlen(BIZUNO_URL_PORTAL)-1).'?ajax=1'); } // for non-html requests
 
 // URLs to PhreeSoft Images
 define('BIZUNO_LOGO',    BIZUNO_URL_FS.'0/view/images/bizuno.png'); // URL to default logo

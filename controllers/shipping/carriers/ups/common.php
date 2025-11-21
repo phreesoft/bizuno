@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/shipping/carriers/ups/common.php
  */
 
@@ -164,14 +164,14 @@ Obtain your production credentials (production access key) online during the reg
      */
     protected function queryREST($path, $data=[], $type='post')
     {
-        global $portal;
+        global $io;
         if (empty($this->settings['token']) || $this->settings['token_date'] < time()) { // token expired, get a new token
             $this->settings['token'] = $this->getTokenREST();
             if (!$this->settings['token']) { return msgAdd("Error retrieving token from UPS REST, all services will be unavailable!"); }
         }
         $destURL = $this->urlREST.$path;
         $opts    = ['headers'=>['Content-Type'=>'application/x-www-form-urlencoded', 'Authorization'=>"Bearer {$this->settings['token']}"]];
-        $response= json_decode($portal->cURL($destURL, $data, $type, $opts));
+        $response= json_decode($io->cURL($destURL, $data, $type, $opts));
         if (empty($response)) { return; }
         msgDebug("\nParsed token response = ".print_r($response, true));
         if (!empty($response->response->errors)) {
@@ -188,12 +188,12 @@ Obtain your production credentials (production access key) online during the reg
      */
     private function getTokenREST()
     {
-        global $portal;
+        global $io;
         $httpUrl  = $this->urlREST.'security/v1/oauth/token';
         $creds    = base64_encode("{$this->settings['rest_api_key']}:{$this->settings['rest_secret']}");
         $opts     = ['headers'=>['Content-Type'=>'application/x-www-form-urlencoded', 'Accept'=>'application/json, text/plain, */*', 'Authorization'=>"Basic $creds"]];
         $request  = ['grant_type'=>'client_credentials'];
-        $response = json_decode($portal->cURL($httpUrl, $request, 'post', $opts));
+        $response = json_decode($io->cURL($httpUrl, $request, 'post', $opts));
         if (!empty($response->error)) { msgAdd("UPS REST Error: $response->error: $response->error_description"); return; }
         msgDebug("\Decoded token response = ".print_r($response, true));
         $this->settings['token']     = $response->access_token;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-02
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /model/io.php
  */
 
@@ -36,15 +36,19 @@ final class io
     private $ftp_con;
     private $sftp_con;
     private $sftp_sub;
-    public  $myFolder    = '';
-    public  $db_filename = 'db-20250101';
-    public  $source_dir  = '';
-    public  $source_file = 'filename.txt';
-    public  $dest_dir    = 'backups/';
-    public  $dest_file   = 'filename.bak';
-    public  $mimeType    = '';
-    public  $useragent   = 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0'; // moved to portal
-    public  $options     = [];
+    public  $myFolder     = '';
+    public  $db_filename  = 'db-20250101';
+    public  $source_dir   = '';
+    public  $source_file  = 'filename.txt';
+    public  $dest_dir     = 'backups/';
+    public  $dest_file    = 'filename.bak';
+    public  $mimeType     = '';
+    public  $useragent    = 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0'; // moved to portal
+    public  $options      = [];
+    public  $restHeaders  = [];
+    public  $useOauth     = false;
+    private $phreeSoftREST=  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1';
+
 
     function __construct()
     {
@@ -54,51 +58,131 @@ final class io
     }
 
     /**
-     * @TODO - DEPRECATED AS THE SUBFOLDER NEEDS TO BE PROVIDED
-     * Deletes a module attachment file and resets the attach flag if no more attachments are present
-     * @param array $layout - page structure coming in
-     * @param integer $mID - module ID
-     * @param string $pfxID [default: rID_] - prefix for the filename followed by the record ID
-     * @param boolean $dbID - table name
-     * @return modified $structure
-     */
-/*    public function attachDelete(&$layout, $mID, $pfxID='rID_', $dbID=false)
-    {
-        $dgID = clean('rID', 'text', 'get');
-        $file = clean('data','text', 'get');
-        // get the rID
-        $fID = str_replace(getModuleCache($mID, 'properties', 'attachPath'), '', $file);
-        $tID = substr($fID, 4); // remove rID_
-        $rID = substr($tID, 0, strpos($tID, '_'));
-        msgDebug("\nExtracted rID = $rID");
-        // delete the file
-        $this->fileDelete($file);
-        msgLog(lang('delete').' - '.$file);
-        msgDebug("\n".lang('delete').' - '.$file);
-        // check for more attachments, if no more, clear attachment flag
-        if (!$dbID) { $dbID = $mID; }
-        $rows = $this->fileReadGlob(getModuleCache($mID, 'properties', 'attachPath').$pfxID."{$rID}_");
-        if (!sizeof($rows)) { dbWrite(BIZUNO_DB_PREFIX.$dbID, ['attach'=>'0'], 'update', "id=$rID"); }
-        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval', 'actionData'=>"var row=jqBiz('#$dgID').datagrid('getSelected');
-            var idx=jqBiz('#$dgID').datagrid('getRowIndex', row); jqBiz('#$dgID').datagrid('deleteRow', idx);"]]);
-    } */
-
-    /**
      * Sends a cURL request to a server
      * @param type $data - array containing settings needed to perform cURL request
      * @return cURL Response, false if error
      */
     public function doCurlAction($data=[])
     {
-        global $portal;
         if (!isset($data['url']) || !$data['url']) { msgAdd("Error in cURL, bad url"); }
         if (!isset($data['data'])|| !$data['data']){ msgAdd("Error in cURL, no data"); }
         $mode = isset($data['mode']) ? $data['mode'] : 'get';
         $opts = isset($data['opts']) ? $data['opts'] : [];
         msgDebug("\nSending to url: {$data['url']} and data: ".print_r($data['data'], true));
-        $cURLresp = $portal->cURL($data['url'], $data['data'], $mode, $opts);
+        $cURLresp = $this->cURL($data['url'], $data['data'], $mode, $opts);
         msgDebug("\nReceived back from cURL: ".print_r($cURLresp, true));
         return $cURLresp;
+    }
+
+    public function restRequest($type, $server, $endpoint='', $data=[], $opts=[]) {
+        if (!empty($this->useOauth)) {
+            msgDebug("\nSending REST request via oAuth");
+            $token = $this->restOauthToken();
+            $optsEP= array_replace_recursive(['headers'=>['authorization'=>"Bearer $token", 'x-locale'=>'en_US', 'content-type'=>'application/json']], $opts);
+        } else {
+            msgDebug("\nSending REST request via User/Password");
+            $optsEP = array_replace_recursive(['headers'=>$this->restHeaders,'cookies'=>[]], $opts);
+        }
+        $url = empty($endpoint) ? $server : "$server/$endpoint";
+//      msgDebug("\nHeaders: ".print_r($optsEP, true));
+        msgDebug("\nSending request of type $type to url $url and data of size: ".(is_array($data)?'Array('.sizeof($data).')':strlen($data)));
+        $response= json_decode($this->cURL($url, $data, strtolower($type), $optsEP), true);
+        msgDebug("\nLast response is: ".print_r($response, true));
+        if (empty($response) && !is_array($response)) { msgAdd(sprintf(lang('err_no_communication'), $server), 'trap'); }
+        if (isset($response['message']) && is_string($response['message'])) { // unexpected message returned
+        // Commented out as errors need to be handled individually.
+//          msgAdd("Woo restRequest received back from server: {$response['message']}");
+//          unset($response['message']);
+        }
+        return $response;
+    }
+
+    /**
+     * Fetch oAuth2 token from a RESTful API server
+     * @return token if successful, null if error
+     */
+    public function restOauthToken($server='', $id='', $secret='')
+    {
+        msgDebug("\nEntering restTokenValidate with path = $server");
+        if (empty($server)) { return msgAdd("Error! no server name passed!"); }
+        $token = getModuleCache('bizuno', 'rest');
+        if (empty($token[$server]['token']) || $token[$server]['expires_in'] < time()-10) { // get a new token for today
+            // get an authorization code
+            $code = json_decode($this->cURL("{$server}/oauth/authorize", "response_type=code&client_id=$id", 'get'), true);
+            if (!is_array($code)) { return msgAdd('A string was returned for the OAuth2 code! Not good.'); }
+            // get an access token
+            // WHAT TO DO WITH $code['code?']
+            $optsA = ['headers'=>['Content-Type'=>'application/x-www-form-urlencoded']];
+            $dataA = "grant_type=client_credentials&client_id=$id&client_secret=$secret";
+            $tokenA= json_decode($this->cURL("{$server}/oauth/token", $dataA, 'post', $optsA), true);
+            if (!is_array($tokenA)) { return msgAdd("A string was returned! Not good."); }
+            if (!empty($tokenA['error'])) { return msgAdd("REST Token Request Error: ".print_r($tokenA['errors'], true)); }
+            msgDebug("\nread token = {$tokenA['access_token']} and expires_in = {$tokenA['expires_in']}");
+            if (empty($tokenA['access_token'])) { return msgAdd("Error retrieving token from $server, all APIs will be unavailable!"); }
+            $token[$server]['token']   = $tokenA['access_token'];
+            $token[$server]['expires_in']= time()+$tokenA['expires_in'];
+            setModuleCache('bizuno', 'rest', '', $token);
+        }
+        return $token[$server]['token'];
+    }
+
+    /**
+     * This method retrieves data from a remote server using cURL
+     * @param string $url - URL to request data
+     * @param string $data - data string, will be attached for get and through setopt as post or an array
+     * @param string $type - [default 'get'] Choices are 'get' or 'post'
+     * @return result if successful, false (plus messageStack error) if fails
+     */
+    public function cURL($url, $data=[], $type='get', $opts=[]) {
+        $useragent = 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0';
+        $size = is_array($data) ? 'array('.sizeof($data).')' : strlen($data);
+        msgDebug("\nAt class portal, sending request of length $size to url: $url via $type with sizeof opts = ".sizeof($opts)); //  ." with opts = ".print_r($opts, true)
+        $rData = is_array($data) ? http_build_query($data) : $data;
+        if ($type == 'get') { $url = $url.'?'.$rData; }
+        $headers = [];
+        if (!empty($opts['headers'])) { foreach ($opts['headers'] as $key => $value) { $headers[] = "$key: $value"; } }
+        if (!empty($opts['cookies'])) { foreach ($opts['cookies'] as $key => $value) { $headers[] = "$key: $value"; } }
+        unset($opts['headers'], $opts['cookies']);
+        $options = [];
+        $ch = curl_init();
+        if (!empty($options)) { foreach ($options as $opt => $value) {
+            switch ($opt) {
+                case 'useragent': curl_setopt($ch, CURLOPT_USERAGENT, $useragent); break;
+                default:          curl_setopt($ch, constant($opt), $value); break;
+            }
+        } }
+        curl_setopt($ch, CURLOPT_URL,           $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,    $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($ch, CURLOPT_TIMEOUT,       30); // in seconds
+        curl_setopt($ch, CURLOPT_HEADER,        false);
+        curl_setopt($ch, CURLOPT_VERBOSE,       false);
+        curl_setopt($ch, CURLOPT_ENCODING,      ""); // Let cURL handle the response as some hosts mess up the return encoding, e.g. FedEx
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+        if (strtolower($type) == 'post') {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $rData);
+        } elseif (strtolower($type) == 'put') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $rData);
+        }
+// for debugging cURL issues, uncomment below
+//$fp = fopen(BIZUNO_DATA."cURL_trace.txt", 'w');
+//curl_setopt($ch, CURLOPT_VERBOSE, true);
+//curl_setopt($ch, CURLOPT_STDERR, $fp);
+        $response = curl_exec($ch);
+//msgDebug("\nRaw cURL data returned = ".print_r($response, true)); // This can be helpful if headers are sent first
+        if (curl_errno($ch)) {
+            msgDebug('cURL Error # '.curl_errno($ch).'. '.curl_error($ch));
+            msgAdd('cURL Error # '.curl_errno($ch).'. '.curl_error($ch));
+            curl_close ($ch);
+            return;
+        } elseif (empty($response)) { // had an issue connecting with TLSv1.2, returned no error but no response (ALPN, server did not agree to a protocol)
+            msgAdd("Oops! I Received an empty response back from the cURL request. There was most likely a problem with the connection that was not reported.", 'caution');
+        }
+        curl_close ($ch);
+        return $response;
     }
 
     /**

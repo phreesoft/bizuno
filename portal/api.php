@@ -1,13 +1,28 @@
 <?php
 /**
- * PhreeSoft ISP Clients - Portal API Interface
+ * Bizuno Portal entry point
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * DISCLAIMER
+ * Do not edit or add to this file if you wish to upgrade Bizuno to newer
+ * versions in the future. If you wish to customize Bizuno for your
+ * needs please contact PhreeSoft for more information.
  *
  * @name       Bizuno ERP
+ * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
- * @author     David Premo, PhreeSoft, Inc.
- * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-11-17
- * @filesource /lib/api.php
+ * @license    https://www.gnu.org/licenses/agpl-3.0.txt
+ * @version    7.x Last Update: 2025-11-21
+ * @filesource /portal/api.php
  */
 
 namespace bizuno;
@@ -20,7 +35,7 @@ class portalApi
     {
         $iso = !empty($_COOKIE['bizunoEnv']['lang']) ? $_COOKIE['bizunoEnv']['lang'] : 'en_US';
         $lang = [];
-        include("lib/locale/$iso.php"); // replace $lang
+        include(BIZUNO_FS_LIBRARY . "locale/$iso/portal.php"); // replace $lang
         $this->lang = $lang;
     }
 
@@ -153,14 +168,14 @@ class portalApi
 
     public function lostPW(&$layout=[])
     {
-        $portal = new portalView();
-        $portal->lostCreds($layout);
+        $view = new portalView();
+        $view->lostCreds($layout);
     }
 
     public function lostVal(&$layout=[])
     {
-        $portal = new portalView();
-        $portal->lostNewPW($layout);
+        $view = new portalView();
+        $view->lostNewPW($layout);
     }
 
     /**
@@ -197,8 +212,7 @@ class portalApi
     }
     public function orderAdd(&$layout=[])
     {
-        global $portal;
-//        if (!$portal->portalUserAuth()) { return msgAdd(lang('invalid_access')); } // validate user
+        global $io;
         // Ned a new way to authenticate since the users are now local.
         
         

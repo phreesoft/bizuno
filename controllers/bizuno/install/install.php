@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -115,8 +115,12 @@ class bizInstall // Checking users:
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']); // Cache to store phreeform reports and forms to speed things up
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>'[]']); // Phreebooks references for journal entries
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=>$roleID,'meta_key'=>'bizuno_role',     'meta_value'=>json_encode($roleMeta)]);
+        // insert a record into the contacts table, use email as the short name for now
+        msgDebug("\nFinished installing modules, next up, setting first user.");
+        $cID     = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['ctype_u'=>'1', 'email'=>$usrEmail, 'primary_name'=>$usrEmail, 'short_name'=>$usrEmail, 'first_date'=>biz_date()]);
+        dbMetaSet(0, 'user_profile', ['email'=>$usrEmail, 'role_id'=>$roleID], 'contacts', $cID);
         setUserCache('profile', 'userRole', $roleID);
-        $user = ['userID'=>$userID, 'psID'=>getUserCache('profile', 'psID'), 'userEmail'=>getUserCache('profile', 'email'), 'userRole'=>$roleID];
+        $user    = ['userID'=>$userID, 'psID'=>getUserCache('profile', 'psID'), 'userEmail'=>getUserCache('profile', 'email'), 'userRole'=>$roleID];
         setUserCookie($user);
         // Load PhreeBooks defaults
         $pbAdmin = new phreebooksAdmin();
@@ -130,10 +134,6 @@ class bizInstall // Checking users:
         $registry->initRegistry(getUserCache('profile', 'email'), getUserCache('business', 'bizID'), 0);
         msgDebug("\nFinished building registry with bizunoMod = ".print_r($bizunoMod, true));
         setModuleCache('phreebooks', 'currency', false, ['defISO'=>$curISO, 'iso'=>[$curISO =>$cur->currencySettings($curISO)]]);
-        // insert a record into the contacts table, use email as the short name
-        msgDebug("\nFinished installing modules, next up, setting first user.");
-        $cID     = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['ctype_u'=>'1', 'email'=>$usrEmail, 'primary_name'=>$usrEmail, 'short_name'=>$usrEmail, 'first_date'=>biz_date()]);
-        dbMetaSet(0, 'user_profile', ['email'=>$usrEmail, 'role_id'=>$roleID], 'contacts', $cID);
         $this->initDashboards($cID, $bAdmin->notes); // create some starting dashboards
         $this->installRefs();  // Pre set the references for the journal entries
         $company = getModuleCache('bizuno', 'settings', 'company'); // set the business title and id

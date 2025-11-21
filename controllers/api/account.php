@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/api/account.php
  */
 
@@ -183,13 +183,13 @@ $output['addresses'][] = ['primary_name'=>'Lisa Premo', 'email'=>'lisa@pps.com']
      */
     public function account_wallet_list($request)
     {
-        global $portal;
+        global $io;
         $qParams= $this->bizuno_open($request);
         $data   = ['contactID' => !empty($qParams['contactID']) ? $qParams['contactID'] : ''];
         msgDebug("\nWorking with contactID = ".print_r($data['contactID'], true));
         $cID    = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "short_name='".addslashes($data['contactID'])."'");
         $output = [];
-        if (!empty($cID)) { $output['wallet'] = $portal->accountWalletList($cID); }
+        if (!empty($cID)) { $output['wallet'] = $io->accountWalletList($cID); }
         return $this->bizuno_close($output);
     }
 }

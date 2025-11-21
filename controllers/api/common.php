@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/api/common.php
  */
 
@@ -40,7 +40,6 @@ class apiCommon
 
     /**
      * Communicates with the remote server through the RESTful API
-     * @global type $portal
      * @param type $type
      * @param type $server
      * @param type $endpoint
@@ -49,15 +48,15 @@ class apiCommon
      */
     public function restGo($type, $server, $endpoint, $data=[])
     {
-        global $portal;
+        global $io;
         $opts = [];
-        if (!empty($portal->useOauth)) { // Set the credentials
-            $portal->id   = $this->options['oauth_client_id'];
-            $portal->pass = $this->options['oauth_client_secret'];
+        if (!empty($io->useOauth)) { // Set the credentials
+            $io->id   = $this->options['oauth_client_id'];
+            $io->pass = $this->options['oauth_client_secret'];
 //      } else { // the following duplicates the credentials and causes failed transaction
 //          $opts = ['headers'=>['email'=>$this->options['rest_user_name'], 'pass'=>$this->options['rest_user_pass']]];
         }
-        $resp = $portal->restRequest($type, $server, "wp-json/bizuno-api/v1/$endpoint", $data, $opts);
+        $resp = $io->restRequest($type, $server, "wp-json/bizuno-api/v1/$endpoint", $data, $opts);
         msgDebug("\nAPI Common received back from REST: ".print_r($resp, true));
         if (isset($resp['message'])) {
             msgDebug("\nMerging the msgStack!");

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-08
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -296,7 +296,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     private function queryMerchant($submit_data=[])
     {
-        global $portal;
+        global $io;
         $txnReq = array_merge([
             'x_login'          => $this->settings['user_id'],
             'x_tran_key'       => $this->settings['txn_key'],
@@ -320,7 +320,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         }
         $request = implode('&', $output);
         // Post order info data to Authorize.net via CURL - Requires that PHP has CURL support installed
-        if (!$result = $portal->cURL($url, $request, 'post')) { return; }
+        if (!$result = $io->cURL($url, $request, 'post')) { return; }
         if (substr($result,0,1) == $this->encapChar) { $result = substr($result,1); }
         $result = preg_replace('/.{*}' . $this->encapChar . '$/', '', $result);
         $resp = explode($this->encapChar . $this->delimiter . $this->encapChar, $result);
