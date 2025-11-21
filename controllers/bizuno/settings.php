@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -130,7 +130,6 @@ class bizunoSettings
      */
     public function adminMethods(&$layout=[])
     {
-        msgTrap();
         $module = clean('module', 'db_field', 'get');
         $folder = clean('folder', 'db_field', 'get');
         msgDebug("\nEntering adminMethods for module $module, folder $folder");
@@ -223,7 +222,6 @@ class bizunoSettings
      */
     public function methodSettingsSave(&$layout=[])
     {
-        msgTrap();
         if (!$security=validateAccess('admin', 3)) { return; }
         $subDir   = clean('type',  'text', 'get');
         $method   = clean('method','text', 'get');

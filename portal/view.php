@@ -54,7 +54,7 @@ class portalView
         // if POST vars are set then try to log in else show form
         if (isset($_POST['bizUser']) && isset($_POST['bizPass'])) {
             msgDebug("\nCredentials sent, trying to validate.");
-            if ($this->validateUser($layout)) { $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]]; return; } // if validated, return to load home page
+            if ($this->validateUser($layout)) { msgDebug("\nUser validated, reloading!"); $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]]; return; } // if validated, return to load home page
         }
         // Show login form
         $src = BIZUNO_LOGO;
@@ -93,6 +93,7 @@ class portalView
      */
     private function validateUser(&$layout=[])
     {
+        if (function_exists("\\bizuno\\portalValidateUser")) { return portalValidateUser($layout, $this->errors, $this->lang); } // hook for customization
         msgDebug("\nEntering validateUser.");
         $email= clean('bizUser', 'email', 'post'); // email address
         $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-14
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/quality/admin.php
  */
 
@@ -254,7 +254,6 @@ class qualityAdmin
      */
     public function adminHome(&$layout=[])
     {
-        msgTrap();
         if (!$security = validateAccess('admin', 1)) { return; }
         $data = ['tabs'=>['tabAdmin'=>['divs'=>[
             'tabTrain' => ['order'=>20,'label'=>lang('tasks_training'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminTraining/manager'"]],
@@ -267,7 +266,6 @@ class qualityAdmin
      */
     public function adminSave()
     {
-        msgTrap();
         if (!$security = validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }

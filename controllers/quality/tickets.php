@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
+ * @version    7.x Last Update: 2025-11-21
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -160,7 +160,6 @@ class qualityTickets extends mgrJournal
     /******************************** Journal Manager ********************************/
     public function manager(&$layout=[])
     {
-        msgTrap();
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::managerMain($layout, $security, ['type'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('ticket'))]);
         $layout['jsHead']['vars'] = "var bizQualStatuses = ".json_encode($this->qual_status).";";

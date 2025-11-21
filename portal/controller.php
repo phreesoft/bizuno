@@ -28,7 +28,6 @@
 namespace bizuno;
 
 // Load portal specific classes
-require(BIZUNO_FS_LIBRARY . 'portal/model.php'); 
 require(BIZUNO_FS_LIBRARY . 'portal/api.php');
 require(BIZUNO_FS_LIBRARY . 'portal/view.php');
 
@@ -65,7 +64,6 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
-msgTrap();
         new view($this->layout);
     }
     private function setDOM()
@@ -81,12 +79,13 @@ msgTrap();
     private function getScope()
     {
         global $db;
-        msgDebug("\nEntering getScope");
+        if (function_exists("\\bizuno\\portalGetScope")) { return portalGetScope($this->route['page'], $this->userValidated); } // Hook for customization
+        msgDebug("\nEntering getScope in library");
         if (!defined('BIZUNO_DB_CREDS')) { msgDebug("\nBIZUNO_DB_CREDS not defined, returning guest"); return 'guest'; } // Path to db not defined, needs install and creds set
         $creds= defined('BIZUNO_DB_CREDS') ? BIZUNO_DB_CREDS : [];
         $db   = new db($creds);
         if (!$db->connected) { msgDebug("\nDB not connected, returning guest"); return 'guest'; }
-        if ('portal'==$this->route['module'] && 'api'==$this->route['page'])         { msgDebug("\nAPI Request, returning api");         return 'api'; }
+        if ('portal'==$this->route['module'] && 'api'==$this->route['page'])          { msgDebug("\nAPI Request, returning api");         return 'api'; }
         if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
         if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'common_meta'))  { msgDebug("\nNormal operation, returning auth");   return 'auth'; }
         if (!$this->userValidated && !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nNeed to install, returning install"); return 'install'; }
