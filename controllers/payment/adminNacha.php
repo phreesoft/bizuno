@@ -107,7 +107,7 @@ class paymentAdminNacha extends mgrJournal
     }
     private function getMaps()
     {
-        $path = bizAutoLoadMap('BIZBOOKS_ROOT/controllers/phreebooks/nachaMaps/');
+        $path = bizAutoLoadMap('BIZUNO_FS_LIBRARY/controllers/phreebooks/nachaMaps/');
         $temp = glob("{$path}*.php");
         msgDebug("\nread from maps: ".print_r($temp, true));
         foreach ($temp as $fn) {

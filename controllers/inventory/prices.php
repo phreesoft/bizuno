@@ -97,7 +97,7 @@ class inventoryPrices extends mgrJournal
         msgDebug("\nEntering prices::managerGrid with args = ".print_r($args, true));
         $opts = array_replace(['cID'=>0, 'iID'=>0, 'dom'=>$this->dom], $args);
         $data = array_replace_recursive(parent::gridBase($security, $args), [
-            'attr'     => ['url'=>BIZUNO_AJAX."&bizRt=inventory/prices/managerRows&type=$this->type&dom={$opts['dom']}&cID={$opts['cID']}&iID={$opts['iID']}"],
+            'attr'     => ['url'=>BIZUNO_URL_AJAX."&bizRt=inventory/prices/managerRows&type=$this->type&dom={$opts['dom']}&cID={$opts['cID']}&iID={$opts['iID']}"],
             'events'   => ['onDblClickRow' => "function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&table='+rowData._table, rowData._rID); }"],
             'source'   => [
                 'search'=>['title', 'cName', 'iName'],
@@ -219,7 +219,7 @@ class inventoryPrices extends mgrJournal
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $args = ['_rID'=>$rID, '_table'=>$table];
         parent::editMeta($layout, $security, $args);
-        $layout['forms']["frm{$this->domSuffix}"]['attr']['action'] = BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type";
+        $layout['forms']["frm{$this->domSuffix}"]['attr']['action'] = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type";
         $cID  = $layout['fields']['cID']['attr']['value'];
         $iID  = $layout['fields']['iID']['attr']['value'];
         $cName= !empty($cID) ? dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name',     "id=$cID") : '';

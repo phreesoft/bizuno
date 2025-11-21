@@ -167,7 +167,7 @@ class shippingAdmin extends shippingCommon
         $rID  = clean('rID', 'integer', 'get');
         if (empty($rID)) { return; }
         $layout['tabs']['tabInventory']['divs']['shipping'] = ['order'=>75,'label'=>lang('shipping'),'type'=>'html','html'=>'',
-            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=shipping/manager/shpmtDetailsEdit&rID=$rID'"]];
+            'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=shipping/manager/shpmtDetailsEdit&rID=$rID'"]];
     }
 
     /**
@@ -234,7 +234,7 @@ class shippingAdmin extends shippingCommon
     {
         msgDebug("\nEntering $this->moduleID:install");
         $registry = getModuleCache($this->moduleID, 'properties');
-        $registry['path'] = rtrim(BIZBOOKS_ROOT."controllers/$this->moduleID", '/').'/';
+        $registry['path'] = rtrim(BIZUNO_FS_LIBRARY."controllers/$this->moduleID", '/').'/';
         setModuleCache($this->moduleID, 'properties', false, $registry);
         $bAdmin = new bizunoSettings();
         foreach ($this->structure['dirMethods'] as $dirMeth) { $bAdmin->adminInstMethods($this->moduleID, $dirMeth, $this->defMethods); }
@@ -296,7 +296,7 @@ class shippingAdmin extends shippingCommon
                     'flds'   => ['order'=> 1,'type'=>'fields',  'keys'=>['myPkgs']],
                     'toolbar'=> ['order'=>10,'type'=>'toolbar', 'key' =>'tbPkg'],
                     'body'   => ['order'=>50,'type'=>'datagrid','key' =>'dgMyPkg']]],
-                'tools'=>['order'=>80,'label'=>lang('tools'),'type'=>'html','html'=>'','options'=>["href"=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/tools/manager'"]]]]],
+                'tools'=>['order'=>80,'label'=>lang('tools'),'type'=>'html','html'=>'','options'=>["href"=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/manager'"]]]]],
             'datagrid'=> ['dgMyPkg'=>$this->dgMyPkg('dgMyPkg')],
             'fields'  => ['myPkgs'=>['attr'=>['type'=>'hidden']]],
             'jsHead'  => [$this->moduleID=>"var myPackages = ".json_encode(['total'=>sizeof($myPkgs), 'rows'=>$myPkgs]).";

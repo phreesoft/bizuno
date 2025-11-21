@@ -218,9 +218,9 @@ class inventoryAdmin
         $data = [
             'tabs' => ['tabAdmin'=> ['divs'=>[
                 'woTasks'=> ['order'=>60,'label'=>sprintf(lang('tbd_tasks'), lang('work_order')),'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/tasks/manager'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tasks/manager'"]],
                 'invAttr'=> ['order'=>70,'label'=>$this->lang['attributes'],'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/attributes/adminAttrLoad'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/adminAttrLoad'"]],
                 'tools'  => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','divs'=>[
                     'general' => ['order'=>20,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                         'invVal'   => ['order'=>10,'type'=>'panel','classes'=>['block50'],'key'=>'invVal'],

@@ -446,10 +446,10 @@ function dbDump($filename='bizuno_backup', $dirWrite='', $dbTable='')
     global $io;
     // set execution time limit to a large number to allow extra time
     set_time_limit(20000);
-    $dbHost = BIZPORTAL['host'];
-    $dbName = BIZPORTAL['name'];
-    $dbUser = BIZPORTAL['user'];
-    $dbPass = BIZPORTAL['pass'];
+    $dbHost = BIZUNO_DB_CREDS['host'];
+    $dbName = BIZUNO_DB_CREDS['name'];
+    $dbUser = BIZUNO_DB_CREDS['user'];
+    $dbPass = BIZUNO_DB_CREDS['pass'];
     $dbPath = BIZUNO_DATA.$dirWrite;
     $dbFile = $filename.".sql.gz";
     if (!$dbTable && BIZUNO_DB_PREFIX <> '') { // fetch table list (will be entire db if no prefix)

@@ -174,7 +174,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                 'shipment'=> ['order'=>20,'label'=>lang('ship'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'genShip' => ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'genShip']]],
                 'divLabel'=> ['order'=>30,'label'=>$this->lang['label_generator'],'type'=>'html','html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/ship/labelMain'"]]]]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/ship/labelMain'"]]]]],
             'panels'   => [
                 'manager' => ['type' =>'accordion','key'=>"acc{$this->domSuffix}"],
                 'genShip' => ['label'=>$this->lang['ship_invoice'],'type'=>'fields','keys'=>['shipInst','selInvoice']]],
@@ -193,7 +193,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             $title= isset($est->lang['tabTitle']) ? $est->lang['tabTitle'] : (isset($est->lang['acronym']) ? $est->lang['acronym'] : $est->lang['title']);
             if (method_exists($est, 'manager')) {
                 $data['tabs']["tab{$this->domSuffix}"]['divs'][$carrier] = ['order'=>$est->settings['order'],'label'=>$title, 'type'=>'html', 'html'=>'',
-                    'options' => ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getCarrier&sID=$carrier'"]];
+                    'options' => ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getCarrier&sID=$carrier'"]];
             } else {
                 $data['tabs']["tab{$this->domSuffix}"]['divs'][$carrier] = ['order'=>$order,'label'=>$title,'type'=>'html','html'=>lang('msg_no_settings')];
             }

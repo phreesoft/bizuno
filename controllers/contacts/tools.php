@@ -68,8 +68,8 @@ class contactsTools
     {
         global $io;
         if (!$security = validateAccess('admin', 4)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/address.php','contactsAddress');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/payment/wallet.php',  'paymentWallet');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/address.php','contactsAddress');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/payment/wallet.php',  'paymentWallet');
         $this->srcID = clean('rID', 'integer', 'get'); // record ID to merge
         $this->destID= clean('data','integer', 'get'); // record ID to keep
         if (!$this->srcID || !$this->destID) { return msgAdd("Bad IDs, Source ID = $this->srcID and Destination ID = $this->destID"); }
@@ -260,7 +260,7 @@ class contactsTools
         $struc = $this->chartSalesData($rID, $type);
         $title = $type=='v' ? $this->lang['purchases_by_month'] : $this->lang['sales_by_month'];
         $output= ['divID'=>"chartContactsChart",'type'=>'column','attr'=>['legend'=>'none','title'=>$title],'data'=>array_values($struc)];
-        $action= BIZUNO_AJAX."&bizRt=contacts/tools/chartSalesGo&rID=$rID&type=$type";
+        $action= BIZUNO_URL_AJAX."&bizRt=contacts/tools/chartSalesGo&rID=$rID&type=$type";
         $js    = "ajaxDownload('frmContactsChart');\n";
         $js   .= "var dataContactsChart = ".json_encode($output).";\n";
         $js   .= "function funcContactsChart() { drawBizunoChart(dataContactsChart); };";

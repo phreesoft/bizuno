@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/export.php', 'apiExport');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
 class ifGoogle extends apiExport
 {
@@ -167,9 +167,9 @@ class ifGoogle extends apiExport
                     'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>".$this->lang['build_inventory_desc']."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnInv']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
-            'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=ifGoogle&dl=1"]]],
+            'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=ifGoogle&dl=1"]]],
             'fields' => [
-                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZBOOKS_URL_ROOT.'0/controllers/api/funnels/ifGoogle/google_large.png']],
+                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZUNO_URL_PORTAL.'0/controllers/api/funnels/ifGoogle/google_large.png']],
                 'btnInv' => ['events'=>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]]],
             'jsReady'=> ['init'    =>"ajaxDownload('frmInventory');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);
@@ -227,7 +227,7 @@ class ifGoogle extends apiExport
                         }
                         break;
                     case 'image_link':
-                        $aItem[$idx] = BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/{$item['image_with_path']}";
+                        $aItem[$idx] = BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/{$item['image_with_path']}";
                         break;
                     case 'link':
                     case 'mobile_link':

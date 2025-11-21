@@ -136,10 +136,10 @@ final class view
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];
         $data['head']['metaIcon']    = ['order'=>28,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.BIZUNO_ICON.'" />'];
         // Page head CSS
-        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/portal.css" />'];
+        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/portal.css" />'];
         // Page head JavaScript 
-        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'jQuery-3.7.1.js"></script>'];
-        $data['head']['jsBizuno']    = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZBOOKS_URL_FS.'0/view/portal.js"></script>'];
+        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'jQuery-3.7.1.js"></script>'];
+        $data['head']['jsBizuno']    = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_FS.'0/view/portal.js"></script>'];
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
         }
@@ -160,8 +160,8 @@ final class view
         $this->setEnvHTML($data); // load the <head> HTML for pages
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
-//          $data['head']['cssMobile'] = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS.'jquery-easyui/themes/mobile.css" />'];
-            $data['head']['jsMobile']  = ['order'=>66,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'jquery-easyui/jquery.easyui.mobile.js?ver='.MODULE_BIZUNO_VERSION.'"></script>'];
+//          $data['head']['cssMobile'] = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS.'jquery-easyui/themes/mobile.css" />'];
+            $data['head']['jsMobile']  = ['order'=>66,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'jquery-easyui/jquery.easyui.mobile.js?ver='.MODULE_BIZUNO_VERSION.'"></script>'];
         }
         $dom .= "<!DOCTYPE HTML>\n<html>\n<head>\n".$this->renderHead($data)."</head>\n";
         if (in_array($this->myDevice, ['mobile', 'tablet'])) {
@@ -188,12 +188,12 @@ final class view
         $theme   = getUserCache('profile', 'theme', false, 'auto');
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'black' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
-        $favicon = $logoPath ? BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
+        $favicon = $logoPath ? BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
 //        $cssPath = defined('BIZUNO_SHARED') && !empty(BIZUNO_SHARED) ? 'myPortal' : 'ispPortal';
         $js  = "var bizID = '".getUserCache('business','bizID', false, 0)."';\n";
-        $js .= "var bizunoHome = '".BIZUNO_HOME."';\n";
-        $js .= "var bizunoAjax = '".BIZUNO_AJAX."';\n";
-        $js .= "var bizunoAjaxFS = '".BIZBOOKS_URL_FS."';\n";
+        $js .= "var bizunoHome = '".BIZUNO_URL_PORTAL."';\n";
+        $js .= "var bizunoAjax = '".BIZUNO_URL_AJAX."';\n";
+        $js .= "var bizunoAjaxFS = '".BIZUNO_URL_FS."';\n";
         // Create page Head HTML
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.(!empty($data['title']) ? $data['title'] : getModuleCache('bizuno', 'properties', 'title')).'</title>'];
         $data['head']['metaPath']    = ['order'=>22,'type'=>'html','html'=>'<!-- route:'.clean('bizRt',['format'=>'path_rel','default'=>''],'get').' -->'];
@@ -202,19 +202,19 @@ final class view
         $data['head']['metaRobots']  = ['order'=>28,'type'=>'html','html'=>'<meta name="robots" content="noindex" />'];
         $data['head']['metaIcon']    = ['order'=>30,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.$favicon.'" />'];
         // CSS Links
-        $data['head']['cssTheme']    = ['order'=>40,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/'.$theme.'/easyui.css" />'];
-        $data['head']['cssIcon']     = ['order'=>42,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/icon.css" />'];
-        $data['head']['cssStyle']    = ['order'=>44,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZBOOKS_URL_FS.'0/view/easyUI/stylesheet.css&ver='.MODULE_BIZUNO_VERSION.'" />'];
-        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/viewCSS&icons='.$icons.'" />'];
-        $data['head']['cssMobile']   = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SCRIPTS .'jquery-easyui/themes/mobile.css" />'];
-        $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiCSS" />']; // combines all of the easyUI extension css
+        $data['head']['cssTheme']    = ['order'=>40,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS .'jquery-easyui/themes/'.$theme.'/easyui.css" />'];
+        $data['head']['cssIcon']     = ['order'=>42,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS .'jquery-easyui/themes/icon.css" />'];
+        $data['head']['cssStyle']    = ['order'=>44,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_FS      .'0/view/easyUI/stylesheet.css&ver='.MODULE_BIZUNO_VERSION.'" />'];
+        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_API     .'portal/api/viewCSS&icons='.$icons.'" />'];
+        $data['head']['cssMobile']   = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS .'jquery-easyui/themes/mobile.css" />'];
+        $data['head']['cssEasyExt']  = ['order'=>54,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_API     .'portal/api/easyuiCSS" />']; // combines all of the easyUI extension css
         // JavaScript Links 
-        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS .'jQuery-3.7.1.js"></script>'];
-        $data['head']['jsFontAwe']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->fontAwe .'" crossorigin="anonymous"></script>'];
+        $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS .'jQuery-3.7.1.js"></script>'];
+        $data['head']['jsFontAwe']   = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->fontAwe     .'" crossorigin="anonymous"></script>'];
         $data['head']['jsBizuno']    = ['order'=>64,'type'=>'html','html'=>'<script type="text/javascript">'.$js."</script>"];
-        $data['head']['jsEasyUI']    = ['order'=>66,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS .'jquery-easyui/jquery.easyui.min.js?ver='.MODULE_BIZUNO_VERSION.'"></script>'];
-        $data['head']['jsCommon']    = ['order'=>78,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZBOOKS_URL_FS.'0/view/easyUI/common.js&ver='.MODULE_BIZUNO_VERSION.'"></script>']; 
-        $data['head']['jsEasyExt']   = ['order'=>80,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SRVR    .'?bizRt=portal/api/easyuiJS"></script>']; // combines all of the easyUI extension js
+        $data['head']['jsEasyUI']    = ['order'=>66,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS .'jquery-easyui/jquery.easyui.min.js?ver='.MODULE_BIZUNO_VERSION.'"></script>'];
+        $data['head']['jsCommon']    = ['order'=>78,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_FS      .'0/view/easyUI/common.js&ver='.MODULE_BIZUNO_VERSION.'"></script>']; 
+        $data['head']['jsEasyExt']   = ['order'=>80,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_API     .'portal/api/easyuiJS"></script>']; // combines all of the easyUI extension js
     }
 
     /**
@@ -662,8 +662,8 @@ function createDivs() {
     var dashDiv = jqBiz('<div />').appendTo('#bizBody'); // try recreating the div from scratch
     dashDiv.attr('id', 'dashboard');
     for (var i = 0; i < numCols; i++) { jqBiz('#dashboard').append('<div></div>'); }
-    jqBiz('#dashboard').portal( { border:false, onStateChange:function() { var state = getPortalState(); jqBiz.ajax({ url:'".BIZUNO_AJAX."&bizRt=bizuno/dashboard/organize&menuID='+menuID+'&numCols='+numCols+'&state='+state }); } });
-    jqBiz.ajax({ url: '".BIZUNO_AJAX."&bizRt=bizuno/dashboard/render&menuID='+menuID+'&numCols='+numCols, success: addPanels });
+    jqBiz('#dashboard').portal( { border:false, onStateChange:function() { var state = getPortalState(); jqBiz.ajax({ url:'".BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/organize&menuID='+menuID+'&numCols='+numCols+'&state='+state }); } });
+    jqBiz.ajax({ url: '".BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/render&menuID='+menuID+'&numCols='+numCols, success: addPanels });
 }
 function getPanelOptions(id) {
     for (var i=0; i<panels.length; i++) if (panels[i].id == id) return panels[i];
@@ -775,13 +775,13 @@ function viewNumToWords($value=0)
 {
     $lang = getUserCache('profile', 'language', false, 'en_US');
     if ($lang <> 'en_US') {
-        if (file_exists(BIZBOOKS_ROOT."locale/".getUserCache('profile', 'language')."/functions.php")) { // PhreeBooks 5
-            bizAutoLoad(BIZBOOKS_ROOT."locale/".getUserCache('profile', 'language')."/functions.php", 'viewCurrencyToWords', 'function');
+        if (file_exists(BIZUNO_FS_LIBRARY."locale/".getUserCache('profile', 'language')."/functions.php")) { // PhreeBooks 5
+            bizAutoLoad(BIZUNO_FS_LIBRARY."locale/".getUserCache('profile', 'language')."/functions.php", 'viewCurrencyToWords', 'function');
         } elseif (file_exists(BIZUNO_DATA."locale/".getUserCache('profile', 'language')."/functions.php")) { // WordPress
             bizAutoLoad(BIZUNO_DATA."locale/".getUserCache('profile', 'language')."/functions.php", 'viewCurrencyToWords', 'function');
         }
     }
-    bizAutoLoad(BIZBOOKS_ROOT."locale/en_US/functions.php", 'viewCurrencyToWords', 'function');
+    bizAutoLoad(BIZUNO_FS_LIBRARY."locale/en_US/functions.php", 'viewCurrencyToWords', 'function');
     return viewCurrencyToWords($value);
 }
 
@@ -1204,7 +1204,7 @@ function adminStructure($module, $structure=[], $lang=[])
             'intro'  => ['order'=>15,'type'=>'html', 'html'=>$html],
             'main'   => ['order'=>50,'type'=>'tabs','key'=>'tabAdmin']],
         'toolbars'=> ['tbAdmin' =>['icons'=>['save'=>['order'=>20,'events'=>['onClick'=>"jqBiz('#frmAdmin').submit();"]]]]],
-        'forms'   => ['frmAdmin'=>['attr'=>['type'=>'form', 'action'=>BIZUNO_AJAX."&bizRt=$module/admin/adminSave"]]],
+        'forms'   => ['frmAdmin'=>['attr'=>['type'=>'form', 'action'=>BIZUNO_URL_AJAX."&bizRt=$module/admin/adminSave"]]],
         'tabs'    => ['tabAdmin'=>['divs'=>['settings'=>['order'=>10,'label'=>lang('settings'),'type'=>'divs','divs'=>[
             'toolbar'=> ['order'=>10,'type'=>'toolbar',  'key' =>'tbAdmin'],
             'formBOF'=> ['order'=>15,'type'=>'form',     'key' =>'frmAdmin'],
@@ -1219,7 +1219,7 @@ function adminStructure($module, $structure=[], $lang=[])
     $order = 70;
     foreach ($methDirs as $folder) { // keys = 'totals', 'carriers', 'funnels', 'gateways', etc.
         $data['tabs']['tabAdmin']['divs']['tab'.$folder] = ['order'=>$order,'label'=>lang($folder),'type'=>'html','html'=>'',
-            'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=bizuno/settings/adminMethods&module=$module&folder=$folder'"]];
+            'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=bizuno/settings/adminMethods&module=$module&folder=$folder'"]];
         $order++;
     }
     return $data; // since this now just a div, don't need viewMain()
@@ -1350,7 +1350,7 @@ function htmlFindImage($settings, $height=32)
     if (strpos($settings['path'], 'BIZUNO_DATA/') ===0) { // use client folder path
         $url = bizAutoLoadMap($settings['url']);
     } else { // use the bizuno folder via api FS
-        $url = BIZBOOKS_URL_FS."0/controllers/{$settings['module']}/{$settings['folder']}/{$settings['id']}/";
+        $url = BIZUNO_URL_FS."0/controllers/{$settings['module']}/{$settings['folder']}/{$settings['id']}/";
     }
     return html5('', ['attr'=>['type'=>'img','src'=>"{$url}logo.png", 'height'=>$height]]);
 }

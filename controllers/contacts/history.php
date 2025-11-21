@@ -131,7 +131,7 @@ class contactsHistory
             default: $jPmt = 18; $cmPmt = 22; break;
         }
         $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang('journal_id', $jID)),
-            'attr'   => ['idField'=>'id','url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&type=$this->type&jID=$jID&rID=$rID"],
+            'attr'   => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&type=$this->type&jID=$jID&rID=$rID"],
             'source' => [
                 'tables' => ['journal_main'=>['table'=>BIZUNO_DB_PREFIX.'journal_main']],
                 'filters' => [

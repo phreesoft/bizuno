@@ -55,7 +55,7 @@ class mgrJournal
     {
         $defs = array_replace(['dom'=>'page', 'type'=>'meta', '_table'=>'common', '_refID'=>clean('refID', 'integer', 'get'), 'period'=>getModuleCache('phreebooks', 'fy', 'period'), 'textCopy'=>lang('instr_copy'), 'work'=>false, 'xGet'=>''], $args); // valid types are journal or meta
         $data = ['id'=>"dg{$this->domSuffix}", 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'], 'metaPrefix'=>$this->metaPrefix, 'metaTable'=>$defs['_table'], 'metaKey'=>$defs['_refID'],
-            'attr'   => ['toolbar'=>"#dg{$this->domSuffix}Toolbar", 'idField'=>$defs['type']=='meta'?'_rID':'id', 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows{$defs['xGet']}"],
+            'attr'   => ['toolbar'=>"#dg{$this->domSuffix}Toolbar", 'idField'=>$defs['type']=='meta'?'_rID':'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows{$defs['xGet']}"],
             'events' => [
                 'rowStyler'    =>"function(index, row) { if (row.status==1) { return {class:'row-inactive'}; }}",
                 'onDblClickRow'=>"function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&table='+rowData._table+'{$defs['xGet']}', ".($defs['type']=='meta'?'rowData._rID':'rowData.id')."); }",
@@ -464,7 +464,7 @@ class mgrJournal
                 'new'  => ['order'=>40,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '{$defs['title']}', '$this->moduleID/$this->pageID/".($admin?'adminEdit':'edit')."&dom={$defs['dom']}&table={$defs['_table']}{$defs['xGet']}', 0);"]],
                 'copy' => ['order'=>50,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"var title=prompt('".lang('msg_entry_copy')."'); if (title!=null) jsonAction('$this->moduleID/$this->pageID/" .($admin?'adminCopy'  :'copy')  ."&refID={$defs['_refID']}&table={$defs['_table']}{$defs['xGet']}','{$defs['_rID']}', title);"]],
                 'trash'=> ['order'=>80,'hidden'=>$security>3 && $defs['_rID']?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/$this->pageID/".($admin?'adminDelete':'delete')."&refID={$defs['_refID']}&table={$defs['_table']}{$defs['xGet']}','{$defs['_rID']}');"]]]]],
-            'forms'   => ["frm{$this->domSuffix}"=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/".($admin?'adminSave':'save')."{$defs['xGet']}"]]],
+            'forms'   => ["frm{$this->domSuffix}"=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/".($admin?'adminSave':'save')."{$defs['xGet']}"]]],
             'fields'  => $this->struc,
             'jsReady' => ['init'=>"ajaxForm('frm{$this->domSuffix}');"]];
         $tree = $this->extractTabTree();

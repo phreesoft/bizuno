@@ -70,10 +70,10 @@ class administrateBackup
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmAudit'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['auditDesc','btnAudit','audClnDesc','dateClean','btnClean']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>lang('files'),'url'=>BIZUNO_AJAX."&bizRt=administrate/backup/mgrRows",'ext'=>$io->getValidExt('backup')]]],
+                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>lang('files'),'url'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/mgrRows",'ext'=>$io->getValidExt('backup')]]],
             'forms'   => [
-                'frmBackup'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/backup/save"]],
-                'frmAudit' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/backup/cleanAudit"]]],
+                'frmBackup'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/save"]],
+                'frmAudit' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/cleanAudit"]]],
             'fields'  => [
                 'backupDesc'=> ['order'=>10,'html'=>$this->lang['desc_backup'],          'attr'=>['type'=>'raw']],
 //              'incFiles'  => ['order'=>20,'label'=>$this->lang['desc_backup_all'],'attr'=>['type'=>'checkbox', 'value'=>'all']],
@@ -110,7 +110,7 @@ class administrateBackup
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]]],
             'toolbars'=> ['tbRestore' => ['icons'=>['cancel'=>['order'=>10,'events'=>['onClick'=>"bizPanelReload('bizBody', 'administrate/backup/manager');"]]]]],
             'datagrid'=> ['dgRestore' => $this->dgRestore('dgRestore')],
-            'forms'   => ['frmRestore'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/backup/uploadRestore",'enctype'=>"multipart/form-data"]]],
+            'forms'   => ['frmRestore'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/uploadRestore",'enctype'=>"multipart/form-data"]]],
             'fields'  => [
                 'txtFile'=> ['order'=>10,'html'=>lang('msg_io_upload_select')." ".sprintf(lang('max_upload'), $upload_mb)."<br />",'attr'=>['type'=>'raw']],
                 'fldFile'=> ['order'=>15,'attr'=>['type'=>'file']],
@@ -207,7 +207,7 @@ class administrateBackup
         if ($this->dbRestore($dbFile)) { 
             bizClrCookie('bizunoSession'); // forces a logout
             bizCacheExpClear();
-            $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"location.href='".BIZUNO_HOME."'"]]);
+            $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"location.href='".BIZUNO_URL_PORTAL."'"]]);
         } else {
             msgAdd("There was an error during the restore. Most likely nothing was done, sorry.");
         }
@@ -219,10 +219,10 @@ class administrateBackup
         $output = $retValue = null;
         $bizCreds= getUserCache('business');
         $dbFile  = BIZUNO_DATA.$filename;
-        $dbHost  = BIZPORTAL['host'];
-        $dbName  = !empty(BIZPORTAL['name']) ? BIZPORTAL['name'] : (!empty($bizCreds['bizDB']) ? $bizCreds['bizDB'] : '');
-        $dbUser  = BIZPORTAL['user'];
-        $dbPass  = BIZPORTAL['pass'];
+        $dbHost  = BIZUNO_DB_CREDS['host'];
+        $dbName  = !empty(BIZUNO_DB_CREDS['name']) ? BIZUNO_DB_CREDS['name'] : (!empty($bizCreds['bizDB']) ? $bizCreds['bizDB'] : '');
+        $dbUser  = BIZUNO_DB_CREDS['user'];
+        $dbPass  = BIZUNO_DB_CREDS['pass'];
         if (empty($dbName) || empty($dbUser) || empty($dbPass)) { return msgAdd('invalid_credentials'); }
         $ext     = strtolower(pathinfo($dbFile, PATHINFO_EXTENSION));
         msgDebug("\nLooking for how to process extension: $ext");
@@ -250,7 +250,7 @@ class administrateBackup
     private function dgRestore($name='dgRestore')
     {
         $data = ['id'=>$name, 'title'=>lang('files'),
-            'attr'   => ['idField'=>'title', 'url'=>BIZUNO_AJAX."&bizRt=administrate/backup/mgrRows"],
+            'attr'   => ['idField'=>'title', 'url'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/mgrRows"],
             'columns'=> [
                 'action'=> ['order'=> 1,'label'=>lang('action'),  'attr'=>['width'=>60],
                     'events' =>['formatter'=>"function(value,row,index) { return {$name}Formatter(value,row,index); }"],

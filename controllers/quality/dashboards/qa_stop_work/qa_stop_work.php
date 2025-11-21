@@ -71,7 +71,7 @@ class qa_stop_work
     public function render($opts=[])
     {
         $rows   = [];
-        $action = BIZUNO_AJAX."&bizRt=$this->moduleID/tickets/exportData&type=status&range={$opts['range']}";
+        $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tickets/exportData&type=status&range={$opts['range']}";
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('export_data')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
         $filter = "journal_id=30 AND closed='0'"; // AND printed=2
         $order  = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';

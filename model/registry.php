@@ -77,8 +77,8 @@ final class bizRegistry
         global $bizunoLang;
         msgDebug("\nFetching lang from file system.");
         $langCore = $langByRef = [];
-        require(BIZBOOKS_ROOT.'locale/en_US/language.php');  // pulls the current language in English
-        include(BIZBOOKS_ROOT.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
+        require(BIZUNO_FS_LIBRARY.'locale/en_US/language.php');  // pulls the current language in English
+        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
         $bizunoLang = [
             'core'      => array_merge($langCore, $langByRef),
             'modules'   => [],
@@ -86,7 +86,7 @@ final class bizRegistry
             'methods'   => []];
         foreach (array_keys($this->validMods) as $modID) {
             $lang = [];
-            $fullPath = bizAutoLoadMap(BIZBOOKS_ROOT."locale/en_US/modules/$modID/language.php");
+            $fullPath = bizAutoLoadMap(BIZUNO_FS_LIBRARY."locale/en_US/modules/$modID/language.php");
             msgDebug("\nLooking for language for module $modID at: $fullPath");
             if (file_exists($fullPath)) { require($fullPath); } // populates $lang
             ksort($lang);
@@ -110,7 +110,7 @@ final class bizRegistry
                 $modSettings[$modID] = $cfgMods[$modID];
             } else {
                 msgDebug("\nConfig database data is NOT set for module: $modID, trying to install.");
-                bizAutoLoad(BIZBOOKS_ROOT .'controllers/bizuno/settings.php', 'bizunoSettings');
+                bizAutoLoad(BIZUNO_FS_LIBRARY .'controllers/bizuno/settings.php', 'bizunoSettings');
                 setUserCache('role', 'administrate', 1);
                 $bAdmin = new bizunoSettings();
                 $bAdmin->moduleInstall($layout, $modID, $path);
@@ -153,7 +153,7 @@ unset($bizunoMod[$module]['dashboards']);
         $admin->structure['title']      = !empty($admin->lang['title'])       ? $admin->lang['title']       : $fqcn;
         $admin->structure['description']= !empty($admin->lang['description']) ? $admin->lang['description'] : $fqcn." description";
         $admin->structure['path']       = $relPath;
-        $admin->structure['url']        = str_replace('BIZBOOKS_ROOT/', 'BIZBOOKS_URL_ROOT/', $relPath);
+        $admin->structure['url']        = str_replace('BIZUNO_FS_LIBRARY/', 'BIZUNO_URL_PORTAL/', $relPath);
         if (!isset($admin->structure['status'])) { $admin->structure['status'] = 1; }
         $admin->structure['hasAdmin']   = method_exists($admin, 'adminHome') ? true : false;
         $admin->structure['devStatus']  = !empty($admin->devStatus) ? $admin->devStatus : false;
@@ -398,7 +398,7 @@ unset($bizunoMod[$module]['dashboards']);
         foreach ($methods as $method => $path) {
             if (defined('BIZUNO_DATA') && strpos($path, 'BIZUNO_DATA/') === 0) {
                 $bizID = getUserCache('business', 'bizID');
-                $url   = BIZBOOKS_URL_FS."$bizID/myExt/controllers/$module/$folderID/$method/";
+                $url   = BIZUNO_URL_FS."$bizID/myExt/controllers/$module/$folderID/$method/";
             } else {
                 $url   = isset($structure['url']) ? "{$structure['url']}$folderID/$method/" : '';
             }

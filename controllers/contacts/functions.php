@@ -87,7 +87,7 @@ function viewContactSales($cID='',$range='q0')
 {
     global $report;
     if (empty($GLOBALS['contactSales'])) {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'calculatePeriod', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'calculatePeriod', 'function');
         $parts  = explode(":", $report->datedefault); // encoded dates, type:start:end
         $period = calculatePeriod($parts[2], false);
         $QtrStrt= $period - (($period - 1) % 3);

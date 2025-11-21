@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 /**
  * Main journal class wrapper, calls appropriate journal class as needed
@@ -134,7 +134,7 @@ class journal
     {
         $jName = $this->getJournalName($jID);
         $fqcn = "\\bizuno\\$jName";
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/$jName.php", $fqcn);
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journals/$jName.php", $fqcn);
         return new $fqcn($main, $item);
     }
 
@@ -517,7 +517,7 @@ class journal
         msgDebug("\nEntering journal:updateContact with Update Billing button selected: ".(!empty($updateB) ? 'YES' : 'NO'));
         if ( empty($updateB) &&  empty($updateS)) { return true; } // nothing to do, return
         $cType  = in_array($this->main['journal_id'], [3,4,6,7,17,20,21]) ? 'v' : 'c';
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/main.php', 'contactsMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/main.php', 'contactsMain');
         $contact= new contactsMain($cType);
         if (!empty($updateB)) { // Billing address
             $billB = $contact->addressUpdate(['cID'=>$cIDb, 'aID'=>$aIDb, 'cType'=>$this->type, 'aType'=>'b', 'suffix'=>'_b']);

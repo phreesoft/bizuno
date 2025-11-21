@@ -75,7 +75,7 @@ Bizuno can be installed as a standalone application, a WordPress plugin, or host
 
 ## Configuration
 Customize Bizuno by editing the `/portalCFG.php` file to set up your environment settings:
-- **Database Settings**: Update `BIZPORTAL` with your database credentials.
+- **Database Settings**: Update `BIZUNO_DB_CREDS` with your database credentials.
 - **Business ID**: Set your busienss ID, can be any combination of numbers and letters, best if more than 6 characters
 - **Business Data Path**: Path to your business data files. This can be anywhere within the server php path. For security, the your data files should be located out of the reach of your wweb server.
 - **Bizuno Key**: Set to a random 16 character string, used to encode your cookies and for other security measures.

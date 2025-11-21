@@ -143,7 +143,7 @@ class apiExport
                 'verify_add' => true]];
 //        $pkg['ship']['country2'] = $layout['pkg']['destination']['country'];
 //        $pkg['ship']['country3'] = $pkg['ship']['country'];
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/rate.php', 'shippingShip');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/rate.php', 'shippingShip');
         $quote = new shippingRate();
         $quote->fieldsAddress($pkg, ['suffix'=>'_o','cID'=>0]); // origin
         $quote->fieldsAddress($pkg, ['suffix'=>'_s','cID'=>0]); // shipper
@@ -166,7 +166,7 @@ class apiExport
 //      if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'model'))            { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD model VARCHAR(24) NOT NULL DEFAULT '' COMMENT 'label:Model;tag:Model;tab:$id;order:41'"); }
 //      if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'meta_keywords'))    { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD meta_keywords VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'label:Meta Keywords;tag:MetaKeywords;tab:$id;o rder:90;group:General'"); }
 //      if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'meta_description')) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD meta_description VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'label:Meta Description;tag:MetaDescription;tab:$id;order:91;group:General'"); }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/admin.php', 'inventoryAdmin');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/admin.php', 'inventoryAdmin');
         $inv = new inventoryAdmin();
         $inv->installPhysicalFields();
     }

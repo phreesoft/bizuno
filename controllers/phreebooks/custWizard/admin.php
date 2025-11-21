@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
 
 class custWizardAdmin {
     public  $moduleID   = 'custWizard';
@@ -41,7 +41,7 @@ class custWizardAdmin {
         $this->structure= [
             'prerequisites'=> ['bizuno'=>'3.0'],
             'category'     => $this->category,
-            'url'          => BIZBOOKS_URL_ROOT."controllers/$this->moduleID/",
+            'url'          => BIZUNO_URL_PORTAL."controllers/$this->moduleID/",
             'hooks'        => ['phreebooks'=>['main'=>['manager'=>['page'=>'admin','class'=>'custWizardAdmin','order'=>50]]]]];
     }
 

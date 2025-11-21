@@ -31,7 +31,7 @@ use PHPMailer\PHPMailer\PHPMailer; //Import PHPMailer classes into the global na
 use PHPMailer\PHPMailer\Exception;
 //use PHPMailer\PHPMailer\SMTP;
 
-class bizunoMailer
+class bizunoMailer extends portalMail
 {
     public $struc;
     public $toEmail;
@@ -92,7 +92,12 @@ class bizunoMailer
      * This sends an e-mail to one or more recipients, handles errors.
      * @return boolean - true if successful, false with messageStack errors if not
      */
-    public function sendMail()
+    public function sendMail() {
+        if ( method_exists( get_parent_class( $this ), 'sendMail' ) ) { return parent::sendMail(); }
+        return $this->bizunoMailerSendMail();
+    }
+
+    private function bizunoMailerSendMail()
     {
         global $mail;
 //      error_reporting(E_ALL & ~E_NOTICE); // This is to eliminate errors from undefined constants in phpmailer
@@ -101,7 +106,7 @@ class bizunoMailer
 //$mail->DebugOutput = function($str, $level) { msgDebug("\nphpMailer Debug level $level; message: $str"); };
         $mail->CharSet = defined('CHARSET') ? CHARSET : 'utf-8'; // default "iso-8859-1";
         $mail->isHTML(true); // set email format to HTML
-        $mail->setLanguage(substr(getUserCache('profile', 'language', false, 'en_US'), 0, 2), BIZBOOKS_ROOT.'apps/PHPMailer/language/');
+        $mail->setLanguage(substr(getUserCache('profile', 'language', false, 'en_US'), 0, 2), BIZUNO_FS_LIBRARY.'apps/PHPMailer/language/');
         if (!$mail->validateAddress($this->FromEmail)) { return msgAdd(sprintf(lang('error_invalid_email'), $this->FromEmail)); }
         $mail->setFrom($this->FromEmail, $this->FromName);
 //      $mail->addReplyTo($this->FromEmail, $this->FromName); // don't need anymore since users can now send from their own address
@@ -141,7 +146,6 @@ class bizunoMailer
         }
         msgAdd('Message has been sent.', 'success');
         return true;
-            
     }
 
     private function sendSMTP($creds)

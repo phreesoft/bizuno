@@ -106,7 +106,7 @@ class phreebooksReturns extends mgrJournal
         $sqlPeriod= $dateRange['sql'];
         $stores   = getModuleCache('bizuno', 'stores');
         $data     = array_replace_recursive(parent::gridBase($security, $args), ['metaTable'=>'journal',
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&mgrAction=$action&rIDList=$key&range=$range"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&mgrAction=$action&rIDList=$key&range=$range"],
             'source' => [
                 'tables' => ['journal_meta'=>['table'=>BIZUNO_DB_PREFIX.'journal_meta','join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_meta.ref_id"]],
                 'search' => ['invoice_num', 'post_date', 'description', 'meta_value'],
@@ -319,7 +319,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
                 'formBOF'  => ['order'=>20,'type'=>'form',   'key' =>'frmReturn'],
                 'winReturn'=> ['order'=>50,'type'=>'fields', 'keys'=>array_keys($fields)],
                 'formEOF'  => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
-            'forms'   => ['frmReturn'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getReturnNum"]]],
+            'forms'   => ['frmReturn'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getReturnNum"]]],
             'fields'  => $fields,
             'jsReady' => ['init'=>"ajaxForm('frmReturn', true);"]];
         $layout = array_replace_recursive($layout, $data);

@@ -81,7 +81,7 @@ class phreebooksRestfulTax
                     'desc'   => ['order'=>20,'type'=>'html','html'=>"<p>Pick your Nexus states and press Save:</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnSaveNexus','nexusSt']],
                     'formEOF'=> ['order'=>90,'type'=>'html','html'=>"</form>"]]]],
-            'forms'  => ['frmNexus'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save"]]],
+            'forms'  => ['frmNexus'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/save"]]],
             'fields' => $fields,
             'jsReady'=> ['init'=>"ajaxForm('frmNexus'); bizSelSet('nexusSt',".json_encode($this->nexusSt).");"]];
         $layout = array_replace_recursive($layout, $data);

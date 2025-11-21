@@ -47,12 +47,12 @@ function bizAutoLoad($path, $method='', $type='class')
 
 function bizAutoLoadMap($path='')
 {
-    if (empty($path)) { return BIZBOOKS_ROOT; }
+    if (empty($path)) { return BIZUNO_FS_LIBRARY; }
     $max = 1;
-    if (strpos($path, 'BIZBOOKS_ROOT/')===0)     { return str_replace('BIZBOOKS_ROOT/',    BIZBOOKS_ROOT,    $path, $max); }
+    if (strpos($path, 'BIZUNO_FS_LIBRARY/')===0)     { return str_replace('BIZUNO_FS_LIBRARY/',    BIZUNO_FS_LIBRARY,    $path, $max); }
     if (strpos($path, 'BIZUNO_DATA/')  ===0)     { return str_replace('BIZUNO_DATA/',      BIZUNO_DATA,      $path, $max); }
-    if (strpos($path, 'BIZBOOKS_URL_ROOT/')===0) { return str_replace('BIZBOOKS_URL_ROOT/',BIZBOOKS_URL_ROOT,$path, $max); }
-    if (strpos($path, 'BIZBOOKS_URL_FS/')  ===0) { return str_replace('BIZBOOKS_URL_FS/',  BIZBOOKS_URL_FS,  $path, $max); }
+    if (strpos($path, 'BIZUNO_URL_PORTAL/')===0) { return str_replace('BIZUNO_URL_PORTAL/',BIZUNO_URL_PORTAL,$path, $max); }
+    if (strpos($path, 'BIZUNO_URL_FS/')  ===0) { return str_replace('BIZUNO_URL_FS/',  BIZUNO_URL_FS,  $path, $max); }
     return $path;
 }
 /**
@@ -63,8 +63,8 @@ function bizAutoLoadMap($path='')
 function bizAutoLoadRemap($path)
 {
     $max = 1;
-    if (strpos($path, BIZBOOKS_ROOT)===0)   { return str_replace(BIZBOOKS_ROOT,'BIZBOOKS_URL_ROOT/',   $path, $max); }
-    if (strpos($path,'BIZBOOKS_ROOT/')===0) { return str_replace('BIZBOOKS_ROOT/','BIZBOOKS_URL_ROOT/',$path, $max); }
+    if (strpos($path, BIZUNO_FS_LIBRARY)===0)   { return str_replace(BIZUNO_FS_LIBRARY,'BIZUNO_URL_PORTAL/',   $path, $max); }
+    if (strpos($path,'BIZUNO_FS_LIBRARY/')===0) { return str_replace('BIZUNO_FS_LIBRARY/','BIZUNO_URL_PORTAL/',$path, $max); }
     return $path;
 }
 /**
@@ -272,17 +272,17 @@ function loadBaseLang($lang='en_US')
         $langCache = json_decode(file_get_contents(BIZUNO_DATA."cache/lang_{$lang}.json"), true);
     } else {
         msgDebug("\nFetching lang from file system.");
-        require(BIZBOOKS_ROOT.'locale/en_US/language.php');  // pulls the current language in English
-        include(BIZBOOKS_ROOT.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
+        require(BIZUNO_FS_LIBRARY.'locale/en_US/language.php');  // pulls the current language in English
+        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
         $langCache['core'] = array_merge($langCore, $langByRef);
     }
     if ($lang == 'en_US') { return $langCache; } // just english, we're done
     $otherLang = [];
-    if (file_exists(BIZBOOKS_ROOT."locale/$lang/language.php")) {
+    if (file_exists(BIZUNO_FS_LIBRARY."locale/$lang/language.php")) {
         msgDebug("\nFetching lang: $lang from file system.");
-        require(BIZBOOKS_ROOT."locale/$lang/language.php");  // pulls locale overlay
+        require(BIZUNO_FS_LIBRARY."locale/$lang/language.php");  // pulls locale overlay
         $langCore = array_replace_recursive($langCache, $langCore); // overlay ISO lang on top of working cache file
-        include(BIZBOOKS_ROOT.'locale/en_US/langByRef.php'); // lang by reference (reset after loading translation)
+        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (reset after loading translation)
         $otherLang = array_replace_recursive($langCore, $langByRef);
     }
     return array_replace($langCache, $otherLang);
@@ -1205,7 +1205,7 @@ function periodAutoUpdate($verbose=true)
     if (!$period) { // we're outside of the defined fiscal years
         if ($verbose) { msgAdd(sprintf(lang('err_gl_post_date_invalid'), $period)); } // removed 'trap' as auto fiscal year creates debug files everywhwere
         setUserCache('role', 'administrate', 1);
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/tools.php', 'phreebooksTools');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/tools.php', 'phreebooksTools');
         $tools = new phreebooksTools();
         $tools->fyAdd(); // auto-add new fiscal year
         return true;
@@ -1633,7 +1633,7 @@ function viewFavicon($url, $title='', $event=false)
         $img = base64_encode($result);
         if ($img) { $io->fileWrite($img, "cache/icons/{$parts['host']}.fav"); }
     }
-    if (empty($img)) { $img = base64_encode(file_get_contents(BIZBOOKS_URL_FS.'0/view/images/favicon.ico')); }
+    if (empty($img)) { $img = base64_encode(file_get_contents(BIZUNO_URL_FS.'0/view/images/favicon.ico')); }
     return '<img src="data:image/png;base64,'.$img.'" width="32" height="32" alt="'.$title.'" '.$target.'/>';
 }
 

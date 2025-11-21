@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/common.php", 'jCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journals/common.php", 'jCommon');
 
 class j02 extends jCommon
 {

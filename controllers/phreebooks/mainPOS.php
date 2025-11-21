@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
 
 class mainPOSMain
 {
@@ -199,7 +199,7 @@ function bizPOSBalCalc() {
     {
         if (!$security = validateAccess('j19_mgr', 2)) { return; }
         $ledger = [];
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/payment/main.php", 'paymentMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/payment/main.php", 'paymentMain');
         $auth = new paymentMain();
         $txID = addslashes($auth->authorize($ledger));
         $layout = array_replace_recursive($layout, ['content'=> ['action'=>'eval', 'actionData'=>"bizPOSPmtSet('$txID');"]]);
@@ -213,7 +213,7 @@ function bizPOSBalCalc() {
     public function save(&$layout=[])
     {
         if (!$security = validateAccess('j19_mgr', 2)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journal.php", 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journal.php", 'journal');
         dbTransactionStart();
         $ledger = new journal(0, $this->journalID);
         if (!$this->getMain    ($ledger)) { return; }
@@ -369,7 +369,7 @@ function bizPOSBalCalc() {
      */
     private function setPayments(&$ledger)
     {
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/payment/main.php", 'paymentMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/payment/main.php", 'paymentMain');
         foreach ($ledger->items as $row) { // handle payments
             if ($row['gl_type'] != 'pmt') { continue; }
             $processor = new paymentMain();

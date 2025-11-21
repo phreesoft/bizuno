@@ -27,8 +27,8 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php','journal');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/payment/main.php',      'paymentMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php','journal');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/payment/main.php',      'paymentMain');
 
 class phreebooksMain
 {
@@ -400,7 +400,7 @@ var pbChart=[];\njqBiz.each(bizDefaults.glAccounts.rows, function( key, value ) 
                     'events'=>['onClick'=>"jsonAction('phreebooks/main/popupRecur', jqBiz('#recur_id').val(), jqBiz('#recur_frequency').val());"]],
                 'new'  => ['order'=>60,'label'=>lang('new'),   'hidden'=>$security>1?false:true,'events'=>['onClick'=>"journalEdit($this->journalID, 0);"]],
                 'trash'=> ['order'=>70,'label'=>lang('delete'),'hidden'=>$rID && $security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('phreebooks/main/delete&jID=$this->journalID', $rID);"]]]]],
-            'forms'   => ['frmJournal'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/main/save&jID=$this->journalID"]]],
+            'forms'   => ['frmJournal'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/main/save&jID=$this->journalID"]]],
             'fields'  => $structure,
             'items'   => $ledger->items,
             'totals'  => $ledger->journal->totals,
@@ -457,15 +457,15 @@ var pbChart=[];\njqBiz.each(bizDefaults.glAccounts.rows, function( key, value ) 
         $qty_order= jsLang('qty_po');
         switch ($this->journalID) {
             case 14: // assemblies
-                $layout['fields']['store_id']['events']['onChange']= " jqBiz('#sku').combogrid({ url:'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1&filter=assy&bID='+bizSelGet('store_id') });";
-                $layout['fields']['sku']['defaults']['url']        = "'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1&filter=assy&bID='+bizSelGet('store_id')";
+                $layout['fields']['store_id']['events']['onChange']= " jqBiz('#sku').combogrid({ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1&filter=assy&bID='+bizSelGet('store_id') });";
+                $layout['fields']['sku']['defaults']['url']        = "'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1&filter=assy&bID='+bizSelGet('store_id')";
                 $layout['fields']['sku']['defaults']['panelWidth'] = 650;
                 $layout['fields']['sku']['defaults']['callback']   = "bizTextSet('description', data.description_short);
     jqBiz('#qty').val('1');
     jqBiz('#gl_account').val(data.gl_inv);
     jqBiz('#gl_acct_id').val(data.gl_inv);
     bizNumSet('qty_stock', data.qty_stock);
-    jqBiz('#dgJournalItem').datagrid({ url:'".BIZUNO_AJAX."&bizRt=inventory/main/managerBOMList&rID='+data.id+'&bID='+bizSelGet('store_id') });
+    jqBiz('#dgJournalItem').datagrid({ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerBOMList&rID='+data.id+'&bID='+bizSelGet('store_id') });
     jqBiz('#dgJournalItem').datagrid('reload');
     assyUpdateBalance();";
                 $layout['fields']['sku']['defaults']['columns'] = "[[
@@ -791,7 +791,7 @@ function bizUnitDiscDisc(newValue) {
         $pmt_total = clean('total_amount', 'float', 'post');
         if (!$first_chk) { return msgAdd("Ref # cannot be blank!"); }
         // ***************************** START TRANSACTION *******************************
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/payment/nacha.php', 'paymentNacha');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/payment/nacha.php', 'paymentNacha');
         $achMapID = clean('totals_achMapID', 'alpha_num', 'post');
         $nacha = new paymentNacha($achMapID);
         $nacha->openACH($achMapID);
@@ -1331,7 +1331,7 @@ function bizUnitDiscDisc(newValue) {
         }
         $jrnl_sql = $this->setAllowedJournals($valid_jIDs);
         $data  = ['id'=>$name, 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
-            'attr'=> ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_AJAX."&bizRt=phreebooks/main/managerRows&jID=$this->journalID&type=$this->type",
+            'attr'=> ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/main/managerRows&jID=$this->journalID&type=$this->type",
                 'xtraField'=> [['key'=>'jrnlTBD','value'=>"journal_id"],['key'=>'cIDTBD','value'=>"contact_id_b"]]],
             'events' => ['onDblClickRow'=>"function(idx, data){ journalEdit(data.journal_id, data.id); }"],
             'source' => [
@@ -1757,7 +1757,7 @@ function bizUnitDiscDisc(newValue) {
     {
         if (empty($jID)) { $jID = 12; }
         $jName = "j".substr('0'.$jID, -2);
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journals/$jName.php", $jName);
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journals/$jName.php", $jName);
         $fqcn = "\\bizuno\\$jName";
         return new $fqcn();
     }

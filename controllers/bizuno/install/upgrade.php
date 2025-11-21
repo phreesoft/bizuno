@@ -144,7 +144,7 @@ function bizunoUpgrade()
         $exists = dbMetaGet(0, 'bizuno_refs');
         if (empty($exists)) {
             // convert the references to common meta
-            bizAutoLoad(BIZBOOKS_ROOT.'controllers/bizuno/install/install.php', 'bizInstall');
+            bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/install.php', 'bizInstall');
             $crnt = getModuleCache('bizuno', 'references');
             $inst = new bizInstall();
             $meta = [];
@@ -157,7 +157,7 @@ function bizunoUpgrade()
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
-    require_once(BIZBOOKS_ROOT.'controllers/administrate/tools.php');
+    require_once(BIZUNO_FS_LIBRARY.'controllers/administrate/tools.php');
     $ctl = new administrateTools();
     $ctl->repairComments(false);
 

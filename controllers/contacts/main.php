@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/functions.php', 'getContactSecID', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/functions.php', 'getContactSecID', 'function');
 
 class contactsMain
 {
@@ -291,19 +291,19 @@ class contactsMain
                     'genProp' => ['order'=>50,'type'=>'panel','key'=>'genProp','classes'=>['block33']],
                     'genAtch' => ['order'=>85,'type'=>'panel','key'=>'genAtch','classes'=>['block66']]]],
                 'history' => ['order'=>30,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/manager&type=$this->type&rID=$rID'"]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/manager&type=$this->type&rID=$rID'"]],
                 'wallet'  => ['order'=>35,'label'=>lang('wallet'),'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=payment/wallet/manager&type=$this->type&rID=$rID'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=payment/wallet/manager&type=$this->type&rID=$rID'"]],
                 'prices_c'=> ['order'=>40, 'label'=>sprintf(lang('tbd_prices'), lang('ctype_c')),'hidden'=>!empty($cData['ctype_c'])?false:true,'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&dom=div&type=c&cID=$rID&table=contacts'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/prices/manager&dom=div&type=c&cID=$rID&table=contacts'"]],
                 'prices_v'=> ['order'=>40, 'label'=>sprintf(lang('tbd_prices'), lang('ctype_v')),'hidden'=>!empty($cData['ctype_v'])?false:true,'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=inventory/prices/manager&dom=div&type=v&cID=$rID&table=contacts'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/prices/manager&dom=div&type=v&cID=$rID&table=contacts'"]],
                 'bill_add'=> ['order'=>45,'label'=>lang('address_type_b'), 'type'=>'html', 'html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=b&refID=$rID'"]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=b&refID=$rID'"]],
                 'ship_add'=> ['order'=>50,'label'=>lang('address_type_s'), 'type'=>'html', 'html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=s&refID=$rID'"]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=s&refID=$rID'"]],
                 'notes'   => ['order'=>70,'label'=>lang('notes'), 'type'=>'html', 'html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/getTabNotes&type=$this->type&rID=$rID'"]]]]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getTabNotes&type=$this->type&rID=$rID'"]]]]],
             'panels'  => [
                 'genAddA' => ['label'=>lang('address_type_m'),'type'=>'address','keys'=>$fldAddr,'settings'=>['limit'=>'a','required'=>true]],
                 'genCont' => ['label'=>lang('contact_info'),  'type'=>'fields', 'keys'=>$fldCont],
@@ -311,7 +311,7 @@ class contactsMain
                 'genAcct' => ['label'=>lang('account'),       'type'=>'fields', 'keys'=>$fldAcct],
                 'genProp' => ['label'=>lang('properties'),    'type'=>'fields', 'keys'=>$fldProp],
                 'genAtch' => ['type'=>'attach','defaults'=>['dgName'=>$this->moduleID.'Attach','path'=>getModuleCache($this->moduleID,'properties','attachPath','contacts'),'prefix'=>"rID_{$rID}_"]]],
-            'forms'   => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
+            'forms'   => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
             'fields'  => $structure,
             'jsReady' => ['init'=>"ajaxForm('frmContact');"]];
         if (!validateAccess('admin', 4, false)) { unset($data['tabs']['tabContacts']['divs']['general']['divs']['genRole']); }
@@ -329,7 +329,7 @@ class contactsMain
         }
         if (in_array($this->type, ['c', 'v'])) { // Add CRM tab and enable ACH to General page
             $data['tabs']['tabContacts']['divs']['crm_add'] = ['order'=>25,'label'=>lang('address_type_i'), 'type'=>'html', 'html'=>'',
-                'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=contacts/address/manager&dom=div&type=$this->type&aType=i&refID=$rID'"]];
+                'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=contacts/address/manager&dom=div&type=$this->type&aType=i&refID=$rID'"]];
             $data['panels']['genProp']['keys'][] = 'ach_enable';
         } else {
             unset($data['tabs']['tabContacts']['divs']['genStat'], $data['tabs']['tabContacts']['divs']['wallet'],
@@ -337,7 +337,7 @@ class contactsMain
         }
         if ($this->type=='c' && !empty(getMetaContact($rID, 'crm_project'))) { // only show CRM projects tab for customers
             $data['tabs']['tabContacts']['divs']['crm_proj'] = ['order'=>27,'label'=>lang('ctype_j'),'type'=>'html','html'=>'',
-            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/projects/manager&cID=$rID'"]];
+            'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/projects/manager&cID=$rID'"]];
         }
         customTabs($data, 'contacts', 'tabContacts');
         $this->editCustomType($data, $rID); // customize based on type
@@ -363,7 +363,7 @@ class contactsMain
                 break;
             case 'c': // Customers
                 $data['tabs']['tabContacts']['divs']['payment'] = ['order'=>60,'label'=>lang('payment'),'hidden'=>$rID && getUserCache('profile', 'admin_encrypt')?false:true,'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=payment/main/manager&rID=$rID'"]];
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=payment/main/manager&rID=$rID'"]];
                 break;
             case 'j': // Projects/Jobs
             case 'v': // Vendors
@@ -402,7 +402,7 @@ class contactsMain
         $output = ['label'=>'', 'fields'=>[]];
         msgDebug("\nEntering contacts::editStatus with rID = $rID");
         if (!in_array($this->type, ['c','v'])) { return $output; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
         $layout = [];
         $pb = new phreebooksMain();
         $pb->detailStatus($layout, $rID);
@@ -684,7 +684,7 @@ class contactsMain
         $f0_value = "";
         if ($this->defaults['f0']<>'a') { $f0_value = "inactive='{$this->defaults['f0']}'"; }
         $data = ['id'=>"dg$name", 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
-            'attr'=> ['idField'=>'id', 'toolbar'=>"#dg{$name}Toolbar", 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&type=$type".($rID?"&rID=$rID":'')],
+            'attr'=> ['idField'=>'id', 'toolbar'=>"#dg{$name}Toolbar", 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&type=$type".($rID?"&rID=$rID":'')],
             'events' => [
                 'onDblClickRow'=> "function(rowIndex, rowData){ accordionEdit('acc$name', 'dg$name', 'div{$name}Detail', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&type=$type&ref=$rID', rowData.id); }"],
             'footnotes' => $this->dgContactsFootnotes(),
@@ -870,7 +870,7 @@ class contactsMain
         $order = clean('order',['format'=>'text',     'default'=>'desc'],    'post');
         $search= clean('search_log',['format'=>'text','default'=>''],        'post');
         return ['id'=>$name, 'rows'=>$rows, 'page'=>$page,
-            'attr'   => ['nowrap'=>false, 'toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRowsLog&rID=$rID"],
+            'attr'   => ['nowrap'=>false, 'toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRowsLog&rID=$rID"],
             'source' => [
                 'tables' => ['contacts_log'=>['table'=>BIZUNO_DB_PREFIX."contacts_log"]],
                 'search' => ['notes'],
@@ -909,7 +909,7 @@ class contactsMain
                 'formBOF' => ['order'=>20,'type'=>'form',   'key' =>'frmTerms'],
                 'winTerms'=> ['order'=>50,'type'=>'fields', 'keys'=>array_keys($fields)],
                 'formEOF' => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
-            'forms'    => ['frmTerms'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/setTerms&prefix=$prefix"]]],
+            'forms'    => ['frmTerms'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/setTerms&prefix=$prefix"]]],
             'fields'   => $fields,
             'jsReady'  => ['init'=>"ajaxForm('frmTerms');"]];
         $layout = array_replace_recursive($layout, $data);

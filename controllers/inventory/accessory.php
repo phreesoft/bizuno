@@ -72,7 +72,7 @@ function invAccessorySave() {
     {
         $data = ['id'=>$name,'type'=>'edatagrid',
             'attr'   => ['toolbar'  => "#{$name}Bar",'singleSelect'=> true,
-                'url'=> BIZUNO_AJAX."&bizRt=$this->moduleID/accessory/accessoryList&rID=$skuID"],
+                'url'=> BIZUNO_URL_AJAX."&bizRt=$this->moduleID/accessory/accessoryList&rID=$skuID"],
             'events' => [
                 'onLoadSuccess'=> "function(data)     { invAccessorySave(); if (data.total == 0) jqBiz('#$name').edatagrid('addRow'); }",
                 'onAdd'        => "function(rowIndex) { accessoryIndex = rowIndex; }",

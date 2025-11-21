@@ -266,10 +266,10 @@ class bizunoAdmin
         $stats  = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $data   = [
             'tabs'    => ['tabAdmin'=>['divs'=>[
-                'tabMaint'=> ['order'=>20,'label'=>lang('maintenance'),  'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=administrate/adminMaint/manager'"]],
-                'sched'   => ['order'=>30,'label'=>$this->lang['fa_schedules'],'type'=>'html', 'html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=administrate/fixedAssets/adminSchedLoad'"]],
-                'tabs'    => ['order'=>40,'label'=>lang('extra_tabs'),   'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=administrate/tabs/manager'"]],
-                'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=administrate/fields/manager'"]],
+                'tabMaint'=> ['order'=>20,'label'=>lang('maintenance'),  'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/adminMaint/manager'"]],
+                'sched'   => ['order'=>30,'label'=>$this->lang['fa_schedules'],'type'=>'html', 'html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fixedAssets/adminSchedLoad'"]],
+                'tabs'    => ['order'=>40,'label'=>lang('extra_tabs'),   'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/tabs/manager'"]],
+                'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager'"]],
                 'tools'   => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'recalc' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'recalc'],
                     'fixCmt' => ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'fixCmt'],
@@ -285,7 +285,7 @@ class bizunoAdmin
                 'fixCmt' => ['label'=>$this->lang['admin_fix_comments'],'type'=>'fields','keys'=>$output['keys']['keys3']],
                 'fixTbl' => ['label'=>$this->lang['admin_fix_tables'],  'type'=>'fields','keys'=>$output['keys']['keys4']]],
             'datagrid'=> ['bizStats'=>$this->dgStats('bizStats')],
-            'forms'   => ['frmStatus'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/tools/statusSave"]]],
+            'forms'   => ['frmStatus'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/tools/statusSave"]]],
             'fields'  => $output['fields'],
             'jsHead'  => [$this->moduleID=>"var bizStatsData = ".json_encode($stats).";"],
             'jsBody'  => ['company_logo'=>"imgManagerInit('company_logo', '$imgSrc', '$imgDir', ".json_encode(['style'=>"max-height:200px;max-width:200px;"]).");"],

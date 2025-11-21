@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/export.php', 'apiExport');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
 class ifWooCommerce extends apiExport
 {
@@ -83,7 +83,7 @@ class ifWooCommerce extends apiExport
     {
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
-            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZBOOKS_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
+            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
             'radio1'    => ['order'=>20,'break' =>true,'label' =>$this->lang['upload_opt1'],'attr'=>['type'=>'radio','value'=>1,'id'=>'optUpload','name'=>'optUpload']],
             'radio2'    => ['order'=>21,'break' =>true,'label' =>$this->lang['upload_opt2'],'attr'=>['type'=>'radio','value'=>2,'id'=>'optUpload','name'=>'optUpload']],
             'radio3'    => ['order'=>22,'break' =>true,'label' =>$this->lang['upload_opt3'],'attr'=>['type'=>'radio','value'=>3,'id'=>'optUpload','name'=>'optUpload','checked'=>true]],
@@ -132,7 +132,7 @@ class ifWooCommerce extends apiExport
                 'frmInv'    =>['attr'=>['type'=>'form','action'=>'']],
                 'frmSync'   =>['attr'=>['type'=>'form','action'=>'']],
                 'frmConfirm'=>['attr'=>['type'=>'form','action'=>'']],
-                'frmTaxTbl' =>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/getTaxTable&modID=$this->code"]]],
+                'frmTaxTbl' =>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/getTaxTable&modID=$this->code"]]],
             'fields' => $fields,
             'jsHead' => ['init'=>$this->getViewJS()],
             'jsReady'=> ['init'=>"ajaxForm('frmInv');\najaxForm('frmSync');\najaxForm('frmConfirm');\najaxDownload('frmTaxTbl');\njqBiz('progress').attr({value:0,max:100});"]];
@@ -152,7 +152,7 @@ var cntCur  = 0;
 var runaway = 0;
 function bulkUpload() { // fetch the sku count
     jqBiz.ajax({
-        url: '".BIZUNO_AJAX."&bizRt=$this->moduleID/admin/apiInvCount&modID=$this->code&fltr='+bizTextGet('fltr'),
+        url: '".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/apiInvCount&modID=$this->code&fltr='+bizTextGet('fltr'),
         success: function(json) {
             processJson(json);
             skuList = json.items;
@@ -170,7 +170,7 @@ function bulkUpload() { // fetch the sku count
 function productUpload(rID) {
     if (!rID) return;
     jqBiz.ajax({
-        url: '".BIZUNO_AJAX."&bizRt=$this->moduleID/admin/productToStore&modID=$this->code&rID='+rID+'&optUpload='+jqBiz('input[name=optUpload]:checked').val()+'&quiet=1',
+        url: '".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/productToStore&modID=$this->code&rID='+rID+'&optUpload='+jqBiz('input[name=optUpload]:checked').val()+'&quiet=1',
         success: function(json) {
             processJson(json);
             var rID = skuList.shift();
@@ -196,7 +196,7 @@ function productUpload(rID) {
      */
     public function productToStore($invID=0)
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
         $rID    = !empty($invID) ? $invID : clean('rID', 'integer', 'get');
         msgDebug("\nEntering productToStore with invID = $rID");
         if (empty($rID)) { return msgAdd('bad inventory ID passed!'); }
@@ -308,7 +308,7 @@ function productUpload(rID) {
      */
     public function invRefreshNext(&$layout=[])
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
         $cron   = getUserCron('invRefresh');
         $numRows= $this->refreshRows;
         $data   = [];
@@ -414,7 +414,7 @@ if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move
      */
     public function cartConfirm()
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'getCarrierText', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'getCarrierText', 'function');
         $output  = ['head'=>[], 'body'=>[]];
         $shipDate= clean('dateShip', 'date', 'get');
         msgDebug("\nEntering cartConfirm with ship_date = $shipDate and settings = ".print_r($this->settings, true));

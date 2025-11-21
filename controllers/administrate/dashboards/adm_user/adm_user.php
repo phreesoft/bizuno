@@ -61,7 +61,7 @@ class adm_user
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</div></form>"],
             ]]],
             'forms' => [
-                "frm{$this->code}" => ['attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_AJAX."&bizRt=administrate/admin/$this->code"]],
+                "frm{$this->code}" => ['attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/admin/$this->code"]],
             ],
             'fields'=> [
                 'field0' => ['order'=>10,'label'=>lang('field0'),'options'=>['width'=>300,'height'=>30,'value'=>"'content'",'validType'=>"'text'"],'attr'=>['type'=>'text','value'=>'']],

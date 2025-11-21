@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 class phreebooksChart extends mgrJournal
 {
@@ -149,8 +149,8 @@ class phreebooksChart extends mgrJournal
     {
         if (!$security = validateAccess('admin', 4)) { return; }
         $chart   = clean('chart', 'path', 'get');
-        if (!file_exists(BIZBOOKS_ROOT.$chart)) { return msgAdd('Bad path to chart!'); }
-        $accounts= $this->prepData(BIZBOOKS_ROOT.$chart);
+        if (!file_exists(BIZUNO_FS_LIBRARY.$chart)) { return msgAdd('Bad path to chart!'); }
+        $accounts= $this->prepData(BIZUNO_FS_LIBRARY.$chart);
         $output  = [];
         foreach ($accounts as $row) {
             $output[] = ['id'=>$row['id'], 'type'=>lang('gl_acct_type_'.trim($row['code'])), 'title'=>$row['description'],
@@ -448,7 +448,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
     public function chartInstall($chart)
     {
         msgDebug("\nTrying to load chart: $chart");
-        if     (file_exists(BIZBOOKS_ROOT."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZBOOKS_ROOT."locale/en_US/modules/phreebooks/charts/$chart"; }
+        if     (file_exists(BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart"; }
         else { return msgAdd('Bad path to chart!', 'trap'); }
         unset($GLOBALS['BIZUNO_TABLES']); // need to reset this as most likely the tables were just added.
         if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || !empty(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))) { return msgAdd($this->lang['coa_import_blocked']); }

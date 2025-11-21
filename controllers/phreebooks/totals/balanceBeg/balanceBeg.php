@@ -65,7 +65,7 @@ function totalsGetBegBalance(postDate) {
     var rID      = jqBiz('#id').val();
     var glAccount= bizSelGet('gl_acct_id');
     jqBiz.ajax({
-        url: '".BIZUNO_AJAX."&bizRt=phreebooks/main/journalBalance&rID='+rID+'&postDate='+postDate+'&glAccount='+glAccount,
+        url: '".BIZUNO_URL_AJAX."&bizRt=phreebooks/main/journalBalance&rID='+rID+'&postDate='+postDate+'&glAccount='+glAccount,
         success: function (json) {
             processJson(json);
             if (json.balance) { bizNumSet('totals_balanceBeg', json.balance); }

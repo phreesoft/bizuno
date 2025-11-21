@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'inventoryProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'inventoryProcess', 'function');
 
 class inventoryMain
 {
@@ -346,19 +346,19 @@ class inventoryMain
                     'genGL'   => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'genGL'],
                     'genAtch' => ['order'=>80,'type'=>'panel','classes'=>['block66'],'key'=>'genAtch']]],
                 'movement' => ['order'=>30,'label'=>lang('movement'),'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/movement&rID=$rID'"]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/movement&rID=$rID'"]],
                 'history'  => ['order'=>35,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
-                    'options'=> ['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/history/historian&rID=$rID'"]],
+                    'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/historian&rID=$rID'"]],
                 'prices_c' => ['order'=>40,'label'=>sprintf(lang('tbd_prices'), lang('ctype_c')), 'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/prices/manager&type=c&dom=div&iID=$rID'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/prices/manager&type=c&dom=div&iID=$rID'"]],
                 'prices_v' => ['order'=>41,'label'=>sprintf(lang('tbd_prices'), lang('ctype_v')), 'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/prices/manager&type=v&dom=div&iID=$rID'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/prices/manager&type=v&dom=div&iID=$rID'"]],
                 'invImages'=> ['order'=>55,'label'=>lang('images'),     'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/images/imagesLoad&rID=$rID'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/images/imagesLoad&rID=$rID'"]],
                 'invAttr'  => ['order'=>65,'label'=>lang('attributes'), 'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/attributes/attrLoad&rID=$rID'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/attrLoad&rID=$rID'"]],
                 'invAccy'  => ['order'=>90,'label'=>lang('accessories'),'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/accessory/accessoryEdit&rID=$rID'"]]]]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/accessory/accessoryEdit&rID=$rID'"]]]]],
             'panels'  => [
                 'genProp' => ['label'=>lang('properties'),                              'type'=>'fields','keys'=>$fldProp],
                 'genStat' => ['label'=>lang('status'),                                  'type'=>'fields','keys'=>$fldStatus],
@@ -367,7 +367,7 @@ class inventoryMain
                 'genVend' => ['label'=>lang('details').' ('.lang('vendors').')',        'type'=>'fields','keys'=>$fldVend],
                 'genGL'   => ['label'=>lang('details').' ('.lang('general_ledger').')', 'type'=>'fields','keys'=>$fldGL],
                 'genAtch' => ['type'=>'attach','defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath', 'inventory'),'prefix'=>"rID_{$rID}_"]]],
-            'forms'   => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=inventory/main/save"]]],
+            'forms'   => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=inventory/main/save"]]],
             'fields'  => $structure,
             'jsHead'  => ['invHead' => "var curIndex=undefined; var invTypeMsg=[]; curIndex=0;
 function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerializer('dgVendors', 'invVendors'); return true; }"],
@@ -376,9 +376,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         customTabs($data, 'inventory', 'tabInventory'); // add custom tabs
         if (in_array($data['fields']['inventory_type']['attr']['value'], ['ma','sa'])) { // assembly, add tab
             $data['tabs']['tabInventory']['divs']['bom'] = ['order'=>20,'label'=>lang('inventory_assy_list'),'type'=>'html','html'=>'',
-                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/main/managerBOM&rID=$rID'"]];
+                'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/managerBOM&rID=$rID'"]];
             $data['tabs']['tabInventory']['divs']['invWO'] = ['order'=>52,'label'=>lang('work_orders'),'type'=>'html','html'=>'',
-                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/build/manager&dom=div&refID=$rID'"]];
+                'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/build/manager&dom=div&refID=$rID'"]];
         }
         $layout = array_replace_recursive($layout, $data);
 
@@ -415,7 +415,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             if (!$curOpt) { $curOpt = json_encode([]); }
             $html = html5('invOptions', ['attr'=>  ['type'=>'hidden', 'value'=>$curOpt]]);
             $layout['tabs']['tabInventory']['divs']['tabOptions'] = ['order'=>20, 'label'=>lang('options'),'type'=>'html', 'html'=>$html,
-                'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/options/optionsEdit&rID=$rID'"]];
+                'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/options/optionsEdit&rID=$rID'"]];
         }
         $defaults = ['sales'=>getChartDefault(30), 'stock'=>getChartDefault(4), 'cogs'=>getChartDefault(32), 'method'=>'f'];
         $layout['fields']['lang']['ms_skus_created'] = $this->lang['skus_created'];
@@ -842,7 +842,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             case 'n': $f0_value = "inactive='1'"; break;
         }
         $data = ['id'=> $name, 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
-            'attr'     => ['idField'=>'id', 'toolbar'=>"#{$name}Toolbar", 'url'=>BIZUNO_AJAX."&bizRt=inventory/main/managerRows"],
+            'attr'     => ['idField'=>'id', 'toolbar'=>"#{$name}Toolbar", 'url'=>BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows"],
             'events'   => [
                 'onDblClickRow'=> "function(rowIndex, rowData){ accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".jsLang('details')."', 'inventory/main/edit', rowData.id); }",
                 'rowStyler'    => "function(index, row) { if (row.inactive==1) { return {class:'row-inactive'}; }}"],
@@ -984,7 +984,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                         'settings'=> ['order'=>10,'icon'=>'settings','events'=>['onClick'=>"inventoryProperties(bizDGgetRow('$name'));"]],
                         'trash'   => ['order'=>80,'icon'=>'trash',   'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'sku'=> ['order'=>30,'label'=>lang('sku'),'attr'=>['sortable'=>true,'resizable'=>true,'align'=>'center'],
-                    'events' => ['editor'=>"{type:'combogrid',options:{ url:'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1',
+                    'events' => ['editor'=>"{type:'combogrid',options:{ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1',
                         width:150, panelWidth:320, delay:500, idField:'sku', textField:'sku', mode:'remote',
                         onClickRow: function (idx, cgData) {
                             bizNumEdSet('$name', curIndex, 'qty', 1);
@@ -1032,7 +1032,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         }
         return ['id' => $props['name'],
             'attr'   => ['title'=>$props['title'], 'pagination'=>false, 'idField'=>'id'],
-            'events' => ['url'=>"'".BIZUNO_AJAX."&bizRt=inventory/history/historyRows&jID=$jID&sku=$sku'"],
+            'events' => ['url'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/history/historyRows&jID=$jID&sku=$sku'"],
             'columns'=> ['id'=> ['attr'=>['hidden'=>true]],
                 'action'     => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>60,'hidden'=>$hide_cost?true:false],
                     'events' => ['formatter'=>"function(value,row,index) { return {$props['name']}Formatter(value,row,index); }"],
@@ -1172,6 +1172,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $layout['panels']['genProp']['keys'] = array_merge($layout['panels']['genProp']['keys'], ['buy_uom','sell_qty','sell_uom']);
         $layout['panels']['genStat']['keys'] = array_merge($layout['panels']['genStat']['keys'], ['qty_min_desc','qty_restock_desc','qty_stock_desc','qty_po_desc','qty_so_desc','qty_alloc_desc']);
         $layout['tabs']['tabInventory']['divs']['vendors'] = ['order'=>55,'label'=>lang('vendors'),'type'=>'html','html'=>'',
-            'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/vendors/vendorsLoad&rID=$rID'"]];
+            'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/vendors/vendorsLoad&rID=$rID'"]];
     }
 }

@@ -32,7 +32,7 @@ namespace bizuno;
 define ('FEDEX_TRACKING_URL', 'https://www.fedex.com/fedextrack/?trknbr=TRACKINGNUM');
 
 bizAutoLoad(dirname(__FILE__).'/common.php', 'fedexCommon');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
 
 class fedex extends fedexCommon
 {
@@ -42,7 +42,7 @@ class fedex extends fedexCommon
     function __construct()
     {
         parent::__construct();
-        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
+        $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->reconcile_path  = "data/shipping/reconcile/$this->code/";
     }
@@ -114,8 +114,8 @@ class fedex extends fedexCommon
                     'dgRecon'=> ['order'=>70,'type'=>'datagrid','key' =>"dgReconcile{$this->code}"],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]],
             'forms' => [
-                'frmFedExRecon' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=shipping/reconcile/reconcileInvoice&carrier=$this->code"]],
-                'frmFedExTrack' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=shipping/track/trackBulk&carrier=$this->code"]]],
+                'frmFedExRecon' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=shipping/reconcile/reconcileInvoice&carrier=$this->code"]],
+                'frmFedExTrack' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=shipping/track/trackBulk&carrier=$this->code"]]],
             'datagrid'=> ["dgReconcile{$this->code}"=>$this->dgReconcile("dgReconcile{$this->code}")],
             'fields' => [
                 'fileFedExRecon'=> ['attr'=>['type'=>'file']],
@@ -290,7 +290,7 @@ class fedex extends fedexCommon
     private function dgReconcile($name)
     {
         return ['id'=>$name, 'title'=>lang('history'),
-            'attr'   => ['idField'=>'title', 'url'=>BIZUNO_AJAX."&bizRt=shipping/reconcile/reconcileList&carrier=$this->code"],
+            'attr'   => ['idField'=>'title', 'url'=>BIZUNO_URL_AJAX."&bizRt=shipping/reconcile/reconcileList&carrier=$this->code"],
             'columns'=> [
                 'action' => ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index) { return ".$name."Formatter(value,row,index); }"],
                     'actions'=> [

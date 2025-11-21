@@ -29,7 +29,7 @@ namespace bizuno;
 
 use setasign\Fpdi\Tcpdf\Fpdi;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
 
 class phreeformRender
 {
@@ -103,7 +103,7 @@ class phreeformRender
                 'mimePdf' => ['order'=>30,'label'=>lang('pdf'),                   'events'=>['onClick'=>"jqBiz('#fmt').val('pdf'); jqBiz('#frmPhreeform').submit();"]],
                 'mimeHtml'=> ['order'=>40,'label'=>lang('html'),'hidden'=>$hidden,'events'=>['onClick'=>"jqBiz('#fmt').val('html');jqBiz('#frmPhreeform').submit();"]],
                 'mimeXls' => ['order'=>50,'label'=>lang('csv'), 'hidden'=>$hidden,'events'=>['onClick'=>"jqBiz('#fmt').val('csv'); jqBiz('#frmPhreeform').submit();"]]]]],
-            'forms'   => ['frmPhreeform'=>['classes'=>['fileDownloadForm'],'attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_AJAX."&bizRt=phreeform/render/render".$extras]]],
+            'forms'   => ['frmPhreeform'=>['classes'=>['fileDownloadForm'],'attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_URL_AJAX."&bizRt=phreeform/render/render".$extras]]],
             'fields'  => [
                 'id'        => ['attr'=>['type'=>'hidden','value'=>$rID]],
                 'msgFrom'   => ['break'=>true,'label'=>lang('from'),    'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>500,'editable'=>false],'values'=>array_values($emailData['valsFrom']),'attr'=>['type'=>'select','value'=>$emailData['defFrom']]],
@@ -582,7 +582,7 @@ class phreeformRender
      */
     private function renderForm(&$report)
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/renderForm.php', 'PDF');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/renderForm.php', 'PDF');
         // check for at least one field selected to show
         if (!$report->fieldlist->rows) { // No fields are checked to show, that's bad
             return msgAdd(lang('PHREEFORM_NOROWS'), 'caution');
@@ -1058,7 +1058,7 @@ msgDebug("\nresult = ".print_r($result, true));
     private function GeneratePDFFile($data, $report)
     { // for pdf reports only
         global $report;
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/renderReport.php', 'PDF');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/renderReport.php', 'PDF');
         $pdf   = new PDF();
         $pdf->ReportTable($data);
         $ReportName = ReplaceNonAllowedCharacters($report->title).'.pdf';
@@ -1078,7 +1078,7 @@ msgDebug("\nresult = ".print_r($result, true));
      */
     private function GenerateHTMLFile($data, $report)
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/renderHTML.php', 'HTML');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/renderHTML.php', 'HTML');
         $html = new HTML($data, $report);
         return ['content'=>['action'=>'divHTML','divID'=>'bizBody','html'=>$html->output]];
     }
@@ -1280,7 +1280,7 @@ msgDebug("\nresult = ".print_r($result, true));
             $func = getModuleCache('phreeform', 'separators')[$Process]['function'];
             $fqfn = "\\bizuno\\$func";
             $module = getModuleCache('phreeform', 'separators')[$Process]['module'];
-            bizAutoLoad(BIZBOOKS_ROOT."controllers/$module/functions.php", $fqfn, 'function');
+            bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/$module/functions.php", $fqfn, 'function');
             return $fqfn($value, $Process);
         }
         return $value;
@@ -1289,8 +1289,8 @@ msgDebug("\nresult = ".print_r($result, true));
     private function loadSpecialClass($special_class='')
     {
         msgDebug("\nLoading special class $special_class");
-        if       (file_exists (BIZBOOKS_ROOT."controllers/phreeform/extensions/$special_class.php")) {
-                   bizAutoLoad(BIZBOOKS_ROOT."controllers/phreeform/extensions/$special_class.php");
+        if       (file_exists (BIZUNO_FS_LIBRARY."controllers/phreeform/extensions/$special_class.php")) {
+                   bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreeform/extensions/$special_class.php");
         } elseif (file_exists (BIZUNO_DATA  ."myExt/model/$special_class.php")) {
                    bizAutoLoad(BIZUNO_DATA  ."myExt/model/$special_class.php");
         } else { return msgAdd("Cannot find special class: $special_class"); }

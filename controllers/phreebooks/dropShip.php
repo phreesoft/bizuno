@@ -108,7 +108,7 @@ class phreebooksDropShip
         msgDebug("\nReady to post with items = ".print_r($items, true));
         // Post it
         dbTransactionStart();
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         $ledger = new journal(0, 4);
         $ledger->main  = $main;
         $ledger->items = $items;

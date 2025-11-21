@@ -43,7 +43,7 @@ class payrollCentric
     public function importForm(&$layout=[])
     {
         $fields= [
-            'imgLogo' => ['order'=>10,'attr'=>['type'=>'img','height'=>'45','src'=>BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
+            'imgLogo' => ['order'=>10,'attr'=>['type'=>'img','height'=>'45','src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
             'desc'    => ['order'=>20,'html'=>"<p>{$this->lang['import_desc']}</p>",'attr'=>['type'=>'raw']],
             'selFile' => ['order'=>30,'attr'=>['type'=>'file']],
             'btnGo'   => ['order'=>40,'icon'=>'next', 'events'=>['onClick'=>"jqBiz('#formIOP').submit();"]]];
@@ -52,7 +52,7 @@ class payrollCentric
                 'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>'formIOP'],
                 'body'   => ['order'=>40,'type'=>'fields','keys'=>['imgLogo','desc','selFile','btnGo']],
                 'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]],
-            'forms'    => ['formIOP'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->methodDir/importGo&modID=$this->code"]]],
+            'forms'    => ['formIOP'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->methodDir/importGo&modID=$this->code"]]],
             'fields'   => $fields,
             'jsReady'  => ['initIOP'=>"ajaxForm('formIOP', true);"]]; // do not check for preSubmit as it picks the journal edit function ???
         $layout = array_replace_recursive($layout, $data);
@@ -72,7 +72,7 @@ class payrollCentric
         msgDebug("\nWorking with item rows = ".print_r($rows, true));
         $today = biz_date('Y-m-d');
         if (empty($rows)) { return msgAdd("Bad file uploaded, please check it out and try again!"); }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         $balance = $total = 0;
         foreach ($rows as $row) {
             if (empty($row['G/L Account'])) { continue; } // blank lines, single column header, skip

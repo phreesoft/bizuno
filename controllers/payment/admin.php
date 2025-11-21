@@ -75,7 +75,7 @@ class paymentAdmin
         if (!$security = validateAccess('admin', 1)) { return; }
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang));
         // add the nacha manager
-        $layout['tabs']['tabAdmin']['divs']['tabACH'] = ['order'=>70,'label'=>$this->lang['ach_accounts'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminNacha/manager'"]];
+        $layout['tabs']['tabAdmin']['divs']['tabACH'] = ['order'=>70,'label'=>$this->lang['ach_accounts'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminNacha/manager'"]];
     }
 
     /**

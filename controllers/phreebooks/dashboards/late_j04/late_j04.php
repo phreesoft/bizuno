@@ -75,8 +75,8 @@ class late_j04
     public function render($opts=[])
     {
         global $currencies;
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/functions.php',  'getContactID', 'function');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php','getInvoiceInfo','function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/functions.php',  'getContactID', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php','getInvoiceInfo','function');
         $today = biz_date('Y-m-d');
         $filter= "journal_id=$this->journalID AND closed='0'";
         if ($opts['reps'] && getUserCache('profile', 'userID', false, '0')) {

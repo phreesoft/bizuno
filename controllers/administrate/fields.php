@@ -150,7 +150,7 @@ class administrateFields extends mgrJournal
             'toolbars'=> ['tbField'=>['icons' =>[
                 'new' => ['order'=>20,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}','dg{$this->domSuffix}','dtl{$this->domSuffix}','".lang('details')."','$this->moduleID/$this->page/add', 0);"]],
                 'save'=> ['order'=>40,'events'=>['onClick'=>"jqBiz('#frmField').submit();"]]]]],
-            'forms'   => ['frmField'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/fields/save"]]],
+            'forms'   => ['frmField'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/fields/save"]]],
             'jsHead'  => ['grpData' => "var grpData=".json_encode($groups).";"],
             'jsBody'  => ['init'=>$jsBody],
             'jsReady' => ['init'=>"ajaxForm('frmField');"]];

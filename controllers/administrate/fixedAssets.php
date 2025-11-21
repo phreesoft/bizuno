@@ -374,7 +374,7 @@ function faSchedSave() {
                     'schedSave'=>['order'=>10,'icon'=>'save','events'=>['onClick'=>"faSchedSave();"]],
                     'schedNew' =>['order'=>30,'icon'=>'add', 'events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]],
                     'schedCat'=> ['order'=>70,'label'=>$this->lang['category'],'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
-                        'options'=>['width'=>150,'editable'=>true,'onClick'=>"function(row) { var tab=jqBiz('#tabAdmin').tabs('getSelected'); tab.panel('refresh','".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/adminSchedLoad&rID='+row.text); }"]]]],
+                        'options'=>['width'=>150,'editable'=>true,'onClick'=>"function(row) { var tab=jqBiz('#tabAdmin').tabs('getSelected'); tab.panel('refresh','".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/adminSchedLoad&rID='+row.text); }"]]]],
             'columns' => [
                 'action' => ['order'=>1, 'label'=>lang('action'), 'attr'=>  ['width'=>80],
                     'events' => ['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],

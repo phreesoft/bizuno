@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journals/common.php', 'jCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journals/common.php', 'jCommon');
 
 class j22 extends jCommon
 {
@@ -118,7 +118,7 @@ jqBiz('#gl_acct_id').combogrid({'onChange': function(newVal, oldVal) { totalsGet
             $data['divs']['divDetail']  = ['order'=>50,'type'=>'html','html'=>"<p>".sprintf(lang('search_open_journal'),lang('ctype_c'))."</p>".html5('contactSel', ['attr'=>['value'=>'']])];
             $data['jsBody']['selVendor']= "jqBiz('#contactSel').combogrid({width:200,panelWidth:500,delay:500,iconCls:'icon-search',hasDownArrow:false,
     idField:'contact_id_b',textField:'primary_name_b',mode:'remote',iconCls:'icon-search',hasDownArrow:false,
-    url:       '".BIZUNO_AJAX."&bizRt=phreebooks/main/managerRowsBank&jID=".JOURNAL_ID."',
+    url:       '".BIZUNO_URL_AJAX."&bizRt=phreebooks/main/managerRowsBank&jID=".JOURNAL_ID."',
     onBeforeLoad:function (param) { var newValue = jqBiz('#contactSel').combogrid('getValue'); if (newValue.length < 2) return false; },
     onClickRow:function (idx, row) { journalEdit(".JOURNAL_ID.", 0, row.contact_id_b); },
     columns:[[

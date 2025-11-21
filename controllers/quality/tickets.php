@@ -121,7 +121,7 @@ class qualityTickets extends mgrJournal
         $f1 = clean('f1', 'integer', 'post');
         $f1_value = $f1 ? "printed='$f1'" : "";
         $data = array_replace_recursive(parent::gridBase($security, $args), [
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList&range=$range"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList&range=$range"],
             'source' => [
                 'search' => ['contact_name', 'invoice_num', 'contact_id', 'ref_num', 'title'],
                 'filters'=> [

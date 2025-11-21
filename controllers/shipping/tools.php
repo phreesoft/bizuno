@@ -64,7 +64,7 @@ class shippingTools
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
 //              'syncShip'=> ['label'=>$this->lang['sync_shipments_title'],'type'=>'fields','keys'=>['syncDesc','btnSync']],
                 'dgFiles' => ['type'=>'datagrid','styles'=>['width'=>'100%'],'key'=>'dgBackup']],
-            'forms'   => ['frmBackup' => ['attr'=>['type'=>'form', 'action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/cleanLog"]]],
+            'forms'   => ['frmBackup' => ['attr'=>['type'=>'form', 'action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/cleanLog"]]],
             'datagrid'=> ['dgBackup'=>$this->dgBackup('dgBackup')],
             'fields'  => $fields,
             'jsReady' => ['init'=>"ajaxForm('frmBackup');"]];
@@ -78,7 +78,7 @@ class shippingTools
     private function dgBackup($name)
     {
         return ['id'=>$name, 'title'=>lang('files'),
-            'attr'  => ['idField'=>'name', 'url'=>BIZUNO_AJAX."&bizRt=bizuno/backup/mgrRows"],
+            'attr'  => ['idField'=>'name', 'url'=>BIZUNO_URL_AJAX."&bizRt=bizuno/backup/mgrRows"],
             'columns' => [
                 'action' => ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index) { return {$name}Formatter(value,row,index); }"],
                     'actions'=> [

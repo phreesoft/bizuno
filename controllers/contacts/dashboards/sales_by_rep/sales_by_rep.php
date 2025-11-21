@@ -71,7 +71,7 @@ class sales_by_rep
     public function render($opts=[])
     {
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frm$this->code').submit();"]];
-        $action = BIZUNO_AJAX."&bizRt=$this->moduleID/tools/salesByRep&range={$opts['range']}";
+        $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/salesByRep&range={$opts['range']}";
         $data   = $this->getTotals($opts['range']);
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $html  .= '<form id="frm'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>';

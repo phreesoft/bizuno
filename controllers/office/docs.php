@@ -80,7 +80,7 @@ class officeDocs extends mgrJournal
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $rID    = clean('rID', ['format'=>'integer','default'=>0], 'get');
         $js     = $this->mgrJS('treeDocs', 'treeMenu', $security);
-        $divSrch= html5('', ['options'=>['mode'=>"'remote'",'url'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/search'",'editable'=>'true','idField'=>"'id'",'textField'=>"'text'",'width'=>250,'panelWidth'=>400,
+        $divSrch= html5('', ['options'=>['mode'=>"'remote'",'url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/search'",'editable'=>'true','idField'=>"'id'",'textField'=>"'text'",'width'=>250,'panelWidth'=>400,
             'onClick'=>"function (row) { jqBiz('#accDocs').accordion('select', 1); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/edit&rID='+row.id); }"],'attr'=>['type'=>'select']]);
         $data   = ['title'=> $this->mgrTitle,
             'divs' => [
@@ -95,8 +95,8 @@ class officeDocs extends mgrJournal
                     'panel' => ['type'=>'panel','key'=>'docBookMk'],
                     'hist'  => ['type'=>'panel','key'=>'myHist']]],
                 'docSearch'=> ['label'=>lang('search'),               'type'=>'html','html'=>$divSrch],
-                'docBookMk'=> ['label'=>$this->lang['my_bookmarks'],  'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/docsBookmarked'"],'html'=>'&nbsp;'],
-                'myHist'   => ['label'=>$this->lang['recently_added'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/docsRecent'"],    'html'=>'&nbsp;']],
+                'docBookMk'=> ['label'=>$this->lang['my_bookmarks'],  'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsBookmarked'"],'html'=>'&nbsp;'],
+                'myHist'   => ['label'=>$this->lang['recently_added'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsRecent'"],    'html'=>'&nbsp;']],
             'accordion'=> ['accDocs'=>['styles'=>['height'=>'100%'],'divs'=>[
                 'divTree'  => ['order'=>10,'label'=>$this->lang['my_docs'],'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'],
                     'divs'=>[
@@ -104,7 +104,7 @@ class officeDocs extends mgrJournal
                         'tree'   => ['order'=>50,'type'=>'tree',  'key' =>'treeDocs']]],
                 'divDetail'=> ['order'=>30,'label'=>lang('details'),'type'=>'html','html'=>'&nbsp;']]]],
             'tree'     => ['treeDocs'=>[
-                'attr'  => ['dnd'=>true, 'animate'=>true, 'lines'=>true, 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerTree"],
+                'attr'  => ['dnd'=>true, 'animate'=>true, 'lines'=>true, 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerTree"],
                 'events'=> [
                     'onClick'      => "function(node) { attr = JSON.parse(node.attributes); if (attr.mime_type != 'dir') { jqBiz('#accDocs').accordion('select', 1); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/docs/edit&rID='+node.id); } }",
                     'onDrop'       => "function(target,source,point) { alert('dropped source id '+source.id+' on target id = '+target.id); }",
@@ -571,7 +571,7 @@ jqBiz('#treeDocs').tree('reload');";
     private function dgHistory($name, $rID, $security)
     {
         return ['id'=>$name, 'title'=>lang('history'),
-            'attr'   => ['idField'=>'id', 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/historyList&rID=$rID"],
+            'attr'   => ['idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/historyList&rID=$rID"],
             'events' => [], // add data:docsHistory
             'columns'=> ['id'=>['order'=>0,'attr'=>['hidden'=>true]],
                 'action'=> ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index) { return {$name}Formatter(value,row,index); }"],

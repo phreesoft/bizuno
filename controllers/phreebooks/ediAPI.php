@@ -34,9 +34,9 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/ediSegments.php', 'phreebooksEdiSegments');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/prices.php', 'inventoryPrices');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/ediSegments.php', 'phreebooksEdiSegments');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/prices.php', 'inventoryPrices');
 
 class phreebooksEdiAPI extends phreebooksEdiSegments
 {

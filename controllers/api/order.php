@@ -29,7 +29,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/common.php', 'apiCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/common.php', 'apiCommon');
 
 class apiOrder extends apiCommon
 {
@@ -61,8 +61,8 @@ class apiOrder extends apiCommon
     public function apiJournalEntry($order=[])
     {
         $layout = [];
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'journal');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'availableQty', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
         $this->mapPost($order); // map the input to the proper post format to use existing
         msgDebug("\nModified post = ".print_r($_POST, true));
         compose('phreebooks', 'main', 'save', $layout); // compose doesn't work because user is not logged in

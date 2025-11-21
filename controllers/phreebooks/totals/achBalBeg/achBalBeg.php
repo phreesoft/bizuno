@@ -76,7 +76,7 @@ function totalsGetAchBegBal(postDate) {
     var rID      = jqBiz('#id').val();
     var achMapID = bizSelGet('totals_achMapID');
     jqBiz.ajax({
-        url: '".BIZUNO_AJAX."&bizRt=phreebooks/main/journalBalance&rID='+rID+'&postDate='+postDate+'&achMapID='+achMapID,
+        url: '".BIZUNO_URL_AJAX."&bizRt=phreebooks/main/journalBalance&rID='+rID+'&postDate='+postDate+'&achMapID='+achMapID,
         success: function (json) {
             processJson(json);
             if (json.balance) { bizNumSet('totals_achBalBeg', json.balance); bizTextSet('ach_gl_acct_id', json.gl_account); }

@@ -90,7 +90,7 @@ class bizunoSettings
             msgDebug("\nInstalled module: $module");
             if (isset($msgStack->error['error']) && sizeof($msgStack->error['error']) > 0) { msgDebug("\nMsgStack had an error, returning!"); return; }
         }
-        $layout = array_replace_recursive($layout, ['content'=>['rID'=>$module,'action'=>'href','link'=>BIZUNO_HOME."&bizRt=bizuno/settings/manager"]]);
+        $layout = array_replace_recursive($layout, ['content'=>['rID'=>$module,'action'=>'href','link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/settings/manager"]]);
     }
 
     /**
@@ -118,7 +118,7 @@ class bizunoSettings
         msgLog("Removed module: $module");
         dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."configuration WHERE config_key='$module'");
         bizCacheExpClear(); // force reload of all users cache with next page access, menus and permissions, etc.
-        $layout= array_replace_recursive($layout, ['content'=>['rID'=>$module, 'action'=>'href', 'link'=>BIZUNO_HOME."&bizRt=bizuno/settings/manager"]]);
+        $layout= array_replace_recursive($layout, ['content'=>['rID'=>$module, 'action'=>'href', 'link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/settings/manager"]]);
     }
 
     /**
@@ -160,7 +160,7 @@ class bizunoSettings
                 $html .= '    <td valign="top" style="text-align:right;">'.html5('install_'.$method, $fields['btnMethodAdd'])."</td>\n";
             } else {
                 $html .= '<div id="divMethod_'.$method.'" style="display:none;" class="layout-expand-over">';
-                $html .= html5("frmMethod_$method", ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=bizuno/settings/methodSettingsSave&module=$module&type=$folder&method=$method"]]);
+                $html .= html5("frmMethod_$method", ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=bizuno/settings/methodSettingsSave&module=$module&type=$folder&method=$method"]]);
                 if (method_exists($clsMeth, 'settingsHeader')) { $html .= $clsMeth->settingsHeader(); }
                 $structure = method_exists($clsMeth, 'settingsStructure') ? $clsMeth->settingsStructure() : [];
                 foreach ($structure as $setting => $values) {
@@ -276,9 +276,9 @@ class bizunoSettings
         $meta   = dbMetaGet(0, "methods_{$dirMeth}"); // get the existing meta, probably won't be there since we are installing
         $metaIdx= metaIdxClean($meta);
         // get all methods in the folder to initialize
-        $members= $io->folderRead(BIZBOOKS_ROOT."controllers/$module/$dirMeth/");
+        $members= $io->folderRead(BIZUNO_FS_LIBRARY."controllers/$module/$dirMeth/");
         foreach ($members as $method) {
-            $path   = BIZBOOKS_ROOT."controllers/$module/$dirMeth/$method/";
+            $path   = BIZUNO_FS_LIBRARY."controllers/$module/$dirMeth/$method/";
             msgDebug("\nlooking for method $method at path = ".print_r($path, true));
             $fqcn   = "\\bizuno\\$method";
             if (!bizAutoLoad("{$path}$method.php", $fqcn)) { continue; } // This should never happen as we just read the folder, except with development bug
@@ -291,7 +291,7 @@ class bizunoSettings
                 'status'     => in_array($method, $defaults) ? 1 : 0,
                 'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
                 'path'       => $path,
-                'url'        => BIZBOOKS_URL_ROOT."controllers/$module/$dirMeth/$method/"];
+                'url'        => BIZUNO_URL_PORTAL."controllers/$module/$dirMeth/$method/"];
             msgDebug("\nargs array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
             msgDebug("\nmerged array = ".print_r($merged, true));
@@ -341,7 +341,7 @@ class bizunoSettings
      */
     public function adminAddRpts($path='')
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
         $error = false;
         msgDebug("\nEntering adminAddRpts, adding reports to path = $path");
         if (file_exists ($path.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/reports/')) {

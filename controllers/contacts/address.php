@@ -83,7 +83,7 @@ class contactsAddress extends mgrJournal
         msgDebug("\nEntering contacts:address:managerGrid with args = ".print_r($args, true));
         $defs = array_replace(['_refID'=>clean('refID', 'integer', 'get'), '_table'=>'contacts', 'dom'=>''], $args);
         $data = array_replace_recursive(parent::gridBase($security, $defs), [
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&aType=$this->aType&cType=$this->cType&dom={$defs['dom']}&refID={$defs['_refID']}"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&aType=$this->aType&cType=$this->cType&dom={$defs['dom']}&refID={$defs['_refID']}"],
             'source' => [
                 'search' => ['primary_name', 'contact', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'city', 'postal_code', 'email'],
                 'actions'=> [

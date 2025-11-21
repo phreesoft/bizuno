@@ -110,12 +110,12 @@ class bizunoImage
             if ($search && strpos(strtolower($fn), $search) === false) { continue; }
             $newPath = clean("$path/$fn", 'path_rel'); // remove double slashes, if present
             if (is_dir(BIZUNO_DATA."images/$newPath")) {
-                $src = BIZBOOKS_URL_FS."0/view/icons/default/32x32/folder.png";
+                $src = BIZUNO_URL_FS."0/view/icons/default/32x32/folder.png";
                 $isDir = true;
             } else {
                 $ext = pathinfo(BIZUNO_DATA."images/$newPath", PATHINFO_EXTENSION);
                 if (!in_array(strtolower($ext), $io->getValidExt('image'))) { continue; }
-                $src = BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$newPath";
+                $src = BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$newPath";
                 msgDebug("\nsrc for image = $src");
                 $isDir = false;
             }
@@ -156,7 +156,7 @@ function imgRefresh() {
     var path   = jqBiz('#imgMgrPath').val();
     var search = jqBiz('#imgSearch').val();
     var action = jqBiz('#imgAction').val();
-    var shref  = '".BIZUNO_AJAX."&bizRt=bizuno/image/manager&imgTarget='+target+'&imgMgrPath='+path+'&imgSearch='+search+'&imgAction=';
+    var shref  = '".BIZUNO_URL_AJAX."&bizRt=bizuno/image/manager&imgTarget='+target+'&imgMgrPath='+path+'&imgSearch='+search+'&imgAction=';
     if (action == 'upload') {
         jqBiz('#frmImgMgr').submit(function (e) {
             jqBiz.ajax({
@@ -191,7 +191,7 @@ function imgRefresh() {
         $search  = clean('search','text', 'get');
         $path    = clean('path',  'path_rel','get');
         $fn      = clean('fn',    'text', 'get');
-        $href    = BIZUNO_AJAX."&bizRt=bizuno/image/manager&imgTarget=$target&imgMgrPath=$path&imgSearch=$search&imgAction=refresh";
+        $href    = BIZUNO_URL_AJAX."&bizRt=bizuno/image/manager&imgTarget=$target&imgMgrPath=$path&imgSearch=$search&imgAction=refresh";
         $fullPath= clean("images/$path/$fn", 'path_rel'); // remove double slashes, if present
         msgDebug("\nLooking for file to delete file or folder at full path: $fullPath");
         if (is_dir(BIZUNO_DATA.$fullPath)) {
@@ -211,7 +211,7 @@ function imgRefresh() {
         $bID   = clean('rID', 'integer', 'get');
         $img   = clean('data', 'path', 'get');
         $html  = html5('', ['styles'=>['max-width'=>'100%;','max-height'=>'100%;'],'events'=>['onClick'=>"jqBiz('#winImage').window('close');"],
-            'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS."$bID/images/$img"]]);
+            'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS."$bID/images/$img"]]);
         $data  = ['type'=>'popup','title'=>lang('current_image'),'attr'=>['id'=>'winImage'], // ,'width'=>600,'height'=>600
             'divs'=>['winImage'=>['order'=>50,'type'=>'html','html'=>$html]]];
         $layout= array_replace_recursive($layout, $data);

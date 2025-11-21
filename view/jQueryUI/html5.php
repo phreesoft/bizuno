@@ -98,7 +98,7 @@ final class html5 {
             case 'payments':
                 foreach ($viewData['payments'] as $methID) {
                     $fqcn   = "\\bizuno\\$methID";
-                    bizAutoLoad(BIZBOOKS_ROOT."controllers/payment/gateways/$methID/$methID.php", $fqcn);
+                    bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/payment/gateways/$methID/$methID.php", $fqcn);
                     $totals = new $fqcn();
                     $output .= $totals->render($viewData);
                 }
@@ -738,7 +738,7 @@ columns:  [[
                 'action' => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>60],
                     'events' => ['formatter'=>"function(value,row,index) { return {$attr['dgName']}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt={$attr['getPath']}&pathID=$path&fileID=idTBD');"]],
+                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt={$attr['getPath']}&pathID=$path&fileID=idTBD');"]],
                         'trash'   =>['order'=>70,'icon'=>'trash',   'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('{$attr['delPath']}&secID={$attr['secID']}','{$attr['dgName']}','{$path}idTBD');"]]]],
                 'fn'   => ['order'=>10,'label'=>lang('filename'),'attr'=>['width'=>300,'resizable'=>true]],
                 'size' => ['order'=>20,'label'=>lang('size'),    'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']],
@@ -908,7 +908,7 @@ columns:  [[
         $bizID   = getUserCache('business', 'bizID');
         msgDebug("\nEntering layoutDesktop with menuID = $menuID and bizID = $bizID");
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
-        $src     = $logoPath ? BIZBOOKS_URL_FS."$bizID/images/$logoPath" : BIZUNO_LOGO;
+        $src     = $logoPath ? BIZUNO_URL_FS."$bizID/images/$logoPath" : BIZUNO_LOGO;
         $portal  = explode('.', $_SERVER['SERVER_ADDR']);
         $version = MODULE_BIZUNO_VERSION."-{$portal[3]}-".getUserCache('profile', 'language')."-".getDefaultCurrency();
         if (!empty($bizID)) {
@@ -1010,7 +1010,7 @@ columns:  [[
         msgDebug("\nEntering layoutMenuLeft working with type = $type and menuID = ".print_r($menuID, true));
         switch ($type) {
             case 'add':   return html5('', ['order'=>10,'icon'=>'add','options'=>['menuAlign'=>"'right'"],
-                'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"hrefClick('".BIZUNO_HOME."&bizRt=bizuno/dashboard/manager&menuID=$menuID');"]]);
+                'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"hrefClick('".BIZUNO_URL_PORTAL."&bizRt=bizuno/dashboard/manager&menuID=$menuID');"]]);
             case 'back':  return ['child'=>['back'=>['order'=>50,'icon'=>'back','events'=>['onClick'=>"jqBiz.mobile.back();"]]]];
             case 'close': return html5('', ['order'=>10,'icon'=>'close','options'=>['menuAlign'=>"'left'"],
                 'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"jqBiz.mobile.back();"]]);
@@ -1393,7 +1393,7 @@ columns:  [[
     public function inputContact($id, $prop) {
         $defs = ['value'=>0,'suffix'=>'','store'=>0,'drop'=>false,'fill'=>false,'data'=>false,'callback'=>"contactsDetail(row.id, '', false);"];
         $attr = array_merge($defs, !empty($prop['defaults']) ? $prop['defaults'] : []);
-        $url  = "'".BIZUNO_AJAX."&bizRt=contacts/main/managerRowsSel&clr=1&type=a";
+        $url  = "'".BIZUNO_URL_AJAX."&bizRt=contacts/main/managerRowsSel&clr=1&type=a";
         $url .= "&store=".(!empty($attr['store']) ? '1' : '0');
         $url .= "'";
         $prop['classes'][]               = 'easyui-combogrid';
@@ -1547,7 +1547,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
     public function inputInventory($id, $prop) {
         $defaults = ['width'=>200, 'panelWidth'=>550, 'delay'=>500, //'iconCls'=>"'icon-search'", 'hasDownArrow'=>'false',
             'idField'=>"'id'", 'textField'=>"'description_short'", 'mode'=>"'remote'"];
-        $defaults['url']     = "'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1'";
+        $defaults['url']     = "'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1'";
         $defaults['callback']= "jqBiz('#item_cost').val(data.item_cost); jqBiz('#full_price').val(data.full_price);";
         $defaults['columns'] = "[[{field:'id',hidden:true},{field:'sku',title:'".jsLang('sku')."',width:150},{field:'description_short',title:'".jsLang('description')."',width:400}]]";
         // override defaults
@@ -2001,7 +2001,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
 /** *************************** Grid Editors ***************** */
 function dgEditComboTax($name) {
     return "{type:'combogrid', options:{width:130, panelWidth:750, delay:900, idField:'id', textField:'short_name', mode:'remote',
-    url:'".BIZUNO_AJAX."&bizRt=contacts/main/managerRows&clr=1&type=v', selectOnNavigation:false,
+    url:'".BIZUNO_URL_AJAX."&bizRt=contacts/main/managerRows&clr=1&type=v', selectOnNavigation:false,
     onSelect:function(index,row) {
 bizSelEdSet('$name',curIndex,'cID',row.id);
 bizTextEdSet('$name',curIndex,'cTitle',row.short_name);

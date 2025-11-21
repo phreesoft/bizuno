@@ -87,7 +87,7 @@ class extBizPOSAdmin
         if (!$security = validateAccess('admin', 1)) { return; }
         $rID     = clean('id', 'text', 'get');
         $values  = !empty($rID) ? getModuleCache($this->moduleID, 'tills', $rID) : $this->tillDefaults;
-        $objXML  = bizuno_simpleXML(file_get_contents(BIZBOOKS_ROOT."controllers/$this->moduleID/PrinterCodes.xml"));
+        $objXML  = bizuno_simpleXML(file_get_contents(BIZUNO_FS_LIBRARY."controllers/$this->moduleID/PrinterCodes.xml"));
         foreach ($objXML->data as $row) { $printers[] = ['id'=>$row->id, 'text'=>"$row->Manufacturer $row->Model"]; }
         $data    = ['type'=>'divHTML',
             'divs'    => [
@@ -98,7 +98,7 @@ class extBizPOSAdmin
                 'formEOF' => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
             'toolbars'=> ['tbTills'=>  ['icons' => [
                 'save' => ['order'=>10,'icon'=>'save','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmTills').submit();"]]]]],
-            'forms'   => ['frmTills'=>  ['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/tillSave"]]],
+            'forms'   => ['frmTills'=>  ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/tillSave"]]],
             'fields'  => [
                 'id'      => ['label'=>$this->lang['till_id'],   'break'=>true,'position'=>'after','attr'=>['value'=>$values['id']]],
                 'title'   => ['label'=>$this->lang['till_title'],'break'=>true,'position'=>'after','attr'=>['value'=>$values['title']]],
@@ -142,7 +142,7 @@ class extBizPOSAdmin
             'drawer2Code' => '',
             'cutterCode'  => '',
             'cutterPart'  => ''];
-        $objXML = bizuno_simpleXML(file_get_contents(BIZBOOKS_ROOT."controllers/$this->moduleID/PrinterCodes.xml"));
+        $objXML = bizuno_simpleXML(file_get_contents(BIZUNO_FS_LIBRARY."controllers/$this->moduleID/PrinterCodes.xml"));
         foreach ($objXML->data as $row) { if ($row->id == $values['printer']) {
             $values['manufacturer']= isset($row->Manufacturer)? $row->Manufacturer: 'Generic';
             $values['model']       = isset($row->Model)       ? $row->Model       : 'Generic';
@@ -218,7 +218,7 @@ class extBizPOSAdmin
     {
         return [
             'id'     => $name,
-            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'singleSelect'=>true, 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/tillManagerRows"],
+            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'singleSelect'=>true, 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/tillManagerRows"],
             'events' => [
                 'onDblClickRow'=> "function(rowIndex, rowData) { accordionEdit('accTills', 'dgTills', 'detail', '".lang('details')."', '$this->moduleID/admin/tillEdit&id='+rowData.id); }"],
             'source' => ['actions'=> [

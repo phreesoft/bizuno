@@ -43,11 +43,11 @@ class contactsApi
     public function contactsAPI(&$layout)
     {
         $fields = [
-            'btnConapi_tpl'=> ['icon'=>'download','label'=>lang('download'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt=contacts/api/apiTemplate');"]],
+            'btnConapi_tpl'=> ['icon'=>'download','label'=>lang('download'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=contacts/api/apiTemplate');"]],
             'fileContacts' => ['attr'=>['type'=>'file']],
             'btnConapi_imp'=> ['icon'=>'import','label'=>lang('import'),'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmConApiImport').submit();"]],
-            'btnConapi_exp'=> ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt=contacts/api/apiExport');"]]];
-        $forms = ['frmConApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=contacts/api/apiImport"]]];
+            'btnConapi_exp'=> ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=contacts/api/apiExport');"]]];
+        $forms = ['frmConApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=contacts/api/apiImport"]]];
         $html  = '<p>'.$this->lang['conapi_desc'].'</p>
 <p>'.$this->lang['conapi_template'].html5('', $fields['btnConapi_tpl']).'</p><hr />'.html5('frmConApiImport',  $forms['frmConApiImport']).'
 <p>'.$this->lang['conapi_import']  .html5('fileContacts', $fields['fileContacts']).html5('', $fields['btnConapi_imp'])."</p></form>\n<hr />
@@ -64,7 +64,7 @@ class contactsApi
     {
         global $io;
         $tables = [];
-        require(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php');
+        require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         $cMap   = $tables['contacts']['fields'];
         $header = [];
         $props  = [];
@@ -89,7 +89,7 @@ class contactsApi
     {
         if (!$security = validateAccess('admin', 2)) { return; }
         $tables  = $map = $this->template = [];
-        require(BIZBOOKS_ROOT."controllers/bizuno/install/tables.php"); // replaces $map
+        require(BIZUNO_FS_LIBRARY."controllers/bizuno/install/tables.php"); // replaces $map
         $cMap    = $tables['contacts']['fields'];
         $cFields = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts', '', 'Contact');
         foreach ($cFields  as $field => $props) { $template[$props['tag']] = trim($field); }
@@ -179,7 +179,7 @@ class contactsApi
         global $io;
         if (!$security = validateAccess('admin', 1)) { return; }
         $tables  = $merged = $output = [];
-        require(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php');
+        require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         $cMap    = $tables['contacts']['fields'];
         $cFields = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts',     '', 'Contact');
         $header  = [];

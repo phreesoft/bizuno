@@ -69,7 +69,7 @@ class shippingRate extends shippingCommon
                 'shipTo'  => ['label'=>lang('address_type_s'),'type'=>'fields','keys'=>$fields['keyAddr']],
                 'options' => ['label'=>lang('options'),       'type'=>'fields','keys'=>$fields['keyOpt']],
                 'details' => ['label'=>lang('details'),       'type'=>'fields','keys'=>$fields['keyDtl']]],
-            'forms'    => ['frmEstimate'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/rateList"]]],
+            'forms'    => ['frmEstimate'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/rateList"]]],
             'fields'   => $fields['fields'],
             'jsReady'  => ['init'=>"ajaxForm('frmEstimate');"]]);
     }

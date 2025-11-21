@@ -42,7 +42,7 @@ class phreebooksAutoAssy {
     public function autoAssy()
     {
         if (!$security = validateAccess('j14_mgr', 2)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         $rID   = clean('rID', 'integer', 'get');
         $main  = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "id=$rID");
         if (!in_array($main['journal_id'], [9, 10, 12])) { return msgAdd("Operation not permitted!"); }

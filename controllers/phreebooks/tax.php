@@ -78,7 +78,7 @@ class phreebooksTax extends mgrJournal
         
         $yes_no_choices = [['id'=>'a','text'=>lang('all')], ['id'=>'0','text'=>lang('active')], ['id'=>'1','text'=>lang('inactive')]];
         $data = array_replace_recursive(parent::gridBase($security, $args), [
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=phreebooks/tax/managerRows&type=$this->type"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/managerRows&type=$this->type"],
             'source' => [
                 'search' => ['ref_num', 'title', 'description'],
                 'filters'=> [

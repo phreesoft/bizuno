@@ -85,7 +85,7 @@ class ship_j10
     public function render($opts=[])
     {
         global $currencies;
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'getInvoiceInfo', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'getInvoiceInfo', 'function');
         $filter= "m.journal_id=$this->journalID AND m.closed='0' AND i.gl_type='itm' AND i.date_1<='$this->today'";
         if (!empty(getUserCache('profile', 'restrict_store')) && sizeof(getModuleCache('bizuno', 'stores')) > 1) {
             $filter .= " AND store_id=".getUserCache('profile', 'store_id', false, -1);

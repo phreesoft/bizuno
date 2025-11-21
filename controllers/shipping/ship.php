@@ -87,7 +87,7 @@ class shippingShip extends shippingCommon
                     'settings'=>['suffix'=>'','search'=>false,'clear'=>false,'validate'=>true]],
                 'options' => ['label'=>lang('options'),               'type'=>'fields',  'keys'  =>$keys['options']],
                 'hazmat'  => ['label'=>lang('options'),               'type'=>'fields',  'keys'  =>$keys['hazmat']]],
-            'forms'   => ['frmLabel'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/labelGet"]]],
+            'forms'   => ['frmLabel'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/labelGet"]]],
             'datagrid'=> ['dgPkg'=>$this->dgPkg('dgPkg', $dbData['pkg'])],
             'fields'  => $fields,
             'jsBody'  => $js['jsBody'],
@@ -500,7 +500,7 @@ function preSubmit() {
                 switch ($ext) {
                     case 'gif':
                         $jsLabelGIF[] = ['type'=>$ext, 'rID'=>$metaID,'path'=>$file];
-                        $html  .= html5('', ['break'=>true,'attr'=>['type'=>'img', 'src'=>BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/".$jsLabelGIF[0]['path']]]);
+                        $html  .= html5('', ['break'=>true,'attr'=>['type'=>'img', 'src'=>BIZUNO_URL_FS.getUserCache('business', 'bizID')."/".$jsLabelGIF[0]['path']]]);
                         break;
                     case 'pdf':
                         $html  .= html5('', ['break'=>true,'events'=>['onClick'=>"labelPDF($metaID, '$file');"],'attr'=>['type'=>'button','value'=>'Download PDF']]);
@@ -552,11 +552,11 @@ function labelPDF(rID, path) {
             'toolbars'=> ['tbLabel'=>['icons'=>['close'=>['order'=>10,'events'=>['onClick'=>"window.close();"]]]]],
             'jsReady' => ['init'=>$jsReady]];
         if (!empty($enTherm)) {
-            $data['head']['qzTray']    = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'qz-tray/qz-tray.js"></script>'];
+            $data['head']['qzTray']    = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'qz-tray/qz-tray.js"></script>'];
 //          $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>'];
-            $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_SCRIPTS.'qz-tray/jsrsasign.js"></script>'];
+            $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'qz-tray/jsrsasign.js"></script>'];
             $data['head']['qzSign']    = ['order'=>92,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->thermalTransport.'sign-message.js"></script>'];
-        } elseif (!file_exists(BIZUNO_SCRIPTS.'assets/qz-tray/qz-tray.js')) {
+        } elseif (!file_exists(BIZUNO_URL_SCRIPTS.'assets/qz-tray/qz-tray.js')) {
             msgAdd("Thermal labels are not available to print, proper transport is not installed!");
         }
         $data['jsHead']['init'] = $jsHead; // needs to be last

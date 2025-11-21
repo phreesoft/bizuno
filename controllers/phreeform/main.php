@@ -78,7 +78,7 @@ class phreeformMain extends mgrJournal
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $rID = clean('rID', ['format'=>'integer','default'=>0], 'get');
         $gID = clean('gID', 'text', 'get');
-        $divSrch= html5('', ['options'=>['mode'=>"'remote'",'url'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/search'",'editable'=>'true','idField'=>"'id'",'textField'=>"'text'",'width'=>250,'panelWidth'=>400,
+        $divSrch= html5('', ['options'=>['mode'=>"'remote'",'url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/search'",'editable'=>'true','idField'=>"'id'",'textField'=>"'text'",'width'=>250,'panelWidth'=>400,
             'onClick'=>"function (row) { jqBiz('#accDocs').accordion('select', 1); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/edit&rID='+row.id); }"],'attr'=>['type'=>'select']]);
         $data   = ['title'=> lang('reports'),
             'divs'   => [
@@ -99,15 +99,15 @@ class phreeformMain extends mgrJournal
                     'search'=> ['type'=>'panel','key'=>'docSearch'],
                     'panel' => ['type'=>'panel','key'=>'myBookMark']]],
                 'docSearch' => ['label'=>lang('search'),               'type'=>'html','html'=>$divSrch],
-                'myBookMark'=> ['label'=>$this->lang['my_favorites'],  'type'=>'html','id'=>'myBookMark','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/main/favorites'"],'html'=>'&nbsp;'],
-                'myHist'    => ['label'=>$this->lang['recent_reports'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/main/recent'"],   'html'=>'&nbsp;']],
+                'myBookMark'=> ['label'=>$this->lang['my_favorites'],  'type'=>'html','id'=>'myBookMark','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/favorites'"],'html'=>'&nbsp;'],
+                'myHist'    => ['label'=>$this->lang['recent_reports'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/recent'"],   'html'=>'&nbsp;']],
             'accordion'=> ['accDocs'=>['styles'=>['height'=>'100%'],'divs'=>[ // 'attr'=>['halign'=>'left'], crashes older versions of Chrome and Safari
                 'divTree'  => ['order'=>10,'label'=>$this->lang['my_reports'],'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'], // 'attr'=>['titleDirection'=>'up'],
                     'divs'=>[
                         'toolbar'=> ['order'=>10,'type'=>'fields','keys'=>['expand','collapse']],
                         'tree'   => ['order'=>50,'type'=>'tree',  'key' =>'treePhreeform']]],
                 'divDetail'=> ['order'=>30,'label'=>lang('details'),'type'=>'html','html'=>'&nbsp;']]]], // 'attr'=>['titleDirection'=>'up'],
-            'tree'     => ['treePhreeform'=>['attr'=>['type'=>'tree','url'=>BIZUNO_AJAX."&bizRt=phreeform/main/managerTree"],'events'=>[
+            'tree'     => ['treePhreeform'=>['attr'=>['type'=>'tree','url'=>BIZUNO_URL_AJAX."&bizRt=phreeform/main/managerTree"],'events'=>[
                 'onClick'  => "function(node) { if (typeof node.id != 'undefined') {
     if (jqBiz('#treePhreeform').tree('isLeaf', node.target)) { jqBiz('#accDocs').accordion('select', 1); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/main/edit&rID='+node.id); }
     else { jqBiz('#treePhreeform').tree('toggle', node.target); } } }"]]],
@@ -163,11 +163,11 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
             'toolbars'  => ["tb{$this->domSuffix}"=>['hideLabels'=>true,'icons'=>[
                 'open'  => ['order'=>10,'events'=>['onClick'=>"winOpen('phreeformOpen', '$this->moduleID/render/open&rID=$rID');"]],
                 'edit'  => ['order'=>20,'hidden'=>($security>1)?false:true,
-                    'events'=>['onClick'=>"window.location.href='".BIZUNO_HOME."&bizRt=phreeform/design/edit&rID=$rID';"]],
+                    'events'=>['onClick'=>"window.location.href='".BIZUNO_URL_PORTAL."&bizRt=phreeform/design/edit&rID=$rID';"]],
                 'rename'=> ['order'=>30,'hidden'=>($security>2)?false:true,
                     'events'=>['onClick'=>"var title=prompt('".lang('msg_entry_rename')."'); if (title !== null) { jsonAction('$this->moduleID/$this->pageID/rename', '$rID', title); }"]],
                 'export'=> ['order'=>60,'hidden'=>($security>2)?false:true,
-                    'events'=>['onClick'=>"window.location.href='".BIZUNO_AJAX."&bizRt=$this->moduleID/io/export&rID=$rID';"]]]]]];
+                    'events'=>['onClick'=>"window.location.href='".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/io/export&rID=$rID';"]]]]]];
         $layout = array_replace_recursive($layout, $data);
     }
 

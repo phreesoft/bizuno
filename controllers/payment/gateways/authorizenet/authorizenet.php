@@ -33,7 +33,7 @@ namespace bizuno;
 
 if (!defined('PAYMENT_AUTHORIZENET_URL'))      { define('PAYMENT_AUTHORIZENET_URL', 'https://secure2.authorize.net/gateway/transact.dll'); }
 if (!defined('PAYMENT_AUTHORIZENET_URL_TEST')) { define('PAYMENT_AUTHORIZENET_URL_TEST', 'https://test.authorize.net/gateway/transact.dll'); }
-bizAutoLoad(BIZBOOKS_ROOT.'model/encrypter.php', 'encryption');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'model/encrypter.php', 'encryption');
 
 class authorizenet
 {

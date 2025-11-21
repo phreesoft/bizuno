@@ -59,14 +59,14 @@ class bizunoDashboard
             'menu_id'=> $menuID,
             'divs'   => [
                 'toolbar' => ['order'=>10,'type'=>'toolbar','key' =>'tbDashBoard'],
-                'frmDash' => ['order'=>15,'type'=>'html',   'html'=>html5('frmDashboard', ['attr'=>['type'=>'form', 'action'=>BIZUNO_AJAX."&bizRt=bizuno/dashboard/save&menuID=$menuID"]])],
+                'frmDash' => ['order'=>15,'type'=>'html',   'html'=>html5('frmDashboard', ['attr'=>['type'=>'form', 'action'=>BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/save&menuID=$menuID"]])],
                 'heading' => ['order'=>30,'type'=>'html',   'html'=>"<h1>$title</h1>"],
                 'adminSet'=> ['order'=>50,'type'=>'tabs',   'key' =>'tabSettings'],
                 'footer'  => ['order'=>99,'type'=>'html',   'html'=>"</form>"]],
             'jsReady' => ['jsForm'=>"ajaxForm('frmDashboard');"],
             'tabs'    => ['tabSettings'=> ['attr'=>['tabPosition'=>'left']]],
             'toolbars'=> ['tbDashBoard'=> ['icons' => [
-                'cancel'=> ['order'=> 10, 'events'=>['onClick'=>"location.href='".BIZUNO_HOME."&bizRt=bizuno/main/bizunoHome&menuID=$menuID'"]],
+                'cancel'=> ['order'=> 10, 'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."&bizRt=bizuno/main/bizunoHome&menuID=$menuID'"]],
                 'save'  => ['order'=> 20, 'events'=>['onClick'=>"jqBiz('#frmDashboard').submit();"]]]]]];
         $allDash = dbMetaGet(0, 'dashboards'); // Fetch list of all dashboards
         metaIdxClean($allDash); // remove the row id, etc
@@ -158,7 +158,7 @@ class bizunoDashboard
         }
         msgDebug("\nReady to write updated dashboard list: ".print_r($userMenu, true));
         dbMetaSet($rID, "dashboard_{$menuID}", $userMenu, 'contacts', getUserCache('profile', 'userID'));
-        $layout = array_replace_recursive($layout, ['content'=>['action'=>'href', 'link'=>BIZUNO_HOME."&bizRt=bizuno/main/bizunoHome&menuID=$menuID"]]);
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'href', 'link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/main/bizunoHome&menuID=$menuID"]]);
     }
 
     /**
@@ -273,7 +273,7 @@ class bizunoDashboard
                 'collapsible'=> empty($myDash->noCollapse)   ? true   : false,
                 'closable'   => empty($myDash->noClose)      ? true   : false,
                 'tools'      => $icnTools,
-                'href'       => BIZUNO_AJAX."&bizRt=bizuno/dashboard/settings&dashID=$dashID&menu=$menu_id"];
+                'href'       => BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/settings&dashID=$dashID&menu=$menu_id"];
         }
         msgDebug("\nList dashboards for menu ID = $menu_id is: ".print_r($dashboard, true));
         for ($i = 0; $i < $cols; $i++) { $state[] = !empty($temp[$i]) && is_array($temp[$i]) ? implode(',', $temp[$i]) : ''; }

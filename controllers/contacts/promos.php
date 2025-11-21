@@ -101,7 +101,7 @@ class contactsPromos extends mgrJournal
                     'formEOF' => ['order'=>85,'type'=>'html',    'html'=>"</form>"]]],
                 'divPromosRows'  => ['order'=>50,'label'=>$this->lang['promos_list'],'type'=>'datagrid','key'=>'dgPromos'],
                 'divPromosDetail'=> ['order'=>70,'label'=>lang('details'),'type'=>'html', 'html'=>$this->lang['desc_promo_empty']]]]],
-            'forms'    => ['frmPromoMgr'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/promos/sendMain"]]],
+            'forms'    => ['frmPromoMgr'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/sendMain"]]],
             'datagrid' => [
                 'dgPromos' => $this->dgPromos ('dgPromos',  $security),
                 'dgHistory'=> $this->dgHistory('dgHistory')],
@@ -190,7 +190,7 @@ function xfrResponse(json) {
         $order = clean('order',['format'=>'text', 'default'=>'asc'], 'post');
         $search= getSearch();
         return ['id'=>$name, 'page'=>clean('page', ['format'=>'integer', 'default'=>1], 'post'), 'rows'=>clean('rows', ['format'=>'integer', 'default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post'),
-            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/promos/managerRows"],
+            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/managerRows"],
             'events' => ['onDblClickRow' => "function(rowIndex, rowData){ accordionEdit('accPromos', 'dgPromos', 'divPromosDetail', '".jsLang('details')."', '$this->moduleID/promos/edit', rowData.id); }"],
             'source' => [
                 'tables' => [$this->moduleID => ['table'=>BIZUNO_DB_PREFIX."crmPromos"]],
@@ -229,7 +229,7 @@ function xfrResponse(json) {
         $sort = clean('sort', ['format'=>'text', 'default'=>'send_date'], 'post');
         $order= clean('order',['format'=>'text', 'default'=>'desc'], 'post');
         return ['id'=>$name, 'page'=>clean('page', ['format'=>'integer', 'default'=>1], 'post'), 'rows'=>clean('rows', ['format'=>'integer', 'default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post'),
-            'attr'   => ['title'=>lang('history'), 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/promos/managerRowsHistory"],
+            'attr'   => ['title'=>lang('history'), 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/managerRowsHistory"],
             'source' => [
                 'tables'=> ["{$this->moduleID}_history"=>  ['table'=>BIZUNO_DB_PREFIX."{$this->moduleID}_history"]],
                 'sort'  => ['s0'=>  ['order'=>10, 'field'=>"$sort $order"]]],
@@ -262,7 +262,7 @@ function xfrResponse(json) {
                 'fields'  => ['order'=>50,'type'=>'fields', 'keys'=>array_keys($struc)],
                 'formEOF' => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
             'toolbars' => ['tbPromos'=>['icons'=>['save'=>['order'=>40,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"jqBiz('#frmPromo').submit();"]]]]],
-            'forms'    => ['frmPromo'=>['attr' =>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/promos/save"]]],
+            'forms'    => ['frmPromo'=>['attr' =>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/save"]]],
             'fields'   => $fields,
             'jsReady'  => ['init'=>"ajaxForm('frmPromo');"]];
         $layout = array_replace_recursive($layout, $data);

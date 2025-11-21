@@ -176,7 +176,7 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
             default:  $status = '';
         }
         $output = ['id'=>$name, 'type'=>'edatagrid', 'toolbar'=>"#{$name}Toolbar", 'strict'=>true, 'rows'=> $this->defaults['rows'], 'page'=>$this->defaults['page'],
-            'attr'     => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'clientPaging'=>false, 'remoteFilter'=>true, 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/bulkEdit/managerRows"],
+            'attr'     => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'clientPaging'=>false, 'remoteFilter'=>true, 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/bulkEdit/managerRows"],
             'events'   => [
                 'onClickRow'         => "function(rowIndex, rowData) { jqBiz('#$name').edatagrid('editRow', rowIndex); }",
                 'onSave'             => "function(rowIndex, rowData) { var data=JSON.stringify(rowData); jsonAction('$this->moduleID/bulkEdit/save', 0, data); }",

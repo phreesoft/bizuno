@@ -32,7 +32,7 @@ namespace bizuno;
 define('UPS_TRACKING_URL', 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=TRACKINGNUM'); // &trackNums=1ZXXXXXXXXXXXXXXXX
 
 bizAutoLoad(dirname(__FILE__).'/common.php', 'upsCommon');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
 
 class ups extends upsCommon
 {
@@ -45,7 +45,7 @@ class ups extends upsCommon
     function __construct()
     {
         parent::__construct();
-        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
+        $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->reconcile_path  = 'data/shipping/reconcile/ups/';
     }
@@ -98,7 +98,7 @@ class ups extends upsCommon
                     'body'   => ['order'=>30,'type'=>'fields',  'keys'=>['frmUPSTrack','dateUPSTrack','btnUPSTrack']],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]],
             'forms'  => [
-                'frmUPSTrack' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=shipping/track/trackBulk&carrier=$this->code"]]],
+                'frmUPSTrack' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=shipping/track/trackBulk&carrier=$this->code"]]],
             'fields' => [
                 'dateUPSTrack'=> ['attr'=>['type'=>'date','value'=>localeCalculateDate(biz_date('Y-m-d'), -7)]],
                 'btnUPSTrack' => ['icon'=>'next','events'=>['onClick'=>"jqBiz('#frmUPSTrack').submit();"]],

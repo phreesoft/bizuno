@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journals/common.php', 'jCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journals/common.php', 'jCommon');
 
 class j15 extends jCommon
 {
@@ -319,7 +319,7 @@ class j15 extends jCommon
                 'sku'        => ['order'=>20, 'label'=>lang('sku'),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true,'align'=>'center'],
                     'events' => ['editor'=>"{type:'combogrid',options:{
     width: 150, panelWidth: 540, delay: 500, idField: 'sku', textField: 'sku', mode: 'remote',
-    url:        '".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1&f0=a&bID=$store_id',
+    url:        '".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1&f0=a&bID=$store_id',
     onClickRow: function (idx, data) { adjFill(data); },
     columns:[[{field:'sku',title:'".jsLang('sku')."',width:100},{field:'description_short',title:'".jsLang('description')."',width:200},{field:'qty_stock',title:'$on_hand', align:'right',width:90},{field:'qty_po',title:'$on_order',align:'right',width:90}]]
 }}"]],

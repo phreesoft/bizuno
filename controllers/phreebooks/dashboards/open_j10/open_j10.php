@@ -76,7 +76,7 @@ class open_j10
     function render($opts=[])
     {
         global $currencies;
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'getInvoiceInfo', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'getInvoiceInfo', 'function');
         $selRep = !empty($opts['reps']) && getUserCache('role', 'security', 'admin', false, 0)<3 ? 0 : getUserCache('profile', 'userID');
         $filter = "journal_id=$this->journalID AND closed='0'";
         if (!empty($opts['reps'])  && validateAccess($this->secID, 1)<4){ $filter.= " AND rep_id='".getUserCache('profile', 'userID', false, '0')."'"; }

@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 class phreebooksAdmin {
 
@@ -261,12 +261,12 @@ class phreebooksAdmin {
      */
     public function adminHome(&$layout = []) {
         if (!$security = validateAccess('admin', 1)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
         $currency= new phreebooksCurrency();
         $repost  = $this->getViewRepost();
         // Add the Sales Tax Collected panel to tools tab
         $period= getModuleCache('phreebooks', 'fy', 'period') - 1;
-        $taxNxs  = '<div><form id="frmTaxCalc" action="'.BIZUNO_AJAX.'&bizRt=phreebooks/restfulTax/calcTaxCollected">';
+        $taxNxs  = '<div><form id="frmTaxCalc" action="'.BIZUNO_URL_AJAX.'&bizRt=phreebooks/restfulTax/calcTaxCollected">';
         $taxNxs .= "<p>".lang('tax_calc_desc')."</p>\n";
         $taxNxs .= html5('period', ['label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]]);
         $taxNxs .= '<p>'.html5('', ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]).'</p>';
@@ -285,14 +285,14 @@ class phreebooksAdmin {
                 'events' => ['onClick'=>"if (confirm('".$this->lang['msg_gl_db_purge_confirm']."')) jsonAction('phreebooks/tools/glPurge', 0, jqBiz('#purge_db').val());"]]];
         $data    = [
             'tabs'    => ['tabAdmin'=>['divs'=>[
-                'tabGL'    => ['order'=>20,'label'=>lang('chart_of_accts'), 'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/chart/manager'"]],
-                'tabCur'   => ['order'=>30,'label'=>lang('currencies'),     'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/currency/manager'"]],
-                'tabNexus' => ['order'=>40,'label'=>lang('nexus'),          'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
-                'tabTaxc'  => ['order'=>45,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
-                'tabTaxv'  => ['order'=>50,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
+                'tabGL'    => ['order'=>20,'label'=>lang('chart_of_accts'), 'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/chart/manager'"]],
+                'tabCur'   => ['order'=>30,'label'=>lang('currencies'),     'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/currency/manager'"]],
+                'tabNexus' => ['order'=>40,'label'=>lang('nexus'),          'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
+                'tabTaxc'  => ['order'=>45,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
+                'tabTaxv'  => ['order'=>50,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
                 'tabFY'    => ['order'=>80,'label'=>lang('fiscal_calendar'),'type'=>'html','html'=>'',
-                    'options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=phreebooks/admin/managerFY'"]],
-                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
+                    'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/admin/managerFY'"]],
+                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
                 'tools'    => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                 'tabTools' => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'testGL'   => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'testGL'],
@@ -321,8 +321,8 @@ class phreebooksAdmin {
                 'taxCalc'  => ['label'=>lang('tax_collected'),'type'=>'html',  'html'=>$taxNxs]],
             'datagrid'=> ['dgCurrency'  =>$currency->dgCurrency('dgCurrency', $security)],
             'forms'   => [
-                'frmEdiMan'  => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
-                'frmCurrency'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/currency/save"]]],
+                'frmEdiMan'  => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
+                'frmCurrency'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/currency/save"]]],
             'fields'  => $fields,
             'jsHead'  => ['purgeAttch' => $this->getViewPurgeAttach(),
                 'dataCurrency'=> "var dataCurrency = ".json_encode(array_values(getModuleCache('phreebooks','currency','iso'))).";",
@@ -453,7 +453,7 @@ function getPurgeDates() {
         foreach ($dbFYs as $row) { $FYs[] = ['id' => $row['fiscal_year'], 'text' => $row['fiscal_year']]; }
         $fy        = clean('fy', ['format'=>'integer', 'default'=>getModuleCache('phreebooks', 'fy', 'fiscal_year', false, biz_date('Y'))], 'get');
         $fiscalY   = ['label'=>lang('fiscal_year'),'values'=>$FYs,'attr'=>['type'=>'select','value'=>$fy],
-            'events' => ['onChange'=>"var tab=jqBiz('#tabAdmin').tabs('getSelected'); tab.panel( 'refresh', '".BIZUNO_AJAX."&bizRt=phreebooks/admin/managerFY&fy='+bizSelGet('fy') );"]];
+            'events' => ['onChange'=>"var tab=jqBiz('#tabAdmin').tabs('getSelected'); tab.panel( 'refresh', '".BIZUNO_URL_AJAX."&bizRt=phreebooks/admin/managerFY&fy='+bizSelGet('fy') );"]];
         $btnSaveFy = ['icon'=>'save','size'=>'large',
             'events' => ['onClick'=>"divSubmit('phreebooks/tools/fySave', 'fyCal');"]];
         $max_posted= dbGetValue(BIZUNO_DB_PREFIX."journal_main",    "MAX(period) AS period", false, false);
@@ -489,7 +489,7 @@ function getPurgeDates() {
      */
     public function installFirst()
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/chart.php', 'phreebooksChart');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/chart.php', 'phreebooksChart');
         $coa = new phreebooksChart();
         msgDebug("\n  Loading chart of accounts");
         $coa->chartInstall(getUserCache('profile', 'chart'));
@@ -524,7 +524,7 @@ function getPurgeDates() {
         msgDebug("\nEntering $this->moduleID:install");
         // set the currency settings
         $defISO    = getModuleCache('phreebooks', 'currency', 'defISO');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
         $currency  = new phreebooksCurrency();
         $currencies= getModuleCache('phreebooks', 'currency', 'iso', false, []);
         $currencies[$defISO] = $currency->currencySettings($defISO);

@@ -71,13 +71,13 @@ class bizInstall // Checking users:
         global $io, $bizunoMod;
         if (!defined('BIZUNO_DATA') || !defined('BIZUNO_DB_PREFIX')) { die ("Constants are not defined, proper business is not set."); }
         ini_set('memory_limit','1024M'); // temporary
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/bizuno/settings.php',    'bizunoSettings');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/admin.php',   'phreebooksAdmin');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/currency.php','phreebooksCurrency');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php','phreeformImport', 'function');
-        bizAutoLoad(BIZBOOKS_ROOT.'model/mail.php',                     'bizunoMailer');
-        bizAutoLoad(BIZBOOKS_ROOT.'model/manager.php',                  'mgrJournal');
-        bizAutoLoad(BIZBOOKS_ROOT.'model/registry.php',                 'bizRegistry');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/settings.php',    'bizunoSettings');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/admin.php',   'phreebooksAdmin');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/currency.php','phreebooksCurrency');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php','phreeformImport', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'model/mail.php',                     'bizunoMailer');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'model/manager.php',                  'mgrJournal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'model/registry.php',                 'bizRegistry');
         if (!$this->installBizunoPre()) { return; } // pre-install for portal
         $userID = 1; // Same with user
         setUserCache('profile', 'userID',  $userID); // Local user ID
@@ -100,7 +100,7 @@ class bizInstall // Checking users:
         // ready to install, tables first
         if (dbTableExists(BIZUNO_DB_PREFIX.'journal_main')) { return msgAdd("Cannot install, the database has tables present. Aborting!"); }
         $tables  = [];
-        require(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php'); // get the tables
+        require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // get the tables
         dbInstallTables($tables);
         // set some meta to force the position of the row ID's
         $roleID   = 10; // needs to sync with phreesoft.com for new installs or menus don't show
@@ -204,7 +204,7 @@ class bizInstall // Checking users:
         msgDebug("\nEntering installReports, building phreeForm folder tree");
         $today = biz_date();
         $phreeFormStructure = [];
-        include(BIZBOOKS_ROOT.'controllers/bizuno/install/phreeform.php');
+        include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/phreeform.php');
         foreach ($phreeFormStructure as $idx => $row) { // add the parent folder
             $values = [ 'parent_id'=>0, 'group_id'=>$idx, 'mime_type'=>'dir', 'title'=>$row['title'],
                 'create_date'=>$today, 'last_update'=>$today, 'users'=>[-1], 'roles'=>[-1]];
@@ -216,10 +216,10 @@ class bizInstall // Checking users:
             }
         }
         // Now load all of the reports since the tree strcuture is set
-        if (file_exists (BIZBOOKS_ROOT.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/reports/')) {
-            $read_path = BIZBOOKS_ROOT.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/reports/';
+        if (file_exists (BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/reports/')) {
+            $read_path = BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/reports/';
         } else {
-            $read_path = BIZBOOKS_ROOT.'locale/en_US/reports/';
+            $read_path = BIZUNO_FS_LIBRARY.'locale/en_US/reports/';
         }
         $files = scandir($read_path);
         msgDebug("\nread files to import = ".print_r($files, true));

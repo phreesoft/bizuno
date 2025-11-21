@@ -30,7 +30,7 @@ namespace bizuno;
 bizAutoLoad(dirname(__FILE__)."/../../functions.php", 'viewCarrierServices');
 
 define('ODFL_RATE_WSDL_VERSION','4');
-define('ODFL_RATE_WSDL', BIZBOOKS_ROOT.'controllers/shipping/carriers/odfl/RateService.wsdl');
+define('ODFL_RATE_WSDL', BIZUNO_FS_LIBRARY.'controllers/shipping/carriers/odfl/RateService.wsdl');
 define('ODFL_RATE_URL','https://www.odfl.com/wsRate_v4/RateService/WEB-INF/wsdl/RateService.wsdl');
 
 class odfl
@@ -62,7 +62,7 @@ class odfl
     {
         $this->lang = array_replace(getLang($this->moduleID), $this->lang);
         localizeLang($this->lang, $this->methodDir, $this->code);
-        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
+        $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->getSettings();
     }

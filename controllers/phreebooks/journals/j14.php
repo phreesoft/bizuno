@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journals/common.php', 'jCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journals/common.php', 'jCommon');
 
 class j14 extends jCommon
 {
@@ -56,12 +56,12 @@ class j14 extends jCommon
         $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item', $this->journalID);
         $structure['sku']['attr']['type']        = 'inventory';
         $structure['sku']['defaults']['idField'] = "'sku'";
-        $structure['sku']['defaults']['url']     = "'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&filter=assy&clr=1&bID='+jqBiz('#store_id').val()";
+        $structure['sku']['defaults']['url']     = "'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&filter=assy&clr=1&bID='+jqBiz('#store_id').val()";
         $structure['sku']['defaults']['callback']= "bizTextSet('description', data.description_short);
     jqBiz('#gl_account').val(data.gl_inv);
     jqBiz('#gl_acct_id').val(data.gl_inv);
     bizNumSet('qty_stock', data.qty_stock);
-    jqBiz('#dgJournalItem').datagrid({ url:'".BIZUNO_AJAX."&bizRt=inventory/main/managerBOMList&rID='+data.id });
+    jqBiz('#dgJournalItem').datagrid({ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerBOMList&rID='+data.id });
     bizGridReload('dgJournalItem');
     bizNumSet('qty', 1);";
         $structure['qty_stock']    = ['order'=>80,'break'=>true,'options'=>['width'=>100],'label'=>pullTableLabel('inventory', 'qty_stock'),'attr'=>['type'=>'float','readonly'=>'readonly']];

@@ -69,7 +69,7 @@ class aged_receivables
     public function render()
     {
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frm$this->code').submit();"]];
-        $action = BIZUNO_AJAX."&bizRt=phreebooks/tools/agingData";
+        $action = BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/agingData";
         $data   = $this->getTotals();
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $html  .= '<form id="frm'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>';
@@ -96,7 +96,7 @@ google.charts.setOnLoadCallback(chart{$this->code});\n";
 
     public function getTotals()
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'calculate_aging', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'calculate_aging', 'function');
         $output= ['data'=>[['Customer','Post Date','Ref Number','Current','1-30','31-60','61-90','91-120','Over 120']],
             'balance_121' => 0,'balance_120' => 0,'balance_91' => 0,'balance_90' => 0,'balance_61' => 0,'balance_60' => 0,'balance_30' => 0,'balance_0' => 0];
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "journal_id IN (12, 13) AND closed='0'", 'primary_name_b', ['DISTINCT contact_id_b'], 0, false);

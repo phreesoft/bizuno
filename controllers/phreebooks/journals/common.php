@@ -977,7 +977,7 @@ class jCommon
             'events' => ['data' => "datagridData",
                 'onLoadSuccess' => "function(row)      { totals_subtotal(0); }",
                 'onClickRow'    => "function(rowIndex, row) { curIndex = rowIndex; }",
-                'onBeforeEdit'  => "function(rowIndex) { curIndex = rowIndex; var edtURL=jqBiz(this).edatagrid('getColumnOption','sku'); edtURL.editor.options.url='".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1&bID='+bizSelGet('store_id'); }",
+                'onBeforeEdit'  => "function(rowIndex) { curIndex = rowIndex; var edtURL=jqBiz(this).edatagrid('getColumnOption','sku'); edtURL.editor.options.url='".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1&bID='+bizSelGet('store_id'); }",
                 'onBeginEdit'   => "function(rowIndex) { ordersEditing(rowIndex); }",
                 'onDestroy'     => "function(rowIndex) { totalUpdate('dgOrders onDestroy'); curIndex = undefined; }",
                 'onAdd'         => "function(rowIndex) { setFields(rowIndex); }"],
@@ -1007,7 +1007,7 @@ class jCommon
                             'display' => "typeof row.item_ref_id==='undefined' || row.item_ref_id=='0' || row.item_ref_id==''"]]],
                 'sku'=> ['order'=>30, 'label'=>pullTableLabel('journal_item', 'sku', $this->journalID),
                     'attr' => ['width'=>150, 'sortable'=>true, 'resizable'=>true, 'align'=>'center', 'value'=>''],
-                    'events'=>  ['editor'=>"{type:'combogrid',options:{ url:'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&clr=1',
+                    'events'=>  ['editor'=>"{type:'combogrid',options:{ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1',
                         width:150, panelWidth:550, delay:500, idField:'sku', textField:'sku', mode:'remote',
                         onLoadSuccess: function () { jqBiz.parser.parse(jqBiz(this).datagrid('getPanel'));
                             var skuEditor = jqBiz('#dgJournalItem').datagrid('getEditor', {index:curIndex,field:'sku'});

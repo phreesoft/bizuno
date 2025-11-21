@@ -103,7 +103,7 @@ class inventoryAttributes
     jsonAction('$this->moduleID/attributes/adminAttrSave', title, dgRows);
 }";
         $fields = ['attrCat'=>['order'=>10,'label'=>$this->lang['category'],'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
-            'options' =>['editable'=>'true','onChange'=>"function() { jqBiz('#dgInvAttr').datagrid({url:'".BIZUNO_AJAX."&bizRt=$this->moduleID/attributes/adminRows&attrCat='+bizSelGet('attrCat')}); }"]]];
+            'options' =>['editable'=>'true','onChange'=>"function() { jqBiz('#dgInvAttr').datagrid({url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/adminRows&attrCat='+bizSelGet('attrCat')}); }"]]];
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'    => [
                 'tbAttr'=> ['order'=>10, 'type'=>'toolbar', 'key' =>'tbInvAttr'],
@@ -245,7 +245,7 @@ class inventoryAttributes
     {
         return ['id' => $name,'type'=>'edatagrid',
             'attr'   => ['width'=>400,'toolbar'=>"#{$name}Toolbar",'idField'=>'index','rownumbers'=>true,'pagination'=>false,
-                'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/attributes/adminRows&attrCat=$title"],
+                'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/adminRows&attrCat=$title"],
             'events' => [
                 'onLoadSuccess'=> "function(data)     { jqBiz('#dgInvAttr').datagrid('enableDnd'); if (data.total == 0) { jqBiz('#$name').edatagrid('addRow'); } }",
                 'onClickRow'   => "function(rowIndex) { curIndex = rowIndex; }",

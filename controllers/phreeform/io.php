@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php','phreeformImport', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php','phreeformImport', 'function');
 
 class phreeformIo
 {
@@ -63,7 +63,7 @@ class phreeformIo
         $data  = [
             'title'=> lang('import'),
             'toolbars' => ['tbImport'=>['icons'=>[
-                'back' => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_HOME."&bizRt=phreeform/main/manager'"]]]]],
+                'back' => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."&bizRt=phreeform/main/manager'"]]]]],
             'divs'     => [
                 'toolbar'=> ['order'=>10,'type'=>'toolbar','key'=>'tbImport'],
                 'heading'=> ['order'=>15,'type'=>'html',   'html'=>"<h1>dave - ".$this->lang['phreeform_import']."</h1>"],
@@ -71,7 +71,7 @@ class phreeformIo
                 'body'   => ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'import' => ['order'=>10,'type'=>'panel','classes'=>['block66'],'key'=>'import']]],
                 'formEOF'=> ['order'=>90,'type'=>'html',   'html'=>"</form>"]],
-            'forms'    => ['frmImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreeform/io/importReport"]]],
+            'forms'    => ['frmImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreeform/io/importReport"]]],
             'panels'  => [
                 'import' => ['label'=>$this->lang['phreeform_import'], 'type'=>'fields','keys'=>array_keys($fields)]],
             'fields'   => $fields,
@@ -88,7 +88,7 @@ class phreeformIo
      */
     function ReadDefReports()
     {
-        $path = BIZBOOKS_ROOT.'locale/en_US/reports';
+        $path = BIZUNO_FS_LIBRARY.'locale/en_US/reports';
         // build the report titles
         $titles = [];
         foreach (getModuleCache('phreeform', 'rptGroups') as $value) { $titles[$value['id']] = $value['text']; }
@@ -117,7 +117,7 @@ class phreeformIo
     {
         msgDebug("\nEntering importReport");
         if (!$security = validateAccess('phreeform', 2)) { return; }
-        $path    = BIZBOOKS_ROOT.clean('selModule','text', 'post');
+        $path    = BIZUNO_FS_LIBRARY.clean('selModule','text', 'post');
         $lang    = clean('selLang',  ['format'=>'text', 'default'=>'en_US'], 'post');
         $replace = clean('cbReplace','boolean', 'post');
         $imp_name= clean('imp_name', 'filename', 'post');

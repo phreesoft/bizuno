@@ -135,7 +135,7 @@ class contactsAdmin
                 'attr' => ['type'=>'button','value'=>lang('go')]]];
         $data  = [
             'tabs'    => ['tabAdmin'=>['divs'=>[
-//                'fields'=> ['order'=>40,'label'=>lang('extra_fields'),'type'=>'html','html'=>'','options'=>["href"=>"'".BIZUNO_AJAX."&bizRt=administrate/fields/manager&module=$this->moduleID&table=contacts'"]],
+//                'fields'=> ['order'=>40,'label'=>lang('extra_fields'),'type'=>'html','html'=>'','options'=>["href"=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager&module=$this->moduleID&table=contacts'"]],
                 'tools' => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','divs'=>[
                     'general' => ['order'=>20,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                         'closeJ9' => ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'closeJ9'],

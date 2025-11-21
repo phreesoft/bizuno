@@ -67,9 +67,9 @@ class paymentNacha
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmNacha'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['nachaDesc','btnBackup']], // 'incFiles' is a later feature ???
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>$this->lang['file_nacha'],'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/nacha/mgrRows",'ext'=>$io->getValidExt('txt')]]],
+                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>$this->lang['file_nacha'],'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/nacha/mgrRows",'ext'=>$io->getValidExt('txt')]]],
             'forms'  => [
-                'frmNacha'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=bizuno/nacha/save"]]],
+                'frmNacha'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=bizuno/nacha/save"]]],
             'fields' => [
                 'nachaDesc' => ['order'=>10,'html'=>$this->lang['desc_nacha'],'attr'=>['type'=>'raw']],
                 'btnBackup' => ['order'=>30,'icon'=>'nacha','label'=>lang('go'),'align'=>'right','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmNacha').submit();"]]],
@@ -115,8 +115,8 @@ class paymentNacha
     public function openACH($format='ccd')
     {
         $map = [];
-        if (file_exists(BIZBOOKS_ROOT."controllers/phreebooks/nachaMaps/$format.php")) {
-            require(BIZBOOKS_ROOT."controllers/phreebooks/nachaMaps/$format.php");
+        if (file_exists(BIZUNO_FS_LIBRARY."controllers/phreebooks/nachaMaps/$format.php")) {
+            require(BIZUNO_FS_LIBRARY."controllers/phreebooks/nachaMaps/$format.php");
         }
         else {  msgAdd("Map file of type $format doesn't exist. Bailing!"); }
         $this->map = $map;
@@ -141,7 +141,7 @@ class paymentNacha
         msgDebug("\nNacha file generated = \n\n".print_r($data, true)."\n\n");
         $filename = biz_date('Ymd-his')."-{$this->map['id']}.txt";
         $io->fileWrite($data, "{$this->dirBackup}$filename");
-        $script = "jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt=bizuno/main/fileDownload&pathID=$this->dirBackup&fileID=$filename');";
+        $script = "jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=bizuno/main/fileDownload&pathID=$this->dirBackup&fileID=$filename');";
         $button = '<button onclick="'.$script.'">Click here to download the NACHA file</button>';
         msgAdd("<p>A total of $this->rowCount ACH records were created.</p><p> $button </p>", 'info');
         msgLog("A total of $this->rowCount ACH records were created.");

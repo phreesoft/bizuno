@@ -257,8 +257,8 @@ class qualityAdmin
         msgTrap();
         if (!$security = validateAccess('admin', 1)) { return; }
         $data = ['tabs'=>['tabAdmin'=>['divs'=>[
-            'tabTrain' => ['order'=>20,'label'=>lang('tasks_training'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminTraining/manager'"]],
-            'tabAudit' => ['order'=>30,'label'=>lang('tasks_audit'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/adminAudits/manager'"]]]]]];
+            'tabTrain' => ['order'=>20,'label'=>lang('tasks_training'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminTraining/manager'"]],
+            'tabAudit' => ['order'=>30,'label'=>lang('tasks_audit'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminAudits/manager'"]]]]]];
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
     }
 

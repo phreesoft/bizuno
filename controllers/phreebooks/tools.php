@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
 
 class phreebooksTools
 {
@@ -49,7 +49,7 @@ class phreebooksTools
 //      $code   = clean('code', 'text', 'get'); // not used yet // 6_12 : dashbaord summary_6_12
         $range  = clean('range','cmd',  'get');
         $fqdn   = "\\bizuno\\summary_6_12";
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/dashboards/summary_6_12/summary_6_12.php', $fqdn);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/dashboards/summary_6_12/summary_6_12.php', $fqdn);
         $dash   = new $fqdn();
         $data   = $dash->dataSales($range);
         $raw[]  = [jslang('Date'), jsLang('purchases'), jsLang('sales')];
@@ -68,7 +68,7 @@ class phreebooksTools
     {
         global $io;
         $fqdn  = "\\bizuno\\aged_receivables";
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/contacts/dashboards/aged_receivables/aged_receivables.php', $fqdn);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/dashboards/aged_receivables/aged_receivables.php', $fqdn);
         $dash  = new $fqdn([]);
         $data  = $dash->getTotals();
         msgDebug("\nRecevied back from aging calculation: ".print_r($data, true));
@@ -175,7 +175,7 @@ class phreebooksTools
     public function fyCloseValidate(&$layout=[])
     {
         $icnFyGo = ['attr'=>['type'=>'button', 'value'=>$this->lang['fy_del_btn_go']],
-            'events'=>  ['onClick'=>"jqBiz('#tabAdmin').tabs('add',{title:'Close FY',href:'".BIZUNO_AJAX."&bizRt=phreebooks/tools/fyCloseHome'}); bizWindowClose('winFyClose');"]];
+            'events'=>  ['onClick'=>"jqBiz('#tabAdmin').tabs('add',{title:'Close FY',href:'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/fyCloseHome'}); bizWindowClose('winFyClose');"]];
         $icnCancel = ['attr'=>['type'=>'button', 'value'=>$this->lang['fy_del_btn_cancel']],
             'events'=>  ['onClick'=>"bizWindowClose('winFyClose');"]];
         $html  = '<p>'.$this->lang['fy_del_desc'] .'</p><div style="float:right">'.html5('', $icnFyGo).'</div><div>'.html5('', $icnCancel).'</div>';
@@ -546,7 +546,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']++; $cron['ttlRecord']+=sizeof($chart); return; }
         
         // Let's go
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/chart.php', 'phreebooksChart');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/chart.php', 'phreebooksChart');
         $glAcct = new phreebooksChart();
         dbTransactionStart();
         $cron['msg'][] = "Read number of inactive gl accounts for FY ending {$cron['fyEndDate']} = ".sizeof($chart);
@@ -606,7 +606,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         $cron['msg'][] = "Validating inventory usage: Block {$cron['curBlk']} ($chunk records) of {$cron['ttlBlk']} blocks.";
 
         // Let's go
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/main.php', 'inventoryMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/main.php', 'inventoryMain');
         $inventory = new inventoryMain();
         dbTransactionStart();
         if (empty($cron['clnIID'])) { $cron['clnIID'] = $cron['clnIIDcnt'] = 0; }
@@ -682,7 +682,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
     {
         ini_set("max_execution_time", 300); // 5 minutes per post
         if (!validateAccess('j2_mgr', 3)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         dbTransactionStart();
         $jID = dbGetvalue(BIZUNO_DB_PREFIX.'journal_main', 'journal_id', "id=$rID");
         $repost = new journal($rID, $jID);
@@ -1003,7 +1003,7 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
     {
         global $io;
         $fqdn  = "\\bizuno\\sales_by_rep";
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/dashboards/sales_by_rep/sales_by_rep.php', $fqdn);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/dashboards/sales_by_rep/sales_by_rep.php', $fqdn);
         $dash  = new $fqdn([]);
         $data  = $dash->getTotals();
         msgDebug("\nRecevied back from sales by rep: ".print_r($data, true));

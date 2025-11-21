@@ -30,7 +30,7 @@
 namespace bizuno;
 
 bizAutoLoad(dirname(__FILE__).'/common.php', 'endiciaCommon');
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
 
 class endicia extends endiciaCommon
 {
@@ -41,7 +41,7 @@ class endicia extends endiciaCommon
     function __construct()
     {
         parent::__construct();
-        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
+        $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
     }
 

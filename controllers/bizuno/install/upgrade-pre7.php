@@ -41,7 +41,7 @@ function bizunoPre6config() {
     $core   = ['bizuno','contacts','inventory','payment','phreebooks','phreeform'];
     $modPro = ['proCust','proGL','proHR','proIF','proInv','proLgstc','proQA','proVend'];
     $layout = [];
-    bizAutoLoad(BIZBOOKS_ROOT .'controllers/bizuno/settings.php', 'bizunoSettings');
+    bizAutoLoad(BIZUNO_FS_LIBRARY .'controllers/bizuno/settings.php', 'bizunoSettings');
     $bAdmin = new bizunoSettings(); // modules should already be installed, besides this is just for config table
     foreach (portalModuleList() as $modID => $path) {
         if (substr($modID, 0, 3) == 'pro') {
@@ -299,7 +299,7 @@ function upgrade_pre7($dbVersion='1.0')
     if (version_compare($dbVersion, '3.4.5') < 0) { // add additional emails to the address book
     }
     if (version_compare($dbVersion, '4.4.0') < 0) { // index sku for large inventory tables
-        $stmt = dbGetResult("SELECT COUNT(*) AS cnt FROM information_schema.statistics WHERE TABLE_SCHEMA='".BIZPORTAL['name']."' AND TABLE_NAME='".BIZUNO_DB_PREFIX."inventory' AND INDEX_NAME='sku'");
+        $stmt = dbGetResult("SELECT COUNT(*) AS cnt FROM information_schema.statistics WHERE TABLE_SCHEMA='".BIZUNO_DB_CREDS['name']."' AND TABLE_NAME='".BIZUNO_DB_PREFIX."inventory' AND INDEX_NAME='sku'");
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
         if (empty($data['cnt'])) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD INDEX('sku')"); }
     }
@@ -330,7 +330,7 @@ function upgrade_pre7($dbVersion='1.0')
         // some special cases
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['drop_ship'=>'0'], 'update', "drop_ship IS NULL OR drop_ship=''");
         // Fix all the tables to match this release
-        require_once(BIZBOOKS_ROOT."controllers/administrate/tools.php");
+        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
         $ctl = new administrateTools();
         $ctl->repairTables(false);
     }
@@ -341,7 +341,7 @@ function upgrade_pre7($dbVersion='1.0')
     }
     if (version_compare($dbVersion, '6.2.2') < 0) {
         // Fix all the tables to match this release
-        require_once(BIZBOOKS_ROOT."controllers/administrate/tools.php");
+        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
         $ctl = new administrateTools();
         $ctl->repairTables(false);
     }
@@ -350,7 +350,7 @@ function upgrade_pre7($dbVersion='1.0')
     }
     if (version_compare($dbVersion, '6.2.5') < 0) {
         // Fix all the tables to match this release
-        require_once(BIZBOOKS_ROOT."controllers/administrate/tools.php");
+        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
         $ctl = new administrateTools();
         $ctl->repairTables(false);
     }

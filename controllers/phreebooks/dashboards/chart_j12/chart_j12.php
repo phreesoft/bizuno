@@ -79,10 +79,10 @@ class chart_j12
      */
     public function render($opts=[])
     {
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
         $selRep = !empty($opts['reps']) && getUserCache('role', 'security', 'admin', false, 0)<3 ? 0 : $opts['selRep'];
-        $action = BIZUNO_AJAX."&bizRt=$this->moduleID/tools/exportSales&range={$opts['range']}&selRep=$selRep";
+        $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/exportSales&range={$opts['range']}&selRep=$selRep";
         $cData  = chartSales($this->journalID, $opts['range'], $this->rows, $selRep);
         $title  = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['count'], viewFormat($cData['total'], 'currency'));
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';

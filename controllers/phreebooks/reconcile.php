@@ -37,7 +37,7 @@ class phreebooksReconcile
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess('recon', 3)) { return; }
-        $htmlHead = html5('frmReconcile',['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/reconcile/save"]]).
+        $htmlHead = html5('frmReconcile',['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/reconcile/save"]]).
                     html5('item_array',  ['attr'=>['type'=>'hidden']]);
         $data = ['title'=> lang('bank_recon'),
             'toolbars'=> ['tbRecon'=>['icons'=>['save'=>['order'=>40,'events'=>['onClick'=>"jqBiz('#frmReconcile').submit();"]]]]],
@@ -234,7 +234,7 @@ msgDebug("\nRead not in period = ".print_r($not_in_period, true));
         $stmt_balance = dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'stmt_balance', "period='{$this->defaults['period']}' AND gl_account='{$this->defaults['glAcct']}'");
         return ['id'=>$name, 'type'=>'treegrid', 'title'=>lang('bank_recon'),
             'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'treeField'=>'title', 'singleSelect'=>false, 'showFooter'=>true, 'animate'=>true, 'pagination'=>false,
-                'url' => BIZUNO_AJAX."&bizRt=phreebooks/reconcile/managerRows"],
+                'url' => BIZUNO_URL_AJAX."&bizRt=phreebooks/reconcile/managerRows"],
             'events' => [
                 'onLoadSuccess'=> "function(row, data){ reconInit(row, data); }",
                 'onCheck'      => "function(row)      { reconCheck(row); reconTotal(); }",

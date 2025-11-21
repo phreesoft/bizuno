@@ -77,7 +77,7 @@ function migrateBizuno(&$cron)
     $dbVersion= getModuleCache('bizuno', 'properties', 'version');
     switch ($cron['curStep']) {
         case  0: // bring to latest free version level, 6.7.8.2
-            bizAutoLoad(BIZBOOKS_ROOT.'controllers/bizuno/install/upgrade-pre7.php');
+            bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/upgrade-pre7.php');
             upgrade_pre7($dbVersion);
             $cron['curStep']++;
             break;
@@ -734,7 +734,7 @@ function migrate_phreeform(&$cron=[], $cntOnly=false)
     $cron['msg'] = "Processing Block {$cron['curBlk']} ($chunk records) of {$cron['ttlBlk']} blocks from table: $table";
 
     // Let's go
-    bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php', 'phreeFormXML2Obj', 'function');
+    bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php', 'phreeFormXML2Obj', 'function');
     dbTransactionStart();
     $map  = dbMetaGet(0, '_ADMIN_ID_MAP');
     $dirs = dbGetMulti(BIZUNO_DB_PREFIX.$table, "mime_type='dir'", 'id');

@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
 
 class phreebooksFulfillment {
     public  $moduleID   = 'phreebooks';
@@ -117,7 +117,7 @@ class phreebooksFulfillment {
         unset($layout['toolbars']['tbPhreeBooks']['icons']['jSave']['child']['optSaveAs']);
         unset($layout['toolbars']['tbPhreeBooks']['icons']['jSave']['child']['optMoveTo']);
         $layout['toolbars']['tbPhreeBooks']['icons']['new']['events']['onClick'] = "location.reload();";
-        $layout['forms']['frmJournal']['attr']['action'] =BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/fulfillSave&jID=12";
+        $layout['forms']['frmJournal']['attr']['action'] =BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/fulfillSave&jID=12";
         $this->restoreSecurity();
     }
 

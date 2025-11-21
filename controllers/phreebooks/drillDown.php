@@ -150,7 +150,7 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
             default:  $status = '';
         }
         $output = ['id'=>$name, 'type'=>'datagrid', 'toolbar'=>"#{$name}Toolbar", 'strict'=>true, 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
-            'attr'     => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'clientPaging'=>false, 'remoteFilter'=>true, 'url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows"],
+            'attr'     => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'clientPaging'=>false, 'remoteFilter'=>true, 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows"],
             'events'   => [
                 'onClickRow'         => "function(rowIndex, rowData) { jqBiz('#$name').edatagrid('editRow', rowIndex); }",
                 'onHeaderContextMenu'=> "function(e, field) { e.preventDefault(); jqBiz(this).edatagrid('columnMenu').menu('show', { left:e.pageX, top:e.pageY }); }",

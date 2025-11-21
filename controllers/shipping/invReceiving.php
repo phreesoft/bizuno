@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/main.php", 'phreebooksMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/main.php", 'phreebooksMain');
 
 class shippingInvReceiving
 {
@@ -99,7 +99,7 @@ bizFocus('contactSel');";
         // change some behavior
         $layout['fields']['waiting']['attr']['checked'] = true;
         $layout['toolbars']['tbPhreeBooks']['icons']['new']['events']['onClick'] = "location.reload();";
-        $layout['forms']['frmJournal']['attr']['action']= BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/receivingSave&jID=6";
+        $layout['forms']['frmJournal']['attr']['action']= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/receivingSave&jID=6";
     }
     public function receivingSave(&$layout=[])
     {

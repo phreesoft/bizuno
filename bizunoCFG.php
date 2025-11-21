@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-18
+ * @version    7.x Last Update: 2025-11-20
  * @filesource /bizunoCFG.php
  */
 
@@ -31,30 +31,37 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 
 define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.3'); // Pull from file 
 
-// URL paths
-if (!defined('BIZUNO_HOME'))      { define('BIZUNO_HOME', strpos(BIZUNO_SRVR, '?')===false ? BIZUNO_SRVR.'?' : BIZUNO_SRVR); } // Full URL path to Bizuno Home
-if (!defined('BIZUNO_AJAX'))      { define('BIZUNO_AJAX', substr(BIZUNO_SRVR, 0, strlen(BIZUNO_SRVR)-1).'?ajax=1'); } // for non-html requests
-if (!defined('BIZBOOKS_URL_ROOT')){ define('BIZBOOKS_URL_ROOT', BIZUNO_SRVR); } // full url to Bizuno root folder
-if (!defined('BIZBOOKS_URL_FS'))  { define('BIZBOOKS_URL_FS',   BIZBOOKS_URL_ROOT.'?bizRt=portal/api/fs&src='); } // full url to Bizuno portal file system access script
+// Platform Specific - File System Paths
+//if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  WP_PLUGIN_DIR . "/$this->bizLib/" ); }
+//if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_FS_LIBRARY . 'assets/' ); } // for shared access using composer
+// Platform Specific - URL's
+//if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  home_url() . "/$this->bizSlug" ); } // full url to Bizuno root folder
+//if ( !defined( 'BIZUNO_URL_AJAX' ) )    { define( 'BIZUNO_URL_AJAX',    admin_url(). 'admin-ajax.php?action=BIZUNO_URL_AJAX' ); }
+//if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     plugin_dir_url( __FILE__ ) . "portalAPI.php?bizRt=" ); }
+//if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src='); }
+//if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', plugins_url()."/$this->bizLib/scripts/" );  }
 // File system paths
-define('BIZBOOKS_ROOT',     BIZUNO_REPO); // file system path to bizuno root index file
-// URLs to PhreeSoft Images
-define('PHREESOFT_LOGO',    BIZBOOKS_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
-define('BIZUNO_LOGO',       BIZBOOKS_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
-define('BIZUNO_ICON',       'https://www.bizuno.com/bizuno_icon.png'); // URL to default Bizuno icon on the bizuno.com site
+//if (!defined('BIZUNO_FS_LIBRARY')) { define('BIZUNO_FS_LIBRARY',     BIZUNO_FS_LIBRARY); } // file system path to bizuno root index file
+// URL paths
+//if (!defined('BIZUNO_URL_PORTAL')) { define('BIZUNO_URL_PORTAL', strpos(BIZUNO_URL_PORTAL, '?')===false ? BIZUNO_URL_PORTAL.'?' : BIZUNO_URL_PORTAL); } // Full URL path to Bizuno Home
+//if (!defined('BIZUNO_URL_AJAX'))   { define('BIZUNO_URL_AJAX', substr(BIZUNO_URL_PORTAL, 0, strlen(BIZUNO_URL_PORTAL)-1).'?ajax=1'); } // for non-html requests
 
-// Set support ticket email, this makes the menu option show
-if (!defined('BIZUNO_SUPPORT_NAME'))  { define('BIZUNO_SUPPORT_NAME', 'Bizuno Support'); }
-if (!defined('BIZUNO_SUPPORT_EMAIL')) { define('BIZUNO_SUPPORT_EMAIL','support@phreesoft.com'); }
+// URLs to PhreeSoft Images
+define('BIZUNO_LOGO',    BIZUNO_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
+define('BIZUNO_ICON',    'https://www.bizuno.com/bizuno_icon.png'); // URL to default Bizuno icon on the bizuno.com site
+
+define('PHREESOFT_LOGO', BIZUNO_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
+define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft API
+define('PHREESOFT_IP',   '71.78.123.232');
 
 // Set the PDF renderer application
 $pdfRenderer = 'TCPDF'; // Options are 'TCPDF' (Default) and 'tFPDF'
 if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
     define('BIZUNO_PDF_ENGINE', 'tFPDF');
-    define('BIZUNO_3P_PDF', BIZBOOKS_ROOT.'assets/FPDF/');
+    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'FPDF/');
 } else { // Current: https://github.com/tecnickcom/tc-lib-pdf - was: https://tcpdf.org/
     define('BIZUNO_PDF_ENGINE', 'TCPDF');
-    define('BIZUNO_3P_PDF', BIZBOOKS_ROOT.'assets/TCPDF/');
+    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'TCPDF/');
 }
 
 // set some sitewide constants
@@ -84,17 +91,14 @@ define('BIZTHEMES_EASYUI', ['auto', // Auto Detect, chooses either Bizuno theme 
     'ui-cupertino', 'ui-dark-hive', 'ui-pepper-grinder', 'ui-sunny']); // jQuery UI themes 
 
 // Fetch the Bizuno library classes and functions
-require_once ( BIZBOOKS_ROOT . 'model/functions.php' ); // Core functions, needs to be included first
-require_once ( BIZBOOKS_ROOT . 'locale/cleaner.php' );
-require_once ( BIZBOOKS_ROOT . 'locale/currency.php' );
-require_once ( BIZBOOKS_ROOT . 'model/db.php' );
-require_once ( BIZBOOKS_ROOT . 'model/encrypter.php' );
-require_once ( BIZBOOKS_ROOT . 'model/io.php' );
-require_once ( BIZBOOKS_ROOT . 'model/manager.php' );
-require_once ( BIZBOOKS_ROOT . 'model/msg.php' );
-require_once ( BIZBOOKS_ROOT . 'model/mail.php' );
-require_once ( BIZBOOKS_ROOT . 'view/main.php' );
-require_once ( BIZBOOKS_ROOT . 'view/easyUI/html5.php' );
-
-// @TODO - This needs to be present for hosted but not for WordPRess, move to portal
-// require ( BIZUNO_ASSETS . 'autoload.php' ); // Load the Bizuno thrid party libraries
+require_once ( BIZUNO_FS_LIBRARY . 'model/functions.php' ); // Core functions, needs to be included first
+require_once ( BIZUNO_FS_LIBRARY . 'locale/cleaner.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'locale/currency.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/db.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/encrypter.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/io.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/manager.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/msg.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'model/mail.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'view/main.php' );
+require_once ( BIZUNO_FS_LIBRARY . 'view/easyUI/html5.php' );

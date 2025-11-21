@@ -76,7 +76,7 @@ class phreebooksEdiMain extends mgrJournal
         $sqlPeriod= $dateRange['sql'];
         $stores   = getModuleCache('bizuno', 'stores');
         $data     = array_replace_recursive(parent::gridBase($security, $args), ['metaTable'=>'journal',
-            'attr'   => ['url'=>BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows"],
             'events' => ['onDblClickRow'=>"function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&spec='+rowData.spec, ".($defs['type']=='meta'?'rowData._rID':'rowData.id')."); }"],
             'source' => [
                 'tables' => ['journal_meta'=>['table'=>BIZUNO_DB_PREFIX.'journal_meta','join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_meta.ref_id"]],

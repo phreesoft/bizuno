@@ -87,7 +87,7 @@ class administrateDashboard
         $html  = "  <tr>\n".'<td valign="top"><b>'.$this->allDash[$dashID]['title'].'</b></td>';
         $html .= "    <td><div>".$this->allDash[$dashID]['description']."</div>";
         $html .= '<div id="dash_'.$dashID.'" style="display:none;" class="layout-expand-over">';
-        $html .= html5("frmMethod_$dashID", ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=administrate/dashboard/save&dashID=$dashID"]]);
+        $html .= html5("frmMethod_$dashID", ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/dashboard/save&dashID=$dashID"]]);
         $fqcn  = "\\bizuno\\$dashID";
         bizAutoLoad("{$this->allDash[$dashID]['path']}$dashID.php", $fqcn);
         $cls   = new $fqcn();

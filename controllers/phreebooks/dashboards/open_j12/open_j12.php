@@ -76,7 +76,7 @@ class open_j12
     {
         global $currencies;
         msgDebug("\nEntering $this->code:render with opts = ".print_r($opts, true));
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'getPaymentInfo', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'getPaymentInfo', 'function');
         $filter= "journal_id=$this->journalID AND closed='0'";
         if (!empty($opts['reps'])  && validateAccess($this->secID, 1)<4){ $filter.= " AND rep_id='".getUserCache('profile', 'userID', false, '0')."'"; }
         if ( isset($opts['limit']) && !empty($opts['limit']))           { $filter.= " AND post_date<='".biz_date('Y-m-d')."'"; }

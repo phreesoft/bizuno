@@ -70,7 +70,7 @@ class summary_6_12
         $total_v= $total_c = 0;
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#sum_6_12').submit();"]];
         $data   = $this->dataSales($opts['range']);
-        $action = BIZUNO_AJAX."&bizRt=phreebooks/tools/jrnlData&code=6_12&range={$opts['range']}";
+        $action = BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/jrnlData&code=6_12&range={$opts['range']}";
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $html  .= '<form id="sum_6_12" action="'.$action.'">'.html5('', $iconExp).'</form>';
         $js     = "ajaxDownload('sum_6_12');

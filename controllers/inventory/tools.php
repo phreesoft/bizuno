@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/functions.php', 'inventoryProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'inventoryProcess', 'function');
 
 class inventoryTools
 {
@@ -237,7 +237,7 @@ class inventoryTools
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $struc = $this->chartSalesData($sku);
         $output= ['divID'=>"chartInventoryChart",'type'=>'column','attr'=>['legend'=>'none','title'=>lang('sales')],'data'=>array_values($struc)];
-        $action= BIZUNO_AJAX."&bizRt=inventory/tools/chartSalesGo&sku=$sku";
+        $action= BIZUNO_URL_AJAX."&bizRt=inventory/tools/chartSalesGo&sku=$sku";
         $js    = "ajaxDownload('frmInventoryChart');\n";
         $js   .= "var dataInventoryChart = ".json_encode($output).";\n";
         $js   .= "function funcInventoryChart() { drawBizunoChart(dataInventoryChart); };";
@@ -299,7 +299,7 @@ class inventoryTools
     {
         global $io;
         $fqdn = "\\bizuno\\inv_stock";
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/inventory/dashboards/inv_stock/inv_stock.php', $fqdn);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/dashboards/inv_stock/inv_stock.php', $fqdn);
         $dash = new $fqdn();
         $data = $dash->getData();
         foreach ($data as $row) { $output[] = '"'.implode('","', $row).'"'; }
@@ -646,7 +646,7 @@ class inventoryTools
         $skuID = clean('rID', 'integer', 'get');
         $data  = $this->chartForecastData($skuID);
         $output= ['divID'=>'chartForecastChart','type'=>'column','attr'=>['legend'=>'none','title'=>$this->lang['inv_forecast']],'data'=>array_values($data)];
-        $action= BIZUNO_AJAX."&bizRt=$this->moduleID/tools/chartForecastGo&rID=$skuID";
+        $action= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/chartForecastGo&rID=$skuID";
         $js    = "ajaxDownload('frmForecastChart');\n";
         $js   .= "var dataForecastChart = ".json_encode($output).";\n";
         $js   .= "function funcForecastChart() { drawBizunoChart(dataForecastChart); };";

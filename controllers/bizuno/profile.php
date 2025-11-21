@@ -65,7 +65,7 @@ class bizunoProfile extends mgrJournal
         $rID  = metaIdxClean($metaVal); // need a rID since we enter directly from a menu selection
         $args = ['dom'=>'page', '_rID'=>$rID, '_table'=>'contacts', '_refID'=>getUserCache('profile', 'userID'), 'title'=>lang('edit_profile')];
         parent::editMeta($layout, 3, $args);
-        $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>$this->lang['reminders'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=bizuno/reminder/manager'"]];
+        $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>$this->lang['reminders'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=bizuno/reminder/manager'"]];
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow new, copy here
     }
     public function save()

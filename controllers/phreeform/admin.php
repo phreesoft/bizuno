@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreeform/functions.php', 'phreeformFonts', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php', 'phreeformFonts', 'function');
 
 class phreeformAdmin
 {

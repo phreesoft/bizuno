@@ -27,7 +27,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/export.php', 'apiExport');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
 class ifBigCom extends apiExport
 {
@@ -132,7 +132,7 @@ class ifBigCom extends apiExport
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
             'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://www.bigcommerce.com');"],
-                'attr'=>['type'=>'img','height'=>100,'src'=>BIZBOOKS_URL_ROOT."0/controllers/$this->moduleID/channels/$this->code/$this->code.png"]],
+                'attr'=>['type'=>'img','height'=>100,'src'=>BIZUNO_URL_PORTAL."0/controllers/$this->moduleID/channels/$this->code/$this->code.png"]],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
             'btnOrders'   => ['events' =>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"], 'attr'=>['type'=>'button','value'=>lang('go')]],
@@ -163,9 +163,9 @@ class ifBigCom extends apiExport
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['dateShip','btnConfirm']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => [
-                'frmInventory'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=$this->code"]],
-                'frmOrders'   => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]],
-                'frmConfirm'  => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/confirmGo&modID=$this->code"]]],
+                'frmInventory'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=$this->code"]],
+                'frmOrders'   => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]],
+                'frmConfirm'  => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/confirmGo&modID=$this->code"]]],
             'fields' => $fields,
             'jsReady'=>['init'=>"ajaxDownload('frmInventory');\najaxForm('frmOrders');\najaxDownload('frmConfirm');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);
@@ -199,7 +199,7 @@ class ifBigCom extends apiExport
         $this->itemCnt = 1;
         $orderCnt = 0;
         msgDebug("\nWorking with settings = ".print_r($this->settings, true));
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         $strucMain = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main');
         $strucItem = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
         if (!$io->validateUpload('fileOrders', '', ['csv','txt'])) { return; }

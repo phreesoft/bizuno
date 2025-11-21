@@ -32,12 +32,12 @@ bizAutoLoad(dirname(__FILE__)."/../../functions.php", 'retrieve_carrier_function
 
 // Canada Post specifics
 ini_set("soap.wsdl_cache_enabled", "0");
-define('CANADAPOST_CERT', BIZBOOKS_ROOT.'controllers/shipping/carriers/canadapost/cacert.pem');
+define('CANADAPOST_CERT', BIZUNO_FS_LIBRARY.'controllers/shipping/carriers/canadapost/cacert.pem');
 define('CANADAPOST_TEST_HOST', 'ct.soa-gw.canadapost.ca');
 define('CANADAPOST_HOST', 'soa-gw.canadapost.ca');
 define('CANADAPOST_TEST_RATE_URL', 'https://ct.soa-gw.canadapost.ca/rs/soap/rating/v3');
 define('CANADAPOST_RATE_URL', 'https://soa-gw.canadapost.ca/rs/soap/rating/v3');
-define('CANADAPOST_RATE_WSDL', BIZBOOKS_ROOT.'controllers/shipping/carriers/canadapost/rating.wsdl');
+define('CANADAPOST_RATE_WSDL', BIZUNO_FS_LIBRARY.'controllers/shipping/carriers/canadapost/rating.wsdl');
 
 class canadapost
 {
@@ -132,7 +132,7 @@ class canadapost
     {
         $this->lang = array_replace(getLang($this->moduleID), $this->lang);
         localizeLang($this->lang, $this->methodDir, $this->code);
-        $tabImage = BIZBOOKS_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
+        $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->getSettings();
         $this->contact_type = clean('cType', ['format' => 'char', 'default' => 'c'], 'post');

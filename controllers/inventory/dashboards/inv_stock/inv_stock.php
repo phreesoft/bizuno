@@ -70,7 +70,7 @@ class inv_stock
     {
         if (empty($opts['glAcct'])) { return msgAdd('Please select a valid GL account'); }
         $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#inv_data').submit();"]];
-        $action = BIZUNO_AJAX."&bizRt=inventory/tools/invDataGo";
+        $action = BIZUNO_URL_AJAX."&bizRt=inventory/tools/invDataGo";
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $html  .= '<form id="inv_data" action="'.$action.'">'.html5('', $iconExp).'</form>';
         $output = ['divID'=>$this->code."_chart",'type'=>'line','attr'=>['chartArea'=>['left'=>'15%'],'title'=>'GL Acct: '.$opts['glAcct']],'data'=>$this->getData($opts['glAcct'])];

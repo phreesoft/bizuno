@@ -43,7 +43,7 @@ namespace bizuno;
 if (!defined('PAYMENT_CONVERGE_URL'))     { define('PAYMENT_CONVERGE_URL',     'https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do'); }
 if (!defined('PAYMENT_CONVERGE_URL_TEST')){ define('PAYMENT_CONVERGE_URL_TEST','https://demo.myvirtualmerchant.com/VirtualMerchantDemo/processxml.do'); }
 
-bizAutoLoad(BIZBOOKS_ROOT."model/encrypter.php", 'encryption');
+bizAutoLoad(BIZUNO_FS_LIBRARY."model/encrypter.php", 'encryption');
 
 class converge
 {

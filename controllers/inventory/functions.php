@@ -127,7 +127,7 @@ return '';
         } else { $inv = $report->currentValues; }
         $values= ['iID'=>$inv['id'], 'iCost'=>$inv['item_cost'],'iList'=>$inv['full_price'],'iSheetc'=>$fld[1],'iSheetv'=>$fld[1],'cID'=>0,'cSheet'=>$fld[1],'cType'=>'c','qty'=>1];
         $prices= [];
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/inventory/prices.php", 'inventoryPrices');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/inventory/prices.php", 'inventoryPrices');
         $mgr   = new inventoryPrices();
         $mgr->pricesLevels($prices, $values);
         return $prices['price'];

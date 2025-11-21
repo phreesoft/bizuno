@@ -114,7 +114,7 @@ class inventoryBuild extends mgrJournal
         $args = ['dom'=>$dom, 'type'=>'journal', 'work'=>true, 'title'=>sprintf(lang('tbd_manager'), lang('production'))];
         parent::managerMain($layout, $security, $args);
         if ('div'==$dom && !empty($refID)) { // if inside the inventory edit screen
-            $layout['datagrid']["dg{$this->domSuffix}"]['attr']['url'] = BIZUNO_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&refID=$refID";
+            $layout['datagrid']["dg{$this->domSuffix}"]['attr']['url'] = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&refID=$refID";
         }
         unset($layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['new']); // remove the work icon since this is meta only
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']); // Don't allow copy here
@@ -158,7 +158,7 @@ class inventoryBuild extends mgrJournal
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $fldSel= ['id'=>'newSKU', 'props'=>['attr'=>['type'=>'inventory'],
-            'defaults'=>['url'=>"'".BIZUNO_AJAX."&bizRt=inventory/main/managerRows&filter=assy&clr=1'"]]];
+            'defaults'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&filter=assy&clr=1'"]]];
         $args  = ['_table'=>'inventory', 'fldSel'=>$fldSel, 'desc'=>'Select a SKU to generate a new Work Order.'];
         parent::addDB($layout, $security, $args);
     }
@@ -178,7 +178,7 @@ class inventoryBuild extends mgrJournal
         $layout['fields']['sku']['attr']['value'] = $item['sku'];
         $layout['fields']['qty']['attr']['value'] = $item['qty'];
         $image = clean(dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "sku='".addslashes($item['sku'])."'"), 'path_rel');
-        $layout['fields']['imgSKU']['attr']['src']      = BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/$image";
+        $layout['fields']['imgSKU']['attr']['src']      = BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$image";
         $layout['fields']['imgSKU']['events']['onClick']= "jsonAction('bizuno/image/view', '".getUserCache('business', 'bizID')."', '$image');";
         $jsBody= "function testStock() {\nvar sku = jqBiz('#sku').val();\nvar qty = jqBiz('#qty').val();
     jqBiz.ajax({url:bizunoAjax+'&bizRt=inventory/main/getStockAssy&sku='+sku+'&qty='+qty, success:function(data){processJson(data);}});}";
@@ -188,7 +188,7 @@ class inventoryBuild extends mgrJournal
             'toolbars'=> ["tb{$this->domSuffix}"=>['icons'=>[
                 'print'=> ['order'=>40,'hidden'=>$rID==0 && $security>1?false:true,'events'=>['onClick'=>"jqBiz('#xChild').val('print'); jqBiz('#frmJournal').submit();"]]]]],
             'panels'  => [
-                'build'  => ['label'=>$this->lang['msg_build_num'],'id'=>'build','type'=>'html','options'=>['href'=>"'".BIZUNO_AJAX."&bizRt=$this->moduleID/build/details&woID=$rID'"],'html'=>'&nbsp;']],
+                'build'  => ['label'=>$this->lang['msg_build_num'],'id'=>'build','type'=>'html','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/build/details&woID=$rID'"],'html'=>'&nbsp;']],
             'jsBody'  => ['init'=>$jsBody]];
         $layout= array_replace_recursive($layout, $data);
         // Stores
@@ -262,7 +262,7 @@ class inventoryBuild extends mgrJournal
                 'formBOF'=> ['order'=>20,'type'=>'form','key' =>'frmSteps'],
                 'body'   => ['order'=>50,'type'=>'html','html'=>$this->getViewDetail($fields, $onStep)],
                 'formEOF'=> ['order'=>90,'type'=>'html','html'=>"</form>"]],
-            'forms'  => ['frmSteps' =>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/build/saveStep"]]],
+            'forms'  => ['frmSteps' =>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/build/saveStep"]]],
             'fields' => $fields,
             'jsBody' => ['init'=>"function preSubmit() { jqBiz('#step_notes').val(jqBiz('#notes').val()); return true; }"],
             'jsReady'=> ['init'=>"ajaxForm('frmSteps');"]];
@@ -430,7 +430,7 @@ class inventoryBuild extends mgrJournal
     private function assemble($main, $item)
     {
         $glInv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'gl_inv', "sku='".addslashes($item['sku'])."'");
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journal.php", 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journal.php", 'journal');
         $glEntry = new journal(0, 14);
         $glEntry->main['description'] = "{$this->lang['msg_build_num']} ({$item['qty']}) {$main['description']}";
         $glEntry->main['invoice_num'] = $main['invoice_num'];
@@ -463,7 +463,7 @@ class inventoryBuild extends mgrJournal
         $woItem= dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "id=$rID");
         $args  = ['_table'=>'journal'];
         parent::deleteDB($layout, $security, $args);
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/main.php', 'phreebooksMain');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
         $steps = getMetaJournal($rID, 'production_steps');
         msgDebug("\nRead steps to be analyzed = ".print_r($steps, true));
         $wasAssembled = false; // un-assemble the product if assembled

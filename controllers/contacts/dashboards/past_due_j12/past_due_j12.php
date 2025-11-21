@@ -76,7 +76,7 @@ class past_due_j12
     {
         global $currencies;
         $today = biz_date();
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/functions.php', 'getPaymentInfo', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'getPaymentInfo', 'function');
         $filter= "journal_id=$this->journalID AND closed='0'";
         $order = $opts['order']=='desc' ? 'post_date DESC' : 'post_date';
         $result= dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','journal_id','total_amount','currency','currency_rate','post_date','terms','invoice_num','contact_id_b','primary_name_b']);

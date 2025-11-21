@@ -174,11 +174,11 @@ class ifWalmart
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['dateShip','btnConfirm']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'   => [
-                'frmInventory'=> ['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=ifWalmart/admin/inventoryGo"]],
-                'frmOrders'   => ['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=ifWalmart/admin/ordersGo"]],
-                'frmConfirm'  => ['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=ifWalmart/admin/confirmGo"]]],
+                'frmInventory'=> ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/inventoryGo"]],
+                'frmOrders'   => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/ordersGo"]],
+                'frmConfirm'  => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/confirmGo"]]],
             'fields' => [
-                'imgWalmart'  => ['attr'   => ['type'=>'img', 'src'=>BIZBOOKS_ROOT.'0/controllers/api/funnels/ifWalmart/logo.png']],
+                'imgWalmart'  => ['attr'   => ['type'=>'img', 'src'=>BIZUNO_FS_LIBRARY.'0/controllers/api/funnels/ifWalmart/logo.png']],
                 'selMap'      => ['values' => $maps, 'attr'=> ['type'=>'select']],
                 'btnInventory'=> ['events' => ['onClick'=>"jqBiz('#frmInventory').submit();"], 'attr'=> ['type'=>'button', 'value'=>lang('go')]],
                 'fileOrders'  => ['attr'   => ['type'=>'file']],
@@ -191,7 +191,7 @@ class ifWalmart
 
     private function adminHome(&$layout=[])
     {
-        $listWm = glob(BIZBOOKS_ROOT.'controllers/api/funnels/walmart/source/*');
+        $listWm = glob(BIZUNO_FS_LIBRARY.'controllers/api/funnels/walmart/source/*');
         $templWm = [['id'=>'', 'text'=>lang('select')]];
         foreach ($listWm as $option) { if (is_dir($option)) {
             $tpl = substr($option, strrpos($option, '/')+1);
@@ -204,7 +204,7 @@ class ifWalmart
         $layout['fields']['tplDescWm'] = ['order'=>10,'html'=>$this->lang['walmart_template_desc'],  'attr'=>['type'=>'raw']];
         $layout['fields']['selTempWm'] = ['order'=>20,'values'=>$templWm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifWalmart', 0, bizSelGet('selTempWm'));"],'attr'=>['type'=>'select']];
         $layout['fields']['divMapWm']  = ['order'=>90,'html'=>'<div id="divWalmartMap">&nbsp;</div>','attr'=>['type'=>'raw']];
-        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZBOOKS_URL_ROOT."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZUNO_URL_PORTAL."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
         $layout['jsReady'][$channel]= "walmartContact();";
     }
 
@@ -214,7 +214,7 @@ class ifWalmart
    */
     private function loadInvTemplate($tpl, $force=true)
     {
-        $tmp   = array_map('str_getcsv', file(BIZBOOKS_ROOT."controllers/ifWalmart/source/$tpl/$tpl.csv")); // pull title, extract count and required/optional
+        $tmp   = array_map('str_getcsv', file(BIZUNO_FS_LIBRARY."controllers/ifWalmart/source/$tpl/$tpl.csv")); // pull title, extract count and required/optional
         $titles= array_shift($tmp); // just need the first row
         msgDebug("\nWorking with titles = ".print_r($titles, true));
         $map   = [];
@@ -223,7 +223,7 @@ class ifWalmart
             $map[$values['title']] = $values;
         }
         // now the definitions file
-        if (($handle = fopen(BIZBOOKS_ROOT."controllers/ifWalmart/source/$tpl/Definitions.csv", "r")) !== false) {
+        if (($handle = fopen(BIZUNO_FS_LIBRARY."controllers/ifWalmart/source/$tpl/Definitions.csv", "r")) !== false) {
             while (($data = fgetcsv($handle, 0, "\t")) !== false) {
                 if (isset($data[1]) && isset($output['fields'][$data[1]])) {
                     $output['fields'][$data[1]]['tip']     = $data[3]."\n\nRange: ".$data[4]."\n\nExample: ".$data[5];
@@ -287,7 +287,7 @@ class ifWalmart
         $data = [
             'content'=> ['action'=>'divHTML','divID'=>'divWalmartMap'],
             'divs'   => ['divTpl'=>['oreder'=>10,'type'=>'html','html'=>$this->viewTemplate]],
-            'forms'  => ['frmTemplate'=>['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=ifWalmart/admin/templateSave"]]],
+            'forms'  => ['frmTemplate'=>['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/templateSave"]]],
             'icnSave'=> ['icon'=>'save','events'=>  ['onClick'=>"jqBiz('#frmTemplate').submit();"]],
             'fldTpl' => ['attr'=>  ['type'=>'hidden', 'value'=>"$tpl"]],
             'lang'   => [
@@ -388,7 +388,7 @@ class ifWalmart
                     'label' =>$this->lang['import_payment'],
                     'order' =>80,
                     'events'=>  ['onClick'=>"reconcileWalmart();"]];
-                $layout['divs']['ifWalmart'] = ['order'=>0, 'type'=>'html', 'html'=>'<script type="text/javascript" src="'.BIZBOOKS_ROOT.'controllers/ifWalmart/ifWalmart.js"></script>'];
+                $layout['divs']['ifWalmart'] = ['order'=>0, 'type'=>'html', 'html'=>'<script type="text/javascript" src="'.BIZUNO_FS_LIBRARY.'controllers/ifWalmart/ifWalmart.js"></script>'];
             }
         }
     }
@@ -422,7 +422,7 @@ class ifWalmart
     public function inventoryGo(&$layout=[])
     {
         global $msgStack, $io;
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/inventory/prices.php", 'inventoryPrices');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/inventory/prices.php", 'inventoryPrices');
         $dbField = $this->settings['general']['catalog_field'];
         $map = clean('selMap', 'text', 'post');
         if (!file_exists (BIZUNO_DATA."data/ifWalmart/$map.map")) { return msgAdd(sprintf($this->lang['err_no_inv_map'], $map)); }
@@ -460,7 +460,7 @@ class ifWalmart
                         if (!$aItem[$idx]) { msgAdd(sprintf($this->lang['err_inv_no_price'], $item['sku'])); }
                         break;
                     case 'main_image_url':
-                        $aItem[$idx] = BIZBOOKS_URL_FS.getUserCache('business', 'bizID')."/images/{$item['image_with_path']}";
+                        $aItem[$idx] = BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/{$item['image_with_path']}";
                         break;
                     default:
                         $aItem[$idx] = $attr['value'] && isset($item[$attr['value']]) ? str_replace(["\r","\n","\t"], ' ', $item[$attr['value']]) : '';
@@ -491,8 +491,8 @@ class ifWalmart
     {
         global $io;
         if (!$security = validateAccess('walmart', 2)) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journal.php", 'journal');
-        bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journal.php", 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
         if (!$io->validateUpload('fileOrders', 'text', 'txt')) { return; }
         // load the walmart contact record info
         $cID = isset($this->settings['general']['contact_id']) ? $this->settings['general']['contact_id'] : false;
@@ -702,7 +702,7 @@ return msgAdd("This feature has not been completed at this time!");
     {
         if (!$security = validateAccess('walmart', 3)) { return; }
         $html  = '<p>'.lang('desc_new_price_sheets')."</p>";
-        $html .= html5('frmNewPmt', ['attr'=>  ['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=ifWalmart/admin/paymentProcess"]]);
+        $html .= html5('frmNewPmt', ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/paymentProcess"]]);
         $html .= html5('walmart_pmt',  ['attr'=>  ['type'=>'file']]);
         $html .= html5('iconGO', ['icon'=>'next', 'events'=>  ['onClick'=>"jqBiz('#frmNewPmt').submit(); bizWindowClose('winNewPmt'); jqBiz('body').addClass('loading');"]]);
         $html .= "</form>";

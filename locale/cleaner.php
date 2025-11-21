@@ -345,8 +345,8 @@ function getLang($module='')
     }
     if ($myLang == 'en_US') { return $output; }
     $lang = [];
-    if (file_exists(BIZBOOKS_ROOT."locale/$myLang/modules/$module/language.php")) {
-        require    (BIZBOOKS_ROOT."locale/$myLang/modules/$module/language.php"); // populates $lang
+    if (file_exists(BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/language.php")) {
+        require    (BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/language.php"); // populates $lang
         $output = array_replace($output, $lang);
     }
     return $output;
@@ -394,8 +394,8 @@ function getMethLang($module, $method, $code)
     }
     if ($myLang=='en_US') { return $output; }
     // merge with locale
-    if (file_exists(BIZBOOKS_ROOT."locale/$myLang/modules/$module/$mDir/$method/language.php")) {
-        include    (BIZBOOKS_ROOT."locale/$myLang/modules/$module/$mDir/$method/language.php"); // populates $lang
+    if (file_exists(BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/$mDir/$method/language.php")) {
+        include    (BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/$mDir/$method/language.php"); // populates $lang
         $output = array_replace($output, $lang);
     }
     return $output;
@@ -438,11 +438,11 @@ function localeLoadDB()
 {
     $contents = '';
     if (!empty(getUserCache('profile', 'language', false, 'en_US'))) {
-        if (file_exists(BIZBOOKS_ROOT.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml')) {
-            $contents = file_get_contents(BIZBOOKS_ROOT.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml');
+        if (file_exists(BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml')) {
+            $contents = file_get_contents(BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml');
         }
     }
-    if (empty($contents)) { $contents = file_get_contents(BIZBOOKS_ROOT.'locale/en_US/locale.xml'); }
+    if (empty($contents)) { $contents = file_get_contents(BIZUNO_FS_LIBRARY.'locale/en_US/locale.xml'); }
     return parseXMLstring($contents);
 }
 
@@ -453,11 +453,11 @@ function localeLoadDB()
 function localeLoadCharts()
 {
     $output= [];
-    $lang  = is_dir(BIZBOOKS_ROOT.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/modules/phreebooks/charts') ? getUserCache('profile', 'language', false, 'en_US') : 'en_US';
-    $charts= scandir(BIZBOOKS_ROOT."locale/$lang/modules/phreebooks/charts/");
+    $lang  = is_dir(BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/modules/phreebooks/charts') ? getUserCache('profile', 'language', false, 'en_US') : 'en_US';
+    $charts= scandir(BIZUNO_FS_LIBRARY."locale/$lang/modules/phreebooks/charts/");
     foreach ($charts as $chart) { 
         if ($chart == '.' || $chart == '..') { continue; }
-        $data    = file(BIZBOOKS_ROOT."locale/$lang/modules/phreebooks/charts/$chart");
+        $data    = file(BIZUNO_FS_LIBRARY."locale/$lang/modules/phreebooks/charts/$chart");
         $title0  = str_replace('Description: ', '', array_shift($data));
         $title   = str_replace(',', '', $title0);
         $output[]= ['id'=>$chart, 'text'=>!empty($title) ? $title : $chart];

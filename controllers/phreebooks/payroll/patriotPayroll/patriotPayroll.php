@@ -62,7 +62,7 @@ class patriotPayroll
     {
         $modID = clean('modID', 'cmd', 'get');
         $fields= [
-            'imgLogo' => ['order'=>10,'attr'=>['type'=>'img','height'=>'45','src'=>BIZBOOKS_URL_FS."&src=175/myExt/controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.png"]],
+            'imgLogo' => ['order'=>10,'attr'=>['type'=>'img','height'=>'45','src'=>BIZUNO_URL_FS."&src=175/myExt/controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.png"]],
             'desc'    => ['order'=>20,'html'=>"<p>{$this->lang['import_desc']}</p>",'attr'=>['type'=>'raw']],
             'selFile' => ['order'=>30,'attr'=>['type'=>'file']],
             'btnGo'   => ['order'=>40,'icon'=>'next', 'events'=>['onClick'=>"jqBiz('#formIOP').submit();"]]];
@@ -71,7 +71,7 @@ class patriotPayroll
                 'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>'formIOP'],
                 'body'   => ['order'=>40,'type'=>'fields','keys'=>['imgLogo','desc','selFile','btnGo']],
                 'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]],
-            'forms'    => ['formIOP'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/importGo&modID=$modID"]]],
+            'forms'    => ['formIOP'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/importGo&modID=$modID"]]],
             'fields'   => $fields,
             'jsReady'  => ['initIOP'=>"ajaxForm('formIOP', true);"]]; // do not check for preSubmit as it picks the journal edit function ???
         $layout = array_replace_recursive($layout, $data);
@@ -88,7 +88,7 @@ class patriotPayroll
         if (!$security = validateAccess('j2_mgr', 2)) { return; }
         if (!$this->processCSV()) { return; }
         $today = biz_date('Y-m-d');
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         $items = [];
         msgDebug("\nWorking with extracted totals = ".print_r($this->totals, true));
         foreach ($this->totals as $idx => $row) {

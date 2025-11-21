@@ -76,9 +76,9 @@ jqBiz('#bing').keypress(function(event) {
                     'events' => ['onClick'=> "winHref('https://search.yahoo.com?q='+jqBiz('#yahoo').val())"]],
                 'btnBing'  => ['order'=>30,'attr'=>['type'=>'button','value'=>$this->lang['bing']],  'styles'=>['cursor'=>'pointer'],
                     'events' => ['onClick'=> "winHref('https://www.bing.com?q='+jqBiz('#bing').val())"]],
-                'imgGoogle'=> ['order'=>10,'label'=>$this->lang['google'],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS.'0/controllers/bizuno/dashboards/lp_search/google.png','height'=>50]],
-                'imgYahoo' => ['order'=>10,'label'=>$this->lang['yahoo'], 'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS.'0/controllers/bizuno/dashboards/lp_search/yahoo.png', 'height'=>50]],
-                'imgBing'  => ['order'=>10,'label'=>$this->lang['bing'],  'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_FS.'0/controllers/bizuno/dashboards/lp_search/bing.jpg',  'height'=>50]]],
+                'imgGoogle'=> ['order'=>10,'label'=>$this->lang['google'],'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/controllers/bizuno/dashboards/lp_search/google.png','height'=>50]],
+                'imgYahoo' => ['order'=>10,'label'=>$this->lang['yahoo'], 'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/controllers/bizuno/dashboards/lp_search/yahoo.png', 'height'=>50]],
+                'imgBing'  => ['order'=>10,'label'=>$this->lang['bing'],  'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/controllers/bizuno/dashboards/lp_search/bing.jpg',  'height'=>50]]],
             'jsHead'=>[$this->code=>$js]];
         return ['data'=>$data];
     }

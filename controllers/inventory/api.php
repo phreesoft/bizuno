@@ -46,12 +46,12 @@ class inventoryApi
         $skips = [];
         for ($i=0; $i<6; $i++) { $skips[] = ['id'=>$i, 'text'=>$i]; }
         $fields = [
-            'btnInvapi_tpl' => ['icon'=>'download','label'=>lang('download'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt=inventory/api/apiTemplate');"]],
+            'btnInvapi_tpl' => ['icon'=>'download','label'=>lang('download'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=inventory/api/apiTemplate');"]],
             'selInvSkips'   => ['values'=>$skips, 'attr'=>['type'=>'spinner','value'=>2]],
             'fileInventory' => ['attr'=>['type'=>'file']],
             'btnInvapi_imp' => ['icon'=>'import','label'=>lang('import'),'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmInvApiImport').submit();"]],
-            'btnInvapi_exp' => ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_AJAX."&bizRt=inventory/api/apiExport');"]]];
-        $forms = ['frmInvApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=inventory/api/apiImport"]]];
+            'btnInvapi_exp' => ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=inventory/api/apiExport');"]]];
+        $forms = ['frmInvApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=inventory/api/apiImport"]]];
         $html = '<p>'.$this->lang['invapi_desc'].'</p>
 <p>'.$this->lang['invapi_template'].html5('', $fields['btnInvapi_tpl']).'</p><hr />'.html5('frmInvApiImport',  $forms['frmInvApiImport']).'
 <p>'.$this->lang['invapi_skips']   .html5('selInvSkips',  $fields['selInvSkips']).'</p>
@@ -68,7 +68,7 @@ class inventoryApi
     {
         global $io;
         $tables = [];
-        require(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php');
+        require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         $map    = $tables['inventory']['fields'];
         $header = $props  = [];
         $fields = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
@@ -96,7 +96,7 @@ class inventoryApi
         set_time_limit(600); // 10 minutes
         $structure= dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
         $tables= $map = [];
-        require(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php'); // replaces $map
+        require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // replaces $map
         $map   = $tables['inventory']['fields'];
         if (!$rows) { $rows = $this->prepData($structure); }
         $cnt   = $newCnt = $updCnt = 0;
@@ -173,7 +173,7 @@ class inventoryApi
         global $io;
         if (!$security = validateAccess('admin', 1)) { return; }
         $tables = $header = $output = [];
-        require(BIZBOOKS_ROOT."controllers/bizuno/install/tables.php");
+        require(BIZUNO_FS_LIBRARY."controllers/bizuno/install/tables.php");
         $map    = $tables['inventory']['fields'];
         $fields = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
         foreach ($fields as $field => $settings) { if (!empty($map[$field]['export'])) { $header[] = $settings['tag']; } }

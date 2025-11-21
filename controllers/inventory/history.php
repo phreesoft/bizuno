@@ -419,7 +419,7 @@ class inventoryHistory
         }
         $data = ['id' => $props['name'],
             'attr'   => ['title'=>$props['title'], 'pagination'=>false, 'idField'=>'id'],
-            'events' => ['url'=>"'".BIZUNO_AJAX."&bizRt=inventory/history/historyRows&jID=$jID&skuID=$skuID'"],
+            'events' => ['url'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/history/historyRows&jID=$jID&skuID=$skuID'"],
             'columns'=> ['id'   => ['attr'=>['hidden'=>true]],
                 'action'        => ['order'=>1,'label'=>lang('action'),'attr'=>['hidden'=>$hide_cost?true:false],
                     'events'    => ['formatter'=>"function(value,row,index) { return {$props['name']}Formatter(value,row,index); }"],
@@ -458,7 +458,7 @@ class inventoryHistory
             default: $jPmt = 18; break;
         }
         $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang('journal_id', $jID)),
-            'attr'   => ['idField'=>'id','url'=>BIZUNO_AJAX."&bizRt=inventory/history/movementRows&jID=$jID&skuID=$skuID"],
+            'attr'   => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=inventory/history/movementRows&jID=$jID&skuID=$skuID"],
             'source' => [
                 'tables' => [
                     'journal_main'=>['table'=>BIZUNO_DB_PREFIX.'journal_main'],
@@ -509,7 +509,7 @@ class inventoryHistory
         $order = clean('order',['format'=>'text',   'default'=>'desc'],       'post');
         $hide  = 1; //getUserCache('role', 'security', 'woProd') ? false : true;
         $data  = ['id'=>'dgWO', 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>'Open Work Orders',
-            'attr'    => ['idField'=>'id','url'=>BIZUNO_AJAX."&bizRt=inventory/history/buildRows&skuID=$skuID"],
+            'attr'    => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=inventory/history/buildRows&skuID=$skuID"],
             'source'  => [
                 'tables' => ['journal_main'=>['table'=>BIZUNO_DB_PREFIX.'journal_main']],
                 'filters' => [

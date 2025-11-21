@@ -29,7 +29,7 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT.'controllers/api/common.php', 'apiCommon');
+bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/common.php', 'apiCommon');
 
 class apiShipping extends apiCommon
 {

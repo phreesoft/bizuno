@@ -100,9 +100,9 @@ class ifStripe {
                     'desc'    => ['order'=>20,'type'=>'html',  'html'=>"<p>".$this->lang['import_orders_desc']."</p>"],
                     'body'    => ['order'=>30,'type'=>'fields','keys'=>['fileOrders','btnOrders']],
                     'formEOF' => ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
-            'forms'  => ['frmOrders'=>['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]]],
+            'forms'  => ['frmOrders'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]]],
             'fields' => [
-                'imgLogo'   => ['styles'=>['cursor'=>'pointer'],'events'=>['onClick'=>"winHref('https://www.stripe.com');"],'attr'=>['type'=>'img','src'=>BIZBOOKS_URL_ROOT.'0/controllers/api/funnels/ifStripe/ifStripe.png']],
+                'imgLogo'   => ['styles'=>['cursor'=>'pointer'],'events'=>['onClick'=>"winHref('https://www.stripe.com');"],'attr'=>['type'=>'img','src'=>BIZUNO_URL_PORTAL.'0/controllers/api/funnels/ifStripe/ifStripe.png']],
                 'fileOrders'=> ['order'=>30,'attr'  =>['type'=>'file']],
                 'btnOrders' => ['order'=>40,'icon'=>'next', 'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"]]],
             'jsReady'=>['init'=>"ajaxForm('frmOrders');"]];
@@ -119,7 +119,7 @@ class ifStripe {
     {
         if (!$security = validateAccess('j2_mgr', 2))  { return; }
         if (!$this->processCSV()) { return; }
-        bizAutoLoad(BIZBOOKS_ROOT.'controllers/phreebooks/journal.php', 'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
         // *************** START TRANSACTION *************************
         dbTransactionStart();
         foreach ($this->J12 as $entry) { if (!$this->postJrnl($entry, 12)) { return; } } // customer purchases

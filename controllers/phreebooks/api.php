@@ -27,10 +27,10 @@
 
 namespace bizuno;
 
-bizAutoLoad(BIZBOOKS_ROOT."controllers/contacts/main.php", 'contactsMain');
-bizAutoLoad(BIZBOOKS_ROOT."controllers/inventory/main.php", 'inventoryMain');
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/journal.php", 'journal');
-bizAutoLoad(BIZBOOKS_ROOT."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/contacts/main.php", 'contactsMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/inventory/main.php", 'inventoryMain');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journal.php", 'journal');
+bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/functions.php", 'phreebooksProcess', 'function');
 
 class phreebooksApi
 {
@@ -54,13 +54,13 @@ class phreebooksApi
                 'body'    => ['order'=>50,'type'=>'html','html'=>$this->getViewBB()],
                 'formEOF' => ['order'=>95,'type'=>'html','html'=>"</form>"]]]]]],
             'forms'=>[
-                'frmBegBal'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/begBalSave"]],
-                'frmImpBB' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importBegBal"]],
-                'frmImpInv'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importJournal&id=inv"]],
-                'frmImpJ4' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importJournal&id=j4"]],
-                'frmImpJ6' => ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importJournal&id=j6"]],
-                'frmImpJ10'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importJournal&id=j10"]],
-                'frmImpJ12'=> ['attr'=>['type'=>'form','action'=>BIZUNO_AJAX."&bizRt=phreebooks/api/importJournal&id=j12"]]],
+                'frmBegBal'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/begBalSave"]],
+                'frmImpBB' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importBegBal"]],
+                'frmImpInv'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importJournal&id=inv"]],
+                'frmImpJ4' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importJournal&id=j4"]],
+                'frmImpJ6' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importJournal&id=j6"]],
+                'frmImpJ10'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importJournal&id=j10"]],
+                'frmImpJ12'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/api/importJournal&id=j12"]]],
             'jsBody' => ['init'=>$this->getViewBBJS()],
             'jsReady'=> ['init'=>"ajaxForm('frmBegBal');"]]);
         $layout['jsReady']['phreebooksImport'] = "ajaxForm('frmImpBB');\najaxForm('frmImpInv');\najaxForm('frmImpJ4');\najaxForm('frmImpJ6');\najaxForm('frmImpJ10');\najaxForm('frmImpJ12');";

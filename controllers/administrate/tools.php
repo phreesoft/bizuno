@@ -77,7 +77,7 @@ class administrateTools {
                 'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>'frmTicket'],
                 'body'   => ['order'=>50,'type'=>'fields','keys'=>array_keys($fields)],
                 'formEOF'=> ['order'=>85,'type'=>'html',  'html'=>"</form>"]]]],
-            'forms' => ['frmTicket'=>['attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_AJAX."&bizRt=administrate/tools/ticketSave",'enctype'=>"multipart/form-data"]]],
+            'forms' => ['frmTicket'=>['attr'=>['type'=>'form','method'=>'post','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/tools/ticketSave",'enctype'=>"multipart/form-data"]]],
             'fields'=> $fields];
         $layout = array_replace_recursive($layout, viewMain(), $data);
 
@@ -170,9 +170,9 @@ class administrateTools {
      */
     public function repairComments($verbose=true)
     {
-        msgDebug("\nEntering repairComments with path to tables = ".BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php');
+        msgDebug("\nEntering repairComments with path to tables = ".BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         $tables = [];
-        include(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php'); // loads $tables
+        include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // loads $tables
         foreach ($tables as $table => $tProps) { // as defined by code
             if (!dbTableExists(BIZUNO_DB_PREFIX.$table)) { continue; }
             $stmt = dbGetResult("SHOW FULL COLUMNS FROM ".BIZUNO_DB_PREFIX."$table");
@@ -204,7 +204,7 @@ class administrateTools {
     public function repairTables($verbose=true)
     {
         $tables = [];
-        include(BIZBOOKS_ROOT.'controllers/bizuno/install/tables.php'); // loads $tables
+        include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // loads $tables
         foreach ($tables as $table => $props) {
             $exists = !dbTableExists(BIZUNO_DB_PREFIX.$table) ? false : true;
             $fields = [];
