@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /bizunoCFG.php
  */
 
@@ -32,11 +32,11 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.3'); // Pull from file 
 
 // URLs to PhreeSoft Images
-define('BIZUNO_LOGO',    BIZUNO_URL_FS.'0/view/images/bizuno.png'); // URL to default logo
+define('BIZUNO_LOGO',    'https://www.bizuno.com/bizuno.png'); // URL to default logo
 define('BIZUNO_ICON',    'https://www.bizuno.com/bizuno_icon.png'); // URL to default Bizuno icon on the bizuno.com site
 
-define('PHREESOFT_LOGO', BIZUNO_URL_FS.'0/view/images/phreesoft.png'); // URL to default logo
-define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft API
+define('PHREESOFT_LOGO', 'https://www.phreesoft.com/phreesoft.png'); // URL to default logo
+define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft RESTful API
 define('PHREESOFT_IP',   '71.78.123.232');
 
 // Set the PDF renderer application
