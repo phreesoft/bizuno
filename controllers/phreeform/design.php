@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-02
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -191,7 +191,7 @@ final class phreeformDesign extends mgrJournal
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['trash']);
         $data   = [ // 'reportType'=>$type,
             'toolbars'  => ["tb{$this->domSuffix}"=>['icons'=>[
-                'back'   => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."&bizRt=$this->moduleID/main/manager'"]],
+                'back'   => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."?bizRt=$this->moduleID/main/manager'"]],
                 'preview'=> ['order'=>30,'events'=>['onClick'=>"jqBiz('#xChild').val('print'); jqBiz('#frm{$this->domSuffix}').submit();"]]]]],
             'tabs'      => ["tab{$this->domSuffix}"=>['divs'=>[
                 'general' => ['divs'=>[ // 'order'=>10,'label'=>lang('general'),'type'=>'divs','classes'=>['areaView'],

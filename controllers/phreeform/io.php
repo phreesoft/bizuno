@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-28
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/phreeform/io.php
  */
 
@@ -63,7 +63,7 @@ class phreeformIo
         $data  = [
             'title'=> lang('import'),
             'toolbars' => ['tbImport'=>['icons'=>[
-                'back' => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."&bizRt=phreeform/main/manager'"]]]]],
+                'back' => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."?bizRt=phreeform/main/manager'"]]]]],
             'divs'     => [
                 'toolbar'=> ['order'=>10,'type'=>'toolbar','key'=>'tbImport'],
                 'heading'=> ['order'=>15,'type'=>'html',   'html'=>"<h1>dave - ".$this->lang['phreeform_import']."</h1>"],

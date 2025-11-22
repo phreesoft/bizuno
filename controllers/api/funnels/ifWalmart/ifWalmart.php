@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/api/funnels/ifWalmart/ifWalmart.php
  */
 
@@ -204,7 +204,7 @@ class ifWalmart
         $layout['fields']['tplDescWm'] = ['order'=>10,'html'=>$this->lang['walmart_template_desc'],  'attr'=>['type'=>'raw']];
         $layout['fields']['selTempWm'] = ['order'=>20,'values'=>$templWm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifWalmart', 0, bizSelGet('selTempWm'));"],'attr'=>['type'=>'select']];
         $layout['fields']['divMapWm']  = ['order'=>90,'html'=>'<div id="divWalmartMap">&nbsp;</div>','attr'=>['type'=>'raw']];
-        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZUNO_URL_PORTAL."controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
+        $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
         $layout['jsReady'][$channel]= "walmartContact();";
     }
 

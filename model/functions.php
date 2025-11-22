@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /model/functions.php
  */
 
@@ -49,10 +49,10 @@ function bizAutoLoadMap($path='')
 {
     if (empty($path)) { return BIZUNO_FS_LIBRARY; }
     $max = 1;
-    if (strpos($path, 'BIZUNO_FS_LIBRARY/')===0)     { return str_replace('BIZUNO_FS_LIBRARY/',    BIZUNO_FS_LIBRARY,    $path, $max); }
-    if (strpos($path, 'BIZUNO_DATA/')  ===0)     { return str_replace('BIZUNO_DATA/',      BIZUNO_DATA,      $path, $max); }
-    if (strpos($path, 'BIZUNO_URL_PORTAL/')===0) { return str_replace('BIZUNO_URL_PORTAL/',BIZUNO_URL_PORTAL,$path, $max); }
-    if (strpos($path, 'BIZUNO_URL_FS/')  ===0) { return str_replace('BIZUNO_URL_FS/',  BIZUNO_URL_FS,  $path, $max); }
+    if (strpos($path, 'BIZUNO_FS_LIBRARY')===0) { return str_replace('BIZUNO_FS_LIBRARY',BIZUNO_FS_LIBRARY,$path, $max); }
+    if (strpos($path, 'BIZUNO_DATA')  ===0)     { return str_replace('BIZUNO_DATA',      BIZUNO_DATA,      $path, $max); }
+    if (strpos($path, 'BIZUNO_URL_PORTAL')===0) { return str_replace('BIZUNO_URL_PORTAL',BIZUNO_URL_PORTAL,$path, $max); }
+    if (strpos($path, 'BIZUNO_URL_FS')  ===0)   { return str_replace('BIZUNO_URL_FS',    BIZUNO_URL_FS,    $path, $max); }
     return $path;
 }
 

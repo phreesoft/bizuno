@@ -32,50 +32,40 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 /******************** BEGIN - Site Specific Settings ***********************/
 
 // 1-10 digit AlphaNumeric, cannot be zero
-define('BIZUNO_BIZID', '1'); 
+if ( !defined( 'BIZUNO_BIZID' ) )       { define( 'BIZUNO_BIZID',       '12345' ); } // Bizuno Business ID [for multi-business]
 
 // file system path to your data files.
 // Can be outside of your web server direct access but mush be within the 
 // path of PHP.
-define('BIZUNO_DATA', 'data/');
+if ( !defined( 'BIZUNO_DATA' ) )        { define( 'BIZUNO_DATA',        BIZUNO_FS_PORTAL . 'data/' ); } // Path to user files, cache and backup
 
 // Encryption key for cookies, and other publically viewable information
 // Up to 16 alpha-numeric characters, randomly generated
-define('BIZUNO_KEY', '0123456789AbCdEf'); 
+if ( !defined( 'BIZUNO_KEY' ) )         { define( 'BIZUNO_KEY',         '0123456789abcdef' ); } // Unique key used for encryption
 
 // Database credentials
-define('BIZUNO_DBTYPE',   'mysql');      // Database Engine
-define('BIZUNO_DBHOST',   'localhost');  // Host Name
-define('BIZUNO_DB_PREFIX','');           // Database Table Prefix
-define('BIZUNO_DBNAME',   'dbName');     // Database Name
-define('BIZUNO_DBUSER',   'dbUsername'); // User name
-define('BIZUNO_DBPASS',   'dbPassword'); // Password
+if ( !defined( 'BIZUNO_DB_PREFIX' ) )   { define( 'BIZUNO_DB_PREFIX',   '' ); } // Database table prefix
+if ( !defined( 'BIZUNO_DB_CREDS' ) )    { define( 'BIZUNO_DB_CREDS',    ['type'=>'mysql', 'host'=>'localhost', 'name'=>'dbName', 'user'=>'dbUser', 'pass'=>'dbPassword', 'prefix'=>BIZUNO_DB_PREFIX ] ); }
 
 /******************** END - Site Specific Settings ***********************/
 
-// Set the Bizuno host 
-define('BIZUNO_HOST', 'LOCAL');
+// Platform Specific - File System Paths
+if ( !defined( 'BIZUNO_FS_PORTAL' ) )   { define( 'BIZUNO_FS_PORTAL',   $_SERVER['DOCUMENT_ROOT'].'/'); }
+if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  BIZUNO_FS_PORTAL ); }
+if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_FS_PORTAL . 'vendor/' ); }
 
-// Database credentials
-define('BIZUNO_DB_CREDS', [
-    'type'  => BIZUNO_DBTYPE,
-    'host'  => BIZUNO_DBHOST,
-    'name'  => BIZUNO_DBNAME,
-    'user'  => BIZUNO_DBUSER,
-    'pass'  => BIZUNO_DBPASS,
-    'prefix'=> BIZUNO_DB_PREFIX]);
-define('BIZUNO_PORTAL',  $_SERVER['SERVER_NAME']);
+// Platform Specific - URL's
+if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ); } // full url to Bizuno root folder
+if ( !defined( 'BIZUNO_URL_AJAX' ) )    { define( 'BIZUNO_URL_AJAX',    BIZUNO_URL_PORTAL.'?ajax=1' ); }
+if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     BIZUNO_URL_PORTAL.'?bizRt=' ); }
+if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src=' ); }
+if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', BIZUNO_URL_PORTAL.'/scripts/' );  }
 
-// File System Paths
-define('BIZUNO_FS_ASSETS', 'vendor/');
-define('BIZUNO_FS_LIBRARY',   BIZUNO_FS_ASSETS.'phreesoft/bizuno/');
-// URL's
-define('BIZUNO_URL_SCRIPTS', BIZUNO_FS_LIBRARY.'scripts/');
-define('BIZUNO_URL_PORTAL',    'https://'.BIZUNO_PORTAL.'/');
+// If you want to allow users to send support tickets to your administrator, set email here
+//define('BIZUNO_SUPPORT_NAME', 'My Business Support');
+//define('BIZUNO_SUPPORT_EMAIL','webmaster@my-business.com');
 
-// Initialize Bizuno - Make sure the Bizuno library is installed and reachable
-if (!file_exists(BIZUNO_FS_LIBRARY.'bizunoCFG.php')) {
-    echo 'The Bizuno Library cannot be located. the library and installation instructions can be found <a href="https://github.com/phreesoft/bizuno">HERE</a>';
-    exit;
-}
-require(BIZUNO_FS_LIBRARY.'bizunoCFG.php'); // Config for current release
+// Initialize Bizuno
+require ( BIZUNO_FS_PORTAL  . 'lib/controller.php' );
+require ( BIZUNO_FS_LIBRARY . 'bizunoCFG.php' );
+if (file_exists()) { require ( BIZUNO_FS_ASSETS  . 'autoload.php' ); } // Load the Bizuno thrid party libraries

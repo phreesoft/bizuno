@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-04
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/api/funnels/ifBigCom/ifBigCom.php
  */
 
@@ -132,7 +132,7 @@ class ifBigCom extends apiExport
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
             'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://www.bigcommerce.com');"],
-                'attr'=>['type'=>'img','height'=>100,'src'=>BIZUNO_URL_PORTAL."0/controllers/$this->moduleID/channels/$this->code/$this->code.png"]],
+                'attr'=>['type'=>'img','height'=>100,'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.png"]],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
             'btnOrders'   => ['events' =>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"], 'attr'=>['type'=>'button','value'=>lang('go')]],

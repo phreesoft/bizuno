@@ -66,7 +66,7 @@ class bizunoDashboard
             'jsReady' => ['jsForm'=>"ajaxForm('frmDashboard');"],
             'tabs'    => ['tabSettings'=> ['attr'=>['tabPosition'=>'left']]],
             'toolbars'=> ['tbDashBoard'=> ['icons' => [
-                'cancel'=> ['order'=> 10, 'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."&bizRt=bizuno/main/bizunoHome&menuID=$menuID'"]],
+                'cancel'=> ['order'=> 10, 'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."?bizRt=bizuno/main/bizunoHome&menuID=$menuID'"]],
                 'save'  => ['order'=> 20, 'events'=>['onClick'=>"jqBiz('#frmDashboard').submit();"]]]]]];
         $allDash = dbMetaGet(0, 'dashboards'); // Fetch list of all dashboards
         metaIdxClean($allDash); // remove the row id, etc
@@ -158,7 +158,7 @@ class bizunoDashboard
         }
         msgDebug("\nReady to write updated dashboard list: ".print_r($userMenu, true));
         dbMetaSet($rID, "dashboard_{$menuID}", $userMenu, 'contacts', getUserCache('profile', 'userID'));
-        $layout = array_replace_recursive($layout, ['content'=>['action'=>'href', 'link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/main/bizunoHome&menuID=$menuID"]]);
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'href', 'link'=>BIZUNO_URL_PORTAL."?bizRt=bizuno/main/bizunoHome&menuID=$menuID"]]);
     }
 
     /**

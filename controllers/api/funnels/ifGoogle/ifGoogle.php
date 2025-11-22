@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/api/funnels/ifGoogle/ifGoogle.php
  */
 
@@ -169,7 +169,7 @@ class ifGoogle extends apiExport
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=ifGoogle&dl=1"]]],
             'fields' => [
-                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZUNO_URL_PORTAL.'0/controllers/api/funnels/ifGoogle/google_large.png']],
+                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZUNO_URL_FS.'0/controllers/api/funnels/ifGoogle/google_large.png']],
                 'btnInv' => ['events'=>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]]],
             'jsReady'=> ['init'    =>"ajaxDownload('frmInventory');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);

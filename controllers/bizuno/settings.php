@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -90,7 +90,7 @@ class bizunoSettings
             msgDebug("\nInstalled module: $module");
             if (isset($msgStack->error['error']) && sizeof($msgStack->error['error']) > 0) { msgDebug("\nMsgStack had an error, returning!"); return; }
         }
-        $layout = array_replace_recursive($layout, ['content'=>['rID'=>$module,'action'=>'href','link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/settings/manager"]]);
+        $layout = array_replace_recursive($layout, ['content'=>['rID'=>$module,'action'=>'href','link'=>BIZUNO_URL_PORTAL."?bizRt=bizuno/settings/manager"]]);
     }
 
     /**
@@ -118,7 +118,7 @@ class bizunoSettings
         msgLog("Removed module: $module");
         dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."configuration WHERE config_key='$module'");
         bizCacheExpClear(); // force reload of all users cache with next page access, menus and permissions, etc.
-        $layout= array_replace_recursive($layout, ['content'=>['rID'=>$module, 'action'=>'href', 'link'=>BIZUNO_URL_PORTAL."&bizRt=bizuno/settings/manager"]]);
+        $layout= array_replace_recursive($layout, ['content'=>['rID'=>$module, 'action'=>'href', 'link'=>BIZUNO_URL_PORTAL."?bizRt=bizuno/settings/manager"]]);
     }
 
     /**
@@ -289,7 +289,8 @@ class bizunoSettings
                 'status'     => in_array($method, $defaults) ? 1 : 0,
                 'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
                 'path'       => $path,
-                'url'        => BIZUNO_URL_PORTAL."controllers/$module/$dirMeth/$method/"];
+                'url'        => BIZUNO_URL_PORTAL."/controllers/$module/$dirMeth/$method/", // @TODO - url is broken
+                ];
             msgDebug("\nargs array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
             msgDebug("\nmerged array = ".print_r($merged, true));

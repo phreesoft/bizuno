@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1028,7 +1028,7 @@ columns:  [[
         msgDebug("\nEntering layoutMenuLeft working with type = $type and menuID = ".print_r($menuID, true));
         switch ($type) {
             case 'add':   return html5('', ['order'=>10,'icon'=>'add','options'=>['menuAlign'=>"'right'"],
-                'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"hrefClick('".BIZUNO_URL_PORTAL."&bizRt=bizuno/dashboard/manager&menuID=$menuID');"]]);
+                'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"hrefClick('".BIZUNO_URL_PORTAL."?bizRt=bizuno/dashboard/manager&menuID=$menuID');"]]);
             case 'back':  return ['child'=>['back'=>['order'=>50,'icon'=>'back','events'=>['onClick'=>"jqBiz.mobile.back();"]]]];
             case 'close': return html5('', ['order'=>10,'icon'=>'close','options'=>['menuAlign'=>"'left'"],
                 'classes'=>['easyui-linkbutton'],'events'=>['onClick'=>"jqBiz.mobile.back();"]]);

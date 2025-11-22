@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/phreeform/main.php
  */
 
@@ -163,7 +163,7 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
             'toolbars'  => ["tb{$this->domSuffix}"=>['hideLabels'=>true,'icons'=>[
                 'open'  => ['order'=>10,'events'=>['onClick'=>"winOpen('phreeformOpen', '$this->moduleID/render/open&rID=$rID');"]],
                 'edit'  => ['order'=>20,'hidden'=>($security>1)?false:true,
-                    'events'=>['onClick'=>"window.location.href='".BIZUNO_URL_PORTAL."&bizRt=phreeform/design/edit&rID=$rID';"]],
+                    'events'=>['onClick'=>"window.location.href='".BIZUNO_URL_PORTAL."?bizRt=phreeform/design/edit&rID=$rID';"]],
                 'rename'=> ['order'=>30,'hidden'=>($security>2)?false:true,
                     'events'=>['onClick'=>"var title=prompt('".lang('msg_entry_rename')."'); if (title !== null) { jsonAction('$this->moduleID/$this->pageID/rename', '$rID', title); }"]],
                 'export'=> ['order'=>60,'hidden'=>($security>2)?false:true,

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-20
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /controllers/phreebooks/custWizard/admin.php
  */
 
@@ -41,7 +41,7 @@ class custWizardAdmin {
         $this->structure= [
             'prerequisites'=> ['bizuno'=>'3.0'],
             'category'     => $this->category,
-            'url'          => BIZUNO_URL_PORTAL."controllers/$this->moduleID/",
+            'url'          => BIZUNO_URL_PORTAL."/controllers/$this->moduleID/",
             'hooks'        => ['phreebooks'=>['main'=>['manager'=>['page'=>'admin','class'=>'custWizardAdmin','order'=>50]]]]];
     }
 

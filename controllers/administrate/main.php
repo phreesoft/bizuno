@@ -116,7 +116,7 @@ class administrateMain extends mgrJournal
                 $data  = ['type'=>'divHTML', 'divs'=>['body'=>['order'=>15, 'type'=>'html', 'html'=>$html]], 'jsReady'=>['init'=>$action]];
                 break;
             case 'home':
-                $action= "location.href='".BIZUNO_URL_PORTAL."&bizRt=$this->moduleID/$this->pageID/manager'";
+                $action= "location.href='".BIZUNO_URL_PORTAL."?bizRt=$this->moduleID/$this->pageID/manager'";
                 $data  = ['type'=>'divHTML', 'divs'=>['body'=>['order'=>15, 'type'=>'html', 'html'=>$html]], 'jsReady'=>['init'=>$action]];
                 break;
             default: msgAdd("Unexpected redirect!");

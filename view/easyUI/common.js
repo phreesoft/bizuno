@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
+ * @version    7.x Last Update: 2025-11-22
  * @filesource /view/easyUI/common.js
  */
 
@@ -953,7 +953,7 @@ function isMobile() {
 function hrefClick(path, rID, jData) {
     if  (typeof path == 'undefined') return alert('ERROR: The destination path is required, no value was provided.');
     var pathClean = path.replace(/&amp;/g,"&");
-    var remoteURL = bizunoHome+'&bizRt='+pathClean;
+    var remoteURL = pathClean==='' ? bizunoHome : bizunoHome+'?bizRt='+pathClean;
     if (typeof rID   != 'undefined') remoteURL += '&rID='+rID;
     if (typeof jData != 'undefined') remoteURL += '&data='+encodeURIComponent(jData);
     window.location = remoteURL;
@@ -993,11 +993,11 @@ function jsonPortal(path, rID, jData) {
 function winOpen(id, path, w, h) {
     if (!w) w = 800;
     if (!h) h = 650;
-    var popupWin = window.open(bizunoHome+"&bizRt="+path, id, 'width='+w+',height='+h+',resizable=1,scrollbars=1,top=150,left=200');
+    var popupWin = window.open(bizunoHome+"?bizRt="+path, id, 'width='+w+',height='+h+',resizable=1,scrollbars=1,top=150,left=200');
     if (popupWin==null) {
         jqBiz.messager.alert({ title:'Popup Blocked!',
             msg: 'Your browser has blocked the popup! Please make sure you allow popups from this site or some browsers require an user click action to process the popup. Press OK to try again.',
-            fn: function() { var popupWin = window.open(bizunoHome+"&bizRt="+path, id, 'width='+w+',height='+h+',resizable=1,scrollbars=1,top=150,left=200');
+            fn: function() { var popupWin = window.open(bizunoHome+"?bizRt="+path, id, 'width='+w+',height='+h+',resizable=1,scrollbars=1,top=150,left=200');
                 if (popupWin==null) { alert('The popup is still blocked. You will need to perform this function another way or use a different browser.'); return; }
             }
         });
