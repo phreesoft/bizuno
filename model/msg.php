@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-23
  * @filesource /model/msg.php
  */
 
@@ -124,6 +124,7 @@ final class messageStack
     function debugWrite($filename=false, $append=false, $force=false)
     {
         global $db, $io;
+        if (empty($this->trace)) { return; }
         $dest = !empty($filename) ? $filename : $this->debug_file;
         $script_time = (int)(1000 * (microtime(true) - SCRIPT_START_TIME));
 //      if ($script_time > 500) { $force = true; }
@@ -133,8 +134,10 @@ final class messageStack
         msgDebug("\nMessageStack array contains: ".print_r($this->error, true));
         msgDebug("\nWriting data to filename: $dest");
         msgDebug("\nPage trace stats: Execution Time: $script_time ms, $dbCnt queries taking $dbTime ms");
-        if (is_object($io)) { $io->fileWrite($this->trace, $dest, true, $append, true); }
-        else { msgAdd("Class io does not exist, write failed!"); }
+        if (is_object($io)) { 
+            $io->fileWrite($this->trace, $dest, true, $append, true);
+//            $this->trace = '';
+        } else { msgAdd("Class io does not exist, write failed!"); }
     }
 }
 

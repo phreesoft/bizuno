@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-23
  * @filesource /portal/api.php
  */
 
@@ -29,7 +29,9 @@ namespace bizuno;
 
 class portalApi
 {
-    public $lang;
+    private $ShipTaxSt= ['AR','CT','GA','IL','KS','KY','MI','MS','NE','NJ','NM','NY',
+        'NC','ND','OH','OK','PA','RI','SC','SD','TN','TX','UT','VT','WA','WV','WI'];
+    public  $lang;
     
     function __construct()
     {
@@ -199,6 +201,42 @@ class portalApi
             foreach ($result as $row) { $roles[] = ['roleID'=>$row['_rID'], 'label'=>$row['title']]; }
         } else { $roles = []; }
         $layout = array_replace_recursive($layout, ['content'=>['roles'=>$roles]]);
+    }
+
+    public function getSalesTax(&$layout=[])
+    {
+        $args  = [
+            'total'   => clean('total',  'float',    'post'),
+            'shipping'=> clean('freight','float',    'post'),
+            'city'    => clean('city',   'text',     'post'),
+            'state'   => clean('state',  'text',     'post'),
+            'zipCode' => clean('zip',    'text',     'post'),
+            'country' => clean('country','alpha_num','post')];
+        // sanity check
+        msgDebug("\nEntering getSalesTax with args = ".print_r($args, true));
+        $this->cleanZip($args['zipCode'], $args['country']);
+        if (empty($args['zipCode'])) { return msgAdd('There are no rates to display, postal code was not provided!'); }
+        // see if shipping is taxable
+        $taxShip = in_array($args['state'], $this->ShipTaxSt) ? true : false;
+        // check for other state specific parameters
+
+        // retrieve from the tax table
+        $rate  = dbGetValue('sales_tax_map', 'tax_rate', "zipcode='{$args['zipCode']}'");
+        msgDebug("\nresult of db query rate = ".print_r($rate, true));
+        $tax   = !$taxShip ? floatval($args['total']) * $rate : (floatval($args['total']) + floatval($args['shipping'])) * $rate;
+        $layout= ['type'=>'raw', 'content'=>json_encode(['sales_tax'=>round($tax, 2), 'rate'=>$rate, 'msg'=>''])];
+    }
+
+    private function cleanZip(&$zip, $country='USA')
+    {
+        $zip = preg_replace("/[^a-zA-Z0-9]/", "", strtoupper($zip));
+        switch ($country) {
+            case 'CA':
+            case 'CAN': $zip = substr(trim($zip), 0, 6); break;
+            case 'US':
+            case 'USA': $zip = substr(trim($zip), 0, 5); break;
+            default: // leave it alone
+        }
     }
 
     public function shipGetRates(&$layout=[])

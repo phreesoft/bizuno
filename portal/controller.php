@@ -64,7 +64,6 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
-msgTrap();
         new view($this->layout);
     }
     private function setDOM()
