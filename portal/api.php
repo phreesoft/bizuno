@@ -187,6 +187,7 @@ class portalApi
     {
         bizClrCookie('bizunoSession');
         $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]]);
+        if (function_exists("\\bizuno\\portalLogout")) { portalLogout($layout); }
     }
 
     public function getBizRoles(&$layout=[])

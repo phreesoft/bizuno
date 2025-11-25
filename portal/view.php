@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-11-25
  * @filesource /portal/view.php
  */
 
@@ -50,7 +50,8 @@ class portalView
     public function login(&$layout=[])
     {
         global $db;
-        msgDebug("\nEntering guest/login.");
+        if (function_exists("\\bizuno\\portalLogin")) { return portalLogin($layout, $this->errors, $this->lang); } // hook for customization
+        msgDebug("\nEntering portalView::guest/login.");
         // if POST vars are set then try to log in else show form
         if (isset($_POST['bizUser']) && isset($_POST['bizPass'])) {
             msgDebug("\nCredentials sent, trying to validate.");
@@ -93,7 +94,6 @@ class portalView
      */
     private function validateUser(&$layout=[])
     {
-        if (function_exists("\\bizuno\\portalValidateUser")) { return portalValidateUser($layout, $this->errors, $this->lang); } // hook for customization
         msgDebug("\nEntering validateUser.");
         $email= clean('bizUser', 'email', 'post'); // email address
         $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");

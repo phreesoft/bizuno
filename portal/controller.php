@@ -44,6 +44,7 @@ class portalCtl
     function __construct()
     {
         global $msgStack, $io, $cleaner;
+        if (!session_id()) { session_start(); }
         $msgStack= new messageStack();
         $io      = new io();
         $cleaner = new cleaner();
@@ -64,6 +65,7 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
+msgTrap();
         new view($this->layout);
     }
     private function setDOM()
