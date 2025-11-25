@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-04
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/bizuno/dashboards/launchpad/launchpad.php
  */
 
@@ -78,7 +78,7 @@ class launchpad
             }
             $sorted = sortOrder($theList, 'label');
             foreach ($sorted as $row) {
-                $onClick= isset($row['onClick']) ? $row['onClick'] : "winHref(bizunoHome+'&bizRt={$row['route']}');";
+                $onClick= isset($row['onClick']) ? $row['onClick'] : "winHref(bizunoHome+'?bizRt={$row['route']}');";
                 $content= html5('', ['icon'=>$row['icon'],'events'=>['onClick'=>$onClick]]).viewText($row['label']);
                 $trash  = '<span style="float:right">'.html5('', ['icon'=>'trash','size'=>'small','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) { dashSubmit('$this->code', '{$row['id']}'); }"]]);
                 $rows[] = viewDashList($content, $trash);

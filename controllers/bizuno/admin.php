@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -125,13 +125,13 @@ class bizunoAdmin
                 'id'              => ['label'=>lang('contacts',     'short_name', 'b'),'attr'=>['value'=>getUserCache('profile', 'biz_title')]],
                 'primary_name'    => ['label'=>lang('primary_name'),   'attr'=>['value'=>getUserCache('profile', 'biz_title')]],
                 'contact'         => ['label'=>lang('contact')],
-                'email'           => ['label'=>lang('email')],
+                'email'           => ['label'=>lang('email_gen')],
                 'contact_ap'      => ['label'=>lang('contact', 'p')],
-                'email_ap'        => ['label'=>lang('email', 'p')],
+                'email_ap'        => ['label'=>lang('email_ap')],
                 'contact_ar'      => ['label'=>lang('contact', 'r')],
-                'email_ar'        => ['label'=>lang('email', 'r')],
+                'email_ar'        => ['label'=>lang('email_ar')],
                 'store_mgr'       => ['label'=>lang('contact', 'd')],
-                'email_mgr'       => ['label'=>lang('email', 'd')],
+                'email_mgr'       => ['label'=>lang('email_mgr')],
                 'address1'        => ['label'=>lang('address1')],
                 'address2'        => ['label'=>lang('address2')],
                 'city'            => ['label'=>lang('city')],

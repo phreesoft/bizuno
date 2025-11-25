@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1427,14 +1427,14 @@ function bizUnitDiscDisc(newValue) {
                     'attr'  => ['width'=>60, 'align'=>'center', 'resizable'=>true, 'hidden'=>in_array($this->journalID,[14,15,16])?true:false]]]];
         switch ($this->journalID) {
             case 0: // search journal
-                $data['events']['onDblClickRow'] = "function(rowIndex, rowData){ winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID='+rowData.id); }";
+                $data['events']['onDblClickRow'] = "function(rowIndex, rowData){ winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID='+rowData.id); }";
                 $data['source']['tables']['journal_item'] = ['table'=>BIZUNO_DB_PREFIX.'journal_item', 'join'=>'JOIN', 'links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_item.ref_id"];
                 $data['source']['search'][] = BIZUNO_DB_PREFIX.'journal_main.id';
                 $data['source']['search'][] = BIZUNO_DB_PREFIX.'journal_item.sku';
                 $data['source']['search'][] = BIZUNO_DB_PREFIX.'journal_item.description';
                 unset($data['source']['actions']['newJournal']);
                 unset($data['columns']['id']['attr']['hidden']);
-                $data['columns']['action']['actions']['edit']['events']['onClick'] = "winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD');";
+                $data['columns']['action']['actions']['edit']['events']['onClick'] = "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');";
                 $data['columns']['journal_id'] = ['order'=>15, 'field'=>BIZUNO_DB_PREFIX.'journal_main.journal_id','label'=>pullTableLabel('journal_main', 'journal_id'),
                     'events'=>['formatter'=>"function(value) { return jrnlTitles['j'+value]; }"], 'attr'=>['width'=>80, 'resizable'=>true]];
                 $journalID = clean('journalID', 'integer', 'post');

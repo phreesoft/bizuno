@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/inventory/dashboards/inv_recent/inv_recent.php
  */
 
@@ -92,7 +92,7 @@ class inv_recent
                 foreach ($items as $item) {
                     $type   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='".addslashes($item['sku'])."'");
                     if (in_array($type, ['sv','lb'])) { continue; }
-                    $elDOM  = ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=6&rID={$row['id']}');"],'attr'=>['type'=>'button','value'=>"#{$row['purch_order_id']}"]];
+                    $elDOM  = ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID=6&rID={$row['id']}');"],'attr'=>['type'=>'button','value'=>"#{$row['purch_order_id']}"]];
                     $store  = sizeof(getModuleCache('bizuno', 'stores')) > 1 ? viewFormat($opts['num_rows'], 'storeID').' ' : '';
                     $left   = biz_date('m/d', strtotime($row['post_date']))." $store - ({$item['qty']}) ".viewText($item['sku'], $opts['trim']);
                     $right  = ''; // viewText($item['qty']);

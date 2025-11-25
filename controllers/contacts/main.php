@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/contacts/main.php
  */
 
@@ -241,11 +241,15 @@ class contactsMain
             $structure['country']['attr']['value']   = getModuleCache('bizuno','settings','company','country');
         }
         $fldAddr = ['primary_name', 'contact', 'address1', 'address2', 'city', 'state', 'postal_code', 'country'];
-        $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'website'];
+        $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'email2', 'email3', 'email4', 'website'];
         $fldAcct = ['short_name','inactive','rep_id','tax_rate_id','price_sheet','store_id','terms','terms_text','terms_edit','first_date','date_last','last_date_1','last_date_2','histPay'];
         $fldProp = ['id','account_number','gov_id_number','gl_account','recordID','tax_exempt','marketplace'];
         // set some special cases
-//        $structure['type']['attr']['value']  = $this->type;
+//      $structure['type']['attr']['value']  = $this->type;
+        $structure['email']['label']         = lang('email_sales');
+        $structure['email2']['label']        = lang('email_ar');
+        $structure['email3']['label']        = lang('email_purch');
+        $structure['email4']['label']        = lang('email_ap');
         $structure['short_name']['tooltip']  = lang('msg_leave_null_to_assign_ref');
         $structure['inactive']['label']      = lang('status');
         $structure['inactive']['values']     = getModuleCache('contacts', 'statuses');

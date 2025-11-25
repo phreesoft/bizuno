@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/dashboards/unprinted_j04/unprinted_j04.php
  */
 
@@ -79,7 +79,7 @@ class unprinted_j04
             foreach ($result as $entry) { // build the list
                 $left   = viewDate($entry['post_date']).' - '.viewText($entry['primary_name_b'], $opts['trim']);
                 $right  = html5('', ['icon'=>'email','events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=vend:j4&date=a&xfld=journal_main.id&xcr=equal&xmin={$entry['id']}');"]]);
-                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=4&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID=4&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
                 $rows[] = viewDashLink($left, $right, $action);
             }
         }

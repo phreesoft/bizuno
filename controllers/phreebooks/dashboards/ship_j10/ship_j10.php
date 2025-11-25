@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-10
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/dashboards/ship_j10/ship_j10.php
  */
 
@@ -123,7 +123,7 @@ class ship_j10
                 $store  = sizeof(getModuleCache('bizuno', 'stores')) > 1 ? "[".viewFormat($entry['store_id'], 'storeID')."]" : '-';
                 $left   = biz_date('m/d', strtotime($entry['post_date']))." $store ".$this->rowStyler($entry['contact_id_b'], viewText($entry['primary_name_b'], $opts['trim']));
                 $right  = '';
-                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
                 $rows[] = viewDashLink($left, $right, $action);
                 $rowCnt++;
                 if (!empty($opts['num_rows']) && $rowCnt>=$opts['num_rows']) { break; }

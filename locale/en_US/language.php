@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /local/en_US/language.php
  */
 
@@ -483,6 +483,7 @@ $langCore = [
     'projects' => 'Projects',
     'promotions' => 'Promotions',
     'purchases' => 'Purchases',
+    'purchasing' => 'Purchasing',
     'purchase_tax' => 'Purchase Tax',
     'purch_cond' => 'Purchase Condition',
     'quality_manual' => 'Quality Manual',
@@ -921,10 +922,12 @@ $langCore = [
     'state' => 'State',
     'postal_code' => 'Postal Code',
     'country' => 'Country',
-    'email_d' => 'Email: Store Manager',
-    'email_m' => 'Email: General Mailbox',
-    'email_p' => 'Email: Accounts Payable',
-    'email_r' => 'Email: Accounts Receivable',
+    'email_gen' => 'Email: General Mailbox',
+    'email_mgr' => 'Email: Store Mgr',
+    'email_ap' => 'Email: Accts/Pay',
+    'email_ar' => 'Email: Accts/Rec',
+    'email_purch' => 'Email: Purchasing',
+    'email_sales' => 'Email: Sales',
     'website' => 'Website',
     'contact_type' => 'Contact Type', // Table contacts
     'ctype_b' => 'Branch',

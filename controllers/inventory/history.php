@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/inventory/history.php
  */
 
@@ -425,10 +425,10 @@ class inventoryHistory
                     'events'    => ['formatter'=>"function(value,row,index) { return {$props['name']}Formatter(value,row,index); }"],
                     'actions'   => [
                         'print' => ['order'=>10,'icon'=>'print', 'events' => ['onClick'=>"var jID=jqBiz('#journal_id').val(); winOpen('phreeformOpen', 'phreeform/render/open&group={$frmGrp}&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]],
-                        'edit'  => ['order'=>20,'icon'=>'edit',  'label'=>lang('edit'),          'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD');"]],
+                        'edit'  => ['order'=>20,'icon'=>'edit',  'label'=>lang('edit'),          'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');"]],
                         'toggle'=> ['order'=>40,'icon'=>'toggle','label'=>lang('toggle_status'), 'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"jsonAction('phreebooks/main/toggleWaiting&jID=$jID&dgID={$props['name']}', idTBD);"]],
                         'dates' => ['order'=>50,'icon'=>'date',  'label'=>lang('delivery_dates'),'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"]],
-                        'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
+                        'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
                 'invoice_num'   => ['order'=>20,'label'=>lang('invoice_num', $jID),   'attr'=>['resizable'=>true]],
                 'primary_name_b'=> ['order'=>30,'label'=>lang('primary_name'),        'attr'=>['sortable'=>true,'resizable'=>true]],
                 'purch_order_id'=> ['order'=>40,'label'=>lang('purch_order_id', $jID),'attr'=>['resizable'=>true,'sortable'=>true]],
@@ -475,7 +475,7 @@ class inventoryHistory
                 'action'    => ['order'=>1, 'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
                     'actions'=> [
                         'edit'       => ['order'=>20,'icon'=>'edit',    'label'=>lang('edit'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD');"]],
+                            'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');"]],
                         'print'      => ['order'=>40,'icon'=>'print',   'label'=>lang('print'),
                             'events' => ['onClick'=>"var idx=jqBiz('#$name').datagrid('getRowIndex', idTBD); var jID=jqBiz('#$name').datagrid('getRows')[idx].journal_id; ('fitColumns', true); winOpen('phreeformOpen', 'phreeform/render/open&group={$gID[0]}:j'+jID+'&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]],
                                     ]],
@@ -522,7 +522,7 @@ class inventoryHistory
                     'events' => ['formatter'=>"function(value,row,index) { return dgWOFormatter(value,row,index); }"],
                     'actions'=> [
                         'edit'       => ['order'=>20,'icon'=>'edit',    'label'=>lang('edit'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=inventory/build/manager&rID=idTBD');"]],
+                            'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=inventory/build/manager&rID=idTBD');"]],
                         'print'=>['order'=>20,'icon'=>'print','label'=>lang('print'),'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=mfg:wo&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]]]],
                 'sku'          => ['order'=>10,'field'=>'sku',          'label'=>lang('sku'),      'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true],
                     'events' => ['styler'=>"function(value,row,index) { if (row.started=='1') { return {style:'background-color:lightgreen'}; } }"]],

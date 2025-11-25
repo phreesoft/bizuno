@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/dashboards/open_j03/open_j03.php
  */
 
@@ -91,7 +91,7 @@ class open_j03
                 $total += $entry['total_amount'];
                 $left   = viewDate($entry['post_date'])." - ".viewText($entry['primary_name_b'], $opts['trim']);
                 $right  = viewFormat($entry['total_amount'], 'currency');
-                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+                $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
                 $rows[] = viewDashLink($left, $right, $action);
             }
             $currencies->iso  = getDefaultCurrency();

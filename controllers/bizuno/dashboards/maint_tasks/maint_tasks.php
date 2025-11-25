@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/bizuno/dashboards/maint_tasks/maint_tasks.php
  */
 
@@ -107,7 +107,7 @@ class maint_tasks
         else { foreach ($result as $entry) {
             $event = "if (confirm('".$this->lang['msg_confirm_complete']."')) dashSubmit('$this->code', {$entry['id']});";
             $row   = '<span style="float:right;height:16px;">'.html5('work_icon', ['icon'=>'work', 'size'=>'small','events'=>['onClick'=>$event]]).'</span>';
-            $row  .= '<span style="float:left">'.html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/$this->pageID/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>lang('view')]]);
+            $row  .= '<span style="float:left">'.html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>lang('view')]]);
             $row  .= '<span style="min-height:16px;">'.$entry['description'].'</span>';
             $rows[]= $row;
         } }

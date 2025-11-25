@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/contacts/history.php
  */
 
@@ -146,23 +146,23 @@ class contactsHistory
                 'action'    => ['order'=>1, 'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
                     'actions'=> [
                         'edit'       => ['order'=>20,'icon'=>'edit',    'label'=>lang('edit'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD');"]],
+                            'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');"]],
                         'print'      => ['order'=>40,'icon'=>'print',   'label'=>lang('print'),
                             'events' => ['onClick'=>"var idx=jqBiz('#$name').datagrid('getRowIndex', idTBD); var jID=jqBiz('#$name').datagrid('getRows')[idx].journal_id; ('fitColumns', true); winOpen('phreeformOpen', 'phreeform/render/open&group={$gID[0]}:j'+jID+'&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]],
                         'dates'      => ['order'=>50,'icon'=>'date',   'label'=>lang('delivery_dates'), 'hidden'=>$sec4_10>1?false:true,
                             'events' => ['onClick' => "windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"],
                             'display'=> "row.journal_id=='4' || row.journal_id=='10'"],
                         'purchase'   => ['order'=>80,'icon'=>'purchase','label'=>lang('fill_purchase'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD&jID=6&bizAction=inv');"],
+                            'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=6&bizAction=inv');"],
                             'display'=> "row.closed=='0' && (row.journal_id=='3' || row.journal_id=='4')"],
                         'sale'       => ['order'=>80,'icon'=>'sales',   'label'=>lang('fill_sale'),
-                            'events' => ['onClick' => "winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD&jID=12&bizAction=inv');"],
+                            'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=12&bizAction=inv');"],
                             'display'=> "row.closed=='0' && (row.journal_id=='9' || row.journal_id=='10')"],
                         'payment'    => ['order'=>80,'icon'=>'payment', 'label'=>lang('payment'),
-                            'events' => ['onClick' => "var cID=jqBiz('#id').val(); winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=0&jID=$jPmt&bizAction=inv&iID=idTBD&cID='+cID);"],
+                            'events' => ['onClick' => "var cID=jqBiz('#id').val(); winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=0&jID=$jPmt&bizAction=inv&iID=idTBD&cID='+cID);"],
                             'display'=> "row.closed=='0' && (row.journal_id=='6' || row.journal_id=='12')"],
                         'cmPmt'      => ['order'=>80,'icon'=>'payment', 'label'=>lang('payment'),
-                            'events' => ['onClick' => "var cID=jqBiz('#id').val(); winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=0&jID=$cmPmt&bizAction=inv&iID=idTBD&cID='+cID);"],
+                            'events' => ['onClick' => "var cID=jqBiz('#id').val(); winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=0&jID=$cmPmt&bizAction=inv&iID=idTBD&cID='+cID);"],
                             'display'=> "row.closed=='0' && (row.journal_id=='7' || row.journal_id=='13')"]]],
                 'invoice_num'   => ['order'=>10, 'field'=>"invoice_num",'label'=>pullTableLabel('journal_main', 'invoice_num', $jID),
                     'attr'  => ['width'=>125, 'sortable'=>true, 'resizable'=>true]],

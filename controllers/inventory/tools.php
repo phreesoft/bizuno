@@ -792,7 +792,7 @@ class inventoryTools
         foreach ($result['rows'] as $row) {
             $curBal['b'.$row['store']] += $row['qty'];
             $html .= '<tr>';
-            $html .= '<td style="border:1px solid black;text-align: center;">'.html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID={$row['jID']}&rID={$row['id']}');"],'attr'=>['type'=>'button','value'=>"#{$row['ref']}"]]).'</td>';
+            $html .= '<td style="border:1px solid black;text-align: center;">'.html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID={$row['jID']}&rID={$row['id']}');"],'attr'=>['type'=>'button','value'=>"#{$row['ref']}"]]).'</td>';
             $html .= '<td style="border:1px solid black;text-align: center;">'.viewFormat($row['jID'], 'j_desc')   .'</td>';
             $html .= '<td style="border:1px solid black;text-align: center;">'.viewFormat($row['date'], 'date')     .'</td>';
             $html .= '<td style="border:1px solid black;text-align: center;">'.viewFormat($row['store'], 'contactID').'</td>';

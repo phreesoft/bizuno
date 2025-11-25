@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/dashboards/late_j04/late_j04.php
  */
 
@@ -100,7 +100,7 @@ class late_j04
                     $total += $item['total_amount'];
                     $left   = viewDate($item['date_1'])." - ".viewText($item['description'], $opts['trim']);
                     $right  = viewFormat($item['total_amount'], 'currency');
-                    $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+                    $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&jID=$this->journalID&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
                     $rows[] = viewDashLink($left, $right, $action);
                     $counter++;
                     if (!empty($opts['num_rows']) && $counter >= $opts['num_rows']) { break; }

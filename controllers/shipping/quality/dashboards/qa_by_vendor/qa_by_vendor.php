@@ -83,7 +83,7 @@ google.charts.setOnLoadCallback(chart0{$this->code});
 function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
 function chart0{$this->code}Select(chart, data) {
     var cData = chart.getSelection();
-    winHref(bizunoHome+'&bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
+    winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
 }";
         return ['html'=>$html, 'jsHead'=>$js];
     }

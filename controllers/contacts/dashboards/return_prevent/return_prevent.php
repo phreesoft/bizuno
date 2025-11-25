@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-19
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/contacts/dashboards/return_prevent/return_prevent.php
  */
 
@@ -88,7 +88,7 @@ class return_prevent
             msgDebug("\nmeta = ".print_r($meta, true));
             $left  = viewDate($meta['creation_date'])." - ".viewText($meta['caller_name'], $opts['trim']);
             $right = '';
-            $action= html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/returns/manager&rID={$entry['metaID']}');"],'attr'=>['type'=>'button','value'=>"#{$meta['ref_num']}"]]);
+            $action= html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/returns/manager&rID={$entry['metaID']}');"],'attr'=>['type'=>'button','value'=>"#{$meta['ref_num']}"]]);
             $rows[]= viewDashLink($left, $right, $action);
         }
         if (empty($rows)) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }

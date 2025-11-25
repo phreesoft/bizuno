@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/shipping/invReceiving.php
  */
 
@@ -107,7 +107,7 @@ bizFocus('contactSel');";
         $ctl = new phreeBooksMain();
         $ctl->save();
         if (msgErrors() === 0) {
-            $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"window.location=bizunoHome+'&bizRt=$this->moduleID/$this->pageID/receivingMain';"]]);
+            $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"window.location=bizunoHome+'?bizRt=$this->moduleID/$this->pageID/receivingMain';"]]);
         }
     }
 }

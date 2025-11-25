@@ -157,8 +157,8 @@ final class phreeformDesign extends mgrJournal
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
             'printedfield'  => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>$this->lang['lbl_set_printed_flag'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'breakfield'    => ['tab'=>'settings','panel'=>'options','order'=>30,'label'=>lang('phreeform_field_break'),  'clean'=>'db_field', 'attr'=>['maxlength'=>64]],
-            'serialform'    => ['tab'=>'settings','panel'=>'options','order'=>35,'label'=>$this->lang['lbl_serial_form'], 'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]]]);
+            'breakfield'    => ['tab'=>'settings','panel'=>'options','order'=>30,'label'=>$this->lang['phreeform_field_break'],'clean'=>'db_field', 'attr'=>['maxlength'=>64]],
+            'serialform'    => ['tab'=>'settings','panel'=>'options','order'=>35,'label'=>$this->lang['lbl_serial_form'],      'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]]]);
         }
     }
 

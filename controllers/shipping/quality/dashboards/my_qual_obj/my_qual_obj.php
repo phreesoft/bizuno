@@ -1,6 +1,6 @@
 <?php
 /*
- * Bizuno extension extISO9001 dashboard - Open Corrective Actions
+ * Bizuno extension extISO9001 dashboard - My Open Corrective Actions
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,23 +21,25 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
- * @filesource /controllers/quality/dashboards/qa_stop_work/qa_stop_work.php
+ * @version    7.x Last Update: 2025-11-24
+ * @filesource /controllers/quality/dashboards/my_qual_obj/my_qual_obj.php
  */
 
 namespace bizuno;
 
-class qa_stop_work
+class my_qual_obj
 {
-    public  $moduleID = 'quality';
-    public  $methodID = 'extISO9001';
-    public  $methodDir= 'dashboards';
-    public  $code     = 'qa_stop_work';
-    public  $secID    = 'extISO9001';
-    public  $category = 'quality';
+    public  $moduleID  = 'quality';
+    public  $methodID  = 'extISO9001';
+    public  $methodDir = 'dashboards';
+    public  $code      = 'my_qual_obj';
+    public  $secID     = 'extISO9001';
+    private $metaPrefix= 'quality_objective';
+    public  $category  = 'quality';
     public  $struc;
-    public  $lang     = ['title' => 'Current Stop Work',
-        'description' => 'Lists open quality tickets that prompted a Stop Work situation.'];
+    public  $lang      = ['title'=>'My Quality Objectives',
+        'description'=>'Lists the open Quality Objectives assigned to the user with links to edit and review the details.',
+        'total_open' => 'Total Objectives:'];
 
     function __construct()
     {
@@ -57,7 +59,7 @@ class qa_stop_work
             'users'   => ['order'=>10,'label'=>lang('users'),        'clean'=>'array',   'attr'=>['type'=>'users',   'value'=>[0],],  'admin'=>true],
             'roles'   => ['order'=>20,'label'=>lang('groups'),       'clean'=>'array',   'attr'=>['type'=>'roles',   'value'=>[-1]],  'admin'=>true],
             // User fields
-            'range'   => ['order'=>40,'label'=>lang('disp_due'),     'clean'=>'boolean', 'attr'=>['type'=>'select',  'value'=>8],     'values'=>viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status'), true)],
+            'num_rows'=> ['order'=>50,'label'=>lang('limit_results'),'clean'=>'integer', 'attr'=>['type'=>'spinner', 'value'=>5],     'options'=>['min'=>0,'max'=>50,'width'=>100]],
             'trim'    => ['order'=>70,'label'=>lang('truncate_fit'), 'clean'=>'integer', 'attr'=>['type'=>'spinner', 'value'=>20],    'options'=>['min'=>10,'max'=>80,'width'=>100]],
             'order'   => ['order'=>80,'label'=>lang('sort_order'),   'clean'=>'db_field','attr'=>['type'=>'select',  'value'=>'desc'],'values'=>$order]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
@@ -65,26 +67,28 @@ class qa_stop_work
 
     /**
      * Generates the structure for the dashboard view
+     * @global object $currencies - Sets the currency values for proper display
+     * @param array $layout - structure coming in
      * @param array $opts - Personalized user/menu options
      * @return modified $layout
      */
     public function render($opts=[])
     {
-        $rows   = [];
-        $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tickets/exportData&type=status&range={$opts['range']}";
-        $iconExp= ['attr'=>['type'=>'button','value'=>lang('export_data')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
-        $filter = "journal_id=30 AND closed='0'"; // AND printed=2
-        $order  = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';
-        $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','invoice_num','description','post_date','printed']);
+        $rows  = [];
+        $cID   = getUserCache('profile', 'userID');
+        $result= getMetaCommon($this->metaPrefix);
+        msgDebug("\nread meta = ".print_r($result, true));
         foreach ($result as $entry) { // build the list
-            if (!in_array($entry['printed'], ['2'])) { continue; } // printed is db version of status
-            $left   = viewDate($entry['post_date'])." - ".viewText($entry['description'], $opts['trim']);
+            if (in_array($entry['status'], ['85']) || $entry['entered_by']<>$cID) { continue; }
+            $left   = viewDate($entry['creation_date'])." - ".viewText($entry['title'], $opts['trim']);
             $right  = '';
-            $action = html5('', ['styles'=>['background'=>'red','color'=>'#fff'],'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/correctives/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+            $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/objectives/manager&rID={$entry['_rID']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['ref_num']}"]]);
             $rows[] = viewDashLink($left, $right, $action);
         }
-        if (empty($rows)) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }
-        $html = !empty($result) ? '<form id="form'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>' : '';
-        return ['lists'=>$rows, 'html'=>$html, 'jsHead'=>"ajaxDownload('form{$this->code}');"];
+        if (empty($rows)) { $rows[] = '<span>'.lang('no_results').'</span>'; }
+        else {
+            $output = sortOrder($rows, 'ref_num', strtolower($opts['order'])=='asc'?'asc':'desc');
+            $rows[] = '<div><b>'.$this->lang['total_open']." ".sizeof($output)."</b></div>"; }
+        return ['lists'=>$rows];
       }
 }

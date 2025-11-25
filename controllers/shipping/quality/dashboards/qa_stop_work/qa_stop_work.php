@@ -21,32 +21,27 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
- * @filesource /controllers/quality/dashboards/open_qual_cor/open_qual_cor.php
+ * @version    7.x Last Update: 2025-11-24
+ * @filesource /controllers/quality/dashboards/qa_stop_work/qa_stop_work.php
  */
 
 namespace bizuno;
 
-class open_qual_cor
+class qa_stop_work
 {
-    public  $moduleID  = 'quality';
-    public  $methodID  = 'extISO9001';
-    public  $methodDir = 'dashboards';
-    public  $code      = 'open_qual_cor';
-    public  $secID     = 'extISO9001';
-    private $metaPrefix= 'qa_ticket';
-    public  $category  = 'quality';
-    private $journalID = 30;
+    public  $moduleID = 'quality';
+    public  $methodID = 'extISO9001';
+    public  $methodDir= 'dashboards';
+    public  $code     = 'qa_stop_work';
+    public  $secID    = 'extISO9001';
+    public  $category = 'quality';
     public  $struc;
-    private $dates;
-    public  $lang      = ['title' => 'Open Quality Tickets',
-        'description' => 'Lists the open Quality tickets with links to edit and review the details. Download of raw data is also available',
-        'total_open' => 'Total Open Tickets:'];
+    public  $lang     = ['title' => 'Current Stop Work',
+        'description' => 'Lists open quality tickets that prompted a Stop Work situation.'];
 
     function __construct()
     {
         localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->dates = localeDates(true, true, true);
         $this->fieldStructure();
     }
 
@@ -62,10 +57,9 @@ class open_qual_cor
             'users'   => ['order'=>10,'label'=>lang('users'),        'clean'=>'array',   'attr'=>['type'=>'users',   'value'=>[0],],  'admin'=>true],
             'roles'   => ['order'=>20,'label'=>lang('groups'),       'clean'=>'array',   'attr'=>['type'=>'roles',   'value'=>[-1]],  'admin'=>true],
             // User fields
-            'range'   => ['order'=>40,'label'=>lang('range'),        'clean'=>'char',    'attr'=>['type'=>'select',  'value'=>'w'],   'values' =>viewKeyDropdown($this->dates)],
-            'num_rows'=> ['order'=>50,'label'=>lang('limit_results'),'clean'=>'integer', 'attr'=>['type'=>'spinner', 'value'=>5],     'options'=>['min'=>0,'max'=>50,'width'=>100]],
+            'range'   => ['order'=>40,'label'=>lang('disp_due'),     'clean'=>'boolean', 'attr'=>['type'=>'select',  'value'=>8],     'values'=>viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status'), true)],
             'trim'    => ['order'=>70,'label'=>lang('truncate_fit'), 'clean'=>'integer', 'attr'=>['type'=>'spinner', 'value'=>20],    'options'=>['min'=>10,'max'=>80,'width'=>100]],
-            'order'   => ['order'=>80,'label'=>lang('sort_order'),   'clean'=>'db_field','attr'=>['type'=>'select',  'value'=>'desc'],'values' =>$order]];
+            'order'   => ['order'=>80,'label'=>lang('sort_order'),   'clean'=>'db_field','attr'=>['type'=>'select',  'value'=>'desc'],'values'=>$order]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
@@ -76,20 +70,21 @@ class open_qual_cor
      */
     public function render($opts=[])
     {
-        $rows  = [];
-        $dates = dbSqlDates($opts['range'], 'post_date');
-        $filter= "post_date>='{$dates['start_date']}' AND post_date<'{$dates['end_date']}' AND journal_id=$this->journalID AND closed='0'"; // AND printed=2 AND printed NOT IN (7, 99)
-        $order = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';
-        $result= dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','invoice_num','description','post_date'], $opts['num_rows']);
+        $rows   = [];
+        $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tickets/exportData&type=status&range={$opts['range']}";
+        $iconExp= ['attr'=>['type'=>'button','value'=>lang('export_data')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
+        $filter = "journal_id=30 AND closed='0'"; // AND printed=2
+        $order  = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $filter, $order, ['id','invoice_num','description','post_date','printed']);
         foreach ($result as $entry) { // build the list
+            if (!in_array($entry['printed'], ['2'])) { continue; } // printed is db version of status
             $left   = viewDate($entry['post_date'])." - ".viewText($entry['description'], $opts['trim']);
             $right  = '';
-            $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/tickets/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+            $action = html5('', ['styles'=>['background'=>'red','color'=>'#fff'],'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/correctives/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
             $rows[] = viewDashLink($left, $right, $action);
         }
-        $total = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'COUNT(*) AS total', $filter, false);
-        if (empty($rows)) { $rows[] = "<span>".lang('no_results').'</span>'; }
-        else { $rows[] = '<div><b>'.$this->lang['total_open']." $total</b></div>"; }
-        return ['lists'=>$rows];
-    }
+        if (empty($rows)) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }
+        $html = !empty($result) ? '<form id="form'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>' : '';
+        return ['lists'=>$rows, 'html'=>$html, 'jsHead'=>"ajaxDownload('form{$this->code}');"];
+      }
 }

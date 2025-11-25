@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/quality/dashboards/open_qual_obj/open_qual_obj.php
  */
 
@@ -85,7 +85,7 @@ class open_qual_obj
             if ($entry['date_target']<$dates['start_date'] || $entry['date_target']>$dates['end_date']) { continue; }
             $left  = viewDate($entry['date_target'])." - ".viewText($entry['title'], $opts['trim']);
             $right = '';
-            $action= html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/objectives/manager&rID={$entry['_rID']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['ref_num']}"]]);
+            $action= html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/objectives/manager&rID={$entry['_rID']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['ref_num']}"]]);
             if (!empty($opts['num_rows']) && sizeof($rows)>=$opts['num_rows']) { break; }
             $rows[]= viewDashLink($left, $right, $action);
         }

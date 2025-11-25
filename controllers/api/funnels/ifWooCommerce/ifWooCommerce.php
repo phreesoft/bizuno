@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -357,14 +357,10 @@ function productUpload(rID) {
         msgDebug("\nEntering updateByItem with stock = $stock"); // with prices = ".print_r($prices, true));
         if (empty($prices['content']['levels'])) { return; }
         $sellQtys= [];
-// BOF - Temp patch
-if (sizeof($prices['content']['levels'])==1) { $prices['content']['levels'][0]['default'] = 1; }
-// EOF - Temp patch
+        if (sizeof($prices['content']['levels'])==1) { $prices['content']['levels'][0]['default'] = 1; }
         foreach ($prices['content']['levels'] as $sheet) {
             if (empty($sheet['default'])) { continue; } // needs to be a default sheet
-// BOF - Temp Patch
-if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move on to the next one
-// EOF - Temp Patch
+            if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move on to the next one
             foreach ($sheet['sheets'] as $level) {
                 if (empty($level['qty']) || empty($level['price'])) { continue; } // skip empty rows
                 $level['price'] = $level['price'] * $level['qty'];

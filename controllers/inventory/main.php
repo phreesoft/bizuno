@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/inventory/main.php
  */
 
@@ -853,8 +853,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'actions' => [
                     'newInventory'=>['order'=>10,'icon'=>'add',    'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', 0);"]],
                     'mergeInv'    =>['order'=>30,'icon'=>'merge',  'hidden'=>$security>4?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
-                    'woDesign'    =>['order'=>50,'icon'=>'design', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/design/manager');"]],
-                    'woTasks'     =>['order'=>55,'icon'=>'inv-adj','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=$this->moduleID/tasks/manager');"]],
+                    'woDesign'    =>['order'=>50,'icon'=>'design', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/design/manager');"]],
+                    'woTasks'     =>['order'=>55,'icon'=>'inv-adj','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/tasks/manager');"]],
                     'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizTextSet('search', ''); ".$name."Reload();"]]],
                 'filters'=> [
                     'f0'     => ['order'=>10,'label'=>lang('status'),'break'=>true,'sql'=>$f0_value,'values'=> $yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['f0']]],
@@ -1037,10 +1037,10 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'action'     => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>60,'hidden'=>$hide_cost?true:false],
                     'events' => ['formatter'=>"function(value,row,index) { return {$props['name']}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'edit'  => ['order'=>20,'icon'=>'edit',  'label'=>lang('edit'),          'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD');"]],
+                        'edit'  => ['order'=>20,'icon'=>'edit',  'label'=>lang('edit'),          'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');"]],
                         'toggle'=> ['order'=>40,'icon'=>'toggle','label'=>lang('toggle_status'), 'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"jsonAction('phreebooks/main/toggleWaiting&jID=$jID&dgID={$props['name']}', idTBD);"]],
                         'dates' => ['order'=>50,'icon'=>'date',  'label'=>lang('delivery_dates'),'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"]],
-                        'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'&bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
+                        'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
                 'invoice_num'=> ['order'=>20,'label'=>lang('invoice_num', $jID),    'attr'=>['width'=>100,'resizable'=>true]],
                 'store_id'   => ['order'=>30,'label'=>lang('contacts_short_name_b'),'attr'=>['width'=>100,'resizable'=>true,'hidden'=>$stores]],
                 'rep_id'     => ['order'=>30,'label'=>lang('contacts_rep_id_c'),    'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']],

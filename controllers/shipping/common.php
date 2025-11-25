@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/shipping/common.php
  */
 
@@ -100,10 +100,10 @@ class shippingCommon
             'telephone2'  => ['panel'=>'contact','order'=>15, 'label'=>lang('telephone2'),   'clean'=>'filename', 'attr'=>['size'=>20, 'value'=>'']],
             'telephone3'  => ['panel'=>'contact','order'=>20, 'label'=>lang('telephone3'),   'clean'=>'filename', 'attr'=>['size'=>20, 'value'=>'']],
             'telephone4'  => ['panel'=>'contact','order'=>25, 'label'=>lang('telephone4'),   'clean'=>'filename', 'attr'=>['size'=>20, 'value'=>'']],
-            'email'       => ['panel'=>'contact','order'=>30, 'label'=>lang('email'),        'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
-            'email2'      => ['panel'=>'contact','order'=>35, 'label'=>lang('email_m'),      'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
-            'email3'      => ['panel'=>'contact','order'=>40, 'label'=>lang('email_p'),      'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
-            'email4'      => ['panel'=>'contact','order'=>45, 'label'=>lang('email_r'),      'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
+            'email'       => ['panel'=>'contact','order'=>30, 'label'=>lang('email_sales'),  'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
+            'email2'      => ['panel'=>'contact','order'=>35, 'label'=>lang('email_ar'),     'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
+            'email3'      => ['panel'=>'contact','order'=>40, 'label'=>lang('email_purch'),  'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
+            'email4'      => ['panel'=>'contact','order'=>45, 'label'=>lang('email_ap'),     'clean'=>'email',    'attr'=>['size'=>64, 'value'=>'']],
             'website'     => ['panel'=>'contact','order'=>50, 'label'=>lang('website'),      'clean'=>'url_full', 'attr'=>['size'=>48, 'value'=>'']],
             'notes'       => ['panel'=>'notes',  'order'=>10,                                'clean'=>'text',     'attr'=>['type'=>'editor']]];
     }

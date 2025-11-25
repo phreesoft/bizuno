@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-24
  * @filesource /controllers/phreebooks/fulfillment.php
  */
 
@@ -132,7 +132,7 @@ class phreebooksFulfillment {
         $this->overrideSecurity();
         compose('phreebooks', 'main', 'save', $layout);
         $xChild  = clean('xChild', 'text', 'post');
-        $jsonAction = "window.location=bizunoHome+'&bizRt=$this->moduleID/$this->pageID/fulfillMain';";
+        $jsonAction = "window.location=bizunoHome+'?bizRt=$this->moduleID/$this->pageID/fulfillMain';";
         switch ($xChild) { // child screens to spawn
             case 'print':
                 $formID = getDefaultFormID(12);
