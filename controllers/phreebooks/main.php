@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-11-26
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1378,7 +1378,7 @@ function bizUnitDiscDisc(newValue) {
                         'toggle_j12' => ['order'=>40,'icon'=>'toggle', 'label'=>lang('toggle_status'),'hidden'=>$sec6_12>3?false:true,
                             'events' => ['onClick' => "jsonAction('phreebooks/main/toggleWaiting&jID=jrnlTBD', idTBD);"],
                             'display'=> "row.journal_id=='12'"],
-                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>lang('auto_assy'),
+                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>$this->lang['auto_assy'],
                             'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_auto_assy']."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
                             'display'=> "(row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"],
                         'dates'      => ['order'=>50,'icon'=>'date',   'label'=>lang('delivery_dates'), 'hidden'=>$sec4_10>1?false:true,

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-26
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -120,7 +120,6 @@ $lang = [
     'enable_crm_lbl' => 'Enable CRM functionality',
     'enable_crm_tip' => 'CRM functionality includes tools and features to better manage your customer base.',
     'err_multiple_vendors' => 'More than one preferred vendor was selected, this process only works with a single preferred vendor. The Purchase Order was not created!',
-    'err_no_vendor_found' => 'No vendors were found on the preferred vendor list for this order that have inventory types that affect you cost of goods sold (type stock, assembly, etc.)',
     // Projects
     'projects' => 'Projects',
     'new_proj' => 'New Project',

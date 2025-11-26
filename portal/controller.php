@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-26
  * @filesource /portal/controller.php
  */
 
@@ -65,7 +65,6 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
-msgTrap();
         new view($this->layout);
     }
     private function setDOM()
@@ -226,7 +225,7 @@ msgTrap();
         } else { msgDebug("\n  Cache is valid! NOT reloading..."); }
     }
 
-    private function cacheReload($mode='user')
+    private function cacheReload()
     {
         msgDebug("\nEntering reloadCache");
         bizAutoLoad(BIZUNO_FS_LIBRARY.'model/registry.php', 'bizRegistry');

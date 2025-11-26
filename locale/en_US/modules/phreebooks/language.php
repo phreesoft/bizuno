@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-26
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -126,6 +126,7 @@ $lang = [
     'err_debits_credits_not_zero' => 'Error: The debits total must equal the credits total to post a general journal entry.',
     'err_journal_delete' => 'This %s record cannot be deleted because there is a future transaction posted that is dependent on this record. The future transaction must be deleted first.',
     'err_total_not_match' => 'The calculated total of %s is not equal to the submitted total of %s, this is typically a tax calculation or rounding problem, please contact PhreeSoft for assistance!',
+    'err_no_vendor_found' => 'No vendors were found on the preferred vendor list for this order that have inventory types that affect you cost of goods sold (type stock, assembly, etc.)',
     // Buttons
     'title_gl_test' => 'Validate and Repair GL Balances',
     'new_currency' => 'New Currency',
@@ -148,7 +149,7 @@ $lang = [
     'status_open_j12' => 'Unpaid Invoices',
     'status_open_j13' => 'Unpaid Credits',
     // General
-    'create_po' => 'Create Drop Ship PO',
+    'auto_assy' => 'Auto-assemble Shortages',
     'create_return' => 'Create and Get Return Auth #',
     'pb_inv_unit' => 'Unit Price',
     'pb_line_item_tax' => 'Line Item Tax',

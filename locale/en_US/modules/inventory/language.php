@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-08
+ * @version    7.x Last Update: 2025-11-26
  * @filesource controllers/inventory/locale/en_US/language.php
  */
 
@@ -190,7 +190,6 @@ $lang = [
     'sb_task_list' => 'Task List (id)',
     'sb_proc_draw' => 'Drawings',
     'sb_proc_docs' => 'Docs',
-    'auto_assy' => 'Auto-assemble Shortages',
     'dgNotes' => 'Right click on a heading to add/remove columns. Type in boxes within each column filter responses. Click a row to start editing, click out of row to save changes for that row.',
     'msg_sel_ms'  => 'For Inventory with Options type inventory, this record must be saved first to create the main record in the database. Once saved, edit the item and the Options tab will appear for adding available options. NOTE: Options need to be added prior to any journal activity as once a post has been recorded, the options cannot be changed.',
     'msg_assy_success' => 'Completed auto-assembly! The number of items acted upon was: %s.',
