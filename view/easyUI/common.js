@@ -2083,7 +2083,18 @@ function drawBizunoChart(json) {
     var divWidth = parseInt(jqBiz('#'+json.divID).width());
     var divHeight= parseInt(divWidth * 3 / 4);
     var data     = google.visualization.arrayToDataTable(json.data);
-    var options  = {width:divWidth,height:divHeight};
+    const options = {
+        width: divWidth,
+        height:divHeight,
+//        title: 'Company Performance',
+        titleTextStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim() },
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-bg').trim(),
+        hAxis: { textStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim() } },
+        vAxis: { textStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim() },
+                 gridlines: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim() } },
+        legend:{ textStyle: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim() } },
+        series:{ 0: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim() } }
+    };
     for (var idx in json.attr) { options[idx] = json.attr[idx]; }
     switch (json.type) {
         default:
@@ -2106,6 +2117,32 @@ function drawBizunoChart(json) {
     }
     chart.draw(data, options);
     if (typeof json.event != 'undefined') { google.visualization.events.addListener(chart, 'select', function () { var fnstring = json.event; var fn = window[fnstring]; if (typeof fn === "function") fn(chart, data); }); }
+}
+
+function drawBizunoTable(json) {
+    const data = google.visualization.arrayToDataTable(json.data);
+    const options = {
+      showRowNumber: false,
+      width:         '100%',
+      height:        '100%',
+      datalessTable: true
+    };
+    const chart = new google.visualization.LineChart(document.getElementById(json.divID));
+    chart.draw(data, options);
+    // Build your own perfect dark-mode table
+    const table = new google.visualization.Table(document.getElementById(json.tableID));
+    table.draw(data, {
+        showRowNumber: true,
+        width: '100%',
+        height: '100%',
+        allowHtml: true,
+        cssClassNames: {
+            headerRow: 'google-table-header',
+            tableRow: 'google-table-row',
+            hoverTableRow: 'google-table-hover',
+            selectedTableRow: 'google-table-selected'
+        }
+    });
 }
 
 /******************* PHREEBOOKS MODULE *********************/

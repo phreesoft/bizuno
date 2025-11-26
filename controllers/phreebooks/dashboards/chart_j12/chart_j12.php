@@ -89,7 +89,7 @@ class chart_j12
         $html  .= '<form id="form'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>';
         $output = ['divID'=>$this->code."_chart",'type'=>'pie','attr'=>['chartArea'=>['left'=>'15%'],'title'=>$title],'data'=>$cData['chart']];
         $js     = "ajaxDownload('form{$this->code}');
-var data_{$this->code} = ".json_encode($output).";
+const data_{$this->code} = ".json_encode($output).";
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(chart{$this->code});
 function chart{$this->code}() { drawBizunoChart(data_{$this->code}); };";

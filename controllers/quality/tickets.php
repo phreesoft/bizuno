@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-11-26
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -58,43 +58,43 @@ class qualityTickets extends mgrJournal
         $users = listUsers(); 
         $this->struc = [ // general
             'id'                => ['panel'=>'general','order'=> 1,'dbField'=>'id',                                               'clean'=>'integer', 'attr'=>['type'=>'hidden']],
-            'ref_num'           => ['panel'=>'general','order'=> 1,'dbField'=>'invoice_num',   'label'=>lang('task_id'),          'clean'=>'integer',  'attr'=>['type'=>'text', 'readonly'=>true]],
-            'title'             => ['panel'=>'general','order'=>10,'dbField'=>'description',   'label'=>lang('title'),            'clean'=>'text',    'attr'=>['type'=>'text',    'value'=>'']],
-            'store_id'          => ['panel'=>'general','order'=>15,'dbField'=>'store_id',      'label'=>lang('store_id'),         'clean'=>'integer', 'attr'=>['type'=>'select',  'value'=>-1], 'values'=>viewStores()],
-            'preventable'       => ['panel'=>'general','order'=>20,'dbField'=>'waiting',       'label'=>lang('preventable'),      'clean'=>'bolean',  'attr'=>['type'=>'selNoYes','value'=> 0]],
-            'status'            => ['panel'=>'general','order'=>25,'dbField'=>'printed',       'label'=>lang('status'),           'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>viewKeyDropdown($this->qual_status, true)],
-            'closed'            => ['panel'=>'general','order'=>30,'dbField'=>'closed',        'label'=>lang('closed'),           'clean'=>'bolean',  'attr'=>['type'=>'selNoYes','value'=> 0]],
-            'requested_by'      => ['panel'=>'general','order'=>35,'dbField'=>'rep_id',        'label'=>$this->lang['found_by'],  'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
-            'creation_date'     => ['panel'=>'general','order'=>40,'dbField'=>'post_date',     'label'=>lang('date_created'),     'clean'=>'date',    'attr'=>['type'=>'date',    'value'=>biz_date()]],
-            'entered_by'        => ['panel'=>'general','order'=>45,                            'label'=>lang('entered_by'),       'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
+            'ref_num'           => ['panel'=>'general','order'=> 1,'dbField'=>'invoice_num',     'label'=>lang('task_id'),          'clean'=>'integer',  'attr'=>['type'=>'text', 'readonly'=>true]],
+            'title'             => ['panel'=>'general','order'=>10,'dbField'=>'description',     'label'=>lang('title'),            'clean'=>'text',    'attr'=>['type'=>'text',    'value'=>'']],
+            'store_id'          => ['panel'=>'general','order'=>15,'dbField'=>'store_id',        'label'=>lang('store_id'),         'clean'=>'integer', 'attr'=>['type'=>'select',  'value'=>-1], 'values'=>viewStores()],
+            'preventable'       => ['panel'=>'general','order'=>20,'dbField'=>'waiting',         'label'=>lang('preventable'),      'clean'=>'bolean',  'attr'=>['type'=>'selNoYes','value'=> 0]],
+            'status'            => ['panel'=>'general','order'=>25,'dbField'=>'printed',         'label'=>lang('status'),           'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>viewKeyDropdown($this->qual_status, true)],
+            'requested_by'      => ['panel'=>'general','order'=>35,'dbField'=>'rep_id',          'label'=>$this->lang['found_by'],  'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
+            'creation_date'     => ['panel'=>'general','order'=>40,'dbField'=>'post_date',       'label'=>lang('date_created'),     'clean'=>'date',    'attr'=>['type'=>'date',    'value'=>biz_date()]],
+            'entered_by'        => ['panel'=>'general','order'=>45,                              'label'=>lang('entered_by'),       'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
             // detail
-            'close_start_date'  => ['panel'=>'details','order'=>30,                            'label'=>lang('date_found'),       'clean'=>'date',    'attr'=>['type'=>'date']],
-            'close_start_by'    => ['panel'=>'details','order'=>35,                            'label'=>$this->lang['created_by'],'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
-            'contact_id'        => ['panel'=>'details','order'=>40,'dbField'=>'contact_id_b',  'label'=>lang('vendor'),           'clean'=>'integer', 'attr'=>['type'=>'contact'],'defaults'=>['type'=>'v','callback'=>'']],
-            'audit_start_by'    => ['panel'=>'details','order'=>45,                            'label'=>lang('quantity'),         'clean'=>'float',   'attr'=>['type'=>'integer']],
-            'sku_id'            => ['panel'=>'details','order'=>50,'dbField'=>'purch_order_id','label'=>lang('sku'),              'clean'=>'integer', 'attr'=>['type'=>'inventory'],'defaults'=>['callback'=>'']],
-            'telephone'         => ['panel'=>'details','order'=>55,'dbField'=>'telephone1_b',  'label'=>lang('telephone1'),       'clean'=>'db_field','attr'=>['type'=>'text']],
-            'email'             => ['panel'=>'details','order'=>60,'dbField'=>'email_b',       'label'=>lang('email'),            'clean'=>'email',   'attr'=>['type'=>'text']],
+            'close_start_date'  => ['panel'=>'details','order'=>30,                              'label'=>lang('date_found'),       'clean'=>'date',    'attr'=>['type'=>'date']],
+            'close_start_by'    => ['panel'=>'details','order'=>35,                              'label'=>$this->lang['created_by'],'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
+            'contact_id'        => ['panel'=>'details','order'=>40,'dbField'=>'contact_id_b',    'label'=>lang('vendor'),           'clean'=>'integer', 'attr'=>['type'=>'contact'],'defaults'=>['type'=>'v','callback'=>'']],
+            'audit_start_by'    => ['panel'=>'details','order'=>45,                              'label'=>lang('quantity'),         'clean'=>'float',   'attr'=>['type'=>'integer']],
+            'sku_id'            => ['panel'=>'details','order'=>50,'dbField'=>'purch_order_id',  'label'=>lang('sku'),              'clean'=>'integer', 'attr'=>['type'=>'inventory'],'defaults'=>['callback'=>'']],
+            'telephone'         => ['panel'=>'details','order'=>55,'dbField'=>'telephone1_b',    'label'=>lang('telephone1'),       'clean'=>'db_field','attr'=>['type'=>'text']],
+            'email'             => ['panel'=>'details','order'=>60,'dbField'=>'email_b',         'label'=>lang('email'),            'clean'=>'email',   'attr'=>['type'=>'text']],
             // stop work cause
-            'analyze_end_by'    => ['panel'=>'stop_work','order'=>10,                          'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
-            'analyze_end_date'  => ['panel'=>'stop_work','order'=>20,                          'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
-            'notes'             => ['panel'=>'stop_work','order'=>30,                          'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
+            'analyze_end_by'    => ['panel'=>'stop_work','order'=>10,                            'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
+            'analyze_end_date'  => ['panel'=>'stop_work','order'=>20,                            'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
+            'notes'             => ['panel'=>'stop_work','order'=>30,                            'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
             // work around
-            'audit_end_by'      => ['panel'=>'workaround','order'=>10,                         'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
-            'audit_end_date'    => ['panel'=>'workaround','order'=>20,                         'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
-            'audit_notes'       => ['panel'=>'workaround','order'=>30,                         'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
+            'audit_end_by'      => ['panel'=>'workaround','order'=>10,                           'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
+            'audit_end_date'    => ['panel'=>'workaround','order'=>20,                           'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
+            'audit_notes'       => ['panel'=>'workaround','order'=>30,                           'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
             // root cause analysis
-            'analyze_start_by'  => ['panel'=>'root_cause','order'=>10,                         'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
-            'analyze_start_date'=> ['panel'=>'root_cause','order'=>20,                         'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
-            'issue_notes'       => ['panel'=>'root_cause','order'=>30,                         'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
+            'analyze_start_by'  => ['panel'=>'root_cause','order'=>10,                           'label'=>lang('by'),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
+            'analyze_start_date'=> ['panel'=>'root_cause','order'=>20,                           'label'=>lang('date'),  'clean'=>'date',   'attr'=>['type'=>'date']],
+            'issue_notes'       => ['panel'=>'root_cause','order'=>30,                           'label'=>lang('notes'), 'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
             // corrective action
             'action_by'         => ['panel'=>'action_cor','order'=>10,                           'label'=>lang('by'),   'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
             'action_date'       => ['panel'=>'action_cor','order'=>20,'dbField'=>'terminal_date','label'=>lang('date'), 'clean'=>'date',   'attr'=>['type'=>'date']],
             'action_notes'      => ['panel'=>'action_cor','order'=>30,                           'label'=>lang('notes'),'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false],
             // closed
-            'close_end_by'      => ['panel'=>'action_close','order'=>10,                         'label'=>lang('by'),   'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
-            'close_end_date'    => ['panel'=>'action_close','order'=>20,'dbField'=>'closed_date','label'=>lang('date'), 'clean'=>'date',   'attr'=>['type'=>'date']],
-            'contact_notes'     => ['panel'=>'action_close','order'=>30,                         'label'=>lang('notes'),'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false]];
+            'closed'            => ['panel'=>'action_close','order'=>10,'dbField'=>'closed',     'label'=>lang('closed'),           'clean'=>'bolean',  'attr'=>['type'=>'selNoYes','value'=> 0]],
+            'close_end_by'      => ['panel'=>'action_close','order'=>20,                         'label'=>lang('by'),   'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>$users],
+            'close_end_date'    => ['panel'=>'action_close','order'=>30,'dbField'=>'closed_date','label'=>lang('date'), 'clean'=>'date',   'attr'=>['type'=>'date']],
+            'contact_notes'     => ['panel'=>'action_close','order'=>40,                         'label'=>lang('notes'),'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false]];
     }
 
     /**
@@ -123,7 +123,7 @@ class qualityTickets extends mgrJournal
         $data = array_replace_recursive(parent::gridBase($security, $args), [
             'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList&range=$range"],
             'source' => [
-                'search' => ['contact_name', 'invoice_num', 'contact_id', 'ref_num', 'title'],
+                'search' => ['invoice_num', 'description', 'email_b', 'purch_order_id'],
                 'filters'=> [
                     'store_id'=>['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]],

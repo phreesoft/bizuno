@@ -77,19 +77,150 @@ class cash_register
             $total  += $balance;
         }
         $cashGL[]= [lang('total'), '', ['v'=>$total,'f'=>viewFormat($total, 'currency')]];
-        $html = '<span style="width:100%" id="'.$this->code.'_chart"></span>';
+//      $html = '<span style="width:100%" id="'.$this->code.'_chart"></span>';
+        $html = '<div id="'.$this->code.'"></div><div id="'.$this->code.'_chart" style="margin-top: 20px; overflow-x:auto;"></div>';
         $js   = "function chart{$this->code}() {
     var data = new google.visualization.DataTable();
     data.addColumn('string', '".jslang('gl_account')."');
     data.addColumn('string', '".jslang('bank')      ."');
     data.addColumn('number', '".jslang('balance')   ."');
     data.addRows(".json_encode($cashGL).");
+    const chartOptions = {
+        backgroundColor: 'transparent',
+        titleTextStyle: { color: 'var(--chart-text)' },
+        hAxis: { textStyle: { color: 'var(--chart-text)' } },
+        vAxis: { textStyle: { color: 'var(--chart-text)' }, gridlines: { color: 'var(--chart-grid)' } },
+        legend: { textStyle: { color: 'var(--chart-text)' } },
+        datalessTable: true };
+
+//    const chart = new google.visualization.LineChart(document.getElementById('{$this->code}_chart'));
+//    chart.draw(data, chartOptions);
+
+    const table = new google.visualization.Table(document.getElementById('{$this->code}_chart'));
+    table.draw(data, { showRowNumber: false, width: '100%',  height: '100%', allowHtml: true,
+        cssClassNames: { headerRow: 'my-table-header', tableRow: 'my-table-row', hoverTableRow: 'my-table-hover', oddTableRow: 'my-table-odd' }
+    });
+}
+google.charts.load('current', {'packages':['table']});
+google.charts.setOnLoadCallback(chart{$this->code});\n";
+/*  
     data.setColumnProperties(0, {style:'font-style:bold;text-align:center'});
     var table = new google.visualization.Table(document.getElementById('{$this->code}_chart'));
     table.draw(data, {showRowNumber:false, width:'100%', height:'100%'});
 }
 google.charts.load('current', {'packages':['table']});
-google.charts.setOnLoadCallback(chart{$this->code});\n";
-        return ['html'=>$html, 'jsHead'=>$js];
+google.charts.setOnLoadCallback(chart{$this->code});\n"; */
+        return ['html'=>$this->getHTML($cashGL)]; //, 'jsHead'=>$this->getJS(), 'jsReady'=>"chart{$this->code}();)"];
     }
+    private function getHTML($cashGL)
+    {
+        return "
+<style>#chart_div, #custom_table { width: 100% !important; height: 100% !important; min-height: 50px; position: relative; }</style>
+<div class=\"google-chart-container\">
+    <div id=\"chart_div\"></div>
+  <div id=\"custom-table\"></div>
+</div>
+  <script>
+    google.charts.load('current', {packages:['corechart', 'table']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      const data = new google.visualization.DataTable();
+      data.addColumn('string', '".jslang('gl_account')."');
+      data.addColumn('string', '".jslang('account')   ."');
+      data.addColumn('number', '".jslang('balance')   ."');
+      data.addRows(".json_encode($cashGL).");
+
+      const options = {
+        width: '100%',
+        height: '100%',
+        chartArea: { width: '90%', height: '80%' },
+        backgroundColor: 'transparent',
+        titleTextStyle: { color: 'var(--text)' },
+        hAxis: { textStyle: { color: 'var(--text)' } },
+        vAxis: { textStyle: { color: 'var(--text)' }, gridlines: { color: 'var(--grid)' } },
+        legend: { textStyle: { color: 'var(--text)' } },
+        datalessTable: true
+      };
+      
+//      const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+//      chart.draw(data, options);
+
+      new google.visualization.Table(document.getElementById('custom-table')).draw(data, {
+        showRowNumber: false,
+        cssClassNames: {
+          headerRow: 'my-table-header',
+          tableRow: 'my-table-row',
+          hoverTableRow: 'my-table-hover',
+          oddTableRow: 'my-table-odd'
+        }
+      });
+    }
+    // Re-draw on theme change
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
+    new MutationObserver(drawChart).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+";
+    }
+/*
+LATEST GROK:
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        .google-chart-wrapper {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            position: relative;
+            border: 1px solid #ddd;   
+        }
+        #chart_div {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute;
+            top: 0; left: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div style="height:500px; border:2px solid red;">
+    <div class="google-chart-wrapper">
+        <div id="chart_div"></div>
+    </div>
+</div>
+
+<script>
+google.charts.load('current', {packages:['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+    const data = google.visualization.arrayToDataTable([
+        ['Year', 'Sales'], ['2021', 1000], ['2022', 1170], ['2023', 660], ['2024', 1030]
+    ]);
+
+    const options = {
+        title: 'Auto 100% Height Chart',
+        height: '100%',
+        width: '100%',
+        chartArea: {width:'90%', height:'80%'},
+        backgroundColor: 'transparent'
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+
+    // Auto-resize forever
+    const resize = () => chart.draw(data, options);
+    $(window).resize(resize);
+    setTimeout(resize, 100);  // initial fix for some EasyUI cases
+}
+</script>
+</body>
+</html>
+ */    
+    
 }

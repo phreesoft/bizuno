@@ -27,6 +27,7 @@
 /* a, div, body, html, table{ font:normal normal 16px Verdana; } */
 body, html               { font-family:Verdana; }
 body                     { background-color:#ffffff; margin:0; }
+body.dark-mode           { --chart-bg: #1e1e1e; --chart-text: #ffffff; --chart-grid: #444444; --chart-line: #4285f4; }
 h1                       { width:auto; clear:both; color:#003080; font-size:16px; font-variant:small-caps; font-weight:bold; background-color:transparent; padding:4px; }
 h2                       { width:auto; clear:both; color:#003080; font-size:14px; font-variant:small-caps; font-weight:bold; background-color:transparent; padding:2px; }
 p                        { line-height: 1.5em; margin: 0px 0px 1em; padding: 0px; }
@@ -83,20 +84,45 @@ body.loading .modal      { display:block; }
 .jrnlAssgn               { border:1px solid #BC2A4D; }
 .jrnlTrash               { background-color:red; }
 
-.google-visualization-table-table {
-  background-color: #333; /* Dark background */
-  color: #fff; /* Light text */
+
+:root { --bg: #ffffff; --text: #000000; --grid: #cccccc; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1e1e1e; --text: #ffffff; --grid: #444444; }
+    }
+    body.dark { --bg: #1e1e1e; --text: #ffffff; --grid: #444444; }
+
+    #chart_div {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;     /* makes it fill the wrapper perfectly */
+    top: 0; left: 0;
 }
+    #custom-table { margin-top: 0px; }
+
+    .my-table-header { background: var(--bg) !important; color: var(--text) !important; font-weight: bold; }
+    .my-table-row, .my-table-odd { background: var(--bg) !important; color: var(--text) !important; }
+    .my-table-hover { background: color-mix(in srgb, var(--bg) 90%, white) !important; }
+    @media (prefers-color-scheme: dark) {
+      .my-table-hover { background: color-mix(in srgb, var(--bg) 120%, white) !important; }
+    }
+    .google-chart-container {
+    width: 100% !important;     /* Full width */
+    height: 100% !important;    /* Full height of parent */
+    min-height: 25px;          /* Optional: prevent it from collapsing too small */
+}
+    
+/*.google-table-header                { background-color: var(--chart-bg) !important; color: var(--chart-text) !important; border-bottom: 2px solid var(--chart-grid); }
+.google-table-row                   { background-color: var(--chart-bg); color: var(--chart-text); }
+.google-table-row:nth-child(even)   { background-color: color-mix(in srgb, var(--chart-bg) 90%, white); }
+@media (prefers-color-scheme: dark) { .google-table-row:nth-child(even) { background-color: color-mix(in srgb, var(--chart-bg) 90%, black); } }
+
+.google-visualization-table-table   { background-color: #333; color: #fff; } // Dark background, Light text
 .google-visualization-table-th,
-.google-visualization-table-td {
-  border: 1px solid #555; /* Slightly lighter border */
-}
-.google-visualization-table-tr-odd {
-  background-color: #444; /* Slightly lighter row background */
-}
-.google-visualization-table-tr-even {
-  background-color: #555;
-}
+.google-visualization-table-td      { border: 1px solid #555; } // Slightly lighter border
+.google-visualization-table-tr-odd  { background-color: #444; } // Slightly lighter row background
+.google-visualization-table-tr-even { background-color: #555; }
+*/
+
 #overlay {
   position: fixed; /* Sit on top of the page content */
   display: none; /* Hidden by default */

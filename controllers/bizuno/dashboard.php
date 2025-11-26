@@ -412,7 +412,7 @@ class bizunoDashboard
             $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>"<span>".lang('no_results')."</span>"];
         }
         $output['jsHead']['init'] = !empty($data['jsHead']) ? $data['jsHead'] : '';
-        $output['jsReady']['init']= $jsReady;
+        $output['jsReady']['init']= $jsReady . (!empty($data['jsReady']) ? "\n".$data['jsReady'] : '');
 //msgDebug("\nresults from viewDash = ".print_r($output, true));
         return $output;
     }
