@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/bizuno/dashboards/todays_audit/todays_audit.php
  */
 
@@ -68,7 +68,7 @@ class todays_audit
         $today  = biz_date('Y-m-d');
         $filter = "date>'{$today}'";
         if ($opts['reps']) {
-            if (getUserCache('role', 'security', 'admin', false, 0)<3) { $filter.= " AND user_id='".getUserCache('profile', 'userID')."'"; }
+            if (empty(getUserCache('role', 'administrate'))) { $filter.= " AND user_id='".getUserCache('profile', 'userID')."'"; }
         }
         $order  = $opts['order']=='desc' ? 'date DESC' : 'date';
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'audit_log', $filter, $order, ['date','user_id','log_entry'], $opts['num_rows']);

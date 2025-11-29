@@ -84,44 +84,57 @@ body.loading .modal      { display:block; }
 .jrnlAssgn               { border:1px solid #BC2A4D; }
 .jrnlTrash               { background-color:red; }
 
-
-:root { --bg: #ffffff; --text: #000000; --grid: #cccccc; }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #1e1e1e; --text: #ffffff; --grid: #444444; }
-    }
-    body.dark { --bg: #1e1e1e; --text: #ffffff; --grid: #444444; }
-
-    #chart_div {
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute;     /* makes it fill the wrapper perfectly */
-    top: 0; left: 0;
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --grid: #cccccc;
 }
-    #custom-table { margin-top: 0px; }
 
-    .my-table-header { background: var(--bg) !important; color: var(--text) !important; font-weight: bold; }
-    .my-table-row, .my-table-odd { background: var(--bg) !important; color: var(--text) !important; }
-    .my-table-hover { background: color-mix(in srgb, var(--bg) 90%, white) !important; }
-    @media (prefers-color-scheme: dark) {
-      .my-table-hover { background: color-mix(in srgb, var(--bg) 120%, white) !important; }
-    }
-    .google-chart-container {
-    width: 100% !important;     /* Full width */
-    height: 100% !important;    /* Full height of parent */
-    min-height: 25px;          /* Optional: prevent it from collapsing too small */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e1e;
+    --text: #ffffff;
+    --grid: #444444;
+  }
 }
-    
-/*.google-table-header                { background-color: var(--chart-bg) !important; color: var(--chart-text) !important; border-bottom: 2px solid var(--chart-grid); }
-.google-table-row                   { background-color: var(--chart-bg); color: var(--chart-text); }
-.google-table-row:nth-child(even)   { background-color: color-mix(in srgb, var(--chart-bg) 90%, white); }
-@media (prefers-color-scheme: dark) { .google-table-row:nth-child(even) { background-color: color-mix(in srgb, var(--chart-bg) 90%, black); } }
 
-.google-visualization-table-table   { background-color: #333; color: #fff; } // Dark background, Light text
-.google-visualization-table-th,
-.google-visualization-table-td      { border: 1px solid #555; } // Slightly lighter border
-.google-visualization-table-tr-odd  { background-color: #444; } // Slightly lighter row background
-.google-visualization-table-tr-even { background-color: #555; }
-*/
+/* Force everything – Google loves inline styles */
+.my-table-header,
+.google-visualization-table-table .google-visualization-table-tr-head td {
+  background-color: var(--bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+}
+
+.my-table-row,
+.my-table-odd,
+.google-visualization-table-table .google-visualization-table-tr-even td,
+.google-visualization-table-table .google-visualization-table-tr-odd td {
+  background-color: var(--bg) !important;
+  background-image: none !important;
+  color: var(--text) !important;
+}
+
+/* THIS is the one that finally kills the white hover */
+.my-table-hover,
+.google-visualization-table-table .google-visualization-table-tr-over td {
+  background-color: #3a3a3a !important;     /* dark mode hover */
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+/* Light-mode override when NOT dark */
+@media (prefers-color-scheme: light) {
+  .my-table-hover,
+  .google-visualization-table-table .google-visualization-table-tr-over td {
+    background-color: #f5f5f5 !important;
+    color: #000000 !important;
+  }
+}
+body.dark .my-table-hover,
+body.dark .google-visualization-table-table .google-visualization-table-tr-over td {
+  background-color: #3a3a3a !important;
+}
 
 #overlay {
   position: fixed; /* Sit on top of the page content */

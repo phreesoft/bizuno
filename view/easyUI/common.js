@@ -138,8 +138,8 @@ jqBiz.fn.serializeObject = function() {
 };
 
 jqBiz.extend(jqBiz.fn.textbox.methods, {
-	show: function(jqy) { return jqy.each(function() { jqBiz(this).next().show(); }); },
-	hide: function(jqy) { return jqy.each(function() { jqBiz(this).next().hide(); }); }
+    show: function(jqy) { return jqy.each(function() { jqBiz(this).next().show(); }); },
+    hide: function(jqy) { return jqy.each(function() { jqBiz(this).next().hide(); }); }
 });
 
 jqBiz.fn.textWidth = function(text, font) {
@@ -1210,13 +1210,7 @@ function dashSubmit(dashID, rowID) {
     var gData = '&menuID='+menuID+'&dashID='+dashID;
     if (rowID) gData += '&rID='+rowID; // then there was a row action
     var form = jqBiz('#'+dashID+'Form');
-    jqBiz.ajax({
-        type: 'POST',
-        url:  bizunoAjax+'&bizRt=bizuno/dashboard/attr'+gData,
-        data: form.serialize(),
-        success: function(json) { processJson(json); jqBiz('#'+dashID).panel('refresh'); }
-    });
-    return false;
+    divSubmit('bizuno/dashboard/attr'+gData, dashID);
 }
 
 /**

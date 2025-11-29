@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-14
+ * @version    7.x Last Update: 2025-11-19
  * @filesource /controllers/bizuno/dashboards/my_messages/my_messages.php
  */
 
@@ -54,7 +54,7 @@ class my_messages
         $this->struc = [ // Admin fields
             'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array','attr'=>['type'=>'users','value'=>[0]], 'admin'=>true],
             'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array','attr'=>['type'=>'roles','value'=>[-1]],'admin'=>true]];
-        if (getuserCache('role', 'security', 'admin')>1) { // only allow adds if admin access
+        if (!empty(getUserCache('role', 'administrate'))) { // only allow adds if admin access
             $this->struc['title'] = ['order'=>50,'label'=>lang('title'),'clean'=>'text','attr'=>['type'=>'text','value'=>'']];
         }
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings

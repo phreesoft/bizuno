@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/contacts/dashboards/new_cust/new_cust.php
  */
 
@@ -43,11 +43,6 @@ class new_cust
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [ // Admin fields
@@ -56,9 +51,16 @@ class new_cust
             'reps'  => ['order'=>30,'label'=>lang('just_reps'),'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0],   'admin'=>true]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
     public function render()
     {
+        $table = [
+            [lang('today'),     ['v'=>$this->getTotals('c')]],
+            [lang('dates_wtd'), ['v'=>$this->getTotals('e')]],
+            [lang('dates_mtd'), ['v'=>$this->getTotals('g')]]];
+        $header= [['title'=>lang('range'), 'type'=>'string'], ['title'=>lang('total'), 'type'=>'number']];
+        return ['type'=>'gTable', 'header'=>$header, 'data'=>$table];
+
+
         $html= '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $js  = "function chart{$this->code}() {
     var data = new google.visualization.DataTable();
@@ -73,7 +75,6 @@ google.charts.load('current', {'packages':['table']});
 google.charts.setOnLoadCallback(chart{$this->code});\n";
         return ['html'=>$html, 'jsHead'=>$js];
     }
-
     private function getTotals($range='c')
     {
         $dates = dbSqlDates($range, 'first_date');

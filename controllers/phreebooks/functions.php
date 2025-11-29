@@ -671,6 +671,7 @@ function insertChartOfAccountsHistory($glAcct='', $glType='', $period=1)
 
 function chartSales($jID, $range='c', $pieces=10, $reps=false)
 {
+    msgDebug("\nEntering chartSales with jID = $jID, range = $range, pieces = $pieces, and reps = $reps");
     switch ($jID) {
         default:
         case 12: $type='c'; $filter = "journal_id IN (12,13)";

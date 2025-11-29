@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-04
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -204,7 +204,7 @@ class bizunoDashboard
      * Updates a dashboard settings from the menu settings submit
      * @return null, just saves the new settings so next time the dashboard is loaded, the new settings will be there
      */
-    public function attr()
+    public function attr(&$layout=[])
     {
         $menuID = clean('menuID','db_field','get');
         $dashID = clean('dashID','db_field','get');
@@ -225,6 +225,7 @@ class bizunoDashboard
         }
         msgDebug("\nWriting userMeta: ".print_r($userMenu, true));
         dbMetaSet($rID, "dashboard_{$menuID}", $userMenu, 'contacts', getUserCache('profile', 'userID'));
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#$dashID').panel('refresh');"]]);
     }
 
     /**
@@ -344,21 +345,29 @@ class bizunoDashboard
     {
         msgDebug("\nEntering viewDash with meta = ".print_r($meta, true));
         $dashID = $this->myDash->code;
-        $admFlds= $admKeys = [];
-        $jsReady= '';
         $output = ['type'=>'divHTML', // core structure
             'divs'=>[
                 'divBOF' => ['order'=> 1,'type'=>'html','html'=>"<div>"],
                 'divEOF' => ['order'=>99,'type'=>'html','html'=>"</div>"]]];
         metaPopulate($this->myDash->struc, $meta);
+        $this->viewDashAdmin($output, $dashID); // Build the admin section
+        // Build the contents
+        $this->viewDashDiv($output, $data, $dashID);
+//msgDebug("\nresults from viewDash = ".print_r($output, true));
+        return $output;
+    }
+    private function viewDashAdmin(&$output, $dashID)
+    {
+        $admFlds = $admKeys = [];
+        $jsReady = '';
         foreach ($this->myDash->struc as $field => $vals) {
             if (!empty($vals['admin'])) { continue; } //only allow user enabled options
             $admKeys[] = $dashID.$field;
             if (in_array($vals['attr']['type'], ['spinner'])) {
-                $jsReady .= "dashDelay('$dashID', 0, '{$dashID}$field'); ";
+                $jsReady .= "dashDelay('$dashID', 0, '{$dashID}$field');\n";
                 $admFlds[$dashID.$field] = array_replace_recursive($vals, ['position'=>'after','events'=>['onChange'=>"jqBiz('#{$dashID}$field').keyup();"]]);
             } elseif (in_array($vals['attr']['type'], ['select', 'selNoYes'])) {
-                $admFlds[$dashID.$field] = array_replace_recursive($vals, ['position'=>'after','events'=>['onChange'=>"dashSubmit('$dashID', 0);"]]);
+                $admFlds[$dashID.$field] = array_replace_recursive($vals, ['position'=>'after','events'=>['onChange'=>"dashSubmit('{$dashID}', 0);"]]);
             } else {
                 $admFlds[$dashID.$field] = array_replace_recursive($vals, ['position'=>'after']);
                 $addSave = true; // need to add the save button since the form doesn't auto-submit
@@ -366,10 +375,11 @@ class bizunoDashboard
         }
         if (!empty($addSave)) {
             $admKeys[] = $dashID.'Save';
-            $admFlds[$dashID.'Save'] = ['attr'=>['type'=>'button','value'=>lang('save')],'events'=>['onClick'=>"dashSubmit('$dashID', 0);"]];
+            $admFlds[$dashID.'Save'] = ['attr'=>['type'=>'button','value'=>lang('save')],'events'=>['onClick'=>"dashSubmit('{$dashID}', 0);"]];
         }
         if (!empty($admKeys)) {
-            $jsReady .= "jqBiz('#{$dashID}Form').keypress(function(event) { var keycode=event.keyCode?event.keyCode:event.which; if (keycode=='13') { dashSubmit('$dashID', 0); } });";
+            $jsReady .= "jqBiz('#{$dashID}Attr').keypress(function(event) { var keycode=event.keyCode?event.keyCode:event.which; if (keycode=='13') { dashSubmit('{$dashID}', 0); } });\n";
+//            $jsReady .= "ajaxForm('{$dashID}Form');\n";
             $output['divs']['admin'] = ['order'=>10,'styles'=>['display'=>'none'],'attr'=>['id'=>"{$dashID}_attr"],'type'=>'divs','divs'=>[
                 'frmBOF'=> ['order'=>20,'type'=>'form',  'key' =>"{$dashID}Form"],
                 'body'  => ['order'=>50,'type'=>'fields','keys'=>$admKeys],
@@ -377,43 +387,116 @@ class bizunoDashboard
             $output['forms']["{$dashID}Form"] = ['attr'=>['type'=>'form','action'=>'']];
             $output['fields'] = $admFlds;
         }
+        if (!empty($jsReady)) { $output['jsReady']['admin'] = $jsReady; }
+    }
+
+    private function viewDashDiv(&$output, $data, $dashID)
+    {
         if (!empty($data['legend']) && empty(getModuleCache('bizuno', 'settings', 'general', 'hide_filters', 0))) {
-            $output['divs']['head'] = ['order'=>40,'type'=>'html','html'=>$data['legend']];
+//            $output['divs']['head'] = ['order'=>40,'type'=>'html','html'=>$data['legend']];
         }
-        if       (!empty($data['lists']))  { // for lists
-            $output['divs']['body']= ['order'=>50, 'type'=>'list', 'key'=>$dashID];
-            $output['lists']       = [$dashID=>$data['lists']];
-        } elseif (!empty($data['html']))   { // for html strings
-            $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>$data['html']];
-        } elseif (!empty($data['data']))   { // structure 
-            $output = array_replace_recursive($output, $data['data']);
-        } elseif (!empty($data['usrList'])){ // for user defined lists
+        switch ($data['type']) {
+            case 'gChart': $this->googleChart($output, $dashID, $data); break;
+            case 'gTable': $this->googleTable($output, $dashID, $data); break;
+            default:
+                if       (!empty($data['lists']))  { // for lists
+                    $output['divs']['body']= ['order'=>50, 'type'=>'list', 'key'=>$dashID];
+                    $output['lists']       = [$dashID=>$data['lists']];
+                } elseif (!empty($data['html']))   { // for html strings
+                    $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>$data['html']];
+                } elseif (!empty($data['data']))   { // structure 
+                    $output = array_replace_recursive($output, $data['data']);
+                } elseif (!empty($data['usrList'])){ // for user defined lists
+
+                } elseif (!empty($data['tskList'])){ // for task lists, like reminders
+
+                } else {
+                    $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>"<span>".lang('no_results')."</span>"];
+                }
+        }
+        if (!empty($data['jsHead'])) { $output['jsHead']['init'] = "\n".$data['jsHead']; }
+        if (!empty($data['jsBody'])) { $output['jsBody']['init'] = "\n".$data['jsBody']; }
+        if (!empty($data['jsReady'])){ $output['jsReady']['init']= "\n".$data['jsReady']; }
+    }
+    private function googleChart(&$output, $dashID, $data)
+    {
+        $jsReady= '';
+        
 /*
-    $menuID   = clean('menuID', 'cmd', 'get');
-    $rmID     = clean('rID', 'integer', 'get');
-    $add_entry= clean($this->code.'_0', 'text', 'post');
-    if (!$rmID && $add_entry == '') { return; } // do nothing if no title or url entered
-    $usrMeta  = dbMetaGet(0, "dashboard_{$menuID}", 'contacts', getUserCache('profile', 'userID'));
-    $rID      = metaIdxClean($usrMeta);
-    if ($rmID) { array_splice($usrMeta['settings']['data'], $rmID - 1, 1); }
-    else       { $usrMeta['settings']['data'][] = $add_entry; }
-    dbMetaSet($rID, "dashboard_{$menuID}", $usrMeta, 'contacts', getUserCache('profile', 'userID'));
- */            
-        } elseif (!empty($data['tskList'])) { // for task lists, like reminders
-/* 
-        if (!$idx= clean('rID', 'integer', 'get')) { return; }
-        $usrMeta  = dbMetaGet(0, "dashboard_{$this->pageID}", 'contacts', getUserCache('profile', 'userID'));
-        $rID      = metaIdxClean($usrMeta);
-        unset($usrMeta['current'][($idx-1)]);
-        $usrMeta['current'] = array_values($settings['current']);
-        dbMetaSet($rID, "dashboard_{$this->pageID}", $usrMeta, 'contacts', getUserCache('profile', 'userID'));
- */
-        } else {
-            $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>"<span>".lang('no_results')."</span>"];
+  </script>
+</head>
+<body>
+  <!-- Div that will hold the pie chart -->
+  <div id="piechart"></div>
+</body>
+</html>
+         */
+//        $output = ['divID'=>$dashID."-chart",'type'=>'pie','attr'=>['chartArea'=>['left'=>'15%'],'title'=>$data['title']],'data'=>$data['data']['chart']];
+        $jsBody = "
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(chart{$dashID});
+function chart{$dashID}() {
+    // Create the data table
+    var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
+    var options = {
+        title: '{$data['title']}',
+        titleTextStyle: { color: screenMode==='dark' ? '#eeeeee' : '#333333' },
+        chartArea: {
+            left: 0,                          // ← kills left margin
+            top: 40,                          // space for title only
+            right: 0,                         // ← kills right margin
+            bottom: 0,                        // ← kills bottom margin (optional)
+            width: '100%',
+            height: '100%'                    // or use fixed px like 460 if you prefer
+          },
+//        enableInteractivity: true,
+//        forceIFrame: false,
+        backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
+        is3D: true,                    // 3D pie chart
+        pieSliceText: 'percentage',    // 'percentage', 'value', 'label', or 'none'
+        pieSliceTextStyle: { fontSize: 14, color: screenMode==='dark' ? '#ffffff' : '#000000' },
+        legend: { position: 'right', textStyle: { color: screenMode==='dark' ? '#cccccc' : '#333333' } },
+        tooltip: { textStyle: { color: screenMode==='dark' ? '#707070' : '#707070' } },
+    };
+    // Instantiate and draw the chart
+    var chart = new google.visualization.PieChart(document.getElementById('{$dashID}_chart'));
+    chart.draw(data, options);
+}";
+        $html   = '<style>#{$dashID}_chart { width: 100% !important; height: 100% !important; }</style><div id="'.$dashID.'_chart"></div>';
+        if (!empty($data['callback'])) {
+            $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
+            $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
+            $jsReady.= "\najaxDownload('dl_{$dashID}')";
         }
-        $output['jsHead']['init'] = !empty($data['jsHead']) ? $data['jsHead'] : '';
-        $output['jsReady']['init']= $jsReady . (!empty($data['jsReady']) ? "\n".$data['jsReady'] : '');
-//msgDebug("\nresults from viewDash = ".print_r($output, true));
-        return $output;
+        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
+        $output['jsBody'][$dashID]= $jsBody;
+        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
+    }
+    private function googleTable(&$output, $dashID, $data)
+    {
+        $cols = $jsReady = '';
+        if (!empty($data['header'])) { // build the header columns
+            foreach ($data['header'] as $col) { $cols .= "\ndata.addColumn('{$col['type']}', '".addslashes($col['title'])."'); "; }
+        }
+        if (!empty($data['data'])) { $cols .= "\ndata.addRows(".json_encode($data['data'])."); "; } // add the data
+        $html  = '<div id="'.$dashID.'-table"></div>';
+        $jsBody="
+google.charts.load('current', {packages:['table']});
+google.charts.setOnLoadCallback(draw_{$dashID}_table);
+function draw_{$dashID}_table() {
+const data = new google.visualization.DataTable(); $cols
+new google.visualization.Table(document.getElementById('{$dashID}-table')).draw(data, {
+    showRowNumber: false, width: '100%', height: '100%', cssClassNames: {
+        headerRow:'my-table-header', tableRow:'my-table-row', hoverTableRow:'my-table-hover', oddTableRow:'my-table-odd' } }); }
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw_{$dashID}_table);
+new MutationObserver(draw_{$dashID}_table).observe(document.body, { attributes: true, attributeFilter: ['class'] });";
+        if (!empty($data['callback'])) {
+            $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
+            $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
+            $jsReady.= "\najaxDownload('dl_$dashID')";
+        }
+        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
+        $output['jsBody'][$dashID]= $jsBody;
+        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
     }
 }

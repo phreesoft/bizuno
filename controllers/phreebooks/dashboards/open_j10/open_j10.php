@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/phreebooks/dashboards/open_j10/open_j10.php
  */
 
@@ -77,7 +77,7 @@ class open_j10
     {
         global $currencies;
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'getInvoiceInfo', 'function');
-        $selRep = !empty($opts['reps']) && getUserCache('role', 'security', 'admin', false, 0)<3 ? 0 : getUserCache('profile', 'userID');
+        $selRep = !empty($opts['reps']) && empty(getUserCache('role', 'administrate')) ? 0 : getUserCache('profile', 'userID');
         $filter = "journal_id=$this->journalID AND closed='0'";
         if (!empty($opts['reps'])  && validateAccess($this->secID, 1)<4){ $filter.= " AND rep_id='".getUserCache('profile', 'userID', false, '0')."'"; }
         if ( isset($opts['limit']) && !empty($opts['limit']))           { $filter.= " AND post_date<='".biz_date('Y-m-d')."'"; }

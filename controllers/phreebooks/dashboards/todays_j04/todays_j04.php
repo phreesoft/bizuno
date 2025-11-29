@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/phreebooks/dashboards/todays_j04/todays_j04.php
  */
 
@@ -77,7 +77,7 @@ class todays_j04
         global $currencies;
         $filter= "journal_id=$this->journalID AND post_date='".biz_date('Y-m-d')."'";
         if ($opts['reps'] && getUserCache('profile', 'userID', false, '0')) {
-            if (getUserCache('role', 'security', 'admin', false, 0)<3) { $filter.= " AND rep_id='".getUserCache('profile', 'userID', false, '0')."'"; }
+            if (emptry(getUserCache('role', 'administrate'))) { $filter.= " AND rep_id='".getUserCache('profile', 'userID', false, '0')."'"; }
         }
         if (!empty(getUserCache('profile', 'restrict_store'))) { $filter.= " AND store_id=".getUserCache('profile', 'store_id'); }
         $order = $opts['order']=='desc' ? 'post_date DESC, invoice_num DESC' : 'post_date, invoice_num';
