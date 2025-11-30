@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/inventory/dashboards/inv_status/inv_status.php
  *
  */
@@ -58,20 +58,12 @@ class inv_status
             'reps'  => ['order'=>30,'label'=>lang('just_reps'),'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0],   'admin'=>true]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render()
     {
         $rows = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "qty_stock<(qty_min+qty_so+qty_alloc-qty_po)", '', ['sku','vendor_id','qty_min','qty_so','qty_alloc','qty_po','qty_stock']);
         $vendors = [];
         foreach ($rows as $row) { $vendors[$row['vendor_id']][] = $row; }
-        $data = ['title'=>[lang('name')], 'total'=>[lang('total')]];
+        $data = [[lang('name'), lang('total')]];
         foreach ($vendors as $id => $skus) {
             $vName = viewFormat($id, 'contactName');
             $total = 0;
@@ -82,12 +74,12 @@ class inv_status
                 $total  += $balance * $cost;
             }
             msgDebug("\nvendor = $vName and total = $total");
-            if (defined('DEMO_MODE')) { $vName = randomNames('i'); }
-            $data['title'][] = $vName;
-            $data['total'][] = $total;
+            $data[] = [$vName, $total];
         }
-        $cData[] = $data['title'];
-        $cData[] = $data['total'];
+        return ['type'=>'gColumn', 'data'=>$data];
+        
+        
+        
         $html = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
         $output = ['divID'=>$this->code."_chart",'type'=>'column','attr'=>['legend'=>['position'=>"right"]],'data'=>$cData];
         $js = "var data_{$this->code} = ".json_encode($output).";\n";

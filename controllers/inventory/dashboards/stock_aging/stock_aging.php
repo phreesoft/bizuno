@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-30
  * @filesource /controllers/inventory/dashboards/stock_aging/stock_aging.php
  */
 
@@ -34,22 +34,16 @@ class stock_aging
     public $code     = 'stock_aging';
     public $secID    = 'inv_mgr';
     public $category = 'inventory';
-    public  $struc;
-    private $ageFld;
+    public $struc;
     public $lang = ['title'=>'Stock Aging',
         'description'=>'Lists the inventory that past the shelf life. For best results, add a custom inventory database field named: shelf_life and populate with number of weeks the product will remain fresh before some form of attention.',
-        'age_default' => 'Default display age (weeks)'];
+        'age_default' => 'Default Shelf Life (Weeks)'];
 
     function __construct()
     {
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $weeks = [1,2,3,4,6,8,13,26,39,52,104];
@@ -62,61 +56,31 @@ class stock_aging
             'defAge'=> ['order'=>40,'label'=>$this->lang['age_default'],'clean'=>'integer','attr'=>['type'=>'select','value'=>52],  'values'=>$ages]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
-        $ttlQty      = $ttlCost = $value = 0;
-        $this->ageFld= dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'shelf_life') ? true : false;
-        $iconExp     = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#form{$this->code}').submit();"]];
-        $action      = BIZUNO_URL_AJAX."&bizRt=$this->category/tools/stockAging";
-        $html        = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
-        $html       .= '<form id="form'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>';
-        $js          = "ajaxDownload('form{$this->code}');
-function chart{$this->code}() {
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', '".jsLang('post_date')."');
-    data.addColumn('string', '".jsLang('inventory_description_short')."');
-    data.addColumn('number','" .jsLang('remaining')."');
-    data.addColumn('number', '".jsLang('value')."');
-    data.addRows([";
-        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "remaining>0", 'post_date', ['sku', 'post_date', 'remaining', 'unit_cost']);
+        msgDebug("\nEntering render with opts = ".print_r($opts, true));
+        $data  = $skuLife = [];
+        $ttlQty= $ttlCost = $value = 0;
+        $hasFld= dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'shelf_life') ? true : false;
+        if ($hasFld) {
+            $allLife = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", INVENTORY_COGS_TYPES)."')", 'sku', ['sku', 'shelf_life']);
+            foreach ($allLife as $life) { $skuLife[$life['sku']] = !empty($life['shelf_life']) ? $life['shelf_life'] : $opts['defAge']; }
+        }
+        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "remaining>0", 'post_date', ['sku', 'post_date', 'remaining', 'unit_cost']);
         foreach ($rows as $row) {
-            $ageDate = $this->getAgingValue($row['sku'], $opts['defAge']);
-            msgDebug("\nsku {$row['sku']} comparing ageDate: $ageDate with post date: {$row['post_date']}");
-            if ($row['post_date'] >= $ageDate) { continue; }
+            $numWks  = !empty($skuLife[$row['sku']]) ? $skuLife[$row['sku']] : $opts['defAge'];
+            $postDate= substr($row['post_date'], 0, 10);
+            msgDebug("\nsku {$row['sku']} comparing ageDate: $numWks with post date: $postDate");
+            if ($postDate >= $numWks) { continue; }
+            msgDebug(" ... is getting old, adding {$row['sku']} to list");
             $ttlQty += $row['remaining'];
             $value   = $row['unit_cost'] * $row['remaining'];
             $ttlCost+= $value;
-            $js     .= "['".viewFormat($row['post_date'], 'date')."','".viewProcess($row['sku'], 'sku_name')."',{v: ".intval($row['remaining'])."},{v:$value, f:'".viewFormat($value,'currency')."'}],";
+            $data[]  = [substr($postDate, 0, 7), $row['sku'], ['v'=>intval($row['remaining'])], ['v'=>$value,'f'=>viewFormat($value, 'currency')]];
         }
-        $js .= "['".jslang('total')."',' ',{v: ".intval($ttlQty)."},{v: $value, f: '".viewFormat($ttlCost,'currency')."'}]]);
-    data.setColumnProperties(0, {style:'font-style:bold;font-size:22px;text-align:center'});
-    var table = new google.visualization.Table(document.getElementById('{$this->code}_chart'));
-    table.draw(data, {showRowNumber:false, width:'90%', height:'100%'});
-}
-google.charts.load('current', {'packages':['table']});
-google.charts.setOnLoadCallback(chart{$this->code});\n";
-        return ['html'=>$html, 'jsHead'=>$js];
-    }
-
-    /**
-     * Retrieves the aging date based on the SKU provided
-     * @param string $sku - SKU to search
-     * @return string - aged date to compare for filter
-     */
-    private function getAgingValue($sku, $defAge)
-    {
-        if (!empty($this->skuDates[$sku])) { return $this->skuDates[$sku]; }
-        $numWeeks = $this->ageFld ? dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'shelf_life', "sku='$sku'") : $defAge;
-        $this->skuDates[$sku] = localeCalculateDate(biz_date('Y-m-d'), -($numWeeks * 7));
-        msgDebug("\n num weeks = $numWeeks and calculated date = {$this->skuDates[$sku]}");
-        return $this->skuDates[$sku];
+        $data[]= [lang('total'), '', ['v'=>intval($ttlQty)], ['v'=>$ttlCost,'f'=>viewFormat($ttlCost,'currency')]];
+        $header= [['title'=>lang('post_date'), 'type'=>'string'], ['title'=>lang('description'), 'type'=>'string'],
+            ['title'=>lang('remaining'), 'type'=>'number'], ['title'=>lang('value'), 'type'=>'number']];
+        return ['type'=>'gTable', 'header'=>$header, 'data'=>$data, 'callback'=>BIZUNO_URL_AJAX.'&bizRt=inventory/tools/stockAging'];
     }
 }

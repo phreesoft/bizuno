@@ -70,7 +70,6 @@ class bookmark_docs
     {
         $result= dbMetaGet(0, 'bookmarks_phreeform', 'contacts', getUserCache('profile', 'userID'));
         msgDebug("\nRead bookmarks for userID: ".getUserCache('profile', 'userID')." to be: ".print_r($result, true));
-//        $html  = html5('', ['classes'=>['easyui-datalist'],'options'=>['lines'=>'true'],'attr'=>['type'=>'ul']]);
         if (!empty($result)) {
             foreach ($result as $doc) {
 //                $html .= html5('', ['options'=>['value'=>$doc['id']],'attr'=>['type'=>'li']]);

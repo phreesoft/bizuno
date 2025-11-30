@@ -396,8 +396,9 @@ class bizunoDashboard
 //            $output['divs']['head'] = ['order'=>40,'type'=>'html','html'=>$data['legend']];
         }
         switch ($data['type']) {
-            case 'gChart': $this->googleChart($output, $dashID, $data); break;
-            case 'gTable': $this->googleTable($output, $dashID, $data); break;
+            case 'gChart':  $this->googleChart($output, $dashID, $data); break;
+            case 'gColumn': $this->googleColumn($output, $dashID, $data); break;
+            case 'gTable':  $this->googleTable($output, $dashID, $data); break;
             default:
                 if       (!empty($data['lists']))  { // for lists
                     $output['divs']['body']= ['order'=>50, 'type'=>'list', 'key'=>$dashID];
@@ -421,44 +422,22 @@ class bizunoDashboard
     private function googleChart(&$output, $dashID, $data)
     {
         $jsReady= '';
-        
-/*
-  </script>
-</head>
-<body>
-  <!-- Div that will hold the pie chart -->
-  <div id="piechart"></div>
-</body>
-</html>
-         */
-//        $output = ['divID'=>$dashID."-chart",'type'=>'pie','attr'=>['chartArea'=>['left'=>'15%'],'title'=>$data['title']],'data'=>$data['data']['chart']];
         $jsBody = "
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(chart{$dashID});
 function chart{$dashID}() {
-    // Create the data table
     var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
     var options = {
         title: '{$data['title']}',
         titleTextStyle: { color: screenMode==='dark' ? '#eeeeee' : '#333333' },
-        chartArea: {
-            left: 0,                          // ← kills left margin
-            top: 40,                          // space for title only
-            right: 0,                         // ← kills right margin
-            bottom: 0,                        // ← kills bottom margin (optional)
-            width: '100%',
-            height: '100%'                    // or use fixed px like 460 if you prefer
-          },
-//        enableInteractivity: true,
-//        forceIFrame: false,
+        chartArea: { left: 0, top: 40, right: 0, bottom: 0, width: '100%', height: '100%' },
         backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
-        is3D: true,                    // 3D pie chart
+        is3D: true,
         pieSliceText: 'percentage',    // 'percentage', 'value', 'label', or 'none'
         pieSliceTextStyle: { fontSize: 14, color: screenMode==='dark' ? '#ffffff' : '#000000' },
         legend: { position: 'right', textStyle: { color: screenMode==='dark' ? '#cccccc' : '#333333' } },
-        tooltip: { textStyle: { color: screenMode==='dark' ? '#707070' : '#707070' } },
+        tooltip: { textStyle: { color: '#707070' } },
     };
-    // Instantiate and draw the chart
     var chart = new google.visualization.PieChart(document.getElementById('{$dashID}_chart'));
     chart.draw(data, options);
 }";
@@ -472,6 +451,33 @@ function chart{$dashID}() {
         $output['jsBody'][$dashID]= $jsBody;
         if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
     }
+    private function googleColumn(&$output, $dashID, $data)
+    {
+        $html  = '<div id="'.$dashID.'-column"></div>';
+        $jsBody="
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(draw_{$dashID}_column);
+function draw_{$dashID}_column() {
+var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
+var options = {
+//  title: 'Test Column',
+    backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
+    chartArea: { width: '100%', height: '100%' },
+    hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
+    vAxis: { minValue: 0 },
+    legend: { position: 'top' },
+    isStacked: false,              // set true for 100% stacked or regular stacked
+    bar: { groupWidth: '75%' },    // thickness of bars
+    animation: { duration: 1000, easing: 'out' }
+};
+  var chart = new google.visualization.ColumnChart(document.getElementById('$dashID-column'));
+  chart.draw(data, options);
+}";
+        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
+        $output['jsBody'][$dashID]= $jsBody;
+        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
+    }
+
     private function googleTable(&$output, $dashID, $data)
     {
         $cols = $jsReady = '';

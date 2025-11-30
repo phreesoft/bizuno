@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2025-11-30
  * @filesource /controllers/phreebooks/dashboards/profit_loss/profit_loss.php
  *
  */
@@ -45,11 +45,6 @@ class profit_loss
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [
@@ -58,7 +53,6 @@ class profit_loss
             'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array', 'attr'=>['type'=>'roles', 'value'=>[-1]], 'admin'=>true]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
     public function render()
     {
         $period  = getModuleCache('phreebooks', 'fy', 'period');
@@ -70,22 +64,13 @@ class profit_loss
         $cData[] = [lang('gl_acct_type_34'), ['v'=>$expenses, 'f'=>viewFormat($expenses, 'currency')]];
         $netInc  = $sales - $cogs - $expenses;
         $cData[] = [lang('net_income'), ['v'=>max(0, $netInc), 'f'=>viewFormat($netInc, 'currency')]]; // Net Income
-        $html    = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
-        $output  = ['divID'=>$this->code."_chart",'type'=>'pie','attr'=>['pieHole'=>'0.3','title'=>sprintf('Total Sales: %s; Net Income: %s', viewFormat($sales, 'currency'), viewFormat($netInc, 'currency'))],'data'=>$cData];
-        $js      = "var data_{$this->code} = ".json_encode($output).";\n";
-        $js     .= "google.charts.load('current', {'packages':['corechart']});\n";
-        $js     .= "google.charts.setOnLoadCallback(chart{$this->code});\n";
-        $js     .= "function chart{$this->code}() { drawBizunoChart(data_{$this->code}); };";
-        return ['html'=>$html, 'jsHead'=>$js];
+        return ['type'=>'gChart', 'data'=>$cData];
     }
-
     function getValue($type, $period, $negate=false)
     {
         $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_history', "period=$period AND gl_type=$type", 'gl_account');
-        $total = 0;
-        foreach ($rows as $row) {
-            $total += $negate ? $row['credit_amount'] - $row['debit_amount'] : $row['debit_amount'] - $row['credit_amount'];
-        }
+        $total= 0;
+        foreach ($rows as $row) { $total += $negate ? $row['credit_amount'] - $row['debit_amount'] : $row['debit_amount'] - $row['credit_amount']; }
         if ($total < 0) { $total = 0; }
         return $total;
     }

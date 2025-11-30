@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2025-11-29
  * @filesource /controllers/contacts/dashboards/rtn_my_biz/rtn_my_biz.php
  */
 
@@ -29,14 +29,15 @@ namespace bizuno;
 
 class rtn_my_biz
 {
-    public $moduleID = 'contacts';
-    public $methodID = 'returns';
-    public $methodDir= 'dashboards';
-    public $code     = 'rtn_my_biz';
-    public $category = 'quality';
+    public  $moduleID = 'contacts';
+    public  $methodID = 'returns';
+    public  $methodDir= 'dashboards';
+    public  $code     = 'rtn_my_biz';
+    public  $category = 'quality';
+    private $pieces   = 10;
     public  $struc;
     private $dates;
-    public $lang     = ['title'=>'Returns By SKU (Preventable)',
+    public  $lang     = ['title'=>'Returns By SKU (Preventable)',
         'description'=>'Lists return metrics by SKU where My Business (you) are at fault. These returns are considered preventable.'];
 
     function __construct()
@@ -60,32 +61,12 @@ class rtn_my_biz
             'range' => ['order'=>40,'label'=>lang('range'),    'clean'=>'char', 'attr'=>['type'=>'select','value'=>0],   'values'=>viewKeyDropdown($this->dates)]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         $cData = $this->rtnSKUs($opts['range']);
-        $html  = '<div style="width:100%" id="'.$this->code.'_chart0"></div>';
-        $output= ['divID'=>$this->code."_chart0",'type'=>'pie','attr'=>['title'=>"Returns by SKU = ".$cData['totalRtn']." entries"],'data'=>$cData['chart']];
-        $js    = "ajaxDownload('form{$this->code}');
-var data0_{$this->code} = ".json_encode($output, JSON_UNESCAPED_UNICODE).";
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(chart0{$this->code});
-function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
-        return ['html'=>$html, 'jsHead'=>$js];
+        $title = "Returns by SKU = ".$cData['totalRtn']." entries";
+        return ['type'=>'gChart', 'title'=>$title, 'data'=>$cData['chart']];
     }
-
-    /**
-     * Generates the pie chart data array
-     * @param integer $pieces - number of pie pieces
-     * @return array - structure with the pie chart data
-     */
     public function rtnSKUs($range)
     {
         msgDebug("\nEntering rtnSKUs with range = $range");
@@ -93,19 +74,16 @@ function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
         $stmt = dbGetResult("SELECT journal_main.id, post_date, meta_value FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
             WHERE {$dates['sql']} AND meta_key='return'");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
-        msgDebug("\nrows result = ".print_r($rows, true));
-//      $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "post_date>='{$dates['start_date']}' AND post_date<'{$dates['end_date']}' AND preventable='1'", '', ['creation_date','close_details']); // ,'fault'
         $output= [];
         foreach ($rows as $row) { // preventable='1'
             $meta = json_decode($row['meta_value'], true);
-            if (empty($meta) || empty($meta['details'])) { continue; }
-            foreach ($meta['details'] as $item) {
-                if (empty($item['sku'])) { continue; }
+            msgDebug("\nmeta = ".print_r($meta, true));
+            if (empty($meta) || empty($meta['receive_details']['rows'])) { continue; }
+            foreach ($meta['receive_details']['rows'] as $item) {
+                if ( empty($item['sku'])) { continue; }
                 if (!isset($output[$item['sku']])) { $output[$item['sku']] = ['qty'=>0,'desc'=>$item['desc']]; } // ,'fault'=>[]
-//              $output[$item['sku']]['qty'] += intval($item['qty']); // gets total pieces returned, can be misleading, i.e. some SKUs come back in qty if not needed
-                $output[$item['sku']]['qty']++;
-//              if (!isset($output[$item['sku']]['fault'][$row['fault']])) { $output[$item['sku']]['fault'][$row['fault']] = 0; }
-//              $output[$item['sku']]['fault'][$row['fault']]++; // fault code index
+                $output[$item['sku']]['qty']++; // uncomment if just want to count orders
+//              $output[$item['sku']]['qty'] += !empty($item['qty']) ? $item['qty'] : 1; // uncomment if want to count total qty returned
             }
         }
         arsort($output);
@@ -113,7 +91,7 @@ function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); };";
         $struc = [];
         $struc['chart'][]= [lang('sku'), lang('total')]; // headings
         foreach ($output as $vals) {
-            if ($cnt < $pieces) { $struc['chart'][] = [$vals['desc'], $vals['qty']]; }
+            if ($cnt < $this->pieces) { $struc['chart'][] = [$vals['desc'], $vals['qty']]; }
             else                { $rTotal += $vals['qty']; }
             $cnt++;
         }

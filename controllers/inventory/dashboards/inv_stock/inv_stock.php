@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-15
+ * @version    7.x Last Update: 2025-11-30
  * @filesource /controllers/inventory/dashboards/inv_stock/inv_stock.php
  */
 
@@ -36,63 +36,36 @@ class inv_stock
     public $category = 'inventory';
     public $struc;
     public $lang     = ['title'=>'Inventory Stock Summary',
-        'description'=>'Displays your inventory stock levels and valuation.'];
+        'description'=>'Displays your inventory stock levels and valuation by GL account.'];
 
     function __construct()
     {
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
-        $defInvGL = getModuleCache('inventory', 'settings', 'phreebooks', 'inv_si');
         $this->struc = [
             // Admin fields
-            'users' => ['order'=>10,'label'=>lang('users'),     'clean'=>'array', 'attr'=>['type'=>'users', 'value'=>[0],], 'admin'=>true],
-            'roles' => ['order'=>20,'label'=>lang('groups'),    'clean'=>'array', 'attr'=>['type'=>'roles', 'value'=>[-1]], 'admin'=>true],
-            // User fields
-            'glAcct'=> ['order'=>40,'label'=>lang('gl_account'),'clean'=>'cmd',   'attr'=>['type'=>'ledger','value'=>$defInvGL],'types'=>['4']]];
+            'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array', 'attr'=>['type'=>'users', 'value'=>[0],], 'admin'=>true],
+            'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array', 'attr'=>['type'=>'roles', 'value'=>[-1]], 'admin'=>true]];
+            // User fields - None
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
-    public function render($opts=[])
+    public function render()
     {
-        if (empty($opts['glAcct'])) { return msgAdd('Please select a valid GL account'); }
-        $iconExp= ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#inv_data').submit();"]];
-        $action = BIZUNO_URL_AJAX."&bizRt=inventory/tools/invDataGo";
-        $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
-        $html  .= '<form id="inv_data" action="'.$action.'">'.html5('', $iconExp).'</form>';
-        $output = ['divID'=>$this->code."_chart",'type'=>'line','attr'=>['chartArea'=>['left'=>'15%'],'title'=>'GL Acct: '.$opts['glAcct']],'data'=>$this->getData($opts['glAcct'])];
-        $js     = "ajaxDownload('inv_data');
-var data_{$this->code} = ".json_encode($output).";
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(chart{$this->code});
-function chart{$this->code}() { drawBizunoChart(data_{$this->code}); };";
-        $legend = !getModuleCache('bizuno','settings','general','hide_filters',0) ? ucfirst(lang('filter')).": GL Acct: {$opts['glAcct']}" : '';
-        return ['html'=>$html, 'jsHead'=>$js, 'legend'=>$legend];
-    }
-
-    public function getData($glAcct)
-    {
-        $period = calculatePeriod(biz_date('Y-m-d'), true);
-        $begPer = $period - 12;
-        $rows   = dbGetMulti(BIZUNO_DB_PREFIX.'journal_history', "gl_account='$glAcct' AND period >= $begPer AND period <= $period", "period");
-        $data[] = [lang('period'), lang('value')]; // headings
+        $data  = $bVal = $skuGL = [];
+        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "remaining>0");
         foreach ($rows as $row) {
-            $bal = $row['beginning_balance'] + $row['debit_amount'] - $row['credit_amount'];
-            $data[] = [$row['period'], round($bal)];
+            if (!isset($bVal[$row['store_id']])) { $bVal[$row['store_id']] = 0; }
+            $bVal[$row['store_id']] += $row['remaining'] * $row['unit_cost'];
         }
-        return $data;
+        $data[]= [lang('store'), lang('value')];
+        foreach ($bVal as $bID => $value) {
+            $title = empty($bID) ? getModuleCache('bizuno', 'settings', 'company', 'primary_name') : viewFormat($bID, 'contactName');
+            $data[]= [$title, ['v'=>$value, 'f'=>viewFormat($value, 'currency')]];
+        }
+        $header= [['title'=>lang('store'), 'type'=>'string'], ['title'=>lang('amount'), 'type'=>'number']];
+        return ['type'=>'gChart', 'header'=>$header, 'data'=>$data, 'callback'=>BIZUNO_URL_AJAX.'&bizRt=inventory/tools/invDataGo'];
     }
 }
