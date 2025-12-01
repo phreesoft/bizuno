@@ -50,7 +50,7 @@ class db extends \PDO
             default:
             case "mysql":
                 try { parent::__construct($dns, $user, $pass); }
-                catch (PDOException $e) { return msgAdd("\nDB Connection failed, error: ".$e->getMessage()); } // ." with db settings: ".print_r($dbData, true)
+                catch (\PDOException $e) { return msgAdd("\nDB Connection failed, error: ".$e->getMessage()); } // ." with db settings: ".print_r($dbData, true)
                 $this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
                 $this->exec("SET character_set_results='utf8', character_set_client='utf8', character_set_connection='utf8', character_set_database='utf8', character_set_server='utf8'");
                 break;

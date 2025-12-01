@@ -84,22 +84,22 @@ final class view
                 $msgStack->debugWrite();
                 break;
             case 'guest':
-                $dom = $this->viewGuestDOM($data);
+                $dom = $this->setHeadKendoUI($data);
                 msgDebug("\n sending type: guest and data = $dom");
                 echo $dom;
                 $msgStack->debugWrite();
                 break;
             case 'migrate': // hybrid 
-                $this->setEnvHTML($data);
+                $this->viewDomEasyUI($data);
                 $dom  = "<!DOCTYPE HTML>\n<html>\n<head>\n".$this->renderHead($data)."</head>\n";
-                $dom .= "  <body>\n".$this->renderGuestDivs($data)."  </body>\n";
+                $dom .= "  <body>\n".$this->renderKendoDivs($data)."  </body>\n";
                 $dom .= "</html>\n";
                 msgDebug("\n sending type: guest and data = $dom");
                 echo $dom;
                 $msgStack->debugWrite();
                 break;
             case 'page':
-                $dom = $this->viewPageDOM($data); // formats final HTML to specific host expectations
+                $dom = $this->viewDomEasyUI($data); // formats final HTML to specific host expectations
                 msgDebug("\n sending type: page and data = $dom");
                 echo $dom;
                 $msgStack->debugWrite();
@@ -126,9 +126,9 @@ final class view
         }
     }
 
-    private function viewGuestDOM($data)
+    private function setHeadKendoUI($data)
     {
-        msgDebug("\nEntering viewGuestDOM");
+        msgDebug("\nEntering setHeadKendoUI");
         // Page head Meta 
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.'Bizuno'.'</title>'];
         $data['head']['metaTitle']   = ['order'=>22,'type'=>'html','html'=>'<meta name="robots" content="noindex">'];
@@ -136,28 +136,46 @@ final class view
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];
         $data['head']['metaIcon']    = ['order'=>28,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.BIZUNO_ICON.'" />'];
         // Page head CSS
-        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/portal.css" />'];
+        $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/kendoUI/bizuno.css" />'];
         // Page head JavaScript 
         $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'jQuery-3.7.1.js"></script>'];
-        $data['head']['jsBizuno']    = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_FS.'0/view/portal.js"></script>'];
+        $data['head']['jsBizuno']    = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_FS.'0/view/kendoUI/bizuno.js"></script>'];
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
         }
         $dom  = "<!DOCTYPE HTML>\n<html>\n<head>\n".$this->renderHead($data)."</head>\n";
-        $dom .= "  <body>\n".$this->renderGuestDivs($data)."  </body>\n";
+        $dom .= "  <body>\n".$this->renderKendoDivs($data)."  </body>\n";
         $dom .= "</html>\n";
         return $dom;
     }
     
     /**
+     *
+     * @global \bizuno\class $html5
+     * @param type $data
+     * @return type
+     */
+    protected function renderKendoDivs($data)
+    {
+        global $html5;
+        if (empty($data)) { return ''; }
+        msgDebug("\nEntering renderKendoDivs");
+        $this->html = $html5->buildDivs($data, 'divs'); // generates $this->html body but can add headers and footers
+        $html = '';
+        $html.= $this->html;
+        $html.= $this->renderJS($data);
+        return "$html\n";
+    }
+
+    /**
      * Platform specific DOM for full page generation
      * @param type $data
      */
-    private function viewPageDOM($data)
+    private function viewDomEasyUI($data)
     {
-        msgDebug("\nEntering viewPageDOM");
+        msgDebug("\nEntering viewDomEasyUI");
         $dom  = '';
-        $this->setEnvHTML($data); // load the <head> HTML for pages
+        $this->setHeadEasyUI($data); // load the <head> HTML for pages
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
 //          $data['head']['cssMobile'] = ['order'=>50,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS.'jquery-easyui/themes/mobile.css" />'];
@@ -182,11 +200,11 @@ final class view
      * @param array $data -
      * @return modified $data
      */
-    private function setEnvHTML(&$data=[])
+    private function setHeadEasyUI(&$data=[])
     {
         $icons   = getUserCache('profile', 'icons', false, 'default');
         $theme   = getUserCache('profile', 'theme', false, 'auto');
-        if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'black' : 'bizuno'; } // change to dark mode
+        if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'bizuno-dark' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
         $js  = "const bizID = '".getUserCache('business','bizID', false, 0)."';\n";
@@ -237,24 +255,6 @@ final class view
             $data['jsHead'] = [];
         }
         return $html;
-    }
-
-    /**
-     *
-     * @global \bizuno\class $html5
-     * @param type $data
-     * @return type
-     */
-    protected function renderGuestDivs($data)
-    {
-        global $html5;
-        if (empty($data)) { return ''; }
-        msgDebug("\nEntering renderGuestDivs");
-        $this->html = $html5->buildDivs($data, 'divs'); // generates $this->html body but can add headers and footers
-        $html = '';
-        $html.= $this->html;
-        $html.= $this->renderJS($data);
-        return "$html\n";
     }
 
     /**

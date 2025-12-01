@@ -29,7 +29,6 @@ namespace bizuno;
 
 // Load portal specific classes
 require(BIZUNO_FS_LIBRARY . 'portal/api.php');
-require(BIZUNO_FS_LIBRARY . 'portal/view.php');
 
 class portalCtl
 {
@@ -86,12 +85,12 @@ class portalCtl
         if (!defined('BIZUNO_DB_CREDS')) { msgDebug("\nBIZUNO_DB_CREDS not defined, returning guest"); return 'guest'; } // Path to db not defined, needs install and creds set
         $creds= defined('BIZUNO_DB_CREDS') ? BIZUNO_DB_CREDS : [];
         $db   = new db($creds);
-        if (!$db->connected) { msgDebug("\nDB not connected, returning guest"); return 'guest'; }
+        // This test first or standalone new installs breaks loading of css/js files
         if ('portal'==$this->route['module'] && 'api'==$this->route['page'])          { msgDebug("\nAPI Request, returning api");         return 'api'; }
+        if (!$db->connected       || !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nDB not connected, returning guest");  return 'install'; }
         if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
         if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'common_meta'))  { msgDebug("\nNormal operation, returning auth");   return 'auth'; }
-        if (!$this->userValidated && !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nNeed to install, returning install"); return 'install'; }
-        msgDebug("\nFall through, returning guest.");
+        msgDebug("\nFalling through, returning guest.");
         return 'guest';
     }
     /**
@@ -100,7 +99,8 @@ class portalCtl
      */
     private function goGuest()
     {
-        $view = new portalView();
+        require(BIZUNO_FS_LIBRARY . 'portal/viewAuth.php');
+        $view = new portalViewAuth();
         $view->login($this->layout);
     }
     /**
@@ -109,6 +109,7 @@ class portalCtl
      */
     private function goAPI()
     {
+        require(BIZUNO_FS_LIBRARY . 'portal/viewAuth.php');
         $view = new portalApi();
         $method = $this->route['method'];
         if (method_exists($view, $method)) {
@@ -117,17 +118,19 @@ class portalCtl
             return;
         }
         msgDebug("\nAPI request {$method} WAS NOT FOUND!");
-        $guest = new portalView(); // Fall through to login screen
+        $guest = new portalViewAuth(); // Fall through to login screen
         $guest->login($this->layout);
     }
     private function goInstall()
     {
-        $view = new portalView();
+        require(BIZUNO_FS_LIBRARY . 'portal/viewMaint.php');
+        $view = new portalViewMaint();
         $view->install($this->layout);
     }
     private function goMigrate()
     {
-        $view = new portalView();
+        require(BIZUNO_FS_LIBRARY . 'portal/viewMaint.php');
+        $view = new portalViewMaint();
         $view->migrate($this->layout);
     }
     private function goAuth()

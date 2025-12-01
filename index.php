@@ -21,12 +21,14 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-30
+ * @version    7.x Last Update: 2025-12-01
  * @filesource /index.php
  */
 
 namespace bizuno;
 
-require('portalCFG.php');
-require('lib/controller.php');
+if (file_exists('portalCFG.php')) { require( 'portalCFG.php' ); }
+elseif (file_exists('portalCFG-sample.php')) { require( 'portalCFG-sample.php' ); }
+else { die( 'Mayday! There seems to be a critical file missing, you may want to re-install Bizuno from the GitHub source!' ); }
+
 new portalCtl();

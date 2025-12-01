@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-10
+ * @version    7.x Last Update: 2025-12-01
  * @filesource /index.php
  */
 
@@ -32,20 +32,24 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 /******************** BEGIN - Site Specific Settings ***********************/
 
 // 1-10 digit AlphaNumeric, cannot be zero
-if ( !defined( 'BIZUNO_BIZID' ) )       { define( 'BIZUNO_BIZID',       '12345' ); } // Bizuno Business ID [for multi-business]
+// Your unique Bizuno Business ID
+if ( !defined( 'BIZUNO_BIZID' ) ) { define( 'BIZUNO_BIZID', '123456' ); }
 
-// file system path to your data files.
-// Can be outside of your web server direct access but mush be within the 
-// path of PHP.
-if ( !defined( 'BIZUNO_DATA' ) )        { define( 'BIZUNO_DATA',        BIZUNO_FS_PORTAL . 'data/' ); } // Path to user files, cache and backup
+// file system path to your cache, data and backup files.
+// Can be outside of your web server direct access but mush be within the path of PHP.
+if ( !defined( 'BIZUNO_DATA' ) ) { define( 'BIZUNO_DATA', $_SERVER['DOCUMENT_ROOT'].'/data/' ); }
 
 // Encryption key for cookies, and other publically viewable information
-// Up to 16 alpha-numeric characters, randomly generated
-if ( !defined( 'BIZUNO_KEY' ) )         { define( 'BIZUNO_KEY',         '0123456789abcdef' ); } // Unique key used for encryption
+// 16 alpha-numeric characters, randomly generated
+if ( !defined( 'BIZUNO_KEY' ) ) { define( 'BIZUNO_KEY', '0123456789abcdef' ); }
 
 // Database credentials
-if ( !defined( 'BIZUNO_DB_PREFIX' ) )   { define( 'BIZUNO_DB_PREFIX',   '' ); } // Database table prefix
-if ( !defined( 'BIZUNO_DB_CREDS' ) )    { define( 'BIZUNO_DB_CREDS',    ['type'=>'mysql', 'host'=>'localhost', 'name'=>'dbName', 'user'=>'dbUser', 'pass'=>'dbPassword', 'prefix'=>BIZUNO_DB_PREFIX ] ); }
+if ( !defined( 'BIZUNO_DB_PREFIX' ) ) { define( 'BIZUNO_DB_PREFIX', '' ); } // Database table prefix
+if ( !defined( 'BIZUNO_DB_CREDS' ) ) { define( 'BIZUNO_DB_CREDS', ['type'=>'mysql', 'host'=>'localhost', 'name'=>'dbName', 'user'=>'dbUser', 'pass'=>'dbPassword', 'prefix'=>BIZUNO_DB_PREFIX ] ); }
+
+// If you want to allow users to send support tickets to your administrator, set email here
+//define('BIZUNO_SUPPORT_NAME', 'My Business Support');
+//define('BIZUNO_SUPPORT_EMAIL','webmaster@my_D_domain.com');
 
 /******************** END - Site Specific Settings ***********************/
 
@@ -61,11 +65,8 @@ if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     BIZUNO_U
 if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src=' ); }
 if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', BIZUNO_URL_PORTAL.'/scripts/' );  }
 
-// If you want to allow users to send support tickets to your administrator, set email here
-//define('BIZUNO_SUPPORT_NAME', 'My Business Support');
-//define('BIZUNO_SUPPORT_EMAIL','webmaster@my-business.com');
-
-// Initialize Bizuno
-require ( BIZUNO_FS_PORTAL  . 'lib/controller.php' );
+// Initialize Bizuno Library
 require ( BIZUNO_FS_LIBRARY . 'bizunoCFG.php' );
-if (file_exists()) { require ( BIZUNO_FS_ASSETS  . 'autoload.php' ); } // Load the Bizuno thrid party libraries
+
+// Initialize Portal
+require ( BIZUNO_FS_PORTAL  . 'portal/controller.php' );

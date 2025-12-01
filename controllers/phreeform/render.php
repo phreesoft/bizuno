@@ -621,7 +621,7 @@ class phreeformRender
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         if (sizeof($result) == 0)       { return msgAdd(lang('phreeform_output_none'), 'caution'); }
 
-msgDebug("\nresult = ".print_r($result, true));
+//msgDebug("\nresult = ".print_r($result, true));
         // set the filename for download or email
         if (isset($report->filenameprefix) || isset($report->filenamefield)) {
             $report->filename  = isset($report->filenameprefix)? $report->filenameprefix : '';

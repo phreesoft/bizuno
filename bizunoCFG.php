@@ -39,16 +39,6 @@ define('PHREESOFT_LOGO', 'https://www.phreesoft.com/phreesoft.png'); // URL to d
 define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft RESTful API
 define('PHREESOFT_IP',   '71.78.123.232');
 
-// Set the PDF renderer application
-$pdfRenderer = 'TCPDF'; // Options are 'TCPDF' (Default) and 'tFPDF'
-if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
-    define('BIZUNO_PDF_ENGINE', 'tFPDF');
-    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'FPDF/');
-} else { // Current: https://github.com/tecnickcom/tc-lib-pdf - was: https://tcpdf.org/
-    define('BIZUNO_PDF_ENGINE', 'TCPDF');
-    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'TCPDF/');
-}
-
 // set some sitewide constants
 //define('COG_ITEM_TYPES', 'ma,mi,ms,sa,si,sr'); // DEPRECATED
 define('INVENTORY_COGS_TYPES', ['ma','mi','ms','sa','si','sr']); // Inventory types that track costs in the gl
@@ -87,3 +77,23 @@ require_once ( BIZUNO_FS_LIBRARY . 'model/msg.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/mail.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'view/main.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'view/easyUI/html5.php' );
+
+// Set the PDF renderer application
+$pdfRenderer = 'TCPDF'; // Options are 'TCPDF' (Default) and 'tFPDF'
+if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
+    define('BIZUNO_PDF_ENGINE', 'tFPDF');
+    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'FPDF/');
+} else { // Current: https://github.com/tecnickcom/tc-lib-pdf - was: https://tcpdf.org/
+    define('BIZUNO_PDF_ENGINE', 'TCPDF');
+    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'TCPDF/');
+}
+
+// Load the Bizuno third party libraries
+if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { 
+    require ( BIZUNO_FS_ASSETS  . 'autoload.php' );
+} else { // If not using composer, try to load each library used seperately
+    
+}
+
+
+

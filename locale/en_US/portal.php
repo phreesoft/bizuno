@@ -21,14 +21,17 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-12-01
  * @filesource /lib/local/en_US.php
  */
 
 $lang = [
     'install_intro' => '<p>You\'re just about ready to get started. We just need to finish installing the database tables and set up your user environment. Please select from the choices below and press the Next icon. If you are not sure, not to worry, most of these can be changed through the administrator settings. It takes about 10 seconds to build your databases and you will be ready to go.</p>',
+    'biz_db_name' => 'Database Name',
+    'biz_db_user' => 'Database Username',
+    'biz_db_pass' => 'Database Password',
     'biz_user' => 'Administrator Email',
-    'biz_pass' => 'Password',
+    'biz_pass' => 'Administrator Password',
     'biz_title' => 'Business Name',
     'biz_lang' => 'Default Language',
     'biz_timezone' => 'Default Timezone',
@@ -36,7 +39,7 @@ $lang = [
     'biz_chart' => 'Pick a default chart of accounts to use:',
     'biz_fy' => 'Pick a fiscal year to get going:',
     'email' => 'Email',
-    'signin' => 'LOGIN',
+    'signin' => 'SIGNIN',
     'install' => 'INSTALL',
     'password' => 'Password',
     'password_lost' => 'Lost Password?',
@@ -50,6 +53,13 @@ $lang = [
     'fiscal_year' =>'Fiscal Year',
     'migrate' => 'Migrate',
     'migrate_intro' => 'Looks like your database version is from a deprecated version of Bizuno. Press Migrate to bring your database to the current Bizuno release.',
+    'msg_reset_email_sent' => 'Reset email sent! Please check your email for a link to reset your password.',
+    'err_config_not_writable' => 'I cannot write to the file portalCFG.php. Please make sure it is writable!',
     'err_illegal_access' => 'Illegal Access!',
+    'err_invalid_email' => 'Your email is invalid, please correct and try again!',
     'err_invalid_creds' => 'Invalid Username/Password.',
+    'err_invalid_db_creds' => 'I am having difficulties connecting to your database, Please checkthe credentials in your PortalCFG.php file!',
+    'err_undefined_db_creds' => 'DB credentials have not been defined, install cannot continue!',
+    'err_no_data_folder' => 'I cannot find your data folder! Does the path exist and is it writeable?',
+    'err_missing_cfg' => 'I cannot find the sample configuration file /portalCFG-sample.php to use as my base! You may want to re-install Bizuno from the GitHub source!',
 ];

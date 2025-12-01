@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-23
+ * @version    7.x Last Update: 2025-12-01
  * @filesource /view/easyui/stylesheet.css
  */
 
@@ -96,6 +96,35 @@ body.loading .modal      { display:block; }
     --text: #ffffff;
     --grid: #444444;
   }
+}
+
+/* Easyui overrides */
+/* Rounded corners for ALL panels, windows, dialogs, messagers… */
+.panel-body,
+.window,
+.window .window-body,
+.dialog-content,
+.messager-body {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    overflow: hidden;                       /* important so content doesn’t leak out */
+}
+
+/* Optional: also round the header (title bar) */
+.panel-header,
+.window-header,
+.dialog-toolbar,
+.dialog-button {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+/* Optional: round the footer/buttons area */
+.panel-footer,
+.window-footer,
+.dialog-button {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 /* Force everything – Google loves inline styles */
