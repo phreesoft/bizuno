@@ -1,5 +1,6 @@
+<?php
 /*
- * Common javascript file loaded with the portal
+ * This class maps the structure to HTML syntax using the jQuery easyUI UI
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-06
- * @filesource /view/portal.js
+ * @version    7.x Last Update: 2025-11-22
+ * @filesource /view/themes/kendoUI/html5.php
  */
 
-var jqBiz = $.noConflict();
-var bizID = 0;
+namespace bizuno;
 
-const isDarkMode    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';
-const screenWidth   = screen.width; // screen dims
-const screenHeight  = screen.height;
-const viewportWidth = window.innerWidth; // window dims
-const viewportHeight= window.innerHeight;
+final class html5 {
 
-// Appends the users viewport size, screen size, and display mode preferences to the login screen
-function appendPrefs() {
-    var form = jqBiz('#frmLogin');
-    if (typeof form === 'undefined') { return; } // Not at login screen
-    jqBiz('#frmLogin').attr('action', window.location.href + "?mode=" + isDarkMode + "&screen=" + screenWidth);
+    
 }

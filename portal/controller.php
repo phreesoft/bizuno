@@ -67,12 +67,13 @@ class portalCtl
         }
         new view($this->layout);
     }
+
     private function setDOM()
     {
         global $html5;
         $modsEasy= ['administrate','api','bizuno','common','contacts','inventory','payment','phreebooks','phreeform','quality','shipping'];
         bizAutoLoad(BIZUNO_FS_LIBRARY.'view/main.php', 'view');
-        $ui = !in_array($this->route['module'], $modsEasy) ? 'jQueryUI' : 'easyUI';
+        $ui = !in_array($this->route['module'], $modsEasy) ? 'kendoUI' : 'easyUI';
         bizAutoLoad(BIZUNO_FS_LIBRARY."view/$ui/html5.php", 'html5');
         $html5 = new html5();
     }
@@ -153,7 +154,7 @@ class portalCtl
     {
         msgDebug("\nEntering setGuestCache");
         return [
-            'profile'   => ['userID'=>0, 'email'=>'', 'language'=>'en_US'], // , 'admin_id'=>0, 'biz_id'=>0
+            'profile'   => ['userID'=>0, 'email'=>'', 'language'=>'en_US'],
             'business'  => ['bizID' =>defined('BIZUNO_BIZID') ? BIZUNO_BIZID : 0],
             'dashboards'=> []];
     }

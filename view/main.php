@@ -189,11 +189,10 @@ final class view
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'black' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
-//        $cssPath = defined('BIZUNO_SHARED') && !empty(BIZUNO_SHARED) ? 'myPortal' : 'ispPortal';
-        $js  = "var bizID = '".getUserCache('business','bizID', false, 0)."';\n";
-        $js .= "var bizunoHome = '".BIZUNO_URL_PORTAL."';\n";
-        $js .= "var bizunoAjax = '".BIZUNO_URL_AJAX."';\n";
-        $js .= "var bizunoAjaxFS = '".BIZUNO_URL_FS."';\n";
+        $js  = "const bizID = '".getUserCache('business','bizID', false, 0)."';\n";
+        $js .= "const bizunoHome = '".BIZUNO_URL_PORTAL."';\n";
+        $js .= "const bizunoAjax = '".BIZUNO_URL_AJAX."';\n";
+        $js .= "const bizunoAjaxFS = '".BIZUNO_URL_FS."';\n";
         // Create page Head HTML
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.(!empty($data['title']) ? $data['title'] : getModuleCache('bizuno', 'properties', 'title')).'</title>'];
         $data['head']['metaPath']    = ['order'=>22,'type'=>'html','html'=>'<!-- route:'.clean('bizRt',['format'=>'path_rel','default'=>''],'get').' -->'];
