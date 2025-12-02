@@ -107,7 +107,6 @@ body.loading .modal      { display:block; }
 .messager-body {
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    overflow: hidden;                       /* important so content doesn’t leak out */
 }
 
 /* Optional: also round the header (title bar) */

@@ -395,6 +395,7 @@ class bizunoDashboard
         if (!empty($data['legend']) && empty(getModuleCache('bizuno', 'settings', 'general', 'hide_filters', 0))) {
 //            $output['divs']['head'] = ['order'=>40,'type'=>'html','html'=>$data['legend']];
         }
+        if (empty($data['type'])) { $data['type'] = 'bizWay'; }
         switch ($data['type']) {
             case 'gChart':  $this->googleChart($output, $dashID, $data); break;
             case 'gColumn': $this->googleColumn($output, $dashID, $data); break;

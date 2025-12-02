@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /model/registry.php
  */
 
@@ -306,9 +306,9 @@ unset($bizunoMod[$module]['dashboards']);
             dbMetaSet($role['_rID'], 'bizuno_role', $role);
             $this->userInfo['r'.$role['_rID']] = [
                 'title'   => $role['title'],
-                'restrict'=> $role['restrict'],
+                'restrict'=> !empty($role['restrict'])? $role['restrict']: 0,
                 'admin'   => $role['administrate'],
-                'groups'  => $role['groups']];
+                'groups'  => !empty($role['groups'])  ? $role['groups']  : null];
         }
         dbSetBizunoUsers();
         dbSetBizunoEmployees();

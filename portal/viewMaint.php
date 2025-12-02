@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /portal/viewMaint.php
  */
 
@@ -34,6 +34,7 @@ class portalViewMaint
     private $defChart= 'retail-single.csv';
     public  $lang;
     public  $locale  = '';
+    private $bizKey;
     private $dbCreds = [];
 
     function __construct()
@@ -42,6 +43,7 @@ class portalViewMaint
         $lang = [];
         require(BIZUNO_FS_LIBRARY . "locale/$iso/portal.php"); // replace $lang
         $this->lang = $lang;
+        $this->bizKey = BIZUNO_KEY;
     }
 
     /******************************* Lost Password *************************************/
@@ -167,7 +169,7 @@ class portalViewMaint
             $exists= dbMetaGet(0, 'user_auth', 'contacts', $cID);
             msgDebug("\nExists = ".print_r($exists, true));
             $rID = metaIdxClean($exists);
-            $peppered = hash_hmac('sha256', $_POST['bizPass0'], BIZUNO_KEY);
+            $peppered = hash_hmac('sha256', $_POST['bizPass0'], $this->bizKey);
             $hashed = password_hash($peppered, PASSWORD_DEFAULT);
             dbMetaSet($rID, 'user_auth', $hashed, 'contacts', $cID);
             dbMetaDelete($codeID, 'contacts');
@@ -227,7 +229,7 @@ class portalViewMaint
         $email = clean('biz_user', 'email', 'post');
         if (empty($email)) { $this->errors .= $this->lang['err_invalid_email']; return; }
         if (!$this->installTestDB()) { $this->errors .= $this->lang['err_invalid_db_creds']; return; }
-        $cookie = base64_encode(json_encode([1, 0, $email, $this->instRole, $_SERVER['REMOTE_ADDR']]));
+        $cookie = base64_encode(json_encode([1, 0, $email, 10, $_SERVER['REMOTE_ADDR']])); // role=10 by default
         bizSetCookie('bizunoUser',   $email, time()+(60*60*24*7)); // 7 days
         bizSetCookie('bizunoSession',$cookie,time()+(60*60*10)); // 10 hours
         setUserCache('profile', 'userID', 1); // Local user ID
@@ -240,7 +242,7 @@ class portalViewMaint
         $installer = new bizInstall();
         $installer->installBizuno($layout);
         if (isset($GLOBALS['BIZUNO_INSTALL_CID'])) { // since we are local, need to set role and password contact meta
-            $peppered = hash_hmac('sha256', $_POST['biz_pass'], BIZUNO_KEY);
+            $peppered = hash_hmac('sha256', $_POST['biz_pass'], $this->bizKey);
             $hashed = password_hash($peppered, PASSWORD_DEFAULT);
             dbMetaSet(0, 'user_auth', $hashed, 'contacts', $GLOBALS['BIZUNO_INSTALL_CID']);
         }
@@ -269,11 +271,13 @@ class portalViewMaint
     {
         switch ($const) {
             case 'BIZUNO_BIZID': return "if ( !defined( 'BIZUNO_BIZID' ) ) { define( 'BIZUNO_BIZID', '".randomValue(6)."' ); }";
-            case 'BIZUNO_KEY':   return "if ( !defined( 'BIZUNO_KEY' ) ) { define( 'BIZUNO_KEY', '".randomValue(16)."' ); }";
+            case 'BIZUNO_KEY':
+                $this->bizKey = randomValue(16); // need this to encrypt the cookie
+                return "if ( !defined( 'BIZUNO_KEY' ) ) { define( 'BIZUNO_KEY', '$this->bizKey' ); }";
             case 'BIZUNO_DB_CREDS':
                 $name = clean('biz_db_name', 'db_field','post');
-                $user = clean('biz_db_user', 'db_field', 'post');
-                $pass = clean('biz_db_pass', 'text',     'post');
+                $user = clean('biz_db_user', 'db_field','post');
+                $pass = clean('biz_db_pass', 'text',    'post');
                 $this->dbCreds = ['type'=>'mysql', 'host'=>'localhost', 'name'=>$name, 'user'=>$user, 'pass'=>$pass, 'prefix'=>BIZUNO_DB_PREFIX ];
                 return "if ( !defined( 'BIZUNO_DB_CREDS' ) ) { define( 'BIZUNO_DB_CREDS', ['type'=>'mysql', 'host'=>'localhost', 'name'=>'$name', 'user'=>'$user', 'pass'=>'".addslashes($pass)."', 'prefix'=>BIZUNO_DB_PREFIX ] ); }";
         }

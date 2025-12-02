@@ -46,13 +46,13 @@ class favorite_reports
     }
     private function fieldStructure()
     {
-        $reports= [['id'=>'', 'text'=>lang('select')]];
+        $reports= [['id'=>'0', 'text'=>lang('select')]];
         foreach ($this->allRpts as $row) { if (validateUsersRoles($row)) { $reports[] = ['id'=>$row['id'], 'text'=>$row['title']]; } }
         $this->struc = [ // Admin fields
-            'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array','attr'=>['type'=>'users','value'=>[ 0]],'admin'=>true],
-            'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array','attr'=>['type'=>'roles','value'=>[-1]],'admin'=>true],
+            'users' => ['order'=>10,'label'=>lang('users'), 'clean'=>'array',  'attr'=>['type'=>'users','value'=>[ 0]],'admin'=>true],
+            'roles' => ['order'=>20,'label'=>lang('groups'),'clean'=>'array',  'attr'=>['type'=>'roles','value'=>[-1]],'admin'=>true],
             // User fields
-            'rptID' => ['order'=>40,'label'=>lang('report_add'),'clean'=>'integer','attr'=>['type'=>'select','value'=>''],'values'=>$reports]];
+            'rptID' => ['order'=>40,                        'clean'=>'integer','attr'=>['type'=>'select','value'=>0],'values'=>$reports]];
         metaPopulate($this->struc, getMetaDashboard($this->code));
     }
     public function render($opts=[])
@@ -79,7 +79,7 @@ class favorite_reports
     {
         $rmID = clean('rID', 'integer', 'get');
         $rptID= clean($this->code.'rptID', 'integer', 'post');
-        if (empty($rmID) && empty($rptID)) { return msgAdd(lang('bad_data')); } // do nothing if no title or url entered
+        if (empty($rmID) && empty($rptID)) { return; } // do nothing if no title or url entered
         if ($rmID) { array_splice($usrMeta[$this->code]['opts']['data'], array_search($rmID, $usrMeta[$this->code]['opts']['data']), 1); }
         else       { $usrMeta[$this->code]['opts']['data'][] = $rptID; }
     }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /portal/viewAuth.php
  */
 
@@ -43,11 +43,15 @@ class portalViewAuth
     {
         global $db;
         if (function_exists("\\bizuno\\portalLogin")) { return portalLogin($layout, $this->errors, $this->lang); } // hook for customization
-        msgDebug("\nEntering portalView::guest/login.");
+        msgDebug("\nEntering portalViewAuth::guest/login.");
         // if POST vars are set then try to log in else show form
         if (isset($_POST['bizUser']) && isset($_POST['bizPass'])) {
             msgDebug("\nCredentials sent, trying to validate.");
-            if ($this->validateUser($layout)) { msgDebug("\nUser validated, reloading!"); $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]]; return; } // if validated, return to load home page
+            if ($this->validateUser($layout)) { // if validated, return to load home page
+                msgDebug("\nUser validated, reloading!");
+                $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]];
+                return;
+            }
         }
         // Show login form
         $src = BIZUNO_LOGO;
@@ -91,6 +95,7 @@ class portalViewAuth
         $profile = getMetaContact($user['id'], 'user_profile');
         $peppered= hash_hmac('sha256', $_POST['bizPass'], BIZUNO_KEY);
         if (password_verify($peppered, $encPW['value'])) {
+            msgDebug("\nUser validated, setting cookie.");
             $user = ['userID'=>$user['id'], 'psID'=>0, 'userEmail'=>$email, 'userRole'=>$profile['role_id'], 'userName'=>$user['primary_name']];
             setUserCookie($user);
             $layout['jsReady']['reload'] = "window.location.href = '".BIZUNO_URL_PORTAL."'";

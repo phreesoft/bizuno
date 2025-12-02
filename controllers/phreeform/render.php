@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -1165,7 +1165,8 @@ class phreeformRender
         $vals = [];
         $meta = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
         $def  = !empty($report->defaultemail) ? $report->defaultemail : 'user';
-        if (!empty($meta['email'])) { 
+        if (!empty($meta['email'])) {
+            if (empty($meta['title'])) { $meta['title'] = $meta['email']; }
             $user = $meta['title']." <".$meta['email'].">";
             $vals['user'] = ['id'=>'user', 'text'=>$user];
         }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /model/functions.php
  */
 
@@ -241,6 +241,8 @@ function setUserCookie($user)
     if (!empty($user['userID'])) { // set the users preferences
         $meta   = dbMetaGet(0, 'user_profile', 'contacts', $user['userID']);
         $metaIdx= metaIdxClean($meta);
+        if (!isset($meta['mode']))  { $meta['mode']  = 'dark'; }
+        if (!isset($meta['screen'])){ $meta['screen']= '2048'; }
         $mode   = clean('mode',  'alpha_num', 'get');
         if (!empty($mode) && $mode<>$meta['mode']) { $meta['mode'] = $mode; }
         $device = clean('screen','alpha_num', 'get');
@@ -660,6 +662,7 @@ function getMetaMethod($folder, $method='')
     }
     if (isset($GLOBALS["methods_{$folder}"])) {
         msgDebug(" ... Retrieved methods from db meta key.");
+        if (!empty($method) && empty($GLOBALS["methods_{$folder}"][$method])) { return []; }
         return !empty($method) ? $GLOBALS["methods_{$folder}"][$method] : $GLOBALS["methods_{$folder}"];
     }
     msgAdd("\nMethod meta for folder $folder NOT FOUND! This is not good.", 'trap');

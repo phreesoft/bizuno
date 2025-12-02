@@ -81,7 +81,7 @@ require_once ( BIZUNO_FS_LIBRARY . 'view/easyUI/html5.php' );
 // Set the PDF renderer application
 $pdfRenderer = 'TCPDF'; // Options are 'TCPDF' (Default) and 'tFPDF'
 if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
-    define('BIZUNO_PDF_ENGINE', 'tFPDF');
+    define('BIZUNO_PDF_ENGINE', 'FPDF');
     define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'FPDF/');
 } else { // Current: https://github.com/tecnickcom/tc-lib-pdf - was: https://tcpdf.org/
     define('BIZUNO_PDF_ENGINE', 'TCPDF');
@@ -89,11 +89,29 @@ if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
 }
 
 // Load the Bizuno third party libraries
-if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { 
+if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { // using composer
     require ( BIZUNO_FS_ASSETS  . 'autoload.php' );
 } else { // If not using composer, try to load each library used seperately
-    
+    if (file_exists( BIZUNO_FS_ASSETS . 'tecnickcom/tcpdf/tcpdf.php' ) && 'TCPDF' == BIZUNO_PDF_ENGINE) {
+        require ( BIZUNO_FS_ASSETS . 'tecnickcom/tcpdf/tcpdf.php' );
+        require ( BIZUNO_FS_ASSETS . 'setasign/fpdi/src/autoload.php' );
+    } elseif (file_exists( BIZUNO_FS_ASSETS . 'setasign/fpdf/fpdf.php' ) && 'FPDF' == BIZUNO_PDF_ENGINE) {
+        require ( BIZUNO_FS_ASSETS . 'setasign/fpdf/fpdf.php' );
+        require ( BIZUNO_FS_ASSETS . 'setasign/fpdi/src/autoload.php' );
+    }
+    if (file_exists( BIZUNO_FS_ASSETS . 'phpmailer/phpmailer/src/PHPMailer.php' )) {
+        require ( BIZUNO_FS_ASSETS . 'phpmailer/phpmailer/src/PHPMailer.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpmailer/phpmailer/src/SMTP.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpmailer/phpmailer/src/Exception.php' );
+    }
+    if (file_exists( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Net/SSH2.php' )) {
+        require ( BIZUNO_FS_ASSETS . 'paragonie/constant_time_encoding/src/EncoderInterface.php' ); // ParagonIE, needs to be before phpseclib
+        require ( BIZUNO_FS_ASSETS . 'paragonie/constant_time_encoding/src/Base64.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Crypt/Common/AsymmetricKey.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Crypt/Hash.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Crypt/PublicKeyLoader.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Crypt/RSA.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Math/BigInteger.php' );
+        require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Net/SSH2.php' );
+    }
 }
-
-
-

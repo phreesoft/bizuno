@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2025-12-02
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -43,7 +43,7 @@ class shippingAdmin extends shippingCommon
     {
         parent::__construct();
         $this->structure= [
-            'dirMethods'=> 'carriers',
+            'dirMethods'=> ['carriers'],
             'menuBar'   => ['child'=>[
                 'tools'    => ['child'=>[
                     'shipping'=>['order'=>10,'label'=>sprintf(lang('tbd_manager'),lang('shipping')),'icon'=>'shipping','route'=>"$this->moduleID/manager/manager"]]],
