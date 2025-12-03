@@ -7,11 +7,7 @@ Bizuno is a full-featured, open-source ERP and accounting application developed 
 1. [Features](#features)
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Configuration](#configuration)
-6. [Contributing](#contributing)
-7. [Troubleshooting](#troubleshooting)
-8. [License](#license)
+4. [License](#license)
 
 ## Features
 - **Double-Entry Accounting**: Complete financial tracking with general ledger, accounts receivable, and accounts payable.
