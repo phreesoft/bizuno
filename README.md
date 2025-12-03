@@ -28,59 +28,40 @@ Before installing Bizuno, ensure you have:
 - **PHP**: Version 8.0 or higher (PHP 8.2 recommended).
 - **MySQL**: Version 5.6 or higher (MySQL 8.0+ recommended). MariaDB 10.2 or higher (10.11+ recommended)
 - **Web Server**: Apache or Nginx.
-- **Git**: For cloning the repository.
-- A modern web browser (e.g., Chrome, Firefox) for the dashboard.
-- Optional: WordPress installation for plugin-based deployment.
+- A modern web browser (e.g., Chrome, Firefox, Safari) for the dashboard.
+- **Optional**: WordPress installation for plugin-based deployment.
 
 ## Installation
 Bizuno can be installed as a standalone application, a WordPress plugin, or hosted in the PhreeSoft cloud. Below are instructions for the standalone installation from the GitHub repository.
 
-1. **Clone the Repository**
+1. **Using composer (preferred)**
+   - Before installation you will need a website and a database to host your Bizuno business books. Bizuno can be installed in a sub-domain on your current website but it is recommended that your Bizuno database be separate from your other databases.
+   - Installing using composer with install Bizuno and all necessary libraries
    ```bash
-   git clone https://github.com/bcezarc/PhreeBooksERP.git
-   cd PhreeBooksERP
+   composer create-project phreesoft/bizuno
    ```
+   - Navigate to the web root and you should see the installation page.
+   - Fill out the fields and press Install. It takes about 10 seconds to create the database. Once complete yo should see the Bizuno home dashboard.
+   - A pre-set ToDo list will be generated with applicable priorities. Some actions cannot be taken once journal entries have been made.
+   - Please refer the the Bizuno help pages for operational tips and procedures.
 
-2. **Upload to Web Server**
-   - Copy the repository files to your web server’s root directory or a subdirectory (e.g., `/var/www/html/bizuno`).[](https://github.com/bcezarc/PhreeBooksERP)
-   - Ensure the web server has read access to all directories except `/my_files`, which requires write access for company-specific files.[](https://wiki.koozali.org/PhreeBooks)
-
-3. **Set Up Database**
-   - Create a MySQL database using a tool like phpMyAdmin or the MySQL CLI.
-   - Note your database credentials (host, username, password, database name).
-
-4. **Run Installation**
-   - Navigate to the Bizuno root folder in your browser (e.g., `http://yourdomain.com/bizuno`).
-   - The installation portal will prompt for:
-     - Administrator email and password.
-     - Database credentials (host, username, password, database name).
-     - Initial settings (e.g., currency, chart of accounts).[](https://github.com/bcezarc/PhreeBooksERP)
-   - Select preferences and click **Next**. Wait approximately 10 seconds for configuration. The dashboard will load upon completion.[](https://github.com/bcezarc/PhreeBooksERP)
+2. **Manual Install**
+   - Download the latest release of Bizuno from the GitHub server into your website document root folder and unzip the file. (e.g., `/var/www/html`).[](https://github.com/phreesoft/bizuno)
+   - Navigate to the web root and you should see the installation page.
+   - Fill out the fields and press Install. It takes about 10 seconds to create the database. Once complete yo should see the Bizuno home dashboard. The auto-installer will create the file bizunoCFG.php from the sample file in the package. The file can be created manually if you have special requirements, i.e. want your data files stored in a private folder. Either way, the installer will verify db connectivity and install the core tables.
+   - A pre-set ToDo list will be generated with applicable priorities. Some actions cannot be taken once journal entries have been made.
+   - Please refer the the Bizuno help pages for operational tips and procedures.
 
 **WordPress Plugin Installation**
-- Install the Bizuno Accounting plugin from the WordPress plugin repository.
-- Activate the plugin and log in to WordPress.
-- Access Bizuno from the WordPress admin menu (requires user authorization).[](https://www.phreesoft.com/bizuno/)
+- From the Wordpres plugin page, click on upload and search for the bizuno-accounting (search: Bizuno) plugin. Click on Install to retrieve the plugin from the WordPress Repository.
+- Activate the plugin and log in to WordPress. The latest Bizuno library plugin (yes, it is a seperate plugin) will be retrieved from the PhreeSoft server if it is not present on your server server.
+- Once activated, Bizuno can be accessed from the WordPress admin menu (requires user authorization). This will open a new tab in your browser and land on the install page. Fill out the form and press Install.
+- Bizuno will create a new page with the slug bizuno. If you use permalinks to access pages via slug, accessing Bizuno from this point can be by navigating directly to: [](https://www.yourdomain.com/bizuno)
+- NOTE: Bizuno keeps a separate user list from the standard Wordpress users table. The user that installs Bizuno will have their account created automatically and assumed to be the administrator within Bizuno. Once installed, new users can be added from within Bizuno.
+- Please refer the the Bizuno help pages for operational tips and procedures.
 
 **Cloud Hosting**
-- Sign up for PhreeSoft’s cloud hosting at [phreesoft.com](https://www.phreesoft.com). No local installation is required.[](https://www.phreesoft.com/product/hosted-bizuno/)
-
-### Web Dashboard
-1. Access the dashboard at `http://yourdomain.com/bizuno` or via the WordPress admin panel.
-2. Log in with your administrator credentials (default: set during installation).
-3. Use the interface to:
-   - Create and manage tasks, invoices, and payments.
-   - Track inventory and generate reports.
-   - Configure integrations (e.g., WooCommerce, shipping carriers).[](https://www.phreesoft.com/)
-
-## Configuration
-Customize Bizuno by editing the `/portalCFG.php` file to set up your environment settings:
-- **Database Settings**: Update `BIZUNO_DB_CREDS` with your database credentials.
-- **Business ID**: Set your busienss ID, can be any combination of numbers and letters, best if more than 6 characters
-- **Business Data Path**: Path to your business data files. This can be anywhere within the server php path. For security, the your data files should be located out of the reach of your wweb server.
-- **Bizuno Key**: Set to a random 16 character string, used to encode your cookies and for other security measures.
-
-For issues or feature requests, visit the [GitHub Issues page](https://github.com/bcezarc/PhreeBooksERP/issues).[](https://github.com/bcezarc/PhreeBooksERP)
+- Sign up for PhreeSoft’s cloud hosting at [phreesoft.com](https://www.phreesoft.com). No local installation is required. Phreesoft will assist in the configuration and maintenance of Bizuno.[](https://www.phreesoft.com/product/hosted-bizuno/)
 
 ## License
 Bizuno is licensed under the GNU Affero General Public License v3 (AGPL3). See [LICENSE](LICENSE) for details.[](https://www.gnu.org/licenses/agpl-3.0.txt)
