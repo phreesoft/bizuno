@@ -26,7 +26,7 @@ Bizuno is a full-featured, open-source ERP and accounting application developed 
 ## Prerequisites
 Before installing Bizuno, ensure you have:
 - **PHP**: Version 8.0 or higher (PHP 8.2 recommended).
-- **MySQL**: Version 5.0 or higher (MySQL 5.6 or 5.7 recommended).
+- **MySQL**: Version 5.6 or higher (MySQL 8.0+ recommended). MariaDB 10.2 or higher (10.11+ recommended)
 - **Web Server**: Apache or Nginx.
 - **Git**: For cloning the repository.
 - A modern web browser (e.g., Chrome, Firefox) for the dashboard.
