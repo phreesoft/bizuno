@@ -42,7 +42,7 @@ Bizuno can be installed as a standalone application, a WordPress plugin, or host
    - Please refer the the Bizuno help pages for operational tips and procedures.
 
 2. **Manual Install**
-   - Download the latest release of Bizuno from the GitHub server into your website document root folder and unzip the file. (e.g., `/var/www/html`).[](https://github.com/phreesoft/bizuno)
+   - Download the latest release of Bizuno from the GitHub server into your website document root folder and unzip the file. (e.g., `/var/www/html`).[Bizuno @GitHub](https://github.com/phreesoft/bizuno)
    - Navigate to the web root and you should see the installation page.
    - Fill out the fields and press Install. It takes about 10 seconds to create the database. Once complete yo should see the Bizuno home dashboard. The auto-installer will create the file bizunoCFG.php from the sample file in the package. The file can be created manually if you have special requirements, i.e. want your data files stored in a private folder. Either way, the installer will verify db connectivity and install the core tables.
    - A pre-set ToDo list will be generated with applicable priorities. Some actions cannot be taken once journal entries have been made.
@@ -52,12 +52,12 @@ Bizuno can be installed as a standalone application, a WordPress plugin, or host
 - From the Wordpres plugin page, click on upload and search for the bizuno-accounting (search: Bizuno) plugin. Click on Install to retrieve the plugin from the WordPress Repository.
 - Activate the plugin and log in to WordPress. The latest Bizuno library plugin (yes, it is a seperate plugin) will be retrieved from the PhreeSoft server if it is not present on your server server.
 - Once activated, Bizuno can be accessed from the WordPress admin menu (requires user authorization). This will open a new tab in your browser and land on the install page. Fill out the form and press Install.
-- Bizuno will create a new page with the slug bizuno. If you use permalinks to access pages via slug, accessing Bizuno from this point can be by navigating directly to: [](https://www.yourdomain.com/bizuno)
+- Bizuno will create a new page with the slug bizuno. If you use permalinks to access pages via slug, accessing Bizuno from this point can be by navigating directly to: [My Business](https://www.yourdomain.com/bizuno)
 - NOTE: Bizuno keeps a separate user list from the standard Wordpress users table. The user that installs Bizuno will have their account created automatically and assumed to be the administrator within Bizuno. Once installed, new users can be added from within Bizuno.
 - Please refer the the Bizuno help pages for operational tips and procedures.
 
 **Cloud Hosting**
-- Sign up for PhreeSoft’s cloud hosting at [phreesoft.com](https://www.phreesoft.com). No local installation is required. Phreesoft will assist in the configuration and maintenance of Bizuno.[](https://www.phreesoft.com/product/hosted-bizuno/)
+- Sign up for PhreeSoft’s cloud hosting at [phreesoft.com](https://www.phreesoft.com). No local installation is required. Phreesoft will assist in the configuration and maintenance of Bizuno.[ISP Bizuno Hosting](https://www.phreesoft.com/product/hosted-bizuno/)
 
 ## License
 Bizuno is licensed under the GNU Affero General Public License v3 (AGPL3). See [LICENSE](LICENSE) for details.[](https://www.gnu.org/licenses/agpl-3.0.txt)
