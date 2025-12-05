@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-29
+ * @version    7.x Last Update: 2025-12-05
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -397,9 +397,9 @@ class bizunoDashboard
         }
         if (empty($data['type'])) { $data['type'] = 'bizWay'; }
         switch ($data['type']) {
-            case 'gChart':  $this->googleChart($output, $dashID, $data); break;
-            case 'gColumn': $this->googleColumn($output, $dashID, $data); break;
-            case 'gTable':  $this->googleTable($output, $dashID, $data); break;
+            case 'gChart':  googleChart($output, $dashID, $data);  break;
+            case 'gColumn': googleColumn($output, $dashID, $data); break;
+            case 'gTable':  googleTable($output, $dashID, $data);  break;
             default:
                 if       (!empty($data['lists']))  { // for lists
                     $output['divs']['body']= ['order'=>50, 'type'=>'list', 'key'=>$dashID];
@@ -408,10 +408,6 @@ class bizunoDashboard
                     $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>$data['html']];
                 } elseif (!empty($data['data']))   { // structure 
                     $output = array_replace_recursive($output, $data['data']);
-                } elseif (!empty($data['usrList'])){ // for user defined lists
-
-                } elseif (!empty($data['tskList'])){ // for task lists, like reminders
-
                 } else {
                     $output['divs']['body']= ['order'=>50, 'type'=>'html', 'html'=>"<span>".lang('no_results')."</span>"];
                 }
@@ -419,91 +415,5 @@ class bizunoDashboard
         if (!empty($data['jsHead'])) { $output['jsHead']['init'] = "\n".$data['jsHead']; }
         if (!empty($data['jsBody'])) { $output['jsBody']['init'] = "\n".$data['jsBody']; }
         if (!empty($data['jsReady'])){ $output['jsReady']['init']= "\n".$data['jsReady']; }
-    }
-    private function googleChart(&$output, $dashID, $data)
-    {
-        $jsReady= '';
-        $jsBody = "
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(chart{$dashID});
-function chart{$dashID}() {
-    var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
-    var options = {
-        title: '{$data['title']}',
-        titleTextStyle: { color: screenMode==='dark' ? '#eeeeee' : '#333333' },
-        chartArea: { left: 0, top: 40, right: 0, bottom: 0, width: '100%', height: '100%' },
-        backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
-        is3D: true,
-        pieSliceText: 'percentage',    // 'percentage', 'value', 'label', or 'none'
-        pieSliceTextStyle: { fontSize: 14, color: screenMode==='dark' ? '#ffffff' : '#000000' },
-        legend: { position: 'right', textStyle: { color: screenMode==='dark' ? '#cccccc' : '#333333' } },
-        tooltip: { textStyle: { color: '#707070' } },
-    };
-    var chart = new google.visualization.PieChart(document.getElementById('{$dashID}_chart'));
-    chart.draw(data, options);
-}";
-        $html   = '<style>#{$dashID}_chart { width: 100% !important; height: 100% !important; }</style><div id="'.$dashID.'_chart"></div>';
-        if (!empty($data['callback'])) {
-            $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
-            $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
-            $jsReady.= "\najaxDownload('dl_{$dashID}')";
-        }
-        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
-        $output['jsBody'][$dashID]= $jsBody;
-        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
-    }
-    private function googleColumn(&$output, $dashID, $data)
-    {
-        $html  = '<div id="'.$dashID.'-column"></div>';
-        $jsBody="
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(draw_{$dashID}_column);
-function draw_{$dashID}_column() {
-var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
-var options = {
-//  title: 'Test Column',
-    backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
-    chartArea: { width: '100%', height: '100%' },
-    hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
-    vAxis: { minValue: 0 },
-    legend: { position: 'top' },
-    isStacked: false,              // set true for 100% stacked or regular stacked
-    bar: { groupWidth: '75%' },    // thickness of bars
-    animation: { duration: 1000, easing: 'out' }
-};
-  var chart = new google.visualization.ColumnChart(document.getElementById('$dashID-column'));
-  chart.draw(data, options);
-}";
-        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
-        $output['jsBody'][$dashID]= $jsBody;
-        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
-    }
-
-    private function googleTable(&$output, $dashID, $data)
-    {
-        $cols = $jsReady = '';
-        if (!empty($data['header'])) { // build the header columns
-            foreach ($data['header'] as $col) { $cols .= "\ndata.addColumn('{$col['type']}', '".addslashes($col['title'])."'); "; }
-        }
-        if (!empty($data['data'])) { $cols .= "\ndata.addRows(".json_encode($data['data'])."); "; } // add the data
-        $html  = '<div id="'.$dashID.'-table"></div>';
-        $jsBody="
-google.charts.load('current', {packages:['table']});
-google.charts.setOnLoadCallback(draw_{$dashID}_table);
-function draw_{$dashID}_table() {
-const data = new google.visualization.DataTable(); $cols
-new google.visualization.Table(document.getElementById('{$dashID}-table')).draw(data, {
-    showRowNumber: false, width: '100%', height: '100%', cssClassNames: {
-        headerRow:'my-table-header', tableRow:'my-table-row', hoverTableRow:'my-table-hover', oddTableRow:'my-table-odd' } }); }
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw_{$dashID}_table);
-new MutationObserver(draw_{$dashID}_table).observe(document.body, { attributes: true, attributeFilter: ['class'] });";
-        if (!empty($data['callback'])) {
-            $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
-            $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
-            $jsReady.= "\najaxDownload('dl_$dashID')";
-        }
-        $output['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
-        $output['jsBody'][$dashID]= $jsBody;
-        if (!empty($jsReady)) { $output['jsReady'][$dashID]= $jsReady; }
     }
 }

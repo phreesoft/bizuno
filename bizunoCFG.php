@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-03
  * @filesource /bizunoCFG.php
  */
 
@@ -29,7 +29,7 @@ namespace bizuno;
 
 if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)); }
 
-define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.3'); // Pull from file 
+define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.4'); // Pull from file 
 
 // URLs to PhreeSoft Images
 define('BIZUNO_LOGO',    'https://www.bizuno.com/bizuno.png'); // URL to default logo

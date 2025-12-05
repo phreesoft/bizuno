@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-12-05
  * @filesource /model/mail.php
  */
 
@@ -210,7 +210,7 @@ class bizunoMailer
             $mail->Host      = 'smtp.gmail.com'; 
             $mail->SMTPAuth  = true;
             $mail->Username  = $email;
-            $mail->Password  = $appPW;
+            $mail->Password  = trim(str_replace(' ', '', $appPW));
             $mail->SMTPSecure= 'tls';
             $mail->Port      = 587;
             $mail->send();

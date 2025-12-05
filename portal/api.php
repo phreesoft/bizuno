@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-23
+ * @version    7.x Last Update: 2025-12-05
  * @filesource /portal/api.php
  */
 
@@ -252,12 +252,12 @@ class portalApi
     public function orderAdd(&$layout=[])
     {
         global $io;
-        // Ned a new way to authenticate since the users are now local.
-        
-        
-        
+
+        // Need a new way to authenticate since the users are now local.
+
         $security = getUserCache('role', 'security');
         $security['prices_c'] = 2;
+        $security['j10_mgr'] = 2; // Need both sales and sales order since user has an option.
         $security['j12_mgr'] = 2;
         setUserCache('role', 'security', $security);
         loadBusinessCache();
