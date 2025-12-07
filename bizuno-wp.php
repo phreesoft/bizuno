@@ -18,10 +18,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class bizuno_wp_library
+class bizuno_wp
 {
     public function __construct()
     {
     }
 }
-new bizuno_wp_library();
+new bizuno_wp();
