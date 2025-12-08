@@ -332,19 +332,25 @@ class portalViewMaint
             return;
         }
         // Show migrate form
-        $js    = '<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/portal.css" />';
+//        $js    = '<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/portal.css" />';
         $logo  = ['label'=>getModuleCache('bizuno','properties','title'),'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/view/images/bizuno.png','height'=>48]];
-        $html  = '<div>'.html5('', $logo).'</div>'."\n".'<div class="info">'.$this->lang['migrate_intro'].'</div><br />'."\n".'<button>'.$this->lang['migrate'].'</button>'."\n";
+        $html  = '<div>'.html5('', $logo).'</div>'."\n".'<div class="info"><p>'.$this->lang['migrate_intro'].'</p></div>'."\n";
         if (!empty($this->errors)) { $html .= '<div class="error">'.$this->errors.'</div>'; }
         msgDebug("\nStarting to generate layout");
+        if (dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { // add admin user and password for new method of saving contact info
+            $html .= '<div class="info"><p>'.$this->lang['migrate_creds'].'</p></div>
+    <div class="info">'.$this->lang['biz_user'].'</div><div class="field"><input type="text" name="biz_user" value=""></div>
+    <div class="info">'.$this->lang['biz_pass'].'</div><div class="field"><input type="password" name="biz_pass" value=""></div>';
+        }
+        $html .= "<p><button>".$this->lang['migrate']."</button></p>\n";
         $layout= ['type'=>'migrate',
             'divs'   => [
-                'head'=> ['order'=> 5,'type'=>'html','html'=>$js],
+//                'head'=> ['order'=> 5,'type'=>'html','html'=>$js],
                 'body'=> ['order'=>10,'type'=>'divs','classes'=>['login-form'],'divs'=>[
-                'formBOF'=> ['order'=>20,'type'=>'form','key' =>'frmMigrate'],
-                'body'   => ['order'=>51,'type'=>'html','html'=>$html],
-                'formEOF'=> ['order'=>90,'type'=>'html','html'=>"</form>"]]]],
-            'forms'  =>['frmMigrate'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&migrate=1"]]],
+                    'formBOF'=> ['order'=>20,'type'=>'form','key' =>'frmMigrate'],
+                    'main'   => ['order'=>51,'type'=>'html','html'=>$html],
+                    'formEOF'=> ['order'=>90,'type'=>'html','html'=>"</form>"]]]],
+                'forms'  =>['frmMigrate'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&migrate=1"]]],
             'jsReady'=>['init'=>"ajaxForm('frmMigrate');"]];
         msgDebug("\nReturning layout ".print_r($layout, true));
     }
@@ -358,6 +364,10 @@ class portalViewMaint
         if (empty($charts)) { // if the COA is not present, bail on migrate since pre 7.0 it only survived in the cache
             return msgAdd('The chart of accounts is missing! Bailing');
         }
+        
+        // pull the admin username and password, set cookie for bizunoUser and temp one for bizunoPass with ecncrypted pw
+        
+
         $cron = migrateBizunoPrep();
         msgDebug("\nInitializing cron Bizuno migrate with cron = ".print_r($cron, true));
         setModuleCache('bizuno', 'cron', 'migrateBizuno', $cron);

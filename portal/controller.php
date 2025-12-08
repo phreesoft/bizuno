@@ -87,12 +87,13 @@ class portalCtl
         $db   = new db($creds);
         // This test first or standalone new installs breaks loading of css/js files
         if ('portal'==$this->route['module'] && 'api'==$this->route['page'])          { msgDebug("\nAPI Request, returning api");         return 'api'; }
-        if (!$db->connected       || !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nDB not connected, returning guest");  return 'install'; }
-        if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
+        if (!$db->connected       || !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nDB not connected, returning install");return 'install'; }
+        if ( dbTableExists(BIZUNO_DB_PREFIX.'address_book'))                          { msgDebug("\nNeed to migrate, returning migrate"); return 'migrate'; }
         if ( $this->userValidated &&  dbTableExists(BIZUNO_DB_PREFIX.'common_meta'))  { msgDebug("\nNormal operation, returning auth");   return 'auth'; }
         msgDebug("\nFalling through, returning guest.");
         return 'guest';
     }
+    
     /**
      * Handles requests when user has not been authenticated
      * @param type $layout

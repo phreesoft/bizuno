@@ -364,7 +364,7 @@ function migrate_users(&$cron=[], $cntOnly=false)
             'language'       => !empty($attrs['profile']['language'])       ? $attrs['profile']['language']       : 'en_US',
             'title'          => !empty($attrs['profile']['title'])          ? $attrs['profile']['title']          : $user['email'],
             'icons'          => !empty($attrs['profile']['icons'])          ? $attrs['profile']['icons']          : 'default',
-            'theme'          => !empty($attrs['profile']['theme'])          ? $attrs['profile']['theme']          : 'bizuno',
+            'theme'          => !empty($attrs['profile']['theme'])          ? $attrs['profile']['theme']          : 'auto',
             'gzone'          => !empty($attrs['profile']['gzone'])          ? $attrs['profile']['gzone']          : 'America/New_York',
             'def_periods'    => !empty($attrs['profile']['def_periods'])    ? $attrs['profile']['def_periods']    : 'l',
             'grid_rows'      => !empty($attrs['profile']['grid_rows'])      ? $attrs['profile']['grid_rows']      : 20,
@@ -380,9 +380,15 @@ function migrate_users(&$cron=[], $cntOnly=false)
             'smtp_host'      => !empty($attrs['profile']['smtp_host'])      ? $attrs['profile']['smtp_host']      : 'https://smtp.gmail.com',
             'smtp_port'      => !empty($attrs['profile']['smtp_port'])      ? $attrs['profile']['smtp_port']      : 587,
             'smtp_user'      => !empty($attrs['profile']['smtp_user'])      ? $attrs['profile']['smtp_user']      : '',
-            'smtp_pass'      => !empty($attrs['profile']['smtp_pass'])      ? $attrs['profile']['smtp_pass']      : ''
-            ];
+            'smtp_pass'      => !empty($attrs['profile']['smtp_pass'])      ? $attrs['profile']['smtp_pass']      : ''];
         dbWrite(BIZUNO_DB_PREFIX.'contacts_meta', ['ref_id'=>$newID, 'meta_key'=>'user_profile', 'meta_value'=>json_encode($profile)]);
+        
+        
+        
+        // if users email matches the admin, set the users auth in the meta table from the cookie, unset the cookie
+        
+        
+        
     }
     dbMetaSet(0, '_ADMIN_ID_MAP', $userMap); // save the user map as common meta for use later
     // migrate the users_profile table
