@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-02
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /portal/viewMaint.php
  */
 
@@ -169,9 +169,7 @@ class portalViewMaint
             $exists= dbMetaGet(0, 'user_auth', 'contacts', $cID);
             msgDebug("\nExists = ".print_r($exists, true));
             $rID = metaIdxClean($exists);
-            $peppered = hash_hmac('sha256', $_POST['bizPass0'], $this->bizKey);
-            $hashed = password_hash($peppered, PASSWORD_DEFAULT);
-            dbMetaSet($rID, 'user_auth', $hashed, 'contacts', $cID);
+            dbMetaSet($rID, 'user_auth', encryptPassword($_POST['bizPass0'], $this->bizKey), 'contacts', $cID);
             dbMetaDelete($codeID, 'contacts');
             $layout['jsReady']['reload'] = "window.location.href = '".BIZUNO_URL_PORTAL."'";
             return true;
@@ -242,9 +240,7 @@ class portalViewMaint
         $installer = new bizInstall();
         $installer->installBizuno($layout);
         if (isset($GLOBALS['BIZUNO_INSTALL_CID'])) { // since we are local, need to set role and password contact meta
-            $peppered = hash_hmac('sha256', $_POST['biz_pass'], $this->bizKey);
-            $hashed = password_hash($peppered, PASSWORD_DEFAULT);
-            dbMetaSet(0, 'user_auth', $hashed, 'contacts', $GLOBALS['BIZUNO_INSTALL_CID']);
+            dbMetaSet(0, 'user_auth', encryptPassword($_POST['biz_pass'], $this->bizKey), 'contacts', $GLOBALS['BIZUNO_INSTALL_CID']);
         }
         return true;
     }
@@ -321,8 +317,16 @@ class portalViewMaint
         $migrate= clean('migrate','integer', 'get');
         $inStep = clean('inStep', 'integer', 'get');
         if (!empty($migrate)) { // check for post to start migration
-            msgDebug("\nEntering controllers/installBizuno");
-            if ($_SERVER['SERVER_NAME']<>BIZUNO_PORTAL) { return msgAdd("err_illegal_access"); }
+            if (empty($inStep)) { // first pass, save the creds and create cookie
+                $bizUser= clean('biz_user', 'email', 'post');
+                $bizPass= encryptPassword($_POST['biz_pass'], $this->bizKey);
+                $cookie = base64_encode(json_encode([1, 0, $bizUser, 10, $_SERVER['REMOTE_ADDR']]));
+                bizSetCookie('bizunoSession',$cookie,  time()+(60*60*10)); // 10 hours
+                bizSetCookie('bizunoUser',   $bizUser, time()+(60*60*24)); // 1 day
+//              bizSetCookie('bizunoPass',   $bizPass, time()+(60*60*4)); // 4 hours
+                $_SESSION['bizunoUser'] = $bizUser;
+                $_SESSION['bizunoPass'] = $bizPass;
+            }
             $creds = getUserCookie();
             setUserCache('profile', 'psID',  $creds[1]); // PhreeSoft user ID
             setUserCache('profile', 'email', $creds[2]); // User email
@@ -332,20 +336,20 @@ class portalViewMaint
             return;
         }
         // Show migrate form
-//        $js    = '<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/portal.css" />';
+        $js    = '<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/kendoUI/bizuno.css" />'."\n"; // need both old and new css for migration
         $logo  = ['label'=>getModuleCache('bizuno','properties','title'),'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS.'0/view/images/bizuno.png','height'=>48]];
         $html  = '<div>'.html5('', $logo).'</div>'."\n".'<div class="info"><p>'.$this->lang['migrate_intro'].'</p></div>'."\n";
         if (!empty($this->errors)) { $html .= '<div class="error">'.$this->errors.'</div>'; }
         msgDebug("\nStarting to generate layout");
         if (dbTableExists(BIZUNO_DB_PREFIX.'address_book')) { // add admin user and password for new method of saving contact info
-            $html .= '<div class="info"><p>'.$this->lang['migrate_creds'].'</p></div>
+            $html .= '<br /><hr /><br />
     <div class="info">'.$this->lang['biz_user'].'</div><div class="field"><input type="text" name="biz_user" value=""></div>
     <div class="info">'.$this->lang['biz_pass'].'</div><div class="field"><input type="password" name="biz_pass" value=""></div>';
         }
         $html .= "<p><button>".$this->lang['migrate']."</button></p>\n";
         $layout= ['type'=>'migrate',
             'divs'   => [
-//                'head'=> ['order'=> 5,'type'=>'html','html'=>$js],
+                'head'=> ['order'=> 5,'type'=>'html','html'=>$js],
                 'body'=> ['order'=>10,'type'=>'divs','classes'=>['login-form'],'divs'=>[
                     'formBOF'=> ['order'=>20,'type'=>'form','key' =>'frmMigrate'],
                     'main'   => ['order'=>51,'type'=>'html','html'=>$html],
@@ -356,7 +360,7 @@ class portalViewMaint
     }
     public function migrateBizuno(&$layout=[])
     {
-        $dbVer = getModuleCache('bizuno', 'properties', 'version');
+        $dbVer  = getModuleCache('bizuno', 'properties', 'version');
         msgDebug("\nEntering migrateBizuno with dbVersion = $dbVer and MODULE_BIZUNO_VERSION = ".MODULE_BIZUNO_VERSION);
         if (version_compare($dbVer, '7.0') >= 0) { return; } // already there
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/migrate-7.0.php');
@@ -364,17 +368,14 @@ class portalViewMaint
         if (empty($charts)) { // if the COA is not present, bail on migrate since pre 7.0 it only survived in the cache
             return msgAdd('The chart of accounts is missing! Bailing');
         }
-        
-        // pull the admin username and password, set cookie for bizunoUser and temp one for bizunoPass with ecncrypted pw
-        
-
-        $cron = migrateBizunoPrep();
+        $cron   = migrateBizunoPrep();
         msgDebug("\nInitializing cron Bizuno migrate with cron = ".print_r($cron, true));
         setModuleCache('bizuno', 'cron', 'migrateBizuno', $cron);
         $layout = array_replace_recursive($layout,['content'=>['action'=>'eval', 'actionData'=>"cronInit('migrateBizuno','&migrate=1&inStep=1');"]]);
     }
     public function migrateBizunoNext(&$layout=[])
     {
+        msgTrap();
         msgDebug("\nEntering migrateBizunoNext.");
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/migrate-7.0.php');
         $cron = getModuleCache('bizuno', 'cron', 'migrateBizuno');
@@ -385,7 +386,7 @@ class portalViewMaint
         $msg = "Completed Step: {$cron['curStep']} of $ttlSteps<br />Block {$cron['curBlk']} of {$cron['ttlBlk']}<br />Total of $ttlRecords records.<br />";
         if ($cron['curStep']>$cron['ttlSteps']) { // wrap up this iteration
             $msg .= "<p>Database table migrate completed! Press OK to go to your business.</p>";
-            $msg .= html5('btnGo', ['events'=>['onClick'=>"window.location='https://".BIZUNO_PORTAL."';"], 'attr'=>['type'=>'button','value'=>lang('finish')], 'styles'=>['cursor'=>'pointer']]);
+            $msg .= html5('btnGo', ['events'=>['onClick'=>"window.location='".BIZUNO_URL_PORTAL."';"], 'attr'=>['type'=>'button','value'=>lang('finish')], 'styles'=>['cursor'=>'pointer']]);
             msgLog($msg);
             $data = ['content'=>['percent'=>100,'msg'=>$msg,'baseID'=>'migrateBizuno','urlID'=>"&migrate=1&inStep=1"]];
             setModuleCache('bizuno', 'properties', 'version', '7.0');
@@ -395,7 +396,7 @@ class portalViewMaint
             dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'address_book'); // Drop this table here as we use it to determine if we need to migrate
         } else { // return to update progress bar and start next step
             $blkPrcnt= floor(100*($cron['curBlk'])/$cron['ttlBlk']);
-            $data = ['content'=>['percent'=>$blkPrcnt,'msg'=>$msg,'baseID'=>'migrateBizuno','urlID'=>"&migrate=1&inStep=1"]];
+            $data = ['content'=>['percent'=>$blkPrcnt,'msg'=>$msg,'baseID'=>'migrateBizuno','urlID'=>"&migrate=1&inStep={$cron['curStep']}"]];
             setModuleCache('bizuno', 'cron', 'migrateBizuno', $cron);
         }
         $layout = array_replace_recursive($layout, $data);

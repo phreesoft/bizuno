@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-26
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -49,10 +49,6 @@ class qualityTickets extends mgrJournal
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     protected function fieldStructure()
     {
         $users = listUsers(); 
@@ -97,11 +93,6 @@ class qualityTickets extends mgrJournal
             'contact_notes'     => ['panel'=>'action_close','order'=>40,                         'label'=>lang('notes'),'clean'=>'text',   'attr'=>['type'=>'editor'], 'break'=>false]];
     }
 
-    /**
-     * This function builds the grid structure for retrieving the data
-     * @param integer $security - access level range 0-4
-     * @return array $data - structure of the grid to render
-    */
     protected function managerGrid($security=0, $args=[])
     {
         $stores   = getModuleCache('bizuno', 'stores');
@@ -145,9 +136,32 @@ class qualityTickets extends mgrJournal
         return $data;
     }
 
+
     /**
-     * Settings for the manager grid
+     * Pulls the filtered list from the requested dashboard after a user selects a piece of the pie
+     * @param array $data - grid data to modify
+     * @return modifies the grid data array
      */
+    private function addFilters(&$data=[], $dashID='')
+    {
+        msgDebug("\nEntering addFilters with dashID=$dashID");
+        $slice= clean('sliceID','integer','get');
+        $range= clean('range',  'integer','get');
+        msgDebug("\nEntering addFilters with sliceID = $slice and range = $range");
+//      $props= dbMetaGet(0, "dashboard_{$menu}", 'contacts', getUserCache('profile', 'userID'));
+        $dash = getDashboard($dashID); // , $props['$dashID']['opts']
+        $cData= $dash->getData($range);
+        unset($data['source']['filters']['period']['sql'], $data['source']['filters']['jID']['sql']);
+        $data['source']['filters']['search']['attr']['value'] = '';
+        $data['source']['filters']['period']['attr']['value'] = 'a';
+        $data['source']['filters']['period']['sql'] = '';
+        $data['source']['filters']['status']['attr']['value'] = 'a';
+        $data['source']['filters']['status']['sql'] = '';
+        $data['source']['filters']['closed']['attr']['value'] = '0';
+        $data['source']['filters']['closed']['sql'] = '';
+        $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"id IN (".implode(',', $cData['rIDs'][$slice]).")"];
+    }
+
     private function managerSettings()
     {
         parent::managerDefaults();
@@ -243,31 +257,5 @@ class qualityTickets extends mgrJournal
         }
         if (empty($rows)) { return msgAdd(lang('no_results')); }
         $io->download('data', arrayToCSV($rows), "QAdata-".biz_date('Y-m-d').".csv");
-    }
-
-    /**
-     * Pulls the filtered list from the requested dashboard after a user selects a piece of the pie
-     * @param array $data - grid data to modify
-     * @return modifies the grid data array
-     */
-    private function addFilters(&$data=[], $dashID='')
-    {
-        msgDebug("\nEntering addFilters with dashID=$dashID");
-        $key  = clean('rIDList','integer','get');
-        $menu = clean('menu',   'cmd',    'get');
-        $range = clean('range', 'integer','get');
-        $props= dbMetaGet(0, "dashboard_{$menu}", 'contacts', getUserCache('profile', 'userID'));
-        $dash = getDashboard($dashID, $props['$dashID']['opts']);
-        $cData= $dash->getData($range);
-        msgDebug("\n Back from readiong cData with results: ".print_r($cData, true));
-        $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"id IN (".implode(',', $cData['data'][$key]['rID']).")"];
-        // clean up some filters
-        $data['source']['filters']['search']['attr']['value'] = '';
-        $data['source']['filters']['period']['attr']['value'] = 'a';
-        $data['source']['filters']['period']['sql'] = '';
-        $data['source']['filters']['status']['attr']['value'] = 'a';
-        $data['source']['filters']['status']['sql'] = '';
-        $data['source']['filters']['closed']['attr']['value'] = '0';
-        $data['source']['filters']['closed']['sql'] = '';
     }
 }

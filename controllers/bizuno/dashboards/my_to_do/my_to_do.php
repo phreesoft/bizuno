@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-14
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/bizuno/dashboards/my_to_do/my_to_do.php
  */
 
@@ -33,7 +33,7 @@ class my_to_do
     public $methodDir= 'dashboards';
     public $code     = 'my_to_do';
     public $category = 'general';
-    public  $struc;
+    public $struc;
     public $lang = ['title'=>'My ToDo List',
         'description'=> 'Creates a list of activities and things to do.'];
  
@@ -42,11 +42,6 @@ class my_to_do
         localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [ // Admin fields
@@ -55,12 +50,6 @@ class my_to_do
             // User fields
             'title' => ['order'=>50,'label'=>lang('title'), 'clean'=>'text', 'attr'=>['type'=>'text', 'value'=>'']]];
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         if (empty($opts['data'])) { $rows[] = "<span>".lang('no_results')."</span>"; }

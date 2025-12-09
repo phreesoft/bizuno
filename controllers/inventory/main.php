@@ -835,6 +835,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
     {
         $this->managerSettings();
         $yes_no_choices = [['id'=>'a','text'=>lang('all')],['id'=>'y','text'=>lang('active')],['id'=>'n','text'=>lang('inactive')]];
+        $secJ06 = getUserCache('role', 'security', 'j6_mgr');
+        $secJ12 = getUserCache('role', 'security', 'j12_mgr');
         switch ($this->defaults['f0']) { // clean up the filter
             default:
             case 'a': $f0_value = ""; break;
@@ -871,7 +873,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                         'edit'  => ['order'=>30,'icon'=>'edit',   'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', idTBD);"]],
                         'rename'=> ['order'=>40,'icon'=>'rename', 'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_rename']."'); if (title!=null) jsonAction('inventory/main/rename', idTBD, title);"]],
                         'copy'  => ['order'=>50,'icon'=>'copy',   'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_copy']."'); if (title!=null) jsonAction('inventory/main/copy', idTBD, title);"]],
-                        'chart' => ['order'=>60,'icon'=>'mimePpt','label'=>lang('sales'),'events'=>['onClick'=>"windowEdit('inventory/tools/chartSales&rID=idTBD', 'myInvChart', '&nbsp;', 600, 500);"]],
+                        'chart' => ['order'=>60,'icon'=>'mimePpt','label'=>lang('sales'),    'events'=>['onClick'=>"windowEdit('inventory/tools/chartSales&rID=idTBD', 'myInvChart', '&nbsp;', 600, 500);"]],
+                        'gLineP'=> ['order'=>63,'icon'=>'mimeXls','label'=>lang('purchases'),'hidden'=>$secJ06>3?false:true,'events'=>['onClick'=>"windowEdit('inventory/tools/chartHistPurch&rID=idTBD', 'myInvPurch', '&nbsp;', 600, 500);"]],
+                        'gLineS'=> ['order'=>65,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>$secJ12>3?false:true,'events'=>['onClick'=>"windowEdit('inventory/tools/chartHistSales&rID=idTBD', 'myInvSales', '&nbsp;', 600, 500);"]],
                         'trash' => ['order'=>90,'icon'=>'trash',  'hidden'=>$security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('inventory/main/delete', idTBD);"]],
                         'attach'=> ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
                 'sku'              => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'inventory.sku','label'=>pullTableLabel("inventory", 'sku'), 'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],

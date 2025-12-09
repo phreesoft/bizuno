@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-11
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -382,13 +382,9 @@ function migrate_users(&$cron=[], $cntOnly=false)
             'smtp_user'      => !empty($attrs['profile']['smtp_user'])      ? $attrs['profile']['smtp_user']      : '',
             'smtp_pass'      => !empty($attrs['profile']['smtp_pass'])      ? $attrs['profile']['smtp_pass']      : ''];
         dbWrite(BIZUNO_DB_PREFIX.'contacts_meta', ['ref_id'=>$newID, 'meta_key'=>'user_profile', 'meta_value'=>json_encode($profile)]);
-        
-        
-        
-        // if users email matches the admin, set the users auth in the meta table from the cookie, unset the cookie
-        
-        
-        
+        if (isset($_SESSION['bizunoUser']) && $user['email']==$_SESSION['bizunoUser']) {
+            dbWrite(BIZUNO_DB_PREFIX.'contacts_meta', ['ref_id'=>$newID, 'meta_key'=>'user_auth', 'meta_value'=>$_SESSION['bizunoPass']]);
+        }
     }
     dbMetaSet(0, '_ADMIN_ID_MAP', $userMap); // save the user map as common meta for use later
     // migrate the users_profile table
@@ -911,7 +907,7 @@ function migrate_docs(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_docs with cntOnly = ".($cntOnly?'true':'false'));
     $table= 'extDocs';
     $chunk= 10000;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -968,7 +964,7 @@ function migrate_shipping_log(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_shipping_log.");
     $table= 'extShipping';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1022,7 +1018,7 @@ function migrate_returns(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_returns.");
     $table= 'extReturns';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly)    { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1059,7 +1055,7 @@ function migrate_fixed_assets(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_fixed_assets.");
     $table= 'extFixedAssets';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1090,7 +1086,7 @@ function migrate_maint(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_maint.");
     $table= 'extMaint';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1129,7 +1125,7 @@ function migrate_training(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_training.");
     $table= 'extTraining';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ?  dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1167,7 +1163,7 @@ function migrate_prod_tasks(&$cron=[], $cntOnly=false) // Map srvBuilder_tasks t
     msgDebug("\nEntering migrate_prod_tasks.");
     $table= 'srvBuilder_tasks';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly)   { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)){ $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1198,7 +1194,7 @@ function migrate_prod_jobs(&$cron=[], $cntOnly=false) // Map srvBuilder_jobs to 
     msgDebug("\nEntering migrate_prod_jobs.");
     $table= 'srvBuilder_jobs';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
 
@@ -1237,7 +1233,7 @@ function migrate_prod_journal(&$cron=[], $cntOnly=false) // Map srvBuilder_journ
     msgDebug("\nEntering migrate_prod_journal.");
     $table= 'srvBuilder_journal';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1287,7 +1283,7 @@ function migrate_quality(&$cron=[], $cntOnly=false)
     msgDebug("\nEntering migrate_quality.");
     $table= 'extISO9001';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;
@@ -1365,7 +1361,7 @@ function migrate_qual_audit(&$cron=[], $cntOnly=false) // Map extISO9001Audit to
     msgDebug("\nEntering migrate_qual_audit.");
     $table= 'extISO9001Audit';
     $chunk= 200;
-    $cnt  = dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false);
+    $cnt  = dbTableExists(BIZUNO_DB_PREFIX.$table) ? dbGetValue(BIZUNO_DB_PREFIX.$table, 'COUNT(*) AS cnt', '', false) : 0;
     if ($cntOnly) { $cron['ttlSteps']++; $cron['ttlBlk']+=ceil($cnt/$chunk); $cron['ttlRecord']+=$cnt; return; }
     if (empty($cnt)) { $cron['curStep']++; return; } // reset for next step
     $cron['curBlk']++;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-10
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -164,38 +164,6 @@ class administrateTools {
     }
 
     /**
-     * Verifies the comments from the newest release match the database comments
-     * @param type $verbose
-     * @return type
-     */
-    public function repairComments($verbose=true)
-    {
-        msgDebug("\nEntering repairComments with path to tables = ".BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
-        $tables = [];
-        include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // loads $tables
-        foreach ($tables as $table => $tProps) { // as defined by code
-            if (!dbTableExists(BIZUNO_DB_PREFIX.$table)) { continue; }
-            $stmt = dbGetResult("SHOW FULL COLUMNS FROM ".BIZUNO_DB_PREFIX."$table");
-            if (!$stmt) { return msgAdd("No results for table $table! Bailing"); }
-            $structure = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($structure as $field) {
-                $default = in_array($field['Default'], ['CURRENT_TIMESTAMP']) ? $field['Default'] : "'{$field['Default']}'"; // don't quote mysql reserved words
-                $params  = $field['Type'].' ';
-                $params .= $field['Null']=='NO'      ? 'NOT NULL '         : 'NULL ';
-                $params .= !empty($field['Default']) ? "DEFAULT $default " : '';
-                $params .= $field['Extra']           ? $field['Extra'].' ' : '';
-                $newComment = !empty($tProps['fields'][$field['Field']]['comment']) ? $tProps['fields'][$field['Field']]['comment'] : $field['Comment'];
-                if ($newComment == $field['Comment']) { continue; } // if not changed, do nothing
-                dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."$table` CHANGE `{$field['Field']}` `{$field['Field']}` $params COMMENT '$newComment'");
-            }
-        }
-        // Now the phreeform
-        // do this by loading the install tree and rebuilding it.
-
-        if ($verbose) { msgAdd("finished!"); }
-    }
-
-    /**
      * Verifies the current database table structure matches the core application and extensions.
      * CAUTION: CAN TAKE A LONG TIME TO RUN
      * @param boolean $verbose - Returns 'Finished' if set to true when complete.
@@ -206,20 +174,16 @@ class administrateTools {
         $tables = [];
         include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // loads $tables
         foreach ($tables as $table => $props) {
-            $exists = !dbTableExists(BIZUNO_DB_PREFIX.$table) ? false : true;
+            if (!dbTableExists(BIZUNO_DB_PREFIX.$table)) { msgAdd("Core table: $table, cannot be found, skipping!"); continue; }
             $fields = [];
             foreach ($props['fields'] as $field => $values) {
-                $temp = ($exists ? "CHANGE `$field` " : '' ) . "`$field` ".$values['format']." ".$values['attr'];
+                $exists = dbFieldExists(BIZUNO_DB_PREFIX.$table, $field);
+                $temp = ($exists ? "CHANGE `$field` " : "ADD COLUMN " ) . "`$field` ".$values['format']." ".$values['attr'];
                 if (isset($values['comment'])) { $temp .= " COMMENT '".$values['comment']."'"; }
                 $fields[] = $temp;
             }
-            if ($exists) {
-                msgDebug("\nAltering table: $table");
-                $sql = "ALTER TABLE `".BIZUNO_DB_PREFIX."$table` ".implode(', ', $fields);
-            } else { // add new table
-                msgDebug("\nCreating table: $table");
-                $sql = "CREATE TABLE IF NOT EXISTS `".BIZUNO_DB_PREFIX."$table` (".implode(', ', $fields).", ".$props['keys']." ) ".$props['attr'];
-            }
+            msgDebug("\nAltering table: $table");
+            $sql = "ALTER TABLE `".BIZUNO_DB_PREFIX."$table` ".implode(', ', $fields);
             dbGetResult($sql);
         }
         if ($verbose) { msgAdd("finished!"); }

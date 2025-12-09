@@ -259,7 +259,7 @@ class contactsTools
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $struc = $this->chartSalesData($rID, $type);
         $title = $type=='v' ? $this->lang['purchases_by_month'] : $this->lang['sales_by_month'];
-        $action= BIZUNO_URL_AJAX."&bizRt=contacts/tools/chartSalesGo&rID=$rID&type=$type";
+        $action= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/chartSalesGo&rID=$rID&type=$type";
         $layout = array_merge_recursive($layout, ['type'=>'divHTML',
             'divs'=>[
                 'divBOF' => ['order'=> 1,'type'=>'html','html'=>"<div>"],

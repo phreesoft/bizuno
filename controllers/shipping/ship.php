@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-06
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -438,7 +438,7 @@ function preSubmit() {
             'ship_cod_val' => clean('ship_cod_val', 'cmd',    'post'),
             'ship_cod_cur' => clean('ship_cod_cur', 'cmd',    'post'),
             'ship_cod_type'=> clean('ship_cod_type','cmd',    'post'),
-            'extra1'       => clean('extra1',       'cmd',    'post'),
+            'extra1'       => clean('extra1',       'array',  'post'),
             // Hazmat
 //          'hazmat'       => clean('hazmat',       'TND',    'post'),
             // settings
@@ -451,9 +451,8 @@ function preSubmit() {
             'ship_confirm' => clean('ship_confirm', 'integer','post'),
             'confirm_type' => clean('confirm_type', 'cmd',    'post'),
             // ltl
-            'ltl_desc'     => clean('ltl_desc',     'cmd',    'post'),
-            'ltl_class'    => clean('ltl_class',    'cmd',    'post'),
-            'extra1'       => clean('extra1',       'cmd',    'post')];
+            'ltl_desc'     => clean('ltl_desc',     'text',   'post'),
+            'ltl_class'    => clean('ltl_class',    'cmd',    'post')];
         $packages = clean('pkg_array', 'json', 'post');
         $fields['pkgs'] = !empty($packages['rows']) ? $packages['rows'] : [];
         $this->fieldsAddress($fields, ['suffix'=>'_s','cID'=>clean('store_id_p', 'integer', 'post')]); // shipper

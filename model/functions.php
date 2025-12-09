@@ -1482,6 +1482,13 @@ function dateNumDaysDiff($start_date, $end_date)
     return ceil($diff / 86400);
 }
 
+function encryptPassword($pass, $key='')
+{
+    if (empty($key)) { $key = BIZUNO_KEY; }
+    $peppered= hash_hmac('sha256', $pass, $key);
+    return password_hash($peppered, PASSWORD_DEFAULT);
+}
+
 /**
  * Pads the index to the specified length
  * @param integer $value - value to be padded

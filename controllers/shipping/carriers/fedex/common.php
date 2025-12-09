@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -515,8 +515,8 @@ return '';
 //              'nmfcCode'           => 'string',
                 'subPackagingType'   => 'PALLET',
                 'id'                 => 'Pallet '.($idx+1),
-                'description'        => 'NON-SPILLABLE BATTERIES', // FedEx says required
-                'weight'             =>['units'=>$wtUOM, 'value'=>$pallet['weight']],
+                'description'        => !empty($pkg['ltl_desc']) ? $pkg['ltl_desc'] : 'MERCHANDISE', // FedEx says required
+                'weight'             => ['units'=>$wtUOM, 'value'=>$pallet['weight']],
 //              'volume'             => ['units'=> 'CUBIC_FT','value'=> 0],
 //**************************************** uncomment below to test ******************
                 'purchaseOrderNumber'=> !empty($pkg['ship_ref_1']) ? $pkg['ship_ref_1'] : '', // needs to be invoice num - cost

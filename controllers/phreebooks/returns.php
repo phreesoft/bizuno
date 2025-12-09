@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -100,13 +100,13 @@ class phreebooksReturns extends mgrJournal
     protected function managerGrid($security=0, $args=[])
     {
         $action   = clean('mgrAction','cmd',    'get');
-        $key      = clean('rIDList',  'integer','get');
+        $slice    = clean('sliceID',  'integer','get');
         $range    = clean('range',    'integer','get');
         $dateRange= dbSqlDates($this->defaults['period']);
         $sqlPeriod= $dateRange['sql'];
         $stores   = getModuleCache('bizuno', 'stores');
         $data     = array_replace_recursive(parent::gridBase($security, $args), ['metaTable'=>'journal',
-            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&mgrAction=$action&rIDList=$key&range=$range"],
+            'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&mgrAction=$action&sliceID=$slice&range=$range"],
             'source' => [
                 'tables' => ['journal_meta'=>['table'=>BIZUNO_DB_PREFIX.'journal_meta','join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_meta.ref_id"]],
                 'search' => ['invoice_num', 'post_date', 'description', 'meta_value'],
@@ -139,13 +139,31 @@ class phreebooksReturns extends mgrJournal
         msgDebug("\nready to process, grid = ".print_r($data, true));
         return $data;
     }
+
+    /**
+     * Pulls the filtered list from the requested dashboard after a user selects a piece of the pie
+     * @param array $data - grid data to modify
+     * @return modifies the grid data array
+     */
+    private function addFilters(&$data=[], $dashID='')
+    {
+        $slice= clean('sliceID','integer','get');
+        $range= clean('range',  'integer','get');
+        msgDebug("\nEntering addFilters with sliceID = $slice and range = $range");
+        $dash = getDashboard($dashID, []);
+        $cData= $dash->getData($range);
+        unset($data['source']['filters']['period']['sql'], $data['source']['filters']['jID']['sql']);
+        $data['source']['filters']['period']['attr']['value'] = 'a'; // set period to all since the range could cover many periods
+        $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"journal_main.id IN (".implode(',', $cData['rIDs'][$slice]).")"];
+    }
+
     protected function managerSettings()
     {
         parent::managerDefaults();
         $this->defaults['sort']    = clean('sort',    ['format'=>'cmd',      'default'=>'post_date'],'post');
         $this->defaults['period']  = clean('period',  ['format'=>'cmd',      'default'=>getUserCache('profile', 'def_periods', '', 'l')], 'post');
-        $this->defaults['store_id']= clean('store_id',['format'=>'integer',  'default'=>-1],       'post');
-        $this->defaults['status']  = clean('status',  ['format'=>'alpha_num','default'=>'a'],      'post');
+        $this->defaults['store_id']= clean('store_id',['format'=>'integer',  'default'=>-1],         'post');
+        $this->defaults['status']  = clean('status',  ['format'=>'alpha_num','default'=>'a'],        'post');
     }
 
     /******************************** Journal Manager ********************************/
@@ -231,22 +249,6 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
         array_unshift($rows, ['Create Date', 'Reference #', 'Customer', 'SKU(s)', 'Notes']);
         if (empty($rows)) { return msgAdd(lang('no_results')); }
         $io->download('data', arrayToCSV($rows), "RMAdata-".biz_date('Y-m-d').".csv");
-    }
-
-    /**
-     * Pulls the filtered list from the requested dashboard after a user selects a piece of the pie
-     * @param array $data - grid data to modify
-     * @return modifies the grid data array
-     */
-    private function addFilters(&$data=[], $dashID='')
-    {
-        $key  = clean('rIDList','integer','get');
-        $range= clean('range',  'integer','get');
-        $dash = getDashboard($dashID, []);
-        msgDebug("\nFetched dash properties = ".print_r($dash, true));
-        $cData= $dash->getData($range);
-        unset($data['source']['filters']['period']); // clear date search criteris, i.e. set to all since we are after specific id's
-        $data['source']['filters']['rIDList'] = ['order'=> 0, 'hidden'=>true, 'sql'=>"journal_main.id IN (".implode(',', $cData['data'][$key]['rID']).")"];
     }
 
     /**

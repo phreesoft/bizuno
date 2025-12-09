@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -272,7 +272,6 @@ class bizunoAdmin
                 'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager'"]],
                 'tools'   => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'recalc' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'recalc'],
-                    'fixCmt' => ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'fixCmt'],
                     'fixTbl' => ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'fixTbl'],
                     'stsSet' => ['order'=>40,'type'=>'panel','classes'=>['block66'],'key'=>'stsSet']]],
                 'stats'   => ['order'=>90,'label'=>lang('statistics'),'styles'=>['width'=>'700px;','height'=>'250px'],'type'=>'datagrid','key'=>'bizStats']]]],
@@ -282,8 +281,7 @@ class bizunoAdmin
                     'body'   => ['order'=>20,'type'=>'fields','keys'=>$output['keys']['keys0']],
                     'formEOF'=> ['order'=>30,'type'=>'html',  'html'=>"</form>"]]],
                 'recalc' => ['label'=>$this->lang['fa_recalc_title'],   'type'=>'fields','keys'=>$output['keys']['keys1']],
-                'fixCmt' => ['label'=>$this->lang['admin_fix_comments'],'type'=>'fields','keys'=>$output['keys']['keys3']],
-                'fixTbl' => ['label'=>$this->lang['admin_fix_tables'],  'type'=>'fields','keys'=>$output['keys']['keys4']]],
+                'fixTbl' => ['label'=>$this->lang['admin_fix_tables'],  'type'=>'fields','keys'=>$output['keys']['keys2']]],
             'datagrid'=> ['bizStats'=>$this->dgStats('bizStats')],
             'forms'   => ['frmStatus'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/tools/statusSave"]]],
             'fields'  => $output['fields'],
@@ -310,14 +308,11 @@ class bizunoAdmin
             'keys'  =>[
                 'keys0' => ['btnStatus'],
                 'keys1' => ['recalcDesc','btnRecalc'],
-                'keys3' => ['descFixComment','fix_cmt_btn'],
-                'keys4' => ['descFixTables','fix_tbl_btn']],
+                'keys2' => ['descFixTables','fix_tbl_btn']],
             'fields'=>[
                 'recalcDesc'    => ['order'=>10,'html'=>$this->lang['fa_recalc_desc'],'attr'=>['type'=>'raw']],
                 'btnRecalc'     => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('start')],'events'=>['onClick'=>"jsonAction('administrate/fixedAssets/depValueBulk');"]],
                 'btnStatus'     => ['order'=>99,'icon'=>'save','label'=>'save','events'=>['onClick'=>"jqBiz('#frmStatus').submit();"]],
-                'descFixComment'=> ['order'=>10,'html'=>$this->lang['desc_update_comments'],                 'attr'=>['type'=>'raw']],
-                'fix_cmt_btn'   => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/tools/repairComments');"],'attr'=>['type'=>'button','value'=>lang('go')]],
                 'descFixTables' => ['order'=>10,'html'=>$this->lang['desc_update_tables'],'attr'=>['type'=>'raw']],
                 'fix_tbl_btn'   => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/tools/repairTables');"],'attr'=>['type'=>'button','value'=>lang('go')]]]];
         foreach ($status as $key => $settings) {

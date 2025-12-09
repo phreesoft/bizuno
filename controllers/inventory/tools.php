@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-07
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -226,8 +226,88 @@ class inventoryTools
     }
 
     /**
+     * Generates a chart with yearly purchase volume and cost
+     * @param array $layout - current working structure
+     * @return modified $layout
+     */
+    public function chartHistPurch(&$layout=[])
+    {
+        msgTrap();
+        $rID   = clean('rID', 'integer', 'get');
+        $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
+        if (!$rID) { return msgAdd(lang('err_bad_id')); }
+        $struc = $this->chartHistData($rID, $sku, 6);
+        $title = lang('purchase')." history for SKU: $sku";
+        $layout= array_merge_recursive($layout, ['type'=>'divHTML',
+            'divs'=>['divBOF'=>['order'=>1, 'type'=>'html', 'html'=>"<div>"], 'divEOF'=>['order'=>99, 'type'=>'html', 'html'=>"</div>"]]]);
+        googleLine2($layout, 'invHistPurch', ['title'=>$title, 'data'=>array_values($struc)]);
+    }
+    /**
+     * Generates a chart with yearly purchase volume and cost
+     * @param array $layout - current working structure
+     * @return modified $layout
+     */
+    public function chartHistSales(&$layout=[])
+    {
+        $rID   = clean('rID', 'integer', 'get');
+        $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
+        if (!$rID) { return msgAdd(lang('err_bad_id')); }
+        $struc = $this->chartHistData($rID, $sku, 12);
+        $title = lang('sales')." history for SKU: $sku";
+        $layout= array_merge_recursive($layout, ['type'=>'divHTML',
+            'divs'=>['divBOF'=>['order'=>1, 'type'=>'html', 'html'=>"<div>"], 'divEOF'=>['order'=>99, 'type'=>'html', 'html'=>"</div>"]]]);
+        googleLine2($layout, 'invHistSales', ['title'=>$title, 'data'=>array_values($struc)]);
+    }
+    private function chartHistData($id, $sku, $jID=12)
+    {
+        $output= [];
+        $frstYr= biz_date('Y');
+        $jIDs  = $jID==6 ? '6, 7' : '12, 13';
+        $key   = $jID==6 ? 'inventory_purchases' : 'inventory_sales';
+        // get the inventory_purchase meta
+        $meta  = getMetaInventory($id, $key);
+        msgDebug("\nRead meta for sku id = $id and sku = $sku = ".print_r($meta, true));
+        if (!empty($meta)) { 
+            foreach ($meta as $date => $values) {
+                $year = substr($date, 0, 4);
+                $frstYr = min($year, $frstYr);
+                if (!isset($output['Y'.$year])) { $output['Y'.$year] = ['year'=>$year, 'qty'=>0, 'total'=>0]; }
+                $output['Y'.$year]['qty']  += $values['qty']; 
+                $output['Y'.$year]['total']+= $values['total']; 
+            }
+        }
+        // Now get all of the journal data
+        $sql = "SELECT YEAR(m.post_date) AS year, SUM(i.qty) AS qty, SUM(i.credit_amount+i.debit_amount) AS total
+            FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
+            WHERE i.sku='".addslashes($sku)."' and m.journal_id IN ($jIDs) GROUP BY year";
+        msgDebug("\nSQL = $sql");
+        if (!$stmt = dbGetResult($sql)) { return msgAdd(lang('err_bad_sql')); }
+        $result= $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        msgDebug("\nresult = ".print_r($result, true));
+        $precision = getModuleCache('phreebooks', 'currency', 'iso')[getDefaultCurrency()]['dec_len'];
+        if (!empty($result)) { 
+            foreach ($result as $values) {
+                $year = $values['year'];
+                $frstYr = min($year, $frstYr);
+                if (!isset($output['Y'.$year])) { $output['Y'.$year] = ['year'=>$year, 'qty'=>0, 'total'=>0]; }
+                $output['Y'.$year]['qty']  += $values['qty']; 
+                $output['Y'.$year]['total']+= $values['total']; 
+            }
+        }
+        ksort($output); // sort by year
+        $struc = [[lang('year'), lang('qty'), lang('total')]];
+        for ($i = $frstYr; $i <= biz_date('Y'); $i++) { // now make sure there is a value for every year
+            if (!isset($output['Y'.$i])) { $struc[] = [$i, 0, 0]; }
+            else                         { $struc[] = [$output['Y'.$i]['year'], $output['Y'.$i]['qty'], $output['Y'.$i]['total']]; }
+        }
+        msgDebug("\nReturing with yearly data = ".print_r($struc, true));
+        return array_values($struc); // lose the indexes
+    }
+
+    /**
      * Generates a pop up bar chart for monthly sales of inventory items
      * @param array $layout - current working structure
+
      * @return modified $layout
      */
     public function chartSales(&$layout=[])
@@ -236,22 +316,14 @@ class inventoryTools
         $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $struc = $this->chartSalesData($sku);
-        $output= ['divID'=>"chartInventoryChart",'type'=>'column','attr'=>['legend'=>'none','title'=>lang('sales')],'data'=>array_values($struc)];
-        $action= BIZUNO_URL_AJAX."&bizRt=inventory/tools/chartSalesGo&sku=$sku";
-        $js    = "ajaxDownload('frmInventoryChart');\n";
-        $js   .= "var dataInventoryChart = ".json_encode($output).";\n";
-        $js   .= "function funcInventoryChart() { drawBizunoChart(dataInventoryChart); };";
-        $js   .= "google.charts.load('current', {'packages':['corechart']});\n";
-        $js   .= "google.charts.setOnLoadCallback(funcInventoryChart);\n";
+        $title = lang('sales');
+        $action= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/chartSalesGo&sku=$sku";
         $layout = array_merge_recursive($layout, ['type'=>'divHTML',
-            'divs'  => [
-                'body'  =>['order'=>50,'type'=>'html',  'html'=>'<div style="width:100%" id="chartInventoryChart"></div>'],
-                'divExp'=>['order'=>70,'type'=>'html',  'html'=>'<form id="frmInventoryChart" action="'.$action.'"></form>'],
-                'btnExp'=>['order'=>90,'type'=>'fields','keys'=>['icnExp']]],
-            'fields'=> ['icnExp'=>['attr'=>['type'=>'button','value'=>lang('download_data')],'events'=>['onClick'=>"jqBiz('#frmInventoryChart').submit();"]]],
-            'jsHead'=> ['init'=>$js]]);
-        }
-
+            'divs'=>[
+                'divBOF' => ['order'=> 1,'type'=>'html','html'=>"<div>"],
+                'divEOF' => ['order'=>99,'type'=>'html','html'=>"</div>"]]]);
+        googleColumn($layout, 'inventoryChart', ['title'=>$title, 'data'=>array_values($struc), 'callback'=>$action]); // , 'legend'=>$legend
+    }
     private function chartSalesData($sku)
     {
         $dates = localeGetDates(localeCalculateDate(biz_date('Y-m-d'), 0, 0, -1));
@@ -259,7 +331,7 @@ class inventoryTools
         msgDebug("\nDates = ".print_r($dates, true));
           $sql = "SELECT MONTH(m.post_date) AS month, YEAR(m.post_date) AS year, SUM(i.credit_amount+i.debit_amount) AS total
             FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
-            WHERE i.sku='$sku' and m.journal_id IN $jIDs AND m.post_date>='{$dates['ThisYear']}-{$dates['ThisMonth']}-01'
+            WHERE i.sku='".addslashes($sku)."' and m.journal_id IN $jIDs AND m.post_date>='{$dates['ThisYear']}-{$dates['ThisMonth']}-01'
               GROUP BY year, month LIMIT 12";
         msgDebug("\nSQL = $sql");
         if (!$stmt = dbGetResult($sql)) { return msgAdd(lang('err_bad_sql')); }
@@ -277,10 +349,9 @@ class inventoryTools
         }
         foreach ($result as $row) {
             if (isset($struc[$row['year'].$row['month']])) { $struc[$row['year'].$row['month']][1] = round($row['total'], $precision); }
-          }
+        }
         return $struc;
     }
-
     public function chartSalesGo()
     {
         global $io;

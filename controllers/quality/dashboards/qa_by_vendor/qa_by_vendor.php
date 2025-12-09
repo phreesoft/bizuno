@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-06
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/quality/dashboards/qa_by_vendor/qa_by_vendor.php
  */
 
@@ -47,11 +47,6 @@ class qa_by_vendor
         $this->dates = [0=>lang('dates_quarter'), 1=>lang('dates_lqtr'), 2=>lang('quarter_neg2'), 3=>lang('quarter_neg3'), 4=>lang('quarter_neg4'), 5=>lang('quarter_neg5')];
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [
@@ -62,63 +57,45 @@ class qa_by_vendor
             'range' => ['order'=>40,'label'=>lang('range'), 'clean'=>'char', 'attr'=>['type'=>'select','value'=>false],'values'=>viewKeyDropdown($this->dates)]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         $menu  = clean('menu', 'db_field', 'get');
-        $cData  = $this->getData($opts['range']);
-        $title  = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['totalRtn']);
-        $html   =  '<div style="width:100%" id="'.$this->code.'_chart0"></div>';
-        $output = ['divID'=>$this->code."_chart0",'type'=>'pie','event'=>"chart0{$this->code}Select",'attr'=>['title'=>$title],'data'=>$cData['chart']];
-        $js     = "var data0_{$this->code} = ".json_encode($output, JSON_UNESCAPED_UNICODE).";
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(chart0{$this->code});
-function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
-function chart0{$this->code}Select(chart, data) {
-    var cData = chart.getSelection();
-    winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
-}";
-        return ['html'=>$html, 'jsHead'=>$js];
+        $cData = $this->getData($opts['range']);
+        $title = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['totalRtn']);
+        $legend= !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? lang('filter').": {$this->dates[$opts['range']]}" : '';
+        $click = "winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+sel[0].row);";
+        return ['type'=>'gChart', 'title'=>$title, 'legend'=>$legend, 'data'=>$cData['chart'], 'click'=>$click];
     }
-
-    /**
-     * Pulls the data from the db, sorts and builds chart data array
-     * @return array - chart data ready for Google chart API
-     */
     public function getData($range, $slices=10)
     {
         $dates = dbSqlDatesQrtrs($range, 'post_date');
+        $raw   = $struc = $fTotals = $rIDs = [];
+        $cnt   = $rTotal= 0;
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $dates['sql']." AND journal_id=30 AND contact_id_b<>0", '', ['id', 'contact_id_b', 'description', 'rep_id']);
-        msgDebug("\nRead rows to be: ".print_r($rows, true));
-        $raw   = [];
         foreach ($rows as $row) {
             if (!isset($raw[$row['contact_id_b']])) { $raw[$row['contact_id_b']] = ['cID'=>$row['contact_id_b'], 'cnt'=>0, 'rID'=>[]]; }
             $raw[$row['contact_id_b']]['cnt']++;
             $raw[$row['contact_id_b']]['rID'][] = $row['id'];
         }
         $output= sortOrder($raw, 'cnt', 'desc');
-        $cnt   = $rTotal  = 0;
-        $struc = $fTotals = [];
         $struc['chart'][] = [lang('Contact'), lang('total')]; // headings
         $fTotals[] = lang('total');
-        msgDebug("\nPre-processed output = ".print_r($output, true));
         foreach ($output as $row) { // build pie chart data
             $name = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name', "id={$row['cID']}");
-            if ($cnt < $slices) { $struc['chart'][] = [$name, $row['cnt']]; }
-            else { $rTotal += $row['cnt']; }
+            if ($cnt < $slices) {
+                $struc['chart'][] = [$name, $row['cnt']];
+                $struc['rIDs'][]  = $row['rID'];
+            }
+            else {
+                $rTotal += $row['cnt'];
+                if (empty($struc['rIDs'][$this->slices])) { $struc['rIDs'][$this->slices] = []; }
+                $struc ['rIDs'][$this->slices] = array_unique(array_merge($struc['rIDs'][$this->slices], $row['rID']));
+            }
             $cnt++;
         }
         $struc['chart'][] = [lang('other'), $rTotal];
-        $struc['data']    = array_values($output);
         $struc['totalRtn']= sizeof($rows);
-        msgDebug("\nSource data output = ".print_r($struc, true));
+        msgDebug("\ngetData output = ".print_r($struc, true));
         return $struc;
     }
 }

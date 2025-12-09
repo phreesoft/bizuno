@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-09
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -65,7 +65,7 @@ class phreebooksAdmin {
                         'j10_mgr'=> ['order'=>20,'label'=>'journal_id_10', 'icon'=>'order',    'route'=>"$this->moduleID/main/manager&jID=10"],
                         'j12_mgr'=> ['order'=>10,'label'=>'journal_id_12', 'icon'=>'sales',    'route'=>"$this->moduleID/main/manager&jID=12"],
                         'j13_mgr'=> ['order'=>40,'label'=>'journal_id_13', 'icon'=>'credit',   'route'=>"$this->moduleID/main/manager&jID=13"]]],
-                    'returns'    => ['order'=>30,'label'=>'returns',       'icon'=>'return',   'route'=>"$this->moduleID/returns/manager');"],
+                    'returns'    => ['order'=>30,'label'=>'returns',       'icon'=>'return',   'route'=>"$this->moduleID/returns/manager"],
                     'fulfillment'=> ['order'=>40,'label'=>'fulfillment',   'icon'=>'fill',     'route'=>"$this->moduleID/fulfillment/fulfillMain"]]],
                 'inventory' => ['child'=>[
                     'j14_mgr' => ['order'=>35,'label'=>'journal_id_14',    'icon'=>'tools',    'route'=>"$this->moduleID/main/manager&jID=14"],

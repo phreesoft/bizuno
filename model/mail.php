@@ -149,10 +149,10 @@ class bizunoMailer
                     $mail->send();
             }
         } catch (phpmailerException $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("bizMail phpmailerException: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->errorMessage());
         } catch (Exception $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("bizMail Exception: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->getMessage());
         }
         msgAdd('Message has been sent.', 'success');
@@ -174,10 +174,10 @@ class bizunoMailer
             if ($creds['smtp_port']==587) { $mail->SMTPSecure = 'tls'; }
             $mail->send();
         } catch (phpmailerException $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("SMTP phpmailerException: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->errorMessage());
         } catch (Exception $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("SMTP Exception: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->getMessage());
         }
         $mail->smtpClose();
@@ -215,10 +215,10 @@ class bizunoMailer
             $mail->Port      = 587;
             $mail->send();
         } catch (phpmailerException $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("Google phpmailerException: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->errorMessage());
         } catch (Exception $e) {
-            msgAdd(sprintf("Email send failed to: $this->ToName"));
+            msgAdd("Google Exception: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->getMessage());
         }
         $mail->smtpClose();

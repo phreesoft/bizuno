@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-05
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /view/main.php
  */
 
@@ -171,7 +171,7 @@ final class view
      * Platform specific DOM for full page generation
      * @param type $data
      */
-    private function viewDomEasyUI($data)
+    private function viewDomEasyUI(&$data)
     {
         msgDebug("\nEntering viewDomEasyUI");
         $dom  = '';
@@ -1418,30 +1418,37 @@ function googleChart(&$layout, $dashID, $data)
 {
     $jsReady= '';
     $jsBody = "
-google.charts.load('current', {'packages':['corechart']});
+google.charts.load('current', { packages: ['corechart'] });
 google.charts.setOnLoadCallback(chart{$dashID});
 function chart{$dashID}() {
-var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
-var options = {
-    title: '{$data['title']}',
-    titleTextStyle: { color: screenMode==='dark' ? '#eeeeee' : '#333333' },
-    chartArea: { left: 0, top: 40, right: 0, bottom: 0, width: '100%', height: '100%' },
-    backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
-    is3D: true,
-    pieSliceText: 'percentage',    // 'percentage', 'value', 'label', or 'none'
-    pieSliceTextStyle: { fontSize: 14, color: screenMode==='dark' ? '#ffffff' : '#000000' },
-    legend: { position: 'right', textStyle: { color: screenMode==='dark' ? '#cccccc' : '#333333' } },
-    tooltip: { textStyle: { color: '#707070' } },
-};
-var chart = new google.visualization.PieChart(document.getElementById('{$dashID}_chart'));
-chart.draw(data, options);
-}";
+    var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
+    var options = {
+        title: '{$data['title']}',
+        titleTextStyle: { color: (screenMode === 'dark' ? '#eeeeee' : '#333333') },
+        backgroundColor: (screenMode === 'dark' ? '#333333' : 'transparent'),
+        is3D: true,
+        pieSliceText: 'percentage', // 'percentage', 'value', 'label', or 'none'
+        pieSliceTextStyle: { fontSize: 14, color: (screenMode === 'dark' ? '#ffffff' : '#000000') },
+        legend: { position: 'right', textStyle: { color: (screenMode === 'dark' ? '#cccccc' : '#333333') } },
+        chartArea: { left: 0, top: 40, width: '100%', height: '85%' }
+    };
+    var chart = new google.visualization.PieChart(document.getElementById('{$dashID}_chart'));
+    chart.draw(data, options);";
     $html   = '<style>#{$dashID}_chart { width: 100% !important; height: 100% !important; }</style><div id="'.$dashID.'_chart"></div>';
     if (!empty($data['callback'])) {
         $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
         $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
-        $jsReady.= "\najaxDownload('dl_{$dashID}')";
+        $jsReady.= "\najaxDownload('dl_{$dashID}');";
     }
+    if (!empty($data['click'])) {
+        $jsBody .= "
+    google.visualization.events.addListener(chart, 'select', function() {
+        var sel = chart.getSelection();
+        if (sel.length > 0) { {$data['click']} }
+    });";
+    }
+    $jsBody .= "
+};"; // End the function
     $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
     $layout['jsBody'][$dashID]= $jsBody;
     if (!empty($jsReady)) { $layout['jsReady'][$dashID]= $jsReady; }
@@ -1460,20 +1467,20 @@ function googleColumn(&$layout, $dashID, $data)
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(draw_{$dashID}_column);
 function draw_{$dashID}_column() {
-var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
-var options = {
-//  title: 'Test Column',
-backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
-chartArea: { width: '100%', height: '100%' },
-hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
-vAxis: { minValue: 0 },
-legend: { position: 'top' },
-isStacked: false,              // set true for 100% stacked or regular stacked
-bar: { groupWidth: '75%' },    // thickness of bars
-animation: { duration: 1000, easing: 'out' }
-};
-var chart = new google.visualization.ColumnChart(document.getElementById('$dashID-column'));
-chart.draw(data, options);
+    var data = google.visualization.arrayToDataTable(".json_encode($data['data']).");
+    var options = {
+    //  title: 'Test Column',
+    backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
+    chartArea: { width: '100%', height: '100%' },
+    hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
+    vAxis: { minValue: 0 },
+    legend: { position: 'top' },
+    isStacked: false,              // set true for 100% stacked or regular stacked
+    bar: { groupWidth: '75%' },    // thickness of bars
+    animation: { duration: 1000, easing: 'out' }
+    };
+    var chart = new google.visualization.ColumnChart(document.getElementById('$dashID-column'));
+    chart.draw(data, options);
 }";
     if (!empty($data['callback'])) {
         $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
@@ -1483,6 +1490,47 @@ chart.draw(data, options);
     $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
     $layout['jsBody'][$dashID]= $jsBody;
     if (!empty($jsReady)) { $layout['jsReady'][$dashID]= $jsReady; }
+}
+
+/**
+ * Generates the HTML to create a Google line graph for 2 lines of data
+ * @param array $layout - structure coming in
+ * @param type $dashID - div ID
+ * @param type $data - table data
+ */
+function googleLine2(&$layout, $dashID, $data)
+{
+    $html = '<div id="'.$dashID.'-line" style="width:100%; height:450px;"></div>';
+    $jsBody = "
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(draw_{$dashID}_line);
+function draw_{$dashID}_line() {
+    var data = google.visualization.arrayToDataTable(" . json_encode($data['data']) . ");
+    var options = {
+        title: '{$data['title']}',
+        titleTextStyle: { color: screenMode==='dark' ? '#eee' : '#333', fontSize: 16 },
+        backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
+        chartArea: { left: 70, right: 100, top: 50, height: '80%', width: '72%' },
+        series: {
+            0: { targetAxisIndex: 0, color: '#4285F4', lineWidth: 3 }, // blue
+            1: { targetAxisIndex: 1, color: '#EA4335', lineWidth: 3 }  // red
+        },
+        vAxes: {
+            0: { title: 'Quantity Sold', titleTextStyle: { color: '#4285F4' }, textStyle: { color: screenMode==='dark' ? '#ccc' : '#333' }, minValue: 0 },
+            1: { title: 'Total Sales ($)', titleTextStyle: { color: '#EA4335' }, textStyle: { color: screenMode==='dark' ? '#ccc' : '#333' }, format: '$#,##0', minValue: 0 }
+        },
+        hAxis: { title: 'Year', titleTextStyle: { color: screenMode==='dark' ? '#eee' : '#333' }, textStyle: { color: screenMode==='dark' ? '#aaa' : '#666' }, slantedText: false },
+        legend: { position: 'top', textStyle: { color: screenMode==='dark' ? '#ccc' : '#333' }  },
+        pointSize: 8,
+        curveType: 'function',
+        animation: { startup: true, duration: 1200, easing: 'out' },
+        tooltip: { isHtml: true }
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('$dashID-line'));
+    chart.draw(data, options);
+}";
+    $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
+    $layout['jsBody'][$dashID]= $jsBody;
 }
 
 /**
@@ -1503,10 +1551,11 @@ function googleTable(&$layout, $dashID, $data)
 google.charts.load('current', {packages:['table']});
 google.charts.setOnLoadCallback(draw_{$dashID}_table);
 function draw_{$dashID}_table() {
-const data = new google.visualization.DataTable(); $cols
-new google.visualization.Table(document.getElementById('{$dashID}-table')).draw(data, {
-showRowNumber: false, width: '100%', height: '100%', cssClassNames: {
-    headerRow:'my-table-header', tableRow:'my-table-row', hoverTableRow:'my-table-hover', oddTableRow:'my-table-odd' } }); }
+    const data = new google.visualization.DataTable(); $cols
+    new google.visualization.Table(document.getElementById('{$dashID}-table')).draw(data, {
+    showRowNumber: false, width: '100%', height: '100%', cssClassNames: {
+        headerRow:'my-table-header', tableRow:'my-table-row', hoverTableRow:'my-table-hover', oddTableRow:'my-table-odd' } });
+}
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw_{$dashID}_table);
 new MutationObserver(draw_{$dashID}_table).observe(document.body, { attributes: true, attributeFilter: ['class'] });";
     if (!empty($data['callback'])) {

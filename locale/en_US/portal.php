@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /lib/local/en_US.php
  */
 
@@ -52,7 +52,7 @@ $lang = [
     'chart_of_accounts' => 'Chart of Accounts',
     'fiscal_year' =>'Fiscal Year',
     'migrate' => 'Migrate',
-    'migrate_intro' => 'Looks like your database version is from a deprecated version of Bizuno. Press Migrate to bring your database to the current Bizuno release.',
+    'migrate_intro' => 'Looks like your database version is from a deprecated version of Bizuno. Press Migrate to bring your database to the current Bizuno release. The new architecture no longer ties into the host system and combines the user table with the contacts table. Therefore, new credentials will need to be generated for all migrated users.',
     'msg_reset_email_sent' => 'Reset email sent! Please check your email for a link to reset your password.',
     'err_config_not_writable' => 'I cannot write to the file portalCFG.php. Please make sure it is writable!',
     'err_illegal_access' => 'Illegal Access!',

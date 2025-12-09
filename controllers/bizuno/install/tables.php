@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-12
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -189,7 +189,7 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>true,'desc'=>"Item SKU, must be unique, duplicates will override the current values."],
             'description_short'   => ['format'=>'VARCHAR(64)',  'attr'=>"DEFAULT NULL",            'comment'=>'tag:Description;order:20',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Required for inital import, optional thereafter"],
-            'inactive'            => ['format'=>"ENUM('0','1')",'attr'=>"DEFAULT '0'",             'comment'=>'type:checkbox;tag:Inactive;order:30',
+            'inactive'            => ['format'=>"CHAR(1)",      'attr'=>"DEFAULT '0'",             'comment'=>'type:checkbox;tag:Inactive;order:30',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Inactive flag, valid values are 0 - Active, or 1 - Inactive"],
             'item_weight'         => ['format'=>'FLOAT',        'attr'=>"DEFAULT '0'",             'comment'=>'tag:Weight;order:40',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Item weight (in default units)"],
@@ -371,10 +371,10 @@ $tables = [
             'notes'         => ['format'=>'TEXT',         'attr'=>"DEFAULT NULL",           'comment'=>'tag:Notes;order:90'],
             'contact_id_b'  => ['format'=>'INT(11)',      'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:BillingContactID;order:2'],
             'address_id_b'  => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:BillingAddressID;order:3'],
-            'primary_name_b'=> ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingPrimaryName;order:10'],
-            'contact_b'     => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAttention;order:20'],
-            'address1_b'    => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAddress1;order:30'],
-            'address2_b'    => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAddress2;order:40'],
+            'primary_name_b'=> ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingPrimaryName;order:10'],
+            'contact_b'     => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAttention;order:20'],
+            'address1_b'    => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAddress1;order:30'],
+            'address2_b'    => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingAddress2;order:40'],
             'city_b'        => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingCity;order:50'],
             'state_b'       => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingState;order:60'],
             'postal_code_b' => ['format'=>'VARCHAR(10)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingPostalCode;order:70'],
@@ -383,10 +383,10 @@ $tables = [
             'email_b'       => ['format'=>'VARCHAR(64)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:BillingEmail;order:95'],
             'contact_id_s'  => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:ShippingContactID;order:2'],
             'address_id_s'  => ['format'=>'INT(11)',      'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:ShippingAddressID;order:3'],
-            'primary_name_s'=> ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingPrimaryName;order:10'],
-            'contact_s'     => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAttention;order:20'],
-            'address1_s'    => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAddress1;order:30'],
-            'address2_s'    => ['format'=>'VARCHAR(36)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAddress2;order:40'],
+            'primary_name_s'=> ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingPrimaryName;order:10'],
+            'contact_s'     => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAttention;order:20'],
+            'address1_s'    => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAddress1;order:30'],
+            'address2_s'    => ['format'=>'VARCHAR(48)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingAddress2;order:40'],
             'city_s'        => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingCity;order:50'],
             'state_s'       => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingState;order:60'],
             'postal_code_s' => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:ShippingPostalCode;order:70'],

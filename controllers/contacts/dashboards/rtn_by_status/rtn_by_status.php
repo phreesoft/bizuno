@@ -48,11 +48,6 @@ class rtn_by_status
         $this->dates = localeDates(true, true, true);
         $this->fieldStructure();
     }
-
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $order = [['id'=>'asc','text'=>lang('decreasing')],['id'=>'desc','text'=>lang('decreasing')]];
@@ -68,12 +63,6 @@ class rtn_by_status
             'range'   => ['order'=>80,'label'=>lang('range'),        'clean'=>'char',    'attr'=>['type'=>'select',  'value'=>'l'],   'values'=>viewKeyDropdown($this->dates)]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
-
-    /**
-     * Generates the structure for the dashboard view
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         msgDebug("\nstatuses = ".print_r($this->status, true));

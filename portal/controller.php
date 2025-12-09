@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-02
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /portal/controller.php
  */
 
@@ -148,6 +148,11 @@ class portalCtl
         $mixer     = new encryption();
         $bizunoUser= $this->setGuestCache();
         $this->validateCookie(); // Validates sign in status
+        if (!$this->userValidated) { // not logged in, changed ip's (laptop changing locations) or an attack in progress, sign out
+            bizClrCookie('bizunoSession');
+            $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
+            return;
+        }
         $this->initUserCache();
         $this->initBusinessCache();
         $this->cacheValidate();

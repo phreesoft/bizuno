@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-12
+ * @version    7.x Last Update: 2025-12-08
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -159,7 +159,7 @@ function bizunoUpgrade()
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
     require_once(BIZUNO_FS_LIBRARY.'controllers/administrate/tools.php');
     $ctl = new administrateTools();
-    $ctl->repairComments(false);
+    $ctl->repairTables(false);
 
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version

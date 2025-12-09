@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-09
  * @filesource /controllers/contacts/dashboards/return_metrics/return_metrics.php
  */
 
@@ -34,6 +34,7 @@ class return_metrics
     public $methodDir= 'dashboards';
     public $code     = 'return_metrics';
     public $category = 'quality';
+    public $slices   = 10; // Number of pie slices
     public  $struc;
     private $dates;
     public $lang     = ['title'=>'Returns By SKU',
@@ -74,56 +75,51 @@ class return_metrics
         $menu  = clean('menu', 'db_field', 'get');
         $cData = $this->getData($opts['range']);
         $title = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['totalRtn']);
-        $html  = '<div style="width:100%" id="'.$this->code.'_chart0"></div>';
-        $output= ['divID'=>$this->code."_chart0",'type'=>'pie','event'=>"chart0{$this->code}Select",'attr'=>['title'=>$title],'data'=>$cData['chart']];
-        $js    = "ajaxDownload('form{$this->code}');
-var data0_{$this->code} = ".json_encode($output, JSON_UNESCAPED_UNICODE).";
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(chart0{$this->code});
-function chart0{$this->code}() { drawBizunoChart(data0_{$this->code}); }
-function chart0{$this->code}Select(chart, data) {
-    var cData = chart.getSelection();
-    winHref(bizunoHome+'?bizRt=phreebooks/$this->methodID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+cData[0].row);
-}";
-        return ['html'=>$html, 'jsHead'=>$js];
+        $legend= !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? lang('filter').": {$this->dates[$opts['range']]}" : '';
+        $click = "winHref(bizunoHome+'?bizRt=phreebooks/$this->methodID/manager&range={$opts['range']}&mgrAction=$this->code&sliceID='+sel[0].row);";
+        return ['type'=>'gChart', 'title'=>$title, 'legend'=>$legend, 'data'=>$cData['chart'], 'click'=>$click];
     }
 
     /**
      * Generates the pie chart data array
      * @return array - structure with the pie chart data
      */
-    public function getData($range, $slices=10)
+    public function getData($range)
     {
-        $dates = dbSqlDatesQrtrs($range, 'post_date');
-        $raw   = $struc = $fTotals= [];
-        $cnt   = $oTotal= $rTotal = 0;
+        $dates= dbSqlDatesQrtrs($range, 'post_date');
+        $raw  = $struc = $fTotals = $rTotal = $rIDs = [];
+        $cnt  = $oTotal= 0;
         $stmt = dbGetResult("SELECT journal_main.id FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id WHERE meta_key='return' AND {$dates['sql']}");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
-        msgDebug("\nrows result = ".print_r($rows, true));
         foreach ($rows as $row) {
             $items = dbGetMulti(BIZUNO_DB_PREFIX."journal_item WHERE ref_id={$row['id']} AND gl_type='itm'");
             msgDebug("\nitem row = ".print_r($items, true));
             if (empty($items)) { continue; }
-            $rTotal++;
             foreach ($items as $item) {
-                if ( empty($item['sku'])) { continue; }
+                if ( empty($item['sku']) || isset($rTotal[$row['id']])) { continue; }
                 if (!isset($raw[$item['sku']])) { $raw[$item['sku']] = ['sku'=>$item['sku'], 'qty'=>0, 'desc'=>$item['description']]; }
                 $raw[$item['sku']]['qty']++;
                 $raw[$item['sku']]['rID'][] = $row['id'];
+                $rTotal[$row['id']] = $row['id'];
             }
         }
         $output = sortOrder($raw, 'qty', 'desc');
         $struc['chart'][] = [lang('sku'), lang('total')]; // headings
         $fTotals[] = lang('total');
         foreach ($output as $vals) {
-            if ($cnt < $slices) { $struc['chart'][] = [$vals['sku'], $vals['qty']]; }
-            else                { $oTotal += $vals['qty']; }
+            if ($cnt < $this->slices) { 
+                $struc['chart'][] = [$vals['sku'], $vals['qty']];
+                $struc['rIDs'][]  = $vals['rID']; // is already an array
+            } else { 
+                $oTotal += $vals['qty'];
+                if (empty($struc['rIDs'][$this->slices])) { $struc['rIDs'][$this->slices] = []; }
+                $struc ['rIDs'][$this->slices] = array_unique(array_merge($struc['rIDs'][$this->slices], $vals['rID']));
+             }
             $cnt++;
         }
         $struc['chart'][] = [lang('other'), $oTotal];
-        $struc['data']    = array_values($output);
-        $struc['totalRtn']= $rTotal;
-        msgDebug("\nOutput = ".print_r($struc, true));
+        $struc['totalRtn']= sizeof($rTotal);
+        msgDebug("\ngetData output = ".print_r($struc, true));
         return $struc;
     }
 }

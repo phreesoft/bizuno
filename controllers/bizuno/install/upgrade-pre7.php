@@ -329,32 +329,15 @@ function upgrade_pre7($dbVersion='1.0')
         }
         // some special cases
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['drop_ship'=>'0'], 'update', "drop_ship IS NULL OR drop_ship=''");
-        // Fix all the tables to match this release
-        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
-        $ctl = new administrateTools();
-        $ctl->repairTables(false);
     }
     if (version_compare($dbVersion, '6.2.1') < 0) { // another try at adding new field
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'phreeform', 'bookmarks')) {
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."phreeform` ADD `bookmarks` TEXT DEFAULT NULL COMMENT 'type:checkbox;tag:Bookmarks;order:50' AFTER `title`");
         }
     }
-    if (version_compare($dbVersion, '6.2.2') < 0) {
-        // Fix all the tables to match this release
-        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
-        $ctl = new administrateTools();
-        $ctl->repairTables(false);
-    }
     if (version_compare($dbVersion, '6.2.3') < 0) {
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'0'], 'update', "attach IS NULL OR attach=''");
     }
-    if (version_compare($dbVersion, '6.2.5') < 0) {
-        // Fix all the tables to match this release
-        require_once(BIZUNO_FS_LIBRARY."controllers/administrate/tools.php");
-        $ctl = new administrateTools();
-        $ctl->repairTables(false);
-    }
-
     if (version_compare($dbVersion, '6.3.0') < 0) {
         if (dbTableExists(BIZUNO_DB_PREFIX.'extReturns')) { // change email length to align with general journal and contacts
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."extReturns CHANGE `email` `email` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT '' COMMENT 'tag:CallerEmail;order:45'");
