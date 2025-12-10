@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-05
+ * @version    7.x Last Update: 2025-12-10
  * @filesource /portal/api.php
  */
 
@@ -75,8 +75,8 @@ class portalApi
     public function viewCSS()
     {
         $icnSet = clean('icons', ['format'=>'cmd','default'=>'default'], 'get');
-        $path   = BIZUNO_FS_LIBRARY  .'view/icons/';
-        $pathURL= BIZUNO_URL_FS.'0/view/icons/';
+        $path   = BIZUNO_FS_LIBRARY.'view/icons/';
+        $pathURL= BIZUNO_URL_PORTAL.'/view/icons/';
         if (!file_exists("{$path}$icnSet.php")) { $icnSet = 'default'; }// icons cannot be found, use default
         $icons = [];
         $output="/* $icnSet */\n";

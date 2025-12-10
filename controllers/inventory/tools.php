@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2025-12-10
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -524,7 +524,7 @@ class inventoryTools
                 $adjPO = 0;
             }
             if ($adjPO !== false) {
-                $skuList[] = sprintf('Quantity of SKU: %s on %s was adjusted to %f', $row['sku'], lang('journal_id_4'), $adjPO);
+                $skuList[] = sprintf('Quantity of SKU: %s on %s was adjusted from %f to %f', $row['sku'], lang('journal_id_4'), $row['qty_po'], $adjPO);
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_po'=>$adjPO], 'update', "id={$row['id']}");
             }
             $adjSO = false;
@@ -534,7 +534,7 @@ class inventoryTools
                 $adjSO = 0;
             }
             if ($adjSO !== false) {
-                $skuList[] = sprintf('Quantity of SKU: %s on %s was adjusted to %f', $row['sku'], lang('journal_id_10'), $adjSO);
+                $skuList[] = sprintf('Quantity of SKU: %s on %s was adjusted from %f to %f', $row['sku'], lang('journal_id_10'), $row['qty_so'], $adjSO);
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_so'=>$adjSO], 'update', "id={$row['id']}");
             }
         }

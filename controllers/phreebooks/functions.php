@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2025-12-10
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -391,21 +391,21 @@ function pbGetRefRow($ref, $soRows=[])
 }
 
 /**
- * Creates a 8 character reference used to index gl entries for re-posting entries
+ * Creates a 8 character reference used to index gl entries for re-posting entries. the idea here is to re-post journals that increase stock first to have enough stock to sell/assemble
  * @param integer $ts - date timestamp
  * @param integer $idx - table journal_main record id
- * @param type $jID - journal ID used for balancing vendors vs customer transactions
- * @return string - of format ts:idx with padding
+ * @param integer $jID - journal ID used for balancing vendors vs customer transactions
+ * @return string - format jID:ts:idx with padding
  */
 function padRef($ts, $idx, $jID=8)
 {
     switch ($jID) {
-        case  7: $jID = 12; break; // like a sale
-        case 13: $jID =  6; break; // like a purchase
-        case 14: $jID =  7; break; // assembly before sale
+        case  7: $jID = 12; break; // like a sale, stock decreases
+        case 13: $jID =  6; break; // like a purchase, stock increases
+        case 14: $jID =  8; break; // assembly before sale, after adjustment/transfers. Stock decreases. 
         case 15:
-        case 16: $jID =  8; break; // transfers/adjustments after assemblies and purchases. can be add or subtract, make neutral, after purchases, before sales
-        default: // nothing use the journal id as is
+        case 16: $jID =  7; break; // transfers/adjustments. Can be add or subtract, make neutral, after purchases, before assembly/sales. Typically used to increase stock
+        default: // no mapping, use the journal id as is
     }
     return str_pad($jID, 2, '0', STR_PAD_LEFT).':'.substr($ts, 0, 10).':'.str_pad($idx, 8, '0', STR_PAD_LEFT);
 }

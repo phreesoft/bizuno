@@ -891,7 +891,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         }
         // Stores
         if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return $data; }
-        $this->lang = array_merge(getLang('inventory'), $this->lang);
         $f1  = clean('f1', 'integer', 'request');
         setUserCache('inventory', 'f1', $f1);
         $bID = clean('bID', ['format'=>'integer', 'default'=>-1], 'get'); // restrict all information to a specific store
@@ -923,44 +922,6 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 $data['source']['filters']['f1']['sql'] = BIZUNO_DB_PREFIX."inventory.qty_stock>=1 AND ".BIZUNO_DB_PREFIX."inventory_history.remaining>0 AND ".BIZUNO_DB_PREFIX."inventory_history.store_id=$this->myStore GROUP BY ".BIZUNO_DB_PREFIX."inventory.sku";
                 break;
         }
-        
-/* Stores from managerRows, probably mostly duplicated from above
-        // stores
-        if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }
-        $this->lang = array_merge(getLang('inventory'), $this->lang);
-        $f1  = clean('f1', 'integer', 'request');
-        setUserCache('inventory', 'f1', $f1);
-        $bID = clean('bID', ['format'=>'integer', 'default'=>-1], 'get'); // restrict all information to a specific store
-        if ($bID > -1) { $this->myStore = $bID; } // set the store overrides, if any
-        $GLOBALS['bizuno_store_id'] = $this->myStore;
-        $values  = [['id'=>'0','text'=>lang('all')],['id'=>'1','text'=>$this->lang['stock_all']],['id'=>'2','text'=>lang('active')],['id'=>'3','text'=>$this->lang['store_stock']]];
-        // get the datagrid structure, different place for manager than managerRows
-        $data['columns']['qty_all'] = $data['columns']['qty_stock'];
-        $data['columns']['qty_all']['alias'] = 'qty_stock';
-        if (strpos($data['source']['sort']['s0']['field'], 'qty_all') !== false) { // fix the sort criteris
-            $data['source']['sort']['s0']['field'] = str_replace('qty_all', 'qty_stock', $data['source']['sort']['s0']['field']);
-        }
-        $data['columns']['qty_stock'] = ['order'=>25, 'field'=>'inventory.sku', 'alias'=>'sku','label'=>pullTableLabel('inventory', 'qty_store'), 'process'=>'storeStock',
-            'attr'=>['sortable'=>false,'resizable'=>true,'align'=>'right']];
-        $data['source']['filters']['f1'] = ['order'=>50,'sql'=>'','label'=>$this->lang['store_stock'],'values'=>$values,'attr'=>['type'=>'select','value'=>$f1]];
-        msgDebug("\nextStores set home store: $this->myStore with f1 (store filter selection) = $f1");
-        switch ($f1) { // clean up the filter
-            default:
-            case '0': break; // all
-            case '1': $data['source']['filters']['f1']['sql'] = "qty_stock>0"; break; // In Stock > 0
-            case '2': // Active inventory
-                $data['source']['filters']['f1']['sql'] = "qty_stock>0 OR qty_so>0 OR qty_po>0 OR qty_alloc>0";
-                break;
-            case '3': // Branch Stock > 0
-                unset ($data['columns']['qty_stock']['alias']);
-                unset ($data['columns']['qty_stock']['format']);
-                $data['columns']['qty_stock']['field']  = 'SUM(remaining)';
-                $data['source']['tables']['inv_history']= ['table'=>BIZUNO_DB_PREFIX."inventory_history",'join'=>'JOIN','links'=>BIZUNO_DB_PREFIX."inventory.sku=".BIZUNO_DB_PREFIX."inventory_history.sku"];
-                $data['source']['filters']['f1']['sql'] = BIZUNO_DB_PREFIX."inventory.qty_stock>=1 AND ".BIZUNO_DB_PREFIX."inventory_history.remaining>0 AND ".BIZUNO_DB_PREFIX."inventory_history.store_id=$this->myStore GROUP BY ".BIZUNO_DB_PREFIX."inventory.sku";
-                break;
-        }
-        msgDebug("\nExiting stores with columns = ".print_r($data['columns'], true));
-*/
         return $data;
     }
 
