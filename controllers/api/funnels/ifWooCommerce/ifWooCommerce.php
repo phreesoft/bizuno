@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-10
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -336,18 +336,23 @@ function productUpload(rID) {
 
     private function setPriceLevels($skuID)
     {
-        $fields = ['id','sku','qty_stock','qty_so','qty_alloc','full_price','inventory_type','item_weight'];
+        $fields = ['id', 'sku', 'qty_stock', 'qty_so', 'qty_alloc', 'full_price', 'inventory_type', 'item_weight'];
         $result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', $fields, "id=$skuID");
         $stock  = availableQty($result);
         $pDetails['args'] = ['iID'=>$skuID];
         compose('inventory', 'prices', 'quote', $pDetails);
         msgDebug("\nAfter compose with pDetails = ".print_r($pDetails, true));
-        $product= ['RecordID'=>$skuID, 'SKU'=>$result['sku'], 'QtyStock'=>$stock, 'Weight'=>$result['item_weight'], 'Type'=>$result['inventory_type'],
-            'FullPrice'=>$result['full_price'], 'Price'=>$pDetails['content']['price']];
-        $product['RegularPrice'] = $product['price']; // for Woo both need to be the same
-        if (!empty($pDetails['content']['sale_price'])){ $product['SalePrice']   = $pDetails['content']['sale_price']; }
-        $variations = $this->updateByItem($pDetails, $stock);
-        if (!empty($variations))                       { $product['PriceVariations'] = $variations; }
+        $product= [
+            'SKU'         => $result['sku'],
+            'QtyStock'    => $stock,
+            'Weight'      => $result['item_weight'],
+            'Type'        => $result['inventory_type'],
+            'FullPrice'   => $result['full_price'],
+            'Price'       => $pDetails['content']['price'],
+            'RegularPrice'=> $pDetails['content']['price'],
+            'SalePrice'   => !empty($pDetails['content']['sale_price']) ? $pDetails['content']['sale_price'] : ''];
+        $tiers = $this->updateByItem($pDetails, $stock);
+        if (!empty($tiers)) { $product['PriceTiers'] = $tiers; }
         msgDebug("\nWorking with product: ".print_r($product, true));
         return $product;
     }
@@ -363,12 +368,10 @@ function productUpload(rID) {
             if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move on to the next one
             foreach ($sheet['sheets'] as $level) {
                 if (empty($level['qty']) || empty($level['price'])) { continue; } // skip empty rows
-                $level['price'] = $level['price'] * $level['qty'];
-                $level['stock'] = floor($stock/$level['qty']);
-                $sellQtys[] = $level; // this will use the last default sheet if mutliple defaults are selected.
+                $sellQtys[] = ['qty'=>$level['qty'], 'price'=>round($level['price'], 2)]; // this will use the last default sheet if multiple defaults are selected.
             }
         }
-        msgDebug("\nCleaning up priceVariations resulted in the number of rows: ".sizeof($sellQtys));
+        msgDebug("\nCleaning up priceTiers resulted in the number of rows: ".sizeof($sellQtys));
         return $sellQtys;
     }
 
@@ -433,7 +436,7 @@ function productUpload(rID) {
     public function getTaxVersion(&$layout=[])
     {
         global $io;
-//        if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
+//      if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
         // @TODO - This needs a complete re-write it should:
         // be part of the upgrade polling messaging system, cron operation
         // provide instructions on how to do the upgrade as WordPress tax service needs to be local

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2025-12-11
  * @filesource /portal/controller.php
  */
 
@@ -136,8 +136,7 @@ class portalCtl
     }
     private function goAuth()
     {
-        $this->getCodex();
-        compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout);
+        if ($this->getCodex()) { compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout); }
     }
     private function getCodex()
     {
@@ -149,7 +148,6 @@ class portalCtl
         $bizunoUser= $this->setGuestCache();
         $this->validateCookie(); // Validates sign in status
         if (!$this->userValidated) { // not logged in, changed ip's (laptop changing locations) or an attack in progress, sign out
-            bizClrCookie('bizunoSession');
             $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
             return;
         }
@@ -157,6 +155,7 @@ class portalCtl
         $this->initBusinessCache();
         $this->cacheValidate();
         $this->validateVersion();
+        return true;
     }
 
     public function setGuestCache()
@@ -179,6 +178,9 @@ class portalCtl
             setUserCache('profile', 'email',   $this->creds[2]);
             setUserCache('profile', 'userRole',$this->creds[3]);
             $this->userValidated = true;
+        } else { // computer changed networks, stolen cookie, etc.
+            bizClrCookie('bizunoSession');
+            $this->userValidated = false;
         }
         setlocale(LC_COLLATE,getUserCache('profile', 'language'));
         setlocale(LC_CTYPE,  getUserCache('profile', 'language'));

@@ -375,7 +375,6 @@ class portalViewMaint
     }
     public function migrateBizunoNext(&$layout=[])
     {
-        msgTrap();
         msgDebug("\nEntering migrateBizunoNext.");
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/migrate-7.0.php');
         $cron = getModuleCache('bizuno', 'cron', 'migrateBizuno');

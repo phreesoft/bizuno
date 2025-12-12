@@ -232,7 +232,6 @@ class inventoryTools
      */
     public function chartHistPurch(&$layout=[])
     {
-        msgTrap();
         $rID   = clean('rID', 'integer', 'get');
         $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
