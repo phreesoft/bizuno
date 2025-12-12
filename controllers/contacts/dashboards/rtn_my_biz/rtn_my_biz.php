@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-29
+ * @version    7.x Last Update: 2025-12-12
  * @filesource /controllers/contacts/dashboards/rtn_my_biz/rtn_my_biz.php
  */
 
@@ -34,7 +34,7 @@ class rtn_my_biz
     public  $methodDir= 'dashboards';
     public  $code     = 'rtn_my_biz';
     public  $category = 'quality';
-    private $pieces   = 10;
+    public  $slices   = 10; // Number of pie slices
     public  $struc;
     private $dates;
     public  $lang     = ['title'=>'Returns By SKU (Preventable)',
@@ -63,17 +63,19 @@ class rtn_my_biz
     }
     public function render($opts=[])
     {
-        $cData = $this->rtnSKUs($opts['range']);
+        $cData = $this->getData($opts['range']);
         $title = "Returns by SKU = ".$cData['totalRtn']." entries";
-        return ['type'=>'gChart', 'title'=>$title, 'data'=>$cData['chart']];
+        $legend= !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? lang('filter').": {$this->dates[$opts['range']]}" : '';
+        $click = "winHref(bizunoHome+'?bizRt=phreebooks/$this->methodID/manager&range={$opts['range']}&mgrAction=$this->code&sliceID='+sel[0].row);";
+        return ['type'=>'gChart', 'title'=>$title, 'legend'=>$legend, 'data'=>$cData['chart'], 'click'=>$click];
     }
-    public function rtnSKUs($range)
+    public function getData($range)
     {
         msgDebug("\nEntering rtnSKUs with range = $range");
         $dates = dbSqlDatesQrtrs($range, 'post_date'); // found date
-        $stmt = dbGetResult("SELECT journal_main.id, post_date, meta_value FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
+        $stmt  = dbGetResult("SELECT journal_main.id, post_date, meta_value FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
             WHERE {$dates['sql']} AND meta_key='return'");
-        $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
+        $rows  = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         $output= [];
         foreach ($rows as $row) { // preventable='1'
             $meta = json_decode($row['meta_value'], true);
@@ -84,6 +86,7 @@ class rtn_my_biz
                 if (!isset($output[$item['sku']])) { $output[$item['sku']] = ['qty'=>0,'desc'=>$item['desc']]; } // ,'fault'=>[]
                 $output[$item['sku']]['qty']++; // uncomment if just want to count orders
 //              $output[$item['sku']]['qty'] += !empty($item['qty']) ? $item['qty'] : 1; // uncomment if want to count total qty returned
+                $output[$item['sku']]['rID'][] = $row['id'];
             }
         }
         arsort($output);
@@ -91,8 +94,14 @@ class rtn_my_biz
         $struc = [];
         $struc['chart'][]= [lang('sku'), lang('total')]; // headings
         foreach ($output as $vals) {
-            if ($cnt < $this->pieces) { $struc['chart'][] = [$vals['desc'], $vals['qty']]; }
-            else                { $rTotal += $vals['qty']; }
+            if ($cnt < $this->slices) {
+                $struc['chart'][] = [$vals['desc'], $vals['qty']];
+                $struc['rIDs'][]  = $vals['rID']; // is already an array
+            } else {
+                $rTotal += $vals['qty'];
+                if (empty($struc['rIDs'][$this->slices])) { $struc['rIDs'][$this->slices] = []; }
+                $struc ['rIDs'][$this->slices] = array_unique(array_merge($struc['rIDs'][$this->slices], $vals['rID']));
+            }
             $cnt++;
         }
         $struc['chart'][] = [lang('other'), $rTotal];

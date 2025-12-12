@@ -133,6 +133,7 @@ class phreebooksReturns extends mgrJournal
                 'footnotes'    => ['jType'=>lang('status').': <span class="row-inactive">'.$this->lang['rtn_status_1'].'</span>']]);
         switch($action) {
             case 'rtn_by_cust':   $this->addFilters($data, 'rtn_by_cust');   break;
+            case 'rtn_my_biz':    $this->addFilters($data, 'rtn_my_biz');    break;
             case 'return_metrics':$this->addFilters($data, 'return_metrics');break; // returns by SKU
             default:
         }

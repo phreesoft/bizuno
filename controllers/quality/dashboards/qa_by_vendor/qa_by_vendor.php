@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2025-12-12
  * @filesource /controllers/quality/dashboards/qa_by_vendor/qa_by_vendor.php
  */
 
@@ -59,11 +59,10 @@ class qa_by_vendor
     }
     public function render($opts=[])
     {
-        $menu  = clean('menu', 'db_field', 'get');
         $cData = $this->getData($opts['range']);
         $title = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['totalRtn']);
         $legend= !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? lang('filter').": {$this->dates[$opts['range']]}" : '';
-        $click = "winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&menu=$menu&range={$opts['range']}&mgrAction=$this->code&rIDList='+sel[0].row);";
+        $click = "winHref(bizunoHome+'?bizRt=$this->moduleID/$this->pageID/manager&range={$opts['range']}&mgrAction=$this->code&rIDList='+sel[0].row);";
         return ['type'=>'gChart', 'title'=>$title, 'legend'=>$legend, 'data'=>$cData['chart'], 'click'=>$click];
     }
     public function getData($range, $slices=10)
