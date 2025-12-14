@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2025-12-13
  * @filesource /controllers/inventory/images.php
  */
 
@@ -42,22 +42,36 @@ class inventoryImages
      */
     public function imagesLoad(&$layout=[])
     {
-        $lastPath = getUserCache('imgMgr', 'lastPath', false , '').'/'; // pull last folder from cache
         $rID      = clean('rID', 'integer', 'get');
         $data     = ['fields'=>['invImageAdd'=>['icon'=>'add','label'=>$this->lang['add_image'],'events'=>['onClick'=>"invImagesAdd();"]]]];
-        $imgCnt   = 0;
+        $imgCnt   = $needsUpdate = 0;
         $html = $jsReady = '';
         if ($rID) {
-            $current = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'invImages', "id='$rID'");
-            $theList = $current ? json_decode($current, true) : [];
-            foreach ($theList as $src) {
+            // try to find the root folder by loading the main image
+            $images  = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['image_with_path', 'invImages'], "id='$rID'");
+            msgDebug("\nRetrieved images from db for skuID: $rID = ".print_r($images, true));
+            $dirPath = !empty($images['image_with_path']) ? dirname($images['image_with_path']).'/' : '/';
+            $theList = !empty($images['invImages']) ? json_decode($images['invImages'], true) : [];
+            msgDebug("\ntheList: ".print_r($theList, true));
+            foreach ($theList as $idx => $src) {
+                if (!file_exists(BIZUNO_DATA.'images/'.$src)) { // clean out the list for orphaned images
+                    unset($theList[$idx]);
+                    $needsUpdate = 1;
+                    continue;
+                }
+                $dirPath = dirname($src); 
                 $html   .= '<div style="float:left;width:150px;height:150px;border:2px solid #a1a1a1;margin:5px">';
                 $html   .= html5('invImg_'.$imgCnt, ['attr'=>  ['type'=>'hidden', 'value'=>$src]]);
                 $jsReady.= "imgManagerInit('invImg_$imgCnt', '$src', '".dirname($src)."/');\n";
                 $html   .= '</div>';
                 $imgCnt++;
             }
+            if ($needsUpdate) {
+                msgDebug("\nUpdating db since image list has been changed outside of Bizuno to: ".print_r($theList, true));
+                dbWrite(BIZUNO_DB_PREFIX.'inventory', ['invImages'=>json_encode($theList)], 'update', "id='$rID'");
+            }
         }
+        msgDebug("\nExtracted lastPath = $dirPath");
         $html .= '
 <div id="divInvImgAdd" style="clear:both">'.html5('', $data['fields']['invImageAdd']).'</div>';
         $js = "var invImageCnt = $imgCnt;
@@ -66,7 +80,7 @@ function invImagesAdd() {
     var divHTML = '<div style=\"float:left;width:150px;height:150px;border:2px solid #a1a1a1;margin:5px\">';
     divHTML += divInvImg.replace(/divTBD/g, invImageCnt)+'</div>';
     jqBiz('#divInvImgAdd').before(divHTML);
-    imgManagerInit('invImg_'+invImageCnt, '', '$lastPath');
+    imgManagerInit('invImg_'+invImageCnt, '', '$dirPath');
     invImageCnt++;
 }";
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',

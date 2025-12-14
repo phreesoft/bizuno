@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-12-13
  * @filesource /model/io.php
  */
 
@@ -274,6 +274,7 @@ final class io
      */
     public function fileRead($path, $mode='rb')
     {
+        msgDebug("\nEntering fileRead with path = $path and mode = $mode");
         $myPath = $this->myFolder.$path;
         if (!$handle = @fopen($myPath, $mode)) {
             return msgAdd(sprintf(lang('err_io_file_open'), $path));

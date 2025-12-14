@@ -43,7 +43,7 @@ class portalCtl
     function __construct()
     {
         global $msgStack, $io, $cleaner;
-        if (!session_id()) { session_start(); }
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
         $msgStack= new messageStack();
         $io      = new io();
         $cleaner = new cleaner();

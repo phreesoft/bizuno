@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-10
+ * @version    7.x Last Update: 2025-12-13
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -36,7 +36,7 @@ class ifWooCommerce extends apiExport
     public    $code       = 'ifWooCommerce';
     protected $domSuffix  = 'wpWoo';
     protected $metaPrefix = 'woocommerce';
-    private   $refreshRows= 20; // number of inventory items to pass in a single cron call
+    private   $refreshRows= 300; // number of inventory items to pass in a single cron call
     private   $psServer   = 'https://www.phreesoft.com';
     private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
     public    $settings;

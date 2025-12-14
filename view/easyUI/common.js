@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-13
  * @filesource /view/easyUI/common.js
  */
 
@@ -1302,9 +1302,9 @@ function imgManagerInit(imgID, src, srcPath, opts)
     viewAction     += "var q = jqBiz('#img_"+imgID+"').attr('src'); jqBiz('#imdtl_"+imgID+"').html(jqBiz('<img>',{id:'viewImg',src:q}));";
     viewAction     += "jqBiz('#viewImg').click(function() { jqBiz('#imdtl_"+imgID+"').window('close'); }).css({'max-height':'100%','max-width':'100%'});";
     var editAction  = "jsonAction('bizuno/image/manager&imgMgrPath="+srcPath+"&imgTarget="+imgID+"');";
-    var trashAction = "jqBiz('#img_"+imgID+"').attr('src','"+bizunoAjaxFS+"&src='); jqBiz('#"+imgID+"').val('');";
+    var trashAction = "jqBiz('#img_"+imgID+"').attr('src','"+bizunoAjaxFS+"'); jqBiz('#"+imgID+"').val('');";
     divInvImg      += '<div><a id="im_'+imgID+'" href="javascript:void(0)">';
-    divInvImg      += '  <img type="img" style="'+imgStyle+'" src="'+bizunoAjaxFS+'&src='+bizID+'/'+path+'" name="img_'+imgID+'" id="img_'+imgID+'" /></a></div><div id="imdtl_'+imgID+'"></div>';
+    divInvImg      += '  <img type="img" style="'+imgStyle+'" src="'+bizunoAjaxFS+bizID+'/'+path+'" name="img_'+imgID+'" id="img_'+imgID+'" /></a></div><div id="imdtl_'+imgID+'"></div>';
     divTB  = '<a onClick="'+viewAction +'" class="easyui-linkbutton" title="'+bizLangJS('VIEW') +'" data-options="iconCls:\'icon-search\',plain:true"></a>';
     divTB += '<a onClick="'+editAction +'" class="easyui-linkbutton" title="'+bizLangJS('EDIT') +'" data-options="iconCls:\'icon-edit\',  plain:true"></a>';
     divTB += '<a onClick="'+trashAction+'" class="easyui-linkbutton" title="'+bizLangJS('TRASH')+'" data-options="iconCls:\'icon-trash\', plain:true"></a>';

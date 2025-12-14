@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2025-12-13
  * @filesource /controllers/api/export.php
  */
 
@@ -73,7 +73,7 @@ class apiExport
         $product['ProductImageData'] = $product['ProductImageDirectory'] = $product['ProductImageFilename'] = '';
         if (!empty($product['Image'])) { // primary image file
             $info = pathinfo($product['Image']);
-            $data = $io->fileRead("images/{$product['Image']}");
+            $data = $io->fileRead("images/{$product['Image']}"); // will flag error if file is not there, keep this to fix db
             $product['ProductImageData']     = $data ? base64_encode($data['data']) : '';
             $product['ProductImageDirectory']= $info['dirname']."/";
             $product['ProductImageFilename'] = $info['basename'];
@@ -83,7 +83,11 @@ class apiExport
         foreach ($images as $image) { // invImages extension list
             $info = pathinfo($image);
             $data = $io->fileRead("images/$image");
-            $product['Images'][] = ['Title'=>$info['basename'], 'Path'=>$info['dirname']."/", 'Filename'=>$info['basename'], 'Data'=>$data ? base64_encode($data['data']) : ''];
+            if (!empty($data)) {
+                $product['Images'][] = ['Title'=>$info['basename'], 'Path'=>$info['dirname']."/", 'Filename'=>$info['basename'], 'Data'=>$data ? base64_encode($data['data']) : ''];
+            } else {
+                msgAdd("\nI can't find the image for sku: {$product['SKU']}. Please fix this in the Inventory Manager editor for this SKU in the Images tab and saving the record.");
+            }
         }
     }
 
