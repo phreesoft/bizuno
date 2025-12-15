@@ -252,16 +252,6 @@ class portalApi
         compose('api', 'shipping', 'getRates', $layout);
     }
     
-    /**
-     * Callback for oAuth2 request for access
-     */
-    public function oAuth2(&$layout=[])
-    {
-        $route= preg_replace("/[^a-zA-Z0-9\/]/", '', $_GET['route']);
-        $temp = explode('/', $route, 3); // format module/methods/target, e.g. api/google/gmail
-        compose($temp[0], $temp[1], $temp[2], $layout);
-    }
-
     public function orderAdd(&$layout=[])
     {
 
