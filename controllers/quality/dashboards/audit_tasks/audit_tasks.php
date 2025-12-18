@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-18
  * @filesource /controllers/quality/dashboards/audit_tasks/audit_tasks.php
  */
 
@@ -114,9 +114,11 @@ class audit_tasks
         } }
         return ['lists'=>$rows];
     }
+
     public function save()
     {
         $rID = clean('rID', 'integer', 'get');
-        if (!empty($rID)) { dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['post_date'=>biz_date(), 'closed'=>'1', 'closed_date'=>biz_date()], 'update', "id=$rID"); }
+        // Also set status = 99 (Closed Succesfully)
+        if (!empty($rID)) { dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['post_date'=>biz_date(), 'closed'=>'1', 'closed_date'=>biz_date(), 'printed'=>99], 'update', "id=$rID"); }
     }
 }

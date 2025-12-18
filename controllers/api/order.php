@@ -60,6 +60,7 @@ class apiOrder extends apiCommon
      */
     public function apiJournalEntry($order=[])
     {
+        msgTrap();
         $layout = [];
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'journal');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
@@ -189,6 +190,10 @@ class apiOrder extends apiCommon
     }
     private function guessTaxMethod($values)
     {
+        // To keep things matching, assume the tax calculation at the cart is correct, put tax in other so it matches no matter what and check the exempt box to prevent double tax calculation.
+        
+        // Also, need to check on the tax calculator at the cart about states that don't tax shipping. CA doesn't tax shipping but the order did???
+        
         if (!in_array($values['Shipping']['Country'], ['US', 'USA'])) { return; }
         if (!empty(getModuleCache('phreebooks', 'totals', 'tax_other', 'status'))) {
             $_POST['totals_tax_other']= $values['General']['SalesTaxAmount'];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-17
  * @filesource /controllers/contacts/main.php
  */
 
@@ -528,7 +528,7 @@ class contactsMain
             $data = ['prefix'=>$prefix, 'suffix'=>$suffix, 'fill'=>$fill, 'contact'=>[], 'address'=>$address];
         } else {
             $contact= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$rID");
-            $type   = $contact['ctype_v']=='1' ? 'vendors' : 'customers';
+            $type   = $contact['ctype_v']=='1' ? 'v' : 'c';
             // Fix a few things
             $contact['terms_text']   = viewTerms($contact['terms'], true, $type);
             $contact['terminal_date']= getTermsDate($contact['terms'], $type);
