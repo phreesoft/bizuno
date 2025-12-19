@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-08
+ * @version    7.x Last Update: 2025-12-19
  * @filesource /portal/viewMaint.php
  */
 
@@ -78,11 +78,10 @@ class portalViewMaint
             'forms' => ['frmLost'=>['attr'=>['type'=>'form','method'=>'post']]]];
     }
 
-    private function validateReset(&$layout=[])
+    private function validateReset()
     {
         global $db;
         msgDebug("\nEntering validateReset.");
-        if ($_SERVER['SERVER_NAME']<>BIZUNO_PORTAL) { return $this->lang['err_illegal_access']; }
         $userID = preg_replace("/[^a-zA-Z0-9\-\_\.\@]/", '', $_POST['bizUser']); // email address
         if (!empty($userID) && $db->connected) { // if connected to the db, then find user
             $cID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$userID'");
