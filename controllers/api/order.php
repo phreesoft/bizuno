@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-12-19
  * @filesource /controllers/api/order.php
  */
 
@@ -190,13 +190,10 @@ class apiOrder extends apiCommon
     }
     private function guessTaxMethod($values)
     {
-        // To keep things matching, assume the tax calculation at the cart is correct, put tax in other so it matches no matter what and check the exempt box to prevent double tax calculation.
-        
-        // Also, need to check on the tax calculator at the cart about states that don't tax shipping. CA doesn't tax shipping but the order did???
-        
         if (!in_array($values['Shipping']['Country'], ['US', 'USA'])) { return; }
         if (!empty(getModuleCache('phreebooks', 'totals', 'tax_other', 'status'))) {
             $_POST['totals_tax_other']= $values['General']['SalesTaxAmount'];
+            $_POST['tax_exempt']      = '1'; // disable the rest tax from being calculated
         } else {
             $_POST['totals_tax_rest'] = $values['General']['SalesTaxAmount'];
         }
