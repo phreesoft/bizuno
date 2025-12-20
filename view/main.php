@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2025-12-20
  * @filesource /view/main.php
  */
 
@@ -55,6 +55,7 @@ final class view
         global $msgStack;
         dbWriteCache();
         $type = !empty($data['type']) ? $data['type'] : 'json';
+        msgDebug("\nEntering render with type = $type");
         switch ($type) {
             case 'datagrid':
                 $content = dbTableRead($data['datagrid'][$data['key']]);
@@ -158,8 +159,8 @@ final class view
     protected function renderKendoDivs($data)
     {
         global $html5;
+        msgDebug("\nEntering renderKendoDivs.");
         if (empty($data)) { return ''; }
-        msgDebug("\nEntering renderKendoDivs");
         $this->html = $html5->buildDivs($data, 'divs'); // generates $this->html body but can add headers and footers
         $html = '';
         $html.= $this->html;
@@ -202,6 +203,7 @@ final class view
      */
     private function setHeadEasyUI(&$data=[])
     {
+        msgDebug("\nEntering setHeadEasyUI.");
         $icons   = getUserCache('profile', 'icons', false, 'default');
         $theme   = getUserCache('profile', 'theme', false, 'auto');
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'bizuno-dark' : 'bizuno'; } // change to dark mode

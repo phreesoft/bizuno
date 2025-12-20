@@ -60,7 +60,6 @@ class apiOrder extends apiCommon
      */
     public function apiJournalEntry($order=[])
     {
-        msgTrap();
         $layout = [];
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'journal');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');

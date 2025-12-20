@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-12
+ * @version    7.x Last Update: 2025-12-20
  * @filesource /portal/api.php
  */
 
@@ -45,17 +45,19 @@ class portalApi
     {
         $fn   = $fBad = $eBad = false;
         $parts= explode('/', clean('src', 'path_rel', 'get'), 2);
+        msgDebug("\nBIZUNO_DATA = ".(defined('BIZUNO_DATA') ? BIZUNO_DATA : 'undefined')." and parts = ".print_r($parts, true));
         if (defined('BIZUNO_DATA') && !empty(BIZUNO_DATA)) {
             if (!empty($parts[1])) {
                 $io  = new io(); // needs BIZUNO_DATA
                 $fn  = (empty($parts[0]) ? BIZUNO_FS_LIBRARY : BIZUNO_DATA).$parts[1];
                 $ext = strtolower(pathinfo($parts[1], PATHINFO_EXTENSION));
+                msgDebug("\nLooking for fn = $fn");
                 $fBad= !file_exists($fn) ? true : false;
                 $validExts = array_merge($io->getValidExt('image'), $io->getValidExt('script'));
                 $eBad= !in_array($ext, $validExts) ? true : false;
             } else { $fBad = true; }
         } else { $fBad = true; }
-
+        msgDebug("\neBad = $eBad and fBad = $fBad");
         if ($eBad || $fBad) { $fn = BIZUNO_FS_LIBRARY.'view/images/bizuno.png'; }
         // Send out the image
         header("Accept-Ranges: bytes");
