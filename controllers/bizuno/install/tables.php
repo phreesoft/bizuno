@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-08
+ * @version    7.x Last Update: 2025-12-21
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -43,7 +43,7 @@ $tables = [
         'fields' => [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:10'],
-            'meta_value'=> ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaValue;order:20']],
+            'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:20']],
         'keys' => 'PRIMARY KEY (id), INDEX (meta_key)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'configuration' => ['module' => 'bizuno',
@@ -176,7 +176,7 @@ $tables = [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
             'ref_id'    => ['format'=>'INT(11)',    'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:ReferenceID;order:20'],
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
-            'meta_value'=> ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaValue;order:40']],
+            'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'inventory' => ['module' => 'inventory',
@@ -292,7 +292,7 @@ $tables = [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
             'ref_id'    => ['format'=>'INT(11)',    'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:ReferenceID;order:20'],
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
-            'meta_value'=> ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaValue;order:40']],
+            'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
         'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
     'journal_cogs_owed' => ['module' => 'phreebooks',

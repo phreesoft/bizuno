@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-08
+ * @version    7.x Last Update: 2025-12-21
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -178,7 +178,7 @@ function migrate_tables_part_2(&$cron=[])
         dbGetResult("CREATE TABLE `".BIZUNO_DB_PREFIX."common_meta` (
   `id` int(11) NOT NULL COMMENT 'tag:ID;order:1',
   `meta_key` varchar(64) NOT NULL DEFAULT '' COMMENT 'tag:MetaKey;order:10',
-  `meta_value` text NOT NULL DEFAULT '' COMMENT 'tag:MetaValue;order:20'
+  `meta_value` text NULL DEFAULT '' COMMENT 'tag:MetaValue;order:20'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."common_meta` ADD PRIMARY KEY (`id`);");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."common_meta` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'tag:ID;order:10';");
@@ -192,7 +192,7 @@ function migrate_tables_part_2(&$cron=[])
   `id` int(11) NOT NULL COMMENT 'tag:ID;order:1',
   `ref_id` int(11) NOT NULL COMMENT 'type:hidden;tag:ReferenceID;order:10',
   `meta_key` varchar(64) NOT NULL DEFAULT '' COMMENT 'tag:MetaKey;order:20',
-  `meta_value` text NOT NULL DEFAULT '' COMMENT 'tag:MetaValue;order:30'
+  `meta_value` text NULL DEFAULT '' COMMENT 'tag:MetaValue;order:30'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts_meta` ADD PRIMARY KEY (`id`);");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts_meta` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'tag:ID;order:10';");
@@ -207,7 +207,7 @@ function migrate_tables_part_2(&$cron=[])
   `id` int(11) NOT NULL COMMENT 'tag:ID;order:1',
   `ref_id` int(11) NOT NULL COMMENT 'type:hidden;tag:ReferenceID;order:10',
   `meta_key` varchar(64) NOT NULL DEFAULT '' COMMENT 'tag:MetaKey;order:20',
-  `meta_value` text NOT NULL DEFAULT '' COMMENT 'tag:MetaValue;order:30'
+  `meta_value` text NULL DEFAULT '' COMMENT 'tag:MetaValue;order:30'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory_meta` ADD PRIMARY KEY (`id`);");
         dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory_meta` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'tag:ID;order:10';");
