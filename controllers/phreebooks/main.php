@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-26
+ * @version    7.x Last Update: 2025-12-23
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -287,6 +287,7 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
             ['index'=>'order', 'clean'=>'text',   'default'=>'DESC'],
             ['index'=>'period','clean'=>'alpha_num','default'=>$defPeriod],
             ['index'=>'jID',   'clean'=>'integer','default'=>'a'],
+            ['index'=>'store', 'clean'=>'integer','default'=>$this->myStore], // all stores
             ['index'=>'status','clean'=>'char',   'default'=>'a'],
             ['index'=>'search','clean'=>'text',   'default'=>'']]];
         if (clean('clr', 'boolean', 'get')) { clearUserCache($data['path']); }
@@ -1258,6 +1259,12 @@ function bizUnitDiscDisc(newValue) {
         msgDebug("\nPhreeBooks Settings = ".print_r($this->defaults, true));
         $dateRange  = dbSqlDates($this->defaults['period']);
         $sqlPeriod  = $dateRange['sql']; // BIZUNO_DB_PREFIX."journal_main.period={$this->defaults['period']}";
+        $storeID= clean('store', 'integer', 'post'); // store 0 is HQ so do not use default in clean
+        if ($this->journalID==15) { // for store transfers show all transfer in the filter
+            $storeID = -1;
+        } elseif (!empty($this->restrict) || !isset($_POST['store'])) { // restricted or first time in, default to home store
+            $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
+        }
         $formID     = explode(':', getDefaultFormID($this->journalID));
         $formGroup  = $formID[0].':jjrnlTBD';
         $jHidden    = true;
@@ -1349,11 +1356,13 @@ function bizUnitDiscDisc(newValue) {
                     'newJournal'=>['order'=>10,'icon'=>'add',    'events'=>['onClick'=>"jsonAction('phreebooks/main/getJournalEdit&jID='+$this->journalID);"]],
                     'clrSearch' =>['order'=>50,'icon'=>'refresh','events'=>['onClick'=>"hrefClick('phreebooks/main/manager&mgr=1&jID=$this->journalID');"]]],
                 'filters' => [
-                    'period' => ['order'=>10,'break'=>true,'options'=>['width'=>300],'sql'=>$sqlPeriod,
+                    'period' => ['order'=>10,'break'=>true, 'options'=>['width'=>300],'sql'=>$sqlPeriod,
                         'label'=>lang('period'), 'values'=>viewKeyDropdown(localeDates(true, true, true, true, true)),'attr'=>['type'=>'select','value'=>$this->defaults['period']]],
-                    'jID'    => ['order'=>20,'break'=>true,'sql'=>$jrnl_sql, 'hidden'=>$jHidden,
+                    'rep_id' => ['order'=>14,'break'=>false,'label'=>lang('rep_id'), 'hidden'=>$this->journalID==0?false:true, 'values'=>viewRoleDropdown(),'attr'=>['type'=>'select']],
+                    'store'  => ['order'=>15,'break'=>true, 'label'=>lang('ctype_b'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$storeID]],
+                    'jID'    => ['order'=>20,'break'=>true, 'sql'=>$jrnl_sql, 'hidden'=>$jHidden,
                         'label'=>lang('journal_id'), 'values'=>$jID_values,'attr'=>['type'=>'select','value'=>$this->defaults['jID']]],
-                    'status' => ['order'=>30,'break'=>true,'sql'=>$jrnl_status,'hidden'=>$jHidden,
+                    'status' => ['order'=>30,'break'=>true, 'sql'=>$jrnl_status,'hidden'=>$jHidden,
                         'label'=>lang('status'), 'values'=>$jID_statuses,'attr'=>['type'=>'select','value'=>$this->defaults['status']]],
                     'search' => ['order'=>90,'attr'=>['value'=>$this->defaults['search']]]],
                 'sort' => ['s0'=> ['order'=>10,'field'=>("{$this->defaults['sort']} {$this->defaults['order']}, ".BIZUNO_DB_PREFIX."journal_main.id DESC")]]],
@@ -1412,6 +1421,7 @@ function bizUnitDiscDisc(newValue) {
                 'invoice_num' => ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num', 'label' => lang('invoice_num', $this->journalID),'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'so_po_ref_id' => ['order'=>25, 'field'=>BIZUNO_DB_PREFIX.'journal_main.so_po_ref_id','format'=>'storeID', 'label' => lang('so_po_ref_id', $this->journalID),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [15]) ? false : true]],
+                'store_id' => ['order'=>27, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID','label'=>lang('store_id'),'attr'=>['sortable'=>false,'resizable'=>true]],
                 'purch_order_id' => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id', 'label' => lang('purch_order_id', $this->journalID),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [2,14,15,16,17,18,20,22]) ? true : false]],
                 'description' => ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.description', 'label' => lang('description', $this->journalID),
@@ -1592,19 +1602,14 @@ function bizUnitDiscDisc(newValue) {
                 'display'=>"row.journal_id=='12' && row.waiting=='0'"];
         }
         // Stores
-        $storeID= clean('store', 'integer', 'post'); // store 0 is HQ so do not use default in clean
-        if ($this->journalID==15) { // for store transfers show all transfer in the filter
-            $storeID = -1;
-        } elseif (!empty($this->restrict)) {
-            $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-        }
-        $data['columns']['store_id'] = ['order'=>25, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID',
-            'label' => pullTableLabel('contacts', 'store_id'),'attr'=>['sortable'=>false,'resizable'=>true]];
-        $data['source']['filters']['store'] = ['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$storeID]];
-        msgDebug("\njournal_id = $this->journalID and storeID = $storeID");
         switch ($storeID) {
             case -1: $data['source']['filters']['store']['sql'] = ''; break;
             default: $data['source']['filters']['store']['sql'] = BIZUNO_DB_PREFIX."journal_main.store_id=$storeID"; break;
+        }
+        // Reps
+        if ($this->journalID==0) { // add reps to search filters
+            $repID= clean('rep_id', 'integer', 'post');
+            $data['source']['filters']['rep_id']['sql'] = !empty($repID) ? BIZUNO_DB_PREFIX."journal_main.rep_id=$repID" : '';
         }
         // EDI
 // @TODO - THIS NEEDS TO BE MADE INTO A META VALUE FOR SPEED
@@ -1619,25 +1624,6 @@ function bizUnitDiscDisc(newValue) {
                 'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '856');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 856 - Shipment confirmation with tracking
         }
-/* PROBABLY DUPLICATES, FROM MANAGERROWS
-        // Stores
-        $jID    = clean('jID', 'integer', 'get');
-        if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }
-        $storeID= clean('store', 'integer', 'post'); // store 0 is HQ so do not use default in clean
-        if ($jID==15) { // for store transfers show all transfer in the filter
-            $storeID = -1;
-        } elseif (!empty($this->restrict)) {
-            $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
-        }
-        $layout['datagrid']['manager']['columns']['store_id'] = ['order'=>25, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID',
-            'label' => pullTableLabel('contacts', 'store_id'),'attr'=>['sortable'=>false,'resizable'=>true]];
-        $layout['datagrid']['manager']['source']['filters']['store'] = ['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$storeID]];
-        msgDebug("\njournal_id = $jID and storeID = $storeID");
-        switch ($storeID) {
-            case -1: $layout['datagrid']['manager']['source']['filters']['store']['sql'] = ''; break;
-            default: $layout['datagrid']['manager']['source']['filters']['store']['sql'] = BIZUNO_DB_PREFIX."journal_main.store_id=$storeID"; break;
-        }
- */
         return $data;
     }
 

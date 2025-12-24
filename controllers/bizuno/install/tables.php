@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-21
+ * @version    7.x Last Update: 2025-12-22
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -38,20 +38,20 @@ $tables = [
             'stats'       => ['format'=>'VARCHAR(32)', 'attr'=>"DEFAULT ''",             'comment'=>'type:hidden;tag:Statistics;order:30'],
             'log_entry'   => ['format'=>'VARCHAR(255)','attr'=>"DEFAULT NULL",           'comment'=>'tag:LogEntry;order:50']],
         'keys' => 'PRIMARY KEY (id), KEY (user_id)',
-        'attr' => 'ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'common_meta' => ['module' => 'bizuno',
         'fields' => [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:10'],
             'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:20']],
         'keys' => 'PRIMARY KEY (id), INDEX (meta_key)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'configuration' => ['module' => 'bizuno',
         'fields' => [
             'config_key'  => ['format'=>'VARCHAR(64)','attr'=>"NOT NULL DEFAULT ''",'comment'=>'type:hidden;tag:ConfigKey;order:10'],
             'config_value'=> ['format'=>'MEDIUMTEXT', 'attr'=>"DEFAULT NULL",       'comment'=>'type:hidden;tag:ConfigValue;order:20']],
         'keys' => 'PRIMARY KEY (config_key)',
-        'attr' => 'ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'contacts' => ['module' => 'contacts',
         'fields'=> [
             'id'            => ['format'=>'INT(11)',      'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=> 'type:hidden;tag:RecordID;order:1',
@@ -159,7 +159,7 @@ $tables = [
             'last_date_2'   => ['format'=>'DATE',         'attr'=>"DEFAULT NULL",           'comment'=> 'type:date;tag:AltDate2;order:76',
                 'import'=>true,'export'=>true,'required'=>false,'desc'=>"Last Date 2, uses vary depending on contact type"]],
         'keys' => 'PRIMARY KEY (id), KEY ctype_b (ctype_b), KEY ctype_c (ctype_c), KEY ctype_e (ctype_e), KEY ctype_i (ctype_i), KEY ctype_j (ctype_j), KEY ctype_u (ctype_u), KEY ctype_v (ctype_v), KEY short_name (short_name)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci',
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
         'extra_tabs' => true],
     'contacts_log' => ['module' => 'contacts',
         'fields'=> [
@@ -170,7 +170,7 @@ $tables = [
             'action'    => ['format'=>'VARCHAR(32)','attr'=>"DEFAULT NULL",           'comment'=>'tag:Action;order:30'],
             'notes'     => ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:Notes;order:40']],
         'keys' => 'PRIMARY KEY (id)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'contacts_meta' => ['module' => 'contacts',
         'fields' => [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -178,7 +178,7 @@ $tables = [
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
             'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'inventory' => ['module' => 'inventory',
         'fields' => [
             'id'                  => ['format'=>'INT(11)',      'attr'=>"NOT NULL AUTO_INCREMENT", 'comment'=>'type:hidden;tag:RecordID;order:1',
@@ -270,7 +270,7 @@ $tables = [
             'last_journal_date'   => ['format'=>'DATETIME',     'attr'=>"DEFAULT NULL",            'comment'=>'type:date;tag:DateLastJournal;order:30',
                 'import'=>false,'export'=>true,'required'=>false,'desc'=>"Last date the item was used in a journal entry, format YYY-MM-DD"]],
         'keys' => 'PRIMARY KEY (id), KEY sku (sku)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci',
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
         'extra_tabs' => true], // allow extra tabs to be added to table
     'inventory_history' => ['module' => 'inventory',
         'fields' => [
@@ -286,7 +286,7 @@ $tables = [
             'avg_cost'  => ['format'=>'DOUBLE',     'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:currency;tag:AverageCost;order:60'],
             'post_date' => ['format'=>'DATETIME',   'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:PostDate;order:70']],
         'keys' => 'PRIMARY KEY (id), KEY sku (sku), KEY ref_id (ref_id), KEY remaining (remaining), INDEX (store_id), INDEX (journal_id)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'inventory_meta' => ['module' => 'inventory',
         'fields' => [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -294,7 +294,7 @@ $tables = [
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
             'meta_value'=> ['format'=>'TEXT',       'attr'=>"NULL DEFAULT ''",        'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_cogs_owed' => ['module' => 'phreebooks',
         'fields' => [
             'id'             => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -304,7 +304,7 @@ $tables = [
             'store_id'       => ['format'=>'INT(11)',    'attr'=>"DEFAULT '0'",            'comment'=>'type:hidden;tag:StoreID;order:30'],
             'post_date'      => ['format'=>'DATE',       'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:PostDate;order:40']],
         'keys' => 'PRIMARY KEY (id), KEY sku (sku), INDEX (store_id)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_cogs_usage' => ['module' => 'phreebooks',
         'fields' => [
             'id'                  => ['format'=>'INT(11)','attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -312,7 +312,7 @@ $tables = [
             'inventory_history_id'=> ['format'=>'INT(11)','attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:HistoryRecordID;order:3'],
             'qty'                 => ['format'=>'FLOAT',  'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:hidden;tag:Quantity;order:4']],
         'keys' => 'PRIMARY KEY (id), INDEX (journal_main_id, inventory_history_id)',
-        'attr' => 'ENGINE=innodb DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=innodb DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_history' => ['module' => 'phreebooks',
         'fields'=> [
             'id'               => ['format'=>'INT(11)', 'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -326,7 +326,7 @@ $tables = [
             'stmt_balance'     => ['format'=>'DOUBLE',  'attr'=>"NOT NULL DEFAULT '0'",   'comment'=>'type:date;tag:StatementBalance;order:80'],
             'last_update'      => ['format'=>'DATE',    'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:LastUpdate;order:90']],
         'keys' => 'PRIMARY KEY (id), KEY period (period), KEY gl_account (gl_account)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_item' => ['module' => 'phreebooks',
         'fields'=> [
             'id'           => ['format'=>'INT(11)',      'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -348,7 +348,7 @@ $tables = [
             'post_date'    => ['format'=>'DATE',         'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:PostDate;order:85'],
             'date_1'       => ['format'=>'DATETIME',     'attr'=>"DEFAULT NULL",           'comment'=>'type:date;tag:ItemDate1;order:90']],
         'keys' => 'PRIMARY KEY (id), KEY ref_id (ref_id), KEY sku (sku), KEY item_ref_id (item_ref_id), KEY reconciled (reconciled), KEY gl_account (gl_account)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_main' => ['module' => 'phreebooks',
         'fields'=> [
             'id'            => ['format'=>'INT(11)',      'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -408,7 +408,7 @@ $tables = [
         'keys' => 'PRIMARY KEY (id), KEY period (period), KEY journal_id (journal_id),
             KEY post_date (post_date), KEY closed (closed), KEY store_id (store_id), KEY contact_id_b (contact_id_b), KEY contact_id_s (contact_id_s),
             KEY invoice_num (invoice_num), KEY so_po_ref_id (so_po_ref_id)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_meta' => ['module' => 'phreebooks',
         'fields' => [
             'id'        => ['format'=>'INT(11)',    'attr'=>"NOT NULL AUTO_INCREMENT",'comment'=>'type:hidden;tag:RecordID;order:1'],
@@ -416,7 +416,7 @@ $tables = [
             'meta_key'  => ['format'=>'VARCHAR(64)','attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaKey;order:30'],
             'meta_value'=> ['format'=>'TEXT',       'attr'=>"DEFAULT NULL",           'comment'=>'tag:MetaValue;order:40']],
         'keys' => 'PRIMARY KEY (id), INDEX (ref_id), INDEX (meta_key)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci'],
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'],
     'journal_periods' => ['module' => 'phreebooks',
         'fields'=> [
             'period'     => ['format'=>'INT(11)',  'attr'=>"NOT NULL DEFAULT '0'", 'comment'=>'tag:Period;order:1'],
@@ -426,4 +426,4 @@ $tables = [
             'date_added' => ['format'=>'DATE',     'attr'=>"DEFAULT NULL",'comment'=>'type:date;tag:DateAdded;order:40'],
             'last_update'=> ['format'=>'TIMESTAMP','attr'=>"DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",'comment'=>'type:date;tag:LastUpdate;order:50']],
         'keys' => 'PRIMARY KEY (period)',
-        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci']];
+        'attr' => 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci']];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2025-12-24
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -85,7 +85,7 @@ class administrateAdmin
         $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id'];
         // Add phreebooks panel
         $pbFields= [
-            'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
+//            'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
             'restrict_store' => ['order'=>20,'label'=>$this->lang['restrict_store_lbl'], 'tip'=>$this->lang['restrict_store_tip'], 'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_store'])?true:false]],
             'restrict_user'  => ['order'=>30,'label'=>$this->lang['restrict_user_lbl'],  'tip'=>$this->lang['restrict_user_tip'],  'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_user']) ?true:false]],
             'restrict_period'=> ['order'=>40,'label'=>$this->lang['restrict_period_lbl'],'tip'=>$this->lang['restrict_period_tip'],'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_period']?true:false)]],

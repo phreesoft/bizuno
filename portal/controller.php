@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-11
+ * @version    7.x Last Update: 2025-12-23
  * @filesource /portal/controller.php
  */
 
@@ -85,6 +85,7 @@ class portalCtl
         if (!defined('BIZUNO_DB_CREDS')) { msgDebug("\nBIZUNO_DB_CREDS not defined, returning guest"); return 'guest'; } // Path to db not defined, needs install and creds set
         $creds= defined('BIZUNO_DB_CREDS') ? BIZUNO_DB_CREDS : [];
         $db   = new db($creds);
+        msgDebug("\nConnected to db with result = ".($db->connected ? 'connected'  : 'NOT CONNECTED!' ));
         // This test first or standalone new installs breaks loading of css/js files
         if ('portal'==$this->route['module'] && 'api'==$this->route['page'])          { msgDebug("\nAPI Request, returning api");         return 'api'; }
         if (!$db->connected       || !dbTableExists(BIZUNO_DB_PREFIX.'configuration')){ msgDebug("\nDB not connected, returning install");return 'install'; }

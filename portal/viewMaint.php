@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-19
+ * @version    7.x Last Update: 2025-12-23
  * @filesource /portal/viewMaint.php
  */
 
@@ -222,6 +222,8 @@ class portalViewMaint
         }
         if (!$db->connected) { // take the sample file and make the correction if the creds are valid.
             if (!$this->generateConfigFile()) { return; }
+        } else { // db connected, set the creds and continue with install
+            $this->dbCreds = BIZUNO_DB_CREDS;
         }
         $email = clean('biz_user', 'email', 'post');
         if (empty($email)) { $this->errors .= $this->lang['err_invalid_email']; return; }
@@ -303,6 +305,7 @@ class portalViewMaint
     private function installTestDB()
     {
         global $db;
+        msgDebug("\nEntering installTestDB");
         if (!defined('BIZUNO_DB_CREDS')) { $this->errors .= $this->lang['err_undefined_db_creds']; return ; }
         $db = new db($this->dbCreds); // the constant may be wrong on stand alone servers with no config file so we need to pass a variable
         if (!$db->connected) { $this->errors .= $this->lang['err_invalid_db_creds']; return; }

@@ -215,10 +215,11 @@ function productUpload(rID) {
         $output = array_merge($product, $prices);
         msgDebug("\nReady to compose api/export/apiInventory");
         compose('api', 'export', 'apiInventory', $output);
-        $args = ['data'=>$output,'class'=>'api_product','method'=>'productImport', 'type'=>'post', 'endpoint'=>'product/update'];
+        $args   = ['data'=>$output,'class'=>'api_product','method'=>'productImport', 'type'=>'post', 'endpoint'=>'product/update'];
         msgDebug("\nCalling portal API with product of length: ".sizeof($output));
-        $success = $this->apiAction($args);
-        if (!empty($success)) { msgAdd("Successfully imported SKU: {$output['SKU']}", 'success'); }
+        $resp   = $this->apiAction($args);
+        $postID = !empty($resp['ID']) ? $resp['ID'] : 0;
+        if (!empty($postID)) { msgAdd("Successfully imported SKU: {$output['SKU']}", 'success'); }
     }
 
     /**
@@ -319,16 +320,21 @@ function productUpload(rID) {
             $numRows--;
             $cron['cnt']++;
         }
+        msgDebug("\nReady to send number of rows = ".sizeof($data));
         $args = ['data'=>$data, 'class'=>'api_product', 'method'=>'productRefresh', // local
             'type'=>'put', 'endpoint'=>'product/refresh']; // RESTful
-        $this->apiAction($args);
+        $resp = $this->apiAction($args);
+        $cron['acted'] += $resp['acted'];
+        msgDebug("\nresp = ".print_r($resp, true));
         if (sizeof($cron['rows']) == 0) {
             msgLog("Completed {$cron['total']} inventory items.)");
-            $data = ['content'=>['percent'=>100,'msg'=>"Processed {$cron['total']} total items",'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
+            $message= "Processed {$cron['total']} total items, updated {$cron['acted']}.".(!empty($resp['note'])?"<br />{$resp['note']}":'');
+            $data   = ['content'=>['percent'=>100,'msg'=>$message,'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
             clearUserCron('invRefresh');
         } else { // return to update progress bar and start next step
-            $percent = floor(100*$cron['cnt']/$cron['total']);
-            $data = ['content'=>['percent'=>$percent,'msg'=>"Completed {$cron['cnt']} of {$cron['total']} inventory items.",'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
+            $percent= floor(100*$cron['cnt']/$cron['total']);
+            $message= "Completed {$cron['cnt']} of {$cron['total']} inventory items.".(!empty($resp['note'])?"<br />{$resp['note']}":'');
+            $data   = ['content'=>['percent'=>$percent,'msg'=>$message,'baseID'=>'invRefresh','urlID'=>"$this->moduleID/admin/invRefreshNext&modID=$this->code"]];
             setUserCron('invRefresh', $cron);
         }
         $layout = array_replace_recursive($layout, $data);
@@ -493,8 +499,7 @@ function productUpload(rID) {
         $resp = $io->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
         if (isset($resp['message'])) { msgMerge($resp['message']); }
-        $postID= !empty($resp['ID']) ? $resp['ID'] : 0;
-        return !empty($postID) ? $postID : false;
+        return $resp;
     }
     
     public function adminHome(&$layout=[])
