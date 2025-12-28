@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/inventory/history.php
  */
 
@@ -151,7 +151,7 @@ class inventoryHistory
         $history= $this->historyData($skuInfo);
         $fields = [
             'create' => ['order'=>10,'label'=>lang('creation_date'),    'attr'=>['type'=>'date','readonly'=>true,'value'=>$skuInfo['creation_date']]],
-            'update' => ['order'=>20,'label'=>lang('last_update'),      'attr'=>['type'=>'date','readonly'=>true,'value'=>$skuInfo['last_update']]],
+            'update' => ['order'=>20,'label'=>lang('date_last'),        'attr'=>['type'=>'date','readonly'=>true,'value'=>$skuInfo['last_update']]],
             'journal'=> ['order'=>30,'label'=>lang('last_journal_date'),'attr'=>['type'=>'date','readonly'=>true,'value'=>$skuInfo['last_journal_date']]],
             'usage'  => ['order'=>60,'html' =>$this->viewHistorianUsage($history),'attr'=>['type'=>'raw']]];
         $data   = ['type'=>'divHTML',
@@ -160,13 +160,12 @@ class inventoryHistory
                     'annual'=> ['order'=>10,'type'=>'panel','key'=>'annual','classes'=>['block33']],
                     'usage' => ['order'=>20,'type'=>'panel','key'=>'usage', 'classes'=>['block33']],
                     'dates' => ['order'=>30,'type'=>'panel','key'=>'dates', 'classes'=>['block33']],
-                    'dgJ06' => ['order'=>50,'type'=>'panel','key'=>'dgJ06', 'classes'=>['block50']],
-                    'dgJ12' => ['order'=>60,'type'=>'panel','key'=>'dgJ12', 'classes'=>['block50']],
-                    ]]],
+                    'dgJ06' => ['order'=>50,'type'=>'panel','key'=>'dgJ06', 'classes'=>['block33']],
+                    'dgJ12' => ['order'=>60,'type'=>'panel','key'=>'dgJ12', 'classes'=>['block33']]]]],
             'panels'  => [
-                'annual'=> ['label'=>$this->lang['annual_usage'],'type'=>'datagrid','key'=>'annual'],
-                'usage' => ['label'=>$this->lang['average_usage'],  'type'=>'fields','keys'=>['usage']],
-                'dates' => ['label'=>lang('details'),'type'=>'fields','keys'=>['create','update','journal']],
+                'annual'=> ['label'=>$this->lang['annual_usage'], 'type'=>'datagrid','key' =>'annual'],
+                'usage' => ['label'=>$this->lang['average_usage'],'type'=>'fields',  'keys'=>['usage']],
+                'dates' => ['label'=>lang('details'),             'type'=>'fields',  'keys'=>['create','update','journal']],
                 'dgJ06' => ['type'=>'datagrid','key'=>'dgJ06'],
                 'dgJ12' => ['type'=>'datagrid','key'=>'dgJ12']],
             'datagrid'=> [
@@ -181,9 +180,7 @@ class inventoryHistory
 
     private function viewHistorianUsage($history)
     {
-        // Calculate the annual averages
-
-        $usage  = '<div><br /><hr /><h2>'.$this->lang['stock_usage_lbl'].'</h2>
+        $usage  = '<div>
 <table style="width:100%"><thead class="panel-header"><tr><th style="width:50%">&nbsp;</th><th style="width:25%">'.lang('journal_id_6').'</th><th style="width:25%">'.lang('journal_id_12')."</th></tr></thead><tbody>
     <tr><td>".$this->lang['01month'].'</td><td style="text-align:center;">'.$history['01purch'].'</td><td style="text-align:center;">'.$history['01sales']."</td></tr>
     <tr><td>".$this->lang['03month'].'</td><td style="text-align:center;">'.$history['03purch'].'</td><td style="text-align:center;">'.$history['03sales']."</td></tr>
@@ -368,7 +365,8 @@ class inventoryHistory
     private function dgAnnualHistory($name, $rows=[])
     {
         return ['id' => $name,
-            'attr'   => ['title'=>lang('annual_history'), 'pagination'=>false, 'width'=>300],
+//          'attr'   => ['title'=>lang('annual_history'), 'pagination'=>false, 'width'=>300],
+            'attr'   => ['pagination'=>false],
             'events' => ['data'=>json_encode($rows)],
             'columns'=> [
                 'year' => ['order'=>10,'label'=>'Year', 'attr'=>['width'=>200,'resizable'=>true,'align'=>'center']],
@@ -545,12 +543,12 @@ class inventoryHistory
             $label = jsLang('sales');
         }
         return ['id' => $props['name'],
-            'attr'   => ['title'=>$props['title'], 'pagination'=>false],
+            'attr'   => ['title'=>$props['title'], 'pagination'=>false, 'fitColumns'=>true],
             'events' => ['data' =>$props['data']],
             'columns'=> [
-                'year' => ['order'=>20,'label'=>lang('year'), 'attr'=>['align'=>'center','resizable'=>true]],
-                'month'=> ['order'=>30,'label'=>lang('month'),'attr'=>['align'=>'center','resizable'=>true]],
-                'qty'  => ['order'=>40,'label'=>lang('qty'),  'attr'=>['align'=>'center','resizable'=>true]],
-                'total'=> ['order'=>50,'label'=>$label,       'attr'=>['align'=>'right', 'resizable'=>true],'events'=>['formatter'=>"function(value) { return formatCurrency(value); }"]]]];
+                'year' => ['order'=>20,'label'=>lang('year'), 'attr'=>['width'=>50,'align'=>'center','resizable'=>true]],
+                'month'=> ['order'=>30,'label'=>lang('month'),'attr'=>['width'=>50,'align'=>'center','resizable'=>true]],
+                'qty'  => ['order'=>40,'label'=>lang('qty'),  'attr'=>['width'=>50,'align'=>'center','resizable'=>true]],
+                'total'=> ['order'=>50,'label'=>$label,       'attr'=>['width'=>50,'align'=>'right', 'resizable'=>true],'events'=>['formatter'=>"function(value) { return formatCurrency(value); }"]]]];
     }
 }

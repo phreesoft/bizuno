@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -60,10 +60,11 @@ final class phreeformDesign extends mgrJournal
     {
         $selFont = phreeformFonts();
         $selSize = phreeformSizes();
-        
         $selAlign= phreeformAligns();
-        $emailChoices = [['id'=>'user', 'text'=>$this->lang['phreeform_current_user']], ['id'=>'gen', 'text'=>lang('contact_m')],
-            ['id'=>'ap', 'text'=>lang('contact_p')], ['id'=>'ar', 'text'=>lang('contact_r')]];
+        $emailChoices = [
+            ['id'=>'',     'text'=>lang('none')],     ['id'=>'user','text'=>lang('user_current')],
+            ['id'=>'gen',  'text'=>lang('sales')],    ['id'=>'ap',  'text'=>lang('contact_p')],
+            ['id'=>'purch','text'=>lang('purchases')],['id'=>'ar',  'text'=>lang('contact_r')]];
         $this->struc = [
             // Tab: general - Panel: info 
             '_rID'          => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'integer' ,'attr'=>['type'=>'hidden', 'value'=>0]],
@@ -108,8 +109,7 @@ final class phreeformDesign extends mgrJournal
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
             'datedefault'   => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>$this->lang['date_default_selected'],'values'=>viewDateChoices(),  'clean'=>'char', 'attr'=>['type'=>'select', 'value'=>'c']],
             // Tab: settings - Panel: options
-            'defaultemail'  => ['tab'=>'settings','panel'=>'options',   'order'=>35,'label'=>$this->lang['lbl_phreeform_email'],  'values'=>$emailChoices, 'clean'=>'db_field', 'attr' => ['type'=>'select','value'=>'user']],
-            'filenamefield' => ['tab'=>'settings','panel'=>'options',   'order'=>45,'label'=>lang('fieldname'),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'filenamefield' => ['tab'=>'settings','panel'=>'options',   'order'=>45,'label'=>lang('fieldname'), 'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'filename', 'attr'=> ['type'=>'select']],
             'filenameprefix'=> ['tab'=>'settings','panel'=>'options',   'order'=>50,'label'=>lang('prefix'),                 'clean'=>'filename', 'attr'=>['size'=>10]],
             // Tab: settings - Panel: advanced

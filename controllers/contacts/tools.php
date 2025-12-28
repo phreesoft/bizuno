@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-05
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -326,31 +326,77 @@ class contactsTools
     }
 
     /**
-     * Synchronizes attachments with contacts database flag and actual attachment files
+     * Generates a chart with yearly purchase volume and cost
+     * @param array $layout - current working structure
+     * @return modified $layout
      */
-    public function syncAttachments()
+    public function chartHistPurch(&$layout=[])
     {
-        global $io;
-        $verbose = clean('verbose', 'integer', 'get');
-        $deleted = $repaired = 0;
-        $files = $io->folderRead(getModuleCache('contacts', 'properties', 'attachPath', 'contacts'));
-        foreach ($files as $attachment) {
-            $tID = substr($attachment, 4); // remove rID_
-            $rID = substr($tID, 0, strpos($tID, '_'));
-            if (empty($rID)) { continue; }
-            $exists = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$rID");
-            if (!$exists) {
-                $deleted++;
-                msgDebug("\nDeleting attachment for rID = $rID and file: $attachment");
-                $io->fileDelete(getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."/$attachment");
-            } elseif (!$exists['attach']) {
-                $repaired++;
-                msgDebug("\nSetting attachment flag for id = $rID and file: $attachment");
-                dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
+        $rID   = clean('rID', 'integer', 'get');
+        if (!$rID) { return msgAdd(lang('err_bad_id')); }
+        $name  = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name', "id=$rID");
+        $struc = $this->chartHistData($rID, 6);
+        $title = sprintf("%s history for: $name", lang('purchase'));
+        $layout= array_merge_recursive($layout, ['type'=>'divHTML',
+            'divs'=>['divBOF'=>['order'=>1, 'type'=>'html', 'html'=>"<div>"], 'divEOF'=>['order'=>99, 'type'=>'html', 'html'=>"</div>"]]]);
+        googleLine1($layout, 'contHistPurch', ['title'=>$title, 'data'=>array_values($struc)]);
+    }
+    /**
+     * Generates a chart with yearly purchase volume and cost
+     * @param array $layout - current working structure
+     * @return modified $layout
+     */
+    public function chartHistSales(&$layout=[])
+    {
+        $rID   = clean('rID', 'integer', 'get');
+        if (!$rID) { return msgAdd(lang('err_bad_id')); }
+        $name  = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name', "id=$rID");
+        $struc = $this->chartHistData($rID, 12);
+        $title = sprintf("%s history for: $name", lang('sales'));
+        $layout= array_merge_recursive($layout, ['type'=>'divHTML',
+            'divs'=>['divBOF'=>['order'=>1, 'type'=>'html', 'html'=>"<div>"], 'divEOF'=>['order'=>99, 'type'=>'html', 'html'=>"</div>"]]]);
+        googleLine1($layout, 'contHistSales', ['title'=>$title, 'data'=>array_values($struc)]);
+    }
+
+    private function chartHistData($rID, $jID=12)
+    {
+        $output= [];
+        $frstYr= biz_date('Y');
+        $jIDs  = $jID==6 ? '6, 7' : '12, 13';
+        $key   = $jID==6 ? 'contact_purchases' : 'contact_sales';
+        $meta  = getMetaContact($rID, $key);
+        msgDebug("\nRead meta for contact rID = $rID and meta = ".print_r($meta, true));
+        if (!empty($meta)) { 
+            foreach ($meta as $date => $values) {
+                $year = substr($date, 0, 4);
+                $frstYr = min($year, $frstYr);
+                if (!isset($output['Y'.$year])) { $output['Y'.$year] = ['year'=>(string)$year, 'total'=>0]; }
+                $output['Y'.$year]['total']+= $values['total']; 
             }
         }
-        if ($verbose) {
-            msgAdd("Done! Deleted $deleted attachments and repaired $repaired links to contact records.", 'caution');
+        // Now get all of the journal data
+        $sql = "SELECT YEAR(post_date) AS year, SUM(total_amount) AS total FROM ".BIZUNO_DB_PREFIX."journal_main 
+            WHERE contact_id_b=$rID AND journal_id IN ($jIDs) GROUP BY year";
+        msgDebug("\nSQL = $sql");
+        if (!$stmt = dbGetResult($sql)) { return msgAdd(lang('err_bad_sql')); }
+        $result= $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        msgDebug("\nresult = ".print_r($result, true));
+        $precision = getModuleCache('phreebooks', 'currency', 'iso')[getDefaultCurrency()]['dec_len'];
+        if (!empty($result)) { 
+            foreach ($result as $values) {
+                $year  = $values['year'];
+                $frstYr= min($year, $frstYr);
+                if (!isset($output['Y'.$year])) { $output['Y'.$year] = ['year'=>(string)$year, 'total'=>0]; }
+                $output['Y'.$year]['total']+= round($values['total'], $precision); 
+            }
         }
+        ksort($output); // sort by year
+        $struc = [[lang('year'), lang('total')]];
+        for ($i = $frstYr; $i <= biz_date('Y'); $i++) { // now make sure there is a value for every year
+            if (!isset($output['Y'.$i])) { $struc[] = [$i, 0]; }
+            else                         { $struc[] = [$output['Y'.$i]['year'], $output['Y'.$i]['total']]; }
+        }
+        msgDebug("\nReturing with yearly data = ".print_r($struc, true));
+        return array_values($struc); // lose the indexes
     }
 }

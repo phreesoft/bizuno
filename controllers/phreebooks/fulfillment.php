@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/phreebooks/fulfillment.php
  */
 
@@ -150,7 +150,7 @@ class phreebooksFulfillment {
     private function overrideSecurity()
     {
         $this->tmpSecurity = getUserCache('role', 'security', 'j12_mgr', false, 0);
-        setUserCache('security', 'j12_mgr', 2);
+        setSecurityOverride('j12_mgr', 2);
     }
 
     /**
@@ -158,6 +158,6 @@ class phreebooksFulfillment {
      */
     private function restoreSecurity()
     {
-        setUserCache('security', 'j12_mgr', $this->tmpSecurity);
+        setSecurityOverride('j12_mgr', $this->tmpSecurity);
     }
 }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/bizuno/install/upgrade-pre7.php
  */
 
@@ -37,7 +37,7 @@ if (!defined('BIZUNO_DB_PREFIX')) { exit('Illegal Access!'); }
  */
 function bizunoPre6config() {
     global $bizunoMod;
-    setUserCache('security', 'admin', 4);
+    setSecurityOverride('admin', 4);
     $core   = ['bizuno','contacts','inventory','payment','phreebooks','phreeform'];
     $modPro = ['proCust','proGL','proHR','proIF','proInv','proLgstc','proQA','proVend'];
     $layout = [];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1497,7 +1497,7 @@ columns:  [[
         if (!empty($prop['styles'])) { $style = array_replace($style, $prop['styles']); }
         if ( empty($prop['label']))  { $prop['label'] = ''; }
         $field   = '<div id="'.$id.'" name="'.$id.'" title="'.$prop['label'].'" class="easyui-texteditor"'; // style="width:700px;height:300px;padding:20px"
-        $field  .= $this->addStyles($style).$toolbar.'>'.$prop['attr']['value'].'</div>';
+        $field  .= $this->addStyles($style).$toolbar.'>'.(!empty($prop['attr']['value'])?$prop['attr']['value']:'').'</div>';
         return $field;
     }
 

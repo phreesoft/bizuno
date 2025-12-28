@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/phreebooks/custWizard/admin.php
  */
 
@@ -123,8 +123,8 @@ class custWizardAdmin {
      */
     private function overrideSecurity()
     {
-        $this->tmpSecurity = getUserCache('role', 'security', 'j12_mgr', false, 0);
-        setUserCache('security', 'j12_mgr', 2);
+        $this->tmpSecurity = getUserCache('role', 'security', 'j12_mgr');
+        setSecurityOverride('j12_mgr', 2);
     }
 
     /**
@@ -132,6 +132,6 @@ class custWizardAdmin {
      */
     private function restoreSecurity()
     {
-        setUserCache('security', 'j12_mgr', $this->tmpSecurity);
+        setSecurityOverride('j12_mgr', $this->tmpSecurity);
     }
 }

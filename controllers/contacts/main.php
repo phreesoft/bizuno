@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-24
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/contacts/main.php
  */
 
@@ -711,12 +711,16 @@ class contactsMain
                 'action'    => ['order'=>1,'label'=>lang('action'),
                     'events' => ['formatter'=>"function(value,row,index){ return dg{$name}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'edit'  => ['icon'=>'edit', 'order'=>20, 'label'=>lang('edit'),
+                        'edit'  => ['order'=>20, 'icon'=>'edit', 'label'=>lang('edit'),
                             'events'=> ['onClick' => "accordionEdit('acc$name', 'dg$name', 'div{$name}Detail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$type&ref=$rID', idTBD);"]],
-                        'delete'=> ['icon'=>'trash', 'order'=>60, 'label'=>lang('delete'),'hidden'=>$security>3?false:true,
+                        'delete'=> ['order'=>60, 'icon'=>'trash', 'label'=>lang('delete'),'hidden'=>$security>3?false:true,
                             'events'=> ['onClick' => "if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/$this->pageID/delete', idTBD, 'reload:dg$name');"]],
-                        'chart' => ['icon'=>'mimePpt', 'order'=>80, 'label'=>lang('sales'),'hidden'=>in_array($type, ['c','v'])?false:true,
+                        'chart' => ['order'=>80, 'icon'=>'mimePpt', 'label'=>lang('sales'),'hidden'=>in_array($type, ['c','v'])?false:true,
                             'events'=> ['onClick' => "windowEdit('$this->moduleID/tools/chartSales&cType=$type&rID=idTBD', 'myChart', '&nbsp;', 700, 450);"]],
+                        'gLineP'=> ['order'=>83,'icon'=>'mimeXls','label'=>lang('purchases'),'hidden'=>in_array($type, ['v'])?false:true,
+                            'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistPurch&rID=idTBD', 'myContPurch', '&nbsp;', 600, 500);"]],
+                        'gLineS'=> ['order'=>85,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>in_array($type, ['c'])?false:true,
+                            'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myContSales', '&nbsp;', 600, 500);"]],
                         'attach' => ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
                 'short_name'   => ['order'=>10, 'field'=>'short_name', 'label' => lang('short_name', $type),'events'=>['styler'=>$this->dgContactsStyler()],
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true]],

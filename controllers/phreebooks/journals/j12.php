@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/phreebooks/journals/j12.php
  */
 
@@ -256,7 +256,7 @@ class j12 extends jCommon
                 $bal = $row['ordered'] - $row['processed'];
                 if ($bal <= 0 || empty($row['sku'])) { continue; }
                 $type = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'inventory_type', "sku='{$row['sku']}'");
-                if (!in_array($type, INVENTORY_COGS_TYPES)) { continue; }
+                if (!in_array($type, array_merge(INVENTORY_COGS_TYPES, ['ns']))) { continue; } // add non-stock type to prevent closing partial SO/PO's rcvd
                 $cnt++;
                 if ($this->forceCloseSoPO && $action<>'delete') { // readjust balance
                     dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_so=qty_so-$bal WHERE sku='".addslashes($row['sku'])."'");

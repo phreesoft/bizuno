@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-02
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -36,9 +36,8 @@ class phreeformRender
     public    $moduleID    = 'phreeform';
     public    $attachments = [];
     protected $metaPrefix  = 'phreeform';
-    public $lang;
-    public $toNames;
-    public $critChoices;
+    public    $lang;
+    public    $critChoices;
     
     function __construct()
     {
@@ -95,7 +94,7 @@ class phreeformRender
         if (clean('xmin','text','get'))  { $extras .= '&xmin='.clean('xmin','text','get'); }
         if (clean('xmax','text','get'))  { $extras .= '&xmax='.clean('xmax','text','get'); }
         if (clean('mID','integer','get')){ $extras .= '&mID=' .clean('mID','integer','get'); }
-        $emailData = $this->emailProps($report);
+        $emailData = $this->emailProps();
         $js = $this->getViewRenderJS();
         $data = ['type'=>'page','title'=> $report->title,
             'toolbars'=> ['tbOpen'=>['icons'=>[
@@ -1135,7 +1134,7 @@ class phreeformRender
         $report->xfilterlist->min      = clean('xmin', 'text', 'get');
         $report->xfilterlist->max      = clean('xmax', 'text', 'get');
         msgDebug("\nWorking with report = ".print_r($report, true));
-        $output = $this->emailProps($report);
+        $output = $this->emailProps();
         $output['msgBody'] = str_replace("\n", "<br />", $output['msgBody']);
         $layout = array_replace_recursive($layout, ['content'=>$output]);
     }
@@ -1145,13 +1144,40 @@ class phreeformRender
      * @param object $report - Report structure
      * @return array $output - Properties from search
      */
-    private function emailProps($report='')
+    private function emailProps()
     {
-        $output = ['defFrom'=>'', 'defTo'=>'', 'defCC'=>'', 'valsFrom'=>[], 'valsTo'=>[['id'=>'', 'text'=>lang('select')]],
+        global $report;
+        msgDebug("\nEntering emailProps.");
+        $output= ['defFrom'=>'', 'defTo'=>'', 'defCC'=>'', 'valsFrom'=>[], 'valsTo'=>[],
             'msgSubject'=> sprintf($this->lang['phreeform_email_subject'], $report->title, getModuleCache('bizuno', 'settings', 'company', 'primary_name')),
             'msgBody'   => isset($report->emailmessage) ? TextReplace(stripslashes($report->emailmessage)) : sprintf(lang('phreeform_email_body'), $report->title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'))];
-        $this->getFromAddress($output, $report);
-        $this->getToAddress($output, $report);
+        $this->getFromAddress($output);
+        if (!in_array($report->xfilterlist->fieldname, ['journal_main.id','contacts.id']) || $report->xfilterlist->default <> 'equal') {
+            $this->addStoreInfo($output); // no journal so just add the branch managers
+            return $output;
+        }
+        $mID  = !empty($report->xfilterlist->min) ? $report->xfilterlist->min : 0;
+        if (empty($mID)) { return $output; }
+        if ($report->xfilterlist->fieldname=='journal_main.id') { // pull email from the journal record
+            $main = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "id=$mID");
+            if (empty($main)) { return $output; }
+            $name = !empty(trim((string)$main['contact_b'])) ? trim((string)$main['contact_b']) : trim((string)$main['primary_name_b']);
+            $this->extractAddresses($output, 'jrnl', $name, $main['email_b']);
+            $mID  = $main['contact_id_b']; // update the contact ID from the journal
+        }
+        $main = $this->getToAddress($output, $mID);
+        // make sure there is a value in the default fields
+        if (empty($output['defTo'])  && !empty($output['valsTo']))  { $output['defTo']  = reset($output['valsTo'])['id']; }
+        if (empty($output['defFrom'])&& !empty($output['valsFrom'])){ $output['defFrom']= reset($output['valsFrom'])['id']; }
+        $xKeys= $xVals = [];
+        foreach ((array)$main as $key => $val) { $xKeys[] = "%$key%"; $xVals[] = $val; }
+        $sParts = !empty($report->filenamefield) ? explode('.', $report->filenamefield) : [];
+        if (empty($sParts[1])) { $sParts[1] = ''; }
+        $title  = !empty($report->filenameprefix)? $report->filenameprefix: '';
+        $title .= !empty($main[$sParts[1]])      ? $main[$sParts[1]]      : $report->title;
+        $output['msgSubject']= sprintf($this->lang['phreeform_email_subject'], $title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'));
+        $output['msgBody']   = TextReplace($output['msgBody'], $xKeys, $xVals);
+        msgDebug("\nreturning from emailProps, output is now: ".print_r($output, true));
         return $output;
     }
 
@@ -1160,77 +1186,29 @@ class phreeformRender
      * @param array $output - Render output structure
      * @param object $report - Working report structure
      */
-    private function getFromAddress(&$output, $report)
+    private function getFromAddress(&$output)
     {
-        $vals = [];
-        $meta = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
-        $def  = !empty($report->defaultemail) ? $report->defaultemail : 'user';
-        if (!empty($meta['email'])) {
-            if (empty($meta['title'])) { $meta['title'] = $meta['email']; }
-            $user = $meta['title']." <".$meta['email'].">";
-            $vals['user'] = ['id'=>'user', 'text'=>$user];
+        global $report;
+        $vals   = [];
+        $group  = clean('group', 'cmd', 'get'); // i.e. bnk:j20
+        $defFrom= !empty($group) ? $this->guessDefTo($group) : 'gen';
+        $email  = getUserCache('profile', 'email');
+        $title  = getUserCache('profile', 'title');
+        if (!empty($email)) {
+            if (empty($title)) { $title = $email; }
+            $vals['user'] = ['id'=>"$title <$email>", 'text'=>"$title <$email>"];
+            if ('user' == $defFrom) { $output['defFrom'] = "$title <$email>"; }
         }
-        $output['defFrom'] = 'user';
-        $map  = ['gen'=>'','ap'=>'_ap','ar'=>'_ar'];
+        $map  = ['gen'=>'', 'ap'=>'_ap', 'purch'=>'_mgr', 'ar'=>'_ar'];
         foreach ($map as $key => $suffix) {
             $name = getModuleCache('bizuno', 'settings', 'company', "contact$suffix");
             $email= getModuleCache('bizuno', 'settings', 'company', "email$suffix");
             if (empty($email)) { continue; }
             $val  = (!empty($name) ? $name : $email)." <$email>";
-            $vals[$key] = ['id'=>$key, 'text'=>$val];
-            if ($key == $def) { $output['defFrom'] = $key; }
+            $vals[$key] = ['id'=>$val, 'text'=>$val];
+            if ($key == $defFrom) { $output['defFrom'] = $val; }
         }
         $output['valsFrom'] = $vals;
-    }
-
-    /**
-     * Pulls the To address and sets the default
-     * @param array $output - Render output structure
-     * @param object $report - Working report structure
-     */
-    private function getToAddress(&$output, $report)
-    {
-        msgDebug("\nreport entering getToAddress = ".print_r($report, true));
-        if (!in_array($report->xfilterlist->fieldname, ['journal_main.id','contacts.id']) || $report->xfilterlist->default <> 'equal') {
-            $this->addStoreInfo($output); // no journal so just add the branch managers
-            return;
-        }
-        $mID = $report->xfilterlist->min;
-        switch ($report->xfilterlist->fieldname) {
-            default:
-            case 'journal_main.id':
-                $data = dbGetRow(BIZUNO_DB_PREFIX.'journal_main', "id=$mID");
-                if (empty($data)) { return; }
-                $name = !empty(trim((string)$data['contact_b'])) ? trim((string)$data['contact_b']) : trim((string)$data['primary_name_b']);
-                $this->extractAddresses($output, $name, $data['email_b']);
-                if (!empty($data['contact_id_b'])) { // fetch the email from the main contact record
-                    $cData = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['primary_name', 'email'], "id={$data['contact_id_b']}");
-                    $this->extractAddresses($output, $cData['primary_name'], $cData['email']);
-                }
-                break;
-            case 'contacts.id':
-                $cData = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['primary_name', 'email'], "id=$mID");
-                $this->extractAddresses($output, $cData['primary_name'], $cData['email']);
-                $data = ['contact_id_b'=>$mID];
-                break;
-        }
-        $xKeys= $xVals = [];
-        foreach ((array)$data as $key => $val) { $xKeys[] = "%$key%"; $xVals[] = $val; }
-        $sParts = !empty($report->filenamefield) ? explode('.', $report->filenamefield) : [];
-        if (empty($sParts[1])) { $sParts[1] = ''; }
-        $title  = !empty($report->filenameprefix)? $report->filenameprefix: '';
-        $title .= !empty($data[$sParts[1]])      ? $data[$sParts[1]]      : $report->title;
-        $output['msgSubject']= sprintf($this->lang['phreeform_email_subject'], $title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'));
-        $output['msgBody']   = TextReplace($output['msgBody'], $xKeys, $xVals);
-        $this->toNames = [];
-        if (empty($data['contact_id_b'])) { return; }
-        $cMulti = dbMetaGet('%', 'address_i', 'contacts', $data['contact_id_b']);
-        foreach ($cMulti as $cRow) {
-            $cName = trim($cRow['name_first'].' '.$cRow['name_last']);
-            $name = !empty($cName) ? $cName : trim($cRow['primary_name']);
-            if (empty($cRow['email'])) { continue; }
-            $this->extractAddresses($output, $name, $cRow['email'], false);
-        }
     }
 
     private function addStoreInfo(&$output=[])
@@ -1251,21 +1229,79 @@ class phreeformRender
         }
     }
 
-    private function extractAddresses(&$output, $name='', $email=false, $primary=true)
+    /**
+     * Pulls the To address and sets the default
+     * @param array $output - Render output structure
+     * @param integer $mID - contact record ID
+     */
+    private function getToAddress(&$output, $mID)
     {
-        msgDebug("\nEntering extractAddresses with name = $name and email = $email");
+        $group= clean('group', 'cmd', 'get'); // i.e. bnk:j20
+        $defTo= !empty($group) ? $this->guessDefTo($group) : 'gen';
+        msgDebug("\nreport entering getToAddress");
+        $cData= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$mID");
+        msgDebug("\nfetched cData: ".print_r($cData, true));
+        $map  = ['gen', 'ar', 'purch', 'ap'];
+        foreach ($map as $key) {
+            switch ($key) {
+                case 'gen':  $name = lang('sales');           $email = $cData['email'];  break;
+                case 'ar':   $name = lang('gl_acct_type_2');  $email = $cData['email2']; break;
+                case 'purch':$name = lang('purchasing');      $email = $cData['email3']; break;
+                case 'ap':   $name = lang('gl_acct_type_20'); $email = $cData['email4']; break;
+            }
+            if (empty($email)) { continue; }
+            $this->extractAddresses($output, $key, $name, $email, $defTo);
+        }
+        $this->emailToContacts($output, $mID);
+    }
+
+    private function extractAddresses(&$output, $key='', $name='', $email='', $defTo='')
+    {
+        msgDebug("\nEntering extractAddresses with def = $defTo, key = $key, name = $name and email = $email");
         $parts = explode(',', (string)$email);  // handle comma separated email addresses
         foreach ($parts as $part) {
             $tEmail= strtolower(trim($part));
-            $tName = strtolower(trim($name));
             if (empty($tEmail)) { continue; }
-            if (strpos($tEmail, '@') !== false) { // assume valid email address
-                $val = (!empty($name) ? $name : $part)." <".clean($tEmail, 'email').">";
-                $output['valsTo'][$tEmail] = ['id'=>$val, 'text'=>$val];
-                if (empty($output['defTo']) && ($primary || in_array($tName, $this->toNames))) { $output['defTo'] = $val; continue; }
-            } elseif ($primary) { // just a name or note
-                $this->toNames[] = trim($part); // not a valid email, make it a note
+            if (strpos($tEmail, '@') === false) { continue; }// assume valid email address
+            $val = (!empty($name) ? $name : $part)." <".clean($tEmail, 'email').">";
+            $output['valsTo'][$key] = ['id'=>$val, 'text'=>$val];
+            if ($defTo==$key) { $output['defTo'] = $val; }
+        }
+    }
+
+    /**
+     * Tries to guess the default to email address based on the group passed
+     * @param type $group
+     */
+    private function guessDefTo($group='')
+    {
+        msgDebug("\nEntering guessDefTo with group = $group.");
+        $parts = explode(':', $group);
+        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar'   : 'ap'; }
+        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? 'purch': 'ap'; }
+        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? 'gen'  : 'ar'; }
+        return 'gen';
+    }
+    
+    /**
+     * Adds emails for the contacts of a given contact ID
+     * @param integer $mID - contact record ID 
+     */
+    private function emailToContacts(&$output, $mID)
+    {
+        msgDebug("\nEntering emailToContacts with mID = $mID");
+        $key = 'i0';
+        $meta = dbMetaGet('%', 'address_i', 'contacts', $mID);
+        foreach ($meta as $row) { // only use the first email for contacts type i
+            if (empty($row['email'])) { continue; }
+            if (empty($row['name_first']) && empty($row['name_last'])) {
+                $title = !empty($row['primary_name']) ? $row['primary_name'] : strtolower(trim($row['email']));
+            } else {
+                $title = !empty($row['name_first'])? $row['name_first']   : '';
+                $title.= !empty($row['name_last']) ? ' '.$row['name_last']: '';
             }
+            $output['valsTo'][$key] = ['id'=>"$title <{$row['email']}>", 'text'=>"$title <{$row['email']}>"];
+            $key++;
         }
     }
 

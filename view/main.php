@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-20
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /view/main.php
  */
 
@@ -1500,6 +1500,55 @@ function draw_{$dashID}_column() {
  * @param type $dashID - div ID
  * @param type $data - table data
  */
+function googleLine1(&$layout, $dashID, $data)
+{
+    $html = '<div id="'.$dashID.'-line" style="width:100%; height:450px;"></div>';
+    $jsBody = "
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(draw_{$dashID}_line);
+
+function draw_{$dashID}_line() {
+    var data = google.visualization.arrayToDataTable(" . json_encode($data['data']) . ");
+    var options = {
+        title: '".addslashes($data['title'])."',
+        titleTextStyle: { color: screenMode === 'dark' ? '#eee' : '#333', fontSize: 16 },
+        backgroundColor: screenMode === 'dark' ? '#333333' : 'transparent',
+        chartArea: { left: 70, right: 60, top: 50, height: '80%', width: '85%' },
+        series: { // Single series only
+            0: { color: '#4285F4', lineWidth: 3 }
+        },
+        vAxis: { // Single vertical axis
+            title: 'Total',
+            titleTextStyle: { color: '#4285F4' },
+            textStyle: { color: screenMode === 'dark' ? '#ccc' : '#333' },
+            minValue: 0,
+            format: '$#,##0' // format money
+        },
+        hAxis: { 
+            title: 'Year', 
+            titleTextStyle: { color: screenMode === 'dark' ? '#eee' : '#333' },
+            textStyle: { color: screenMode === 'dark' ? '#aaa' : '#666' },
+            slantedText: false 
+        },
+        legend: { position: 'top', textStyle: { color: screenMode === 'dark' ? '#ccc' : '#333' } },
+        pointSize: 8,
+        curveType: 'function',
+        animation: { startup: true, duration: 1200, easing: 'out' },
+        tooltip: { isHtml: true }
+    };
+    var chart = new google.visualization.LineChart(document.getElementById('$dashID-line'));
+    chart.draw(data, options);
+}";
+    $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
+    $layout['jsBody'][$dashID]= $jsBody;
+}
+
+/**
+ * Generates the HTML to create a Google line graph for 2 lines of data
+ * @param array $layout - structure coming in
+ * @param type $dashID - div ID
+ * @param type $data - table data
+ */
 function googleLine2(&$layout, $dashID, $data)
 {
     $html = '<div id="'.$dashID.'-line" style="width:100%; height:450px;"></div>';
@@ -1509,7 +1558,7 @@ google.charts.setOnLoadCallback(draw_{$dashID}_line);
 function draw_{$dashID}_line() {
     var data = google.visualization.arrayToDataTable(" . json_encode($data['data']) . ");
     var options = {
-        title: '{$data['title']}',
+        title: '".addslashes($data['title'])."',
         titleTextStyle: { color: screenMode==='dark' ? '#eee' : '#333', fontSize: 16 },
         backgroundColor: screenMode==='dark' ? '#333333' : 'transparent',
         chartArea: { left: 70, right: 100, top: 50, height: '80%', width: '72%' },

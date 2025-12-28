@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/phreeform/renderHTML.php
  */
 
@@ -82,7 +82,7 @@ class HTML
         $data = NULL;
         $align="C";
         foreach ($report->fieldlist->rows as $value) {
-            $this->dataAligns[] = $value->align;
+            $this->dataAligns[] = !empty($value->align)?$value->align : 'L';
             if (isset($value->visible) && $value->visible) {
                 $data .= !empty($value->title) ? $value->title : '';
                 if (isset($value->columnbreak) && $value->columnbreak) {

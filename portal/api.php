@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-20
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /portal/api.php
  */
 
@@ -286,19 +286,22 @@ class portalApi
         setUserCache('profile', '', $profile);
         $role   = !empty($profile['role_id']) ? dbMetaGet($profile['role_id'], 'bizuno_role') : 0;
         setUserCache('role', '', $role);
-//        msgDebug("\nEDI cron with role = ".print_r($role, true));
         msgDebug("\nUser has been set, ready to compose");
         compose('phreebooks', 'ediAPI', 'ediGet', $layout);
     }
     
-    public function bizAPI(&$layout=[])
+    /**
+     * Handles customization calls for cron and unauthorized users where the response contains public data.
+     * @param type $layout
+     */
+    public function myAPI()
     {
-        $route = isset($_GET['apiRt']) ? preg_replace("/[^a-zA-Z0-9\/]/", '', $_GET['apiRt']) : '';
-        if (empty($route) || substr_count($route, '/') != 2) { exit('Illegal Access!'); }
-        $apiPath = explode('/', $route, 3);
-        loadBusinessCache();
-        msgDebug("\nUser has been set, ready to compose with route = ".print_r($route, true));
-        compose($apiPath[0], $apiPath[1], $apiPath[2], $layout);
+        if (file_exists(BIZUNO_DATA.'myExt/controllers/api/myAPI.php')) {
+            require(BIZUNO_DATA.'myExt/controllers/api/myAPI.php');
+            loadBusinessCache();           
+            $ctl = new apiMyAPI();
+            $ctl->goAction();
+        }
     }
 
     /************************ Support Metohds **************************/

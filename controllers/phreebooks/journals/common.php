@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -213,9 +213,10 @@ class jCommon
         msgDebug("\n    Entering getStkBalance to load SO/PO balances with rID = $rID ...");
         $item_array = [];
         if (empty($rID)) { return $item_array; } // nothing to do here
-        // start by retrieving the po/so item list
+        // start by retrieving the po/so item list of tracked items
+        $invTypes = implode("','", array_merge(INVENTORY_COGS_TYPES, ['ns'])); // add non-stock type to prevent closing partial SO/PO's rcvd
         $sql0 = "SELECT j.id, j.sku, j.qty FROM ".BIZUNO_DB_PREFIX."journal_item j JOIN ".BIZUNO_DB_PREFIX."inventory i ON j.sku=i.sku
-             WHERE j.ref_id=$rID AND j.gl_type='itm' AND i.inventory_type IN ('".implode("','", INVENTORY_COGS_TYPES)."')";
+             WHERE j.ref_id=$rID AND j.gl_type='itm' AND i.inventory_type IN ('$invTypes')";
         $stmt1  = dbGetResult($sql0);
         $result1= $stmt1->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($result1 as $row) {

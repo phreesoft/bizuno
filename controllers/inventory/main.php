@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /controllers/inventory/main.php
  */
 
@@ -390,16 +390,15 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $output= [];
         if ($sku && sizeof(getModuleCache('bizuno', 'stores')) > 1) { $output = getStoreStock($sku); }
         if (sizeof(getModuleCache('bizuno', 'stores')) > 1) { // build the limit store, store stock display
-            msgDebug("\nextStores adding table to structure");
             $order    = 10;
             $storeKeys= [];
             foreach (getModuleCache('bizuno', 'stores') as $store) {
                 if (!isset($output['b'.$store['id']]['stock'])) { $output['b'.$store['id']]['stock'] = 0; }
                 $layout['fields']['store_'.$store['id']] = ['order'=>$order,'label'=>$store['text'],'attr'=>['type'=>'number','value'=>$output['b'.$store['id']]['stock'],'readonly'=>true]];
                 $storeKeys[] = 'store_'.$store['id'];
-                $order = $order + 5;
+                $order = $order + 10;
             }
-            $layout['fields']['store_id'] = ['order'=>90,'label'=>lang('limit_store'),'values'=>viewStores(),'attr'=>['type'=>'select']];
+            $layout['fields']['store_id'] = ['order'=>90,'label'=>lang('store_pref'),'values'=>viewStores(),'attr'=>['type'=>'select']];
             $layout['tabs']['tabInventory']['divs']['general']['divs']['genStore'] = ['order'=>75,'type'=>'panel','classes'=>['block33'],'key'=>'genStore'];
             $layout['panels']['genStore'] = ['label'=>lang('all_stores'),'type'=>'fields','keys'=>$storeKeys];
         }
@@ -874,8 +873,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                         'rename'=> ['order'=>40,'icon'=>'rename', 'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_rename']."'); if (title!=null) jsonAction('inventory/main/rename', idTBD, title);"]],
                         'copy'  => ['order'=>50,'icon'=>'copy',   'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_copy']."'); if (title!=null) jsonAction('inventory/main/copy', idTBD, title);"]],
                         'chart' => ['order'=>60,'icon'=>'mimePpt','label'=>lang('sales'),    'events'=>['onClick'=>"windowEdit('inventory/tools/chartSales&rID=idTBD', 'myInvChart', '&nbsp;', 600, 500);"]],
-                        'gLineP'=> ['order'=>63,'icon'=>'mimeXls','label'=>lang('purchases'),'hidden'=>$secJ06>3?false:true,'events'=>['onClick'=>"windowEdit('inventory/tools/chartHistPurch&rID=idTBD', 'myInvPurch', '&nbsp;', 600, 500);"]],
-                        'gLineS'=> ['order'=>65,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>$secJ12>3?false:true,'events'=>['onClick'=>"windowEdit('inventory/tools/chartHistSales&rID=idTBD', 'myInvSales', '&nbsp;', 600, 500);"]],
+                        'gLineP'=> ['order'=>63,'icon'=>'mimeXls','label'=>lang('purchases'),'hidden'=>$secJ06>3?false:true,'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistPurch&rID=idTBD', 'myInvPurch', '&nbsp;', 600, 500);"]],
+                        'gLineS'=> ['order'=>65,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>$secJ12>3?false:true,'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myInvSales', '&nbsp;', 600, 500);"]],
                         'trash' => ['order'=>90,'icon'=>'trash',  'hidden'=>$security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('inventory/main/delete', idTBD);"]],
                         'attach'=> ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
                 'sku'              => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'inventory.sku','label'=>pullTableLabel("inventory", 'sku'), 'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],

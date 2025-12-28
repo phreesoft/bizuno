@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-24
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -109,7 +109,7 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     {
         // CAUTION - No security check here or cron will fail as no one is logged into Bizuno
         $opt = clean('opt', 'cmd', 'get');
-        setUserCache('security', 'prices_c', 1); // needed to get customers price
+        setSecurityOverride('prices_c', 1);
         foreach ($this->creds as $creds) {
             foreach ($creds as $key => $value) { $this->$key = $value; }
             $this->ediGetFiles();

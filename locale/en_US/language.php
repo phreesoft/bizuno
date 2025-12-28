@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-26
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /local/en_US/language.php
  */
 
@@ -109,6 +109,7 @@ $langCore = [
     'adjustment' => 'Adjustment',
     'admin'=>'Administrate',
     'administrator'=>'Administrator',
+    'advanced' => 'Advanced',
     'align' => 'Align',
     'all' => 'All',
     'all_groups' => 'All Groups',
@@ -483,6 +484,7 @@ $langCore = [
     'profile' => 'Profile',
     'projects' => 'Projects',
     'promotions' => 'Promotions',
+    'purchase' => 'Purchase',
     'purchases' => 'Purchases',
     'purchasing' => 'Purchasing',
     'purchase_tax' => 'Purchase Tax',
@@ -586,6 +588,7 @@ $langCore = [
     'storage' => 'Storage',
     'store_id' => 'Store ID',
     'store_priv' => 'Restrict to Store',
+    'store_pref' => 'Preferred Store',
     'stores' => 'Stores',
     'style' => 'Style',
     'submit' => 'Submit',
@@ -644,6 +647,7 @@ $langCore = [
     'user_pin_tip' => 'Pin to use for group related authorization signatures.',
     'username' => 'Username',
     'url' => 'URL',
+    'user_current' => 'Current User',
     'user_login' => 'User Login',
     'users' => 'Users',
     'value' => 'Value',

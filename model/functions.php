@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-02
+ * @version    7.x Last Update: 2025-12-27
  * @filesource /model/functions.php
  */
 
@@ -810,6 +810,13 @@ function clearUserCache($group='', $lvl1='')
         msgDebug("\nClearing user cache group: $group and lvl1 = $lvl1");
         unset($bizunoUser[$group][$lvl1]); }
     elseif ($group)          { unset($bizunoUser[$group]); }
+}
+
+function setSecurityOverride($index, $value)
+{
+    global $bizunoUser;
+    if (empty($bizunoUser)) { $bizunoUser = []; } // for cron jobs, this may not be set as user is not logged in.
+    $bizunoUser['role']['security'][$index] = $value;
 }
 
 function getMimeType($filename='')

@@ -27,9 +27,6 @@
 
 namespace bizuno;
 
-// Load portal specific classes
-require(BIZUNO_FS_LIBRARY . 'portal/api.php');
-
 class portalCtl
 {
     public  $layout       = []; // Holds the structure for the output display
@@ -94,7 +91,6 @@ class portalCtl
         msgDebug("\nFalling through, returning guest.");
         return 'guest';
     }
-    
     /**
      * Handles requests when user has not been authenticated
      * @param type $layout
@@ -106,12 +102,13 @@ class portalCtl
         $view->login($this->layout);
     }
     /**
-     * Handles requests when user has not been authenticated
+     * Handles API requests when user has not been authenticated, not necessarily secure!
+     * FOR PUBLIC DATA ONLY UNLESS AUTHENTICATED IN SCRIPT
      * @param type $layout
      */
     private function goAPI()
     {
-        require(BIZUNO_FS_LIBRARY . 'portal/viewAuth.php');
+        require(BIZUNO_FS_LIBRARY . 'portal/api.php');
         $view = new portalApi();
         $method = $this->route['method'];
         if (method_exists($view, $method)) {
@@ -119,7 +116,8 @@ class portalCtl
             $view->$method($this->layout);
             return;
         }
-        msgDebug("\nAPI request {$method} WAS NOT FOUND!");
+        msgDebug("\nAPI request {$method} WAS NOT FOUND, falling through to sign in!");
+        require(BIZUNO_FS_LIBRARY . 'portal/viewAuth.php');
         $guest = new portalViewAuth(); // Fall through to login screen
         $guest->login($this->layout);
     }

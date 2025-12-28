@@ -145,6 +145,7 @@ final class io
         unset($opts['headers'], $opts['cookies']);
         $options = [];
         $ch = curl_init();
+        msgDebug("\nSetting cURL Options, sending to url: $url");
         if (!empty($options)) { foreach ($options as $opt => $value) {
             switch ($opt) {
                 case 'useragent': curl_setopt($ch, CURLOPT_USERAGENT, $useragent); break;

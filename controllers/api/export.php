@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-13
+ * @version    7.x Last Update: 2025-12-26
  * @filesource /controllers/api/export.php
  */
 
@@ -44,10 +44,8 @@ class apiExport
     {
         $rID = clean($product['RecordID'], 'integer');
         if (!$rID) { return msgDebug("\nBad ID passed. Needs to be the inventory field id tag name (RecordID)."); }
-        setUserCache('security', 'prices_c', 1);
-        setUserCache('security', 'j12_mgr', 1);
-        msgDebug("\nRead back user cache for prices_c = ".getUserCache('role', 'security', 'prices_c'));
-        msgDebug("\nRead back user cache for j12_mgr = ".getUserCache('role', 'security', 'j12_mgr'));
+        setSecurityOverride('prices_c', 1);
+        setSecurityOverride('j12_mgr', 1);
         $pDetails['args'] = ['iID'=>$rID];
         compose('inventory', 'prices', 'quote', $pDetails);
         $product['Price'] = $pDetails['content']['price'];
