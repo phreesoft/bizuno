@@ -1032,7 +1032,7 @@ class phreeformRender
             }
         } }
         // fetch the sort order and add to group by string to finish ORDER BY string
-        $strSort = null;
+        $strSort = strpos($strGroup, ',')!==false ? $strGroup : null; // handle complex grouping else add to sort list and group during output
         if (isset($report->sortlist->rows)) { for ($i = 0; $i < sizeof($report->sortlist->rows); $i++) {
             if (!empty($report->sortlist->rows[$i]->default)) {
                 $strSort    .= ($strSort <> '' ? ', ' : '') . prefixTables($report->sortlist->rows[$i]->fieldname);
@@ -1042,9 +1042,9 @@ class phreeformRender
         sqlFilter($report); // fetch criteria and date filter info
         sqlTable ($report); // fetch the tables to query
         $sql = "SELECT $strField FROM $report->sqlTable";
-        if ($report->sqlCrit) { $sql .= " WHERE $report->sqlCrit"; }
-        if ($strGroup)        { $sql .= " GROUP BY $strGroup"; }
-        if ($strSort)         { $sql .= " ORDER BY $strSort"; }
+        if ($report->sqlCrit)              { $sql .= " WHERE $report->sqlCrit"; }
+        if (strpos($strGroup, ',')!==false){ $sql .= " GROUP BY $strGroup"; }
+        if ($strSort)                      { $sql .= " ORDER BY $strSort"; }
         return ['level'=>'success','data'=>$sql,'description'=>$filterdesc.$report->sqlCritDesc];
     }
 
