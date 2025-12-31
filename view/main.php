@@ -422,13 +422,6 @@ function resizeEverything() { ".implode(" ", $jsResize)." }"; }
  */
 function viewFormat($value, $format = '')
 {
-/*  if (empty($GLOBALS['DAVE_DEBUG'])) { $GLOBALS['DAVE_DEBUG'] = 0; }
-    $GLOBALS['DAVE_DEBUG']++;
-    if ($GLOBALS['DAVE_DEBUG'] > 100000) {
-        msgAdd("Trap hit");
-        msgDebugWrite();
-        exit(); // Entering BuildDataArray
-    } */
 //  msgDebug("\nIn viewFormat value = $value and format = $format");
     switch ($format) {
         case 'blank':      return '';

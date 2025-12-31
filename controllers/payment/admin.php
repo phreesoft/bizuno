@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2025-12-29
  * @filesource /controllers/payment/admin.php
  */
 
@@ -29,12 +29,13 @@ namespace bizuno;
 
 class paymentAdmin
 {
-    public $moduleID= 'payment';
-    public $pageID  = 'admin';
-    public $lang;
-    public $defaults;
-    public $settings;
-    public $structure;
+    public  $moduleID  = 'payment';
+    public  $pageID    = 'admin';
+    private $defMethods= ['cod', 'directdebit', 'moneyorder',];
+    public  $lang;
+    public  $defaults;
+    public  $settings;
+    public  $structure;
 
     public function __construct()
     {
@@ -85,4 +86,14 @@ class paymentAdmin
     {
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
+
+    public function install(&$layout=[])
+    {
+        msgDebug("\nEntering $this->moduleID:install");
+        // Install the requried and basic list of gateways
+        $bAdmin = new bizunoSettings();
+        foreach ($this->structure['dirMethods'] as $dirMeth) { $bAdmin->adminInstMethods($this->moduleID, $dirMeth, $this->defMethods); }
+    }
+
+
 }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-19
+ * @version    7.x Last Update: 2025-12-30
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -255,9 +255,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         dbTransactionStart();
         dbMetaSet($this->chartMetaID, $this->metaPrefix, $this->chartMeta);
         insertChartOfAccountsHistory($output['id'], $output['type']); // build the journal_history entries, if not existing
-        if (!empty($metaVal['type']) && $metaVal['type']<>$output['type']) { // check for type change
-            dbWrite(BIZUNO_DB_PREFIX.'journal_history',['gl_type'=>$output['type']], 'update', "gl_account='{$output['id']}'");
-        }
+        dbWrite(BIZUNO_DB_PREFIX.'journal_history',['gl_type'=>$output['type']], 'update', "gl_account='{$output['id']}'"); // only matters if type changes
         dbTransactionCommit();
         msgAdd(lang('msg_record_saved'), 'success');
         msgLog("$this->mgrTitle - ".lang('save').": {$output['title']}");

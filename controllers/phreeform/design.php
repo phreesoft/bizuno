@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2025-12-31
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -879,37 +879,6 @@ jqBiz('#frmFieldSettings').submit(function (e) {
     }
 
     /**
-     * Generates the structure for the grid for report/form groups
-     * @param string $name - DOM field name
-     * @param string $type - choices are rpt (report) OR frm (form)
-     * @return array - structure ready to render
-     */
-    private function dgGroups($name, $type='rpt')
-    {
-        return ['id'=>$name,'type'=>'edatagrid',
-            'attr'   => ['title'  =>lang('group_list'),'toolbar'=>"#{$name}Toolbar",'singleSelect'=> true,'idField'=>'id'],
-            'events' => ['data'   =>'dataGroups'],
-            'source' => ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
-            'columns'=> [
-                'action' => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>45],
-                    'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
-                    'actions'=> [
-                        'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
-                        'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
-                'fieldname' => ['order'=>10, 'label' => lang('fieldname'), 'attr'=>['width'=>250,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
-                'title'     => ['order'=>20, 'label' => lang('title'),     'attr'=>['width'=>150,'resizable'=>true, 'editor'=>'text']],
-                'default'   => ['order'=>30, 'label' => lang('default'),   'attr'=>['width'=>120,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                'page_break'=> ['order'=>40, 'label' => $this->lang['page_break'],'attr'=>['width'=>120,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                'processing'=> ['order'=>50, 'label' => $this->lang['processing'],'attr'=>['width'=>200,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
-                'formatting'=> ['order'=>50, 'label' => lang('format'),'attr'=>['width'=>200,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataFormatting,valueField:'id',textField:'text',groupField:'group'}}"]]]];
-    }
-
-    /**
      * Generates the structure for the grid for report/form sort order selections
      * @param string $name - DOM field name
      * @param string - choices are report (rpt) or form (frm)
@@ -932,6 +901,37 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 'title'    => ['order'=>20, 'label'=>lang('title'), 'attr' => ['width'=>150, 'resizable'=>'true', 'editor'=>'text']],
                 'default'  => ['order'=>30, 'label'=>lang('default'), 'attr'=>  ['width'=>120],
                     'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}", 'resizable'=>'true']]]];
+    }
+
+    /**
+     * Generates the structure for the grid for report/form groups
+     * @param string $name - DOM field name
+     * @param string $type - choices are rpt (report) OR frm (form)
+     * @return array - structure ready to render
+     */
+    private function dgGroups($name, $type='rpt')
+    {
+        return ['id'=>$name,'type'=>'edatagrid',
+            'attr'   => ['title'  =>lang('group_list'),'toolbar'=>"#{$name}Toolbar",'singleSelect'=> true,'idField'=>'id'],
+            'events' => ['data'   =>'dataGroups'],
+            'source' => ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
+            'columns'=> [
+                'action' => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>45],
+                    'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
+                    'actions'=> [
+                        'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
+                        'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
+                'fieldname' => ['order'=>10, 'label' => lang('fieldname'), 'attr'=>['width'=>250,'resizable'=>true],
+                    'events'=> ['editor'=>"{type:'combobox',options:{mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
+                'title'     => ['order'=>20, 'label' => lang('title'),     'attr'=>['width'=>150,'resizable'=>true, 'editor'=>'text']],
+                'default'   => ['order'=>30, 'label' => lang('default'),   'attr'=>['width'=>120,'resizable'=>true],
+                    'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
+                'page_break'=> ['order'=>40, 'label' => $this->lang['page_break'],'attr'=>['width'=>120,'resizable'=>true],
+                    'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
+                'processing'=> ['order'=>50, 'label' => $this->lang['processing'],'attr'=>['width'=>200,'resizable'=>true],
+                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
+                'formatting'=> ['order'=>50, 'label' => lang('format'),'attr'=>['width'=>200,'resizable'=>true],
+                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataFormatting,valueField:'id',textField:'text',groupField:'group'}}"]]]];
     }
 
     /**

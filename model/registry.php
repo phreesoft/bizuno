@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2025-12-29
  * @filesource /model/registry.php
  */
 
@@ -396,7 +396,7 @@ unset($bizunoMod[$module]['dashboards']);
             if (is_array($clsMeth->lang)) { ksort($clsMeth->lang); }
             $bizunoLang['methods'][$folderID][$method] = $clsMeth->lang;
             $title = !empty($clsMeth->lang['title']) ? $clsMeth->lang['title'] : $method;
-            msgDebug("\nUpdating cache with new path = $path");
+            msgDebug("\nUpdating meta with new path = $path");
             $args = [ // just the values to update
                 'id'         => $method, // This should already be set via the registry install, probably not needed here
                 'title'      => $title,
@@ -405,6 +405,7 @@ unset($bizunoMod[$module]['dashboards']);
                 'path'       => $path,
                 'url'        => $url,
                 'menuID'     => !empty($clsMeth->menuID) ? $clsMeth->menuID : ''];
+            if (!isset($meta[$method]['settings'])) { $meta[$method]['settings'] = $clsMeth->settings; } // on migrations, this is sometimes not set.
 //msgDebug("\nregistry args array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
 //msgDebug("\nmerged array = ".print_r($merged, true));

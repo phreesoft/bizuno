@@ -32,19 +32,20 @@ bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/payment/main.php',      'paymentMain'
 
 class phreebooksMain
 {
-    public $moduleID = 'phreebooks';
-    public $journalID= 0;
-    public $gl_type  = '';
-    public $lang;
-    public $myStore;
-    public $defaults;
-    public $rID;
-    public $action;
-    public $totals;
-    public $type;
-    public $isACH;
-    public $restrict = false;
-    public $blocked_journals;
+    public  $moduleID = 'phreebooks';
+    public  $journalID= 0;
+    private $achTotals= ['achBalBeg','achSubtotal','achDiscount','achTotal','achBalEnd'];
+    public  $gl_type  = '';
+    public  $lang;
+    public  $myStore;
+    public  $defaults;
+    public  $rID;
+    public  $action;
+    public  $totals;
+    public  $type;
+    public  $isACH;
+    public  $restrict = false;
+    public  $blocked_journals;
 
     function __construct()
     {
@@ -1624,6 +1625,13 @@ function bizUnitDiscDisc(newValue) {
                 'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '856');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 856 - Shipment confirmation with tracking
         }
+                
+        // @TODO - as part of this module rewrite of edit and dgPhreeBooks, this patch is added to remove store stuff of only a single store
+        // This is where all customization needs to go where the grid is alterd depending on the journal being looked at
+        if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { // single store
+            unset($data['columns']['store_id'], $data['source']['filters']['store']);
+        }
+
         return $data;
     }
 
@@ -1893,7 +1901,10 @@ function bizUnitDiscDisc(newValue) {
             if (in_array($jID, $settings['settings']['journals'])){ $enabled[$methID] = $settings['settings']['order']; }
         }
         asort($enabled);
-        return array_keys($enabled);
+        $temp = array_keys($enabled);
+        // Special case for j20 to remove ACH total methods, they are handled uniquely in the specific class
+        $totals = array_diff($temp, $this->achTotals);
+        return $totals;
     }
 
     public function setInvoiceNum(&$layout=[])

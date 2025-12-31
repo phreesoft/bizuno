@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2025-12-31
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -283,7 +283,6 @@ class phreeformRender
     jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreeform/render/phreeformBody'+params,
         success: function(json) { processJson(json);
             if (json.msgBody) {
-                bizSelSet ('msgFrom',   json.defFrom);
                 bizTextSet('msgSubject',json.msgSubject);
                 jqBiz('#msgBody').val(json.msgBody.replace(/<br \/>/g, \"\\n\"));
             }
@@ -480,6 +479,7 @@ class phreeformRender
      */
     private function renderReport(&$report)
     {
+        msgDebug("\nEntering renderReport with grouplist before processing = ".print_r($report->grouplist, true));
         if (isset($report->grouplist->rows) && is_array($report->grouplist->rows)) {
             foreach (array_keys($report->grouplist->rows) as $key) {
                 $grpSel = clean('critGrpSel', ['format'=>'integer','default'=>''], 'post');
@@ -1024,7 +1024,7 @@ class phreeformRender
         $strField  = implode(', ', $displayed);
         $filterdesc= lang('filters').': ';
         //fetch the groupings and build first level of SORT BY string (for sub totals)
-        $strGroup  = NULL;
+        $strGroup  = null;
         if (isset($report->grouplist->rows)) { for ($i = 0; $i < sizeof($report->grouplist->rows); $i++) {
             if ($report->grouplist->rows[$i]->default) {
                 $strGroup   .= prefixTables($report->grouplist->rows[$i]->fieldname);
@@ -1032,7 +1032,7 @@ class phreeformRender
             }
         } }
         // fetch the sort order and add to group by string to finish ORDER BY string
-        $strSort = $strGroup;
+        $strSort = null;
         if (isset($report->sortlist->rows)) { for ($i = 0; $i < sizeof($report->sortlist->rows); $i++) {
             if (!empty($report->sortlist->rows[$i]->default)) {
                 $strSort    .= ($strSort <> '' ? ', ' : '') . prefixTables($report->sortlist->rows[$i]->fieldname);
@@ -1043,6 +1043,7 @@ class phreeformRender
         sqlTable ($report); // fetch the tables to query
         $sql = "SELECT $strField FROM $report->sqlTable";
         if ($report->sqlCrit) { $sql .= " WHERE $report->sqlCrit"; }
+        if ($strGroup)        { $sql .= " GROUP BY $strGroup"; }
         if ($strSort)         { $sql .= " ORDER BY $strSort"; }
         return ['level'=>'success','data'=>$sql,'description'=>$filterdesc.$report->sqlCritDesc];
     }
@@ -1277,9 +1278,9 @@ class phreeformRender
     {
         msgDebug("\nEntering guessDefTo with group = $group.");
         $parts = explode(':', $group);
-        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar'   : 'ap'; }
-        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? 'purch': 'ap'; }
-        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? 'gen'  : 'ar'; }
+        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar' : 'ap'; }
+        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''   : 'ar'; }
+        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? 'gen': 'ap'; }
         return 'gen';
     }
     

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-12-29
  * @filesource /controllers/phreebooks/journals/j20.php
  */
 
@@ -33,6 +33,7 @@ class j20 extends jCommon
 {
     public  $journalID= 20;
     private $isACH    = []; // tracks if vendor is ACH enabled
+    private $achTotals= ['achBalBeg','achSubtotal','achDiscount','achTotal','achBalEnd'];
     public $main;
     public $items;
     public $type;
@@ -111,25 +112,24 @@ class j20 extends jCommon
     if (!formValidate()) return false;
     return true;
 }";
+            unset($data['jsReady']['focus']);
             $data['jsReady']['init'] = "ajaxForm('frmJournal');
-jqBiz('#post_date').datebox({'onChange': function(newVal, oldVal) { totalsGetBegBalance(newVal); totalsGetAchBegBal(newVal); } });
-jqBiz('#gl_acct_id').combogrid({'onChange': function(newVal, oldVal) { totalsGetBegBalance(bizDateGet('post_date')); totalsGetAchBegBal(bizDateGet('post_date')); } });";
+jqBiz('#post_date').datebox({'onChange': function(newVal, oldVal) { totalsGetBegBalance(newVal); } });
+jqBiz('#gl_acct_id').combogrid({'onChange': function(newVal, oldVal) { totalsGetBegBalance(bizDateGet('post_date')); } });";
             if ($this->action=='bulk') {
                 unset($data['toolbars']['tbPhreeBooks']['icons']['new']);
                 unset($data['toolbars']['tbPhreeBooks']['icons']['recur']);
                 unset($data['divs']['divDetail']['divs']['billAD']);
-                unset($data['jsReady']['focus']);
                 $data['forms']['frmJournal']['attr']['action'] = BIZUNO_URL_AJAX."&bizRt=phreebooks/main/saveBulk&jID=$this->journalID";
-            }
-            unset($data['jsReady']['focus']);
-            if ($this->action=='bulk') {
-                $achTotals = ['achBalBeg','achSubtotal','achDiscount','achTotal','achBalEnd'];
                 $data['divs']['divDetail']['divs']['tot_ach'] = ['order'=>50,'type'=>'panel','key'=>'tot_ach','classes'=>['block25R']];
-                $data['panels']['tot_ach']  = ['label'=>lang('total_ach'),'type'=>'totals', 'content'=>$achTotals];
+                $data['panels']['tot_ach']  = ['label'=>lang('total_ach'),'type'=>'totals', 'content'=>$this->achTotals];
                 $jsTotals = "function achTotalUpdate(func) {\n\tvar taxRunning=0;\n\tvar curTotal=0;\n";
-                foreach ($achTotals as $methID) { $jsTotals .= "\tcurTotal = totals_{$methID}(curTotal);\n"; }
+                foreach ($this->achTotals as $methID) { $jsTotals .= "\tcurTotal = totals_{$methID}(curTotal);\n"; }
                 $jsTotals.= "}";
                 $data['jsHead']['achTotal'] = $jsTotals;
+                $data['jsReady']['init'] = "ajaxForm('frmJournal');
+jqBiz('#post_date').datebox({'onChange': function(newVal, oldVal) { totalsGetBegBalance(newVal); totalsGetAchBegBal(newVal); } });
+jqBiz('#gl_acct_id').combogrid({'onChange': function(newVal, oldVal) { totalsGetBegBalance(bizDateGet('post_date')); totalsGetAchBegBal(bizDateGet('post_date')); } });";
             } else {
                 $data['jsHead']['achTotal'] = "function achTotalUpdate(func) {}";
             }

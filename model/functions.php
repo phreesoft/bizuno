@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2025-12-29
  * @filesource /model/functions.php
  */
 
@@ -815,6 +815,9 @@ function clearUserCache($group='', $lvl1='')
 function setSecurityOverride($index, $value)
 {
     global $bizunoUser;
+    msgDebug("\nEntering setSecurityOverride with index = ".print_r($index, true));
+    msgDebug("\nand value = ".print_r($value, true));
+    msgDebug("\nand bizunoUser = ".print_r($bizunoUser, true));
     if (empty($bizunoUser)) { $bizunoUser = []; } // for cron jobs, this may not be set as user is not logged in.
     $bizunoUser['role']['security'][$index] = $value;
 }

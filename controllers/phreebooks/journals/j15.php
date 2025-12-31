@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2025-12-31
  * @filesource /controllers/phreebooks/journals/j15.php
  */
 
@@ -119,7 +119,7 @@ class j15 extends jCommon
     public function Post()
     {
         msgDebug("\n/********* Posting Journal main ... id = {$this->main['id']} and journal_id = {$this->main['journal_id']}");
-        if (empty($this->items) || !$this->journalFillAddress($this->main)) { return; }
+        if (empty($this->items) || !$this->journalFillAddress()) { return; }
         $this->main['description'] = lang('journal_id_15').": ({$this->items[0]['qty']}) {$this->items[0]['description']}".(sizeof($this->items)>2 ? ' +++' : '');
         $this->unSetCOGSRows(); // unsets rows that will be regenerated during the post
         if (!$this->journalTransfer($this->items))  { return; } // adds offsetting item rows of type: adj as type: xfr
@@ -250,15 +250,12 @@ class j15 extends jCommon
      * @param array $main - journal main
      * @return true on success, false on error
      */
-    private function journalFillAddress(&$main)
+    private function journalFillAddress()
     {
-        if ($this->main['store_id']==$this->main['so_po_ref_id']) { return msgAdd(lang('err_gl_xfr_same_store')); }
-        $main['contact_id_b'] = $main['so_po_ref_id']; // copy the source address to the address billing part
-        $addSrc     = addressLoad($main['contact_id_b'], '_b');
-        foreach ($addSrc as $key => $value) { if (isset($main[$key])) { $main[$key] = $value; } }
-//        $main['contact_id_s'] = $main['store_id']; // copy the destination address to the address shipping part
-//        $addDest    = addressLoad($main['store_id'], '_s');
-//        foreach ($addDest as $key => $value) { if (isset($main[$key])) { $main[$key] = $value; } }
+        msgDebug("\nEntering journalFillAddress with contact_id_b = {$this->main['contact_id_b']} and contact_id_s = {$this->main['contact_id_s']}");
+        if ($this->main['contact_id_b']==$this->main['contact_id_s']) { return msgAdd(lang('err_gl_xfr_same_store')); }
+        $addSrc = addressLoad($this->main['contact_id_b'], '_b');
+        foreach ($addSrc as $key => $value) { if (array_key_exists($key, $this->main)) { $this->main[$key] = $value; } }
         return true;
     }
 
