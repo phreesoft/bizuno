@@ -614,6 +614,7 @@ function bizUnitDiscDisc(newValue) {
      */
     public function save(&$layout=[])
     {
+        msgTrap();
         $rID = clean('id', 'integer', 'post');
         if (!$security = validateAccess("j{$this->journalID}_mgr", $rID?3:2)) { return; }
         $xChild   = clean('xChild', 'text', 'post');

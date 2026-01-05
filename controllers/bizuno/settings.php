@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-01-02
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -269,12 +269,13 @@ class bizunoSettings
 
     public function adminInstMethods($module, $dirMeth, $defaults=[])
     {
+        msgDebug("\nEntering adminInstMethods with module = $module and dirMeth = $dirMeth and sizeof defaults = ".sizeof($defaults, true));
         global $io;
         $newMeta= [];
         $meta   = dbMetaGet(0, "methods_{$dirMeth}"); // get the existing meta, probably won't be there since we are installing
         $metaIdx= metaIdxClean($meta);
         // get all methods in the folder to initialize
-        $members= $io->folderRead(BIZUNO_FS_LIBRARY."controllers/$module/$dirMeth/");
+        $members= $this->methodRead(BIZUNO_FS_LIBRARY."controllers/$module/$dirMeth/");
         foreach ($members as $method) {
             $path   = BIZUNO_FS_LIBRARY."controllers/$module/$dirMeth/$method/";
             msgDebug("\nlooking for method $method at path = ".print_r($path, true));
@@ -297,7 +298,18 @@ class bizunoSettings
             $newMeta[$method] = $merged;
         }
         dbMetaSet($metaIdx, "methods_{$dirMeth}", $newMeta);
+    }
 
+    private function methodRead($path='')
+    {
+        $output = [];
+        if (!file_exists($path)) { return $output; }
+        $temp = scandir($path);
+        if (!is_array($temp)) { return $output; }
+        foreach ($temp as $fn) {
+            if ($fn!='.' && $fn!='..' && is_dir($path.$fn)) {  $output[] = $fn; }
+        }
+        return $output;
     }
 
     /**
@@ -368,12 +380,26 @@ class bizunoSettings
         $roleID= getUserCache('profile', 'userRole');
         $role  = dbMetaGet($roleID, 'bizuno_role');
         metaIdxClean($role); // remove the indexes
-        foreach ($menu as $props) {
+        $this->addSecurity($role['security'], $menu);
+        dbMetaSet($roleID, 'bizuno_role', $role); // need to save intermediate security
+    }
+
+    /**
+     * Recursively set all security to 4
+     * @param type $security
+     * @param type $branch
+     */
+    private function addSecurity(&$security, $branch)
+    {
+        msgDebug("\nEntering addSecurity with branch = ".print_r($branch, true));
+        foreach ($branch as $props) {
             if (empty($props['child'])) { continue; }
             foreach ($props['child'] as $idx => $subProps) {
-                $role['security'][$idx] = 4;
-                dbMetaSet($roleID, 'bizuno_role', $role); // need to save intermediate security
-                if (!empty($subProps['child'])) { $this->setSecurity($subProps); }
+                $security[$idx] = 4;
+                if (!empty($subProps['child'])) {
+                    msgDebug("\nWe have a branch, recursing.");
+                    $this->addSecurity($security, $props['child']);
+                }
             }
         }
     }

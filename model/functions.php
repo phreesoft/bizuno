@@ -816,8 +816,8 @@ function setSecurityOverride($index, $value)
 {
     global $bizunoUser;
     msgDebug("\nEntering setSecurityOverride with index = ".print_r($index, true));
-    msgDebug("\nand value = ".print_r($value, true));
-    msgDebug("\nand bizunoUser = ".print_r($bizunoUser, true));
+//    msgDebug("\nand value = ".print_r($value, true));
+//    msgDebug("\nand bizunoUser = ".print_r($bizunoUser, true));
     if (empty($bizunoUser)) { $bizunoUser = []; } // for cron jobs, this may not be set as user is not logged in.
     $bizunoUser['role']['security'][$index] = $value;
 }

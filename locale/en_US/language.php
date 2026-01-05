@@ -226,6 +226,7 @@ $langCore = [
     'date_closed' => 'Date Closed',
     'date_created' => 'Date Created',
     'date_deliver' => 'Est. Deliver Date',
+    'date_due' => 'Date Due',
     'date_effective' => 'Date Effective',
     'date_end' => 'End Date',
     'date_expire' => 'Expire Date',

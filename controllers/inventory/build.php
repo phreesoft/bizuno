@@ -326,6 +326,7 @@ class inventoryBuild extends mgrJournal
      */
     public function save(&$layout=[])
     {
+msgTrap();
         $rID = clean('id', 'integer', 'post');
         if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
         $item= dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$rID");
@@ -345,6 +346,7 @@ class inventoryBuild extends mgrJournal
      */
     public function saveStep(&$layout=[])
     {
+msgTrap();
         $woID     = clean('id',       'integer','post');
         if (!validateAccess($this->secID, $woID?3:2)) { return; }
         $step_id  = clean('step_id',  'integer','post');
@@ -448,6 +450,9 @@ class inventoryBuild extends mgrJournal
             'tax_rate_id'=> 0,
             'post_date'  => biz_date()];
         $_POST['description'] = $glEntry->main['description'];
+        $journalRef = lang('journal_id_' .$glEntry->main['journal_id']);
+        $invoiceRef = lang('invoice_num_'.$glEntry->main['journal_id']);
+        msgLog($journalRef.'-'.lang('save')." $invoiceRef ".$glEntry->main['invoice_num']." (rID={$glEntry->main['id']})");
         if ($glEntry->Post()) { return true; }
     }
 

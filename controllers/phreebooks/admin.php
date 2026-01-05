@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-29
+ * @version    7.x Last Update: 2026-01-02
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -33,9 +33,9 @@ class phreebooksAdmin {
 
     public $moduleID = 'phreebooks';
     public $pageID   = 'admin';
-    private $defMethods = [
+    private $defMethods = ['totals'=>[
         'achBalBeg', 'achBalEnd', 'achDiscount', 'achSubtotal', 'achTotal', 'balance', 'balanceBeg', 'balanceEnd', 'debitcredit',
-        'discount', 'discountChk', 'shipping', 'subtotal', 'subtotalChk', 'tax_other', 'total', 'total_bal', 'total_pmt'];
+        'discount', 'discountChk', 'shipping', 'subtotal', 'subtotalChk', 'tax_other', 'total', 'total_bal', 'total_pmt']];
     public $lang;
     public $assets;
     public $settings;
@@ -527,7 +527,10 @@ function getPurgeDates() {
         msgDebug("\nEntering $this->moduleID:install");
         // Install the requried and basic list of totals
         $bAdmin = new bizunoSettings();
-        foreach ($this->structure['dirMethods'] as $dirMeth) { $bAdmin->adminInstMethods($this->moduleID, $dirMeth, $this->defMethods); }
+        foreach ($this->structure['dirMethods'] as $dirMeth) {
+            $defaults = isset($this->defMethods[$dirMeth]) ? $this->defMethods[$dirMeth] : [];
+            $bAdmin->adminInstMethods($this->moduleID, $dirMeth, $defaults);
+        }
         // set the currency settings
         $defISO    = getModuleCache('phreebooks', 'currency', 'defISO');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
