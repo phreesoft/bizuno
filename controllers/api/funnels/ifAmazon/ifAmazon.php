@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-24
+ * @version    7.x Last Update: 2026-01-05
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -317,8 +317,9 @@ class ifAmazon {
         global $io;
         msgDebug("\nWorking with settings = ".print_r($this->settings, true));
         if (!$security = validateAccess('ifAmazon', 2)) { return; }
-        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php', 'journal');
-        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php',  'journal');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php','phreebooksProcess','function');
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'getStoreStock',    'function');
         if (!$io->validateUpload('fileOrders', 'text', 'txt')) { return; }
         $strucMain = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main');
         $strucItem = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
@@ -386,7 +387,7 @@ class ifAmazon {
             if (empty($inv)) {
                 return msgAdd("SKU {$data['sku']} cannot be found in Bizuno. No transactions were processed, please correct the error and retry.");
             }
-            if ($inv['qty_stock'] < $data['quantity-purchased']) { $inStock = false; }
+            $inStock = $this->findStock($main, $inv, $data['quantity-purchased']);
             $items[] = [
                 'item_cnt'      => $itemCnt,
                 'gl_type'       => 'itm',
@@ -487,6 +488,24 @@ class ifAmazon {
         msgAdd(sprintf($this->lang['amazon_post_success'], $orderCnt), 'success');
         msgLog(sprintf($this->lang['amazon_post_success'], $orderCnt));
         $layout = array_replace_recursive($layout, ['content'=>  ['action'=>'eval','actionData'=>"jqBiz('body').removeClass('loading');"]]);
+    }
+
+    private function findStock(&$main, $inv, $qty)
+    {
+        if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { // only one store
+            return $inv['qty_stock'] < $qty ? false : true; // becomes inStock
+        } // else multi-store, find if it is in one of the stores
+        $stock = getStoreStock($inv['sku'], $inv['item_cost']);
+        msgDebug("\nRead stock at all stores for SKU = {$inv['sku']} = ".print_r($stock, true));
+        $totalStk = 0;
+        foreach ($stock as $sKey => $item) { // @TODO new feature to geolocate store based on ship to location
+            $totalStk += $item['stock'];
+            if ($item['stock'] >= $qty) { $main['store_id'] = substr($sKey, 1); return true; }
+        }
+        if ($totalStk >= $qty) {
+            msgAdd("Order {$main['purch_order_id']} has enough parts to fill the order but they are in more than one branch.", 'info');
+        }
+        return false;
     }
 
     /**

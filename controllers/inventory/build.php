@@ -326,7 +326,6 @@ class inventoryBuild extends mgrJournal
      */
     public function save(&$layout=[])
     {
-msgTrap();
         $rID = clean('id', 'integer', 'post');
         if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
         $item= dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$rID");
@@ -346,7 +345,6 @@ msgTrap();
      */
     public function saveStep(&$layout=[])
     {
-msgTrap();
         $woID     = clean('id',       'integer','post');
         if (!validateAccess($this->secID, $woID?3:2)) { return; }
         $step_id  = clean('step_id',  'integer','post');
