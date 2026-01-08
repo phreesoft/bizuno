@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/shipping/carriers/ups/manager.php
  *
  * UPS Developer Site:
@@ -79,8 +79,16 @@ class ups extends upsCommon
 
     public function settingSave()
     {
-        $meta   = dbMetaGet(0, "methods_{$this->methodDir}");
-        $metaIdx= metaIdxClean($meta);
+        msgDebug("\nEntering $this->code settingsSave");
+        $meta    = dbMetaGet(0, "methods_{$this->methodDir}");
+        $metaIdx = metaIdxClean($meta);
+        $srvTypes= [];
+        $defs    = explode(':', $this->defaults['service_types']);
+        foreach ($defs as $type) { // Resequence service types to fix order from select to match default order
+            if (strpos($meta[$this->code]['settings']['service_types'], $type)!==false) { $srvTypes[] = $type; }
+        }
+        $meta[$this->code]['settings']['service_types'] = implode(':', $srvTypes);
+        msgDebug("\nResequenced service types = ".print_r($meta[$this->code]['settings']['service_types'], true));
         $meta[$this->code]['settings']['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
         msgDebug("\nSetting settings:services to: ".print_r($meta[$this->code]['settings']['services'], true));
         dbMetaSet($metaIdx, "methods_{$this->methodDir}", $meta);

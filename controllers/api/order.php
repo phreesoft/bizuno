@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-19
+ * @version    7.x Last Update: 2026-01-06
  * @filesource /controllers/api/order.php
  */
 
@@ -35,6 +35,8 @@ class apiOrder extends apiCommon
 {
     public $moduleID = 'api';
     public $pageID   = 'order';
+    private $autoJrnl;
+    private $jID;
 
     function __construct($options=[]) {
         parent::__construct($options);
@@ -74,9 +76,9 @@ class apiOrder extends apiCommon
     private function mapPost($values=[])
     {
         if (empty($values)) { $values = $_POST; }
-        $defjID    = getModuleCache('api', 'settings', 'bizuno_api', 'auto_detect');
-        msgDebug("\nRead Auto Detect = $defjID");
-        $this->jID = !empty($defjID) ? $defjID : 12; // defaults to Invoice if empty or Auto
+        $this->autoJrnl    = getModuleCache('api', 'settings', 'bizuno_api', 'auto_detect');
+        msgDebug("\nRead Auto Detect = $this->autoJrnl");
+        $this->jID = !empty($this->autoJrnl) ? $this->autoJrnl : 10; // defaults to Sales Order if empty (Auto)
         $account   = $this->getContactID($values['Billing']['Email']);
         $_POST['waiting'] = 1;
         $_POST['AddUpdate_b'] = 1;
@@ -160,11 +162,28 @@ class apiOrder extends apiCommon
         return !empty($cID) ? $cID : 0;
 
     }
-    private function getStockLevels($sku, $qty)
+    private function getStockLevels($sku, $qty) // $this->autoJrnl
     {
-        $stock = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type', 'qty_stock'], "sku='".addslashes($sku)."'");
-        msgDebug("\nEntering getStockLevels with sku = $sku and Qty = $qty and in stock = $stock");
-        if (in_array($stock['inventory_type'], INVENTORY_COGS_TYPES) && $qty > $stock['qty_stock']) { $this->jID = 10; }
+        if (!empty($this->autoJrnl)) { return; } // user override
+        $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['inventory_type', 'item_cost', 'qty_stock'], "sku='".addslashes($sku)."'");
+        msgDebug("\nEntering getStockLevels with sku = $sku and Qty = $qty and fetched inv = ".print_r($inv, true));
+        if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { // single store and auto-journal is true
+            $this->jID = $inv['qty_stock'] < $qty ? 10 : 12;
+            return;
+        } // else multi-store, find if it is in one of the stores, assume FIFO
+        $this->jID = 10; // assume not enough for now
+        $stock = getStoreStock($sku);
+        msgDebug("\nRead stock at all stores for SKU: {$inv['sku']} = ".print_r($stock, true));
+        foreach ($stock as $sKey => $item) { // oldest will appear first
+            $storeID = substr($sKey, 1);
+// @TODO new feature to geolocate store based on ship to location, uses FIFO for now
+            if ($item['stock']<=0)   { continue; }
+            if ($item['stock']>=$qty){
+                $_POST['store_id'] = $storeID; // set the store
+                $this->jID = 12;
+                break;
+            }
+        }
     }
     private function guessPaymentMethod($fromCart='creditcard')
     {

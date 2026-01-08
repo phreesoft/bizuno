@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-29
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /model/functions.php
  */
 
@@ -364,10 +364,10 @@ function loadBaseLang($lang='en_US')
 function langFillLabels(&$data, $lang=[])
 {
     global $bizunoLang;
+    msgDebug("\nEntering langFillLabels");
     foreach (array_keys($data) as $key) {
         $bizLabel= isset($bizunoLang['core'][$key.'_lbl']) ? $bizunoLang['core'][$key.'_lbl'] : false;
         $bizTip  = isset($bizunoLang['core'][$key.'_tip']) ? $bizunoLang['core'][$key.'_tip'] : false;
-        msgDebug("\nLooking for key = $key and label = $bizLabel");
         if     (!empty($data[$key]['label'])){ $data[$key]['label']= $data[$key]['label']; }
         elseif (!empty($bizLabel))           { $data[$key]['label']= $bizLabel; }
         elseif (!empty($lang[$key.'_lbl']))  { $data[$key]['label']= $lang[$key.'_lbl']; }

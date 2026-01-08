@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /local/en_US/language.php
  */
 
@@ -566,8 +566,8 @@ $langCore = [
     'sign_off_pin' => 'PIN for Sign-offs',
     'size' => 'Size',
     'sku' => 'SKU',
-    'smtp_enable_lbl' => 'Enable SMTP e-Mail',
-    'smtp_enable_tip' => 'Used for web server transport methods. Sending Bizuno emails via your web hosts default mail transport to your mail server via SMTP protocol. ',
+//    'smtp_enable_lbl' => 'Enable SMTP e-Mail',
+//    'smtp_enable_tip' => 'Used for web server transport methods. Sending Bizuno emails via your web hosts default mail transport to your mail server via SMTP protocol. ',
     'smtp_host_lbl' => 'SMTP Host',
     'smtp_host_tip' => 'Your SMTP Host for your business email host server, i.e. mail.mybusiness.com.',
     'smtp_port_lbl' => 'SMTP Port',

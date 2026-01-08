@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/shipping/carriers/ups/common.php
  */
 
@@ -146,8 +146,8 @@ Obtain your production credentials (production access key) online during the reg
             'gl_acct_v'    => getModuleCache('shipping','settings','general','gl_shipping_v'),
             'default'      => '1', 'token'=>'', 'token_date'=>''];
         $this->options = $this->getOptions();
-        $this->settings= array_replace_recursive($this->defaults, getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []));
-//        $this->settings['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
+        $settings      = empty(getMetaMethod($this->methodDir, $this->code)['settings']) ? [] : (array)getMetaMethod($this->methodDir, $this->code)['settings'];
+        $this->settings= array_replace_recursive($this->defaults, $settings);
         $this->today   = biz_date('Y-m-d');
         $this->currency= 'USD';
         $this->test    = $this->settings['test_mode']=='test' ? true : false;

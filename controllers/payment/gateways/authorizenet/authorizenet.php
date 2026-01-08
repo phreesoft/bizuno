@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -93,7 +93,7 @@ class authorizenet
         $this->viewData = [
             'trans_code'=> ['attr'=>['type'=>'hidden']],
             'selCards'  => ['attr'=>['type'=>'select'],'events'=>['onChange'=>"authorizenetRefNum('stored');"]],
-            'save'      => ['label'=>lang('save'),'break'=>true,'attr'=>['type'=>'checkbox', 'value'=>'1']],
+//          'save'      => ['label'=>lang('save'),'break'=>true,'attr'=>['type'=>'checkbox', 'value'=>'1']],
             'name'      => ['options'=>['width'=>200],'break'=>true,'label'=>lang('payment_name')],
             'number'    => ['options'=>['width'=>200],'break'=>true,'label'=>lang('payment_number'),'events'=>['onChange'=>"convergeRefNum('number');"]],
             'month'     => ['label'=>lang('payment_expiration'),'options'=>['width'=>130],'values'=>$cc_exp['months'],'attr'=>['type'=>'select','value'=>biz_date('m')]],
@@ -166,7 +166,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         if ($show_s) { $html .= lang('payment_stored_cards').'<br />'.html5($this->code.'selCards', $this->viewData['selCards']); }
         $html .= '</div>
 <div id="div'.$this->code.'n"'.(!$show_c&&!$show_s?'':'style=" display:none"').'>'.
-    html5($this->code.'_save',  $this->viewData['save']).
+//    html5($this->code.'_save',  $this->viewData['save']).
     html5($this->code.'_name',  $this->viewData['name']).
     html5($this->code.'_number',$this->viewData['number']).
     html5($this->code.'_month', $this->viewData['month']).
@@ -178,16 +178,19 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     public function paymentAuth($fields, $ledger)
     {
+        msgDebug("\nEntering Authorize.net paymentAuth working with fields = ".print_r($fields, true));
         $refs = $this->guessInv($ledger);
+        $name = explode(' ', clean("{$this->code}_name", 'text', 'post'), 2);
+        $cvv  = clean("{$this->code}_cvv", 'integer', 'post');
         $submit_data = [
             'x_type'        => 'AUTH_ONLY',
             'x_amount'      => $ledger->main['total_amount'],
-            'x_card_num'    => $fields['number'],
-            'x_exp_date'    => $fields['month'] . substr($fields['year'], -2),
+            'x_card_num'    => clean("{$this->code}_number", 'integer', 'post'),
+            'x_exp_date'    => clean("{$this->code}_month", 'integer', 'post') . substr(clean("{$this->code}_year", 'integer', 'post'), -2),
             'x_invoice_num' => $refs['inv'],
             'x_po_num'      => $refs['po'],
-            'x_first_name'  => $fields['first_name'],
-            'x_last_name'   => $fields['last_name'],
+            'x_first_name'  => $name[0],
+            'x_last_name'   => isset($name[1]) ? $name[1] : '',
             'x_company'     => $ledger->main['primary_name_b'],
             'x_address'     => str_replace('&', '-', substr($ledger->main['address1_b'], 0, 20)),
             'x_city'        => $ledger->main['city_b'],
@@ -197,8 +200,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             'x_phone'       => substr(preg_replace("/[^0-9]/", "", $ledger->main['telephone1_b']), 0, 14),
             'x_email'       => isset($ledger->main['email_b']) ? $ledger->main['email_b'] : getModuleCache('bizuno', 'settings', 'company', 'email'),
             'x_description' => $ledger->main['description']];
-        if (!empty($fields['cvv'])) { $submit_data['x_card_code'] = $fields['cvv']; }
-        msgDebug("\nAuthorize.net sale working with fields = ".print_r($fields, true));
+        if (!empty($cvv)) { $submit_data['x_card_code'] = $cvv; }
         if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
         if (!$resp = $this->queryMerchant($submit_data)) { return; }
         return $resp;
@@ -211,28 +213,30 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
      */
     public function sale($fields, $ledger)
     {
+        msgDebug("\nEntering Authorize.net sale working with fields = ".print_r($fields, true));
         $action = clean("{$this->code}_action", 'db_field', 'post');
         $refs = $this->guessInv($ledger);
         $submit_data = [];
+        $name = explode(' ', clean("{$this->code}_name", 'text', 'post'), 2);
+        $cvv  = clean("{$this->code}_cvv", 'integer', 'post');
         switch ($action) {
             case 'c': // capture previously authorized transaction
                 $submit_data = [
                     'x_type'        => 'PRIOR_AUTH_CAPTURE',
-                    'x_trans_id'    => $fields['txID'], // Unique identifier returned on the original transaction
-                    'x_amount'      => $ledger->main['total_amount'],
-                    ];
+                    'x_trans_id'    => isset($fields['txID']) ? $fields['txID'] : '', // Unique identifier returned on the original transaction
+                    'x_amount'      => $ledger->main['total_amount']];
                 break;
             case 's': // saved card, already decoded, just process like new card
             case 'n': // new card
                 $submit_data = [
                     'x_type'        => 'AUTH_CAPTURE', // 'AUTH_ONLY', 'AUTH_CAPTURE', 'PRIOR_AUTH_CAPTURE'
                     'x_amount'      => $ledger->main['total_amount'],
-                    'x_card_num'    => $fields['number'],
-                    'x_exp_date'    => $fields['month'] . substr($fields['year'], -2),
+                    'x_card_num'    => clean("{$this->code}_number", 'integer', 'post'),
+                    'x_exp_date'    => clean("{$this->code}_month", 'integer', 'post') . substr(clean("{$this->code}_year", 'integer', 'post'), -2),
                     'x_invoice_num' => $refs['inv'],
                     'x_po_num'      => $refs['po'],
-                    'x_first_name'  => $fields['first_name'],
-                    'x_last_name'   => $fields['last_name'],
+                    'x_first_name'  => $name[0],
+                    'x_last_name'   => isset($name[1]) ? $name[1] : '',
                     'x_company'     => $ledger->main['primary_name_b'],
                     'x_address'     => str_replace('&', '-', substr($ledger->main['address1_b'], 0, 20)),
                     'x_city'        => $ledger->main['city_b'],
@@ -242,13 +246,12 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
                     'x_phone'       => substr(preg_replace("/[^0-9]/", "", $ledger->main['telephone1_b']), 0, 14),
                     'x_email'       => isset($ledger->main['email_b']) ? $ledger->main['email_b'] : getModuleCache('bizuno', 'settings', 'company', 'email'),
                     'x_description' => $ledger->main['description']];
-                if (!empty($fields['cvv'])) { $submit_data['x_card_code'] = $fields['cvv']; }
+                if (!empty($cvv)) { $submit_data['x_card_code'] = $cvv; }
                 break;
             case 'w': // website capture, just post it
                 msgAdd($this->lang['msg_capture_manual'].' '.$this->lang['msg_website']);
                 break;
         }
-//        msgDebug("\nAuthorize.net sale working with fields = ".print_r($fields, true));
         if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
         if (!$resp = $this->queryMerchant($submit_data)) { return; }
         return $resp;

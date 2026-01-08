@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/contacts/main.php
  */
 
@@ -538,7 +538,7 @@ class contactsMain
             $this->addAddresses($address, 'b');
             $this->addAddresses($address, 's');
             $data = ['prefix'=>$prefix, 'suffix'=>$suffix, 'fill'=>$fill, 'contact'=>$contact, 'address'=>$address];
-            $data['showStatus'] = empty(getModuleCache('phreebooks', 'settings', $type, 'show_status')) ? '0' : '1';
+            $data['showStatus'] = empty(getModuleCache('phreebooks', 'settings', $type=='v'?'vendors':'customers', 'show_status')) ? '0' : '1';
         }
         msgDebug("\nSending data = ".print_r($data, true));
         $layout = array_replace_recursive($layout, ['content'=>$data]);

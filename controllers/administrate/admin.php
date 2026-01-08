@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-24
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -40,11 +40,10 @@ class administrateAdmin
     function __construct()
     {
         $this->lang = getLang($this->moduleID);
-        $this->defaults = ['store_id'=>0, 'restrict_store'=>0, 'restrict_user'=>0, 'restrict_period'=>0, // 'role_id'=>0, 
+        $this->defaults = ['store_id'=>0, 'restrict_store'=>0, 'restrict_user'=>0, 'restrict_period'=>0,
             'cash_acct'=> getModuleCache('phreebooks','settings','customers','gl_cash'),
             'ar_acct'  => getModuleCache('phreebooks','settings','customers','gl_receivables'),
-            'ap_acct'  => getModuleCache('phreebooks','settings','vendors',  'gl_payables'),
-            'smtp_enable'=>0, 'smtp_host'=>'https://smtp.gmail.com', 'smtp_port'=>587, 'smtp_user'=>'', 'smtp_pass'=>''];
+            'ap_acct'  => getModuleCache('phreebooks','settings','vendors',  'gl_payables')];
         $this->structure = [
             'hooks'=>['contacts'=>['main'=>['edit'=>['order'=>10,'method'=>'contactsEdit'], 'save'=>['order'=>10,'method'=>'contactsSave']]]]];
     }
@@ -85,7 +84,7 @@ class administrateAdmin
         $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id'];
         // Add phreebooks panel
         $pbFields= [
-//            'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
+//          'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
             'restrict_store' => ['order'=>20,'label'=>$this->lang['restrict_store_lbl'], 'tip'=>$this->lang['restrict_store_tip'], 'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_store'])?true:false]],
             'restrict_user'  => ['order'=>30,'label'=>$this->lang['restrict_user_lbl'],  'tip'=>$this->lang['restrict_user_tip'],  'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_user']) ?true:false]],
             'restrict_period'=> ['order'=>40,'label'=>$this->lang['restrict_period_lbl'],'tip'=>$this->lang['restrict_period_tip'],'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_period']?true:false)]],
@@ -117,12 +116,7 @@ class administrateAdmin
             'restrict_period'=> clean('restrict_period','boolean','post'),
             'cash_acct'      => clean('cash_acct',      'cmd',    'post'),
             'ar_acct'        => clean('ar_acct',        'cmd',    'post'),
-            'ap_acct'        => clean('ap_acct',        'cmd',    'post'),
-            'smtp_host'      => clean('smtp_host',      'url',    'post'),
-            'smtp_port'      => clean('smtp_port',      'integer','post'),
-            'smtp_user'      => clean('smtp_user',      'email',  'post')];
-        $pass = clean('smtp_pass', 'text', 'post');
-        if (!empty($pass)) { $data['smtp_pass'] = $pass; }
+            'ap_acct'        => clean('ap_acct',        'cmd',    'post')];
         $output = array_replace(!empty($meta)?$meta:[], $data);
         dbMetaSet($rID, 'user_profile', $output, 'contacts', $cID);
     }

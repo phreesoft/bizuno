@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-12
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -96,13 +96,14 @@ class inventoryPrices extends mgrJournal
     {
         msgDebug("\nEntering prices::managerGrid with args = ".print_r($args, true));
         $opts = array_replace(['cID'=>0, 'iID'=>0, 'dom'=>$this->dom], $args);
+        $refID= $this->scope=='contacts' ? $this->cID : $this->iID;
         $data = array_replace_recursive(parent::gridBase($security, $args), [
             'attr'     => ['url'=>BIZUNO_URL_AJAX."&bizRt=inventory/prices/managerRows&type=$this->type&dom={$opts['dom']}&cID={$opts['cID']}&iID={$opts['iID']}"],
             'events'   => ['onDblClickRow' => "function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&table='+rowData._table, rowData._rID); }"],
             'source'   => [
                 'search'=>['title', 'cName', 'iName'],
                 'actions'=> [
-                    'new'   => ['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&dom=$this->dom&table=$this->scope&refID=$this->iID', 0);"]],
+                    'new'   => ['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&dom=$this->dom&table=$this->scope&refID=$refID', 0);"]],
                     'clear' => ['order'=>50,'icon'=>'clear','events'=>['onClick'=>"bizTextSet('search', ''); dg{$this->domSuffix}Reload();"]]],
                 ],
             'footnotes'=> ['codes'=>lang('color_codes').': <span class="row-default">'.lang('default').'</span>'],
@@ -235,7 +236,7 @@ class inventoryPrices extends mgrJournal
         } elseif ($table=='contacts') {
             $layout['fields']['default']['attr']['type'] = 'hidden';
             $layout['fields']['postCalc']['attr']['type']= 'hidden';
-//            $layout['fields']['cID']['attr']['type']  = 'hidden';
+            $layout['fields']['cID']['attr']['type']  = 'hidden'; 
             if (!empty($refID)) { $layout['fields']['cID']['attr']['value']  = $refID; }
         } elseif ($table=='inventory') {
             $layout['fields']['postCalc']['attr']['type']= 'hidden';

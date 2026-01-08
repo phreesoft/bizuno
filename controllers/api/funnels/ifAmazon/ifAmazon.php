@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-05
+ * @version    7.x Last Update: 2026-01-06
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -492,15 +492,18 @@ class ifAmazon {
 
     private function findStock(&$main, $inv, $qty)
     {
-        if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { // only one store
-            return $inv['qty_stock'] < $qty ? false : true; // becomes inStock
-        } // else multi-store, find if it is in one of the stores
+        if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { return $inv['qty_stock'] < $qty ? false : true; }// only one store
+        // else multi-store, find if it is in one of the stores, assume FIFO
         $stock = getStoreStock($inv['sku'], $inv['item_cost']);
-        msgDebug("\nRead stock at all stores for SKU = {$inv['sku']} = ".print_r($stock, true));
-        $totalStk = 0;
-        foreach ($stock as $sKey => $item) { // @TODO new feature to geolocate store based on ship to location
+        msgDebug("\nRead stock at all stores for SKU: {$inv['sku']} = ".print_r($stock, true));
+        $totalStk= 0;
+        $partial = false;
+        foreach ($stock as $sKey => $item) { // oldest will appear first
+// @TODO new feature to geolocate store based on ship to location
+            if ($item['stock']<=0) { continue; }
             $totalStk += $item['stock'];
-            if ($item['stock'] >= $qty) { $main['store_id'] = substr($sKey, 1); return true; }
+            if ($item['stock'] < $qty)               { $partial = true; } // we have some older stock but not enough to fill order, leave decision to user on what to do
+            if ($item['stock'] >= $qty && !$partial) { $main['store_id'] = substr($sKey, 1); return true; }
         }
         if ($totalStk >= $qty) {
             msgAdd("Order {$main['purch_order_id']} has enough parts to fill the order but they are in more than one branch.", 'info');

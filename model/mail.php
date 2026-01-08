@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-05
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /model/mail.php
  */
 
@@ -29,7 +29,7 @@ namespace bizuno;
 
 use PHPMailer\PHPMailer\PHPMailer; //Import PHPMailer classes into the global namespace
 use PHPMailer\PHPMailer\Exception;
-//use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\SMTP; // Only needed for debugging but doesn't hurt to be there.
 
 class bizunoMailer
 {
@@ -54,18 +54,19 @@ class bizunoMailer
      */
     public function __construct($toEmail='', $toName='', $subject='', $body='', $fromEmail='', $fromName='')
     {
+        msgDebug("\nEntering mail:__construct with mail to: $toName <$toEmail> from: $fromName <$fromEmail>");
         $this->fieldStructure();
         if     (sizeof($results = explode(',', $toEmail)) > 1) {
-            foreach ($results as $email) { $this->toEmail[] = ['email'=>trim($email), 'name'=>$toName]; } }
+            foreach ($results as $email) { $this->toEmail[] = ['email'=>trim($email), 'name'=>trim($toName)]; } }
         elseif (sizeof($results = explode(';', $toEmail)) > 1) {
-            foreach ($results as $email) { $this->toEmail[] = ['email'=>trim($email), 'name'=>$toName]; } }
-        else { $this->toEmail[] = ['email'=>trim($toEmail), 'name'=>$toName]; }
+            foreach ($results as $email) { $this->toEmail[] = ['email'=>trim($email), 'name'=>trim($toName)]; } }
+        else { $this->toEmail[] = ['email'=>trim($toEmail), 'name'=>trim($toName)]; }
         $this->ToName    = $toName;
         $this->Subject   = $subject;
         $this->Body      = $body;
         $this->FromEmail = !empty($fromEmail) ? $fromEmail : getUserCache('profile', 'email');
         $this->FromName  = !empty($fromName)  ? $fromName  : getUserCache('profile', 'title');
-        msgDebug("\nSending to: $toName email: $toEmail sub: $subject body: $body from: $fromName email: $fromEmail");
+        msgDebug("\nSending from: $this->FromName email: $this->FromEmail to: ".print_r($this->toEmail, true));
     }
 
     /**
@@ -113,8 +114,6 @@ class bizunoMailer
         global $mail;
 //      error_reporting(E_ALL & ~E_NOTICE); // This is to eliminate errors from undefined constants in phpmailer
         $mail = new PHPMailer(true);
-//$mail->SMTPDebug = 2; // For debugging connections and such
-//$mail->DebugOutput = function($str, $level) { msgDebug("\nphpMailer Debug level $level; message: $str"); };
         $mail->CharSet = defined('CHARSET') ? CHARSET : 'utf-8'; // default "iso-8859-1";
         $mail->isHTML(true); // set email format to HTML
         $mail->setLanguage(substr(getUserCache('profile', 'language', false, 'en_US'), 0, 2), BIZUNO_FS_LIBRARY.'apps/PHPMailer/language/');
@@ -163,20 +162,25 @@ class bizunoMailer
     {
         global $mail;
         msgDebug("\nSending via SMTP with creds = ".print_r($creds, true));
+//$debugOutput = '';
+//$mail->Debugoutput = function ($str, $level) use (&$debugOutput) { $debugOutput .= $str . "\n"; };
+//$mail->SMTPDebug = 2;  // Or higher for more detail
         try {
             $mail->isSMTP();
-            $mail->Host      = $creds['smtp_host'];
             $mail->SMTPAuth  = true;
+            $mail->Host      = $creds['smtp_host'];
+            $mail->Port      = $creds['smtp_port'];
             $mail->Username  = $creds['smtp_user'];
             $mail->Password  = $creds['smtp_pass'];
-            $mail->SMTPSecure= 'tls';
-            $mail->Port      = $creds['smtp_port'];
-            if ($creds['smtp_port']==587) { $mail->SMTPSecure = 'tls'; }
+            if (587==$mail->Port) { $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; }
+            if (465==$mail->Port) { $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; }
             $mail->send();
         } catch (phpmailerException $e) {
+            msgDebug("\nphpMailer Debug level output = $debugOutput");
             msgAdd("SMTP phpmailerException: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->errorMessage());
         } catch (Exception $e) {
+            msgDebug("\nphpMailer Debug level output = $debugOutput");
             msgAdd("SMTP Exception: Email send failed to: $this->ToName", 'trap');
             return msgAdd($e->getMessage());
         }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-05
+ * @version    7.x Last Update: 2026-01-06
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -219,7 +219,7 @@ function getStoreStock($sku='', $newCost=false) {
     msgDebug("\nEntering getStoreStock with sku = $sku and newCost = $newCost");
     $output  = [];
     if ($newCost===false) { $newCost = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'item_cost', "sku='".addslashes($sku)."'"); } // save a sql if this is known
-    $balance = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND remaining>0");
+    $balance = dbGetMulti(BIZUNO_DB_PREFIX.'inventory_history', "sku='".addslashes($sku)."' AND remaining>0 ORDER BY post_date");
     foreach ($balance as $row) {
         if (empty($output['b'.$row['store_id']])) { $output['b'.$row['store_id']] = ['stock'=>0, 'cost'=>$newCost]; }
         $output['b'.$row['store_id']]['stock']+= $row['remaining'];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-23
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1062,8 +1062,8 @@ function bizUnitDiscDisc(newValue) {
         foreach ($items as $row) {
             if (!isBlankRow($row, $skipList)) {
                 $row['item_cnt']     = $item_cnt;
-                $row['debit_amount'] = roundAmount($row['debit_amount']);
-                $row['credit_amount']= roundAmount($row['credit_amount']);
+//              $row['debit_amount'] = roundAmount($row['debit_amount']); // commented this out as orders with very large item list >200 can get hung with rounding errors.
+//              $row['credit_amount']= roundAmount($row['credit_amount']);
                 if (!isset($row['tax_rate_id'])) { $row['tax_rate_id'] = 0; }
                 $ledger->items[] = $row;
             }

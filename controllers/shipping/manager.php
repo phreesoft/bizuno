@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-11
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -181,7 +181,8 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             'fields'   => [
                 'shipInst'  => ['order'=>10,'html'=>$this->lang['ship_invoice_desc'],'attr'=>['type'=>'raw']],
                 'selInvoice'=> ['order'=>20,'attr'=>['value'=>'']]],
-            'jsBody'   => ['init'=>$jsBody]]; // needs to be here to collect tab js for each method
+            'jsBody'   => ['init' => $jsBody],
+            'jsReady'  => ['focus'=> "bizFocus('selInvoice');"]]; // needs to be here to collect tab js for each method
         $order = 70;
         $carriers = getMetaMethod('carriers');
         msgDebug("\ncarrier array = ".print_r($carriers, true));

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-31
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -517,7 +517,7 @@ class phreeformRender
         $msgBody   = str_replace("\n", "<br />", $msgBodyRaw); // convert textbox nl to html br
         $io->fileWrite($output['data'], "temp/{$output['filename']}", true, false, true);
         // send the email
-        $msgFrom   = $this->getSenderInfo('msgFrom');
+        $msgFrom   = $this->getAddrInfo('msgFrom'); // was getSenderInfo but keys no longer used
         $msgTo     = $this->getAddrInfo('msgTo');
         $msgCC1    = $this->getAddrInfo('msgCC1');
         $msgCC2    = $this->getAddrInfo('msgCC2');
@@ -663,11 +663,12 @@ class phreeformRender
     }
 
     /**
-     * Builds the email from form select 
+     * Builds the email from form select - uses keys which are no longer used.
      */
-    private function getSenderInfo()
+/*    private function getSenderInfo()
     {
         $key = clean('msgFrom', 'text', 'post');
+        msgDebug("\nEntering getSenderInfo with msgFrom key = $key");
         $map = ['user'=>'user', 'gen'=>'', 'ap'=>'_ap', 'ar'=>'_ar'];
         switch ($key) {
             case 'user':
@@ -680,7 +681,7 @@ class phreeformRender
                 $email= getModuleCache('bizuno', 'settings', 'company', 'email'.$map[$key]);
         }
         return ['name'=>!empty($name) ? $name : $email, 'email'=>$email];
-    }
+    } */
 
     /**
      * Tries to extract the email and name from the format name <email@mymydomain.com>
@@ -1166,7 +1167,7 @@ class phreeformRender
             $this->extractAddresses($output, 'jrnl', $name, $main['email_b']);
             $mID  = $main['contact_id_b']; // update the contact ID from the journal
         }
-        $main = $this->getToAddress($output, $mID);
+        $this->getToAddress($output, $mID);
         // make sure there is a value in the default fields
         if (empty($output['defTo'])  && !empty($output['valsTo']))  { $output['defTo']  = reset($output['valsTo'])['id']; }
         if (empty($output['defFrom'])&& !empty($output['valsFrom'])){ $output['defFrom']= reset($output['valsFrom'])['id']; }
@@ -1278,9 +1279,9 @@ class phreeformRender
     {
         msgDebug("\nEntering guessDefTo with group = $group.");
         $parts = explode(':', $group);
-        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar' : 'ap'; }
-        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''   : 'ar'; }
-        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? 'gen': 'ap'; }
+        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar': 'ap'; }
+        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''  : 'ar'; }
+        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? ''  : 'ap'; }
         return 'gen';
     }
     

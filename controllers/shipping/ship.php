@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-01-08
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -116,6 +116,7 @@ class shippingShip extends shippingCommon
      */
     private function shipmentFields($data=[], $shipper='')
     {
+        msgDebug("\nEntering shipmentFields."); // with shipper = ".print_r($shipper, true));
         $shipMethods = $shipPkgs = $shipPickup = $shipConfirms = $shipCods = $shipCurrencies = $shipReturns = $LTLClasses = $ShipBillTo = [];
         $method      = isset($data['method_code']) ? explode(':', $data['method_code']) : [$shipper->code,'GND'];
         $dimUOMs     = [['id'=>'IN', 'text'=>$this->lang['dim_in']],    ['id'=>'CM', 'text'=>$this->lang['dim_cm']]];

@@ -237,7 +237,7 @@ class upsShip extends upsCommon
             foreach ($rows as $row) {
                 $qty = clean($row['qty'], 'integer');
                 if (!$qty) {
-                    msgAdd('Error - quanity for one row is zero');
+                    msgAdd('Error - quantity for one row is zero');
                     continue;
                 }
                 if ($qty == 1) {
