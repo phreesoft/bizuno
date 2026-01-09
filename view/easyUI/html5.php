@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2026-01-09
  * @filesource /view/easyUI/html5.php
  */
 
@@ -672,7 +672,7 @@ final class html5 {
             $toolbar[] = ' '.html5('',['icon'=>'copy','events'=>['onClick'=>"addressCopy('{$src[0]}', '{$src[1]}')"]]);
         }
         if ($attr['props']) { $toolbar[] = '<span id="spanContactProps'.$attr['suffix'].'" style="display:none">'.html5('contactProps'.$attr['suffix'], ['icon'=>'settings',
-            'events' => ['onClick'=>"windowEdit('contacts/main/properties&rID='+jqBiz('#contact_id{$attr['suffix']}').val(), 'winContactProps', '".jsLang('details')."', 1000, 600);"]]).'</span>';
+            'events' => ['onClick'=>"windowEdit('contacts/main/properties&type={$attr['type']}&rID='+jqBiz('#contact_id{$attr['suffix']}').val(), 'winContactProps', '".jsLang('details')."', 1000, 600);"]]).'</span>';
         }
         // Options bar
         $options = [];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-09
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -1033,7 +1033,7 @@ class phreeformRender
             }
         } }
         // fetch the sort order and add to group by string to finish ORDER BY string
-        $strSort = strpos($strGroup, ',')!==false ? $strGroup : null; // handle complex grouping else add to sort list and group during output
+        $strSort = strpos($strGroup, ',')===false ? $strGroup : null; // handle complex grouping else add to sort list and group during output
         if (isset($report->sortlist->rows)) { for ($i = 0; $i < sizeof($report->sortlist->rows); $i++) {
             if (!empty($report->sortlist->rows[$i]->default)) {
                 $strSort    .= ($strSort <> '' ? ', ' : '') . prefixTables($report->sortlist->rows[$i]->fieldname);

@@ -146,9 +146,9 @@ class HTML
         $color  = str_replace(':', '', $report->datacolor);
         $dStyle = 'style="font-family:'.$this->fontData.';color:'.$color.';font-size:'.$report->datasize.'pt;"';
         // Ready to draw the column data
-        $rowCnt= 0;
-        $showHd= false;
-        $fill  = false;
+        $rowCnt = 0;
+        $showHd = false;
+        $fill   = false;
         foreach ($data as $myrow) {
             $Action = array_shift($myrow);
             $todo = explode(':', $Action, 2); // contains a letter of the date type and title/group_id

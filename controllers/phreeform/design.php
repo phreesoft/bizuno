@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-31
+ * @version    7.x Last Update: 2026-01-09
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -67,21 +67,23 @@ final class phreeformDesign extends mgrJournal
             ['id'=>'purch','text'=>lang('purchases')],['id'=>'ar',  'text'=>lang('contact_r')]];
         $this->struc = [
             // Tab: general - Panel: info 
-            '_rID'          => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'integer' ,'attr'=>['type'=>'hidden', 'value'=>0]],
-            'parent_id'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'integer' ,'attr'=>['type'=>'hidden', 'value'=>0]],
-            'group_id'      => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'cmd'     ,'attr'=>['type'=>'hidden', 'value'=>'']],
-            'mime_type'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'']],
-            'xChild'        => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'']],
-            'type'          => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'rpt']],
-            'tables'        => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'json',    'attr'=>['type'=>'hidden']],
-            'fieldlist'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'json',    'attr'=>['type'=>'hidden']],
-            'grouplist'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'json',    'attr'=>['type'=>'hidden']],
-            'sortlist'      => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'json',    'attr'=>['type'=>'hidden']],
-            'filterlist'    => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                               'clean'=>'json',    'attr'=>['type'=>'hidden']],
-            'title'         => ['tab'=>'general', 'panel'=>'info', 'order'=>10,'label'=>lang('title'),        'clean'=>'text',    'attr'=>['type'=>'text','size'=>64,'maxlength'=>64]],
-            'group_id'      => ['tab'=>'general', 'panel'=>'info', 'order'=>20,'label'=>lang('group_list'),   'clean'=>'cmd',     'attr'=>['type'=>'select']],
-            'description'   => ['tab'=>'general', 'panel'=>'info', 'order'=>30,'label'=>lang('description'),  'clean'=>'text',    'attr'=>['type'=>'textarea', 'cols'=>60, 'rows'=>4]],
-            // Tab: general - Panel: email
+            '_rID'          => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'integer' ,'attr'=>['type'=>'hidden', 'value'=>0]],
+            'parent_id'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'integer' ,'attr'=>['type'=>'hidden', 'value'=>0]],
+            'group_id'      => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'cmd'     ,'attr'=>['type'=>'hidden', 'value'=>'']],
+            'mime_type'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'']],
+            'xChild'        => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'']],
+            'type'          => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'db_field','attr'=>['type'=>'hidden', 'value'=>'rpt']],
+            'tables'        => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'json',    'attr'=>['type'=>'hidden']],
+            'fieldlist'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'json',    'attr'=>['type'=>'hidden']],
+            'grouplist'     => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'json',    'attr'=>['type'=>'hidden']],
+            'sortlist'      => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'json',    'attr'=>['type'=>'hidden']],
+            'filterlist'    => ['tab'=>'general', 'panel'=>'info', 'order'=> 1,                             'clean'=>'json',    'attr'=>['type'=>'hidden']],
+            'title'         => ['tab'=>'general', 'panel'=>'info', 'order'=>10,'label'=>lang('title'),      'clean'=>'text',    'attr'=>['type'=>'text','size'=>64,'maxlength'=>64]],
+            'group_id'      => ['tab'=>'general', 'panel'=>'info', 'order'=>20,'label'=>lang('group_list'), 'clean'=>'cmd',     'attr'=>['type'=>'select']],
+            'description'   => ['tab'=>'general', 'panel'=>'info', 'order'=>30,'label'=>lang('description'),'clean'=>'text',    'attr'=>['type'=>'textarea', 'cols'=>60, 'rows'=>4]],
+            'create_date'   => ['tab'=>'general', 'panel'=>'info', 'order'=>40,'label'=>lang('date_create'),'clean'=>'date',    'attr'=>['type'=>'date', 'readonly'=>true, 'value'=>biz_date()]],
+            'last_update'   => ['tab'=>'general', 'panel'=>'info', 'order'=>50,'label'=>lang('date_last'),  'clean'=>'date',    'attr'=>['type'=>'date', 'readonly'=>true, 'value'=>'']],
+                 // Tab: general - Panel: email
 //            'emailsubject'  => ['tab'=>'general', 'panel'=>'email','order'=>10,'label'=>lang('email_subject'),'clean'=>'text',    'attr'=>['type'=>'text','size'=>64,'maxlength'=>64]],
             'emailmessage'  => ['tab'=>'general', 'panel'=>'email','order'=>20,                               'clean'=>'text',    'attr'=>['type'=>'editor']],
             // Tab: general - Panel: page
@@ -371,7 +373,9 @@ function pfTableUpdate() {
         foreach ($fields['rows'] as $key => $field) {
             if (isset($field['settings']) && is_string($field['settings'])) { $fields['rows'][$key]['settings'] = json_decode($field['settings']); }
         }
-        $_POST['fieldlist'] = json_encode($fields);
+        if (empty($fields['create_date'])) { $fields['create_date'] = biz_date(); } // fixes bug where this was wiped out during edit
+        $fields['last_update']= biz_date();
+        $_POST['fieldlist']   = json_encode($fields);
     }
 
     /**

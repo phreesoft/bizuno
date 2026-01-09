@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-22
+ * @version    7.x Last Update: 2026-01-09
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -164,6 +164,17 @@ function bizunoUpgrade()
         require (BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         foreach (array_keys($tables) as $table) {
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."$table` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+        }
+        // Fix report dates lost when updated in new version
+        $meta  = dbMetaGet('%', 'phreeform');
+        foreach ($meta as $doc) {
+            if (!empty($doc['create_date']) && !empty($doc['last_update'])) { continue; } // all good
+            $rID = $doc['_rID'];
+            if ( empty($doc['create_date'])) { $doc['create_date'] = '2020-01-01'; }
+            if ( empty($doc['last_update']) && $doc['mime_type']=='dir') { $doc['last_update'] = $doc['create_date']; }
+            else { $doc['last_update'] = '2025-07-01'; }
+            msgDebug("\nReady to update rID = $rID");
+            dbMetaSet($rID, 'phreeform', $doc);
         }
     }
 

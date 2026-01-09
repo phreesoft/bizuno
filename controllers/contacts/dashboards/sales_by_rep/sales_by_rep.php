@@ -29,13 +29,13 @@ namespace bizuno;
 
 class sales_by_rep
 {
-    public $moduleID = 'contacts';
-    public $methodDir= 'dashboards';
-    public $code     = 'sales_by_rep';
-    public $category = 'customers';
+    public  $moduleID = 'contacts';
+    public  $methodDir= 'dashboards';
+    public  $code     = 'sales_by_rep';
+    public  $category = 'customers';
     public  $struc;
     private $dates;
-    public $lang     = ['title'=>'Sales by Rep',
+    public  $lang     = ['title'=>'Sales by Rep',
         'description'=>'Displays total sales by Rep with options for different date ranges.'];
 
     function __construct()
