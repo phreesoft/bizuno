@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-23
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /portal/controller.php
  */
 
@@ -112,6 +112,7 @@ class portalCtl
         $view = new portalApi();
         $method = $this->route['method'];
         if (method_exists($view, $method)) {
+            $this->loadLanguage($lang='en_US');
             msgDebug("\nProcessing API request {$method}");
             $view->$method($this->layout);
             return;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /view/main.php
  */
 
@@ -1055,9 +1055,9 @@ function viewCurrencySel($curData=[])
 {
     $output = [];
     if (empty($curData)) { $curData= localeLoadDB(); }
-    foreach ($curData->Locale as $value) {
-        if (isset($value->Currency->ISO)) {
-            $output[$value->Currency->ISO] = ['id'=>$value->Currency->ISO, 'text'=>$value->Currency->Title];
+    foreach ($curData['Locale'] as $value) {
+        if (isset($value['Currency']['ISO'])) {
+            $output[$value['Currency']['ISO']] = ['id'=>$value['Currency']['ISO'], 'text'=>$value['Currency']['Title']];
         }
     }
     return sortOrder($output, 'text');
@@ -1067,8 +1067,8 @@ function viewTimeZoneSel($locale=[])
 {
     $zones = [];
     if (empty($locale)) { $locale= localeLoadDB(); }
-    foreach ($locale->Timezone as $value) {
-        $zones[] = ['id' => $value->Code, 'text'=> $value->Description];
+    foreach ($locale['Timezone'] as $value) {
+        $zones[] = ['id' => $value['Code'], 'text'=> $value['Description']];
     }
     return $zones;
 }

@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-06
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /controllers/api/order.php
  */
 
@@ -50,8 +50,8 @@ class apiOrder extends apiCommon
     public function add(&$layout=[])
     {
         $postID = $this->apiJournalEntry();
-        $output = ['result'=>!empty($postID)?'Success':'Fail', 'ID'=>$postID];
-        $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);
+        $output = ['result'=>!empty($postID)?'Success':'Fail', 'ID'=>$postID, 'messages'=>msgQueue()];
+        $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);
         msgDebug("\nReturning from API order/add with layout = ".print_r($layout, true));
     }
 

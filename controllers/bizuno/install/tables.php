@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-22
+ * @version    7.x Last Update: 2026-01-11
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -104,7 +104,7 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Address field 2"],
             'city'          => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:City;order:38',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"City or town"],
-            'state'         => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:State;order:40',
+            'state'         => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT NULL",           'comment'=>'type:state;tag:State;order:40',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"State of province"],
             'postal_code'   => ['format'=>'VARCHAR(10)',  'attr'=>"DEFAULT NULL",           'comment'=>'tag:PostalCode;order:42',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Postal or Zip code"],

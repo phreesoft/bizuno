@@ -186,6 +186,7 @@ final class html5 {
             case 'checkbox':    return $this->inputCheckbox($id, $prop);
             case 'color':       return $this->inputColor($id, $prop);
             case 'contact':     return $this->inputContact($id, $prop);
+            case 'state':       return $this->inputState($id, $prop);
             case 'country':     return $this->inputCountry($id, $prop);
             case 'currency':    return $this->inputCurrency($id, $prop);
             case 'date':        return $this->inputDate($id, $prop);
@@ -715,9 +716,14 @@ columns:  [[
         $data = [];
         foreach ($props['keys'] as $key)  {
             $data['fields'][$key] = !empty($viewData['fields'][$key.$attr['suffix']]) ? $viewData['fields'][$key.$attr['suffix']] : $viewData['fields'][$key];
-            if ($attr['format']<>'long' && 'country'==$key) { 
-                unset($data['fields']['country']['label']);
+            if ('country'==$key) { 
+                if ($attr['format']<>'long') { unset($data['fields']['country']['label']); }
+                $this->jsReady[] = "bizRegionInit('{$attr['suffix']}');";
             }
+// temp patch
+if ('state'==$key) { 
+    $data['fields'][$key]['attr']['type'] = 'state';
+}
             if (!empty($attr['required']) && getModuleCache('contacts', 'settings', 'address_book', $key)) { 
                 $data['fields'][$key]['options']['required'] = true;
             }
@@ -1437,7 +1443,7 @@ columns:  [[
     }
 
     public function inputCountry($id, $prop) {
-        msgDebug("\nid = $id and prop = ".print_r($prop, true));
+        msgDebug("\nEntering inputCountry with id = $id and prop = ".print_r($prop, true));
         $value = !empty($prop['attr']['value']) ? $prop['attr']['value'] : getModuleCache('bizuno','settings','company','country','USA');
         $prop['classes'] = ['easyui-combogrid'];
         $prop['options']['data']      = "bizDefaults.countries";
@@ -1673,6 +1679,27 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         }
         $prop['classes'][] = 'easyui-numberspinner';
         $prop['options']['spinAlign'] = "'horizontal'";
+        return $this->input($id, $prop);
+    }
+
+    public function inputState($id, $prop) {
+        msgDebug("\nEntering inputState with id = $id and prop = ".print_r($prop, true));
+        $prop['classes'] = ['easyui-combobox'];
+        $prop['options']['idField']  = "'code'";
+        $prop['options']['textField']= "'title'";
+        unset($prop['attr']['size'], $prop['attr']['maxlength']);
+        $locales = localeLoadDB(); // load countries
+        $iso3 = getModuleCache('bizuno','settings','company','country','USA');
+        $code = getModuleCache('bizuno','settings','company','state');
+        if (isset($locales['Locale'][$iso3]['Regions']) && sizeof($locales['Locale'][$iso3]['Regions'])>0) {
+            $prop['options']['value']     =  "'$code'" ;
+            $prop['options']['valueField']=  "'code'";
+            $prop['options']['data']      = "bizDefaults.regions['$iso3']";
+        } else {
+            $prop['options']['data'] = "[]";
+            $prop['options']['editable'] = true;
+        }
+        msgDebug("\nLeaving inputState with id = $id and prop = ".print_r($prop, true));
         return $this->input($id, $prop);
     }
 

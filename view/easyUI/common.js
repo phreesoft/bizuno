@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-13
+ * @version    7.x Last Update: 2026-01-11
  * @filesource /view/easyUI/common.js
  */
 
@@ -1846,6 +1846,18 @@ function bizParse(id) {
     else                        { jqBiz.parser.parse('#'+id); }
 }
 
+function bizRegionInit(suffix) {
+    var iso3 = bizSelGet('country' + suffix);  // e.g. "USA", "CAN", "MEX"...
+    jqBiz('#country'+suffix).combogrid({ onSelect: function(index,row) { jqBiz('#country'+suffix).combogrid('hidePanel'); bizRegionChange(row.iso3, suffix); } });
+    bizRegionChange(iso3, suffix);
+}
+function bizRegionChange(iso3, suffix) {
+    if (iso3 && bizDefaults?.regions?.[iso3] && Array.isArray(bizDefaults.regions[iso3]) || typeof bizDefaults.regions[iso3] === 'object') {
+        jqBiz('#state'+suffix).combobox({data:bizDefaults.regions[iso3], editable:false}).combobox('loadData', bizDefaults.regions[iso3]);
+    } else { // No regions available for this country → free text input
+        jqBiz('#state'+suffix).combobox({data:[], value:'', editable:true}).combogrid('clear').combobox('loadData', []);
+    }
+}
 function bizSelGet(id) {
     if (jqBiz("#"+id).hasClass( "easyui-combobox" )) {
         return jqBiz('#'+id).combobox('getValue');
@@ -1878,7 +1890,7 @@ function bizSelSet(id, val, fmt) {
 }
 
 /*
- * This function will search all columns in a combo in place of the standard search only by text field
+ * This function will search all gl accounts in a combo in place of the standard search only by text field
  * @param string id - DOM element ID
  * @param string q - search string
  * @returns array - filtered data
@@ -1908,7 +1920,8 @@ function bizSelSearch(id, q) {
  * @returns {undefined}
  */
 function bizSelVals(id, values) {
-    if (!jqBiz('#'+id).combobox({})) { return; }
+//        alert('bizSelVals with id = '+id);
+//    if (!jqBiz('#'+id).combobox({})) { return; } // Instantiates combo using defaults
     jqBiz('#'+id).combobox('loadData', values);
 }
 

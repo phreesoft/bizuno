@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-11
  * @filesource /locale/cleaner.php
  */
 
@@ -152,13 +152,13 @@ class cleaner
         $match = $option=='ISO2' ? 'ISO3' : 'ISO2';
         $return= $option=='ISO2' ? 'ISO2' : 'ISO3';
         msgDebug("\ncleaning country with value = $value and match = $match and return = $return");
-        $country_object = localeLoadDB();
-        foreach ($country_object->Locale as $country_info) {
-            $target = strtoupper($country_info->Country->$match);
-            $title  = strtoupper($country_info->Country->Title);
+        $countries = localeLoadDB();
+        foreach ($countries['Locale'] as $value) {
+            $target = strtoupper($value[$match]);
+            $title  = strtoupper($value['Title']);
             if ($target==$source || $title==$source) {
-                msgDebug("\nReturning with country = ".$country_info->Country->$return);
-                return $country_info->Country->$return;
+                msgDebug("\nReturning with country = ".$value[$return]);
+                return $value[$return];
             }
         }
         return $source ? $source : 'USA';
@@ -437,13 +437,14 @@ function pullTableLabel($table, $field, $suffix='')
 function localeLoadDB()
 {
     $contents = '';
-    if (!empty(getUserCache('profile', 'language', false, 'en_US'))) {
-        if (file_exists(BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml')) {
-            $contents = file_get_contents(BIZUNO_FS_LIBRARY.'locale/'.getUserCache('profile', 'language', false, 'en_US').'/locale.xml');
+    $lang = getUserCache('profile', 'language', false, 'en_US');
+    if (!empty($lang)) {
+        if (file_exists(BIZUNO_FS_LIBRARY."locale/$lang.locale.json")) {
+            $contents = file_get_contents(BIZUNO_FS_LIBRARY."locale/$lang.locale.json");
         }
     }
-    if (empty($contents)) { $contents = file_get_contents(BIZUNO_FS_LIBRARY.'locale/en_US/locale.xml'); }
-    return parseXMLstring($contents);
+    if (empty($contents)) { $contents = file_get_contents(BIZUNO_FS_LIBRARY.'locale/en_US/locale.json'); }
+    return json_decode($contents, true);
 }
 
 /**

@@ -35,10 +35,6 @@ class portalApi
     
     function __construct()
     {
-        $iso = !empty($_COOKIE['bizunoEnv']['lang']) ? $_COOKIE['bizunoEnv']['lang'] : 'en_US';
-        $lang = [];
-        include(BIZUNO_FS_LIBRARY . "locale/$iso/portal.php"); // replace $lang
-        $this->lang = $lang;
     }
 
     public function fs()
@@ -257,7 +253,7 @@ class portalApi
     public function orderAdd(&$layout=[])
     {
 
-        // Need a new way to authenticate since the users are now local.
+        // @TODO - Need a new way to authenticate since the users are now local.
 
         $security = getUserCache('role', 'security');
         $security['prices_c'] = 2;

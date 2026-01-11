@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-11
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -107,8 +107,7 @@ class bizunoAdmin
     {
         foreach ([0,1,2,3,4] as $value) { $selPrec[] = ['id'=>$value, 'text'=>$value]; }
         $selSep= [['id'=>'.','text'=>'Dot (.)'],['id'=>',','text'=>'Comma (,)'],['id'=>' ','text'=>'Space ( )'],['id'=>"'",'text'=>"Apostrophe (')"]];
-        $locale= localeLoadDB();
-        $zones = viewTimeZoneSel($locale);
+        $zones = viewTimeZoneSel();
         $mail  = new bizunoMailer();
         $selDate= [
             ['id'=>'m/d/Y','text'=>'mm/dd/yyyy'],['id'=>'d/m/Y','text'=>'dd/mm/yyyy'],
@@ -192,20 +191,25 @@ class bizunoAdmin
     public function loadBrowserSession(&$layout=[])
     {
         // load the default currency, locale
-        $locale       = getModuleCache('bizuno', 'settings', 'locale');
+        $locale   = getModuleCache('bizuno', 'settings', 'locale');
         if (empty($locale)) { $locale = ['date_short'=>'Y-m-d', 'timezone'=>'America/Chicago']; } // set defaults
-        $dateDelimiter= substr(preg_replace("/[a-zA-Z]/", "", $locale['date_short']), 0, 1);
-        $locales      = localeLoadDB(); // load countries
-        $countries    = [];
-        $defISO       = getModuleCache('bizuno', 'settings', 'company', 'country');
-        $defTitle     = $defISO;
-        foreach ($locales->Locale as $value) {
-            $countries[] = ['iso3'=>$value->Country->ISO3, 'iso2'=>$value->Country->ISO2, 'title'=>$value->Country->Title];
-            if ($defISO == $value->Country->ISO3) { $defTitle = $value->Country->Title; }
+        $dateDelim= substr(preg_replace("/[a-zA-Z]/", "", $locale['date_short']), 0, 1);
+        $locales  = localeLoadDB(); // load countries
+        msgDebug("\nLoaded countries = ".print_r($locales, true));
+        $countries= [];
+        $defISO   = $defTitle = getModuleCache('bizuno', 'settings', 'company', 'country');
+        foreach ($locales['Locale'] as $iso3 => $value) {
+            $countries[] = ['iso3'=>$iso3, 'iso2'=>$value['ISO2'], 'title'=>$value['Title']];
+            if ($defISO == $iso3) { $defTitle = $value['Title']; }
+        }
+        $regions = [];
+        foreach ($locales['Locale'] as $iso3 => $value) {
+            if (empty($value['Regions'])) { continue; }
+            foreach ($value['Regions'] as $state => $region) { $regions[$iso3][] = ['code'=>$state, 'title'=>$region['Title']]; }
         }
         $ISOCurrency = getDefaultCurrency();
         $data = [
-            'calendar'  => ['format'=>$locale['date_short'], 'delimiter'=>$dateDelimiter],
+            'calendar'  => ['format'=>$locale['date_short'], 'delimiter'=>$dateDelim],
             'country'   => ['iso'=>$defISO,'title'=>$defTitle],
             'currency'  => ['defaultCur'=>$ISOCurrency, 'currencies'=>getModuleCache('phreebooks', 'currency', 'iso')],
             'language'  => substr(getUserCache('profile', 'language', false, 'en_US'), 0, 2),
@@ -219,7 +223,8 @@ class bizunoAdmin
                 'neg_pfx'  => isset($locale['number_neg_pfx'])  ? $locale['number_neg_pfx']  : '-',
                 'neg_sfx'  => isset($locale['number_neg_sfx'])  ? $locale['number_neg_sfx']  : ''],
             'dictionary'=> $this->getBrowserLang(),
-            'countries' => ['total'=>sizeof($countries), 'rows'=>$countries]];
+            'countries' => ['total'=>sizeof($countries), 'rows'=>$countries],
+            'regions'   => $regions];
         $layout = array_replace_recursive($layout, ['content'=>$data]);
     }
 
@@ -237,6 +242,7 @@ class bizunoAdmin
             'NAME'       =>lang('primary_name'),
             'PLEASE_WAIT'=>lang('please_wait'),
             'PROPERTIES' =>lang('properties'),
+            'SELECT'     =>lang('select'),
             'SETTINGS'   =>lang('settings'),
             'SHIPPING_ESTIMATOR'=>lang('shipping_estimator'),
             'STATE'      =>lang('state'),

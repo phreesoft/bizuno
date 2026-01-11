@@ -109,6 +109,16 @@ class phreebooksRestfulTax
     /**
      * Fetches the sales tax rate from the PhreeSoft Server via RESTful API
      * @param array $layout - Structure
+
+$client = new Client();
+$headers = [
+  'X-API-KEY' => '{ your API key }',
+  'Content-Type' => 'application/json'
+];
+$request = new Request('GET', 'https://api.zip-tax.com/request/v60?key={ your API key }&address=200 Spectrum Center Drive, Irvine, CA 92618&format=json&countryCode=USA&taxabilityCode=10000', $headers);
+$res = $client->sendAsync($request)->wait();
+echo $res->getBody();
+
      */
     public function getTaxRate(&$layout=[])
     {

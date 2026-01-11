@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -90,17 +90,6 @@ class bizunoMain
      */
     public function sessionRefresh(&$layout) {
     } // nothing to do, just reset session clock
-
-    /**
-     * Loads the countries from the locales.xml file into an array to use on processing
-     * @param array $layout - structure coming in
-     */
-    public function countriesLoad(&$layout) {
-        $temp = localeLoadDB();
-        $output = [];
-        foreach ($temp->country as $value) { $output[] = ['id' => $value->iso3, 'text'=> $value->name]; }
-        $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);
-    }
 
     /**
      * generates the pop up encryption form

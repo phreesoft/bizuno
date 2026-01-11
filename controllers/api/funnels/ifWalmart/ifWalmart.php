@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /controllers/api/funnels/ifWalmart/ifWalmart.php
  */
 
@@ -768,8 +768,8 @@ return msgAdd("This feature has not been completed at this time!");
                 if (strlen($value) > 2) { // full state returned, get the code
                     $state = strtolower($value);
                     $temp = localeLoadDB();
-                    foreach ($temp->Locale as $value) { if ($value->Country->ISO3 == 'USA') {
-                        foreach ($value->Country->Region as $region) { if (strtolower($region->Title) == $state) { return ($region->Code); } }
+                    foreach ($temp['Locale'] as $iso3 => $value) { if ($iso3=='USA') {
+                        foreach ($value['Regions'] as $code => $region) { if (strtolower($region['Title']) == $state) { return ($code); } }
                     } }
                 }
                 return is_string($value) ? strtoupper($value) : $value;

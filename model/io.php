@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-13
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /model/io.php
  */
 
@@ -191,10 +191,10 @@ final class io
      * @param string $type - determines the type of data to download, choices are 'data' [default] or 'file'
      * @param string $src - contains either the file contents (for type data) or path (for type file)
      * @param string $fn - the filename to assign to the download
-     * @param boolean $delete_source - determines if the source file should be deleted after the download, default is false
+     * @param boolean $delete_source - [default: true] Determines if the source file should be deleted after the download
      * @return will not return if successful, if this script returns, the messageStack will contain the error.
      */
-    public function download($type='data', $src='', $fn='download.txt', $delete_source=false)
+    public function download($type='data', $src='', $fn='download.txt', $delete_source=true)
     {
         switch ($type) {
             case 'file': // unzip the file to remove security encryption

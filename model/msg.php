@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-23
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /model/msg.php
  */
 
@@ -228,6 +228,17 @@ function msgErrors()
 {
     global $msgStack;
     return isset($msgStack->error['error']) ? sizeof($msgStack->error['error']) : 0;
+}
+
+/**
+ * Returns the message stack queue for API responses, analysis, etc.
+ * @global array $msgStack
+ * @return array - The messageStack queue at the point of being called.
+ */
+function msgQueue()
+{
+    global $msgStack;
+    return $msgStack->error;
 }
 
 /**

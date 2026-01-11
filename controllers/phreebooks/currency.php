@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-04
+ * @version    7.x Last Update: 2026-01-10
  * @filesource /controllers/phreebooks/currency.php
  */
 
@@ -199,18 +199,18 @@ class phreebooksCurrency
     {
         $setting = ['code'=>$iso, 'value'=>1];
         $curData = localeLoadDB();
-        foreach ($curData->Locale as $value) {
-            if (isset($value->Currency->ISO) && $value->Currency->ISO == $iso) {
+        foreach ($curData['Locale'] as $value) {
+            if (isset($value['Currency']['ISO']) && $value['Currency']['ISO'] == $iso) {
                 $setting = [
-                    'title'  => $value->Currency->Title,
-                    'code'   => $value->Currency->ISO,
-                    'prefix' => isset($value->Currency->Prefix)        ? $value->Currency->Prefix        : '$',
-                    'suffix' => isset($value->Currency->Suffix)        ? $value->Currency->Suffix        : '',
-                    'dec_pt' => isset($value->Currency->Decimal)       ? $value->Currency->Decimal       : '.',
-                    'sep'    => isset($value->Currency->Thousand)      ? $value->Currency->Thousand      : ',',
-                    'dec_len'=> isset($value->Currency->Precision)     ? $value->Currency->Precision     : 2,
-                    'pfxneg' => isset($value->Currency->PrefixNegative)? $value->Currency->PrefixNegative: '-',
-                    'sfxneg' => isset($value->Currency->SuffixNegative)? $value->Currency->SuffixNegative: '',
+                    'title'  => $value['Currency']['Title'],
+                    'code'   => $value['Currency']['ISO'],
+                    'prefix' => isset($value['Currency']['Prefix'])        ? $value['Currency']['Prefix']        : '$',
+                    'suffix' => isset($value['Currency']['Suffix'])        ? $value['Currency']['Suffix']        : '',
+                    'dec_pt' => isset($value['Currency']['Decimal'])       ? $value['Currency']['Decimal']       : '.',
+                    'sep'    => isset($value['Currency']['Thousand'])      ? $value['Currency']['Thousand']      : ',',
+                    'dec_len'=> isset($value['Currency']['Precision'])     ? $value['Currency']['Precision']     : 2,
+                    'pfxneg' => isset($value['Currency']['PrefixNegative'])? $value['Currency']['PrefixNegative']: '-',
+                    'sfxneg' => isset($value['Currency']['SuffixNegative'])? $value['Currency']['SuffixNegative']: '',
                     'value'  => 1];
                 break;
             }
