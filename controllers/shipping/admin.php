@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-02
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -177,6 +177,7 @@ class shippingAdmin extends shippingCommon
     public function apiImport()
     {
         global $io;
+        msgDebug("\nEntering hook shipping:apiImport.");
         if (!$security = validateAccess('admin', 2)) { return; }
         $invShip = [];
         if (!$io->validateUpload('fileInventory', '', ['csv','txt'])) { return; }

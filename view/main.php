@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /view/main.php
  */
 
@@ -209,7 +209,8 @@ final class view
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'bizuno-dark' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
-        $js  = "const bizID = '".getUserCache('business','bizID', false, 0)."';\n";
+        $js  = "const bizVersion = '".MODULE_BIZUNO_VERSION."';\n";
+        $js .= "const bizID = '".getUserCache('business','bizID', false, 0)."';\n";
         $js .= "const bizunoHome = '".BIZUNO_URL_PORTAL."';\n";
         $js .= "const bizunoAjax = '".BIZUNO_URL_AJAX."';\n";
         $js .= "const bizunoAjaxFS = '".BIZUNO_URL_FS."';\n";

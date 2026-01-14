@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2026-01-12
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -142,14 +142,14 @@ class tax_rest
 function totals_$this->code(begBalance) {
     var tax_rest= 0;
     var newBalance= begBalance;
-    var state   = bizTextGet('state_s');
+    var bizState= bizSelGet('state_s');
     var zip     = bizTextGet('postal_code_s');
-    var country = bizSelGet('country_s');
+    var bizCntry= bizSelGet('country_s');
     var ship    = bizNumGet('freight');
     var total   = bizNumGet('total_amount');
     var curTax  = bizNumGet('totals_$this->code');
     if (0==bizCheckBoxGet('tax_exempt') && zip !=='' && begBalance !== 0) {
-        jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreebooks/restfulTax/getTaxRate&state='+state+'&postal_code='+zip+'&shipping='+ship+'&total='+begBalance, async:false, success:function(resp) {
+        jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreebooks/restfulTax/getTaxRate&state='+bizState+'&postal_code='+zip+'&country='+bizCntry+'&shipping='+ship+'&total='+begBalance, async:false, success:function(resp) {
         tax_rest = resp;
  } });
     } else { tax_rest = 0; }
@@ -159,7 +159,6 @@ function totals_$this->code(begBalance) {
     bizNumSet('totals_$this->code', tax_rest);
     return parseFloat(newBalance.toFixed(decLen));
 }", 'jsHead');
-//        htmlQueue("bizTextChange('state_s', tax_rest_get); bizTextChange('postal_code_s', tax_rest_get); bizNumChange('totals_subtotal',tax_rest_get); bizNumChange('freight', tax_rest_get);", 'jsReady');
         return $html;
     }
 }

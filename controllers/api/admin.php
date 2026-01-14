@@ -123,7 +123,7 @@ class apiAdmin extends apiCommon
     }
 
     /**
-     * This method uploads a single inventory item to WooCommerce
+     * This method uploads a single inventory item to a funnel
      * @see apiImport::apiInventory()
      */
     public function productToStore(&$layout=[], $invID=0)

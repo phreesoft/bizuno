@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-13
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -546,7 +546,7 @@ function preSubmitPrices() {
      */
     private function calcPrice($level, $cost=0, $full=0)
     {
-        msgdebug("\nEntering calcPrice with cost = $cost and full = $full"); // and level = ".print_r($level, true));
+        msgDebug("\nEntering calcPrice with cost = $cost and full = $full"); // and level = ".print_r($level, true));
         $price   = !empty($level['price']) ? $level['price'] : $full;
         switch ($level['source']) { // source
             case 0: $price = 0;            break; // Not Used
@@ -578,8 +578,11 @@ function preSubmitPrices() {
                 else { $price = ceil($price / $remainder) * $remainder; }
                 break;
         }
+        $userPrec = getModuleCache('phreebooks', 'currency', 'iso')[getDefaultCurrency()]['dec_len'];
+        $precision = is_numeric($userPrec) ? (int)$userPrec : 2;
         msgDebug("\nReturning from calcPrice with price = $price");
-        return $price;
+//      return $price; // this was the original, may cause issues with orders with large number of line items.
+        return round($price, $precision);
     }
 
     /**

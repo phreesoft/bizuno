@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-11
+ * @version    7.x Last Update: 2026-01-13
  * @filesource /locale/cleaner.php
  */
 
@@ -79,7 +79,7 @@ class cleaner
             case 'email':    return !empty($value) ? preg_replace("/[^a-zA-Z0-9\-\_\.\,\@]/", '', $value) : $default;
             case 'filename': return preg_replace("/[^a-zA-Z0-9\-\_\.\/]/", '', $value);
             case 'implode':  return is_array($value) ? implode(';', $value) : $value;
-            case 'integer':  if ($value===0 || $value==='0') { return 0; } else { return empty($value) ? (!empty($default) ? $default : 0) : preg_replace("/[^0-9]/", "", $value); }
+            case 'integer':  if ($value===0 || $value==='0') { return 0; } else { return empty($value) ? (!empty($default) ? $default : 0) : (int)$value; }
             case 'json':     return json_decode($value, true);
             case 'jsonObj':  return json_decode($value); // return object format
             case 'numeric':  return preg_replace("/[^0-9 ]/", "", $value);

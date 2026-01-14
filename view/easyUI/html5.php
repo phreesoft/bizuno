@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-09
+ * @version    7.x Last Update: 2026-01-12
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1690,9 +1690,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         unset($prop['attr']['size'], $prop['attr']['maxlength']);
         $locales = localeLoadDB(); // load countries
         $iso3 = getModuleCache('bizuno','settings','company','country','USA');
-        $code = getModuleCache('bizuno','settings','company','state');
         if (isset($locales['Locale'][$iso3]['Regions']) && sizeof($locales['Locale'][$iso3]['Regions'])>0) {
-            $prop['options']['value']     =  "'$code'" ;
             $prop['options']['valueField']=  "'code'";
             $prop['options']['data']      = "bizDefaults.regions['$iso3']";
         } else {

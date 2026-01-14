@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-02
+ * @version    7.x Last Update: 2026-001-14
  * @filesource /controllers/inventory/api.php
  */
 
@@ -135,6 +135,7 @@ class inventoryApi
                 $newCnt++;
             }
             if ($rID && $security < 2) { msgAdd('Your permissions prevent altering an existing record, the entry will be skipped!'); continue; }
+            $this->addAttrib($sqlData, $row);
             validateData($structure, $sqlData);
             msgDebug("\nReady to write, data = ".print_r($sqlData, true));
             dbWrite(BIZUNO_DB_PREFIX.'inventory', $sqlData, $rID?'update':'insert', "id=$rID");
@@ -162,6 +163,21 @@ class inventoryApi
         $head    = array_shift($rows);
         foreach ($rows as $row) { $output[] = array_combine($head, $row); }
         return $output;
+    }
+
+    private function addAttrib(&$sqlData, $row)
+    {
+        if (empty($row['invAttrCat'])) { return; }
+        $attrs = getModuleCache('inventory', 'attr');
+        if (empty($row['invAttrCat']) || empty($attrs)) { return; } // nothing to do here
+        $found = false;
+        foreach ($attrs as $cat => $rows) { if (strtolower($cat)==strtolower($row['invAttrCat'])) { $found = true; break; } } // we have a hit
+        if (!$found) { return; } // if not found then we don't know the keys
+        $output = [];
+        foreach (array_keys($rows) as $idx) { if (!empty($row[$idx])) { $output[$idx] = $row[$idx]; } }
+        ksort($output);
+        msgDebug("\nReady to write attribute data = ".print_r($output, true));
+        $sqlData['bizProAttr'] = json_encode(['category'=>$cat, 'attrs'=>$output]);
     }
 
     /**

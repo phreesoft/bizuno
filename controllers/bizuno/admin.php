@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-11
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -209,6 +209,7 @@ class bizunoAdmin
         }
         $ISOCurrency = getDefaultCurrency();
         $data = [
+            'version'   => MODULE_BIZUNO_VERSION,
             'calendar'  => ['format'=>$locale['date_short'], 'delimiter'=>$dateDelim],
             'country'   => ['iso'=>$defISO,'title'=>$defTitle],
             'currency'  => ['defaultCur'=>$ISOCurrency, 'currencies'=>getModuleCache('phreebooks', 'currency', 'iso')],

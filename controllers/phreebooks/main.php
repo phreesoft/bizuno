@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-12
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1109,6 +1109,23 @@ function bizUnitDiscDisc(newValue) {
     {
         $current_total = 0;
         foreach ($ledger->items as $row) { $current_total += $row['debit_amount'] + $row['credit_amount']; } // subtotal of all rows
+
+
+        $freight = clean('freight', 'float', 'post');
+        $discount= clean('totals_discount', 'float', 'post');
+        $salesTax= clean('totals_tax_other', 'float', 'post') + clean('totals_tax_item', 'float', 'post') + clean('totals_tax_order', 'float', 'post');
+        $calTotal= $current_total + $freight + $salesTax + $discount;
+        $ratio   = 1 - (!empty($ledger->main['total_amount']) ? abs($calTotal/$ledger->main['total_amount']) : 0);
+        $diff    = $calTotal - $ledger->main['total_amount'];
+        msgDebug("\nbig order ratio = $ratio and diff = $diff");
+        if ($ratio < 0.0001) { // special patch for extremely long orders.
+            msgDebug("\nApplying current minus diff = ".($ledger->main['total_amount'] + $diff));
+//          $_POST['totals_subtotal'] = $current_total;
+//          $ledger->main['total_amount'] = $_POST['total_amount'] = $ledger->main['total_amount'] + $diff;
+        }
+
+
+
         msgDebug("\nStarting to build total GL rows, starting subtotal = $current_total");
         $ledger->main['sales_tax'] = $ledger->main['discount'] = 0; // clear the sales tax and discount before building new values
         $ledger->totals = $this->loadTotals($this->journalID);
@@ -1608,10 +1625,10 @@ function bizUnitDiscDisc(newValue) {
             default: $data['source']['filters']['store']['sql'] = BIZUNO_DB_PREFIX."journal_main.store_id=$storeID"; break;
         }
         // Reps
-        if ($this->journalID==0) { // add reps to search filters
-            $repID= clean('rep_id', 'integer', 'post');
-            $data['source']['filters']['rep_id']['sql'] = !empty($repID) ? BIZUNO_DB_PREFIX."journal_main.rep_id=$repID" : '';
-        }
+//        if ($this->journalID==0) { // add reps to search filters
+//            $repID= clean('rep_id', 'integer', 'post');
+//            $data['source']['filters']['rep_id']['sql'] = !empty($repID) ? BIZUNO_DB_PREFIX."journal_main.rep_id=$repID" : '';
+//        }
         // EDI
 // @TODO - THIS NEEDS TO BE MADE INTO A META VALUE FOR SPEED
         if (in_array($this->journalID, [9,10,12,13])) {
@@ -1631,7 +1648,6 @@ function bizUnitDiscDisc(newValue) {
         if (sizeof(getModuleCache('bizuno', 'stores')) < 2) { // single store
             unset($data['columns']['store_id'], $data['source']['filters']['store']);
         }
-
         return $data;
     }
 

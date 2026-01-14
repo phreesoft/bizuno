@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /controllers/api/export.php
  */
 
@@ -29,17 +29,11 @@ namespace bizuno;
 
 class apiExport
 {
-    public $moduleID  = 'api';
-    public $pageID    = 'export';
-    public $user_email= '';      // will be filled in after access granted
+    public $moduleID= 'api';
+    public $pageID  = 'export';
 
-    function __construct() {
-//        $this->lang = getLang('bizuno'); // needs to be hardcoded as this is extended by extensions
-    }
+    function __construct() { }
 
-    /**
-     *
-     */
     public function apiInventory(&$product=[])
     {
         $rID = clean($product['RecordID'], 'integer');
@@ -56,14 +50,8 @@ class apiExport
         $product['DimensionUOM']= getModuleCache('inventory', 'settings', 'general', 'dim_uom',   'IN');
         $this->getImage($product);
         $this->getAccessories($product);
+        $this->getAttributes($product);
     }
-
-    /**
-     *
-     * @global type $io
-     * @param type $product
-     * @return type
-     */
     private function getImage(&$product)
     {
         global $io;
@@ -88,7 +76,6 @@ class apiExport
             }
         }
     }
-
     private function getAccessories(&$product)
     {
         if (isset($product['invAccessory'])) {
@@ -100,11 +87,22 @@ class apiExport
             }
         }
     }
+    private function getAttributes(&$product)
+    {
+        msgDebug("\nEntering api:export:getAttributes");
+        if (empty($product['bizProAttr'])) { return; }
+        $data = json_decode($product['bizProAttr'], true);
+        $cat  = !empty($data['category']) ? $data['category'] : '';
+        if (empty($cat)) { return; }
+        $labels= getModuleCache('inventory', 'attr', $cat);
+        if (empty($labels)) { return; }
+        $product['AttributeCategory'] = $cat;
+        foreach ($data['attrs'] as $key => $value) {
+            $product['Attributes'][] = ['index'=>$key, 'title'=>!empty($labels[$key]) ? $labels[$key] : 'uncategorized', 'value'=>$value];
+        }
+        unset($product['bizProAttr']);
+    }
 
-    /**
-     *
-     * @param type $layout
-     */
     public function apiSync(&$layout=[])
     {
         $skus  = [];

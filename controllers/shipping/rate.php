@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2026-01-12
  * @filesource /controllers/shipping/rate.php
  */
 
@@ -97,7 +97,7 @@ class shippingRate extends shippingCommon
             'keyDtl' => ['ship_date','total_amount','ltl_class'],
             'fields' => [
                 'city'        => ['order'=>10,'label'=>lang('city'),       'attr'=>['value'=>!empty($data['ship']['city_s'])       ? $data['ship']['city_s']       : '']],
-                'state'       => ['order'=>20,'label'=>lang('state'),      'attr'=>['value'=>!empty($data['ship']['state_s'])      ? $data['ship']['state_s']      : '']],
+                'state'       => ['order'=>20,'label'=>lang('state'),      'attr'=>['type'=>'state', 'value'=>!empty($data['ship']['state_s'])     ? $data['ship']['state_s']      : '']],
                 'postal_code' => ['order'=>30,'label'=>lang('postal_code'),'attr'=>['value'=>!empty($data['ship']['postal_code_s'])? $data['ship']['postal_code_s']: ''], 'size'=>10],
                 'country'     => ['order'=>40,'label'=>lang('country'),    'attr'=>['type'=>'country', 'value'=>!empty($data['ship']['country_s']) ? $data['ship']['country_s'] : 'USA']],
                 'num_boxes'   => ['order'=>10,'label'=>lang('num_boxes'),'attr'=>['type'=>'integer','value'=>$guess['Qty'],'size'=>5]],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-25
+ * @version    7.x Last Update: 2026-01-12
  * @filesource /controllers/shipping/address.php
  */
 
@@ -88,7 +88,7 @@ class shippingAddress extends shippingCommon
     bizTextSet('address1$suffix', '"    .addslashes($output['address']['address1'])."');
     bizTextSet('address2$suffix', '"    .addslashes($output['address']['address2'])."');
     bizTextSet('city$suffix', '"        .addslashes($output['address']['city'])."');
-    bizTextSet('state$suffix', '"       .addslashes($output['address']['state'])."');
+    bizSelSet('state$suffix', '"        .addslashes($output['address']['state'])."');
     bizTextSet('postal_code$suffix', '" .addslashes($output['address']['postal_code'])."');".
     (!empty($output['resi']) ? "    bizCheckBox('ship_resi');"  : "    bizUncheckBox('ship_resi');"). // order form, next is rate quote popup
     (!empty($output['resi']) ? "    bizCheckBox('residential');": "    bizUncheckBox('residential');")."

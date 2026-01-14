@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-11
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /view/easyUI/common.js
  */
 
@@ -34,7 +34,7 @@ var curIndex     = undefined;
 var deleteRow    = false;
 var rowAutoAdd   = true;
 var no_recurse   = false;
-var addressFields= ['address_id','primary_name','contact','address1','address2','city','state','postal_code','telephone1','telephone2','telephone3','telephone4','email','website'];
+var addressFields= ['address_id','primary_name','contact','address1','address2','city','postal_code','telephone1','telephone2','telephone3','telephone4','email','website'];
 var contactFields= ['id','short_name','inactive','store_id','contact_first','contact_last','flex_field_1','account_number','gov_id_number'];
 var countries    = new Array();
 var inventory    = new Array();
@@ -73,20 +73,21 @@ jqBiz.ajaxSetup({ // Set defaults for ajax requests
     }
 });
 
-/**
- * This function will load into session storage for common Bizuno data that tends to be static once logged in
- */
-function loadSessionStorage() {
-    if (bizID=='0') { return; }
-    jqBiz.ajax({
-        url:     bizunoAjax+'&bizRt=bizuno/admin/loadBrowserSession',
-        success: function(json) {
-            processJson(json);
-            if (typeof sessionStorage.bizuno != 'undefined') { sessionStorage.removeItem('bizuno'); }
-            sessionStorage.setItem('bizuno', JSON.stringify(json));
-            window.location = bizunoHome; // done, load the homepage
-        }
-    });
+let stored = null;
+let storedVersion = null;
+if (sessionStorage.bizuno) {
+    try {
+        stored = JSON.parse(sessionStorage.bizuno);
+        storedVersion = stored?.version;   // safely get it (undefined if missing/old)
+//      console.log("Cache is fresh");
+    } catch (e) {
+//      console.warn("Invalid bizuno cache → will refresh");
+    }
+}
+
+if (!stored || storedVersion !== bizVersion) {
+    // mismatch → refresh in background (home page) or wait for it (other pages)
+    reloadSessionStorage();
 }
 
 function reloadSessionStorage(callBackFunction) {
@@ -112,7 +113,7 @@ if (typeof sessionStorage.bizuno !== 'undefined') {
     bizDefaults = JSON.parse(sessionStorage.getItem('bizuno'));
 } else if (bizID >= 0) { // this happens when first logging in OR opening a new tab in the browser manually
     reloadSessionStorage();
-} else if (typeof bizDefaults.currency==='undefined') { // issue loading cache try again
+} else if (typeof bizDefaults.regions==='undefined') { // issue loading cache try again
     reloadSessionStorage();
 } 
 
@@ -1842,8 +1843,8 @@ function bizPanelRefresh(id) {
 }
 
 function bizParse(id) {
-    if (typeof id=='undefined') { jqBiz.parser.parse(); }
-    else                        { jqBiz.parser.parse('#'+id); }
+    if (typeof id==='undefined') { jqBiz.parser.parse(); }
+    else                         { jqBiz.parser.parse('#'+id); }
 }
 
 function bizRegionInit(suffix) {
@@ -2038,28 +2039,33 @@ function crmDetail(rID, suffix) {
 function addressFill(address, suffix) {
     for (key in address) {
         bizTextSet(key+suffix, address[key]);
+        if (key == 'state')   { jqBiz('#state'  +suffix).combobox('setValue',  address[key]); }
         if (key == 'country') { jqBiz('#country'+suffix).combogrid('setValue', address[key]); }
     }
     jqBiz('#contact_id'+suffix).val(address['ref_id']);
 }
 
 function clearAddress(suffix) {
-    jqBiz('#address'+suffix).find('input, select').each(function(){
-        jqBiz(this).val('').attr('checked',false).css({color:'#000000'}).blur();
-    });
-    jqBiz('#country'+suffix).combogrid('setValue',bizDefaults.country.iso).combogrid('setText', bizDefaults.country.title);
+    jqBiz('#address'+suffix).find('input, select').each(function(){ jqBiz(this).val('').attr('checked',false).css({color:'#000000'}).blur(); });
+    var iso3 = bizDefaults.country.iso;
+    jqBiz('#country'+suffix).combogrid('setValue',iso3).combogrid('setText', bizDefaults.country.title);
+    bizRegionChange(iso3, suffix);
 }
 
 function addressClear(suffix) {
     jqBiz.each(addressFields, function (index, value) { bizTextSet(value+suffix, ''); });
     jqBiz.each(contactFields, function (index, value) { bizTextSet(value+suffix, ''); });
-    if (suffix != '_s') { jqBiz('#addressDiv'+suffix).hide(); }
-    jqBiz('#country'+suffix).combogrid('setValue', bizDefaults.country.iso).combogrid('setText', bizDefaults.country.title);
+    if (suffix !== '_s') { jqBiz('#addressDiv'+suffix).hide(); }
+    var iso3 = bizDefaults.country.iso;
+    jqBiz('#country'+suffix).combogrid('setValue', iso3).combogrid('setText', bizDefaults.country.title);
+    bizRegionChange(iso3, suffix);
 }
 
 function addressCopy(fromSuffix, toSuffix) {
     jqBiz.each(addressFields, function (index, value) { if (jqBiz('#'+value+fromSuffix).length) bizTextSet(value+toSuffix, bizTextGet(value+fromSuffix)); });
-    jqBiz('#country'+toSuffix).combogrid('setValue', jqBiz('#country'+fromSuffix).combogrid('getValue'));
+    jqBiz('#state'  +toSuffix).combobox('setValue', jqBiz('#state'  +fromSuffix).combobox('getValue'));
+    jqBiz('#state'  +toSuffix).combobox('setText',  jqBiz('#state'  +fromSuffix).combobox('getText'));
+    jqBiz('#country'+toSuffix).combogrid('setValue',jqBiz('#country'+fromSuffix).combogrid('getValue'));
     // Clear the ID's so Add/Updates don't erase the source record
     bizTextSet('id'+toSuffix, '0');
     bizTextSet('address_id'+toSuffix, '0');
@@ -2072,16 +2078,15 @@ function shippingValidate(suffix) {
     temp['address1']    = jqBiz('input[name="address1'+suffix+'"]').val();
     temp['address2']    = jqBiz('input[name="address2'+suffix+'"]').val();
     temp['city']        = jqBiz('input[name="city'+suffix+'"]').val();
-    temp['state']       = jqBiz('input[name="state'+suffix+'"]').val();
+//    temp['state']       = bizSelGet('state'  +suffix);
     temp['postal_code'] = jqBiz('input[name="postal_code'+suffix+'"]').val();
-    var country= bizSelGet('country'+suffix);
-    var code   = bizSelGet('method_code');
-    var suffix = suffix;
-    var ship   = encodeURIComponent(JSON.stringify(temp));
+    var bizState= bizSelGet('state'  +suffix);
+    var bizCntry= bizSelGet('country'+suffix);
+    var code    = bizSelGet('method_code');
+    var suffix  = suffix;
+    var ship    = encodeURIComponent(JSON.stringify(temp));
     // For ISP hosted run everything through the Client server
-    jsonAction('shipping/address/validateAddress&suffix='+suffix+'&methodCode='+code+'&country='+country, 0, ship);
-    // For PhreeSoft hosted, run through the portal???
-//  jsonPortal('myPortal/shipping/validateAddress&suffix='+suffix+'&methodCode='+code+'&country='+country, 0, ship);
+    jsonAction('shipping/address/validateAddress&suffix='+suffix+'&methodCode='+code+'&state='+bizState+'&country='+bizCntry, 0, ship);
 }
 
 //*********************************** Chart functions *****************************************/

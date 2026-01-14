@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-19
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /controllers/inventory/attributes.php
  */
 
@@ -177,22 +177,6 @@ class inventoryAttributes
         $structure= dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
         $rows = $this->prepData($structure);
         foreach ($rows as $row) {
-            if (empty($row['sku'])) { continue; }
-            if (empty($row['invAttrCat'])) { continue; }
-            $attrs = getModuleCache('inventory', 'attr');
-            if (empty($row['invAttrCat']) || empty($attrs)) { continue; } // nothing to do here
-            $found = false;
-            foreach ($attrs as $cat => $rows) {
-                if (strtolower($cat)==strtolower($row['invAttrCat'])) { $found = true; break; } // we have a hit
-            }
-            if (!$found) { continue; } // if not found then we don't know the keys
-            $output = [];
-            foreach (array_keys($rows) as $idx) { if (!empty($row[$idx])) { $output[$idx] = $row[$idx]; } }
-            ksort($output);
-            msgDebug("\nReady to write attribute data = ".print_r($output, true));
-            $rID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($row['sku'])."'");
-            if (empty($rID)) { continue; } // SKU not found, here is not the place to create a new part
-            dbWrite(BIZUNO_DB_PREFIX.'inventory', ['bizProAttr'=>json_encode(['category'=>$cat, 'attrs'=>$output])], 'update', "id=$rID");
         }
     }
 
@@ -221,18 +205,6 @@ class inventoryAttributes
      */
     public function apiInventory(&$product=[])
     {
-        msgDebug("\nEntering inventory:attributes:apiInventory");
-        if (empty($product['bizProAttr'])) { return; }
-        $data = json_decode($product['bizProAttr'], true);
-        $cat  = !empty($data['category']) ? $data['category'] : '';
-        if (empty($cat)) { return; }
-        $labels= getModuleCache('inventory', 'attr', $cat);
-        if (empty($labels)) { return; }
-        $product['AttributeCategory'] = $cat;
-        foreach ($data['attrs'] as $key => $value) {
-            $product['Attributes'][] = ['index'=>$key, 'title'=>!empty($labels[$key]) ? $labels[$key] : 'uncategorized', 'value'=>$value];
-        }
-        unset($product['bizProAttr']);
     }
 
     /**

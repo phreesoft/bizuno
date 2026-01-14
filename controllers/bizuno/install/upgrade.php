@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-09
+ * @version    7.x Last Update: 2026-01-14
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -159,11 +159,11 @@ function bizunoUpgrade()
     if (version_compare($dbVer, '7.3.6') < 0) {
         // Fix to support emojis (4-byte characters) in all db tables
         $bizDB = BIZUNO_DB_CREDS['name']; // database table
-        dbGetResult("ALTER DATABASE $bizDB CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"); // sets default for entire DB
+        dbGetResult("ALTER DATABASE $bizDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"); // sets default for entire DB
         $tables = [];
         require (BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
         foreach (array_keys($tables) as $table) {
-            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."$table` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."$table` CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
         // Fix report dates lost when updated in new version
         $meta  = dbMetaGet('%', 'phreeform');
