@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2026-01-16
  * @filesource /controllers/phreebooks/totals/achBalBeg/achBalBeg.php
  */
 
@@ -79,8 +79,8 @@ function totalsGetAchBegBal(postDate) {
         url: '".BIZUNO_URL_AJAX."&bizRt=phreebooks/main/journalBalance&rID='+rID+'&postDate='+postDate+'&achMapID='+achMapID,
         success: function (json) {
             processJson(json);
-            if (json.balance) { bizNumSet('totals_achBalBeg', json.balance); bizTextSet('ach_gl_acct_id', json.gl_account); }
-            else              { alert('Balance could not be found!'); }
+            if (typeof json.balance !== 'undefined') { bizNumSet('totals_achBalBeg', json.balance); bizTextSet('ach_gl_acct_id', json.gl_account); }
+            else { alert('Balance could not be found!'); }
             achTotalUpdate();
        }
     });
