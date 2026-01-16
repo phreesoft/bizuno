@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-01-15
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -109,16 +109,6 @@ class phreebooksRestfulTax
     /**
      * Fetches the sales tax rate from the PhreeSoft Server via RESTful API
      * @param array $layout - Structure
-
-$client = new Client();
-$headers = [
-  'X-API-KEY' => '{ your API key }',
-  'Content-Type' => 'application/json'
-];
-$request = new Request('GET', 'https://api.zip-tax.com/request/v60?key={ your API key }&address=200 Spectrum Center Drive, Irvine, CA 92618&format=json&countryCode=USA&taxabilityCode=10000', $headers);
-$res = $client->sendAsync($request)->wait();
-echo $res->getBody();
-
      */
     public function getTaxRate(&$layout=[])
     {
@@ -128,16 +118,17 @@ echo $res->getBody();
         $salesTax = 0;
         msgDebug("\nEntering getTaxRate with settings = ".print_r($this->settings, true));
         $props = [
-            'total'      => clean('total',      'float','get'),
-            'shipping'   => clean('shipping',   'float','get'),
+            'total'      => clean('total',      'float',    'get'),
+            'shipping'   => clean('shipping',   'float',    'get'),
+            'address1'   => clean('address1',   'text',     'get'),
+            'address2'   => clean('address2',   'text',     'get'),
             'city'       => clean('city',       'alpha_num','get'),
             'state'      => strtoupper(clean('state','alpha_num','get')),
             'country'    => clean('country',    'alpha_num','get'),
-            'postal_code'=> clean('postal_code','chars','get')]; // Just USA for now, Canada is alphanum and has 6 characters, maybe by country
+            'postal_code'=> clean('postal_code','chars',    'get')]; // Just USA for now, Canada is alphanum and has 6 characters, maybe by country
         $isTaxable = in_array($props['state'], $this->nexusSt) ? true : false;
         if (!$isTaxable) { return; }
         if (empty($props['postal_code'])) { return msgAdd("Missing or invalid postal code provided."); }
-        
         $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
         $result = $io->restRequest('get', $this->server, 'wp-json/phreesoft-api/v1/sales_tax', $props);
         if (!empty($result['sales_tax'])) { $salesTax = $result['sales_tax']; }

@@ -140,16 +140,19 @@ class tax_rest
         $html .= "</div>";
         htmlQueue("
 function totals_$this->code(begBalance) {
-    var tax_rest= 0;
+    var tax_rest  = 0;
     var newBalance= begBalance;
-    var bizState= bizSelGet('state_s');
-    var zip     = bizTextGet('postal_code_s');
-    var bizCntry= bizSelGet('country_s');
-    var ship    = bizNumGet('freight');
-    var total   = bizNumGet('total_amount');
-    var curTax  = bizNumGet('totals_$this->code');
+    var address1  = bizTextGet('address1_s');
+    var address2  = bizTextGet('address2_s');
+    var city      = bizTextGet('city_s');
+    var bizState  = bizSelGet('state_s');
+    var zip       = bizTextGet('postal_code_s');
+    var bizCntry  = bizSelGet('country_s');
+    var ship      = bizNumGet('freight');
+    var total     = bizNumGet('total_amount');
+    var curTax    = bizNumGet('totals_$this->code');
     if (0==bizCheckBoxGet('tax_exempt') && zip !=='' && begBalance !== 0) {
-        jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreebooks/restfulTax/getTaxRate&state='+bizState+'&postal_code='+zip+'&country='+bizCntry+'&shipping='+ship+'&total='+begBalance, async:false, success:function(resp) {
+        jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreebooks/restfulTax/getTaxRate&address1='+address1+'&address2='+address2+'&city='+city+'&state='+bizState+'&postal_code='+zip+'&country='+bizCntry+'&shipping='+ship+'&total='+begBalance, async:false, success:function(resp) {
         tax_rest = resp;
  } });
     } else { tax_rest = 0; }

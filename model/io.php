@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-01-15
  * @filesource /model/io.php
  */
 
@@ -174,6 +174,7 @@ final class io
 //curl_setopt($ch, CURLOPT_STDERR, $fp);
         $response = curl_exec($ch);
 //msgDebug("\nRaw cURL data returned = ".print_r($response, true)); // This can be helpful if headers are sent first
+        // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // This may also be a good way
         if (curl_errno($ch)) {
             msgDebug('cURL Error # '.curl_errno($ch).'. '.curl_error($ch));
             msgAdd('cURL Error # '.curl_errno($ch).'. '.curl_error($ch));
