@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-17
  * @filesource /model/functions.php
  */
 
@@ -1382,6 +1382,7 @@ function validateData($structure=[], &$data=[])
 
 /**
  * Validates user security levels to access any given method.
+ * 0 - No Access, 1 - Read Only, 2 - Add, 3 - Edit, 4 - Delete, 5 - Administrate (overwritten if Admin checkbox is selected)
  * @param string $index - Menu item to check against
  * @param integer $min_level - minimum security range 1 to 4 to set security access levels
  * @param boolean $verbose - true add error message to stack if no permission, false to suppress message

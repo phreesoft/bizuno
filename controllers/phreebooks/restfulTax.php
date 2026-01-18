@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-16
+ * @version    7.x Last Update: 2026-01-17
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -114,7 +114,7 @@ class phreebooksRestfulTax
     {
         global $io;
         $layout = array_replace_recursive($layout, ['type'=>'raw','content'=>0]);
-        if (!validateAccess('j9_mgr', 2)) { return; }
+        if (!validateAccess('j9_mgr', 1) && !validateAccess('j10_mgr', 1) && !validateAccess('j12_mgr', 1)) { return; }
         $salesTax = 0;
         msgDebug("\nEntering getTaxRate with settings = ".print_r($this->settings, true));
         $props = [

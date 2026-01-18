@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-13
+ * @version    7.x Last Update: 2026-01-18
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -48,6 +48,7 @@ class inventoryPrices extends mgrJournal
     public $qtySource;
     public $qtyAdj;
     public $qtyRnd;
+    private $fldSearch;
     
     function __construct($rID=0, $iID=0, $cID=0)
     {
@@ -65,6 +66,7 @@ class inventoryPrices extends mgrJournal
         $this->qtyRnd     = ['0'=>lang('none'), '1'=>lang('next_integer'),      '2'=>lang('next_fraction'),      '3'=>lang('next_increment')];
         $this->metaPrefix.= $this->type;
         $this->domSuffix .= $this->type;
+        $this->fldSearch  = $this->dom=='div' ? "srch{$this->domSuffix}" : 'search';
         parent::__construct();
         $this->managerSettings();
         $this->fieldStructure();
@@ -104,8 +106,7 @@ class inventoryPrices extends mgrJournal
                 'search'=>['title', 'cName', 'iName'],
                 'actions'=> [
                     'new'   => ['order'=>10,'icon'=>'add',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&dom=$this->dom&table=$this->scope&refID=$refID', 0);"]],
-                    'clear' => ['order'=>50,'icon'=>'clear','events'=>['onClick'=>"bizTextSet('search', ''); dg{$this->domSuffix}Reload();"]]],
-                ],
+                    'clear' => ['order'=>50,'icon'=>'clear','events'=>['onClick'=>"bizTextSet('$this->fldSearch', ''); dg{$this->domSuffix}Reload();"]]]],
             'footnotes'=> ['codes'=>lang('color_codes').': <span class="row-default">'.lang('default').'</span>'],
             'columns'  => ['action'=>['actions'=>['edit'=>['events'=>[
                     'onClick' => "function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type&table='+rowData._table, rowData._rID); }"]]]],
@@ -124,6 +125,9 @@ class inventoryPrices extends mgrJournal
         parent::managerDefaults();
         $this->defaults['sort'] = clean('sort', ['format'=>'cmd','default'=>'cName'],'post');
         $this->defaults['order']= clean('order',['format'=>'cmd','default'=>'ASC'],  'post');
+        if ($this->dom=='div') { // override search if inside of a div as the field has a different name
+            $this->defaults['search'] = clean("srch{$this->domSuffix}", ['format'=>'text', 'default'=>''], 'post');
+        }
     }
     public function manager(&$layout=[])
     {
@@ -133,6 +137,9 @@ class inventoryPrices extends mgrJournal
         if     (!empty($this->cID) && 'div'==$this->dom) { $args['refID'] = $this->cID; $args['table'] = 'contacts'; }
         elseif (!empty($this->iID) && 'div'==$this->dom) { $args['refID'] = $this->iID; $args['table'] = 'inventory'; }
         parent::managerMain($layout, $security, $args);
+        if ($this->dom=='div') { // if in a div, adjust search to make it unique
+            $layout['datagrid']["dg{$this->domSuffix}"]['source']['filters']['search']['attr']['id'] = "srch{$this->domSuffix}";
+        }
     }
     public function managerRows(&$layout=[])
     {

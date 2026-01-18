@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2026-01-18
  * @filesource /model/manager.php
  */
 
@@ -278,7 +278,7 @@ class mgrJournal
         $defs   = array_replace(['dom'=>'div', '_rID'=>clean('rID', 'integer', 'get'), '_table'=>'common', '_refID'=>clean('refID', 'integer', 'get'), 'index'=>'title', 'title'=>lang('new')], $args);
         msgDebug("\nEntering editMeta with defs = ".print_r($defs, true));
         $metaVal= !empty($defs['_rID']) ? dbMetaGet($defs['_rID'], $this->metaPrefix, $defs['_table'], $defs['_refID']) : ['_refID'=>$defs['_refID'], '_table'=>$defs['_table']];
-        if (!empty($metaVal['title'])) { 
+        if (!empty($metaVal['title']) && empty($args['title'])) { 
             $defs['title'] = lang('edit').': '.(!empty($metaVal['ref_num'])?$metaVal['ref_num'].' - ':'').$metaVal['title'];
         }
         msgDebug("\nRead metaVal from db: ".print_r($metaVal, true));
@@ -461,7 +461,7 @@ class mgrJournal
             'panels'  => [],
             'toolbars'=> ["tb{$this->domSuffix}"=>['icons'=>[
                 'save' => ['order'=>20,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frm{$this->domSuffix}').submit();"]],
-                'new'  => ['order'=>40,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '{$defs['title']}', '$this->moduleID/$this->pageID/".($admin?'adminEdit':'edit')."&dom={$defs['dom']}&table={$defs['_table']}{$defs['xGet']}', 0);"]],
+                'new'  => ['order'=>40,'icon'=>'add','hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '{$defs['title']}', '$this->moduleID/$this->pageID/".($admin?'adminEdit':'edit')."&dom={$defs['dom']}&table={$defs['_table']}{$defs['xGet']}', 0);"]],
                 'copy' => ['order'=>50,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"var title=prompt('".lang('msg_entry_copy')."'); if (title!=null) jsonAction('$this->moduleID/$this->pageID/" .($admin?'adminCopy'  :'copy')  ."&refID={$defs['_refID']}&table={$defs['_table']}{$defs['xGet']}','{$defs['_rID']}', title);"]],
                 'trash'=> ['order'=>80,'hidden'=>$security>3 && $defs['_rID']?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/$this->pageID/".($admin?'adminDelete':'delete')."&refID={$defs['_refID']}&table={$defs['_table']}{$defs['xGet']}','{$defs['_rID']}');"]]]]],
             'forms'   => ["frm{$this->domSuffix}"=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/".($admin?'adminSave':'save')."{$defs['xGet']}"]]],

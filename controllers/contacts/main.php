@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-18
  * @filesource /controllers/contacts/main.php
  */
 
@@ -281,7 +281,7 @@ class contactsMain
             'toolbars'=> [
                 'tbContacts'=> ['icons' => [
                     'save'    => ['order'=>20,'hidden'=>$security >1?false:true,       'events'=>['onClick'=>"if (jqBiz('#frmContact').form('validate')) { jqBiz('body').addClass('loading'); jqBiz('#frmContact').submit(); }"]],
-                    'new'     => ['order'=>40,'hidden'=>$security >1?false:true,       'events'=>['onClick'=>"accordionEdit('accContacts', 'dgContacts', 'divContactsDetail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type', 0);"]],
+                    'new'     => ['order'=>40,'icon'=>'add','hidden'=>$security >1?false:true,'events'=>['onClick'=>"accordionEdit('accContacts', 'dgContacts', 'divContactsDetail', '".lang('details')."', '$this->moduleID/$this->pageID/edit&type=$this->type', 0);"]],
                     'icnEmail'=> ['order'=>60,'hidden'=>$rID && $formID?false:true,    'events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=$formID&xfld=contacts.id&xcr=equal&xmin=$rID');"],'label'=>lang('email'),'icon'=>'email'],
                     'trash'   => ['order'=>80,'hidden'=>$rID && $security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/$this->pageID/delete&type=$this->type', $rID, 'reset');"]]]]],
             'tabs'    => ['tabContacts'=>['divs'=>[

@@ -20,31 +20,30 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-14
+ * @version    7.x Last Update: 2026-01-18
  * @filesource /view/easyUI/common.js
  */
 
 var jqBiz = $.noConflict(); 
 
-/* **************************** Variables loaded as needed ********************************* */
-//initialize some variables
-var portalAjax   = 'https://www.bizuno.com?';
+/* **************************** Load/Initialize Constants and Variables ********************************* */
+const portalAjax   = 'https://www.bizuno.com?';
+const deleteRow    = false;
+const rowAutoAdd   = true;
+const no_recurse   = false;
+const addressFields= ['address_id','primary_name','contact','address1','address2','city','postal_code','telephone1','telephone2','telephone3','telephone4','email','website'];
+const contactFields= ['id','short_name','inactive','store_id','contact_first','contact_last','flex_field_1','account_number','gov_id_number'];
+const cogs_types   = ['si','sr','ms','mi','ma','sa'];
+const discountType = 'amt';
+const feeType      = 'amt';
+const dashTimerVal = 1000;  // time in ms, 2 second for example
 var bizDefaults  = new Array();
 var curIndex     = undefined;
-var deleteRow    = false;
-var rowAutoAdd   = true;
-var no_recurse   = false;
-var addressFields= ['address_id','primary_name','contact','address1','address2','city','postal_code','telephone1','telephone2','telephone3','telephone4','email','website'];
-var contactFields= ['id','short_name','inactive','store_id','contact_first','contact_last','flex_field_1','account_number','gov_id_number'];
 var countries    = new Array();
 var inventory    = new Array();
 var glAccounts   = new Array();
 var arrPmtMethod = new Array();
-var cogs_types   = ['si','sr','ms','mi','ma','sa'];
-var discountType = 'amt';
-var feeType      = 'amt';
 var dashTimer;            // timer identifier
-var dashTimerVal = 1000;  // time in ms, 2 second for example
 var screenMode   = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';
 
 /* **************************** Initialization Functions *********************************** */
@@ -2064,11 +2063,33 @@ function addressClear(suffix) {
 function addressCopy(fromSuffix, toSuffix) {
     jqBiz.each(addressFields, function (index, value) { if (jqBiz('#'+value+fromSuffix).length) bizTextSet(value+toSuffix, bizTextGet(value+fromSuffix)); });
     jqBiz('#state'  +toSuffix).combobox('setValue', jqBiz('#state'  +fromSuffix).combobox('getValue'));
-    jqBiz('#state'  +toSuffix).combobox('setText',  jqBiz('#state'  +fromSuffix).combobox('getText'));
+//  jqBiz('#state'  +toSuffix).combobox('setText',  jqBiz('#state'  +fromSuffix).combobox('getText'));
     jqBiz('#country'+toSuffix).combogrid('setValue',jqBiz('#country'+fromSuffix).combogrid('getValue'));
-    // Clear the ID's so Add/Updates don't erase the source record
-    bizTextSet('id'+toSuffix, '0');
+    bizTextSet('id'+toSuffix, '0'); // Clear the ID's so Add/Updates don't erase the source record
     bizTextSet('address_id'+toSuffix, '0');
+}
+
+function addressCopyForm(sourceFormId, targetFormId) {
+    var $source = jqBiz('#'+sourceFormId);
+    var $target = jqBiz('#'+targetFormId);
+    if (!$source.length || !$target.length) { return; }
+    function getVal(field) {
+        var $el = $source.find('#' + field);
+        if ($el.length === 0) { return ''; }
+        if (typeof $el.textbox === 'function') { return $el.textbox('getValue'); }
+        else { return $el.val() || ''; }
+    }
+    function setVal(field, value) {
+        var $el = $target.find('#' + field);
+        if ($el.length === 0) { return; }
+        if (typeof $el.textbox === 'function') { $el.textbox('setValue', value); }
+        else { $el.val(value); }
+    }
+    addressFields.forEach(function(field) { setVal(field, getVal(field)); });
+    var stateVal = $source.find('#state').combobox('getValue');
+    $target.find('#state').combobox('setValue', stateVal);
+    var countryVal = $source.find('#country').combogrid('getValue');
+    $target.find('#country').combogrid('setValue', countryVal);
 }
 
 function shippingValidate(suffix) {

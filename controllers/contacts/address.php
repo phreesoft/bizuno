@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-28
+ * @version    7.x Last Update: 2026-01-18
  * @filesource /controllers/contacts/address.php
  */
 
@@ -52,7 +52,9 @@ class contactsAddress extends mgrJournal
     }
     public function fieldStructure()
     {
-        $this->struc = [
+        $defState   = !empty(getModuleCache('bizuno', 'settings', 'company', 'state'))  ? getModuleCache('bizuno', 'settings', 'company', 'state') : ''; 
+        $defCountry = !empty(getModuleCache('bizuno', 'settings', 'company', 'country'))? getModuleCache('bizuno', 'settings', 'company', 'country') : 'USA'; 
+        $this->struc= [
             '_rID'        => ['panel'=>'address','order'=> 1,                               'clean'=>'integer', 'attr'=>['type'=>'hidden', 'value'=>0]],
             '_refID'      => ['panel'=>'address','order'=> 1,                               'clean'=>'integer', 'attr'=>['type'=>'hidden', 'value'=>0]],
             'aType'       => ['panel'=>'address','order'=> 1,                               'clean'=>'char',    'attr'=>['type'=>'hidden', 'value'=>$this->aType]],
@@ -61,9 +63,9 @@ class contactsAddress extends mgrJournal
             'address1'    => ['panel'=>'address','order'=>20, 'label'=>lang('address1'),    'clean'=>'text',    'attr'=>['size'=>48, 'value'=>'']],
             'address2'    => ['panel'=>'address','order'=>25, 'label'=>lang('address2'),    'clean'=>'text',    'attr'=>['size'=>48, 'value'=>'']],
             'city'        => ['panel'=>'address','order'=>30, 'label'=>lang('city'),        'clean'=>'text',    'attr'=>['size'=>24, 'value'=>'']],
-            'state'       => ['panel'=>'address','order'=>35, 'label'=>lang('state'),       'clean'=>'text',    'attr'=>['size'=>24, 'value'=>'']],
+            'state'       => ['panel'=>'address','order'=>35, 'label'=>lang('state'),       'clean'=>'text',    'attr'=>['type'=>'state', 'value' =>$defState]],
             'postal_code' => ['panel'=>'address','order'=>40, 'label'=>lang('postal_code'), 'clean'=>'cmd',     'attr'=>['size'=>12, 'value'=>'']],
-            'country'     => ['panel'=>'address','order'=>45, 'label'=>lang('country'),     'clean'=>'db_field','attr'=>['type'=>'country', 'value'=>'USA']],
+            'country'     => ['panel'=>'address','order'=>45, 'label'=>lang('country'),     'clean'=>'db_field','attr'=>['type'=>'country','value'=>$defCountry]],
             'name_first'  => ['panel'=>'contact','order'=>10, 'label'=>lang('name_first'),  'clean'=>'text',    'attr'=>['size'=>32, 'value'=>'']],
             'name_last'   => ['panel'=>'contact','order'=>15, 'label'=>lang('name_last'),   'clean'=>'text',    'attr'=>['size'=>32, 'value'=>'']],
             'title'       => ['panel'=>'contact','order'=>20, 'label'=>lang('title'),       'clean'=>'text',    'attr'=>['size'=>32, 'value'=>'']],
@@ -87,7 +89,7 @@ class contactsAddress extends mgrJournal
             'source' => [
                 'search' => ['primary_name', 'contact', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'city', 'postal_code', 'email'],
                 'actions'=> [
-                    'new' => ['order'=>10,'icon'=>'new',  'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&aType=$this->aType&dom={$defs['dom']}&table={$defs['_table']}&refID={$defs['_refID']}', 0);"]]]],
+                    'new' => ['order'=>10,'icon'=>'add','events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".jsLang('details')."', '$this->moduleID/$this->pageID/edit&aType=$this->aType&dom={$defs['dom']}&table={$defs['_table']}&refID={$defs['_refID']}', 0);"]]]],
             'columns'=> [
                 'name_last'   => ['order'=>10, 'label'=>lang('name_last'),   'attr'=>['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=>$this->aType=='i'?false:true]],
                 'name_first'  => ['order'=>15, 'label'=>lang('name_first'),  'attr'=>['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=>$this->aType=='i'?false:true]],
@@ -134,11 +136,13 @@ class contactsAddress extends mgrJournal
         if ($this->aType=='i' && !empty($rID)) { // different edit heading
             $meta = dbMetaGet($rID, 'address_i', 'contacts');
             $title = lang('edit').': '.$meta['name_last'].', '.$meta['name_first'].' - '.$meta['title'];
-        }
+        }        
         $args = ['_table'=>'contacts', 'index'=>'primary_name', 'title'=>!empty($title)?$title:''];
         parent::editMeta($layout, $security, $args);
-        $layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'] = ['order'=>40,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '{$args['title']}', '$this->moduleID/$this->pageID/edit&aType=$this->aType&dom=$this->dom&table={$args['_table']}', 0);"]];
-        $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']= ['order'=>50,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"var title=prompt('".lang('msg_entry_copy')."'); if (title!=null) jsonAction('$this->moduleID/$this->pageID/copy&aType=$this->aType&refID={$args['_refID']}&table={$args['_table']}','{$args['_rID']}', title);"]];
+        unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new']);
+        $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']= ['order'=>50,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"addressCopyForm('frmContact', 'frm{$this->domSuffix}');"]];
+        $layout['panels']['address'] = array_replace_recursive($layout['panels']['address'], ['type'=>'address', 'settings'=>['limit'=>'a','required'=>true]]); 
+        msgDebug("\nlayout after adjustment = ".print_r($layout, true));
     }
     public function copy(&$layout=[])
     {
