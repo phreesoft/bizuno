@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-15
+ * @version    7.x Last Update: 2026-01-20
  * @filesource /model/io.php
  */
 
@@ -241,9 +241,14 @@ final class io
     public function fileDelete($path=false)
     {
         if (!$path) { return msgAdd("No file specified to delete!"); }
-        msgDebug("\nDeleting files: BIZUNO_DATA/".print_r($path,true));
+        msgDebug("\nDeleting files: BIZUNO_DATA/".print_r($path, true));
         $files = glob($this->myFolder.$path);
-        if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
+        if (is_array($files)) { 
+            foreach ($files as $filename) {
+                msgDebug("\nUnlinking filename = $filename");
+                @unlink($filename);
+            }
+        }
     }
 
     /**

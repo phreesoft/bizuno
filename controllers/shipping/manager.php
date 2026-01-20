@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-20
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -302,34 +302,32 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     public function delete(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
-        $refID= clean('rID', 'integer', 'get');
+        $refID = clean('rID', 'integer', 'get');
         if (empty($refID)) { return msgAdd(lang('illegal_access')); }
-        $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
-        if (!array_is_list($meta)) { $meta = [$meta]; } // if multiple hits on the same journal record, prior bug
-        foreach ($meta as $row) {
-            $args = ['_rID'=>$row['_rID'], '_table'=>'journal', 'tabID'=>2];
-            msgDebug("\nReturned package meta for refID = $refID: ".print_r($row, true));
-            foreach ($row['package'] as $pkg) { $this->deleteLabels($pkg); }
-            parent::deleteMeta($layout, $args);
-        }
+        $meta  = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
+        msgDebug("\nFetched package meta for refID = $refID => ".print_r($meta, true));
+        if (empty($meta)) { return msgAdd("Label meta could not be found!"); }
+        $rID = metaIdxClean($meta);
+        if (!$this->deleteLabels($meta)) { return; }
+        parent::deleteMeta($layout, $args = ['_rID'=>$rID, '_table'=>'journal', 'tabID'=>2]);
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'1'], 'update', "id=$refID");
     }
 
-    private function deleteLabels($pkg=[])
+    private function deleteLabels($meta)
     {
         global $io;
-        msgDebug("\nEntering deleteLabels with pkg = ".print_r($pkg, true));
-        $carrier = explode(':', $pkg['method_code']);
-        if ($pkg['tracking_id'] && $pkg['ship_date'] >= biz_date()) {
-            $labelData = $carrier[0] ? retrieve_carrier_function($carrier[0], 'labelDelete', $pkg['tracking_id'], $carrier[1], $pkg['store_id']) : true; // true if successful
-            if (!empty($labelData)) { // label to delete
-                $date = explode('-', substr($pkg['ship_date'], 0, 10));
-                $file_path = "data/shipping/labels/{$carrier[0]}/{$date[0]}/{$date[1]}/{$date[2]}/{$pkg['tracking_id']}*";
-                $io->fileDelete($file_path);
-            }
-        } elseif ($pkg['tracking_id'] && $pkg['ship_date'] < biz_date('Y-m-d')) {
-            msgAdd(sprintf($this->lang['error_cannot_delete'], viewFormat($pkg['ship_date'], 'date')), 'caution');
+        msgDebug("\nEntering deleteLabels with ship_date = {$meta['ship_date']} and biz_date = ".biz_date());
+        if (substr($meta['ship_date'], 0, 10) < biz_date()) { return msgAdd(sprintf($this->lang['error_cannot_delete'], viewFormat($meta['ship_date'], 'date')), 'caution'); }
+        $carrier= explode(':', $meta['method_code']);
+        $date   = explode('-', substr($meta['ship_date'], 0, 10));
+        $path   = "data/shipping/labels/{$carrier[0]}/{$date[0]}/{$date[1]}/{$date[2]}";
+        foreach ($meta['packages']['rows'] as $pkg) {
+            if (empty($pkg['tracking_id'])) { continue; }
+            $success = $carrier[0] ? retrieve_carrier_function($carrier[0], 'labelDelete', $pkg['tracking_id'], $carrier[1], $pkg['store_id']) : true; // true if successful
+            if (!$success) { return msgAdd("There was an error deleting the label from {$carrier[0]}."); }
+            $io->fileDelete("$path/{$pkg['tracking_id']}*");
         }
+        return true;
     }
 
     /**

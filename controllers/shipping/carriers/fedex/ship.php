@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-15
+ * @version    7.x Last Update: 2026-01-20
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -276,7 +276,7 @@ class fedexShip extends fedexCommon
             'freightBillOfLadingDetail'=> ['format'=>['docType'=>'PDF', 'stockType'=>'PAPER_LETTER']]];
     }
 
-    private function addLabelDocTab($pkg)
+    private function addLabelDocTab() // passed $pkg not used
     {
         $docTab = [
 //          "maskedData"      => ["CUSTOMS_VALUE","TOTAL_WEIGHT"],
@@ -310,10 +310,11 @@ class fedexShip extends fedexCommon
 // ***************************************************************************************************************
     public function labelDelete($tracking_number='', $method='GND')
     {
+        msgDebug("\nEntering FedEx:labelDelete with tracking # = $tracking_number and method = $method");
         if (empty($this->settings['rest_api_key']) || empty($this->settings['rest_secret'])) { return msgAdd($this->lang['err_no_creds']); }
         if (empty($tracking_number)) { return msgAdd("Cannot delete shipment, tracking number was not provided! $tracking_number"); }
         if ($method=='GDF' || $method=='ECF') { //can not delete freight shipment online
-            msgAdd("Cannot delete freight shipment online, please call fedex to cancel or update a freight shipment! $tracking_number", 'warning');
+            msgAdd("Cannot delete freight shipment online, please call fedex to cancel or update a freight shipment! In most cases the shipment is not recognized by FedEx unitl a driver scans the shipping label. Tracking # $tracking_number", 'info');
             return true;
         }
         $payload = ['accountNumber'=>['value'=>$this->settings['acct_number']], 'trackingNumber'=>$tracking_number];

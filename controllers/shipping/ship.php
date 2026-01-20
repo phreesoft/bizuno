@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-20
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -493,7 +493,7 @@ function preSubmit() {
             $path   = "data/shipping/labels/$carrier/{$date[0]}/{$date[1]}/{$date[2]}/{$package['tracking_id']}*.*";
             msgDebug("\nlooking for path = $path");
             $files  = $io->folderReadGlob($path);
-            msgDebug("\Read glob files = ".print_r($files, true));
+            msgDebug("\nRead glob files = ".print_r($files, true));
             if (empty($files)) { msgAdd("Label file $path cannot be found!"); continue; }
             foreach ($files as $file) {
                 $ext = strtolower(substr($file, strrpos($file, '.')+1));
@@ -572,6 +572,6 @@ function labelPDF(rID, path) {
         global $io;
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $path = clean('data','filename','get'); // relative file path from BIZUNO_DATA
-        $io->download('file', pathinfo($path, PATHINFO_DIRNAME)."/", pathinfo($path, PATHINFO_BASENAME)); // doesn't return if successful
+        $io->download('file', pathinfo($path, PATHINFO_DIRNAME)."/", pathinfo($path, PATHINFO_BASENAME), false); // doesn't return if successful
     }
 }
