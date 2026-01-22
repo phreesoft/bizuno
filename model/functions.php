@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-17
+ * @version    7.x Last Update: 2026-01-21
  * @filesource /model/functions.php
  */
 
@@ -196,7 +196,7 @@ function myExceptionHandler($e)
     msgDebug("\nFatal error on line ".$e->getLine()." in file ".$e->getFile().". Description: ".$e->getCode()." - ".$e->getMessage());
     msgAdd("Fatal error on line ".$e->getLine()." in file ".$e->getFile().". Description: ".$e->getCode()." - ".$e->getMessage());
     if (bizDbConnected()) { msgDebugWrite(); }
-    exit(json_encode(['message' => $msgStack->error]));
+    exit(json_encode(['message' => isset($msgStack->error) && !empty($msgStack->error) ? $msgStack->error : 'undefined']));
 //  exit("Program Exception! Please fill out a support ticket with the details that got you here.");
 }
 
