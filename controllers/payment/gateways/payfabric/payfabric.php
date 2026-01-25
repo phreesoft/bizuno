@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2025, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-06
+ * @version    7.x Last Update: 2026-01-24
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -54,7 +54,7 @@ class payfabric
     public  $settings;
     public  $mains;
     public  $cID;
-    public  $lang     = ['title' => 'EVO PayFabric',
+    public  $lang     = ['title' => 'PayFabric',
         'description' => 'Accept credit card payments through the PayFabric payment gateway.',
         'at_payfabric'=> '@PayFabric',
         'setup_id'    => 'Setup ID (provided by PhreeSoft)',
@@ -63,8 +63,7 @@ class payfabric
         'auth_type'   => 'Authorization Type',
         'prefix_amex' => 'Prefix to use for American Express credit cards. (These cards are processed and reconciled through American Express)',
         'allow_refund'=> 'Allow Void/Refunds? This must be enabled by PayFabric for your merchant account or refunds will not be allowed.',
-        'msg_website'        => 'This must be done manually at the PayFabric website.',
-        'msg_capture_manual' => 'The payment was not processed through the PayFabric gateway.',
+        'msg_capture_at_payfabric' => 'The payment has already been captured. Any post order actions must be completed at PayFabric gateway.',
         'msg_void_success'   => 'The VOID at PayFabric was Successful - PayFabric Response: %s - Approval code: %s',
         'msg_refund_success' => 'The REFUND at PayFabric was Successful - PayFabric Response: %s - Approval code: %s',
         'msg_address_result' => 'Address verification results: %s',
@@ -134,6 +133,8 @@ class payfabric
                 if (!empty($values['status']) && $values['status']=='auth') {
                     $show_c =  true;
                     $checked= 'c';
+                } else { // capture done at the cart, show message
+                    msgAdd("Payment for this order was captured by {$this->lang['title']} at the store checkout, the {$this->lang['at_payfabric']} box should be checked to avoid duplicate charges.", 'info');
                 }
             }
         }
@@ -298,7 +299,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
             case 's': return $this->saleNew($ledger); // Capture a new transaction
             default:
             case 'w': // website capture, just post it and let the user know
-                msgAdd($this->lang['msg_capture_manual'].' '.$this->lang['msg_website'], 'caution');
+                msgAdd($this->lang['msg_capture_at_payfabric'], 'info');
                 return true;
         }
     }
