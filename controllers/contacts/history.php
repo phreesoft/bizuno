@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/contacts/history.php
  */
 
@@ -130,7 +130,7 @@ class contactsHistory
             case 12:
             default: $jPmt = 18; $cmPmt = 22; break;
         }
-        $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang('journal_id', $jID)),
+        $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang("journal_id_{$jID}")),
             'attr'   => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&type=$this->type&jID=$jID&rID=$rID"],
             'source' => [
                 'tables' => ['journal_main'=>['table'=>BIZUNO_DB_PREFIX.'journal_main']],

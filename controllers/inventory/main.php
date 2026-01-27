@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/main.php
  */
 
@@ -1005,22 +1005,22 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                         'toggle'=> ['order'=>40,'icon'=>'toggle','label'=>lang('toggle_status'), 'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"jsonAction('phreebooks/main/toggleWaiting&jID=$jID&dgID={$props['name']}', idTBD);"]],
                         'dates' => ['order'=>50,'icon'=>'date',  'label'=>lang('delivery_dates'),'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"]],
                         'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
-                'invoice_num'=> ['order'=>20,'label'=>lang('invoice_num', $jID),    'attr'=>['width'=>100,'resizable'=>true]],
+                'invoice_num'=> ['order'=>20,'label'=>lang("invoice_num_{$jID}"),   'attr'=>['width'=>100,'resizable'=>true]],
                 'store_id'   => ['order'=>30,'label'=>lang('contacts_short_name_b'),'attr'=>['width'=>100,'resizable'=>true,'hidden'=>$stores]],
                 'rep_id'     => ['order'=>30,'label'=>lang('contacts_rep_id_c'),    'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']],
                 'post_date'  => ['order'=>40,'label'=>lang('post_date'),            'attr'=>['width'=>150,'resizable'=>true,'sortable'=>true,'align'=>'center']],
                 'qty'        => ['order'=>50,'label'=>lang('balance'),              'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']],
-                'date_1'     => ['order'=>60,'label'=>jsLang('terminal_date',10),   'attr'=>['width'=>150,'resizable'=>true,'sortable'=>true,'align'=>'center'],
+                'date_1'     => ['order'=>60,'label'=>lang('terminal_date'),        'attr'=>['width'=>150,'resizable'=>true,'sortable'=>true,'align'=>'center'],
                     'events'=>['styler'=>"function(value,row,index) { if (row.waiting==1) { return {style:'background-color:yellowgreen'}; } }"]]]];
     }
 
     private function dgJ06J12($jID=12)
     {
         if ($jID==6) {
-            $props = ['name'=>'dgJ06','title'=>sprintf(lang('tbd_history'), lang('journal_id', '6')), 'data'=>'dataJ6'];
+            $props = ['name'=>'dgJ06','title'=>sprintf(lang('tbd_history'), lang('journal_id_6')), 'data'=>'dataJ6'];
             $label = jsLang('cost');
         } else {
-            $props = ['name'=>'dgJ12','title'=>sprintf(lang('tbd_history'), lang('journal_id', '12')),'data'=>'dataJ12'];
+            $props = ['name'=>'dgJ12','title'=>sprintf(lang('tbd_history'), lang('journal_id_12')),'data'=>'dataJ12'];
             $label = jsLang('sales');
         }
         return ['id' => $props['name'],

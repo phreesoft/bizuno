@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-18
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/contacts/main.php
  */
 
@@ -436,7 +436,7 @@ class contactsMain
             dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
         }
         msgAdd(lang('msg_record_saved'), 'success'); // doesn't hang if returning to manager
-        msgLog(sprintf(lang('tbd_manager'), lang('type', $this->type))." - ".lang('save')." - $title (rID=$rID)");
+        msgLog(sprintf(lang('tbd_manager'), lang("type_{$this->type}"))." - ".lang('save')." - $title (rID=$rID)");
         $data = ['content' => ['action'=>'eval','actionData'=>"jqBiz('#accContacts').accordion('select', 0); bizGridReload('dgContacts'); jqBiz('#divContactsDetail').html('&nbsp;');"]];
         $layout = array_replace_recursive($layout, $data);
     }
@@ -722,31 +722,31 @@ class contactsMain
                         'gLineS'=> ['order'=>85,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>in_array($type, ['c'])?false:true,
                             'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myContSales', '&nbsp;', 600, 500);"]],
                         'attach' => ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
-                'short_name'   => ['order'=>10, 'field'=>'short_name', 'label' => lang('short_name', $type),'events'=>['styler'=>$this->dgContactsStyler()],
+                'short_name'   => ['order'=>10, 'field'=>'short_name', 'label' => lang("short_name_{$type}"),'events'=>['styler'=>$this->dgContactsStyler()],
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true]],
-                'primary_name' => ['order'=>20, 'field'=>'primary_name', 'label' => lang('primary_name', $type),
+                'primary_name' => ['order'=>20, 'field'=>'primary_name', 'label' => lang("primary_name_$type"),
                     'attr' => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?true:false]],
-                'contact_first'=> ['order'=>20, 'field' => 'contact_first', 'label' => lang('contact_first', $type),
+                'contact_first'=> ['order'=>20, 'field' => 'contact_first', 'label' => lang("contact_first_{$type}"),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?false:true]],
-                'contact_last' => ['order'=>25, 'field'=>'contact_last', 'label' => lang('contact_last', $type),
+                'contact_last' => ['order'=>25, 'field'=>'contact_last', 'label' => lang("contact_last_{$type}"),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?false:true]],
                 'role_id'      => ['order'=>25, 'field' => 'id', 'label' => lang('role'),
                     'attr' => ['width'=>150, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?false:true], 'format'=>'roleName'],
-                'store_id'    => ['order'=>30, 'field' => 'store_id', 'label' => lang("store_id"),
+                'store_id'    => ['order'=>30, 'field' => 'store_id', 'label' => lang('store_id'),
                     'attr' => ['width'=>150, 'sortable'=>true,'resizable'=>true, 'hidden'=> sizeof($this->stores)>1?false:true], 'format'=>'storeID'],
-                'flex_field_1'=> ['order'=>35, 'field'=>'flex_field_1', 'label' => lang('flex_field_1', $type),
+                'flex_field_1'=> ['order'=>35, 'field'=>'flex_field_1', 'label' => lang("flex_field_1_{$type}"),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['i'])?false:true]],
                 'email'       => ['order'=>40, 'field'=>'email', 'label' => lang('email'),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?false:true]],
-                'address1'    => ['order'=>40, 'field'=>'address1', 'label' => lang('address1', $type),
+                'address1'    => ['order'=>40, 'field'=>'address1', 'label' => lang("address1_{$type}"),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'city'        => ['order'=>40, 'field'=>'city', 'label' => lang('city', $type),
+                'city'        => ['order'=>40, 'field'=>'city', 'label' => lang("city_{$type}"),
                     'attr' => ['width'=>80, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'state'       =>  ['order'=>50, 'field'=>'state', 'label' => lang('state', $type),
+                'state'       =>  ['order'=>50, 'field'=>'state', 'label' => lang("state_$type"),
                     'attr' => ['width'=>60, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'postal_code' => ['order'=>60, 'field'=>'postal_code', 'label' => lang('postal_code', $type),
+                'postal_code' => ['order'=>60, 'field'=>'postal_code', 'label' => lang("postal_code_{$type}"),
                     'attr' => ['width'=>60, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'telephone1'  => ['order'=>70, 'field'=>'telephone1', 'label' => lang('telephone1', $type),
+                'telephone1'  => ['order'=>70, 'field'=>'telephone1', 'label' => lang("telephone1_{$type}"),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]]],
             ];
         if ($type == 'i') {

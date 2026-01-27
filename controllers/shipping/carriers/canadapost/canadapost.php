@@ -20,7 +20,7 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
  * @version    7.x Last Update: 2025-07-23
  * @filesource /controllers/shipping/carriers/canadapost/canadapost.php

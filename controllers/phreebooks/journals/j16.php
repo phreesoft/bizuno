@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/journals/j16.php
  */
 
@@ -231,8 +231,8 @@ class j16 extends jCommon
      */
     private function dgAdjust($name)
     {
-        $on_hand  = jsLang('inventory', 'qty_stock');
-        $on_order = jsLang('inventory', 'qty_po');
+        $on_hand  = lang('qty_stock');
+        $on_order = lang('qty_po');
         $store_id = getUserCache('profile', 'store_id', false, 0);
         return ['id'=>$name, 'type'=>'edatagrid',
             'attr'   => ['toolbar'=>"#{$name}Toolbar", 'rownumbers'=>true, 'singleSelect'=>true, 'idField'=>'id'],

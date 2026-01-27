@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -1078,12 +1078,12 @@ if (idx!=null) {
                 'onResize'     =>"function() { jqBiz('#$name').datagrid('fixDetailRowHeight', index); }",
                 'onLoadSuccess'=>"function() { setTimeout(function(){ jqBiz('#$name').datagrid('fixDetailRowHeight', index); }, 0); }"],
             'columns'=> [
-                'gl_account'   => ['order'=>20, 'label'=>jsLang(pullTableLabel('journal_item', 'gl_account', $jID)),'attr'=>['width'=>200,'align'=>'center'],
+                'gl_account'   => ['order'=>20, 'label'=>lang("gl_account_{$jID}"),    'attr'=>['width'=>200,'align'=>'center'],
                     'events'   => ['editor'=>dgEditGL("bizUnitDiscGL(index, row);")]],
-                'tax_rate_id'  => ['order'=>30, 'label'=>pullTableLabel('journal_main', 'tax_rate_id', $type),      'attr'=>['width'=>200,'align'=>'center'],
+                'tax_rate_id'  => ['order'=>30, 'label'=>lang("tax_rate_id_{$type}"),'attr'=>['width'=>200,'align'=>'center'],
                     'events'   => ['editor'=>dgEditTax($name, 'tax_rate_id', $type, "bizUnitDiscTax(index, row)"),
                     'formatter'=> "function(value,row){ return getTextValue(bizDefaults.taxRates.$type.rows, value); }"]],
-                'unit_discount'=> ['order'=>40, 'label'=>jsLang('discount'), 'attr'=>['width'=>100,'value'=>0,'resizable'=>true,'align'=>'right'],
+                'unit_discount'=> ['order'=>40, 'label'=>lang('discount'), 'attr'=>['width'=>100,'value'=>0,'resizable'=>true,'align'=>'right'],
                     'events'   => ['editor'=>dgEditCurrency("bizUnitDiscDisc(newValue);", true),
                     'formatter'=> "function(value,row){ return formatCurrency(value); }"]]]];
         return $data;

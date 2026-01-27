@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/history.php
  */
 
@@ -427,14 +427,14 @@ class inventoryHistory
                         'toggle'=> ['order'=>40,'icon'=>'toggle','label'=>lang('toggle_status'), 'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"jsonAction('phreebooks/main/toggleWaiting&jID=$jID&dgID={$props['name']}', idTBD);"]],
                         'dates' => ['order'=>50,'icon'=>'date',  'label'=>lang('delivery_dates'),'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"]],
                         'fill'  => ['order'=>80,'icon'=>$icon,   'label'=>$label,                'hidden'=>$hide>2?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD&jID=$invID&bizAction=inv');"]]]],
-                'invoice_num'   => ['order'=>20,'label'=>lang('invoice_num', $jID),   'attr'=>['resizable'=>true]],
-                'primary_name_b'=> ['order'=>30,'label'=>lang('primary_name'),        'attr'=>['sortable'=>true,'resizable'=>true]],
-                'purch_order_id'=> ['order'=>40,'label'=>lang('purch_order_id', $jID),'attr'=>['resizable'=>true,'sortable'=>true]],
-                'store_id'      => ['order'=>50,'label'=>lang('short_name_b'),        'attr'=>['resizable'=>true,'sortable'=>true,'hidden'=>$stores]],
-                'rep_id'        => ['order'=>60,'label'=>lang('rep_id_c'),            'attr'=>['resizable'=>true,'align'=>'center']],
-                'post_date'     => ['order'=>70,'label'=>lang('post_date'),           'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center']],
-                'qty'           => ['order'=>80,'label'=>lang('balance'),             'attr'=>['resizable'=>true,'align'=>'center']],
-                'date_1'        => ['order'=>90,'label'=>jsLang('date_1',10),         'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center'],
+                'invoice_num'   => ['order'=>20,'label'=>lang("invoice_num_{$jID}"),   'attr'=>['resizable'=>true]],
+                'primary_name_b'=> ['order'=>30,'label'=>lang('primary_name'),         'attr'=>['sortable'=>true,'resizable'=>true]],
+                'purch_order_id'=> ['order'=>40,'label'=>lang("purch_order_id_{$jID}"),'attr'=>['resizable'=>true,'sortable'=>true]],
+                'store_id'      => ['order'=>50,'label'=>lang('short_name_b'),         'attr'=>['resizable'=>true,'sortable'=>true,'hidden'=>$stores]],
+                'rep_id'        => ['order'=>60,'label'=>lang('rep_id_c'),             'attr'=>['resizable'=>true,'align'=>'center']],
+                'post_date'     => ['order'=>70,'label'=>lang('post_date'),            'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center']],
+                'qty'           => ['order'=>80,'label'=>lang('balance'),              'attr'=>['resizable'=>true,'align'=>'center']],
+                'date_1'        => ['order'=>90,'label'=>lang('last_date_1'),          'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center'],
                     'events'=>['styler'=>"function(value,row,index) { if (row.waiting==1) { return {style:'background-color:yellowgreen'}; } }"]]]];
         if (in_array($jID, [3,9])) { // remove some action items
             unset($data['columns']['action']['actions']['toggle'],$data['columns']['action']['actions']['dates'],$data['columns']['action']['actions']['fill']);
@@ -455,7 +455,7 @@ class inventoryHistory
             case 12:
             default: $jPmt = 18; break;
         }
-        $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang('journal_id', $jID)),
+        $data = ['id'=>$name, 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>sprintf(lang('tbd_history'), lang("journal_id_{$jID}")),
             'attr'   => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=inventory/history/movementRows&jID=$jID&skuID=$skuID"],
             'source' => [
                 'tables' => [
@@ -479,15 +479,15 @@ class inventoryHistory
                                     ]],
                 'invoice_num'   => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num','label'=>pullTableLabel('journal_main', 'invoice_num', $jID),
                     'attr' => ['sortable'=>true, 'resizable'=>true]],
-                'primary_name_b'=> ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.primary_name_b','label'=>lang('primary_name', '_b'),
+                'primary_name_b'=> ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.primary_name_b','label'=>lang('primary_name_b'),
                     'attr'  => ['sortable'=>true, 'resizable'=>true]],
-                'state_s'       => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.state_s','label'=>sprintf(lang('tbd_ship'), lang('state', '_s')),
+                'state_s'       => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.state_s','label'=>sprintf(lang('tbd_ship'), lang('state_s')),
                     'attr'  => ['align'=>'center', 'sortable'=>true, 'resizable'=>true]],
-                'purch_order_id'=> ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id','label'=>pullTableLabel('journal_main', 'purch_order_id', $jID),
+                'purch_order_id'=> ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id','label'=>lang("purch_order_id_{$jID}"),
                     'attr'  => ['sortable'=>true, 'resizable'=>true]],
-                'store_id'      => ['order'=>50, 'field'=>BIZUNO_DB_PREFIX.'journal_main.store_id','label'=>pullTableLabel('journal_main', 'store_id', $jID),'format'=>'storeID',
+                'store_id'      => ['order'=>50, 'field'=>BIZUNO_DB_PREFIX.'journal_main.store_id','label'=>lang('store_id'),'format'=>'storeID',
                     'attr'  => ['sortable'=>false, 'resizable'=>true]],
-                'post_date'     => ['order'=>60, 'field' => BIZUNO_DB_PREFIX.'journal_main.post_date', 'format'=>'date','label' => pullTableLabel('journal_main', 'post_date', $jID),
+                'post_date'     => ['order'=>60, 'field' => BIZUNO_DB_PREFIX.'journal_main.post_date', 'format'=>'date','label' => lang("post_date_{$jID}"),
                     'attr' => ['align'=>'center', 'sortable'=>true, 'resizable'=>true]],
                 'qty'           => ['order'=>70, 'field' => BIZUNO_DB_PREFIX.'journal_item.qty', 'format'=>'integer','label' => lang('quantity'),
                     'attr' => ['align'=>'center', 'sortable'=>true, 'resizable'=>true]],
@@ -536,10 +536,10 @@ class inventoryHistory
     private function dgJ06J12Avg($jID=12)
     {
         if ($jID==6) {
-            $props = ['name'=>'dgJ06','title'=>sprintf(lang('tbd_history'), lang('journal_id', '6')), 'data'=>'dataJ6'];
+            $props = ['name'=>'dgJ06','title'=>sprintf(lang('tbd_history'), lang('journal_id_6')), 'data'=>'dataJ6'];
             $label = jsLang('cost');
         } else {
-            $props = ['name'=>'dgJ12','title'=>sprintf(lang('tbd_history'), lang('journal_id', '12')),'data'=>'dataJ12'];
+            $props = ['name'=>'dgJ12','title'=>sprintf(lang('tbd_history'), lang('journal_id_12')),'data'=>'dataJ12'];
             $label = jsLang('sales');
         }
         return ['id' => $props['name'],

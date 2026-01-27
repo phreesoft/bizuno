@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-13
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /locale/cleaner.php
  */
 
@@ -300,12 +300,10 @@ function clean($idx, $processing='text', $src='')
  * @param string $suffix - suffix to check for variants of the index value
  * @return string - translation if found, original $idx if not
  */
-function lang($idx, $suffix='')
+function lang($idx, $module='')
 {
     global $bizunoLang;
-    if (!is_null($suffix)) {
-        if (isset($bizunoLang['core'][$idx.'_'.$suffix])) { return $bizunoLang['core'][$idx.'_'.$suffix]; }
-    }
+    if (!is_null($bizunoLang[$module][$idx]) && isset($bizunoLang[$module][$idx])) { return $bizunoLang[$module][$idx]; }
     return isset($bizunoLang['core'][$idx]) ? $bizunoLang['core'][$idx] : $idx;
 }
 
@@ -315,9 +313,9 @@ function lang($idx, $suffix='')
  * @param string $suffix - suffix to check for variants of the index value
  * @return string - translation if found with slashes added, original $idx if not (with slashes)
  */
-function jsLang($idx, $suffix='')
+function jsLang($idx, $module)
 {
-    $strLang = lang($idx, $suffix);
+    $strLang = lang($idx, $module);
     return !empty($strLang) ? addslashes($strLang) : '';
 }
 
@@ -367,7 +365,7 @@ function getExtLang($module)
  * @param strnig $code - name of the dashboard 
  * @return Modifies $defLang if the language is not en_US
  */
-function localizeLang(&$defLang, $methDir, $code) { // localizeLang($this->lang, $this->methodDir, $this->code);
+function localizeLang(&$defLang, $methDir, $code) {
     global $bizunoLang;
     $myLang= getUserCache('profile', 'language', false, 'en_US');
     if ('en_US'==$myLang) { return; } // if US then just return

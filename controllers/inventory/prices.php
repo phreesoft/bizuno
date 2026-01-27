@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-18
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -133,7 +133,7 @@ class inventoryPrices extends mgrJournal
     {
         msgDebug("\nEntering inventory:prices:manager");
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $args= ['dom'=>$this->dom, 'rID'=>$this->rID, 'cID'=>$this->cID, 'iID'=>$this->iID, 'title'=>lang('price_sheet', $this->type)]; // 
+        $args= ['dom'=>$this->dom, 'rID'=>$this->rID, 'cID'=>$this->cID, 'iID'=>$this->iID, 'title'=>lang("price_sheet_{$this->type}")];
         if     (!empty($this->cID) && 'div'==$this->dom) { $args['refID'] = $this->cID; $args['table'] = 'contacts'; }
         elseif (!empty($this->iID) && 'div'==$this->dom) { $args['refID'] = $this->iID; $args['table'] = 'inventory'; }
         parent::managerMain($layout, $security, $args);
@@ -380,7 +380,7 @@ function preSubmitPrices() {
                 $rows[] = ['group'=>$level['title'],'text'=>"<div style='float:right'>".viewFormat($entry['price'], 'currency').'</div><div>'.(float)$entry['qty']."</div>"];
             }
         } }
-        $data = ['type'=>'popup', 'title'=>lang('prices', $this->type), 'attr'=>['id'=>'winPrices','width'=>300,'height'=>700],
+        $data = ['type'=>'popup', 'title'=>lang("prices_{$this->type}"), 'attr'=>['id'=>'winPrices','width'=>300,'height'=>700],
             'divs'  => ['winStatus'=>['order'=>50,'options'=>['groupField'=>"'group'",'data'=>"pricesData"],'type'=>'list','key' =>'lstPrices']],
             'lists' => ['lstPrices'=>[]], // handled as JavaScript data
             'jsHead'=> ['init'=>"var pricesData = ".json_encode($rows).";"]];

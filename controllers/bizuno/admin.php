@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-14
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -121,15 +121,15 @@ class bizunoAdmin
                 'session_max'     => ['options'=>['min'=> 0,'max'=>300],'attr'=>['type'=>'integer','value'=> 0]], // min zero for auto refresh
                 'hide_filters'    => ['attr'=>['type'=>'selNoYes']]]],
             'company' => ['order'=>20,'label'=>lang('company'),'fields'=>[
-                'id'              => ['label'=>lang('contacts',     'short_name', 'b'),'attr'=>['value'=>getUserCache('profile', 'biz_title')]],
+                'id'              => ['label'=>lang('short_name_b'),'attr'=>['value'=>getUserCache('profile', 'biz_title')]],
                 'primary_name'    => ['label'=>lang('primary_name'),   'attr'=>['value'=>getUserCache('profile', 'biz_title')]],
                 'contact'         => ['label'=>lang('contact')],
                 'email'           => ['label'=>lang('email_gen')],
-                'contact_ap'      => ['label'=>lang('contact', 'p')],
+                'contact_ap'      => ['label'=>lang('contact_p')],
                 'email_ap'        => ['label'=>lang('email_ap')],
-                'contact_ar'      => ['label'=>lang('contact', 'r')],
+                'contact_ar'      => ['label'=>lang('contact_r')],
                 'email_ar'        => ['label'=>lang('email_ar')],
-                'store_mgr'       => ['label'=>lang('contact', 'd')],
+                'store_mgr'       => ['label'=>lang('contact_d')],
                 'email_mgr'       => ['label'=>lang('email_mgr')],
                 'address1'        => ['label'=>lang('address1')],
                 'address2'        => ['label'=>lang('address2')],
@@ -142,7 +142,7 @@ class bizunoAdmin
                 'telephone3'      => ['label'=>lang('telephone3')],
                 'telephone4'      => ['label'=>lang('telephone4')],
                 'website'         => ['label'=>lang('website')],
-                'gov_id_number'   => ['label'=>lang('contacts','gov_id_number')],
+                'gov_id_number'   => ['label'=>lang('gov_id_number')],
                 'logo'            => ['attr'=>['type'=>'hidden']]]],
             'mail' => ['order'=>40,'label'=>lang('mail'),'fields'=>$mail->struc],
             'locale' => ['order'=>70,'label'=>lang('locale'),'fields'=>[

@@ -17,7 +17,7 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
  * @version    7.x Last Update: 2020-09-05
  * @filesource /EXTENSION_PATH/custWizard/locale/en_US/language.php

@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-04
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/mainPOS.php
  */
 
@@ -395,8 +395,8 @@ function bizPOSBalCalc() {
             'attr'   => ['toolbar'=>"#{$name}Toolbar", 'pagination'=>false],
             'events' => ['data'   => 'paymentData'],
             'source' => ['actions'=>[
-                'pmtPay'  => ['order'=>10,'icon'=>'payment','label'=>lang('journal_id', '18'),
-                    'events'=>['onClick'=>"windowEdit('extBizPOS/main/bizWinPmt', 'winBizPOS', '".jsLang('journal_id', '18')."', 400, 400);"]],
+                'pmtPay'  => ['order'=>10,'icon'=>'payment','label'=>lang('journal_id_18'),
+                    'events'=>['onClick'=>"windowEdit('extBizPOS/main/bizWinPmt', 'winBizPOS', '".lang('journal_id_18')."', 400, 400);"]],
                 'pmtPrint'=> ['order'=>80,'align'=>'right','icon'=>'saveprint','label'=>lang('save_print'),'events'=>['onClick'=>"bizPOSSave('print');"]],
                 'pmtSave' => ['order'=>90,'align'=>'right','icon'=>'save','events'=>['onClick'=>"bizPOSSave('save');"]]]],
             'columns'=> [

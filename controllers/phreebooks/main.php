@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-12
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -91,12 +91,12 @@ class phreebooksMain
         $cID   = clean('cID', 'integer', 'get');
         $mgr   = clean('mgr', 'boolean', 'get');
         $jsBody= $jsReady = '';
-        $detail= lang('journal_id', $this->journalID);
+        $detail= lang("journal_id_{$this->journalID}");
         if     (in_array($this->journalID, [3, 4, 6, 7])) {
             $manager = sprintf(lang('tbd_manager'), lang('journal_id_6'));
         } elseif (in_array($this->journalID, [9,10,12,13])) {
             $manager = sprintf(lang('tbd_manager'), lang('journal_id_12'));
-        } else { $manager= sprintf(lang('tbd_manager'), lang('journal_id', $this->journalID)); }
+        } else { $manager= sprintf(lang('tbd_manager'), $detail); }
         if ($this->journalID == 0) { // search
             $jsBody  = "jqBiz('#postDateMin').datebox({onChange:function (newDate) { jqBiz('#postDateMin').val(newDate); } });
 jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax').val(newDate); } });";
@@ -705,9 +705,9 @@ function bizUnitDiscDisc(newValue) {
         // ***************************** END TRANSACTION *******************************
         $_POST['rID'] = $ledger->main['id']; // set the record ID as we now have a successfult transaction
         $this->getAttachments('file_attach', $ledger->main['id'], $ledger->main['so_po_ref_id']);
-        $invoiceRef = lang('invoice_num', $ledger->main['journal_id']);
+        $invoiceRef = lang("invoice_num_{$ledger->main['journal_id']}");
         $billName   = isset($ledger->main['primary_name_b']) ? $ledger->main['primary_name_b'] : $ledger->main['description'];
-        $journalRef = lang('journal_id', $ledger->main['journal_id']);
+        $journalRef = lang("journal_id_{$ledger->main['journal_id']}");
         msgAdd(sprintf(lang('msg_gl_post_success'), $invoiceRef, $ledger->main['invoice_num']), 'success');
         msgLog($journalRef.'-'.lang('save')." $invoiceRef ".$ledger->main['invoice_num']." - $billName (rID={$ledger->main['id']}) ".lang('total').": ".viewFormat($ledger->main['total_amount'], 'currency'));
         $jsonAction = "jqBiz('#accJournal').accordion('select',0); bizGridReload('dgPhreeBooks'); jqBiz('#divJournalDetail').html('&nbsp;');";
@@ -1024,7 +1024,7 @@ function bizUnitDiscDisc(newValue) {
         }
         dbTransactionCommit();
         // *************** END TRANSACTION *************************
-        msgLog(lang('journal_id', $this->journalID).' '.lang('delete')." - {$delOrd->main['invoice_num']} (rID=$rID)");
+        msgLog(lang("journal_id_{$this->journalID}").' '.lang('delete')." - {$delOrd->main['invoice_num']} (rID=$rID)");
         $files = glob(getModuleCache('phreebooks', 'properties', 'attachPath', 'phreebooks')."rID_".$rID."_*.*");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } } // remove attachments
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accJournal').accordion('select',0); bizGridReload('dgPhreeBooks'); jqBiz('#divJournalDetail').html('&nbsp;');"]]);
@@ -1436,17 +1436,17 @@ function bizUnitDiscDisc(newValue) {
 //                          'display'=> "(row.journal_id!='12' && row.journal_id!='6') || (row.journal_id=='12' && (row.closed=='0' || row.total_amount==0)) || (row.journal_id=='6' && (row.closed=='0' || row.total_amount==0))",
                             'events' => ['onClick' => "if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('phreebooks/main/delete&jID={$this->journalID}', idTBD);"]]]],
                 'post_date' => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX.'journal_main.post_date', 'format'=>'date', 'label' => lang('post_date'),'attr'=>['sortable'=>true, 'resizable'=>true]],
-                'invoice_num' => ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num', 'label' => lang('invoice_num', $this->journalID),'attr'=>['sortable'=>true, 'resizable'=>true]],
-                'so_po_ref_id' => ['order'=>25, 'field'=>BIZUNO_DB_PREFIX.'journal_main.so_po_ref_id','format'=>'storeID', 'label' => lang('so_po_ref_id', $this->journalID),
+                'invoice_num' => ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num', 'label' => lang("invoice_num_{$this->journalID}"),'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'so_po_ref_id' => ['order'=>25, 'field'=>BIZUNO_DB_PREFIX.'journal_main.so_po_ref_id','format'=>'storeID', 'label' => lang("so_po_ref_id_{$this->journalID}"),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [15]) ? false : true]],
                 'store_id' => ['order'=>27, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID','label'=>lang('store_id'),'attr'=>['sortable'=>false,'resizable'=>true]],
-                'purch_order_id' => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id', 'label' => lang('purch_order_id', $this->journalID),
+                'purch_order_id' => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id', 'label' => lang("purch_order_id_{$this->journalID}"),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [2,14,15,16,17,18,20,22]) ? true : false]],
-                'description' => ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.description', 'label' => lang('description', $this->journalID),
+                'description' => ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.description', 'label' => lang("description_{$this->journalID}"),
                     'attr'  => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> !in_array($this->journalID, [0,2,14,15,16]) ? true : false]],
                 'primary_name_b' => ['order'=>50, 'field'=>BIZUNO_DB_PREFIX.'journal_main.primary_name_b', 'label' => lang('primary_name'),
                     'attr'  => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [0,2,14,15,16]) || $this->type=='e' ? true : false]],
-                'email_b' => ['order'=>60, 'field'=>BIZUNO_DB_PREFIX.'journal_main.email_b', 'label' => lang('email', $this->type),
+                'email_b' => ['order'=>60, 'field'=>BIZUNO_DB_PREFIX.'journal_main.email_b', 'label' => lang("email_{$this->type}"),
                     'attr'  => ['width'=>220, 'sortable'=>true, 'resizable'=>true, 'hidden'=>true]],
                 'total_amount'=> ['order'=>70, 'field' => BIZUNO_DB_PREFIX.'journal_main.total_amount', 'label' => lang('total_amount'),
                     'events' => ['formatter' => "function(value,row,index) { return formatCurrency(value, true, row.currency, row.currency_rate); }"],
@@ -1601,7 +1601,7 @@ function bizUnitDiscDisc(newValue) {
             $reps= viewRoleDropdown();
             array_shift($reps);
             array_unshift($reps, ['id'=>0, 'text'=>lang('all')]);
-            $data['source']['filters']['rep_id'] = ['order'=>15,'break'=>true, 'label'=>lang('rep_id', $type), 'values'=>$reps,'attr'=>['type'=>'select']];
+            $data['source']['filters']['rep_id'] = ['order'=>15,'break'=>true, 'label'=>lang("rep_id_{$type}"), 'values'=>$reps,'attr'=>['type'=>'select']];
 //          $uID = getUserCache('profile', 'userID', false, 0);
             $rep = clean('rep_id', 'integer', 'post');
             msgDebug("\nRep after processing = $rep");
@@ -1704,23 +1704,23 @@ function bizUnitDiscDisc(newValue) {
                         'hidden' =>  in_array($this->journalID, [4,10]) && $security>1?false:true,
                         'events' => ['onClick'=>"jqBiz('#xAction').val('invoice'); jqBiz('#frmJournal').submit();"]],
                     'optSaveAs'  => ['order'=>50,'label'=>lang('save_as'),'child'=>  [
-                        'saveAsQuote'=> ['order'=>10,'icon'=>'quote','label'=>lang('journal_id', $type=='v'?3: 9),'security'=>3,
+                        'saveAsQuote'=> ['order'=>10,'icon'=>'quote','label'=>lang("journal_id_".($type=='v'?3: 9)),'security'=>3,
 //                            'disabled'=> !in_array($this->journalID, array(3,9)) ? false : true,
                             'events'  => ['onClick'=>"saveAction('saveAs','".($type=='v'?3: 9)."');"]],
-                        'saveAsSO'   => ['order'=>20,'icon'=>'order','label'=>lang('journal_id', $type=='v'?4:10),'security'=>3,
+                        'saveAsSO'   => ['order'=>20,'icon'=>'order','label'=>lang("journal_id_".($type=='v'?4:10)),'security'=>3,
 //                            'disabled'=> !in_array($this->journalID, array(4,10)) ? false : true,
                             'events'  => ['onClick'=>"saveAction('saveAs','".($type=='v'?4:10)."');"]],
-                        'saveAsInv'  => ['order'=>30,'icon'=>'sales','label'=>lang('journal_id', $type=='v'?6:12),'security'=>3,
+                        'saveAsInv'  => ['order'=>30,'icon'=>'sales','label'=>lang("journal_id_".($type=='v'?6:12)),'security'=>3,
 //                            'disabled'=> !in_array($this->journalID, array(6,12)) ? false : true,
                             'events'  => ['onClick'=>"saveAction('saveAs','".($type=='v'?6:12)."');"]]]],
                     'optMoveTo'  => ['order'=>60,'label'=>lang('move_to'),'disabled'=>$this->rID?false:true,'child'=>  [
-                        'MoveToQuote'=> ['order'=>10,'icon'=>'quote','label'=>lang('journal_id', $type=='v'?3: 9),
+                        'MoveToQuote'=> ['order'=>10,'icon'=>'quote','label'=>lang("journal_id_".($type=='v'?3: 9)),
                             'disabled'=> !in_array($this->journalID, [3,9]) ? false : true,'security'=>3,
                             'events'  => ['onClick'=>"saveAction('moveTo','".($type=='v'?3: 9)."');"]],
-                        'MoveToSO'   => ['order'=>20,'icon'=>'order','label'=>lang('journal_id', $type=='v'?4:10),
+                        'MoveToSO'   => ['order'=>20,'icon'=>'order','label'=>lang("journal_id_".($type=='v'?4:10)),
                             'disabled'=> !in_array($this->journalID, [4,10]) ? false : true,'security'=>3,
                             'events'  => ['onClick'=>"saveAction('moveTo','".($type=='v'?4:10)."');"]],
-                        'MoveToInv'  => ['order'=>30,'icon'=>$type=='v'?'purchase':'sales','label'=>lang('journal_id', $type=='v'?6:12),
+                        'MoveToInv'  => ['order'=>30,'icon'=>$type=='v'?'purchase':'sales','label'=>lang("journal_id_".($type=='v'?6:12)),
                             'disabled'=> !in_array($this->journalID, [6,12]) ? false : true,'security'=>3,
                             'events'  => ['onClick'=>"saveAction('moveTo','".($type=='v'?6:12)."');"]]]]];
                 break;

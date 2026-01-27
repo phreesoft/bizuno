@@ -15,7 +15,7 @@
  * has been modified from its original content.
  *
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
  * @version    7.x Last Update: 2025-04-22
  * @filesource /EXTENSION_PATH/ifAmazon/ifAmazon.js

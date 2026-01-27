@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -581,7 +581,7 @@ class journal
         $filter[] = "invoice_num='".addslashes($next_ref)."'";
         if (!empty($this->main['id'])) { $filter[] = "id<>{$this->main['id']}"; }
         $dup = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', implode(' AND ', $filter));
-        if ($dup) { return msgAdd(sprintf(lang('err_gl_invoice_num_dup'), lang('invoice_num', $this->main['journal_id']), $next_ref)); }
+        if ($dup) { return msgAdd(sprintf(lang('err_gl_invoice_num_dup'), lang("invoice_num_{$this->main['journal_id']}"), $next_ref)); }
         return true;
     }
 

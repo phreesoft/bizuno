@@ -19,9 +19,9 @@
  *
  * @name       Bizuno ERP
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
- * @copyright  2008-2025, PhreeSoft, Inc.
+ * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-14
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -324,18 +324,16 @@ function myPkgSave() {
      */
     public function fedExEdit(&$layout=[])
     {
-        $lang  = getExtMethLang($this->moduleID, $this->methodDir, 'fedex');
         $rID   = clean('rID', 'integer','get');
         $type  = clean('type','char',   'get');
         if ($type != 'b') { return; }
-//        $creds = getModuleCache('contacts', $this->moduleID, 'fedex', 'multi_store');
         $meta  = getMetaContact($rID, 'fedex');
         msgDebug("\nRead meta data = ".print_r($meta, true));
         $values= !empty($meta) ? $meta : ['acct_number'=>'','ltl_acct_num'=>'']; // ,'rest_api_key'=>'','rest_secret'=>'','meter_number'=>'','auth_key'=>'','auth_pw'=>'','sp_hub'=>''];
         $fields= [
-            'acct_number' =>['label'=>$lang['acct_number'], 'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['acct_number'], 'maxlength'=>9]],
-            'ltl_acct_num'=>['label'=>$lang['ltl_acct_num'],'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['ltl_acct_num'],'maxlength'=>9]],
-            'gnd_econ_hub'=>['label'=>$lang['sp_hub'],      'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['gnd_econ_hub'],'maxlength'=>4]]];
+            'acct_number' =>['label'=>lang('acct_number'), 'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['acct_number'], 'maxlength'=>9]],
+            'ltl_acct_num'=>['label'=>lang('ltl_acct_num'),'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['ltl_acct_num'],'maxlength'=>9]],
+            'gnd_econ_hub'=>['label'=>lang('sp_hub'),      'position'=>'after','options'=>['groupSeparator'=>"''"],'attr'=>['type'=>'integer','value'=>$values['gnd_econ_hub'],'maxlength'=>4]]];
         $html  = "Enter the FedEx credentials for this store.<br />".html5('acct_number', $fields['acct_number']);
         $html .= "<br />".html5('ltl_acct_num',$fields['ltl_acct_num'])."<br />".html5('gnd_econ_hub',$fields['gnd_econ_hub']);
         $layout['tabs']['tabContacts']['divs']['fedex'] = ['order'=>95,'label'=>'FedEx','type'=>'html','html'=>$html];
