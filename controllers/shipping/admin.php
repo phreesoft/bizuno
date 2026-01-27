@@ -138,7 +138,7 @@ class shippingAdmin extends shippingCommon
             case 13:
             case 15:
                 $layout['datagrid']['manager']['columns']['method_code'] = ['order'=>80,'field'=>BIZUNO_DB_PREFIX.'journal_main.method_code','format'=>'shipInfo',
-                    'label'=>lang("method_code_{$jID}"),'attr'=>['width'=>160, 'resizable'=>true]];
+                    'label'=>lang("method_code_12"),'attr'=>['width'=>160, 'resizable'=>true]];
                 break;
             default:
         }

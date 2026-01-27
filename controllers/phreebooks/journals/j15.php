@@ -54,7 +54,7 @@ class j15 extends jCommon
      */
     public function getDataItem()
     {
-        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item', $this->journalID);
+        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
         $dbData = [];// calculate some form fields that are not in the db
         foreach ($this->items as $key => $row) {
             if ($row['gl_type'] <> 'adj') { continue; } // not an adjustment record

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/api.php
  */
 
@@ -89,10 +89,10 @@ class phreebooksApi
             }
         $output = '<table style="border-style:none;margin-left:auto;margin-right:auto;"><thead class="panel-header"><tr>
     <th>'.lang('gl_acct_id').'</th>
-    <th nowrap="nowrap">'.lang('description')               .'</th>
-    <th nowrap="nowrap">'.lang('journal_item_gl_type')      .'</th>
-    <th nowrap="nowrap">'.lang('journal_item_debit_amount') .'</th>
-    <th nowrap="nowrap">'.lang('journal_item_credit_amount').'</th>
+    <th nowrap="nowrap">'.lang('description')  .'</th>
+    <th nowrap="nowrap">'.lang('gl_type')      .'</th>
+    <th nowrap="nowrap">'.lang('debit_amount') .'</th>
+    <th nowrap="nowrap">'.lang('credit_amount').'</th>
 </tr></thead><tbody>'."\n";
         foreach ($beg_bal as $glAcct => $values) {
             $output .= "  <tr>\n";

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-09
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/administrate/maint.php
  */
 
@@ -88,7 +88,7 @@ class administrateMaint extends mgrJournal
                 'filters'=> [
                     'store_id'=> ['order'=>10,'label'=>lang('ctype_b'),'attr' =>['type'=>sizeof($this->stores)>1?'select':'hidden','value'=>$this->defaults['store_id']], 'values'=>viewStores()]]],
             'columns'=> [
-                'ref_num'   => ['order'=>10, 'field'=>'invoice_num','label'=>$this->lang['ref_num'],'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'ref_num'   => ['order'=>10, 'field'=>'invoice_num','label'=>lang('task_num'),'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'maint_date'=> ['order'=>15, 'field'=>'post_date',  'label'=>$admin?sprintf(lang('tbd_next'), lang('maintenance')):lang('date_maint'), 'attr'=>['type'=>'date','sortable'=>true,'resizable'=>true], 'format'=>'date'],
                 'title'     => ['order'=>20, 'field'=>'description','label'=>lang('title'),         'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'frequency' => ['order'=>30, 'field'=>'recur_id',   'label'=>lang('frequency'),     'attr'=>['sortable'=>true, 'resizable'=>true,'hidden'=>$admin?false:true],
@@ -99,7 +99,7 @@ class administrateMaint extends mgrJournal
                     'attr'  => ['sortable'=>true, 'resizable'=>true,'hidden'=>sizeof(getModuleCache('bizuno', 'stores'))>1?false:true]],
                 'contact_id'=> ['order'=>60, 'field'=>'rep_id',     'label'=>lang('maintainer'),'format'=>'contactID',
                     'attr'  => ['sortable'=>true, 'resizable'=>true,'hidden'=>$admin?true:false]],
-                'maint_date'=> ['order'=>70, 'field'=>'post_date',  'label'=>$admin?$this->lang['next_maint_date']:lang('date'), 'format'=>'date',
+                'maint_date'=> ['order'=>70, 'field'=>'post_date',  'label'=>$admin?lang('date_maint_next'):lang('date'), 'format'=>'date',
                     'attr'  => ['sortable'=>true,'resizable'=>true, 'type'=>'date']]]]);
         return $data;
     }

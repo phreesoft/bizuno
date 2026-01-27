@@ -223,7 +223,7 @@ class contactsMain
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $rID = clean('rID', 'integer', 'get');
-        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts', $this->type);
+        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
         // merge data with structure
         $cData = !empty($rID) ? dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$rID") : $this->contact;
         msgDebug("\nRead data from DB = ".print_r($cData, true));
@@ -256,7 +256,7 @@ class contactsMain
         $structure['rep_id']['values']       = viewRoleDropdown();
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields
-        $structure['terms_text']= ['order'=>61,'label'=>lang("terms_{$this->type}"),'break'=>false,
+        $structure['terms_text']= ['order'=>61,'label'=>lang('terms'),'break'=>false,
             'attr'=>['value'=>viewTerms($structure['terms']['attr']['value'], true, $this->type), 'readonly'=>'readonly']];
         $structure['terms_edit']= ['order'=>62,'icon'=>'settings','label'=>lang('terms'),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/editTerms&type=$this->type',$rID,jqBiz('#terms').val());"]];
         $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.$structure['id']['attr']['value']."</p>",'attr'=>['type'=>'raw']];
@@ -590,7 +590,7 @@ class contactsMain
         if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
         $title = clean('primary_name'.$suffix, 'text', 'post');
         if (empty($title)) { $title = clean('primary_namem'.$suffix, 'text', 'post'); } // may happen either with or without address suffix
-        $values= requestData(dbLoadStructure(BIZUNO_DB_PREFIX.'contacts'), $suffix);
+        $values= requestData(dbLoadStructure(BIZUNO_DB_PREFIX.'contacts'));
         $values['ctype_'.$cType] = '1'; // force the type or set if a suffix is used
         if (!$rID) { $values = array_merge($this->contact, $values); }
         else       { $values['date_last'] = biz_date('Y-m-d'); }
@@ -722,31 +722,31 @@ class contactsMain
                         'gLineS'=> ['order'=>85,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>in_array($type, ['c'])?false:true,
                             'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myContSales', '&nbsp;', 600, 500);"]],
                         'attach' => ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
-                'short_name'   => ['order'=>10, 'field'=>'short_name', 'label' => lang("short_name_{$type}"),'events'=>['styler'=>$this->dgContactsStyler()],
+                'short_name'   => ['order'=>10, 'field'=>'short_name', 'label' => lang('short_name'),'events'=>['styler'=>$this->dgContactsStyler()],
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true]],
-                'primary_name' => ['order'=>20, 'field'=>'primary_name', 'label' => lang("primary_name_$type"),
+                'primary_name' => ['order'=>20, 'field'=>'primary_name', 'label' => lang('primary_name'),
                     'attr' => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?true:false]],
-                'contact_first'=> ['order'=>20, 'field' => 'contact_first', 'label' => lang("contact_first_{$type}"),
+                'contact_first'=> ['order'=>20, 'field' => 'contact_first', 'label' => lang('contact_first'),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?false:true]],
-                'contact_last' => ['order'=>25, 'field'=>'contact_last', 'label' => lang("contact_last_{$type}"),
+                'contact_last' => ['order'=>25, 'field'=>'contact_last', 'label' => lang('contact_last'),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['e','i'])?false:true]],
                 'role_id'      => ['order'=>25, 'field' => 'id', 'label' => lang('role'),
                     'attr' => ['width'=>150, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?false:true], 'format'=>'roleName'],
                 'store_id'    => ['order'=>30, 'field' => 'store_id', 'label' => lang('store_id'),
                     'attr' => ['width'=>150, 'sortable'=>true,'resizable'=>true, 'hidden'=> sizeof($this->stores)>1?false:true], 'format'=>'storeID'],
-                'flex_field_1'=> ['order'=>35, 'field'=>'flex_field_1', 'label' => lang("flex_field_1_{$type}"),
+                'flex_field_1'=> ['order'=>35, 'field'=>'flex_field_1', 'label' => lang('flex_field_1'),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['i'])?false:true]],
                 'email'       => ['order'=>40, 'field'=>'email', 'label' => lang('email'),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?false:true]],
-                'address1'    => ['order'=>40, 'field'=>'address1', 'label' => lang("address1_{$type}"),
+                'address1'    => ['order'=>40, 'field'=>'address1', 'label' => lang('address1'),
                     'attr' => ['width'=>200, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'city'        => ['order'=>40, 'field'=>'city', 'label' => lang("city_{$type}"),
+                'city'        => ['order'=>40, 'field'=>'city', 'label' => lang('city'),
                     'attr' => ['width'=>80, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'state'       =>  ['order'=>50, 'field'=>'state', 'label' => lang("state_$type"),
+                'state'       =>  ['order'=>50, 'field'=>'state', 'label' => lang('state'),
                     'attr' => ['width'=>60, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'postal_code' => ['order'=>60, 'field'=>'postal_code', 'label' => lang("postal_code_{$type}"),
+                'postal_code' => ['order'=>60, 'field'=>'postal_code', 'label' => lang('postal_code'),
                     'attr' => ['width'=>60, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]],
-                'telephone1'  => ['order'=>70, 'field'=>'telephone1', 'label' => lang("telephone1_{$type}"),
+                'telephone1'  => ['order'=>70, 'field'=>'telephone1', 'label' => lang('telephone1'),
                     'attr' => ['width'=>100, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($type,['u'])?true:false]]],
             ];
         if ($type == 'i') {

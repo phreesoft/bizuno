@@ -46,10 +46,9 @@ class administrateDashboard
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
-        $data = ['type'=>'divHTML',
-            'title'=> sprintf(lang('tbd_manager'), lang('dashboard')),
+        $data = ['type'=>'divHTML', // 'title'=> sprintf(lang('tbd_manager'), lang('dashboard')),
             'divs' => [
-                'heading' => ['order'=> 5,'type'=>'html',   'html'=>'<h1>'.lang('admin_dashboard').'</h1>'],
+                'heading' => ['order'=> 5,'type'=>'html',   'html'=>'<h1>'.sprintf(lang('tbd_manager'), lang('dashboard')).'</h1>'],
                 'adminSet'=> ['order'=>50,'type'=>'tabs',   'key' =>'tabSettings']],
             'tabs' => ['tabSettings'=> ['attr'=>['tabPosition'=>'left']]]];
         $this->allDash = dbMetaGet(0, 'dashboards'); // Fetch list of all dashboards
@@ -59,6 +58,9 @@ class administrateDashboard
         foreach ($this->allDash as $dashID => $opts) { // put them into the tabbed lists
             $tree[$opts['group']][$dashID] = ['title'=>$opts['title'], 'description'=>$opts['description']];
         }
+        $labels = array_keys($tree);
+        foreach($labels as $label) { $titles[$label] = lang($label); }
+        uksort($tree, function($keyA, $keyB) use ($titles) { return strcasecmp($titles[$keyA], $titles[$keyB]); });
 //      msgDebug("\nTree is now: ".print_r($tree, true));
         $order= 20;
         foreach ($tree as $group => $dashIDs) {

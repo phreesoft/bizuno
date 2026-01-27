@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /local/en_US/language.php
  */
 
@@ -234,6 +234,7 @@ $langCore = [
     'date_invoice' => 'Date Invoiced',
     'date_last' => 'Last Update',
     'date_maint' => 'Maintenance Date',
+    'date_maint_next' =>'Next Maintenance',
     'date_next' => 'Net Notice Date',
     'date_range' => 'Date Range',
     'date_retire' => 'Date Retired',
@@ -419,6 +420,7 @@ $langCore = [
     'next' => 'Next',
     'next_ref' => 'Next Reference: %s',
     'nexus' => 'Nexus',
+    'nexus_states' => 'States with nexus',
     'no' => 'No',
     'no_image' => 'No Image Found!',
     'no_results' => 'No Results Found!',
@@ -962,8 +964,6 @@ $langCore = [
     'tax_rate' => 'Tax Rate',
     'tax_rate_id' => 'Tax Rate ID',
     'first_date' => 'Creation Date',
-    'last_date_1' => 'Date 1',
-    'last_date_2' => 'Date 2',
     'log' =>'Contacts Log', // Table log
     'log_contact_id' =>'Contact Reference ID',
     'log_entered_by' =>'Entered By',
@@ -1058,7 +1058,7 @@ $langCore = [
     'total_amount' => 'Total Amount',
     'currency_rate' => 'Exchange Rate',
     'so_po_ref_id' => 'SO/PO Record ID',
-    'invoice_num' => 'Reference',
+    'invoice_num_0' => 'Reference #',
     'invoice_num_2' => 'Reference #',
     'invoice_num_3' => 'RFQ #',
     'invoice_num_4' => 'PO #',
@@ -1066,9 +1066,13 @@ $langCore = [
     'invoice_num_7' => 'Credit Memo #',
     'invoice_num_9' => 'Quote #',
     'invoice_num_10' => 'SO #',
+    'invoice_num_12' => 'Reference #',
     'invoice_num_13' => 'Credit Memo #',
-    'invoice_num_17' => 'Deposit Ref',
-    'invoice_num_20' => 'Payment Ref',
+    'invoice_num_14' => 'Assembly #',
+    'invoice_num_15' => 'Transfer #',
+    'invoice_num_16' => 'Adjustment #',
+    'invoice_num_17' => 'Deposit Ref #',
+    'invoice_num_20' => 'Payment Ref #',
     'purch_order_id' => 'PO Reference',
     'recur_id' => 'Recur ID',
     'admin_id' => 'User ID',

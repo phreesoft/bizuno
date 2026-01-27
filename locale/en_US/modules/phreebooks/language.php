@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-26
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -241,7 +241,6 @@ $lang = [
     'task_num' => 'Task ID',
     'task_details' => 'Task Details',
     'frequency' => 'Frequency',
-    'next_maint_date' =>'Next Maintenance',
     'service_date' => 'Service Date',
     'lead_time' => 'Lead Time',
     'lead01' => 'One Day',
@@ -302,9 +301,6 @@ $lang = [
     'edi_jrnl_id' => 'Journal Record ID',
     'edi_rcv_date' => 'EDI Create Date',
     'edi_ack_date' => 'EDI Ack Date',
-    // REST Tax
-    'nexus_lbl' => 'Nexus',
-    'nexus_states' => 'States with nexus',
     // Returns
     'rtn_status_1' => 'RMA Created/Waiting for Parts',
     'rtn_status_2' => 'Parts Received',

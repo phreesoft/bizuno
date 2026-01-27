@@ -325,7 +325,7 @@ if (!formValidate()) return false;\n\treturn true;\n}";
         if ($this->action=='inv' && !empty(getModuleCache('phreebooks', 'settings', $this->type=='v'?'vendors':'customers', 'show_status'))) {
             $jsReady .= "jsonAction('phreebooks/main/detailStatus', $cID);";
         }
-        $structure  = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main', $this->journalID);
+        $structure  = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main');
         if ($this->action=='ord') { // special case where quote is converterd to order, duplicate the quote as ordeer and close quote
             $rID = $this->rID = $this->setQuote2Order($rID, $cID, $structure);
             msgDebug("\nreturned with new ID = $rID and journal ID = $this->journalID");
@@ -621,7 +621,7 @@ function bizUnitDiscDisc(newValue) {
         $recurID  = clean('recur_id', 'integer', 'post');
         $recurFreq= clean('recur_frequency', 'integer', 'post');
         $GLOBALS['bizunoCurrency'] = clean('currency',['format'=>'alpha_num','default'=>getDefaultCurrency()],'post');
-        $structure= ['journal_main' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main', $this->journalID)];
+        $structure= ['journal_main' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main')];
         $values   = requestData($structure['journal_main'], '', true);
         $values['period'] = calculatePeriod($values['post_date'] ? $values['post_date'] : biz_date('Y-m-d')); // recalc period as post date may have changed
         // ***************************** START TRANSACTION *******************************
@@ -775,8 +775,8 @@ function bizUnitDiscDisc(newValue) {
         if (!$security = validateAccess('j20_bulk', 2)) { return; }
         $xChild = clean('xChild', 'text', 'post');
         $structure= [
-            'journal_main' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main', $this->journalID),
-            'journal_item' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item', $this->journalID)];
+            'journal_main' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main'),
+            'journal_item' => dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item')];
         clearUserCache('phreebooks'.$this->journalID); // clear the manager history for new saves, will then show new post on top.
         // organize selections by contact_id create mini 'item_data' for each contact
         $rows = clean('item_array', 'json', 'post');
@@ -1038,7 +1038,7 @@ function bizUnitDiscDisc(newValue) {
     private function getItems(&$ledger)
     {
         $ledger->items = []; // reset the item list as we start with just the datagrid
-        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item', $this->journalID);
+        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
         $map = [
             'ref_id'   => ['type'=>'constant', 'value'=>$ledger->main['id']],
             'gl_type'  => ['type'=>'constant', 'value'=>$this->gl_type],
@@ -1440,9 +1440,9 @@ function bizUnitDiscDisc(newValue) {
                 'so_po_ref_id' => ['order'=>25, 'field'=>BIZUNO_DB_PREFIX.'journal_main.so_po_ref_id','format'=>'storeID', 'label' => lang("so_po_ref_id_{$this->journalID}"),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [15]) ? false : true]],
                 'store_id' => ['order'=>27, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID','label'=>lang('store_id'),'attr'=>['sortable'=>false,'resizable'=>true]],
-                'purch_order_id' => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id', 'label' => lang("purch_order_id_{$this->journalID}"),
+                'purch_order_id' => ['order'=>30, 'field'=>BIZUNO_DB_PREFIX.'journal_main.purch_order_id', 'label' => lang('purch_order_id'),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [2,14,15,16,17,18,20,22]) ? true : false]],
-                'description' => ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.description', 'label' => lang("description_{$this->journalID}"),
+                'description' => ['order'=>40, 'field'=>BIZUNO_DB_PREFIX.'journal_main.description', 'label' => lang('description'),
                     'attr'  => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> !in_array($this->journalID, [0,2,14,15,16]) ? true : false]],
                 'primary_name_b' => ['order'=>50, 'field'=>BIZUNO_DB_PREFIX.'journal_main.primary_name_b', 'label' => lang('primary_name'),
                     'attr'  => ['width'=>240, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [0,2,14,15,16]) || $this->type=='e' ? true : false]],

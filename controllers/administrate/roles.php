@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-31
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/administrate/roles.php
  */
 
@@ -153,7 +153,7 @@ class administrateRoles extends mgrJournal
             msgDebug("\nprocessing menu ID = $mID");
             if (!empty($props['child'])) { $html .= $this->roleTabsChildren($props['child'], $props['label'], $security); }
             $order++;
-            $data['tabs']['tabRoles']['divs'][$mID] = ['order'=>$order,'label'=>$props['label'],'type'=>'divs','classes'=>['areaView'],'divs'=>[
+            $data['tabs']['tabRoles']['divs'][$mID] = ['order'=>$order,'label'=>lang($props['label']),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                 'security' => ['order'=>80,'type'=>'panel','classes'=>['block50'],'key'=>"{$mID}Security"]]];
             $data['panels']["{$mID}Security"] = ['label'=>lang('security'),'type'=>'html','html'=>$html];
         }

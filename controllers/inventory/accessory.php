@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/accessory.php
  */
 
@@ -101,7 +101,7 @@ function invAccessorySave() {
                                   {field:'description_short',title:'".jsLang('description')."',width:200}]]
                     }}"]],
                 'description_short'=> ['order'=>20,'label'=>lang('description'),'attr'=>['width'=>400,'resizable'=>true]],
-                'full_price'       => ['order'=>30,'label'=>lang('journal_item_full_price'), 'attr'=>  ['type'=>'currency','width'=>120,'resizable'=>true],
+                'full_price'       => ['order'=>30,'label'=>lang('full_price'), 'attr'=>['type'=>'currency','width'=>120,'resizable'=>true],
                     'events'=>  ['formatter'=>"function(value,row){ return formatCurrency(value); }"]]]];
         return $data;
     }

@@ -299,7 +299,7 @@ function clean($idx, $processing='text', $src='')
  * @param string $suffix - suffix to check for variants of the index value
  * @return string - translation if found, original $idx if not
  */
-function lang($idx, $module='')
+function lang($idx, $module='core')
 {
     global $bizunoLang;
     if (!is_null($bizunoLang[$module][$idx]) && isset($bizunoLang[$module][$idx])) { return $bizunoLang[$module][$idx]; }
@@ -325,7 +325,7 @@ function langDash($idx, $dash='')
  * @param string $module - Module index in the 
  * @return string - translation if found with slashes added, original $idx if not (with slashes)
  */
-function jsLang($idx, $module)
+function jsLang($idx, $module='core')
 {
     $strLang = lang($idx, $module);
     return !empty($strLang) ? addslashes($strLang) : '';
@@ -622,6 +622,7 @@ function localePeriodicDate($dateStart, $freq='m')
  */
 function requestData($structure, $suffix='', $voidLabels=false)
 {
+    msgDebug("\nEntering requestData with suffix = '$suffix' and voidLabels = $voidLabels");
     $output = [];
     $request= $_POST;
     foreach ($structure as $field => $content) {
@@ -638,6 +639,7 @@ function requestData($structure, $suffix='', $voidLabels=false)
             $output[$field] = !empty($request[$field]) ? '1' : '0';
         }
     }
+//msgDebug("\noutput = ".print_r($output, true));
     validateData($structure, $output);
     msgDebug("\nReturning from requestData with suffix = $suffix and output: ".print_r($output, true));
     return $output;

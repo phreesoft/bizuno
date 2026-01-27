@@ -53,7 +53,7 @@ class j14 extends jCommon
      * Tailors the structure for the specific journal
      */
     public function getDataItem($rID=0) {
-        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item', $this->journalID);
+        $structure = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
         $structure['sku']['attr']['type']        = 'inventory';
         $structure['sku']['defaults']['idField'] = "'sku'";
         $structure['sku']['defaults']['url']     = "'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&filter=assy&clr=1&bID='+jqBiz('#store_id').val()";
