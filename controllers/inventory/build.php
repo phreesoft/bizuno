@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/build.php
  */
 
@@ -125,7 +125,7 @@ class inventoryBuild extends mgrJournal
             $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
         }
         $layout['datagrid']['dgSrvJrnl']['columns']['store_id'] = ['order'=>50,'field'=>'store_id','format'=>'storeID',
-            'label' => pullTableLabel("contacts", 'store_id'),'attr'=>['sortable'=>true,'resizable'=>true]];
+            'label' => lang('store_id'),'attr'=>['sortable'=>true,'resizable'=>true]];
         $layout['datagrid']['dgSrvJrnl']['source']['filters']['store'] = ['order'=>15,'label'=>lang('ctype_b'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$storeID]];
         switch ($storeID) {
             case -1: $layout['datagrid']['dgSrvJrnl']['source']['filters']['store']['sql'] = ''; break;
@@ -147,7 +147,7 @@ class inventoryBuild extends mgrJournal
             $storeID = $layout['fields']['store_id']['attr']['value'] = $this->myStore;
         }
         $layout['datagrid']['dgSrvJrnl']['columns']['store_id'] = ['order'=>50,'field'=>'store_id','format'=>'storeID',
-            'label' => pullTableLabel("contacts", 'store_id'),'attr'=>['sortable'=>true,'resizable'=>true]];
+            'label' => lang('store_id'),'attr'=>['sortable'=>true,'resizable'=>true]];
         $layout['datagrid']['dgSrvJrnl']['source']['filters']['store'] = ['order'=>15,'label'=>lang('ctype_b'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$storeID]];
         switch ($storeID) {
             case -1: $layout['datagrid']['dgSrvJrnl']['source']['filters']['store']['sql'] = ''; break;
@@ -196,7 +196,7 @@ class inventoryBuild extends mgrJournal
             $layout['fields']['store_id']['attr']['value'] = $this->myStore;
             return;
         }
-        $layout['fields']['store_id']['label'] = pullTableLabel("contacts", 'store_id');
+        $layout['fields']['store_id']['label'] = lang('store_id');
         if (!$rID) {
             $layout['fields']['store_id']['attr']['value'] = $this->myStore;
         }

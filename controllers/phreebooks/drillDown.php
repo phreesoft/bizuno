@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/drillDown.php
  */
 
@@ -164,7 +164,7 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
                 'sort'    => ['s0'=>['order'=>10, 'field'=>($this->defaults['sort'].' '.$this->defaults['order'])]]],
             'columns'  => ['id'=> ['order'=>0, 'field'=>'id',      'attr'=>['hidden'=>true]],
                 'inactive'=> ['order'=>0, 'field'=>'inactive','attr'=>['hidden'=>true]],
-                'id'     => ['order'=>10,'field'=>'id','label'=>pullTableLabel('journal_main', 'id'),'attr'=>['sortable'=>true,'resizable'=>true]]]];
+                'id'     => ['order'=>10,'field'=>'id','label'=>lang('id'),'attr'=>['sortable'=>true,'resizable'=>true]]]];
         $this->setColumns($output);
         return $output;
     }

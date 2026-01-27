@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/totals/tax_order/tax_order.php
  */
 
@@ -120,7 +120,7 @@ class tax_order
         $defTax= $type=='v' ? $this->settings['tax_id_v'] : $this->settings['tax_id_c'];
         $tax_id= !empty($data['fields']['tax_rate_id']['attr']['value']) ? $data['fields']['tax_rate_id']['attr']['value'] : $defTax;
         $this->fields = [
-            'totals_tax_order'     => ['label'=>pullTableLabel('journal_main','tax_rate_id',$type).' '.$this->lang['extra_title'],'attr'=>['type'=>'currency','value'=>0,'readonly'=>'readonly']],
+            'totals_tax_order'     => ['label'=>lang("tax_rate_id_{$type}").' '.$this->lang['extra_title'],'attr'=>['type'=>'currency','value'=>0,'readonly'=>'readonly']],
             'tax_rate_id'          => ['defaults'=>['type'=>$type], 'attr'=>['type'=>'tax','value'=>$tax_id]],
             'totals_tax_order_text'=> ['attr' =>['value'=>'textTBD','size'=>'16','readonly'=>'readonly']],
             'totals_tax_order_gl'  => ['label'=>lang('gl_account'), 'attr'=>['type'=>'text','value'=>'glTBD','readonly'=>'readonly']],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/journals/j14.php
  */
 
@@ -64,7 +64,7 @@ class j14 extends jCommon
     jqBiz('#dgJournalItem').datagrid({ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerBOMList&rID='+data.id });
     bizGridReload('dgJournalItem');
     bizNumSet('qty', 1);";
-        $structure['qty_stock']    = ['order'=>80,'break'=>true,'options'=>['width'=>100],'label'=>pullTableLabel('inventory', 'qty_stock'),'attr'=>['type'=>'float','readonly'=>'readonly']];
+        $structure['qty_stock']    = ['order'=>80,'break'=>true,'options'=>['width'=>100],'label'=>lang('qty_stock'),'attr'=>['type'=>'float','readonly'=>'readonly']];
         $structure['balance']      = ['order'=>90,'break'=>true,'options'=>['width'=>100],'label'=>lang('balance'),'attr'=>['type'=>'float', 'readonly'=>'readonly']];
         $structure['gl_account']['attr']['type'] = 'hidden';
         $structure['sku']['order'] = 15;
@@ -368,7 +368,7 @@ class j14 extends jCommon
                 'qty'          => ['order'=> 0,'attr' =>['hidden'=>true]],
                 'sku'          => ['order'=>20,'label'=>lang('sku'),'attr'=>['align'=>'center']],
                 'description'  => ['order'=>30,'label'=>lang('description')],
-                'qty_stock'    => ['order'=>40,'label'=>pullTableLabel('inventory','qty_stock'),'attr'=>['align'=>'right'],
+                'qty_stock'    => ['order'=>40,'label'=>lang('qty_stock'),   'attr'=>['align'=>'right'],
                     'events'=>['formatter'=>"function(value,row){ return formatNumber(value); }"]],
                 'qty_required' => ['order'=>50,'label'=>lang('qty_required'),'attr'=>['align'=>'right'],
                     'events'=>['formatter'=>"function(value,row){ return formatNumber(value); }"]]]];

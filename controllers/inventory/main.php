@@ -877,12 +877,12 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                         'gLineS'=> ['order'=>65,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>$secJ12>3?false:true,'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myInvSales', '&nbsp;', 600, 500);"]],
                         'trash' => ['order'=>90,'icon'=>'trash',  'hidden'=>$security>3?false:true,'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('inventory/main/delete', idTBD);"]],
                         'attach'=> ['order'=>95,'icon'=>'attachment','display'=>"row.attach=='1'"]]],
-                'sku'              => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'inventory.sku','label'=>pullTableLabel("inventory", 'sku'), 'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],
-                'description_short'=> ['order'=>20,'field'=>'description_short','label'=>pullTableLabel("inventory", 'description_short'),'attr'=>['width'=>500,'sortable'=>true,'resizable'=>true]],
-                'qty_stock'        => ['order'=>30,'field'=>'qty_stock','format'=>'number','label'=>pullTableLabel("inventory", 'qty_stock'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
-                'qty_po'           => ['order'=>40,'field'=>'qty_po',   'format'=>'number','label'=>pullTableLabel("inventory", 'qty_po'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
-                'qty_so'           => ['order'=>50,'field'=>'qty_so',   'format'=>'number','label'=>pullTableLabel("inventory", 'qty_so'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']],
-                'qty_alloc'        => ['order'=>60,'field'=>'qty_alloc','format'=>'number','label'=>pullTableLabel("inventory", 'qty_alloc'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']]]];
+                'sku'              => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'inventory.sku','label'=>lang('sku'), 'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]],
+                'description_short'=> ['order'=>20,'field'=>'description_short','label'=>lang('description_short'),'attr'=>['width'=>500,'sortable'=>true,'resizable'=>true]],
+                'qty_stock'        => ['order'=>30,'field'=>'qty_stock','format'=>'number','label'=>lang('qty_stock'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
+                'qty_po'           => ['order'=>40,'field'=>'qty_po',   'format'=>'number','label'=>lang('qty_po'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
+                'qty_so'           => ['order'=>50,'field'=>'qty_so',   'format'=>'number','label'=>lang('qty_so'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']],
+                'qty_alloc'        => ['order'=>60,'field'=>'qty_alloc','format'=>'number','label'=>lang('qty_alloc'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']]]];
         switch ($filter) {
             case 'stock': $data['source']['filters']['restrict'] = ['order'=>99, 'sql'=>"inventory_type in ('si','sr','ms','mi','ma')"]; break;
             case 'assy':  $data['source']['filters']['restrict'] = ['order'=>99, 'sql'=>"inventory_type in ('ma')"]; break;
@@ -902,7 +902,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if (strpos($data['source']['sort']['s0']['field'], 'qty_all') !== false) { // fix the sort criteris
             $data['source']['sort']['s0']['field'] = str_replace('qty_all', 'qty_stock', $data['source']['sort']['s0']['field']);
         }
-        $data['columns']['qty_stock'] = ['order'=>25, 'field'=>'inventory.sku', 'alias'=>'sku','label'=>pullTableLabel('inventory', 'qty_store'), 'process'=>'storeStock',
+        $data['columns']['qty_stock'] = ['order'=>25, 'field'=>'inventory.sku', 'alias'=>'sku','label'=>lang('qty_store'), 'process'=>'storeStock',
             'attr'=>['sortable'=>false,'resizable'=>true,'align'=>'right']];
         $data['source']['filters']['f1'] = ['order'=>50,'sql'=>'','label'=>$this->lang['store_stock'],'values'=>$values,'attr'=>['type'=>'select','value'=>$f1]];
         msgDebug("\nextStores set home store: $this->myStore with f1 (store filter selection) = $f1");
@@ -961,9 +961,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                     'events' => ['formatter'=>"function(value) { return formatNumber(value); }",'editor'=>"{type:'numberbox'}"]],
                 'item_cost'  => ['order'=>60,'label'=>lang('cost'), 'attr'=>['resizable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value) { return formatCurrency(value); }"]],
-                'qty_stock'  => ['order'=>80,'label'=>pullTableLabel("inventory", 'qty_stock'),'attr'=>['resizable'=>true,'align'=>'right'],
+                'qty_stock'  => ['order'=>80,'label'=>lang('qty_stock'),'attr'=>['resizable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value) { return formatNumber(value); }"]],
-                'qty_alloc'  => ['order'=>90,'label'=>pullTableLabel("inventory", 'qty_alloc'),'attr'=>['resizable'=>true,'align'=>'right'],
+                'qty_alloc'  => ['order'=>90,'label'=>lang('qty_alloc'),'attr'=>['resizable'=>true,'align'=>'right'],
                     'events' => ['formatter'=>"function(value) { return formatNumber(value); }"]]]];
         if ($locked) {
             unset($data['columns']['action']['actions']['trash'], $data['columns']['sku']['events']['editor'], $data['columns']['description']['attr']['editor']);

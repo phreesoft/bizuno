@@ -477,7 +477,7 @@ class inventoryHistory
                         'print'      => ['order'=>40,'icon'=>'print',   'label'=>lang('print'),
                             'events' => ['onClick'=>"var idx=jqBiz('#$name').datagrid('getRowIndex', idTBD); var jID=jqBiz('#$name').datagrid('getRows')[idx].journal_id; ('fitColumns', true); winOpen('phreeformOpen', 'phreeform/render/open&group={$gID[0]}:j'+jID+'&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]],
                                     ]],
-                'invoice_num'   => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num','label'=>pullTableLabel('journal_main', 'invoice_num', $jID),
+                'invoice_num'   => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num','label'=>lang("invoice_num_{$jID}"),
                     'attr' => ['sortable'=>true, 'resizable'=>true]],
                 'primary_name_b'=> ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.primary_name_b','label'=>lang('primary_name_b'),
                     'attr'  => ['sortable'=>true, 'resizable'=>true]],

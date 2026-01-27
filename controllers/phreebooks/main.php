@@ -630,7 +630,7 @@ function bizUnitDiscDisc(newValue) {
         msgDebug("\n  Started order post invoice_num = {$values['invoice_num']} and id = {$rID}");
         dbTransactionStart();
         $ledger = new journal($rID, $this->journalID);
-        $ledger->main['description'] = pullTableLabel('journal_main', 'journal_id', $this->journalID).": ".(!empty($values['primary_name_b']) ? $values['primary_name_b'] : '');
+        $ledger->main['description'] = lang("journal_id_{$this->journalID}").": ".(!empty($values['primary_name_b']) ? $values['primary_name_b'] : '');
         $ledger->main = array_replace($ledger->main, $values);
         if (!$ledger->updateContact()) { return; } // Create/Update contact information
         if (in_array($ledger->journalID, [3,4,6,7,9,10,12,13]) && empty($ledger->main['contact_id_b'])) { return msgAdd($this->lang['msg_missing_contact_id']); }
@@ -839,7 +839,7 @@ function bizUnitDiscDisc(newValue) {
                 'trans_code'    => ['type'=>'field',   'index'=>'inv_num']];
             $ledger->items= requestDataGrid($items['rows'], $structure['journal_item'], $map);
             foreach ($ledger->items as $idx => $row) { $ledger->items[$idx]['item_cnt'] = $idx+1; }
-            $ledger->main['description'] = pullTableLabel('journal_main', 'journal_id', $ledger->main['journal_id']);
+            $ledger->main['description'] = lang("journal_id_{$ledger->main['journal_id']}", );
             $ledger->main['description'].= isset($ledger->main['primary_name_b']) ? ": {$ledger->main['primary_name_b']}" : '';
             // pull totals
             $current_total = 0;
@@ -872,7 +872,7 @@ function bizUnitDiscDisc(newValue) {
         $nacha->closeACH();
         dbTransactionCommit();
         // ***************************** END TRANSACTION *******************************
-        $invRef = pullTableLabel('journal_main', 'invoice_num', $ledger->main['journal_id']);
+        $invRef = lang("invoice_num_{$ledger->main['journal_id']}", );
         msgAdd(sprintf(lang('msg_gl_post_success'), $invRef, "$first_chk - $current_chk"), 'success');
         msgLog(lang('phreebooks_manager_bulk').'-'.lang('invoice_num_20')." $first_chk - $current_chk ".lang('total').": ".viewFormat($pmt_total, 'currency'));
         $jsonAction = "jqBiz('#accJournal').accordion('select',0); bizGridReload('dgPhreeBooks'); jqBiz('#divJournalDetail').html('&nbsp;');";
@@ -1463,18 +1463,18 @@ function bizUnitDiscDisc(newValue) {
                 unset($data['source']['actions']['newJournal']);
                 unset($data['columns']['id']['attr']['hidden']);
                 $data['columns']['action']['actions']['edit']['events']['onClick'] = "winHref(bizunoHome+'?bizRt=phreebooks/main/manager&rID=idTBD');";
-                $data['columns']['journal_id'] = ['order'=>15, 'field'=>BIZUNO_DB_PREFIX.'journal_main.journal_id','label'=>pullTableLabel('journal_main', 'journal_id'),
+                $data['columns']['journal_id'] = ['order'=>15, 'field'=>BIZUNO_DB_PREFIX.'journal_main.journal_id','label'=>lang('journal_id'),
                     'events'=>['formatter'=>"function(value) { return jrnlTitles['j'+value]; }"], 'attr'=>['width'=>80, 'resizable'=>true]];
                 $journalID = clean('journalID', 'integer', 'post');
                 $jVals = $this->selJournals(); // needs to be here for generating $this->blocked_journals
                 if     ($journalID)              { $sql = BIZUNO_DB_PREFIX."journal_main.journal_id=$journalID"; }
                 elseif ($this->blocked_journals) { $sql = BIZUNO_DB_PREFIX."journal_main.journal_id NOT IN ($this->blocked_journals)"; }
                 else                             { $sql = ''; }
-                $data['source']['filters']['journalID']= ['order'=>55,'break'=>true,'sql'=>$sql, 'label'=>pullTableLabel('journal_main', 'journal_id'),'values'=>$jVals,'attr'=>['type'=>'select','value'=>$journalID]];
+                $data['source']['filters']['journalID']= ['order'=>55,'break'=>true,'sql'=>$sql, 'label'=>lang('journal_id'),'values'=>$jVals,'attr'=>['type'=>'select','value'=>$journalID]];
                 $sql1 = $this->searchCriteriaSQL('postDate', BIZUNO_DB_PREFIX.'journal_main.post_date', 'date', 'band', getModuleCache('phreebooks', 'fy', 'period_start'), getModuleCache('phreebooks', 'fy', 'period_end'));
                 $temp1 = explode(':', $this->defaults['postDate']);
                 if (!$temp1[0]) { $temp1[0] = 'band'; }
-                $data['source']['filters']['postDate']    = ['order'=>60,'sql'=>$sql1,'label'=>pullTableLabel('journal_main', 'post_date'),'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp1[0]]];
+                $data['source']['filters']['postDate']    = ['order'=>60,'sql'=>$sql1,'label'=>lang('post_date'),'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp1[0]]];
                 $data['source']['filters']['postDateMin'] = ['order'=>61,              'attr'=>['type'=>'date', 'value'=>$temp1[1]]];
                 $data['source']['filters']['postDateMax'] = ['order'=>62,'break'=>true,'attr'=>['type'=>'date', 'value'=>$temp1[2]]];
 
@@ -1504,7 +1504,7 @@ function bizUnitDiscDisc(newValue) {
 
                 $sql6 = $this->searchCriteriaSQL('glAcct',  [BIZUNO_DB_PREFIX.'journal_main.gl_acct_id', BIZUNO_DB_PREFIX.'journal_item.gl_account']);
                 $temp6 = explode(':', $this->defaults['glAcct']);
-                $data['source']['filters']['glAcct']    = ['order'=>75,'sql'=>$sql6,'label'=>pullTableLabel('journal_main', 'gl_acct_id'),'events'=>['onChange'=>"pbSetPrompt('glAcct', 'glAcctMin','glAcctMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp6[0]]];
+                $data['source']['filters']['glAcct']    = ['order'=>75,'sql'=>$sql6,'label'=>lang('gl_acct_id'),'events'=>['onChange'=>"pbSetPrompt('glAcct', 'glAcctMin','glAcctMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp6[0]]];
                 $data['source']['filters']['glAcctMin'] = ['order'=>76,              'attr'=>['value'=>$temp6[1]]];
                 $data['source']['filters']['glAcctMax'] = ['order'=>77,'break'=>true,'attr'=>['value'=>$temp6[2]]];
 

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -238,12 +238,12 @@ class j02 extends jCommon
                 'action'       => ['order'=>1, 'label'=>lang('action'),'attr'=>['width'=>60],
                     'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
                     'actions'  => ['delete'   =>['order'=>20,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
-                'gl_account'   => ['order'=>20,'label'=>pullTableLabel('journal_item','gl_account',$this->journalID),'attr'=>['width'=>200,'resizable'=>true,'align'=>'center'],
+                'gl_account'   => ['order'=>20,'label'=>lang("gl_account_{$this->journalID}"),'attr'=>['width'=>200,'resizable'=>true,'align'=>'center'],
                     'events'   => ['editor'=>dgEditGL()]],
                 'description'  => ['order'=>30,'label'=>lang('description'), 'attr'=>['width'=>400,'editor'=>dgEditText(),'resizable'=>true]],
-                'debit_amount' => ['order'=>40,'label'=>pullTableLabel('journal_item', 'debit_amount'),'attr'=>['width'=>150,'resizable'=>true, 'align'=>'right'],
+                'debit_amount' => ['order'=>40,'label'=>lang('debit_amount'),'attr'=>['width'=>150,'resizable'=>true, 'align'=>'right'],
                     'events'   => ['editor'=>dgEditCurrency("glCalc('debit');"),'formatter'=> "function(value,row){ return formatCurrency(value); }"]],
-                'credit_amount'=> ['order'=>50, 'label'=>pullTableLabel('journal_item', 'credit_amount'),'attr'=>['width'=>150,'resizable'=>true, 'align'=>'right'],
+                'credit_amount'=> ['order'=>50, 'label'=>lang('credit_amount'),'attr'=>['width'=>150,'resizable'=>true, 'align'=>'right'],
                     'events'   => ['editor'=>dgEditCurrency("glCalc('credit');"),'formatter'=> "function(value,row){ return formatCurrency(value); }"]],
                 'notes'        => ['order'=>90, 'label'=>lang('notes'), 'attr'=>  ['width'=>200,'editor'=>'text','resizable'=>true]]]];
     }

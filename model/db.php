@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-05
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /model/db.php
  */
 
@@ -213,7 +213,7 @@ class db extends \PDO
     private function guessLabel($table, $field, $suffix, $comment, $lang) {
         if (isset($comment['label'])){ return $comment['label']; }
         if (isset($lang[$field]))    { return $lang[$field]; }
-        return pullTableLabel($table, $field, $suffix);
+        return !empty($suffix) ? lang($field.'_'.$suffix) : lang($field);
     }
 
     private function guessFormat(&$data, $type)

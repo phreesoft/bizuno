@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -261,7 +261,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
      */
     private function dgItems($name, $type='close')
     {
-        $on_hand = pullTableLabel('inventory', 'qty_stock');
+        $on_hand = lang('qty_stock');
         return ['id'=>$name,'type'=>'edatagrid','title'=>$type=='close' ? $this->lang['item_details'] : $this->lang['receive_details'],
             'attr'  => ['toolbar'=>"{$name}Toolbar",'idField'=>'id','singleSelect'=>true],
             'events'=> ['data'   => "{$name}Data",
@@ -274,7 +274,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
                 'action'=> ['order'=> 1,'label'=>lang('action'),'attr'=>['width'=>60],'events'=>['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> ['trash'=>['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'qty'   => ['order'=>10,'label'=>lang('qty'),   'attr'=>['width'=>75,'resizable'=>true],'events'=>['editor'=>"{type:'numberbox'}"]],
-                'sku'   => ['order'=>20,'label'=>pullTableLabel('journal_item', 'sku'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true],
+                'sku'   => ['order'=>20,'label'=>lang('sku'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'combogrid',options:{
                         width:150, panelWidth:400, delay:500, idField:'sku', textField:'sku', mode:'remote',
                         url:  bizunoAjax+'&bizRt=inventory/main/managerRows',

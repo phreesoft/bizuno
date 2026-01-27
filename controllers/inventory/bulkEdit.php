@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-07
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/bulkEdit.php
  */
 
@@ -190,7 +190,7 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
                 'sort'    => ['s0'=>['order'=>10, 'field'=>($this->defaults['sort'].' '.$this->defaults['order'])]]],
             'columns'  => ['id'=> ['order'=>0, 'field'=>'id',      'attr'=>['hidden'=>true]],
                 'inactive'=> ['order'=>0, 'field'=>'inactive','attr'=>['hidden'=>true]],
-                'sku'     => ['order'=>10,'field'=>'sku','label'=>pullTableLabel("inventory", 'sku'),'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]]]];
+                'sku'     => ['order'=>10,'field'=>'sku','label'=>lang('sku'),'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]]]];
         $this->setColumns($output);
         return $output;
     }

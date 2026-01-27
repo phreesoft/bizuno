@@ -256,7 +256,7 @@ class contactsMain
         $structure['rep_id']['values']       = viewRoleDropdown();
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields
-        $structure['terms_text']= ['order'=>61,'label'=>pullTableLabel('contacts', 'terms', $this->type),'break'=>false,
+        $structure['terms_text']= ['order'=>61,'label'=>lang("terms_{$this->type}"),'break'=>false,
             'attr'=>['value'=>viewTerms($structure['terms']['attr']['value'], true, $this->type), 'readonly'=>'readonly']];
         $structure['terms_edit']= ['order'=>62,'icon'=>'settings','label'=>lang('terms'),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/editTerms&type=$this->type',$rID,jqBiz('#terms').val());"]];
         $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.$structure['id']['attr']['value']."</p>",'attr'=>['type'=>'raw']];

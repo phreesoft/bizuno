@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-29
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/bizuno/dashboards/todays_audit/todays_audit.php
  */
 
@@ -33,7 +33,6 @@ class todays_audit
     public  $methodDir= 'dashboards';
     public  $code     = 'todays_audit';
     public  $category = 'general';
-    private $titles   = [];
     public  $struc;
     public  $lang     = ['title'=>'Today\'s Activity',
         'description'=> 'Lists today\'s activities. Settings are available for enhanced security and control.'];

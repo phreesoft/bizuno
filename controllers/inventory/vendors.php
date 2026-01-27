@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/inventory/vendors.php
  */
 
@@ -103,7 +103,7 @@ class inventoryVendors
                 'action'=> ['order'=>1,'label'=>lang('action'),
                     'actions'=> ['invVendTrash'=>  ['icon'=>'trash','order'=>20,'events'=>  ['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]],
                     'events' => ['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"]],
-                'id'    => ['order'=>10, 'label'=>pullTableLabel("contacts", 'short_name', 'v'),
+                'id'    => ['order'=>10, 'label'=>lang('short_name_v'),
                     'attr' => ['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'center'],
                     'events'=>  ['formatter'=>"function(value, row) { return row.primary_name; }",
                         'editor'=>"{type:'combogrid',options:{width:130,panelWidth:750,delay:900,idField:'id',textField:'primary_name',mode:'remote',

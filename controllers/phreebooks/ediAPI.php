@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -490,7 +490,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
         if (!$journal->Post()) { dbTransactionRollback(); return; }
         // ***************************** END TRANSACTION *******************************
         dbTransactionCommit();
-        $invoiceRef= pullTableLabel('journal_main', 'invoice_num', $journal->main['journal_id']);
+        $invoiceRef= lang("invoice_num_{$journal->main['journal_id']}");
         $billName  = isset($journal->main['primary_name_b']) ? $journal->main['primary_name_b'] : $journal->main['description'];
         msgAdd(sprintf(lang('msg_gl_post_success'), $invoiceRef, $journal->main['invoice_num']), 'success');
         msgLog('Bizuno EDI -'.lang('save')." $invoiceRef ".$journal->main['invoice_num']." - $billName (rID={$journal->main['id']}) ".lang('total').": ".viewFormat($journal->main['total_amount'], 'currency'));

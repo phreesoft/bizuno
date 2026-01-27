@@ -892,11 +892,11 @@ class jCommon
                 'ref_id'     => ['order'=> 0,'attr' =>['hidden'=>'true']],
                 'gl_account' => ['order'=> 0,'attr' =>['hidden'=>'true']],
                 'item_ref_id'=> ['order'=> 0,'attr' =>['hidden'=>'true']],
-                'invoice_num'=> ['order'=>10,'label'=>pullTableLabel('journal_main', 'invoice_num', '12'),
+                'invoice_num'=> ['order'=>10,'label'=>lang('invoice_num_12'),
                     'attr'  => ['sortable'=>true, 'resizable'=>true, 'width'=>100,  'align'=>'center']],
-                'post_date'  => ['order'=>20,'label'=>pullTableLabel('journal_main', 'post_date', '12'),
+                'post_date'  => ['order'=>20,'label'=>lang('post_date_12'),
                     'attr'  => ['type'=>'date','sortable'=>true,'resizable'=>true,'width'=>100,'align'=>'center']],
-                'date_1'     => ['order'=>30,'label'=>pullTableLabel('journal_item', 'date_1', $journalID),
+                'date_1'     => ['order'=>30,'label'=>lang("date_1_{$journalID}"),
                     'attr'  => ['type'=>'date','sortable'=>true,'resizable'=>true,'width'=>100,'align'=>'center']],
                 'description'=> ['order'=>40,'label'=>lang('notes'), 'attr'=>['width'=>350,'resizable'=>true,'editor'=>'text']],
                 'amount'     => ['order'=>50,'label'=>lang('amount_due'),'attr'=>['type'=>'currency','width'=> 100,'resizable'=>true,'align'=>'right'],
@@ -941,14 +941,14 @@ class jCommon
                 'item_ref_id' => ['order'=> 0,'attr' =>['hidden'=>'true']],
                 'gl_account'  => ['order'=> 0,'attr' =>['hidden'=>'true']],
                 'contact_id'  => ['order'=> 0,'attr' =>['hidden'=>'true']],
-                'inv_date'    => ['order'=>10,'label'=>pullTableLabel('journal_main', 'post_date', '12'),'attr'=>['type'=>'date','width'=>100,'sortable'=>true,'resizable'=>true,'align'=>'center']],
-                'primary_name'=> ['order'=>20,'label'=>pullTableLabel('journal_main', 'primary_name_b', '12'),'attr'=>['width'=>220,'sortable'=>true,'resizable'=>true],
+                'inv_date'    => ['order'=>10,'label'=>lang('post_date_12'),'attr'=>['type'=>'date','width'=>100,'sortable'=>true,'resizable'=>true,'align'=>'center']],
+                'primary_name'=> ['order'=>20,'label'=>lang('primary_name_b'),'attr'=>['width'=>220,'sortable'=>true,'resizable'=>true],
                     'events'=> ['styler'=>"function(value,row){ if (row.is_ach=='1') { return {style:'background-color:lightgreen;color:#444;'}; } }"]],
-                'inv_num'     => ['order'=>30,'label'=>pullTableLabel('journal_main', 'invoice_num', '12'),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true, 'align'=>'center']],
+                'inv_num'     => ['order'=>30,'label'=>lang('invoice_num_12'),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true, 'align'=>'center']],
                 'amount'      => ['order'=>40,'label'=>lang('amount_due'),'attr'=>['type'=>'currency', 'width'=>100,'resizable'=>true, 'align'=>'right'],
                     'events'=> ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
                 'description' => ['order'=>50,'label'=>lang('notes'),     'attr'=>['width'=>220,'resizable'=>true,'editor'=>'text']],
-                'date_1'      => ['order'=>60,'label'=>pullTableLabel('journal_item', 'date_1', $journalID),'attr'=>['type'=>'date','width'=>90,'sortable'=>true, 'resizable'=>true, 'align'=>'center'],
+                'date_1'      => ['order'=>60,'label'=>lang("date_1_{$journalID}"),'attr'=>['type'=>'date','width'=>90,'sortable'=>true, 'resizable'=>true, 'align'=>'center'],
                     'events'=>['sorter' => dgSorterDate()]],
                 'discount'    => ['order'=>70,'label'=>lang('discount'),'styles'=>['text-align'=>'right'],
                     'attr'  => ['type'=>'currency','width'=>80, 'resizable'=>true, 'align'=>'right'],
@@ -967,7 +967,7 @@ class jCommon
      * @return array - grid structure
      */
     protected function dgOrders($name, $type) {
-        $on_hand    = pullTableLabel('inventory', 'qty_stock');
+        $on_hand    = lang('qty_stock');
         $gl_account = $type=='v' ? 'gl_inv'    : 'gl_sales';
         $inv_field  = $type=='v' ? 'item_cost' : 'full_price';
         $inv_title  = $type=='v' ? lang('cost'): lang('price');
@@ -1006,7 +1006,7 @@ class jCommon
                         'print'   => ['order'=>80,'icon'=>'print',   'events'=>['onClick'=>"inventoryForm(bizGridGetRow('$name'));"]],
                         'trash'   => ['order'=>90,'icon'=>'trash',   'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"],
                             'display' => "typeof row.item_ref_id==='undefined' || row.item_ref_id=='0' || row.item_ref_id==''"]]],
-                'sku'=> ['order'=>30, 'label'=>pullTableLabel('journal_item', 'sku', $this->journalID),
+                'sku'=> ['order'=>30, 'label'=>lang('sku'),
                     'attr' => ['width'=>150, 'sortable'=>true, 'resizable'=>true, 'align'=>'center', 'value'=>''],
                     'events'=>  ['editor'=>"{type:'combogrid',options:{ url:'".BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows&clr=1',
                         width:150, panelWidth:550, delay:500, idField:'sku', textField:'sku', mode:'remote',
@@ -1029,9 +1029,9 @@ class jCommon
                             {field:'$gl_account', hidden:true}, {field:'item_weight', hidden:true}]]}}"]],
                 'description'  => ['order'=>40, 'label'=>lang('description'),'attr'=>['width'=>400,'editor'=>dgEditText(),'resizable'=>true],
                     'events' => ['formatter'=>"function(value) { return bizGridFormatter(value); }"]],
-                'gl_account'   => ['order'=>50, 'label'=>pullTableLabel('journal_item', 'gl_account', $this->journalID),'attr'=>['width'=>100,'resizable'=>true,'align'=>'center'],
+                'gl_account'   => ['order'=>50, 'label'=>lang("gl_account_{$this->journalID}"),'attr'=>['width'=>100,'resizable'=>true,'align'=>'center'],
                     'events'   => ['editor'=>dgEditGL()]],
-                'tax_rate_id'  => ['order'=>60, 'label'=>pullTableLabel('journal_main', 'tax_rate_id', $this->type),'attr'=>['hidden'=>$hideItemTax,'width'=>150,'resizable'=>true,'align'=>'center'],
+                'tax_rate_id'  => ['order'=>60, 'label'=>lang("tax_rate_id_{$this->type}"),'attr'=>['hidden'=>$hideItemTax,'width'=>150,'resizable'=>true,'align'=>'center'],
                     'events'   => ['editor'=>dgEditTax($name, 'tax_rate_id', $type, "totalUpdate('dgOrders onChangeTax');"),
                     'formatter'=> "function(value,row){ return getTextValue(bizDefaults.taxRates.$type.rows, value); }"]],
                 'price'        => ['order'=>70, 'label'=>lang('price'), 'attr'=>['width'=>80,'value'=>0,'resizable'=>true,'align'=>'right'],

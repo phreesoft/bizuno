@@ -29,7 +29,6 @@ namespace bizuno;
 
 class cleaner
 {
-
     /**
      * This is designed to clean any data input, generally used for _GET and _POST variables but can be used for any data types
      * @param mixed $value this excepts any data and applies filters and tests
@@ -308,9 +307,22 @@ function lang($idx, $module='')
 }
 
 /**
+ * Translates into the locale language from the registry
+ * @param string $idx - The index of the $lang array to pull the language translation from
+ * @param string $dash - Dashboard ID used as index in language array
+ * @return string - translation if found, original $idx if not
+ */
+function langDash($idx, $dash='')
+{
+    global $bizunoLang;
+    if (!is_null($bizunoLang['dashboards'][$dash][$idx]) && isset($bizunoLang['dashboards'][$dash][$idx])) { return $bizunoLang['dashboards'][$dash][$idx]; }
+    return isset($bizunoLang['core'][$idx]) ? $bizunoLang['core'][$idx] : $idx;
+}
+
+/**
  * This function is a special case of function lang that adds slashes to translations for embedding into JavaScript code
  * @param string $idx - The index of the $lang array to pull the language translation from
- * @param string $suffix - suffix to check for variants of the index value
+ * @param string $module - Module index in the 
  * @return string - translation if found with slashes added, original $idx if not (with slashes)
  */
 function jsLang($idx, $module)
@@ -405,27 +417,6 @@ function getMethLang($module, $method, $code)
 function getExtMethLang($modID, $folder, $code)
 {
     return getMethLang($modID, $folder, $code);
-}
-
-/**
- * @TODO - DEPRECATED - Tries to pull the best label for a table field using a suffix for additional resolution.
- * @param string $table name of the table
- * @param string $field name of the column or field
- * @param string $suffix to further refine the translation, suffix is typically data from another field in the table to categorize the row
- * @return string $field the string of the label or the constant value
- */
-function pullTableLabel($table, $field, $suffix='')
-{
-    return lang($field, $suffix);
-/*    global $bizunoLang;
-    if (defined('BIZUNO_DB_PREFIX') && constant('BIZUNO_DB_PREFIX') != '') {
-        $pos = strpos($table, BIZUNO_DB_PREFIX);
-        if ($pos !== false) { $table = substr_replace($table, '', $pos,strlen(BIZUNO_DB_PREFIX)); }
-    }
-    if     (isset($bizunoLang[$table.'_'.$field.'_'.$suffix])) { return $bizunoLang[$table.'_'.$field.'_'.$suffix]; }
-    elseif (isset($bizunoLang[$table.'_'.$field]))             { return $bizunoLang[$table.'_'.$field]; }
-    elseif (isset($bizunoLang[$field]))                        { return $bizunoLang[$field]; }
-    return $field; */
 }
 
 /**
@@ -635,7 +626,8 @@ function requestData($structure, $suffix='', $voidLabels=false)
     $request= $_POST;
     foreach ($structure as $field => $content) {
         if ($voidLabels && isset($request[$field.$suffix])) {
-            if ($request[$field.$suffix] == pullTableLabel($content['table'], $field, '', $suffix)) { $request[$field.$suffix] = ''; }
+            $label = !empty($suffix) ? lang($field.'_'.$suffix) : lang($field);
+            if ($request[$field.$suffix] == $label) { $request[$field.$suffix] = ''; }
         }
         if (in_array($content['format'], ['currency'])) { $content['format'] = 'float'; } // special case for number boxes with special format options
         if (isset($request[$field.$suffix])) {

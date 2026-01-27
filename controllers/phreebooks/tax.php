@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-15
+ * @version    7.x Last Update: 2026-01-27
  * @filesource /controllers/phreebooks/tax.php
  */
 
@@ -257,7 +257,7 @@ function preSubmit() {
                 'action'=> ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> ['invVendTrash'=>['icon'=>'trash','order'=>20,'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'cTitle'=> ['order'=>0, 'attr'=>['hidden'=>'true']],
-                'cID'   => ['order'=>10,'label'=>pullTableLabel('contacts', 'short_name', 'v'), 'attr'=>['width'=>250,'resizable'=>true,'align'=>'center'],
+                'cID'   => ['order'=>10,'label'=>lang('short_name_v'), 'attr'=>['width'=>250,'resizable'=>true,'align'=>'center'],
                     'events' => ['formatter'=>"function(value, row) { return row.cTitle; }",'editor'=>dgEditComboTax($name)]],
                 'text'  => ['order'=>20,'label'=>lang('description'),'attr'=>['width'=>250,'resizable'=>true,'editor'=>'text']],
                 'glAcct'=> ['order'=>30,'label'=>lang('gl_account'), 'attr'=>['width'=>100,'resizable'=>true,'align' =>'center'],'events'=>['editor'=>dgEditGL()]],
