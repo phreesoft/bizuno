@@ -1874,7 +1874,7 @@ function bizUnitDiscDisc(newValue) {
         foreach ($request as $key => $value) {
             if (strpos($key, "rID_") === 0) {
                 $rID = str_replace("rID_", "", $key);
-                dbWrite(BIZUNO_DB_PREFIX."journal_item", ['date_1'=>clean($value, 'date')], 'update', "id=$rID");
+                dbWrite(BIZUNO_DB_PREFIX.'journal_item', ['date_1'=>clean($value, 'date')], 'update', "id=$rID");
             }
         }
         msgAdd(lang('msg_database_write'), 'success');

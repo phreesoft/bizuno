@@ -1184,7 +1184,8 @@ if ('state'==$key) {
                 $viewDataValues[$tmp[0]] = isset($tmp[1]) ? $tmp[1] : '';
             }
             if (empty($row['item_ref_id'])) { continue; }
-            $txID = dbGetValue(BIZUNO_DB_PREFIX."journal_item", array('description','trans_code'), "ref_id='{$prop['settings']['items'][0]['item_ref_id']}' AND gl_type='ttl'");
+            $txID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', array('description', 'trans_code'), "ref_id='{$prop['settings']['items'][0]['item_ref_id']}' AND gl_type='ttl'");
+            msgDebug("\nReturned from fetching trans_code with values = ".print_r($txID, true));
             $props1 = !empty($txID['description']) ? explode(";", $txID['description']) : [];
             foreach ($props1 as $val) {
                 $tmp = explode(":", $val);
