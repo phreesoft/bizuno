@@ -45,7 +45,7 @@ function bizunoUpgrade()
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD `gl_acct_v` VARCHAR(15) DEFAULT NULL COMMENT 'type:ledger;tag:DefGLAcctV;order:68' AFTER `gl_account`");
             dbGetResult("UPDATE `"     .BIZUNO_DB_PREFIX."contacts` SET gl_acct_v=gl_account WHERE ctype_v='1'");
             dbGetResult("UPDATE `"     .BIZUNO_DB_PREFIX."contacts` SET gl_acct_c=gl_account WHERE ctype_c='1'");
-//            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` DROP `gl_account`;");
+//          dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` DROP `gl_account`;");
         }
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'ach_enable')) {
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."contacts ADD `ach_enable` ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;order:10;tag:ACHEnable' AFTER account_number");
@@ -60,7 +60,8 @@ function bizunoUpgrade()
                 case 'api': // merge the proIF settings
                     break;
                 case 'contacts': // merge the proCust settings
-                    $nexus = getModuleCache('proCust', 'settings', 'nexusSt');
+                    $nexus = [];
+                    $nexus['states'] = getModuleCache('proCust', 'settings', 'nexusSt');
                     if (!empty($nexus)){ dbMetaSet(0, 'nexus',$nexus); }
                     $edi   = getModuleCache('proCust', 'edi');
                     if (!empty($edi))  { dbMetaSet(0, 'edi',  $edi); }

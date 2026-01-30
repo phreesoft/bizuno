@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -331,8 +331,9 @@ if (!formValidate()) return false;\n\treturn true;\n}";
             msgDebug("\nreturned with new ID = $rID and journal ID = $this->journalID");
         }
         // complete the structure
-        $structure['invoice_num']['tip'] = lang('msg_leave_null_to_assign_ref');
-        $structure['rep_id']['values']   = viewRoleDropdown(in_array($this->journalID, [3, 4, 6, 7])?'purch':'sales');
+        $structure['invoice_num']['tip']  = lang('msg_leave_null_to_assign_ref');
+        $structure['invoice_num']['label']= lang("invoice_num_{$this->journalID}");
+        $structure['rep_id']['values']    = viewRoleDropdown(in_array($this->journalID, [3, 4, 6, 7])?'purch':'sales');
         if (sizeof(getModuleCache('phreebooks', 'currency', 'iso')) > 1) {
             $structure['currency']['callback']    = 'totalsCurrency';
             $structure['currency']['attr']['type']= 'selCurrency';

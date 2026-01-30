@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /local/en_US/language.php
  */
 
@@ -387,6 +387,7 @@ $langCore = [
     'maintenance' => 'Maintenance',
     'manager' => 'Manager',
     'manufacturing' => 'Manufacturing',
+    'marketplace' => 'Marketplace',
     'margin' => 'Margin',
     'max' => 'Max',
     'maximum' => 'Maximum',
@@ -608,6 +609,8 @@ $langCore = [
     'tasks_audit' => 'Audit Tasks',
     'tasks_training' => 'Training Tasks',
     'tax_exempt' => 'Tax Exempt',
+    'tax_collected' => 'Sales Tax Filing Report',
+    'tax_calc_desc' => 'This tool generates a report that can be used as the geolocation of sales tax collections for the specified month broken down to the city level.',
     'telephone' => 'Telephone',
     'telephone1' => 'Telephone',
     'telephone2' => 'Alt Telephone',

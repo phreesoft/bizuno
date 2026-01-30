@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-11
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /controllers/api/admin.php
  */
 
@@ -148,12 +148,6 @@ class apiAdmin extends apiCommon
     {
         $chan = $this->getMethod();
         $chan->getTaxVersion($layout);
-    }
-
-    public function getTaxTable(&$layout=[])
-    {
-        $chan = $this->getMethod();
-        $chan->getTaxTable($layout);
     }
 
     public function inventoryGo(&$layout=[])

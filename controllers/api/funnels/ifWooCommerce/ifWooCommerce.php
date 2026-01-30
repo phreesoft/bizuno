@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-13
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -93,9 +93,7 @@ class ifWooCommerce extends apiExport
             'selSync'   => ['order'=>10,'break' =>true,'label'=>$this->lang['sync_delete'], 'attr'=>['type'=>'checkbox','value'=>1]],
             'btnSync'   => ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartSync&modID=$this->code&syncDelete='+bizCheckBoxGet('selSync'));"],  'attr'=>['type'=>'button','value'=>lang('go')]],
             'calConfirm'=> ['order'=>10,'break' =>true,'label'=>$this->lang['status_date'], 'attr'=>['type'=>'date',    'value'=>biz_date('Y-m-d')]],
-            'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val());"],'attr'=>['type'=>'button','value'=>lang('confirm')]],
-            'btnTaxVer' => ['order'=>40,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/getTaxVersion&modID=$this->code');"],'attr'=>['type'=>'button','value'=>$this->lang['check_now']]],
-            'btnTaxGet' => ['order'=>60,'events'=>['onClick'=>"jqBiz('#frmTaxTbl').submit();"],'attr'=>['type'=>'button','value'=>$this->lang['get_table']]]];
+            'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val());"],'attr'=>['type'=>'button','value'=>lang('confirm')]]];
         $data = ['title'=>$this->lang['title'],
             'divs'   => ['divIfWC'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
                 'head'   => ['order'=> 1,'type'=>'fields','keys'=>['imgLogo']],
@@ -122,20 +120,14 @@ class ifWooCommerce extends apiExport
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmConfirm'],
                     'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['status_info']}</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['calConfirm','btnConfirm']],
-                    'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'testTax'=> ['title'=>$this->lang['test_tax_lbl'],'type'=>'divs','divs'=>[
-                    'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmTaxTbl'],
-                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['test_tax_desc']}</p>"],
-                    'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnTaxVer','btnTaxGet']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => [
                 'frmInv'    =>['attr'=>['type'=>'form','action'=>'']],
                 'frmSync'   =>['attr'=>['type'=>'form','action'=>'']],
-                'frmConfirm'=>['attr'=>['type'=>'form','action'=>'']],
-                'frmTaxTbl' =>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/getTaxTable&modID=$this->code"]]],
+                'frmConfirm'=>['attr'=>['type'=>'form','action'=>'']]],
             'fields' => $fields,
             'jsHead' => ['init'=>$this->getViewJS()],
-            'jsReady'=> ['init'=>"ajaxForm('frmInv');\najaxForm('frmSync');\najaxForm('frmConfirm');\najaxDownload('frmTaxTbl');\njqBiz('progress').attr({value:0,max:100});"]];
+            'jsReady'=> ['init'=>"ajaxForm('frmInv');\najaxForm('frmSync');\najaxForm('frmConfirm');\njqBiz('progress').attr({value:0,max:100});"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);
     }
 
@@ -462,28 +454,6 @@ function productUpload(rID) {
             }
         }
         return msgAdd("There was an issue retrieving the sales tax rate table version from Phreesoft. Please try again later.", 'trap');
-    }
-
-    public function getTaxTable()
-    {
-        global $io;
-        $output= [];
-        if (!$security = validateAccess($this->code, 2)) { return; }
-        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $result= $io->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/tax_table_dump');
-        if (empty($result['data'])) { return msgAdd("Error retrieving the new sales tax data!"); }
-        // get the Nexus States
-        $nexus = dbMetaGet(0, 'nexus');
-        metaIdxClean($nexus); // remove the indexes
-        msgDebug("\nNexus states = ".print_r($nexus, true));
-        if (empty($nexus)) { return msgAdd("You don't have any Nexus states defined. Please do that in Settings -> PhreeBooks -> Settings and then re-run this script."); }
-        $output[] = array_shift($result['data']); // heading
-        foreach ($result['data'] as $row) {
-            $parts = explode(',', $row);
-            if (in_array($parts[1], $nexus)) { $output[] = $row; } // check the state
-        }
-        msgLog("Retrieved sales tax table from PhreeSoft");
-        $io->download('data', implode("\n", $output), 'SalesTaxDump.csv');
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /controllers/contacts/main.php
  */
 
@@ -64,7 +64,7 @@ class contactsMain
     {
         $postTaxID= clean('tax_rate_id', ['format'=>'integer','default'=>null], 'post');
         $defTaxID = $this->type=='v' ? getModuleCache('phreebooks', 'settings', 'vendors', 'tax_rate_id_v') : getModuleCache('phreebooks', 'settings', 'customers', 'tax_rate_id_c');
-        $this->contact = ['id'=>0, "ctype_{$this->type}"=>'1', 'inactive'=>'0', 'terms'=>'0', 'price_sheet'=>0, 'rep_id'=>0, 'store_id'=>0, 'gov_id_number'=>'',
+        $this->contact = ['id'=>0, "ctype_{$this->type}"=>'1', 'inactive'=>'0', 'terms'=>'0', 'price_sheet'=>0, 'rep_id'=>0, 'store_id'=>0, 'gov_id_number'=>'', 'newsletter'=>'0',
             'gl_account'=>$this->type=='v'? getModuleCache('phreebooks', 'settings', 'vendors', 'gl_expense') : getModuleCache('phreebooks', 'settings', 'customers', 'gl_sales'),
             'tax_rate_id'=> $postTaxID !== null ? $postTaxID : $defTaxID, 'first_date'=>biz_date('Y-m-d'), 'date_last'=>biz_date('Y-m-d')];
     }

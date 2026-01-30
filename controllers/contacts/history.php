@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-01-29
  * @filesource /controllers/contacts/history.php
  */
 
@@ -166,14 +166,14 @@ class contactsHistory
                             'display'=> "row.closed=='0' && (row.journal_id=='7' || row.journal_id=='13')"]]],
                 'invoice_num'   => ['order'=>10, 'field'=>"invoice_num",'label'=>lang("invoice_num_{$jID}"),
                     'attr'  => ['width'=>125, 'sortable'=>true, 'resizable'=>true]],
-                'purch_order_id'=> ['order'=>20, 'field'=>"purch_order_id",'label'=>lang("purch_order_id_{$jID}"),
+                'purch_order_id'=> ['order'=>20, 'field'=>'purch_order_id','label'=>lang('purch_order_id'),
                     'attr'  => ['width'=>150, 'sortable'=>true, 'resizable'=>true]],
-                'post_date'     => ['order'=>30, 'field' => "post_date", 'format'=>'date','label' => lang("post_date_{$jID}"),
+                'post_date'     => ['order'=>30, 'field' => 'post_date', 'format'=>'date','label' => lang('post_date'),
                     'attr'  => ['width'=>120,'align'=>'center', 'sortable'=>true, 'resizable'=>true]],
-                'closed_date'   => ['order'=>40, 'field'=>"closed_date",'label'=>in_array($jID, [6, 12]) ? lang('paid') : lang('closed'),
+                'closed_date'   => ['order'=>40, 'field'=>'closed_date','label'=>in_array($jID, [6, 12]) ? lang('paid') : lang('closed'),
                     'attr'  => ['width'=>120,'align'=>'center', 'sortable'=>true, 'resizable'=>true],
                     'events'=> ['formatter'=>"function(value,row) { return (row.closed=='1' && value!='') ? formatDate(value) : (row.bal_due ? formatCurrency(row.bal_due, false) : ''); }"]],
-                'total_amount'  => ['order'=>50, 'field'=>"total_amount",'label'=>lang('total'), 'attr'=>['width'=>100, 'align'=>'right', 'sortable'=>true, 'resizable'=>true],
+                'total_amount'  => ['order'=>50, 'field'=>'total_amount','label'=>lang('total'), 'attr'=>['width'=>100, 'align'=>'right', 'sortable'=>true, 'resizable'=>true],
                     'events'=> ['formatter'=>"function(value,row) { return (row.journal_id==7 || row.journal_id==13) ? formatCurrency(-value, false) : formatCurrency(value, false); }"]]]];
         if (in_array(getUserCache('profile', 'device'), ['mobile','tablet'])) { 
             $data['columns']['closed_date']['attr']['hidden'] = true;

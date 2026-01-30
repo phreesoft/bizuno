@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-12
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /view/easyUI/html5.php
  */
 
@@ -2087,11 +2087,23 @@ bizNumEdSet('$name',curIndex,'rate', 0); },
  * @param string $onClick - JavaScript to run on click event
  * @return string set for the editor structure
  */
-function dgEditContact($onClick='', $type='c') {
-    return "{type:'combogrid',options:{ data:pbChart, mode:'local', width:300, panelWidth:450, idField:'id', textField:'title', onClickRow:function(index, row){ $onClick },
-inputEvents:jqBiz.extend({},jqBiz.fn.combogrid.defaults.inputEvents,{ keyup:function(e){ glComboSearch(jqBiz(this).val()); } }),
-rowStyler:  function(index,row){ if (row.inactive=='1') { return { class:'row-inactive' }; } },
-columns:    [[{field:'id',title:'".jsLang('gl_account')."',width:130},{field:'title',title:'".jsLang('title')."',width:210},{field:'type',title:'".jsLang('type')."',width:160}]]}}";
+function dgEditContact($name='', $type='c') {
+    return "{type:'combogrid', options:{width:130, panelWidth:460, delay:900, idField:'id', textField:'short_name', mode:'remote',
+    url:'".BIZUNO_URL_AJAX."&bizRt=contacts/main/managerRows&clr=1&type=$type', selectOnNavigation:false,
+    onSelect:function(index,row) {
+    bizSelEdSet('$name',curIndex,'cID',row.id);
+    bizTextEdSet('$name',curIndex,'cTitle',row.short_name);
+    bizTextEdSet('$name',curIndex,'text',row.primary_name);
+    var allRows = jqBiz('#dgContactIDs').datagrid('getRows');
+    var jsonString = JSON.stringify(allRows);
+    jqBiz('#contactIDs').val(jsonString);
+},
+    columns: [[
+        {field:'id',          hidden:true},
+        {field:'short_name',  width:100,title:'".jsLang('short_name')."'},
+        {field:'primary_name',width:200,title:'".jsLang('primary_name')."'},
+        {field:'city',        width:100,title:'".jsLang('city')."'},
+        {field:'state',       width: 50,title:'".jsLang('state')."'} ]] }}";
 }
 
 /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-02
+ * @version    7.x Last Update: 2026-01-30
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -267,13 +267,7 @@ class phreebooksAdmin {
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/currency.php', 'phreebooksCurrency');
         $currency= new phreebooksCurrency();
         $repost  = $this->getViewRepost();
-        // Add the Sales Tax Collected panel to tools tab
-        $period= getModuleCache('phreebooks', 'fy', 'period') - 1;
-        $taxNxs  = '<div><form id="frmTaxCalc" action="'.BIZUNO_URL_AJAX.'&bizRt=phreebooks/restfulTax/calcTaxCollected">';
-        $taxNxs .= "<p>".lang('tax_calc_desc')."</p>\n";
-        $taxNxs .= html5('period', ['label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]]);
-        $taxNxs .= '<p>'.html5('', ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]).'</p>';
-        $taxNxs .= "</form><script>ajaxDownload('frmTaxCalc');</script></div>";
+        $period  = getModuleCache('phreebooks', 'fy', 'period') - 1;
         $fields  = [
             'glTestDesc'   => ['order'=>10,'html'=>$this->lang['pbtools_gl_test_desc'],'attr'=>['type'=>'raw']],
             'btnRepairGL'  => ['order'=>20,'attr'=>['type'=>'button','value'=>lang('start')],'events'=>['onClick'=>"jsonAction('phreebooks/tools/glRepair');"]],
@@ -285,19 +279,20 @@ class phreebooksAdmin {
             'purgeGlDesc'  => ['order'=>10,'html'=>$this->lang['msg_gl_db_purge_confirm'],'attr'=>['type'=>'raw']],
             'purge_db'     => ['order'=>20,'styles'=>['text-align'=>'right'],'attr'=>['size'=>7]],
             'btn_purge'    => ['order'=>30,'attr'=>['type'=>'button', 'value'=>$this->lang['phreebooks_purge_db_journal']],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_gl_db_purge_confirm']."')) jsonAction('phreebooks/tools/glPurge', 0, jqBiz('#purge_db').val());"]]];
+                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_gl_db_purge_confirm']."')) jsonAction('phreebooks/tools/glPurge', 0, jqBiz('#purge_db').val());"]],
+            'taxMonth'     => ['order'=>20,'label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]],
+            'btnTaxSave'   => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]];
         $data    = [
             'tabs'    => ['tabAdmin'=>['divs'=>[
                 'tabGL'    => ['order'=>20,'label'=>lang('chart_of_accts'), 'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/chart/manager'"]],
                 'tabCur'   => ['order'=>30,'label'=>lang('currencies'),     'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/currency/manager'"]],
                 'tabNexus' => ['order'=>40,'label'=>lang('nexus'),          'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
-                'tabTaxc'  => ['order'=>45,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
-                'tabTaxv'  => ['order'=>50,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
+                'tabTaxc'  => ['order'=>50,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
+                'tabTaxv'  => ['order'=>55,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
+                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
                 'tabFY'    => ['order'=>80,'label'=>lang('fiscal_calendar'),'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/admin/managerFY'"]],
-                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
-                'tools'    => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
-                'tabTools' => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
+                'tabTools' => ['order'=>90,'label'=>lang('tools'),'classes'=>['areaView'],'type'=>'divs','divs'=>[
                     'testGL'   => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'testGL'],
                     'cleanAtch'=> ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'cleanAtch'],
                     'pruneCOGS'=> ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'pruneCOGS'],
@@ -305,7 +300,7 @@ class phreebooksAdmin {
                     'ediGet'   => ['order'=>50,'type'=>'panel','classes'=>['block33'],'key'=>'ediGet'],
                     'taxCalc'  => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'taxCalc'],
                     'ediMan'   => ['order'=>70,'type'=>'panel','classes'=>['block33'],'key'=>'ediMan']]],
-                    'purgeGL'  => ['order'=>90,'type'=>'panel','hidden'=> $security>4?false:true,'classes'=>['block33'],'key'=>'purgeGL']]]]]],
+                    'purgeGL'  => ['order'=>90,'type'=>'panel','hidden' =>$security>4?false:true,'classes'=>['block33'],'key'=>'purgeGL']]]],
             'panels'  => [
                 'repostGL' => ['label'=>$this->lang['phreebooks_repost_title'],'type'=>'html',  'html'=>$repost],
                 'testGL'   => ['label'=>$this->lang['title_gl_test'],          'type'=>'fields','keys'=>['glTestDesc','btnRepairGL']],
@@ -321,17 +316,21 @@ class phreebooksAdmin {
                     'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jqBiz('#frmEdiMan').submit();"]])."</p>"]],
                     'formEOF'=> ['order'=>85,'type'=>'html','html'=>'</form>']],
                 'purgeGL'  => ['label'=>$this->lang['msg_gl_db_purge'],        'type'=>'fields','keys'=>['purgeGlDesc','purge_db','btn_purge']],
-                'taxCalc'  => ['label'=>lang('tax_collected'),'type'=>'html',  'html'=>$taxNxs]],
-            'datagrid'=> ['dgCurrency'  =>$currency->dgCurrency('dgCurrency', $security)],
+                'taxCalc'  => ['title'=>lang('tax_collected'),'type'=>'divs','divs'=>[
+                    'desc'   => ['order'=>10,'type'=>'html',    'html'=>"<p>".lang('tax_calc_desc')."</p>"],
+                    'formBOF'=> ['order'=>15,'type'=>'form',    'key' =>'frmTaxCalc'],
+                    'body'   => ['order'=>20,'type'=>'fields',  'keys'=>['taxMonth', 'btnTaxSave']],
+                    'mktplc' => ['order'=>30,'type'=>'datagrid','key' =>'dgNoTax']],
+                    'formEOF'=> ['order'=>85,'type'=>'html',    'html'=>'</form>']]],
             'forms'   => [
-                'frmEdiMan'  => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
-                'frmCurrency'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/currency/save"]]],
+                'frmEdiMan' =>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/ediAPI/ediManual"]],
+                'frmTaxCalc'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/restfulTax/calcTaxCollected"]]],
             'fields'  => $fields,
-            'jsHead'  => ['purgeAttch' => $this->getViewPurgeAttach(),
+            'jsHead'  => ['purgeAttch'=>$this->getViewPurgeAttach(),
                 'dataCurrency'=> "var dataCurrency = ".json_encode(array_values(getModuleCache('phreebooks','currency','iso'))).";",
                 'dataEDI'     => "var dataEDI = "     .json_encode(array_values(getModuleCache($this->moduleID,'edi'))).";"],
             'jsBody'  => ['init'=>"jqBiz('#repost_begin').datebox({ required:true }); jqBiz('#repost_end').datebox({ required:true });"],
-            'jsReady' => ['spTools'=>"ajaxForm('frmEdiMan');"]]; // ajaxForm('frmImpTax');
+            'jsReady' => ['spTools'=>"ajaxForm('frmEdiMan'); ajaxDownload('frmTaxCalc');"]]; // ajaxForm('frmImpTax');
         $jIDs = [2,3,4,6,7,9,10,12,13,14,15,16,17,18,20,22]; // 19, 21 - POS, POP
         $order= 20;
         foreach ($jIDs as $jID) {
