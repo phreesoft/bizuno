@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-28
+ * @version    7.x Last Update: 2026-02-01
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -48,6 +48,7 @@ class phreebooksRestfulTax
         $this->lang     = getLang($this->moduleID);
         $this->nexusMeta= getMetaCommon($this->metaPrefix);
         if (!isset($this->nexusMeta['states'])) { $this->nexusMeta = ['states'=>$this->nexusMeta]; } // patch for older versions
+        msgDebug("\nRead nexus meta from common table = ".print_r($this->nexusMeta, true));
         $this->states   = [
             'AK','AL','AR','AZ','CA','CO','CT','DC','DE','FL','GA','HI','IA','ID','IL','IN','KS',
             'KY','LA','MA','MD','ME','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV',
@@ -162,44 +163,34 @@ class phreebooksRestfulTax
      */
     public function calcTaxCollected()
     {
-msgTrap();
         global $io;
-        msgDebug("\nEntering calcTaxCollected with nexus states = ".print_r($this->nexusMeta['states'], true));
+        msgDebug("\nEntering calcTaxCollected");
         // get customer ID's that are marketplaces as tax for these is withheld separately.
-        $mktplaces = [];
-        $period= clean('period', 'integer', 'post');
+        $mktplcs = [];
+        if (!empty($this->nexusMeta['marketplaces'])) {
+            foreach ($this->nexusMeta['marketplaces'] as $row) { $mktplcs[] = $row['cID']; }
+        }
+        $period= clean('taxMonth', 'integer', 'post');
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "period=$period AND journal_id IN (12, 13)", 'post_date', ['id', 'journal_id', 'invoice_num', 'post_date', 'total_amount', 'sales_tax', 'freight', 'contact_id_b', 'address1_s', 'address2_s', 'city_s', 'state_s', 'postal_code_s', 'country_s']);
-        $data  = [['post_date', 'invoice', 'shipping', 'tax', 'total', 'cust_id', 'exempt', 'address1', 'address2', 'city', 'state', 'zip_code', 'country']];
+        $data  = [['post_date', 'type', 'invoice', 'shipping', 'tax', 'total', 'cust_id', 'exempt', 'address1', 'address2', 'city', 'state', 'postal_code', 'country']];
         foreach ($rows as $row) {
             $data[] = [
-                $row['post_date'], $row['invoice_num'], $row['journal_id']==13?-$row['freight']:$row['freight'],
+                $row['post_date'], $row['journal_id']==13?'credit':'sale', $row['invoice_num'], $row['journal_id']==13?-$row['freight']:$row['freight'],
                 $row['journal_id']==13?-$row['sales_tax']:$row['sales_tax'], $row['journal_id']==13?-$row['total_amount']:$row['total_amount'],
                 $row['contact_id_b'], empty($row['sales_tax']) ? 1 : 0,
                 $row['address1_s'], $row['address2_s'], $row['city_s'], $row['state_s'], $row['postal_code_s'], $row['country_s']];
-        }   
-        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $post  = ['bizID'=>BIZUNO_BIZID, 'nexus'=>$this->nexusMeta['states'], 'marketplaces'=>$mktplaces, 'invoices'=>$data];
-        $result= $io->restRequest('post', $this->server, 'wp-json/phreesoft-api/v1/sales_report', $post);
-        msgDebug("\nreceived back from PhreeSoft the following tax summary = ".print_r($result, true));
-        if (is_array($result)) { return msgAdd("Unexpected response from PhreeSoft: ".print_r($result, true), 'info'); } // probably an error, expecting json
-        $raw = json_decode($result, true);
-//        $output = $this->generateFile($raw);
-//        $io->download('data', implode("\n", $output), "Period_{$period}_Sales-".biz_date('Y-m-d').".csv");
-    }
-
-    private function getCounty($zip='')
-    {
-        msgDebug("\nEntering getCounty with zip = $zip");
-        if (empty($zip)) { return 'unknown'; }
-        $zipcode = substr(trim($zip), 0, 5); // make sure the zip doesn't have the +4
-        $results = dbGetMulti(BIZUNO_DB_PREFIX.'sales_tax_map', "zipcode='$zipcode'");
-        switch (sizeof($results)) {
-            case 0: return []; // not found, this is bad
-            case 1: break; // best case, only one county for this zip, return it
-            default: $results[0]['county'] .= '*'; // multiple county possible, need to get geolocation, but for now return the first with asterisk
         }
-        msgDebug("\nLeaving getCounty with zip = $zip and county result = {$results[0]['county']}");
-        return $results[0];
+        msgDebug("\nReady to send with total orders = ".(sizeof($data)-1));
+        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
+        $post  = json_encode(['bizID'=>BIZUNO_BIZID, 'nexus'=>$this->nexusMeta['states'], 'marketplaces'=>$mktplcs, 'invoices'=>$data]);
+        msgDebug("\npost after encoding = ".print_r($post, true));
+        $opts = ['headers'=>['Content-Type'=>'application/json']];
+        $result= $io->restRequest('post', $this->server, 'wp-json/phreesoft-api/v1/sales_report', $post, $opts);
+        if ($result['result']=='success') {
+            $output = $this->generateFile($result['content']);
+            $io->download('data', implode("\n", $output), "Period_{$period}_Sales-".biz_date('Y-m-d').".csv");
+        }
+        msgAdd('There was an unexpected error from PhreeSoft: '.print_r($result, true));
     }
 
     private function generateFile($data=[])
