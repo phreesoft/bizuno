@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-09
+ * @version    7.x Last Update: 2026-02-03
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -1193,7 +1193,7 @@ class phreeformRender
         global $report;
         $vals   = [];
         $group  = clean('group', 'cmd', 'get'); // i.e. bnk:j20
-        $defFrom= !empty($group) ? $this->guessDefTo($group) : 'gen';
+        $defFrom= !empty($group) ? $this->guessDefFrom($group) : (!empty($report->group_id) ? $this->guessDefFrom($report->group_id) : 'gen');
         $email  = getUserCache('profile', 'email');
         $title  = getUserCache('profile', 'title');
         if (!empty($email)) {
@@ -1238,9 +1238,10 @@ class phreeformRender
      */
     private function getToAddress(&$output, $mID)
     {
+        global $report;
         $group= clean('group', 'cmd', 'get'); // i.e. bnk:j20
-        $defTo= !empty($group) ? $this->guessDefTo($group) : 'gen';
-        msgDebug("\nreport entering getToAddress");
+        $defTo= !empty($group) ? $this->guessDefTo($group) : (!empty($report->group_id) ? $this->guessDefTo($report->group_id) : 'gen');
+        msgDebug("\nreport entering getToAddress with defTo = $defTo");
         $cData= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$mID");
         msgDebug("\nfetched cData: ".print_r($cData, true));
         $map  = ['gen', 'ar', 'purch', 'ap'];
@@ -1272,6 +1273,20 @@ class phreeformRender
     }
 
     /**
+     * Tries to guess the default from email address based on the group passed
+     * @param type $group
+     */
+    private function guessDefFrom($group='')
+    {
+        msgDebug("\nEntering guessDefFrom with group = $group.");
+        $parts = explode(':', $group);
+        if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ap': 'ar'; }
+        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''  : 'ar'; }
+        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? ''  : 'ap'; }
+        return 'gen';
+    }
+    
+    /**
      * Tries to guess the default to email address based on the group passed
      * @param type $group
      */
@@ -1280,8 +1295,8 @@ class phreeformRender
         msgDebug("\nEntering guessDefTo with group = $group.");
         $parts = explode(':', $group);
         if ($parts[0]=='bnk')  { return in_array($parts[1], ['j17','j20']) ? 'ar': 'ap'; }
-        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''  : 'ar'; }
-        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? ''  : 'ap'; }
+        if ($parts[0]=='cust') { return in_array($parts[1], ['j9', 'j10']) ? ''  : 'ap'; }
+        if ($parts[0]=='vend') { return in_array($parts[1], ['j3', 'j4'])  ? ''  : 'ar'; }
         return 'gen';
     }
     

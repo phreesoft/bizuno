@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-03
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -380,7 +380,7 @@ function preSubmitPrices() {
                 $rows[] = ['group'=>$level['title'],'text'=>"<div style='float:right'>".viewFormat($entry['price'], 'currency').'</div><div>'.(float)$entry['qty']."</div>"];
             }
         } }
-        $data = ['type'=>'popup', 'title'=>lang("prices_{$this->type}"), 'attr'=>['id'=>'winPrices','width'=>300,'height'=>700],
+        $data = ['type'=>'popup', 'title'=>sprintf(lang('tbd_prices'), lang("ctype_{$this->type}")), 'attr'=>['id'=>'winPrices','width'=>300,'height'=>700],
             'divs'  => ['winStatus'=>['order'=>50,'options'=>['groupField'=>"'group'",'data'=>"pricesData"],'type'=>'list','key' =>'lstPrices']],
             'lists' => ['lstPrices'=>[]], // handled as JavaScript data
             'jsHead'=> ['init'=>"var pricesData = ".json_encode($rows).";"]];

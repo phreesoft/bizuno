@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-02-03
  * @filesource /model/mail.php
  */
 
@@ -162,10 +162,10 @@ class bizunoMailer
     {
         global $mail;
         msgDebug("\nSending via SMTP with creds = ".print_r($creds, true));
-//$debugOutput = '';
-//$mail->Debugoutput = function ($str, $level) use (&$debugOutput) { $debugOutput .= $str . "\n"; };
-//$mail->SMTPDebug = 2;  // Or higher for more detail
+        $debugOutput = '';
         try {
+// Used to capture connection and other STMP issues, tied to a specific email address
+//if (getUserCache('profile', 'email')=='support@phreesoft.com') { $mail->SMTPDebug = 4; $mail->Debugoutput = function ($str, $level) use (&$debugOutput) { $debugOutput .= $str . "\n"; }; }
             $mail->isSMTP();
             $mail->SMTPAuth  = true;
             $mail->Host      = $creds['smtp_host'];
