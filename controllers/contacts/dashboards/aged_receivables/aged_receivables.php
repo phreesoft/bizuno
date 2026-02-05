@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-29
+ * @version    7.x Last Update: 2026-02-05
  * @filesource /controllers/contacts/dashboards/aged_receivables/aged_receivables.php
  */
 
@@ -37,7 +37,14 @@ class aged_receivables
     public $noSettings= true;
     public  $struc;
     public $lang      = ['title'=>'Aged Receivables',
-        'description'=>'Displays aged receivables. Does not include accounts that are current.'];
+        'description'=>'Displays aged receivables. Does not include accounts that are current.',
+        'aging' => 'Aging',
+        'current' => 'Current',
+        'late_1_30' => 'Late 1-30',
+        'late_31_60' => 'Late 31-60',
+        'late_61_90' => 'Late 61-90',
+        'late_91_120' => 'Late 91-120',
+        'late_over_120' => 'Over 120'];
 
     function __construct()
     {
@@ -57,14 +64,14 @@ class aged_receivables
     {
         $data  = $this->getTotals();
         $table = [
-            [lang('current'),      ['v'=>$data['balance_0'],  'f'=>viewFormat($data['balance_0'],  'currency')]],
-            [lang('late_1_30'),    ['v'=>$data['balance_30'], 'f'=>viewFormat($data['balance_30'], 'currency')]],
-            [lang('late_31_60'),   ['v'=>$data['balance_60'], 'f'=>viewFormat($data['balance_60'], 'currency')]],
-            [lang('late_61_90'),   ['v'=>$data['balance_90'], 'f'=>viewFormat($data['balance_90'], 'currency')]],
-            [lang('late_91_120'),  ['v'=>$data['balance_120'],'f'=>viewFormat($data['balance_120'],'currency')]],
-            [lang('late_over_120'),['v'=>$data['balance_121'],'f'=>viewFormat($data['balance_121'],'currency')]],
+            [$this->lang['current'],      ['v'=>$data['balance_0'],  'f'=>viewFormat($data['balance_0'],  'currency')]],
+            [$this->lang['late_1_30'],    ['v'=>$data['balance_30'], 'f'=>viewFormat($data['balance_30'], 'currency')]],
+            [$this->lang['late_31_60'],   ['v'=>$data['balance_60'], 'f'=>viewFormat($data['balance_60'], 'currency')]],
+            [$this->lang['late_61_90'],   ['v'=>$data['balance_90'], 'f'=>viewFormat($data['balance_90'], 'currency')]],
+            [$this->lang['late_91_120'],  ['v'=>$data['balance_120'],'f'=>viewFormat($data['balance_120'],'currency')]],
+            [$this->lang['late_over_120'],['v'=>$data['balance_121'],'f'=>viewFormat($data['balance_121'],'currency')]],
             [lang('total'),        ['v'=>$data['total'],      'f'=>viewFormat($data['total'],      'currency')]]];
-        $header= [['title'=>lang('term'), 'type'=>'string'], ['title'=>lang('amount'), 'type'=>'number']];
+        $header= [['title'=>$this->lang['aging'], 'type'=>'string'], ['title'=>lang('amount'), 'type'=>'number']];
         return ['type'=>'gTable', 'header'=>$header, 'data'=>$table, 'callback'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/agingData"];
     }
     public function getTotals()
