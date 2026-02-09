@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-20
+ * @version    7.x Last Update: 2026-02-07
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -82,7 +82,13 @@ class fedexShip extends fedexCommon
         msgDebug("\njson encoded payload = ".print_r(json_encode($payload), true));
         $resp   = $this->queryREST($this->is_freight?'ship/v1/freight/shipments':'ship/v1/shipments', $payload);
         if (!empty($resp['errors'])) {
-            foreach ($resp['errors'] as $error) { msgAdd("Error! FedEx rate request <br />Code: {$error['code']}<br />Message: {$error['message']}"); }
+            foreach ($resp['errors'] as $error) {
+                $msg = "FedEx rate request error!<br />Code: {$error['code']}";
+                if (!empty($error['parameterList'])) {
+                    foreach ($error['parameterList'] as $issue) { $msg .= "<br />Message: ".print_r($issue['value'], true); }
+                } else { $msg .= "<br />FedEx Message: {$error['message']}"; }
+                msgAdd($msg);
+            }
             return;
         }
         if (empty($resp['output']['transactionShipments'])) { return; }

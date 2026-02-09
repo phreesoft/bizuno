@@ -648,6 +648,169 @@ function viewDashJS(&$data)
 {
     $data['jsBody']['jsHome'] = "
 var widthPanel = 400;
+var panelOptionsArray = [];  // renamed from 'panels'
+var currentColumnCount = 0;
+
+function calculateColumnCount() {
+    return Math.floor(jqBiz(window).width() / widthPanel);
+}
+
+function createDivs() {
+    var newColumnCount = calculateColumnCount();
+
+    // Skip full recreate if column count is the same and portal already exists
+    if (newColumnCount === currentColumnCount && jqBiz('#dashboard').length && jqBiz('#dashboard').data('portal')) {
+        jqBiz('#dashboard').portal('resize');
+        refreshAllPanels();
+        return;
+    }
+
+    currentColumnCount = newColumnCount;
+
+    // Clean up old portal
+    if (jqBiz('#dashboard').length) {
+        try {
+            var allPortalPanels = jqBiz('#dashboard').portal('getPanels') || [];
+            jqBiz.each(allPortalPanels, function() {
+                jqBiz('#dashboard').portal('remove', this);
+            });
+        } catch (e) {}
+
+        try {
+            jqBiz('#dashboard').portal('destroy');
+        } catch (e) {}
+
+        jqBiz('#dashboard').remove();
+    }
+
+    // Create fresh dashboard container
+    var dashContainer = jqBiz('<div id=\"dashboard\"></div>').appendTo('#bizBody');
+
+    for (var i = 0; i < currentColumnCount; i++) {
+        dashContainer.append('<div></div>');
+    }
+
+    // Initialize the portal
+    dashContainer.portal({
+        border: false,
+        fit: true,
+        onStateChange: function() {
+            var currentState = getPortalState();
+            jqBiz.ajax({
+                url: '".BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/organize&menuID=' + menuID +
+                     '&numCols=' + currentColumnCount + '&state=' + encodeURIComponent(currentState)
+            });
+        }
+    });
+
+    // Fetch panels
+    jqBiz.ajax({
+        url: '".BIZUNO_URL_AJAX."&bizRt=bizuno/dashboard/render&menuID=' + menuID +
+             '&numCols=' + currentColumnCount,
+        success: addPanelsToPortal
+    });
+}
+
+function getPanelOptions(panelId) {
+    for (var i = 0; i < panelOptionsArray.length; i++) {
+        if (panelOptionsArray[i].id == panelId) {
+            return panelOptionsArray[i];
+        }
+    }
+    return undefined;
+}
+
+function getPortalState() {
+    var stateParts = [];
+    for (var colIndex = 0; colIndex < currentColumnCount; colIndex++) {
+        var columnIds = [];
+        var columnPanels = jqBiz('#dashboard').portal('getPanels', colIndex);
+        jqBiz.each(columnPanels, function() {
+            columnIds.push(jqBiz(this).attr('id'));
+        });
+        stateParts.push(columnIds.join(','));
+    }
+    return stateParts.join(':');
+}
+
+function addPanelsToPortal(jsonResponse) {
+    if (jsonResponse.message) displayMessage(jsonResponse.message);
+
+    panelOptionsArray = jsonResponse.Dashboard || [];
+
+    var portalLayoutState = jsonResponse.State || '';
+    var columnData = portalLayoutState.split(':');
+
+    for (var colIndex = 0; colIndex < columnData.length && colIndex < currentColumnCount; colIndex++) {
+        var panelIdsInColumn = columnData[colIndex].split(',');
+        for (var j = 0; j < panelIdsInColumn.length; j++) {
+            var currentId = panelIdsInColumn[j].trim();
+            if (!currentId) continue;
+
+            var panelConfig = getPanelOptions(currentId);
+            if (!panelConfig) continue;
+
+            var panelElement = jqBiz('<div id=\"' + panelConfig.id + '\"></div>').appendTo('body');
+
+            var contentUrl = panelConfig.href || '';
+            panelConfig.href = '';
+
+            panelElement.panel(panelConfig);
+
+            if (isMobile()) {
+                panelElement.panel('panel').draggable('disable');
+            }
+
+            panelElement.panel({
+                href: contentUrl,
+                onBeforeClose: function() {
+                    if (confirm('".jsLang('msg_confirm_delete')."')) {
+                        dashboardDelete(this);
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+            jqBiz('#dashboard').portal('add', {
+                panel: panelElement,
+                columnIndex: colIndex
+            });
+        }
+    }
+
+    setTimeout(refreshAllPanels, 120);
+}
+
+function refreshAllPanels() {
+    jqBiz('#dashboard .panel').each(function() {
+        jqBiz(this).panel('doLayout');
+        // If you know common inner components, add targeted resizes:
+        // jqBiz(this).find('.easyui-datagrid').datagrid('resize');
+        // jqBiz(this).find('.easyui-tabs').tabs('resize');
+        // jqBiz(this).find('.easyui-tree').tree('resize');
+        // jqBiz(this).find('.easyui-accordion').accordion('resize');
+    });
+    jqBiz('#dashboard').portal('resize');
+}
+
+// Window resize handler with debounce
+var resizeTimeout;
+jqBiz(window).on('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(createDivs, 250);
+});
+
+// Start on page load
+jqBiz(function() {
+    currentColumnCount = calculateColumnCount();
+    createDivs();
+});";
+    $data['jsReady']['initDash'] = "createDivs();";
+    
+/*
+    $data['jsBody']['jsHome'] = "
+var widthPanel = 400;
 var panels = new Array();
 var numCols = Math.floor(windowWidth / widthPanel); // in pixels
 function createDivs() {
@@ -700,7 +863,7 @@ function addPanels(json) {
     var panels = jqBiz('#dashboard').portal('getPanels');
     for (var i=0; i<panels.length; i++) { jqBiz('#dashboard').portal('remove', panels[i]); }
     panels = new Array();
-    createDivs();";
+    createDivs();"; */
 }
 
 /**

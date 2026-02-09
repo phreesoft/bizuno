@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-02-07
  * @filesource /controllers/shipping/common.php
  */
 
@@ -70,7 +70,7 @@ class shippingCommon
         unset($this->addrStruc['telephone2'],$this->addrStruc['email2'],$this->addrStruc['telephone3'],$this->addrStruc['email3']);
         unset($this->addrStruc['telephone4'],$this->addrStruc['email4'],$this->addrStruc['website'],   $this->addrStruc['notes']);
         $this->carriers = ['freeshipper', 'flat']; // pick a couple of default carriers to install
-        $carriers = $carriers = getMetaMethod('carriers');
+        $carriers = getMetaMethod('carriers');
         $this->myCarriers = [];
         foreach ($carriers as $key => $value) { if (!empty($value['status'])) { $this->myCarriers[$key] = $value; } }
     }
@@ -112,9 +112,10 @@ class shippingCommon
     {
         msgDebug("\nEntering loadCarrier with carrier = ".print_r($carrier, true));
         if (!is_string($carrier)) { msgAdd("carrier = ".print_r($carrier, true)); return; }
-        if (!empty($carrier)) {
-            if (!file_exists(dirname(__FILE__)."/carriers/$carrier/$carrier.php")) { return msgAdd("Could not find carrier class, looking for $carrier!"); }
-            bizAutoLoad(dirname(__FILE__)."/carriers/$carrier/$carrier.php", $carrier);
+        $carriers = getMetaMethod('carriers');
+        msgDebug("\nLoaded carriers = ".print_r($carriers, true));
+        if (!empty($carriers[$carrier])) {
+            bizAutoLoad($carriers[$carrier]['path']."$carrier.php", $carrier);
             $fqcn    = "\\bizuno\\$carrier";
             msgDebug("\nCreating class $carrier");
             $shipper = new $fqcn();
