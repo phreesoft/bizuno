@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-18
+ * @version    7.x Last Update: 2026-02-09
  * @filesource /view/easyUI/common.js
  */
 
@@ -29,14 +29,14 @@ var jqBiz = $.noConflict();
 /* **************************** Load/Initialize Constants and Variables ********************************* */
 const portalAjax   = 'https://www.bizuno.com?';
 const deleteRow    = false;
-const rowAutoAdd   = true;
 const no_recurse   = false;
 const addressFields= ['address_id','primary_name','contact','address1','address2','city','postal_code','telephone1','telephone2','telephone3','telephone4','email','website'];
 const contactFields= ['id','short_name','inactive','store_id','contact_first','contact_last','flex_field_1','account_number','gov_id_number'];
 const cogs_types   = ['si','sr','ms','mi','ma','sa'];
-const discountType = 'amt';
-const feeType      = 'amt';
 const dashTimerVal = 1000;  // time in ms, 2 second for example
+var rowAutoAdd   = true;
+var discountType = 'amt';
+var feeType      = 'amt';
 var bizDefaults  = new Array();
 var curIndex     = undefined;
 var countries    = new Array();
