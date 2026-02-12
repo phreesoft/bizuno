@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-02-12
  * @filesource /model/msg.php
  */
 
@@ -205,6 +205,14 @@ function msgDebugWrite($filename=false, $append=false, $force=false)
 {
     global $msgStack;
     if (is_object($msgStack)) { $msgStack->debugWrite($filename, $append, $force); }
+}
+
+/*
+ * Wrapper for print_r function which WordPress plugin checker doesn't like
+ */
+function msgPrint($value)
+{
+   return print_r($value, true);
 }
 
 /**
