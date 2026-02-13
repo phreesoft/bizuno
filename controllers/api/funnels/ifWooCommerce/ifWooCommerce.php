@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-13
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -36,7 +36,7 @@ class ifWooCommerce extends apiExport
     public    $code       = 'ifWooCommerce';
     protected $domSuffix  = 'wpWoo';
     protected $metaPrefix = 'woocommerce';
-    private   $refreshRows= 300; // number of inventory items to pass in a single cron call
+    private   $refreshRows= 100; // number of inventory items to pass in a single cron call
     private   $psServer   = 'https://www.phreesoft.com';
     private   $defaults   = ['rest_url'=>'', 'rest_user'=>'', 'rest_pass'=>'', 'inc_inactive'=>''];
     public    $settings;
@@ -285,7 +285,7 @@ function productUpload(rID) {
     {
         $crit = "woocommerce_sync='1'";
         if ( empty($this->settings['inc_inactive'])) { $crit .= " AND inactive='0'"; }
-        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', $crit, 'sku', ['id', 'sku']);
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', $crit, 'sku', ['id']); // removed , 'sku' not needed here
         if (sizeof($result) == 0) { return msgAdd("No items have been tagged to upload to your store!"); }
         foreach ($result as $row) { $rows[] = $row['id']; }
 // $rows = array_slice($rows, 0, 10); // to limit the number of results for testing, comment out when ready to run
@@ -307,6 +307,7 @@ function productUpload(rID) {
         $data   = [];
         while ($numRows > 0) {
             $skuID  = array_shift($cron['rows']);
+if (9018==$skuID) { msgTrap(); }
             if (empty($skuID)) { break; }
             $data[] = $this->setPriceLevels($skuID);
             $numRows--;
@@ -423,37 +424,14 @@ function productUpload(rID) {
             $meta = json_decode($row['meta_value'], true);
             $meth = getCarrierText($row['method_code']);
             $output['head'][$row['purch_order_id']] = 'Shipped '.viewFormat(substr($meta['ship_date'], 0, 10), 'date')." via $meth, tracking number(s):";
-            $output['body'][$row['purch_order_id']] = $meta['packages'];
-        }
+            $trackNum = [];
+            foreach ((array)$meta['packages']['rows'] as $pkg) { $trackNum[] = $pkg['tracking_id']; }
+            $output['body'][$row['purch_order_id']] = implode(', ', $trackNum);
+        } 
         msgDebug("\nReady to send cart confirmation with output = ".print_r($output, true));
         $args = ['data'=>$output, 'class'=>'api_order', 'method'=>'shipConfirm', // local
             'type'=>'post', 'endpoint'=>'order/confirm']; // RESTful
         $this->apiAction($args);
-    }
-
-    public function getTaxVersion(&$layout=[])
-    {
-        global $io;
-//      if (!$security = validateAccess($this->code, 2)) { return; } // no security as this is a cron job
-        // @TODO - This needs a complete re-write it should:
-        // be part of the upgrade polling messaging system, cron operation
-        // provide instructions on how to do the upgrade as WordPress tax service needs to be local
-        // tax tables are located @phreesoft
-        // reset get and then set upgrade flag
-        
-        $meta = dbMetaGet(0, 'sales_tax_table_ver');
-        $curVersion = !empty($meta['value']) ? $meta['value'] : '';
-        msgDebug("\nWorking in getTaxVersion with current version = $curVersion");
-        $io->restHeaders = ['email'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_user'), 'pass'=>getModuleCache('api', 'settings', 'phreesoft_api', 'api_pass')];
-        $result = $io->restRequest('get', $this->psServer, 'wp-json/phreesoft-api/v1/sales_tax_ver');
-        if (!empty($result['tax_version'])) {
-            if (version_compare($result['tax_version'], $curVersion) > 0) {
-                return msgAdd("A new tax table version is available, please download it by clicking the Download Tax button and update your WordPress site.", 'info');
-            } else {
-                return msgAdd("Your tax rate tables are current", 'info');
-            }
-        }
-        return msgAdd("There was an issue retrieving the sales tax rate table version from Phreesoft. Please try again later.", 'trap');
     }
 
     /**
@@ -468,7 +446,10 @@ function productUpload(rID) {
         $io->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
         $resp = $io->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
-        if (isset($resp['message'])) { msgMerge($resp['message']); }
+        if (isset($resp['message'])) {
+            if (is_string($resp['message'])) { msgAdd($resp['message'], 'info'); } // probably an error
+            else                             { msgMerge($resp['message']); }
+        }
         return $resp;
     }
     

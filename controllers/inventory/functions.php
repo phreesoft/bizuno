@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-06
+ * @version    7.x Last Update: 2026-02-13
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -171,6 +171,9 @@ function availableQty($item=[], $args=[])
         foreach ($bom as $row) {
             $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
             if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // non-stock stuff so move along
+            
+            // Here we need to recurse if the assembly contains an assembly which contains an assembly
+            
             $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
             $min_qty= $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
         }

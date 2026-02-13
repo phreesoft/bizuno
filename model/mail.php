@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-03
+ * @version    7.x Last Update: 2026-02-13
  * @filesource /model/mail.php
  */
 
@@ -191,30 +191,14 @@ class bizunoMailer
     private function sendGoogle($creds)
     {
         global $mail;
-        $key  = clean('msgFrom', 'text', 'post');
-        msgDebug("\nReached mail redirect to send Google with key = $key and creds: ".print_r($creds, true));
-        if ('user'==$key) {
-            $meta = getMetaContact(getUserCache('profile', 'userID'), 'user_profile');
-            $email= $meta['email'];
-            $appPW= $meta['gmail_app_pw']; // gmail_app_pw2
-        } else {
-            if (empty($key)) { $key = 'gen'; }
-            $map  = ['gen'=>'', 'ap'=>'_ap','ar'=>'_ar'];
-            $myBiz= getModuleCache('bizuno', 'settings', 'company');
-            msgDebug("\nRead biz settings = ".print_r($myBiz, true));
-            $email = $myBiz['email'.$map[$key]];
-            $myMail= getModuleCache('bizuno', 'settings', 'mail');
-            msgDebug("\nRead biz mail = ".print_r($myMail, true));
-            $mapPW= ['gen'=>'','ap'=>'2',  'ar'=>'3'];
-            $appPW= $myMail['gmail_app_pw'.$mapPW[$key]];
-        }
-        msgDebug("\nEmail changed to: $email and app pw to $appPW");
+        msgDebug("\nReached mail redirect to send Google.");
+        $dest = $this->validateGoogleAppPW($creds);
         try {
             $mail->isSMTP();
             $mail->Host      = 'smtp.gmail.com'; 
             $mail->SMTPAuth  = true;
-            $mail->Username  = $email;
-            $mail->Password  = trim(str_replace(' ', '', $appPW));
+            $mail->Username  = $dest['email'];
+            $mail->Password  = trim(str_replace(' ', '', $dest['appPW']));
             $mail->SMTPSecure= 'tls';
             $mail->Port      = 587;
             $mail->send();
@@ -229,6 +213,28 @@ class bizunoMailer
         return true;
     }
     
+    private function validateGoogleAppPW($creds)
+    {
+        // Set default to users creds
+        $output  = ['email'=>$creds['email'], 'appPW'=>!empty($creds['gmail_app_pw']) ? trim($creds['gmail_app_pw']) : '']; 
+        // Take the mail from and strip everything except the email address
+        $mailFrom= clean('msgFrom', 'text', 'post');
+        $sender  = strpos($mailFrom, '<')!==false ? preg_replace('/.*?<([^>]+)>.*/', '$1', $mailFrom) : clean('msgFrom', 'email', 'post');
+        msgDebug("\nGenerated filtered sender = $sender");
+        if (strtolower($sender)==strtolower($creds['email'])) { return $output; } // normal operation, email uses sender Google account
+        // Retrieve business settings
+        $myBiz   = getModuleCache('bizuno', 'settings', 'company');
+        msgDebug("\nRead biz settings = ".msgPrint($myBiz));
+        // Retrieve Google app passwords
+        $myMail  = getModuleCache('bizuno', 'settings', 'mail');
+        if     ($myBiz['email']    ==$sender) { $output = ['email'=>$myBiz['email'],    'appPW'=>!empty($myMail['gmail_app_pw']) ? trim($myMail['gmail_app_pw']) : '']; }
+        elseif ($myBiz['email_ap'] ==$sender) { $output = ['email'=>$myBiz['email_ap'], 'appPW'=>!empty($myMail['gmail_app_pw2'])? trim($myMail['gmail_app_pw2']): '']; }
+        elseif ($myBiz['email_ar'] ==$sender) { $output = ['email'=>$myBiz['email_ar'], 'appPW'=>!empty($myMail['gmail_app_pw3'])? trim($myMail['gmail_app_pw3']): '']; }
+        elseif ($myBiz['email_mgr']==$sender) { $output = ['email'=>$myBiz['email_mgr'],'appPW'=>!empty($myMail['gmail_app_pw4'])? trim($myMail['gmail_app_pw4']): '']; }
+        msgDebug("\nReturning with adjusted email settings: ".msgPrint($output));
+        return $output; 
+    }
+
     /**
      * Adds one or more CC's to the email
      * @param mixed $toEmail - email addresses, can be array, separated with comma or semi-colons

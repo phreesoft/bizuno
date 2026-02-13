@@ -144,12 +144,6 @@ class apiAdmin extends apiCommon
         $chan->confirmGo($layout);
     }
 
-    public function getTaxVersion(&$layout=[])
-    {
-        $chan = $this->getMethod();
-        $chan->getTaxVersion($layout);
-    }
-
     public function inventoryGo(&$layout=[])
     {
         $chan = $this->getMethod();
