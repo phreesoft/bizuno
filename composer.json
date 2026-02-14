@@ -4,8 +4,8 @@
     "description": "Bizuno is a full featured web based ERP/Accouting library written in PHP",
     "authors": [
         {
-            "name": "David Premo",
-            "email": "dave.premo@phreesoft.com"
+            "name": "PhreeSoft",
+            "email": "support@phreesoft.com"
         }
     ],
     "keywords": ["phreesoft","bizuno","web","erp","accounting","crm"],

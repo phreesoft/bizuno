@@ -307,7 +307,6 @@ function productUpload(rID) {
         $data   = [];
         while ($numRows > 0) {
             $skuID  = array_shift($cron['rows']);
-if (9018==$skuID) { msgTrap(); }
             if (empty($skuID)) { break; }
             $data[] = $this->setPriceLevels($skuID);
             $numRows--;

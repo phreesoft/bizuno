@@ -1,5 +1,5 @@
 === Bizuno – Full ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.3.6
+Stable tag: 7.3.7
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, phreebooks, bizuno, invoicing, purchase-orders, sales-tax, shipping, iso-9001, multi-store
@@ -83,6 +83,9 @@ This plugin is a secure portal/launcher. The comprehensive Bizuno application (l
 9. Dashboard Widget Gallery
 
 == Changelog ==
+
+= 7.3.7 =
+* Bug fixes and prep for locale cleanup, compatibility with WP Bizuno API re-release
 
 = 7.3.6 =
 * Prep for stable release – enhanced self-hosted portal stability
