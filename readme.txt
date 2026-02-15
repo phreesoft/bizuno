@@ -5,7 +5,7 @@ Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, phreebooks, bizuno, invoicing, purchase-orders, sales-tax, shipping, iso-9001, multi-store
 Requires at least: 6.5
 Tested up to: 6.9
-Requires PHP: 8.2
+Requires PHP: 8.0
 License: AGPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/agpl-3.0.html
 
