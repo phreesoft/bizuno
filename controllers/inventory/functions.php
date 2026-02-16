@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-13
+ * @version    7.x Last Update: 2026-02-16
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -66,19 +66,19 @@ function inventoryProcess($value, $format='')
             $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
             $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
             $meta  = getMetaInventory($skuID, 'bill_of_materials');
-            msgDebug("\nIn inventoryProcess with value = $value and sku = ".print_r($sku, true));
+            msgDebug("\nIn inventoryProcess with value = $value and sku = ".msgPrint($sku));
             $output= lang('qty').' - '.lang('sku').' - '.lang('description')."\n";
             foreach ($meta as $row) { $output .= ($sku['qty']*$row['qty'])." - {$row['sku']} - {$row['description']}\n"; }
             return $output;
         case 'sbOnOrder':
-            msgDebug("\nEntering sbOnOrder with value = ".print_r($value, true));
+            msgDebug("\nEntering sbOnOrder with value = ".msgPrint($value));
             $sku    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$value");
             $stmt   = dbGetResult("SELECT SUM(i.qty) AS 'qty' FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id 
                 WHERE m.journal_id=32 AND m.closed='0' AND sku='".addslashes($sku)."'");
             $row    = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : [];
             return !empty($row['qty']) ? $row['qty'] : 0;
         case 'sbSteps':
-            msgDebug("\nEntering sbSteps with value = ".print_r($value, true));
+            msgDebug("\nEntering sbSteps with value = ".msgPrint($value));
 return '';
             $data  = json_decode(dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'steps', "id='$value'"), true);
             $output= '';
@@ -86,21 +86,21 @@ return '';
             return $output;
             return 'needs work';
         case 'sbTask':
-            msgDebug("\nEntering sbTask with value = ".print_r($value, true));
+            msgDebug("\nEntering sbTask with value = ".msgPrint($value));
 return '';
             $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_tasks', 'description', "id='$value'");
             return $result ? $result : $value;
         case 'sbTaskList':
-            msgDebug("\nEntering sbTaskList with value = ".print_r($value, true));
+            msgDebug("\nEntering sbTaskList with value = ".msgPrint($value));
             $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
             $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
             $meta  = getMetaInventory($skuID, 'production_job');
-            msgDebug("\nread meta = ".print_r($meta, true));
+            msgDebug("\nread meta = ".msgPrint($meta));
 //            $data  = json_decode(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'steps', "id='$value'"), true);
             $output= [];
             foreach ($meta['steps'] as $step => $task) {
                 $tMeta = dbMetaGet($task['task_id'], 'production_task');
-                msgDebug("\nread meta = ".print_r($tMeta, true));
+                msgDebug("\nread meta = ".msgPrint($tMeta));
                 $output[] = [
                     'r0' => $step,
                     'r1' => $tMeta['description'],
@@ -155,6 +155,7 @@ function inventoryView($value, $format='') {
  */
 function availableQty($item=[], $args=[])
 {
+    msgDebug("\nEntering availableQty with item = ".msgPrint($item));
     if (empty($item['id']))            { return 0; }
     $incAssy  = isset($args['incAssy'])  ? $args['incAssy']  : getModuleCache('inventory', 'settings', 'general', 'inc_assemblies', 1);
     $incCommit= isset($args['incCommit'])? $args['incCommit']: getModuleCache('inventory', 'settings', 'general', 'inc_committed', 1);
@@ -166,19 +167,22 @@ function availableQty($item=[], $args=[])
     msgDebug("\nIn availableQty with incAssy = $incAssy and incCommit = $incCommit");
     if ($incAssy && in_array($item['inventory_type'], ['ma', 'sa'])) { // for assemblies, see how many we can build
         $bom = getMetaInventory($item['id'], 'bill_of_materials');
-        msgDebug("\nAssy parts = ".print_r($bom, true));
+        msgDebug("\nAssy parts = ".msgPrint($bom));
         $min_qty= 999999;
         foreach ($bom as $row) {
-            $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['qty_stock', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
-            if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // non-stock stuff so move along
-            
-            // Here we need to recurse if the assembly contains an assembly which contains an assembly
-            
-            $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
+            $inv    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id', 'qty_stock', 'qty_so', 'qty_alloc', 'inventory_type'], "sku='".addslashes($row['sku'])."'");
+            if (!in_array($inv['inventory_type'], INVENTORY_COGS_TYPES)) { msgDebug("\n    Not tracked in inventory, skipping!"); continue; } // non-stock stuff so move along
+            if ( in_array($inv['inventory_type'], ['ma', 'sa'])) {
+                msgDebug("\n    Assembly part is an assembly, recursing!");
+                $qtyStk = availableQty($inv);
+            } else {
+                msgDebug("\n    SKU: {$row['sku']} has qty_stock: {$inv['qty_stock']} and qty_so: {$inv['qty_so']} and qty_alloc: {$inv['qty_alloc']}");
+                $qtyStk = !empty($inv['qty_stock']) ? $inv['qty_stock'] : 0;
+            }
             $min_qty= $row['qty'] == 0 ? 0 : min($min_qty, floor($qtyStk / $row['qty']));
         }
         $item['qty_stock'] += $min_qty;
-        msgDebug("\nAfter assembly item[qty_stock] = ".print_r($item['qty_stock'], true));
+        msgDebug("\nAfter assembly item[qty_stock] = ".msgPrint($item['qty_stock']));
     }
     if ($incCommit) { $item['qty_stock'] -= ($item['qty_so'] + $item['qty_alloc']); }
     $toSell = max(0, $item['qty_stock']);
@@ -234,7 +238,7 @@ function getStoreStock($sku='', $newCost=false) {
         if (!isset($output['b'.$row['store_id']]['stock'])) { $output['b'.$row['store_id']]['stock'] = 0; }
         $output['b'.$row['store_id']]['stock'] -= $row['qty'];
     }
-    msgDebug("\nLeaving getStoreStock with output = ".print_r($output, true));
+    msgDebug("\nLeaving getStoreStock with output = ".msgPrint($output));
     return $output;
 }
 
@@ -250,14 +254,14 @@ function getStoreOnOrder($sku='', $jID=10) {
     if (empty($stmt)) { msgDebug ("\nNo Results for sku = $sku and journal ID = $jID"); return $output; }
     $result= $stmt->fetchAll(\PDO::FETCH_ASSOC);
     msgDebug("\nReturned number of open SO/PO rows = ".sizeof($result));
-    msgDebug("\nRows = ".print_r($result, true));
+    msgDebug("\nRows = ".msgPrint($result));
     foreach ($result as $row) {
         $bal = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', "SUM(qty)", "item_ref_id={$row['id']} AND gl_type='itm'", false); // so/po - filled
         if (empty($bal)) { $bal = 0; }
-        msgDebug("\nCalculated balance = ".print_r($bal, true));
+        msgDebug("\nCalculated balance = ".msgPrint($bal));
         if (!isset($output[$row['store_id']]['order'])) { $output[$row['store_id']]['order'] = 0; }
         $output[$row['store_id']]['order'] += $row['qty'] - $bal;
     }
-    msgDebug("\nOutput = ".print_r($output, true));
+    msgDebug("\nOutput = ".msgPrint($output));
     return $output;
 }

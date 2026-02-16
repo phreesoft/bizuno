@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-13
+ * @version    7.x Last Update: 2026-02-16
  * @filesource /model/mail.php
  */
 
@@ -221,7 +221,7 @@ class bizunoMailer
         $mailFrom= clean('msgFrom', 'text', 'post');
         $sender  = strpos($mailFrom, '<')!==false ? preg_replace('/.*?<([^>]+)>.*/', '$1', $mailFrom) : clean('msgFrom', 'email', 'post');
         msgDebug("\nGenerated filtered sender = $sender");
-        if (strtolower($sender)==strtolower($creds['email'])) { return $output; } // normal operation, email uses sender Google account
+        if (empty($mailFrom) || strtolower($sender)==strtolower($creds['email'])) { return $output; } // normal operation, email uses sender Google account
         // Retrieve business settings
         $myBiz   = getModuleCache('bizuno', 'settings', 'company');
         msgDebug("\nRead biz settings = ".msgPrint($myBiz));

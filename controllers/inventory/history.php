@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-16
  * @filesource /controllers/inventory/history.php
  */
 
@@ -81,7 +81,7 @@ class inventoryHistory
         // drop ship PO
         if (validateAccess('j4_mgr', 2, false)) { // Drop Ship action
             $layout['datagrid']['dgJ10']['columns']['action']['actions']['xDropShip'] = ['order'=>45,'icon'=>'order','label'=>lang('create_po'),
-                'events' => ['onClick'=>"if (confirm('".lang('msg_confirm_create_po')."')) jsonAction('$this->moduleID/dropShip/savePO', idTBD);"]];
+                'events' => ['onClick'=>"if (confirm('".lang('msg_confirm_create_po')."')) jsonAction('phreebooks/dropShip/savePO', idTBD);"]];
         }
     }
 
