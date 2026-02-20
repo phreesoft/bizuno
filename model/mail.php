@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-16
+ * @version    7.x Last Update: 2026-02-18
  * @filesource /model/mail.php
  */
 
@@ -193,6 +193,7 @@ class bizunoMailer
         global $mail;
         msgDebug("\nReached mail redirect to send Google.");
         $dest = $this->validateGoogleAppPW($creds);
+        msgDebug("\nAfter validateGoogleAppPW ready to try with dest = ".msgPrint($dest));
         try {
             $mail->isSMTP();
             $mail->Host      = 'smtp.gmail.com'; 
@@ -220,19 +221,19 @@ class bizunoMailer
         // Take the mail from and strip everything except the email address
         $mailFrom= clean('msgFrom', 'text', 'post');
         $sender  = strpos($mailFrom, '<')!==false ? preg_replace('/.*?<([^>]+)>.*/', '$1', $mailFrom) : clean('msgFrom', 'email', 'post');
-        msgDebug("\nGenerated filtered sender = $sender");
+        msgDebug("\nGenerated filtered sender = $sender and output = ".msgPrint($output));
         if (empty($mailFrom) || strtolower($sender)==strtolower($creds['email'])) { return $output; } // normal operation, email uses sender Google account
         // Retrieve business settings
         $myBiz   = getModuleCache('bizuno', 'settings', 'company');
         msgDebug("\nRead biz settings = ".msgPrint($myBiz));
         // Retrieve Google app passwords
         $myMail  = getModuleCache('bizuno', 'settings', 'mail');
-        if     ($myBiz['email']    ==$sender) { $output = ['email'=>$myBiz['email'],    'appPW'=>!empty($myMail['gmail_app_pw']) ? trim($myMail['gmail_app_pw']) : '']; }
-        elseif ($myBiz['email_ap'] ==$sender) { $output = ['email'=>$myBiz['email_ap'], 'appPW'=>!empty($myMail['gmail_app_pw2'])? trim($myMail['gmail_app_pw2']): '']; }
-        elseif ($myBiz['email_ar'] ==$sender) { $output = ['email'=>$myBiz['email_ar'], 'appPW'=>!empty($myMail['gmail_app_pw3'])? trim($myMail['gmail_app_pw3']): '']; }
-        elseif ($myBiz['email_mgr']==$sender) { $output = ['email'=>$myBiz['email_mgr'],'appPW'=>!empty($myMail['gmail_app_pw4'])? trim($myMail['gmail_app_pw4']): '']; }
+        if     ($myBiz['email']    ==$sender) { msgDebug("\n Hit email");    $output = ['email'=>$myBiz['email'],    'appPW'=>!empty($myMail['gmail_app_pw']) ? trim($myMail['gmail_app_pw']) : '']; }
+        elseif ($myBiz['email_ap'] ==$sender) { msgDebug("\n Hit email_ap"); $output = ['email'=>$myBiz['email_ap'], 'appPW'=>!empty($myMail['gmail_app_pw2'])? trim($myMail['gmail_app_pw2']): '']; }
+        elseif ($myBiz['email_ar'] ==$sender) { msgDebug("\n Hit email_ar"); $output = ['email'=>$myBiz['email_ar'], 'appPW'=>!empty($myMail['gmail_app_pw3'])? trim($myMail['gmail_app_pw3']): '']; }
+        elseif ($myBiz['email_mgr']==$sender) { msgDebug("\n Hit email_mgr");$output = ['email'=>$myBiz['email_mgr'],'appPW'=>!empty($myMail['gmail_app_pw4'])? trim($myMail['gmail_app_pw4']): '']; }
         msgDebug("\nReturning with adjusted email settings: ".msgPrint($output));
-        return $output; 
+        return $output;
     }
 
     /**
