@@ -37,6 +37,6 @@
         "setasign/fpdf": "^1.8",
 	"setasign/fpdi": "^2.5",
         "setasign/fpdi_pdf-parser": "2.1.4",
-        "web-auth/webauthn-lib":"^4.9"
+        "web-auth/webauthn-lib": "^5.2"
     }
 }

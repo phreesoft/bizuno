@@ -27,6 +27,8 @@
 
 namespace bizuno;
 
+use lbuchs\WebAuthn\WebAuthn;
+
 class portalCtl
 {
     public  $layout       = []; // Holds the structure for the output display
@@ -41,9 +43,18 @@ class portalCtl
     {
         global $msgStack, $io, $cleaner;
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
         $msgStack= new messageStack();
         $io      = new io();
         $cleaner = new cleaner();
+        if (class_exists('lbuchs\\WebAuthn\\WebAuthn')) {
+            define('BIZUNO_WEBAUTHN_ENABLED', true);
+            msgDebug("\nlbuchs/WebAuthn DETECTED - enabling passkeys.");
+            $this->initWebAuthn();
+        } else {
+            define('BIZUNO_WEBAUTHN_ENABLED', false);
+            msgDebug("\nlbuchs/WebAuthn NOT detected - skipping passkey support.");
+        }
 
 //bizClrCookie('bizunoUser');
 //bizClrCookie('bizunoSession');
@@ -52,7 +63,7 @@ class portalCtl
         $this->userValidated = !empty($this->creds) ? true : false; // validate user
         $this->route = $this->cleanBizRt();
         $this->setDOM(); // load the applicable GUI
-        $scope   = $this->getScope(); // get scope
+        $scope       = $this->getScope(); // get scope
         switch ($scope) { // act accordingly
             case 'api':    $this->goAPI();     break; // API request, may be logged in or guest
             case 'auth':   $this->goAuth();    break; // Normal operation for authorized users
@@ -252,6 +263,16 @@ class portalCtl
         $getLang = clean('bizunoLang', ['format'=>'cmd', 'default'=>'en_US'], 'get');
         if ($getLang<>'en_US') { $lang = $getLang; }
         $bizunoLang = loadBaseLang($lang);
+    }
+
+    private function initWebAuthn()
+    {
+        $rpName = 'Bizuno ERP';
+        $rpId   = parse_url(BIZUNO_URL_PORTAL, PHP_URL_HOST);
+        $this->webauthn = new WebAuthn($rpName, $rpId);
+        // Optional: customize (e.g., timeout in seconds, algorithms)
+        $this->webauthn->timeout = 60;
+        // $this->webauthn->addRootCertificates(...); // if using attestation 'direct'
     }
 
     private function cleanBizRt()

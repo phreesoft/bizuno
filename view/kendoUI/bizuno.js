@@ -35,7 +35,11 @@ const viewportHeight= window.innerHeight;
 
 // Appends the users viewport size, screen size, and display mode preferences to the login screen
 function appendPrefs() {
-    var form = jqBiz('#frmLogin');
-    if (typeof form === 'undefined') { return; } // Not at login screen
-    jqBiz('#frmLogin').attr('action', window.location.href + "?mode=" + isDarkMode + "&screen=" + screenWidth);
+    const form = jqBiz('#frmLogin');
+    if (!form.length) return;
+    let action = window.location.href;
+    // Only append if not already present
+    if (!action.includes('mode='))   { action += (action.includes('?') ? '&' : '?') + 'mode=' + isDarkMode; }
+    if (!action.includes('screen=')) { action += (action.includes('?') ? '&' : '?') + 'screen=' + screenWidth; }
+    form.attr('action', action);
 }

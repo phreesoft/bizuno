@@ -166,6 +166,190 @@ class portalApi
         }
     }
 
+    // POST /bizuno/portal/webauthn/register/options
+    public function webauthnRegisterOptions()
+    {
+        if (!BIZUNO_WEBAUTHN_ENABLED) {
+            http_response_code(404);
+            echo json_encode(['error' => 'WebAuthn not available']);
+            exit;
+        }
+//        $user = $this->getCurrentUser();
+        $userId = (string) getUserCache('profile', 'userID'); // lbuchs expects string user handle
+        if (empty($userId)) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Login required']);
+            exit;
+        }
+        $options = $this->webauthn->getCreateArgs(
+            $userId,
+            getUserCache('profile', 'title'),
+            getUserCache('profile', 'title')
+        );
+        // Optional: exclude existing credentials
+        $existingCreds = getMetaContact($userId, 'webauthn_credentials');
+        if (!empty($existingCreds)) {
+            $exclude = [];
+            foreach ($existingCreds as $cred) {
+                $exclude[] = new \lbuchs\WebAuthn\PublicKeyCredentialDescriptor( 'public-key', ByteBuffer::fromBase64Url($cred['id']) );
+            }
+            $options->excludeCredentials = $exclude;
+        }
+        $_SESSION['webauthn_challenge_reg'] = $this->webauthn->getChallenge();
+        header('Content-Type: application/json');
+        echo json_encode($options);
+        exit;
+    }
+
+    // POST /bizuno/portal/webauthn/register/verify
+    public function webauthnRegisterVerify()
+    {
+        if (!BIZUNO_WEBAUTHN_ENABLED) {
+            http_response_code(404);
+            echo json_encode(['error' => 'WebAuthn not available']);
+            exit;
+        }
+
+//        $user = $this->getCurrentUser();
+        $userId = (string) getUserCache('profile', 'userID');
+        if (empty($userId)) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Login required']);
+            exit;
+        }
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        if (!$data || empty($_SESSION['webauthn_challenge_reg'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid request']);
+            exit;
+        }
+
+        try {
+            $credential = $this->webauthn->processCreate(
+                $data['clientDataJSON'] ?? '',
+                $data['attestationObject'] ?? '',
+                BIZUNO_URL_PORTAL, // expected origin
+                $_SESSION['webauthn_challenge_reg']
+            );
+
+            $credData = [
+                'id'          => $credential->getCredentialId()->getBase64Url(),
+                'publicKey'   => $credential->getPublicKey()->getBase64Url(),
+                'signCount'   => $credential->getSignCount(),
+                'transports'  => $credential->getTransports(),
+                'userHandle'  => $credential->getUserHandle(),
+                'attestation' => $credential->getAttestationType(),
+            ];
+            $creds = getMetaContact(getUserCache('profile', 'userID'), 'webauthn_credentials');
+            $creds[] = $credData; // append new credential
+            $this->saveUserWebauthnCredentials($userId, $creds);
+
+            unset($_SESSION['webauthn_challenge_reg']);
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // POST /bizuno/portal/webauthn/auth/options?bizUser=...
+    public function webauthnAuthOptions()
+    {
+        if (!BIZUNO_WEBAUTHN_ENABLED) {
+            http_response_code(404);
+            echo json_encode(['error' => 'WebAuthn not available']);
+            exit;
+        }
+        $email = clean('bizUser', 'email', 'get');
+        $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");
+        if (!$user) {
+            http_response_code(404);
+            echo json_encode(['error' => 'User not found']);
+            exit;
+        }
+        $creds = getMetaContact(getUserCache('profile', 'userID'), 'webauthn_credentials');
+        if (empty($creds)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No passkeys registered for this user']);
+            exit;
+        }
+        $allow = [];
+        foreach ($creds as $cred) {
+            $allow[] = new \lbuchs\WebAuthn\PublicKeyCredentialDescriptor(
+                'public-key',
+                ByteBuffer::fromBase64Url($cred['id'])
+            );
+        }
+        $options = $this->webauthn->getAuthenticateArgs($allow);
+        $_SESSION['webauthn_challenge_auth'] = $this->webauthn->getChallenge();
+        header('Content-Type: application/json');
+        echo json_encode($options);
+        exit;
+    }
+
+    // POST /bizuno/portal/webauthn/auth/verify
+    public function webauthnAuthVerify()
+    {
+        if (!BIZUNO_WEBAUTHN_ENABLED) {
+            http_response_code(404);
+            echo json_encode(['error' => 'WebAuthn not available']);
+            exit;
+        }
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        if (!$data || empty($_SESSION['webauthn_challenge_auth'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid request']);
+            exit;
+        }
+        try {
+            $credential = $this->webauthn->processAuthenticate(
+                $data['id'] ?? '',
+                $data['rawId'] ?? '',
+                $data['response']['authenticatorData'] ?? '',
+                $data['response']['clientDataJSON'] ?? '',
+                $data['response']['signature'] ?? '',
+                $data['response']['userHandle'] ?? '',
+                BIZUNO_URL_PORTAL,
+                $_SESSION['webauthn_challenge_auth']
+            );
+            // Update sign count in stored credential
+            $creds = getMetaContact($credential->getUserHandle(), 'webauthn_credentials');
+//            $creds = $this->getUserWebauthnCredentials($credential->getUserHandle());
+            foreach ($creds as &$c) {
+                if ($c['id'] === $credential->getCredentialId()->getBase64Url()) {
+                    $c['signCount'] = $credential->getSignCount();
+                    break;
+                }
+            }
+            $this->saveUserWebauthnCredentials($credential->getUserHandle(), $creds);
+            // Login the user
+            $userId = $credential->getUserHandle(); // string ID
+            $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name', 'email'], "id='$userId'");
+            if (!$user) {
+                throw new \Exception('User not found');
+            }
+            $profile = getMetaContact($user['id'], 'user_profile');
+            $userData = [
+                'userID'    => $user['id'],
+                'psID'      => 0,
+                'userEmail' => $user['email'],
+                'userRole'  => $profile['role_id'] ?? 0,
+                'userName'  => $user['primary_name']
+            ];
+            setUserCookie($userData);
+            unset($_SESSION['webauthn_challenge_auth']);
+            echo json_encode(['success' => true]);
+        } catch (\Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     public function lostPW(&$layout=[])
     {
         require(BIZUNO_FS_LIBRARY . 'portal/viewMaint.php');
@@ -300,7 +484,7 @@ class portalApi
         }
     }
 
-    /************************ Support Metohds **************************/
+    /************************ Support Methods **************************/
     private function validatePSrequest($bizID='')
     {
         msgDebug("\nEntering validatePSrequest with bizID = $bizID and remote address = ".$_SERVER['REMOTE_ADDR']." and PHREESOFT_IP = ".PHREESOFT_IP);

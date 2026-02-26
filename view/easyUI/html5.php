@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-25
  * @filesource /view/easyUI/html5.php
  */
 
@@ -140,6 +140,7 @@ final class html5 {
 
     public function render($id = '', $prop = [])
     {
+        if (empty($prop)) { return ''; }
         if (!is_array($prop)) { return msgAdd("received string as array for field $id with prop = ".print_r($prop, true)); }
         if (empty($prop['attr']['type'])) { $prop['attr']['type'] = 'text'; } // assume text if no type
         $field = '';

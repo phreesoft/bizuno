@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-08
+ * @version    7.x Last Update: 2026-02-26
  * @filesource /lib/local/en_US.php
  */
 
@@ -39,13 +39,14 @@ $lang = [
     'biz_chart' => 'Pick a default chart of accounts to use:',
     'biz_fy' => 'Pick a fiscal year to get going:',
     'email' => 'Email',
-    'signin' => 'SIGNIN',
+    'signin' => 'SIGN IN',
     'install' => 'INSTALL',
     'password' => 'Password',
     'password_lost' => 'Lost Password?',
     'password_reset' => 'Reset Password',
     'password_retype' => 'Confirm Password',
     'welcome' => 'Welcome',
+    'please_auth' => 'Enter your Password',
     'my_business' => 'My Business',
     'time_zone' =>'Time Zone',
     'currency' => 'Currency',
