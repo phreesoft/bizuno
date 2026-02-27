@@ -21,19 +21,20 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-02-27
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
 namespace bizuno;
 
 class ifAmazon {
-    public $moduleID = 'api';
-    public $methodDir= 'funnels';
-    public $code     = 'ifAmazon';
-    public $defaults;
-    public $settings;
-    public $lang = ['title' => 'Amazon Interface',
+    public  $moduleID = 'api';
+    public  $methodDir= 'funnels';
+    public  $code     = 'ifAmazon';
+    private $mapPath = BIZUNO_FS_LIBRARY.'controllers/api/funnels/ifAmazon/maps/';
+    public  $defaults;
+    public  $settings;
+    public  $lang = ['title' => 'Amazon Interface',
         'description' => 'The Amazon interface provides capability to download orders, upload product feeds and help reconcile payments.',
         'amazon_field' => 'Amazon Feed Index',
         'bizuno_field' => 'Bizuno Inventory Field',
@@ -155,10 +156,10 @@ class ifAmazon {
         if (!$security = validateAccess('ifAmazon', 1)) { return; }
         $this->journalMainSaveDefaults();
         $maps = [];
-        $files = glob(BIZUNO_DATA."data/ifAmazon/*.map");
+        $files = glob($this->mapPath.'*.map');
         if (is_array($files)) { foreach ($files as $value) {
             $tmp1 = str_replace(".map", "", $value);
-            $tmp2 = str_replace(BIZUNO_DATA."data/ifAmazon/", "", $tmp1);
+            $tmp2 = str_replace($this->mapPath, "", $tmp1);
             $maps[] = ['id'=>$tmp2, 'text'=>$tmp2];
         } }
         $fields = [
@@ -250,10 +251,10 @@ class ifAmazon {
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
         $dbField= $this->settings['catalog_field'];
         $map    = clean('selMap', 'text', 'post');
-        if (!file_exists (BIZUNO_DATA."data/ifAmazon/$map.map")) { return msgAdd(sprintf($this->lang['err_no_inv_map'], $map)); }
-        $map    = json_decode(file_get_contents(BIZUNO_DATA."data/ifAmazon/$map.map"), true);
+        if (!file_exists ($this->mapPath."$map.map")) { return msgAdd(sprintf($this->lang['err_no_inv_map'], $map)); }
+        $map    = json_decode(file_get_contents($this->mapPath."$map.map"), true);
         $rows   = [];
-        $result = dbGetMulti(BIZUNO_DB_PREFIX."inventory", "inactive='0' AND `$dbField`='1'", 'sku');
+        $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inactive='0' AND `$dbField`='1'", 'sku');
         foreach ($result as $key => $item) {
             msgDebug("\nworking with item ".print_r($item, true));
             $aItem = [];

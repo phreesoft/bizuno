@@ -56,19 +56,12 @@ msgTrap();
         $this->logo = ['label'=>getModuleCache('bizuno','properties','title'),'attr'=>['type'=>'img','src'=>$src,'height'=>48]];
     }
 
-    private function saveUserWebauthnCredentials($userId, $credentials)
-    {
-        $json = json_encode($credentials);
-        $existing = getMetaContact($userId, 'webauthn_credentials');
-        if ($existing) {
-            msgDebug("\nUpdating credentials = ".msgPrint($credentials));
-//            dbUpdate(BIZUNO_DB_PREFIX . 'contacts_meta', ['meta_value' => $json], ['ref_id' => $userId, 'meta_key' => 'webauthn_credentials']);
-        } else {
-            msgDebug("\nCreating credentials = ".msgPrint($credentials));
-//            dbInsert(BIZUNO_DB_PREFIX . 'contacts_meta', ['ref_id' => $userId, 'meta_key' => 'webauthn_credentials', 'meta_value' => $json]);
-        }
-    }
-
+    /**
+     * Main method to process sign in process
+     * @global type $db
+     * @param type $layout
+     * @return type
+     */
     public function login(&$layout = [])
     {
         global $db;
@@ -96,6 +89,18 @@ msgTrap();
             }
         } elseif (isset($_POST['bizUser']) && isset($_POST['bizPass'])) { // Step 3: Password has been entered (not using webauthn)
             msgDebug("\nCredentials sent, trying to validate.");
+            
+            // Three options, No 2PA, 2PA with code, 2PA with passkey
+            
+            // No 2PA, just validate user and carry on
+            
+            // 2PA with code, generate code, send via email to user, show code screen
+            
+            // 2PA with passkey, ??? maybe popup, maybe button, where in login sequence? what does Amazon do? google?
+            
+            // Add other possibilities, Google, Facebook, ???
+            
+            
             if ($this->validateUser($layout)) { // if validated, return to load home page
                 msgDebug("\nUser validated, reloading!");
                 $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]];
@@ -105,6 +110,10 @@ msgTrap();
         }
     }
 
+    /**
+     * Handles Step 1: User name
+     * @param array $layout
+     */
     public function viewIntro(&$layout=[])
     {
         $jsAuth = "";
@@ -133,6 +142,11 @@ msgTrap();
             'jsReady'=> ['authn'=>$jsAuth, 'init'=>"appendPrefs();"]];
     }
 
+    /**
+     * Handles Step 2: Authentication
+     * @param array $layout
+     * @param string $email
+     */
     public function viewAuth(&$layout=[], $email='')
     {
         $jsAuth = "";
@@ -158,6 +172,10 @@ msgTrap();
             'jsReady'=> ['authn'=>$jsAuth]];
     }
 
+    /**
+     * Adds the passkey HTML if needed to get user to sign up.
+     * @return string
+     */
     public function addPasskey()
     {
         msgDebug("\nEntering addPasskey");
@@ -169,13 +187,17 @@ msgTrap();
 <button id="btn-register-passkey" type="button">'.'Yes — Set Up Passkey Now'.'</button>';
     }
     
+    /**
+     * Handles the HTML to sign in with Passkey
+     * @return string
+     */
     public function showPasskey()
     {
         msgDebug("\nEntering showPasskey");
         if (!BIZUNO_WEBAUTHN_ENABLED) { return ''; }
         return '<hr />
 <input type="hidden" name="usePasskey" value="1">
-<button id="btn-passkey-login" type="button">Login with Passkey / Biometric</button>';
+<button id="btn-passkey-login" type="button">Sign In with Passkey / Biometric</button>';
     }
     
     private function viewAuthnJS()

@@ -181,11 +181,7 @@ class portalApi
             echo json_encode(['error' => 'Login required']);
             exit;
         }
-        $options = $this->webauthn->getCreateArgs(
-            $userId,
-            getUserCache('profile', 'title'),
-            getUserCache('profile', 'title')
-        );
+        $options = $this->webauthn->getCreateArgs($userId, getUserCache('profile', 'title'), getUserCache('profile', 'title'));
         // Optional: exclude existing credentials
         $existingCreds = getMetaContact($userId, 'webauthn_credentials');
         if (!empty($existingCreds)) {
@@ -348,6 +344,19 @@ class portalApi
             echo json_encode(['error' => $e->getMessage()]);
         }
         exit;
+    }
+
+    private function saveUserWebauthnCredentials($userId, $credentials)
+    {
+        $json = json_encode($credentials);
+        $existing = getMetaContact($userId, 'webauthn_credentials');
+        if ($existing) {
+            msgDebug("\nUpdating credentials = ".msgPrint($credentials));
+//            dbUpdate(BIZUNO_DB_PREFIX . 'contacts_meta', ['meta_value' => $json], ['ref_id' => $userId, 'meta_key' => 'webauthn_credentials']);
+        } else {
+            msgDebug("\nCreating credentials = ".msgPrint($credentials));
+//            dbInsert(BIZUNO_DB_PREFIX . 'contacts_meta', ['ref_id' => $userId, 'meta_key' => 'webauthn_credentials', 'meta_value' => $json]);
+        }
     }
 
     public function lostPW(&$layout=[])
