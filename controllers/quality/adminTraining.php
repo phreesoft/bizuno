@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/quality/adminTraining.php
  */
 
@@ -86,7 +86,7 @@ class qualityAdminTraining extends mgrJournal
                     'events'=>['formatter'=>"function(value,row) { return fmtLeadTime[value]; }"]],
                 'store_id'  => ['order'=>40, 'label'=>lang('store_id'), 'format'=>'storeID',
                     'attr' => ['sortable'=>true, 'resizable'=>true,'hidden'=>sizeof($this->stores)>1?false:true]],
-                'contact_id'=> ['order'=>50, 'label'=>$this->lang['trainer'], 'format'=>'contactID',
+                'contact_id'=> ['order'=>50, 'label'=>lang('trainer', $this->moduleID), 'format'=>'contactID',
                     'attr' => ['sortable'=>true, 'resizable'=>true]],
                 'train_date'=> ['order'=>60, 'label'=>sprintf(lang('tbd_next'), lang('date_training')), 'format'=>'date',
                     'attr' => ['sortable'=>true,'resizable'=>true, 'type'=>'date']]]]);

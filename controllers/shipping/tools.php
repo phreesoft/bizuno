@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-05
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/tools.php
  */
 
@@ -31,13 +31,11 @@ class shippingTools
 {
     public $moduleID= 'shipping';
     public $pageID  = 'tools';
-    public $lang;
     public $dirBackup;
     public $myFolder;
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
         $this->dirBackup = 'backups/';
         $this->myFolder = BIZUNO_DATA;
     }
@@ -46,10 +44,10 @@ class shippingTools
     {
         if (!$security = validateAccess('admin', 1)) { return; }
         $fields = [
-            'cleanDesc'=> ['order'=>10,'html'=>$this->lang['log_clean_desc'],'attr'=>['type'=>'raw']],
+            'cleanDesc'=> ['order'=>10,'html'=>lang('log_clean_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'dateClean'=> ['order'=>20,'attr'=>['type'=>'date', 'value'=>localeCalculateDate(biz_date('Y-m-d'), 0, -6)]],
             'btnClean' => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmBackup').submit();"]],
-//          'syncDesc' => ['order'=>10,'html'=>$this->lang['sync_shipments_desc'],'attr'=>['type'=>'raw']],
+//          'syncDesc' => ['order'=>10,'html'=>lang('sync_shipments_desc'],'attr'=>['type'=>'raw']],
 //          'btnSync'  => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/$this->pageID/syncShipments');"]],
             ];
         $data = ['type'=>'divHTML',
@@ -58,11 +56,11 @@ class shippingTools
 //              'syncShip'=> ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'syncShip'],
                 'dgFiles' => ['order'=>40,'type'=>'panel','classes'=>['block66'],'key'=>'dgFiles']]]],
             'panels'  => [
-                'clean'   => ['title'=>$this->lang['log_backup'],'type'=>'divs','divs'=>[
+                'clean'   => ['title'=>lang('log_backup', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmBackup'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['cleanDesc','dateClean','btnClean']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-//              'syncShip'=> ['label'=>$this->lang['sync_shipments_title'],'type'=>'fields','keys'=>['syncDesc','btnSync']],
+//              'syncShip'=> ['label'=>lang('sync_shipments_title'],'type'=>'fields','keys'=>['syncDesc','btnSync']],
                 'dgFiles' => ['type'=>'datagrid','styles'=>['width'=>'100%'],'key'=>'dgBackup']],
             'forms'   => ['frmBackup' => ['attr'=>['type'=>'form', 'action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/cleanLog"]]],
             'datagrid'=> ['dgBackup'=>$this->dgBackup('dgBackup')],
@@ -118,7 +116,7 @@ class shippingTools
             $this->cleanLogSubDir("data/shipping/labels/$carrier/{$parts[0]}/", $parts[1]);
             $this->cleanLogSubDir("data/shipping/labels/$carrier/{$parts[0]}/{$parts[1]}/", $parts[2]);
         }
-        msgAdd(sprintf($this->lang['log_clean_success'], viewFormat($toDate, 'date')), 'success');
+        msgAdd(sprintf(lang('log_clean_success', $this->moduleID), viewFormat($toDate, 'date')), 'success');
     }
 
     /**
@@ -136,7 +134,7 @@ class shippingTools
         foreach ($folders as $folder) {
             if ($folder < $stopDate) {
                 msgDebug("\nDeleting labels with path = $path and stopDate: $stopDate < folder: $folder ");
-//              msgAdd(sprintf($this->lang['log_clean_status'], "$path/$folder"), 'info');
+//              msgAdd(sprintf(lang('log_clean_status'], "$path/$folder"), 'info');
                 $io->folderDelete("$path/$folder");
 // UNCOMMED ABOVE TO ACTUALLY DELETE THE LABELS
             }

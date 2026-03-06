@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-02-28
  * @filesource controllers/administrate/dashboards/adm_alert/adm_alert.php
  */
 
@@ -55,7 +55,7 @@ class adm_alert
         $data = [ // Generate the content for this dashboard
             'divs'  => [
                 'body' =>['order'=>50,'type'=>'divs','attr'=>['id'=>$this->code],'divs'=>[
-                    'title'  => ['order'=>10,'type'=>'html',  'html'=>"<h1>{$this->lang['title']}</h1>"],
+                    'title'  => ['order'=>10,'type'=>'html',  'html'=>"<h1>".langDash('title', $this->code)."</h1>"],
                     'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>"frm{$this->code}"],
                     'content'=> ['order'=>50,'type'=>'fields','keys'=>['field0']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</div></form>"],

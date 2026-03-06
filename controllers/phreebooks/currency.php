@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/currency.php
  */
 
@@ -36,7 +36,6 @@ class phreebooksCurrency
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -66,11 +65,11 @@ class phreebooksCurrency
         foreach ($codes as $code => $row) { // remove currencies in use
             if (array_key_exists($code, getModuleCache('phreebooks', 'currency', 'iso', false, []))) { unset($codes[$code]); }
         }
-        $html  = '<p>'.$this->lang['new_currency_desc']."</p>";
+        $html  = '<p>'.lang('new_currency_desc', $this->moduleID)."</p>";
         $html .= html5('currencyNewISO',['values'=>$codes,'attr'=>['type'=>'select', 'value'=>'']]);
         $html .= html5('iconGO',['icon'=>'next',
             'events'=>  ['onClick'=>"accordionEdit('accCurrency','dgCurrency','accCurrencyDtl','".lang('details')."','phreebooks/currency/edit&iso='+bizSelGet('currencyNewISO')); bizWindowClose('winNewCur');"]]);
-        $data = ['type'=>'popup','title'=>$this->lang['new_currency'],'attr'=>['id'=>'winNewCur','width'=>400,'height'=>200],
+        $data = ['type'=>'popup','title'=>lang('new_currency', $this->moduleID),'attr'=>['id'=>'winNewCur','width'=>400,'height'=>200],
             'divs' => ['body'=>['order'=>50,'type'=>'html','html'=>$html]]];
         $layout = array_replace_recursive($layout, $data);
     }
@@ -92,13 +91,13 @@ class phreebooksCurrency
             'code'   => ['order'=>1,'label'=>lang('code'),             'attr'=>['value'=>$values['code'], 'readonly'=>true]],
             'is_def' => ['order'=>1,'label'=>lang('default'),          'attr'=>['type'=>'checkbox', 'value'=>'1', 'checked'=>getDefaultCurrency()==$iso?true:false]],
             'xrate'  => ['order'=>1,'label'=>lang('exc_rate'),         'attr'=>['value'=>$values['value']]],
-            'dec_len'=> ['order'=>2,'label'=>$this->lang['dec_length'],'attr'=>['value'=>$values['dec_len']]],
-            'dec_pt' => ['order'=>2,'label'=>$this->lang['dec_point'], 'attr'=>['value'=>$values['dec_pt']]],
+            'dec_len'=> ['order'=>2,'label'=>lang('dec_length', $this->moduleID),'attr'=>['value'=>$values['dec_len']]],
+            'dec_pt' => ['order'=>2,'label'=>lang('dec_point', $this->moduleID), 'attr'=>['value'=>$values['dec_pt']]],
             'sep'    => ['order'=>2,'label'=>lang('separator'),        'attr'=>['value'=>$values['sep']]],
             'prefix' => ['order'=>3,'label'=>lang('prefix'),           'attr'=>['value'=>$values['prefix']]],
             'suffix' => ['order'=>3,'label'=>lang('suffix'),           'attr'=>['value'=>$values['suffix']]],
-            'pfxneg' => ['order'=>3,'label'=>$this->lang['neg_prefix'],'attr'=>['value'=>isset($values['pfxneg']) ? $values['pfxneg'] : '-']],
-            'sfxneg' => ['order'=>3,'label'=>$this->lang['neg_suffix'],'attr'=>['value'=>isset($values['sfxneg']) ? $values['sfxneg'] : '']]];
+            'pfxneg' => ['order'=>3,'label'=>lang('neg_prefix', $this->moduleID),'attr'=>['value'=>isset($values['pfxneg']) ? $values['pfxneg'] : '-']],
+            'sfxneg' => ['order'=>3,'label'=>lang('neg_suffix', $this->moduleID),'attr'=>['value'=>isset($values['sfxneg']) ? $values['sfxneg'] : '']]];
         $data = ['type'=>'divHTML',
             'divs'     => [
                 'toolbar'=> ['order'=>10,'type'=>'toolbar','key' =>'tbCurrency'],
@@ -143,7 +142,7 @@ class phreebooksCurrency
         // check for new default, if so error check journal before replacing
         if ($is_def && $defISO != $iso) { // new default
             $id = dbGetValue(BIZUNO_DB_PREFIX."journal_main", 'id');
-            if ($id) { return msgAdd($this->lang['err_currency_change']); }
+            if ($id) { return msgAdd(lang('err_currency_change', $this->moduleID)); }
             setModuleCache('phreebooks', 'currency', 'defISO', $iso);
             dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."journal_main CHANGE currency currency CHAR(3) NOT NULL DEFAULT '$iso'");
 // @TODO - This needs to be updated to the new common_meta variable, do we still handle charts in multiple currencies?
@@ -176,10 +175,10 @@ class phreebooksCurrency
         $iso = clean('data', 'text', 'get');
         if (!$iso) { return msgAdd("Bad data!"); }
         // cannot delete default currency
-        if ($iso == getDefaultCurrency()) { return msgAdd($this->lang['err_currency_delete_default']); }
+        if ($iso == getDefaultCurrency()) { return msgAdd(lang('err_currency_delete_default', $this->moduleID)); }
         // Can't delete a currency or if it was used in ANY journal entry
         $exists = dbGetValue(BIZUNO_DB_PREFIX."journal_main", 'id', "currency='$iso'");
-        if ($exists) { return msgAdd($this->lang['err_currency_cannot_delete']); }
+        if ($exists) { return msgAdd(lang('err_currency_cannot_delete', $this->moduleID)); }
         $title  = getModuleCache('phreebooks', 'currency', 'iso', $iso)['title'];
         $isoVals= getModuleCache('phreebooks', 'currency', 'iso');
         unset($isoVals[$iso]);
@@ -265,13 +264,13 @@ class phreebooksCurrency
                 'code'   => ['order'=>10,'label'=>lang('code'),             'attr'=>['width'=> 50,'resizable'=>true]],
                 'title'  => ['order'=>20,'label'=>lang('title'),            'attr'=>['width'=>200,'resizable'=>true]],
                 'value'  => ['order'=>30,'label'=>lang('exc_rate'),         'attr'=>['width'=>100,'resizable'=>true]],
-                'pfxneg' => ['order'=>40,'label'=>$this->lang['neg_prefix'],'attr'=>['width'=>100,'resizable'=>true]],
+                'pfxneg' => ['order'=>40,'label'=>lang('neg_prefix', $this->moduleID),'attr'=>['width'=>100,'resizable'=>true]],
                 'prefix' => ['order'=>50,'label'=>lang('prefix'),           'attr'=>['width'=> 80,'resizable'=>true]],
                 'sep'    => ['order'=>60,'label'=>lang('separator'),        'attr'=>['width'=> 80,'resizable'=>true]],
-                'dec_pt' => ['order'=>70,'label'=>$this->lang['dec_point'], 'attr'=>['width'=>100,'resizable'=>true]],
-                'dec_len'=> ['order'=>80,'label'=>$this->lang['dec_length'],'attr'=>['width'=>100,'resizable'=>true]],
+                'dec_pt' => ['order'=>70,'label'=>lang('dec_point', $this->moduleID), 'attr'=>['width'=>100,'resizable'=>true]],
+                'dec_len'=> ['order'=>80,'label'=>lang('dec_length', $this->moduleID),'attr'=>['width'=>100,'resizable'=>true]],
                 'suffix' => ['order'=>90,'label'=>lang('suffix'),           'attr'=>['width'=> 80,'resizable'=>true]],
-                'sfxneg' => ['order'=>99,'label'=>$this->lang['neg_suffix'],'attr'=>['width'=>100,'resizable'=>true]]],
+                'sfxneg' => ['order'=>99,'label'=>lang('neg_suffix', $this->moduleID),'attr'=>['width'=>100,'resizable'=>true]]],
             'footnotes' => ['codes'=>lang('color_codes').': <span class="row-default">'.lang('default').'</span>']];
     }
 }

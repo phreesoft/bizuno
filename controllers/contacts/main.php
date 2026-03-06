@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/main.php
  */
 
@@ -260,7 +260,7 @@ class contactsMain
             'attr'=>['value'=>viewTerms($structure['terms']['attr']['value'], true, $this->type), 'readonly'=>'readonly']];
         $structure['terms_edit']= ['order'=>62,'icon'=>'settings','label'=>lang('terms'),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/editTerms&type=$this->type',$rID,jqBiz('#terms').val());"]];
         $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.$structure['id']['attr']['value']."</p>",'attr'=>['type'=>'raw']];
-        $structure['histPay']   = ['order'=>95,'attr'=>['type'=>'button','value'=>$this->lang['payment_history']],'events'=>['onClick'=>"jsonAction('$this->moduleID/history/payment', $rID);"]];
+        $structure['histPay']   = ['order'=>95,'attr'=>['type'=>'button','value'=>lang('payment_history', $this->moduleID)],'events'=>['onClick'=>"jsonAction('$this->moduleID/history/payment', $rID);"]];
         $status = $this->editStatus($structure, $rID);
         $prices = [['id'=>0, 'text'=>lang('none')]];
         $sheets = dbMetaGet('%', in_array($this->type, ['b','v'])?'price_v':'price_c'); // [getMetaCommon()];
@@ -491,7 +491,7 @@ class contactsMain
         if (!$rID) { return msgAdd('The record was not deleted, the proper id was not passed!'); }
         // error check, no delete if a journal entry exists
         $block = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "contact_id_b='$rID' OR contact_id_s='$rID' OR store_id='$rID'");
-        if ($block) { return msgAdd($this->lang['err_contacts_delete']); }
+        if ($block) { return msgAdd(lang('err_contacts_delete', $this->moduleID)); }
         $short_name = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'short_name', "id='$rID'");
         $actionData = "bizGridReload('dgContacts'); accordionEdit('accContacts','dgContacts','divContactsDetail','".jsLang('details')."','$this->moduleID/$this->pageID/edit&type=$this->type', 0);";
         if (!empty($action)) {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-01
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/dropShip.php
  */
 
@@ -33,7 +33,6 @@ class phreebooksDropShip
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     public function savePO(&$layout=[])
@@ -48,9 +47,9 @@ class phreebooksDropShip
             $skus[$row['sku']] = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "sku='{$row['sku']}'");
             if (empty($skus[$row['sku']]) || !in_array($skus[$row['sku']]['inventory_type'], INVENTORY_COGS_TYPES)) { continue; } // sku must be a stockable type
             if (!$vID && $skus[$row['sku']]['vendor_id']) { $vID = $skus[$row['sku']]['vendor_id']; }
-            elseif ($vID && $vID <> $skus[$row['sku']]['vendor_id']) { return msgAdd($this->lang['err_multiple_vendors']); }
+            elseif ($vID && $vID <> $skus[$row['sku']]['vendor_id']) { return msgAdd(lang('err_multiple_vendors', $this->moduleID)); }
         }
-        if (!$vID) { return msgAdd($this->lang['err_no_vendor_found']); }
+        if (!$vID) { return msgAdd(lang('err_no_vendor_found', $this->moduleID)); }
         $contactV = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$vID");
         // create the new PO
         $main['id'] = $main['waiting'] = $main['attach'] = $main['discount'] = $main['so_po_ref_id'] = $main['invoice_num'] = $main['recur_id'] = $main['freight'] = 0;

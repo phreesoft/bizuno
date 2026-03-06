@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-29
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/payment/admin.php
  */
 
@@ -32,14 +32,12 @@ class paymentAdmin
     public  $moduleID  = 'payment';
     public  $pageID    = 'admin';
     private $defMethods= ['cod', 'directdebit', 'moneyorder',];
-    public  $lang;
     public  $defaults;
     public  $settings;
     public  $structure;
 
     public function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->defaults = [
             'gl_payment_c'  => getChartDefault(0),
             'gl_discount_c' => getChartDefault(0),
@@ -76,7 +74,7 @@ class paymentAdmin
         if (!$security = validateAccess('admin', 1)) { return; }
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang));
         // add the nacha manager
-        $layout['tabs']['tabAdmin']['divs']['tabACH'] = ['order'=>70,'label'=>$this->lang['ach_accounts'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminNacha/manager'"]];
+        $layout['tabs']['tabAdmin']['divs']['tabACH'] = ['order'=>70,'label'=>lang('ach_accounts', $this->moduleID),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminNacha/manager'"]];
     }
 
     /**

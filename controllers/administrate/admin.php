@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -39,7 +39,6 @@ class administrateAdmin
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
         $this->defaults = ['store_id'=>0, 'restrict_store'=>0, 'restrict_user'=>0, 'restrict_period'=>0,
             'cash_acct'=> getModuleCache('phreebooks','settings','customers','gl_cash'),
             'ar_acct'  => getModuleCache('phreebooks','settings','customers','gl_receivables'),
@@ -84,13 +83,13 @@ class administrateAdmin
         $layout['panels']['genCont']['keys'] = ['role_id', 'email', 'telephone1', 'id'];
         // Add phreebooks panel
         $pbFields= [
-//          'store_id'       => ['order'=>10,'label'=>$this->lang['store_id_lbl'],       'tip'=>$this->lang['store_id_tip'],       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
-            'restrict_store' => ['order'=>20,'label'=>$this->lang['restrict_store_lbl'], 'tip'=>$this->lang['restrict_store_tip'], 'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_store'])?true:false]],
-            'restrict_user'  => ['order'=>30,'label'=>$this->lang['restrict_user_lbl'],  'tip'=>$this->lang['restrict_user_tip'],  'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_user']) ?true:false]],
-            'restrict_period'=> ['order'=>40,'label'=>$this->lang['restrict_period_lbl'],'tip'=>$this->lang['restrict_period_tip'],'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_period']?true:false)]],
-            'cash_acct'      => ['order'=>50,'label'=>$this->lang['gl_cash_lbl'],        'tip'=>$this->lang['gl_cash_tip'],        'attr'=>['type'=>'ledger',  'value'=>$opts['cash_acct']]],
-            'ar_acct'        => ['order'=>60,'label'=>$this->lang['gl_receivables_lbl'], 'tip'=>$this->lang['gl_receivables_tip'], 'attr'=>['type'=>'ledger',  'value'=>$opts['ar_acct']]],
-            'ap_acct'        => ['order'=>70,'label'=>$this->lang['gl_purchases_lbl'],   'tip'=>$this->lang['gl_purchases_tip'],   'attr'=>['type'=>'ledger',  'value'=>$opts['ap_acct']]]];
+//          'store_id'       => ['order'=>10,'label'=>lang('store_id_lbl', $this->moduleID),       'tip'=>lang('store_id_tip', $this->moduleID),       'attr'=>['type'=>'select',  'value'=>$opts['store_id']], 'values'=>viewStores()],
+            'restrict_store' => ['order'=>20,'label'=>lang('restrict_store_lbl', $this->moduleID), 'tip'=>lang('restrict_store_tip', $this->moduleID), 'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_store'])?true:false]],
+            'restrict_user'  => ['order'=>30,'label'=>lang('restrict_user_lbl', $this->moduleID),  'tip'=>lang('restrict_user_tip', $this->moduleID),  'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_user']) ?true:false]],
+            'restrict_period'=> ['order'=>40,'label'=>lang('restrict_period_lbl', $this->moduleID),'tip'=>lang('restrict_period_tip', $this->moduleID),'attr'=>['type'=>'checkbox','checked'=>!empty($opts['restrict_period']?true:false)]],
+            'cash_acct'      => ['order'=>50,'label'=>lang('gl_cash_lbl', $this->moduleID),        'tip'=>lang('gl_cash_tip', $this->moduleID),        'attr'=>['type'=>'ledger',  'value'=>$opts['cash_acct']]],
+            'ar_acct'        => ['order'=>60,'label'=>lang('gl_receivables_lbl', $this->moduleID), 'tip'=>lang('gl_receivables_tip', $this->moduleID), 'attr'=>['type'=>'ledger',  'value'=>$opts['ar_acct']]],
+            'ap_acct'        => ['order'=>70,'label'=>lang('gl_purchases_lbl', $this->moduleID),   'tip'=>lang('gl_purchases_tip', $this->moduleID),   'attr'=>['type'=>'ledger',  'value'=>$opts['ap_acct']]]];
         $layout['tabs']['tabContacts']['divs']['general']['divs']['genPB'] = ['order'=>75,'type'=>'panel','key'=>'genPB','classes'=>['block33']];
         $layout['panels']['genPB'] = ['label'=>lang('phreebooks'), 'type'=>'fields', 'keys'=>array_keys($pbFields)];
         $layout['fields'] = array_merge($layout['fields'], $pbFields, $rFields);

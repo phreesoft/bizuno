@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/renderHTML.php
  */
 
@@ -31,7 +31,6 @@ class HTML
 {
     public $moduleID = 'phreeform';
     private $dataAligns = [];
-    public $lang;
     public $defaultFont;
     public $FillColor;
     public $HdColor;
@@ -47,7 +46,6 @@ class HTML
 
     function __construct($data, $report)
     {
-        $this->lang       = getLang($this->moduleID);
         $this->defaultFont= getModuleCache('phreeform','settings','general','default_font','helvetica');
         $this->FillColor  = '#E0EBFF';
         $this->HdColor    = '#00BFFF';
@@ -159,7 +157,7 @@ class HTML
                     break;
                 case "r": // Report Total
                 case "g": // Group Total
-                    $Desc  = ($todo[0] == 'g') ? $this->lang['group_total'] : $this->lang['report_total'];
+                    $Desc  = ($todo[0] == 'g') ? lang('group_total', $this->moduleID) : lang('report_total', $this->moduleID);
                     $rStyle = 'style="background-color:'.$this->ttlColor.'"';
                     $this->writeRow([['align' => 'C', 'value' => $Desc.' '.$todo[1]]], $rStyle, $dStyle, true);
                     if ($rowCnt > 25) { $showHd = true; $rowCnt = 0; }

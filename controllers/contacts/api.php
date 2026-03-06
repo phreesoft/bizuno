@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/api.php
  */
 
@@ -48,10 +48,10 @@ class contactsApi
             'btnConapi_imp'=> ['icon'=>'import','label'=>lang('import'),'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmConApiImport').submit();"]],
             'btnConapi_exp'=> ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=contacts/api/apiExport');"]]];
         $forms = ['frmConApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=contacts/api/apiImport"]]];
-        $html  = '<p>'.$this->lang['conapi_desc'].'</p>
-<p>'.$this->lang['conapi_template'].html5('', $fields['btnConapi_tpl']).'</p><hr />'.html5('frmConApiImport',  $forms['frmConApiImport']).'
-<p>'.$this->lang['conapi_import']  .html5('fileContacts', $fields['fileContacts']).html5('', $fields['btnConapi_imp'])."</p></form>\n<hr />
-<p>".$this->lang['conapi_export']  .html5('', $fields['btnConapi_exp']).'</p>';
+        $html  = '<p>'.lang('conapi_desc', $this->moduleID).'</p>
+<p>'.lang('conapi_template', $this->moduleID).html5('', $fields['btnConapi_tpl']).'</p><hr />'.html5('frmConApiImport',  $forms['frmConApiImport']).'
+<p>'.lang('conapi_import', $this->moduleID)  .html5('fileContacts', $fields['fileContacts']).html5('', $fields['btnConapi_imp'])."</p></form>\n<hr />
+<p>".lang('conapi_export', $this->moduleID)  .html5('', $fields['btnConapi_exp']).'</p>';
         $layout['jsReady']['contactsImport'] = "ajaxForm('frmConApiImport');";
         $layout['tabs']['tabAPI']['divs'][$this->moduleID] = ['order'=>20,'label'=>getModuleCache($this->moduleID, 'properties', 'title'),'type'=>'html','html'=>$html];
     }

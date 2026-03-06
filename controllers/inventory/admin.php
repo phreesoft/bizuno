@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-07
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -31,7 +31,6 @@ class inventoryAdmin
 {
     public $moduleID = 'inventory';
     public $pageID   = 'main';
-    public $lang;
     public $defaults;
     public $settings;
     public $structure;
@@ -42,7 +41,6 @@ class inventoryAdmin
 
     function __construct()
     {
-        $this->lang      = getLang($this->moduleID);
         $this->defaults  = [
             'sales'   => getChartDefault(30),
             'stock'   => getChartDefault(4),
@@ -83,19 +81,19 @@ class inventoryAdmin
             'inv_mv12'  => ['text'=>lang('annual_sales')     .' (sku)'],
             'inv_stk'   => ['text'=>lang('qty_min')          .' (sku)'],
             'storeStock'=> ['text'=>lang('store_stock'),         'group'=>lang('ctype_b')],
-            'sbBOM'     => ['text'=>$this->lang['sb_proc_bom'],  'group'=>lang('work_orders')],
-            'sbOnOrder' => ['text'=>$this->lang['sb_proc_order'],'group'=>lang('work_orders')],
-            'sbSteps'   => ['text'=>$this->lang['sb_step_list'], 'group'=>lang('work_orders')],
-            'sbTask'    => ['text'=>$this->lang['sb_proc_task'], 'group'=>lang('work_orders')],
-            'sbTaskList'=> ['text'=>$this->lang['sb_task_list'], 'group'=>lang('work_orders')],
-            'sbRefDraw' => ['text'=>$this->lang['sb_proc_draw'], 'group'=>lang('work_orders')],
-            'sbRefDocs' => ['text'=>$this->lang['sb_proc_docs'], 'group'=>lang('work_orders')]];
+            'sbBOM'     => ['text'=>lang('sb_proc_bom', $this->moduleID),  'group'=>lang('work_orders')],
+            'sbOnOrder' => ['text'=>lang('sb_proc_order', $this->moduleID),'group'=>lang('work_orders')],
+            'sbSteps'   => ['text'=>lang('sb_step_list', $this->moduleID), 'group'=>lang('work_orders')],
+            'sbTask'    => ['text'=>lang('sb_proc_task', $this->moduleID), 'group'=>lang('work_orders')],
+            'sbTaskList'=> ['text'=>lang('sb_task_list', $this->moduleID), 'group'=>lang('work_orders')],
+            'sbRefDraw' => ['text'=>lang('sb_proc_draw', $this->moduleID), 'group'=>lang('work_orders')],
+            'sbRefDocs' => ['text'=>lang('sb_proc_docs', $this->moduleID), 'group'=>lang('work_orders')]];
         $this->phreeformFormatting = [
-            'buySell'=>['text'=>$this->lang['buy_sell_title'], 'group'=>$this->lang['title'], 'module'=>$this->moduleID, 'function'=>'inventoryView']];
+            'buySell'=>['text'=>lang('buy_sell_title', $this->moduleID), 'group'=>lang('title', $this->moduleID), 'module'=>$this->moduleID, 'function'=>'inventoryView']];
         $this->setPriceProcessing($this->phreeformProcessing); // build dynamic processing based on quantity price sheets available
-        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
+        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, lang('title', $this->moduleID));
         $this->job_units = ['0'=>lang('minutes'), '1'=>lang('hours'), '2'=>lang('days')];
-        $this->notes = [$this->lang['note_inventory_install_1']];
+        $this->notes = [lang('note_inventory_install_1', $this->moduleID)];
     }
 
     public function settingsStructure()
@@ -132,37 +130,37 @@ class inventoryAdmin
                 'inc_assemblies' => ['attr'=>['type'=>'selNoYes', 'value'=>1]],
                 'inc_committed'  => ['attr'=>['type'=>'selNoYes', 'value'=>1]]]],
             'phreebooks'=> ['order'=>20,'label'=>getModuleCache('phreebooks', 'properties', 'title'),'fields'=>[
-                'sales_si'  => ['label'=>$this->lang['inv_sales_lbl'].$si,'tip'=>$this->lang['inv_sales_'].lang('inventory_type_si'),'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_si','value'=>$this->defaults['sales']]],
-                'inv_si'    => ['label'=>$this->lang['inv_inv_lbl'].$si,  'tip'=>$this->lang['inv_inv_']  .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_si',  'value'=>$this->defaults['stock']]],
-                'cogs_si'   => ['label'=>$this->lang['inv_cogs_lbl'].$si, 'tip'=>$this->lang['inv_cogs_'] .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_si', 'value'=>$this->defaults['cogs']]],
-                'method_si' => ['label'=>$this->lang['inv_meth_lbl'].$si, 'tip'=>$this->lang['inv_meth_'] .$si,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
-                'sales_ms'  => ['label'=>$this->lang['inv_sales_lbl'].$ms,'tip'=>$this->lang['inv_sales_'].$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ms','value'=>$this->defaults['sales']]],
-                'inv_ms'    => ['label'=>$this->lang['inv_inv_lbl'].$ms,  'tip'=>$this->lang['inv_inv_']  .$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ms',  'value'=>$this->defaults['stock']]],
-                'cogs_ms'   => ['label'=>$this->lang['inv_cogs_lbl'].$ms, 'tip'=>$this->lang['inv_cogs_'] .$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ms', 'value'=>$this->defaults['cogs']]],
-                'method_ms' => ['label'=>$this->lang['inv_meth_lbl'].$ms, 'tip'=>$this->lang['inv_meth_'] .$ms,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
-                'sales_ma'  => ['label'=>$this->lang['inv_sales_lbl'].$ma,'tip'=>$this->lang['inv_sales_'].$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ma','value'=>$this->defaults['sales']]],
-                'inv_ma'    => ['label'=>$this->lang['inv_inv_lbl'].$ma,  'tip'=>$this->lang['inv_inv_']  .$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ma',  'value'=>$this->defaults['stock']]],
-                'cogs_ma'   => ['label'=>$this->lang['inv_cogs_lbl'].$ma, 'tip'=>$this->lang['inv_cogs_'] .$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ma', 'value'=>$this->defaults['cogs']]],
-                'method_ma' => ['label'=>$this->lang['inv_meth_lbl'].$ma, 'tip'=>$this->lang['inv_meth_'] .$ma,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
-                'sales_sr'  => ['label'=>$this->lang['inv_sales_lbl'].$sr,'tip'=>$this->lang['inv_sales_'].$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sr','value'=>$this->defaults['sales']]],
-                'inv_sr'    => ['label'=>$this->lang['inv_inv_lbl'].$sr,  'tip'=>$this->lang['inv_inv_']  .$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sr',  'value'=>$this->defaults['stock']]],
-                'cogs_sr'   => ['label'=>$this->lang['inv_cogs_lbl'].$sr, 'tip'=>$this->lang['inv_cogs_'] .$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sr', 'value'=>$this->defaults['cogs']]],
-                'method_sr' => ['label'=>$this->lang['inv_meth_lbl'].$sr, 'tip'=>$this->lang['inv_meth_'] .$sr,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
-                'sales_sa'  => ['label'=>$this->lang['inv_sales_lbl'].$sa,'tip'=>$this->lang['inv_sales_'].$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sa','value'=>$this->defaults['sales']]],
-                'inv_sa'    => ['label'=>$this->lang['inv_inv_lbl'].$sa,  'tip'=>$this->lang['inv_inv_']  .$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sa',  'value'=>$this->defaults['stock']]],
-                'cogs_sa'   => ['label'=>$this->lang['inv_cogs_lbl'].$sa, 'tip'=>$this->lang['inv_cogs_'] .$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sa', 'value'=>$this->defaults['cogs']]],
-                'method_sa' => ['label'=>$this->lang['inv_meth_lbl'].$sa, 'tip'=>$this->lang['inv_meth_'] .$sa,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
-                'sales_ns'  => ['label'=>$this->lang['inv_sales_lbl'].$ns,'tip'=>$this->lang['inv_sales_'].$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ns','value'=>$this->defaults['sales']]],
-                'inv_ns'    => ['label'=>$this->lang['inv_inv_lbl'].$ns,  'tip'=>$this->lang['inv_inv_']  .$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ns',  'value'=>$this->defaults['nonstock']]],
-                'cogs_ns'   => ['label'=>$this->lang['inv_cogs_lbl'].$ns, 'tip'=>$this->lang['inv_cogs_'] .$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ns', 'value'=>$this->defaults['cogs']]],
-                'sales_sv'  => ['label'=>$this->lang['inv_sales_lbl'].$sv,'tip'=>$this->lang['inv_sales_'].$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sv','value'=>$this->defaults['sales']]],
-                'inv_sv'    => ['label'=>$this->lang['inv_inv_lbl'].$sv,  'tip'=>$this->lang['inv_inv_']  .$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sv',  'value'=>$this->defaults['nonstock']]],
-                'cogs_sv'   => ['label'=>$this->lang['inv_cogs_lbl'].$sv, 'tip'=>$this->lang['inv_cogs_'] .$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sv', 'value'=>$this->defaults['cogs']]],
-                'sales_lb'  => ['label'=>$this->lang['inv_sales_lbl'].$lb,'tip'=>$this->lang['inv_sales_'].$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_lb','value'=>$this->defaults['sales']]],
-                'inv_lb'    => ['label'=>$this->lang['inv_inv_lbl'].$lb,  'tip'=>$this->lang['inv_inv_']  .$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_lb',  'value'=>$this->defaults['nonstock']]],
-                'cogs_lb'   => ['label'=>$this->lang['inv_cogs_lbl'].$lb, 'tip'=>$this->lang['inv_cogs_'] .$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_lb', 'value'=>$this->defaults['cogs']]],
-                'sales_ai'  => ['label'=>$this->lang['inv_sales_lbl'].$ai,'tip'=>$this->lang['inv_sales_'].$ai,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ai','value'=>$this->defaults['sales']]],
-                'sales_ci'  => ['label'=>$this->lang['inv_sales_lbl'].$ci,'tip'=>$this->lang['inv_sales_'].$ci,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ci','value'=>$this->defaults['sales']]]]]];
+                'sales_si'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $si),'tip'=>lang('inv_sales_', $this->moduleID).lang('inventory_type_si'),'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_si','value'=>$this->defaults['sales']]],
+                'inv_si'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $si),  'tip'=>lang('inv_inv_', $this->moduleID)  .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_si',  'value'=>$this->defaults['stock']]],
+                'cogs_si'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $si), 'tip'=>lang('inv_cogs_', $this->moduleID) .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_si', 'value'=>$this->defaults['cogs']]],
+                'method_si' => ['label'=>sprintf(lang('inv_meth_lbl', $this->moduleID), $si), 'tip'=>lang('inv_meth_', $this->moduleID) .$si,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
+                'sales_ms'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $ms),'tip'=>lang('inv_sales_', $this->moduleID).$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ms','value'=>$this->defaults['sales']]],
+                'inv_ms'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $ms),  'tip'=>lang('inv_inv_', $this->moduleID)  .$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ms',  'value'=>$this->defaults['stock']]],
+                'cogs_ms'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $ms), 'tip'=>lang('inv_cogs_', $this->moduleID) .$ms,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ms', 'value'=>$this->defaults['cogs']]],
+                'method_ms' => ['label'=>sprintf(lang('inv_meth_lbl', $this->moduleID), $ms), 'tip'=>lang('inv_meth_', $this->moduleID) .$ms,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
+                'sales_ma'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $ma),'tip'=>lang('inv_sales_', $this->moduleID).$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ma','value'=>$this->defaults['sales']]],
+                'inv_ma'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $ma),  'tip'=>lang('inv_inv_', $this->moduleID)  .$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ma',  'value'=>$this->defaults['stock']]],
+                'cogs_ma'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $ma), 'tip'=>lang('inv_cogs_', $this->moduleID) .$ma,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ma', 'value'=>$this->defaults['cogs']]],
+                'method_ma' => ['label'=>sprintf(lang('inv_meth_lbl', $this->moduleID), $ma), 'tip'=>lang('inv_meth_', $this->moduleID) .$ma,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
+                'sales_sr'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $sr),'tip'=>lang('inv_sales_', $this->moduleID).$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sr','value'=>$this->defaults['sales']]],
+                'inv_sr'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $sr),  'tip'=>lang('inv_inv_', $this->moduleID)  .$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sr',  'value'=>$this->defaults['stock']]],
+                'cogs_sr'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $sr), 'tip'=>lang('inv_cogs_', $this->moduleID) .$sr,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sr', 'value'=>$this->defaults['cogs']]],
+                'method_sr' => ['label'=>sprintf(lang('inv_meth_lbl', $this->moduleID), $sr), 'tip'=>lang('inv_meth_', $this->moduleID) .$sr,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
+                'sales_sa'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $sa),'tip'=>lang('inv_sales_', $this->moduleID).$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sa','value'=>$this->defaults['sales']]],
+                'inv_sa'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $sa),  'tip'=>lang('inv_inv_', $this->moduleID)  .$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sa',  'value'=>$this->defaults['stock']]],
+                'cogs_sa'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $sa), 'tip'=>lang('inv_cogs_', $this->moduleID) .$sa,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sa', 'value'=>$this->defaults['cogs']]],
+                'method_sa' => ['label'=>sprintf(lang('inv_meth_lbl', $this->moduleID), $sa), 'tip'=>lang('inv_meth_', $this->moduleID) .$sa,'values'=>$invCosts,'attr'=>['type'=>'select',        'value'=>$this->defaults['method']]],
+                'sales_ns'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $ns),'tip'=>lang('inv_sales_', $this->moduleID).$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ns','value'=>$this->defaults['sales']]],
+                'inv_ns'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $ns),  'tip'=>lang('inv_inv_', $this->moduleID)  .$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_ns',  'value'=>$this->defaults['nonstock']]],
+                'cogs_ns'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $ns), 'tip'=>lang('inv_cogs_', $this->moduleID) .$ns,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_ns', 'value'=>$this->defaults['cogs']]],
+                'sales_sv'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $sv),'tip'=>lang('inv_sales_', $this->moduleID).$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_sv','value'=>$this->defaults['sales']]],
+                'inv_sv'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $sv),  'tip'=>lang('inv_inv_', $this->moduleID)  .$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_sv',  'value'=>$this->defaults['nonstock']]],
+                'cogs_sv'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $sv), 'tip'=>lang('inv_cogs_', $this->moduleID) .$sv,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_sv', 'value'=>$this->defaults['cogs']]],
+                'sales_lb'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $lb),'tip'=>lang('inv_sales_', $this->moduleID).$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_lb','value'=>$this->defaults['sales']]],
+                'inv_lb'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $lb),  'tip'=>lang('inv_inv_', $this->moduleID)  .$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_lb',  'value'=>$this->defaults['nonstock']]],
+                'cogs_lb'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $lb), 'tip'=>lang('inv_cogs_', $this->moduleID) .$lb,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_lb', 'value'=>$this->defaults['cogs']]],
+                'sales_ai'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $ai),'tip'=>lang('inv_sales_', $this->moduleID).$ai,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ai','value'=>$this->defaults['sales']]],
+                'sales_ci'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $ci),'tip'=>lang('inv_sales_', $this->moduleID).$ci,'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_ci','value'=>$this->defaults['sales']]]]]];
         settingsFill($data, $this->moduleID);
         return $data;
     }
@@ -187,29 +185,29 @@ class inventoryAdmin
     {
         if (!$security = validateAccess('admin', 1)) { return; }
         $fields = [
-            'invValDesc'   => ['order'=>10,'html'=>$this->lang['inv_tools_val_inv_desc'], 'attr'=>['type'=>'raw']],
-            'btnHistTest'  => ['order'=>20,'label'=>$this->lang['inv_tools_repair_test'], 'attr'=>['type'=>'button','value'=>$this->lang['inv_tools_btn_test']],
+            'invValDesc'   => ['order'=>10,'html'=>lang('inv_tools_val_inv_desc', $this->moduleID), 'attr'=>['type'=>'raw']],
+            'btnHistTest'  => ['order'=>20,'label'=>lang('inv_tools_repair_test', $this->moduleID), 'attr'=>['type'=>'button','value'=>lang('inv_tools_btn_test', $this->moduleID)],
                 'events' => ['onClick'=>"jsonAction('$this->moduleID/tools/historyTestRepair', 0, 'test');"]],
-            'btnHistFix'   => ['order'=>10,'label'=>$this->lang['inv_tools_repair_fix'],  'attr'=>['type'=>'button', 'value'=>$this->lang['inv_tools_btn_repair']],
+            'btnHistFix'   => ['order'=>10,'label'=>lang('inv_tools_repair_fix', $this->moduleID),  'attr'=>['type'=>'button', 'value'=>lang('inv_tools_btn_repair', $this->moduleID)],
                 'events' => ['onClick'=>"jsonAction('$this->moduleID/tools/historyTestRepair', 0, 'fix');"]],
-            'invDrillDesc' => ['order'=>10,'html'=>$this->lang['inv_sku_drill_desc'],     'attr'=>['type'=>'raw']],
+            'invDrillDesc' => ['order'=>10,'html'=>lang('inv_sku_drill_desc', $this->moduleID),     'attr'=>['type'=>'raw']],
             'invDrillSku'  => ['order'=>20,'attr'=> ['type'=>'inventory']],
             'invDrillDate' => ['order'=>30,'attr'=> ['type'=>'date',  'value'=>localeCalculateDate(biz_date('Y-m-d'), 0, -6)]],
             'btnDrillGo'   => ['order'=>40,'attr'=> ['type'=>'button','value'=>lang('go')],
                 'events' => ['onClick'=>"jsonAction('$this->moduleID/tools/skuDrillDown', bizSelGet('invDrillSku'), jqBiz('#invDrillDate').datebox('getText'));"]],
-            'invRecalcDesc'=> ['order'=>10,'html'=>$this->lang['inv_sku_recalc_desc'],    'attr'=>['type'=>'raw']],
+            'invRecalcDesc'=> ['order'=>10,'html'=>lang('inv_sku_recalc_desc', $this->moduleID),    'attr'=>['type'=>'raw']],
             'btnRecalcGo'  => ['order'=>40,'attr'=> ['type'=>'button','value'=>lang('go')],
                 'events' => ['onClick'=>"jsonAction('$this->moduleID/tools/recalcHistory');"]],
-            'invAllocDesc' => ['order'=>10,'html'=>$this->lang['inv_tools_qty_alloc_desc'],'attr'=>['type'=>'raw']],
-            'btnAllocFix'  => ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>$this->lang['inv_tools_qty_alloc_label']],
+            'invAllocDesc' => ['order'=>10,'html'=>lang('inv_tools_qty_alloc_desc', $this->moduleID),'attr'=>['type'=>'raw']],
+            'btnAllocFix'  => ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>lang('inv_tools_qty_alloc_label', $this->moduleID)],
                 'events' => ['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/qtyAllocRepair');"]],
-            'invSoPoDesc'  => ['order'=>10,'html'=>$this->lang['inv_tools_validate_so_po_desc'],'attr'=>['type'=>'raw']],
-            'btnJournalFix'=> ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>$this->lang['inv_tools_btn_so_po_fix']],
+            'invSoPoDesc'  => ['order'=>10,'html'=>lang('inv_tools_validate_so_po_desc', $this->moduleID),'attr'=>['type'=>'raw']],
+            'btnJournalFix'=> ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>lang('inv_tools_btn_so_po_fix', $this->moduleID)],
                 'events' => ['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/onOrderRepair');"]],
-            'invPriceDesc' => ['order'=>10,'html'=>$this->lang['inv_tools_price_assy_desc'],'attr'=>['type'=>'raw']],
+            'invPriceDesc' => ['order'=>10,'html'=>lang('inv_tools_price_assy_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'btnPriceAssy' => ['order'=>20,'label'=>'', 'attr'=>['type'=>'button', 'value'=>lang('go')],
                 'events' => ['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/priceAssy');"]],
-//            'analyzeDesc'=> ['order'=>10,'html' =>$this->lang['inv_analyze_desc'],'attr'=>['type'=>'raw']],
+//            'analyzeDesc'=> ['order'=>10,'html' =>lang('inv_analyze_desc'],'attr'=>['type'=>'raw']],
 //            'analyzeBtn' => ['order'=>20,'attr'=>['type'=>'button', 'value'=>lang('go')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/invBalance');"]],
 //            'syncAtchDesc' => ['order'=>10,'html'=>lang('sync_attach_desc'),'attr'=>['type'=>'raw']],
 //            'btnSyncAttach'=> ['order'=>20,'events'=>['onClick' => "jqBiz('body').addClass('loading'); jsonAction('$this->moduleID/tools/syncAttachments&verbose=1');"],
@@ -219,7 +217,7 @@ class inventoryAdmin
             'tabs' => ['tabAdmin'=> ['divs'=>[
                 'woTasks'=> ['order'=>60,'label'=>sprintf(lang('tbd_tasks'), lang('work_order')),'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tasks/manager'"]],
-                'invAttr'=> ['order'=>70,'label'=>$this->lang['attributes'],'type'=>'html','html'=>'',
+                'invAttr'=> ['order'=>70,'label'=>lang('attributes', $this->moduleID),'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/adminAttrLoad'"]],
                 'tools'  => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','divs'=>[
                     'general' => ['order'=>20,'type'=>'divs','classes'=>['areaView'],'divs'=>[
@@ -232,13 +230,13 @@ class inventoryAdmin
 //                      'analyze'  => ['order'=>70,'type'=>'panel','classes'=>['block50'],'key'=>'analyze'],
                         ]]]]]]],
             'panels' => [
-                'invVal'   => ['label'=>$this->lang['inv_tools_val_inv'],     'type'=>'fields','keys'=>['invValDesc',   'btnHistTest','btnHistFix']],
-                'invDrill' => ['label'=>$this->lang['inv_sku_drill_title'],   'type'=>'fields','keys'=>['invDrillDesc', 'invDrillSku','invDrillDate','btnDrillGo']],
-                'invRecalc'=> ['label'=>$this->lang['inv_sku_recalc_title'],  'type'=>'fields','keys'=>['invRecalcDesc','btnRecalcGo']],
-                'invAlloc' => ['label'=>$this->lang['inv_tools_qty_alloc'],   'type'=>'fields','keys'=>['invAllocDesc', 'btnAllocFix']],
-                'invSoPo'  => ['label'=>$this->lang['inv_tools_repair_so_po'],'type'=>'fields','keys'=>['invSoPoDesc',  'btnJournalFix']],
-                'invPrice' => ['label'=>$this->lang['inv_tools_price_assy'],  'type'=>'fields','keys'=>['invPriceDesc', 'btnPriceAssy']],
-//              'analyze'  => ['label'=>$this->lang['inv_sku_drill_title'],   'type'=>'fields','keys'=>['analyzeDesc',  'analyzeBtn']],
+                'invVal'   => ['label'=>lang('inv_tools_val_inv', $this->moduleID),     'type'=>'fields','keys'=>['invValDesc',   'btnHistTest','btnHistFix']],
+                'invDrill' => ['label'=>lang('inv_sku_drill_title', $this->moduleID),   'type'=>'fields','keys'=>['invDrillDesc', 'invDrillSku','invDrillDate','btnDrillGo']],
+                'invRecalc'=> ['label'=>lang('inv_sku_recalc_title', $this->moduleID),  'type'=>'fields','keys'=>['invRecalcDesc','btnRecalcGo']],
+                'invAlloc' => ['label'=>lang('inv_tools_qty_alloc', $this->moduleID),   'type'=>'fields','keys'=>['invAllocDesc', 'btnAllocFix']],
+                'invSoPo'  => ['label'=>lang('inv_tools_repair_so_po', $this->moduleID),'type'=>'fields','keys'=>['invSoPoDesc',  'btnJournalFix']],
+                'invPrice' => ['label'=>lang('inv_tools_price_assy', $this->moduleID),  'type'=>'fields','keys'=>['invPriceDesc', 'btnPriceAssy']],
+//              'analyze'  => ['label'=>lang('inv_sku_drill_title'],   'type'=>'fields','keys'=>['analyzeDesc',  'analyzeBtn']],
                 ],
             'fields' => $fields];
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
@@ -258,7 +256,7 @@ class inventoryAdmin
     {
         $rID = clean('rID', 'integer', 'get');
         $role= dbMetaGet($rID, 'bizuno_role');
-        $layout['fields']['group_mfg']= ['order'=>50,'label'=>$this->lang['role_mfg'],'tip'=>'',
+        $layout['fields']['group_mfg']= ['order'=>50,'label'=>lang('role_mfg', $this->moduleID),'tip'=>'',
             'attr'=>['type'=>'checkbox','checked'=>!empty($role['groups']['mfg'])?true:false]];
         $layout['tabs']['tabRoles']['divs']['inventory']['divs']['props'] = ['order'=>20,'type'=>'panel','classes'=>['block50'],'key'=>'invSettings'];
         $layout['panels']['invSettings'] = ['label'=>lang('settings'),'type'=>'fields','keys'=>['group_mfg']];
@@ -295,18 +293,6 @@ class inventoryAdmin
         }
         setModuleCache('inventory', 'prices_v', '', $pricesV);
         return true;
-    }
-
-    /**
-     * @TODO - Deprecated
-     * @param type $layout
-     */
-    public function install()
-    {
-//        $bAdmin = new bizunoSettings();
-//        foreach ($this->invMethods as $method) {
-//            $bAdmin->methodInstall($layout, ['module'=>'inventory', 'path'=>'prices', 'method'=>$method], false);
-//        }
     }
 
     /**

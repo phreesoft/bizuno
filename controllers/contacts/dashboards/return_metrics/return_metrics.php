@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/contacts/dashboards/return_metrics/return_metrics.php
  */
 
@@ -48,10 +48,6 @@ class return_metrics
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [
@@ -63,13 +59,6 @@ class return_metrics
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         $menu  = clean('menu', 'db_field', 'get');
@@ -80,10 +69,6 @@ class return_metrics
         return ['type'=>'gChart', 'title'=>$title, 'legend'=>$legend, 'data'=>$cData['chart'], 'click'=>$click];
     }
 
-    /**
-     * Generates the pie chart data array
-     * @return array - structure with the pie chart data
-     */
     public function getData($range)
     {
         $dates= dbSqlDatesQrtrs($range, 'post_date');

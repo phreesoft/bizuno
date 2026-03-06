@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-29
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/admin.php
  */
 
@@ -33,13 +33,11 @@ class phreeformAdmin
 {
     public $moduleID = 'phreeform';
     public $pageID   = 'admin';
-    public $lang;
     public $settings;
     public $structure;
 
     function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure= [
             'menuBar' => ['child'=>['tools'=>['child'=>[
@@ -58,7 +56,7 @@ class phreeformAdmin
                 'column_width'=> ['attr'=>['value'=>25]],
                 'margin'      => ['attr'=>['value'=>8]],
                 'title1'      => ['attr'=>['value'=>'%reportname%']],
-                'title2'      => ['attr'=>['value'=>$this->lang['phreeform_heading_2']]], // 'Report Generated %date%'
+                'title2'      => ['attr'=>['value'=>lang('phreeform_heading_2', $this->moduleID)]], // 'Report Generated %date%'
                 'paper_size'  => ['values'=>phreeformPages($this->lang), 'attr'=>  ['type'=>'select', 'value'=>'Letter:216:282']],
                 'orientation' => ['values'=>phreeformOrientation($this->lang),'attr'=>  ['type'=>'select', 'value'=>'P']],
                 'truncate_len'=> ['attr'=>['value'=>'25']]]]];

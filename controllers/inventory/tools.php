@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-10
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -36,7 +36,6 @@ class inventoryTools
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
         $this->inv_types = INVENTORY_COGS_TYPES;
     }
 
@@ -50,10 +49,10 @@ class inventoryTools
         $icnSave= ['icon'=>'save','label'=>lang('merge'),
             'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/mergeSave', jqBiz('#mergeSrc').val(), jqBiz('#mergeDest').val());"]];
         $props  = ['defaults'=>['callback'=>''],'attr'=>['type'=>'inventory']];
-        $html   = "<p>".$this->lang['msg_inventory_merge_src'] ."</p><p>".html5('mergeSrc', $props)."</p>".
-                  "<p>".$this->lang['msg_inventory_merge_dest']."</p><p>".html5('mergeDest',$props)."</p>".html5('icnMergeSave', $icnSave).
-                  "<p>".$this->lang['msg_inventory_merge_note']."</p>";
-        $data   = ['type'=>'popup','title'=>$this->lang['inventory_merge'],'attr'=>['id'=>'winMerge'],
+        $html   = "<p>".lang('msg_inventory_merge_src', $this->moduleID) ."</p><p>".html5('mergeSrc', $props)."</p>".
+                  "<p>".lang('msg_inventory_merge_dest', $this->moduleID)."</p><p>".html5('mergeDest',$props)."</p>".html5('icnMergeSave', $icnSave).
+                  "<p>".lang('msg_inventory_merge_note', $this->moduleID)."</p>";
+        $data   = ['type'=>'popup','title'=>lang('inventory_merge', $this->moduleID),'attr'=>['id'=>'winMerge'],
             'divs'   => ['body'=>['order'=>50,'type'=>'html','html'=>$html]],
             'jsReady'=> ['init'=>"bizFocus('mergeSrc');"]];
         $layout = array_replace_recursive($layout, $data);
@@ -444,7 +443,7 @@ class inventoryTools
                 $repair[$row['sku']] = $on_hand;
                 if ($action <> 'fix') {
                     $dispVal = round($on_hand, $roundPrec);
-                    msgAdd(sprintf($this->lang['inv_tools_stock_rounding_error'], $row['sku'], $row['qty_stock'], $dispVal));
+                    msgAdd(sprintf(lang('inv_tools_stock_rounding_error', $this->moduleID), $row['sku'], $row['qty_stock'], $dispVal));
                     $cnt++;
                 }
             }
@@ -455,7 +454,7 @@ class inventoryTools
             if ($on_hand <> $cog_diff && abs($on_hand-$cog_diff) > 0.01) {
                 $repair[$row['sku']] = $cog_diff;
                 if ($action <> 'fix') {
-                    msgAdd(sprintf($this->lang['inv_tools_out_of_balance'], $row['sku'], $on_hand, $cog_diff));
+                    msgAdd(sprintf(lang('inv_tools_out_of_balance', $this->moduleID), $row['sku'], $on_hand, $cog_diff));
                     $cnt++;
                 }
             }
@@ -468,11 +467,11 @@ class inventoryTools
                 // commented out, the value has already been rounded.
 //                $value = round($value, $roundPrec);
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_stock'=>$value], 'update', "sku='".addslashes($key)."'");
-                msgAdd(sprintf($this->lang['inv_tools_balance_corrected'], $key, $value), 'info');
+                msgAdd(sprintf(lang('inv_tools_balance_corrected', $this->moduleID), $key, $value), 'info');
             } }
         }
-        if ($cnt == 0) { msgAdd($this->lang['inv_tools_in_balance'], 'info'); }
-        msgLog($this->lang['inv_tools_val_inv']);
+        if ($cnt == 0) { msgAdd(lang('inv_tools_in_balance', $this->moduleID), 'info'); }
+        msgLog(lang('inv_tools_val_inv', $this->moduleID));
     }
 
     /**
@@ -537,9 +536,9 @@ class inventoryTools
                 dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_so'=>$adjSO], 'update', "id={$row['id']}");
             }
         }
-        msgLog($this->lang['inv_tools_repair_so_po']);
+        msgLog(lang('inv_tools_repair_so_po', $this->moduleID));
         if (sizeof($skuList) > 0) { return msgAdd(implode("<br />", $skuList), 'caution'); }
-        msgAdd($this->lang['inv_tools_so_po_result'], 'success');
+        msgAdd(lang('inv_tools_so_po_result', $this->moduleID), 'success');
     }
 
     /**
@@ -715,7 +714,7 @@ class inventoryTools
         if (!$security = validateAccess('inv_mgr', 1, false)) { return; }
         $skuID = clean('rID', 'integer', 'get');
         $data  = $this->chartForecastData($skuID);
-        $output= ['divID'=>'chartForecastChart','type'=>'column','attr'=>['legend'=>'none','title'=>$this->lang['inv_forecast']],'data'=>array_values($data)];
+        $output= ['divID'=>'chartForecastChart','type'=>'column','attr'=>['legend'=>'none','title'=>lang('inv_forecast', $this->moduleID)],'data'=>array_values($data)];
         $action= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/chartForecastGo&rID=$skuID";
         $js    = "ajaxDownload('frmForecastChart');\n";
         $js   .= "var dataForecastChart = ".json_encode($output).";\n";

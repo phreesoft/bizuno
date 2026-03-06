@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/ediMain.php
  *
  * Handles specs:
@@ -58,17 +58,17 @@ class phreebooksEdiMain extends mgrJournal
     {
         $this->struc = [
             '_rID'       => ['panel'=>'general', 'order'=> 1,                                     'clean'=>'integer', 'attr'=>['type'=>'hidden',  'value'=>0]],
-            'edi_source' => ['panel'=>'general', 'order'=>10,'label'=>$this->lang['edi_ed_title'],'clean'=>'text',    'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
-            'spec'       => ['panel'=>'general', 'order'=>20,'label'=>$this->lang['edi_spec'],    'clean'=>'integer', 'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true],'values'=>$this->specs],
+            'edi_source' => ['panel'=>'general', 'order'=>10,'label'=>lang('edi_ed_title', $this->moduleID),'clean'=>'text',    'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
+            'spec'       => ['panel'=>'general', 'order'=>20,'label'=>lang('edi_spec', $this->moduleID),    'clean'=>'integer', 'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true],'values'=>$this->specs],
             'status'     => ['panel'=>'general', 'order'=>30,'label'=>lang('status'),             'clean'=>'db_field','attr'=>['type'=>'select',  'value'=>'', 'readonly'=>true],'values'=>$this->statuses],
             'edi_date'   => ['panel'=>'general', 'order'=>40,'label'=>lang('post_date'),          'clean'=>'date',    'attr'=>['type'=>'date',    'value'=>'', 'readonly'=>true]],
-            'control_num'=> ['panel'=>'general', 'order'=>50,'label'=>$this->lang['edi_ctl_num'], 'clean'=>'integer', 'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
-            'main_id'    => ['panel'=>'general', 'order'=>60,'label'=>$this->lang['edi_jrnl_id'], 'clean'=>'db_field','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
+            'control_num'=> ['panel'=>'general', 'order'=>50,'label'=>lang('edi_ctl_num', $this->moduleID), 'clean'=>'integer', 'attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
+            'main_id'    => ['panel'=>'general', 'order'=>60,'label'=>lang('edi_jrnl_id', $this->moduleID), 'clean'=>'db_field','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
             'ack_date'   => ['panel'=>'general', 'order'=>70,'label'=>lang('edi_ack_date'),       'clean'=>'date',    'attr'=>['type'=>'date',    'value'=>'', 'readonly'=>true]],
-            'edi_name'   => ['panel'=>'edi_data','order'=>10,'label'=>$this->lang['edi_filename'],'clean'=>'filename','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
-            'edi_data'   => ['panel'=>'edi_data','order'=>20,'label'=>$this->lang['edi_req'],     'clean'=>'text',    'attr'=>['type'=>'editor',  'value'=>'', 'readonly'=>true]],
-            'ack_name'   => ['panel'=>'ack_data','order'=>10,'label'=>$this->lang['ack_filename'],'clean'=>'filename','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
-            'ack_data'   => ['panel'=>'ack_data','order'=>20,'label'=>$this->lang['edi_ack'],     'clean'=>'text',    'attr'=>['type'=>'editor',  'value'=>'', 'readonly'=>true]]];
+            'edi_name'   => ['panel'=>'edi_data','order'=>10,'label'=>lang('edi_filename', $this->moduleID),'clean'=>'filename','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
+            'edi_data'   => ['panel'=>'edi_data','order'=>20,'label'=>lang('edi_req', $this->moduleID),     'clean'=>'text',    'attr'=>['type'=>'editor',  'value'=>'', 'readonly'=>true]],
+            'ack_name'   => ['panel'=>'ack_data','order'=>10,'label'=>lang('ack_filename', $this->moduleID),'clean'=>'filename','attr'=>['type'=>'text',    'value'=>'', 'readonly'=>true]],
+            'ack_data'   => ['panel'=>'ack_data','order'=>20,'label'=>lang('edi_ack', $this->moduleID),     'clean'=>'text',    'attr'=>['type'=>'editor',  'value'=>'', 'readonly'=>true]]];
     }
     protected function managerGrid($security=0, $args=[])
     {
@@ -85,7 +85,7 @@ class phreebooksEdiMain extends mgrJournal
                     'metaKey' => ['order'=> 1,'break'=>true,'sql'=>BIZUNO_DB_PREFIX."journal_meta.meta_key LIKE '{$this->metaPrefix}%'", 'hidden'=>true], // m.meta_key LIKE 'shipment_%'
                     'period'  => ['order'=>10,'break'=>true,'label'=>lang('period'), 'options'=>['width'=>300],'sql'=>$sqlPeriod,
                         'values'=>viewKeyDropdown(localeDates(true, true, true, true, true)),'attr'=>['type'=>'select','value'=>$this->defaults['period']]],
-                    'spec'    => ['order'=>20,'break'=>true,'label'=>$this->lang['edi_spec'],
+                    'spec'    => ['order'=>20,'break'=>true,'label'=>lang('edi_spec', $this->moduleID),
                         'values'=>$this->specs, 'attr'=>['type'=>'select','value'=>$this->defaults['spec']]],
                     'store_id'=> ['order'=>30,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]]]],
@@ -95,14 +95,14 @@ class phreebooksEdiMain extends mgrJournal
                     'actions'=> [
                         'edit'  =>['order'=>20,'icon'=>'edit', 'size'=>'small','label'=>lang('edit'),
                             'events'=>['onClick'=>"var row = jqBiz('#dg{$this->domSuffix}').datagrid('getRows')[index]; accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit&spec='+row.spec, 'idTBD');"]]]],
-                'edi_source' => ['order'=>10,'field'=>'journal_meta.id','label'=>$this->lang['edi_ed_title'],'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_source:journal'],
-                'edi_date'   => ['order'=>60,'field'=>'journal_meta.id','label'=>$this->lang['edi_rcv_date'],'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_date:journal','format'=>'date'],
-                'ack_date'   => ['order'=>70,'field'=>'journal_meta.id','label'=>$this->lang['edi_ack_date'],'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:ack_date:journal','format'=>'date'],
+                'edi_source' => ['order'=>10,'field'=>'journal_meta.id','label'=>lang('edi_ed_title', $this->moduleID),'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_source:journal'],
+                'edi_date'   => ['order'=>60,'field'=>'journal_meta.id','label'=>lang('edi_rcv_date', $this->moduleID),'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:edi_date:journal','format'=>'date'],
+                'ack_date'   => ['order'=>70,'field'=>'journal_meta.id','label'=>lang('edi_ack_date', $this->moduleID),'attr'=>['width'=>100, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:ack_date:journal','format'=>'date'],
                 'store_id'   => ['order'=>20,'field'=>'store_id',       'label'=>lang('store_id'),           'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'format'=> 'storeID'],
-                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal'],
+                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>lang('edi_spec', $this->moduleID),    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal'],
                 'invoice_num'=> ['order'=>50,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),     'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true]],
-                'control_num'=> ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_ctl_num'], 'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:control_num:journal'],
-                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>$this->lang['edi_spec'],    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal']]]);
+                'control_num'=> ['order'=>30,'field'=>'journal_meta.id','label'=>lang('edi_ctl_num', $this->moduleID), 'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:control_num:journal'],
+                'spec'       => ['order'=>30,'field'=>'journal_meta.id','label'=>lang('edi_spec', $this->moduleID),    'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],'process'=>'meta:spec:journal']]]);
         if (getUserCache('profile', 'device') == 'mobile') {
             $data['columns']['ack_date']['attr']['hidden']   = true;
             $data['columns']['control_num']['attr']['hidden']= true;
@@ -124,7 +124,7 @@ class phreebooksEdiMain extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $args = ['title'=>$this->lang['edi_title'], 'type'=>'journal'];
+        $args = ['title'=>lang('edi_title', $this->moduleID), 'type'=>'journal'];
         parent::managerMain($layout, $security, $args);
         unset($layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['new']);
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']);
@@ -143,7 +143,7 @@ class phreebooksEdiMain extends mgrJournal
         $refID= $_GET['refID']= clean('rID', 'integer', 'get'); // map journal_main.id to refID
         $meta = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
         $_GET['rID']  = metaIdxClean($meta);
-        $args = ['_table'=>'journal', 'title'=>$this->lang['view_edi_record']];
+        $args = ['_table'=>'journal', 'title'=>lang('view_edi_record', $this->moduleID)];
         parent::editMeta($layout, $security, $args);
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['save'],
               $layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'],

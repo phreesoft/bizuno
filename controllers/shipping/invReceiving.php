@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/invReceiving.php
  */
 
@@ -33,11 +33,9 @@ class shippingInvReceiving
 {
     public $moduleID= 'shipping';
     public $pageID  = 'invReceiving';
-    public $lang;
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
     public function receivingMain(&$layout=[])
     {
@@ -58,7 +56,7 @@ jqBiz('#contactSel').combogrid({width:200,panelWidth:425,delay:500,idField:'id',
 });
 bizFocus('contactSel');";
         $html = html5('contactSel', ['label'=>lang('search')])."\n";
-        $layout['accordion']['accJournal']['divs']['divJournalDetail'] = ['order'=>60, 'label'=>$this->lang['title_receiving'], 'type'=>'html','html'=>$html];
+        $layout['accordion']['accJournal']['divs']['divJournalDetail'] = ['order'=>60, 'label'=>lang('title_receiving', $this->moduleID), 'type'=>'html','html'=>$html];
     }
     public function receivingList(&$layout=[])
     {

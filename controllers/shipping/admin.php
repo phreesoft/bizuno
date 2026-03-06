@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/admin.php
  */
 
@@ -48,7 +48,7 @@ class shippingAdmin extends shippingCommon
                 'tools'    => ['child'=>[
                     'shipping'=>['order'=>10,'label'=>sprintf(lang('tbd_manager'),lang('shipping')),'icon'=>'shipping','route'=>"$this->moduleID/manager/manager"]]],
                 'inventory'=> ['child'=>[
-                    'receiving'=>['order'=>80,'label'=>$this->lang['title_receiving'],'icon'=>'invrec','route'=>"$this->moduleID/invReceiving/receivingMain');"]]]]],
+                    'receiving'=>['order'=>80,'label'=>lang('title_receiving', $this->moduleID),'icon'=>'invrec','route'=>"$this->moduleID/invReceiving/receivingMain');"]]]]],
             'hooks'     => [
                 'contacts'=> [
                     'main' =>[
@@ -67,11 +67,11 @@ class shippingAdmin extends shippingCommon
                         'managerRows'=> ['order'=>25,'method'=>'manager'],
                         'edit'       => ['order'=>90]]]]];
         $this->phreeformProcessing= [
-            'shipReq'  =>['text'=>lang('order_details'),  'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView'],
-            'shipRecon'=>['text'=>lang('reconciled'),     'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView'],
-            'shipTrack'=>['text'=>lang('tracking_id'),    'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView']];
+            'shipReq'  =>['text'=>lang('order_details'),  'group'=>lang('title', $this->moduleID),'module'=>$this->moduleID,'function'=>'shippingView'],
+            'shipRecon'=>['text'=>lang('reconciled'),     'group'=>lang('title', $this->moduleID),'module'=>$this->moduleID,'function'=>'shippingView'],
+            'shipTrack'=>['text'=>lang('tracking_id'),    'group'=>lang('title', $this->moduleID),'module'=>$this->moduleID,'function'=>'shippingView']];
         $this->phreeformFormatting = [
-            'shipInfo' =>['text'=>lang('delivery_method'),'group'=>$this->lang['title'],'module'=>$this->moduleID,'function'=>'shippingView']];
+            'shipInfo' =>['text'=>lang('delivery_method'),'group'=>lang('title', $this->moduleID),'module'=>$this->moduleID,'function'=>'shippingView']];
     }
 
     /**
@@ -293,7 +293,7 @@ class shippingAdmin extends shippingCommon
             'toolbars'=> ['tbPkg'=>['icons'=>[
                 'save' => ['order'=>20,'label'=>lang('save'),'icon'=>'save','events'=>['onClick'=>"myPkgSave();"]]]]],
             'tabs'    => ['tabAdmin'=>['divs'=>[
-                'myPkg'=>['order'=>70,'label'=>$this->lang['packages'],'type'=>'divs','divs'=>[
+                'myPkg'=>['order'=>70,'label'=>lang('packages', $this->moduleID),'type'=>'divs','divs'=>[
                     'flds'   => ['order'=> 1,'type'=>'fields',  'keys'=>['myPkgs']],
                     'toolbar'=> ['order'=>10,'type'=>'toolbar', 'key' =>'tbPkg'],
                     'body'   => ['order'=>50,'type'=>'datagrid','key' =>'dgMyPkg']]],

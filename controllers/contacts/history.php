@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-29
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/history.php
  */
 
@@ -106,7 +106,7 @@ class contactsHistory
         if (empty($rows)) { return msgAdd("No paid invoices this past year!"); }
         $avgSales= viewFormat($total / sizeof($rows), 'currency');
         $avgPmt  = number_format($delta / sizeof($rows), 1);
-        msgAdd(sprintf($this->lang['payment_history_resp'], $terms, $avgSales, $avgPmt), 'info');
+        msgAdd(sprintf(lang('payment_history_resp', $this->moduleID), $terms, $avgSales, $avgPmt), 'info');
     }
 
     /**

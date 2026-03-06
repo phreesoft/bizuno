@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-001-14
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/api.php
  */
 
@@ -34,7 +34,6 @@ class inventoryApi
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -52,11 +51,11 @@ class inventoryApi
             'btnInvapi_imp' => ['icon'=>'import','label'=>lang('import'),'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmInvApiImport').submit();"]],
             'btnInvapi_exp' => ['icon'=>'export','label'=>lang('export'),'events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=inventory/api/apiExport');"]]];
         $forms = ['frmInvApiImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=inventory/api/apiImport"]]];
-        $html = '<p>'.$this->lang['invapi_desc'].'</p>
-<p>'.$this->lang['invapi_template'].html5('', $fields['btnInvapi_tpl']).'</p><hr />'.html5('frmInvApiImport',  $forms['frmInvApiImport']).'
-<p>'.$this->lang['invapi_skips']   .html5('selInvSkips',  $fields['selInvSkips']).'</p>
-<p>'.$this->lang['invapi_import']  .html5('fileInventory',$fields['fileInventory']).html5('btnInvapi_imp', $fields['btnInvapi_imp']).'</p></form><hr />
-<p>'.$this->lang['invapi_export']  .html5('', $fields['btnInvapi_exp']).'</p>';
+        $html = '<p>'.lang('invapi_desc', $this->moduleID).'</p>
+<p>'.lang('invapi_template', $this->moduleID).html5('', $fields['btnInvapi_tpl']).'</p><hr />'.html5('frmInvApiImport',  $forms['frmInvApiImport']).'
+<p>'.lang('invapi_skips', $this->moduleID)   .html5('selInvSkips',  $fields['selInvSkips']).'</p>
+<p>'.lang('invapi_import', $this->moduleID)  .html5('fileInventory',$fields['fileInventory']).html5('btnInvapi_imp', $fields['btnInvapi_imp']).'</p></form><hr />
+<p>'.lang('invapi_export', $this->moduleID)  .html5('', $fields['btnInvapi_exp']).'</p>';
         $layout['tabs']['tabAPI']['divs'][$this->moduleID] = ['order'=>40,'label'=>getModuleCache($this->moduleID, 'properties', 'title'),'type'=>'html','html'=>$html];
         $layout['jsReady'][$this->moduleID] = "ajaxForm('frmInvApiImport');";
     }

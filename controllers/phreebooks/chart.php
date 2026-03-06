@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-30
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -36,14 +36,12 @@ class phreebooksChart extends mgrJournal
     protected $secID     = 'admin';
     protected $domSuffix = 'Chart';
     protected $metaPrefix= 'chart_of_accounts';
-    public $lang;
     public $chartMeta;
     public $chartMetaID;
 
     function __construct()
     {
         parent::__construct();
-        $this->lang       = getLang($this->moduleID);
         $meta  = dbMetaGet(0, $this->metaPrefix);
         $this->chartMetaID= metaIdxClean($meta);
         $this->chartMeta  = $this->validateMeta($meta); // if chart acct ID's are integers then the array reindexes the keys to 0, 1, 2, 3 ...
@@ -90,7 +88,7 @@ class phreebooksChart extends mgrJournal
             'columns'  => [
                 'action' => [
                     'actions'=> [
-                        'rename'=> ['order'=>40,'icon'=>'rename', 'events'=>['onClick'=>"var title=prompt('".$this->lang['chart_rename']."'); if (title!=null) jsonAction('$this->moduleID/$this->pageID/rename', 'idTBD', title);"]]]],
+                        'rename'=> ['order'=>40,'icon'=>'rename', 'events'=>['onClick'=>"var title=prompt('".lang('chart_rename', $this->moduleID)."'); if (title!=null) jsonAction('$this->moduleID/$this->pageID/rename', 'idTBD', title);"]]]],
                 'inactive'=> ['order'=> 0,                                 'attr'=>['hidden'=>true]],
                 'default' => ['order'=> 0,                                 'attr'=>['hidden'=>true]],
                 'id'      => ['order'=>20,'label'=>lang('gl_account'),     'attr'=>['hidden'=>false,'width'=> 80,'sortable'=>true,'resizable'=>true],
@@ -117,11 +115,11 @@ class phreebooksChart extends mgrJournal
         $charts = [];
         $fields = [
             'sel_coa'     => ['order'=>10,'values'=>$charts,'break'=>false,'attr'=>['type'=>'select','size'=>10]],
-            'btn_coa_imp' => ['order'=>20,'icon'=>'import', 'size'=>'large','events'=>['onClick'=>"if (confirm('".$this->lang['msg_gl_replace_confirm']."')) jsonAction('phreebooks/chart/import', 0, bizSelGet('sel_coa'));"]],
+            'btn_coa_imp' => ['order'=>20,'icon'=>'import', 'size'=>'large','events'=>['onClick'=>"if (confirm('".lang('msg_gl_replace_confirm', $this->moduleID)."')) jsonAction('phreebooks/chart/import', 0, bizSelGet('sel_coa'));"]],
             'btn_coa_pre' => ['order'=>25,'icon'=>'preview','size'=>'large','events'=>['onClick'=>"winOpen('popupGL', 'phreebooks/chart/preview&chart='+bizSelGet('sel_coa'), 800, 600);"]],
-            'upload_txt'  => ['order'=>30,'type'=>'html','html'=>$this->lang['coa_upload_file'],'attr'=>['type'=>'raw']],
+            'upload_txt'  => ['order'=>30,'type'=>'html','html'=>lang('coa_upload_file', $this->moduleID),'attr'=>['type'=>'raw']],
             'file_coa'    => ['order'=>35,'label'=>'', 'attr'=>['type'=>'file']],
-            'btn_coa_upl' => ['order'=>40,'attr'=>['type'=>'button', 'value'=>$this->lang['btn_coa_upload']], 'events'=>['onClick'=>"if (confirm('".$this->lang['msg_gl_replace_confirm']."')) jqBiz('#frmGlUpload').submit();"]]];
+            'btn_coa_upl' => ['order'=>40,'attr'=>['type'=>'button', 'value'=>lang('btn_coa_upload', $this->moduleID)], 'events'=>['onClick'=>"if (confirm('".lang('msg_gl_replace_confirm', $this->moduleID)."')) jqBiz('#frmGlUpload').submit();"]]];
         if (!$coa_blocked) { $fields['sel_coa']['values'] = localeLoadCharts(); }
     }
 
@@ -158,7 +156,7 @@ class phreebooksChart extends mgrJournal
         }
         $jsReady = "var winChart = ".json_encode($output).";
 jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'id',title:'".jsLang('gl_account')."',width: 50},{field:'type',title:'" .jsLang('type')."',width:100},{field:'title',title:'".jsLang('title')."',width:200} ]] });";
-        $layout = array_replace_recursive($layout, ['type'=>'page', 'title'=>$this->lang['btn_coa_preview'],
+        $layout = array_replace_recursive($layout, ['type'=>'page', 'title'=>lang('btn_coa_preview', $this->moduleID),
             'divs'=>['divLabel'=>['order'=>60,'type'=>'html','html'=>"<table id=\"dgPopupGL\"></table>"]],
             'jsReady' => ['init'=>$jsReady]]);
     }
@@ -236,12 +234,12 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         $output = metaUpdate($metaVal, $this->struc);
         // error check
         // @TODO - Need to verify the commented out tests
-//      if (!empty($rID) && empty($output['title'])){ return msgAdd($this->lang['chart_save_01']); }
-        if ( empty($output['title']))                { return msgAdd($this->lang['chart_save_02']); }
+//      if (!empty($rID) && empty($output['title'])){ return msgAdd(lang('chart_save_01']); }
+        if ( empty($output['title']))                { return msgAdd(lang('chart_save_02', $this->moduleID)); }
         if ( empty($rID) && isset($this->chartMeta[$output['id']])) { return msgAdd(lang('chart_save_03')); }
         if ( empty($rID) && $output['type']==44)     { foreach ($this->chartMeta as $row) { if ($row['type']==44) { return msgAdd(lang('chart_save_04')); } } }
-//      if ($used && $heading)      { return msgAdd($this->lang['chart_save_05']); }
-//      if (!empty($output['parent']) && empty($glAccounts[$parent]['heading'])) { return msgAdd(sprintf($this->lang['chart_save_06'], $parent)); }
+//      if ($used && $heading)      { return msgAdd(lang('chart_save_05']); }
+//      if (!empty($output['parent']) && empty($glAccounts[$parent]['heading'])) { return msgAdd(sprintf(lang('chart_save_06'], $parent)); }
         msgDebug("\nReady to write updated chart record = ".print_r($output, true));
         if (empty($rID)) { $this->chartMeta[$output['id']]= $output; }
         else             { $this->chartMeta[$rID]         = $output; }
@@ -273,10 +271,10 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         $icnSave= ['icon'=>'save','label'=>lang('merge'),
             'events'=>['onClick'=>"jsonAction('$this->moduleID/chart/mergeSave', jqBiz('#mergeSrc').val(), jqBiz('#mergeDest').val());"]];
         $props  = ['defaults'=>['callback'=>''],'attr'=>['type'=>'ledger']];
-        $html   = "<p>".$this->lang['msg_chart_merge_src'] ."</p><p>".html5('mergeSrc', $props)."</p>".
-                  "<p>".$this->lang['msg_chart_merge_dest']."</p><p>".html5('mergeDest',$props)."</p>".html5('icnMergeSave', $icnSave).
-                  "<p>".$this->lang['msg_chart_merge_note']."</p>";
-        $data   = ['type'=>'popup','title'=>$this->lang['chart_merge'],'attr'=>['id'=>'winMerge'],
+        $html   = "<p>".lang('msg_chart_merge_src', $this->moduleID) ."</p><p>".html5('mergeSrc', $props)."</p>".
+                  "<p>".lang('msg_chart_merge_dest', $this->moduleID)."</p><p>".html5('mergeDest',$props)."</p>".html5('icnMergeSave', $icnSave).
+                  "<p>".lang('msg_chart_merge_note', $this->moduleID)."</p>";
+        $data   = ['type'=>'popup','title'=>lang('chart_merge', $this->moduleID),'attr'=>['id'=>'winMerge'],
             'divs'   => ['body'=>['order'=>50,'type'=>'html','html'=>$html]],
             'jsReady'=> ['init'=>"bizFocus('mergeSrc');"]];
         $layout = array_replace_recursive($layout, $data);
@@ -357,14 +355,14 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         if (!$security = validateAccess($this->secID, 4)) { return; }
         if (empty($rID) || !isset($this->chartMeta[$rID])) { return msgAdd(lang('illegal_access')); }
         // Can't delete gl account if it was used in a journal entry
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "gl_acct_id='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'journal_main')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'journal_item')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_v='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_c='$rID'"))  { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "gl_acct_id='$rID'")) { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'journal_main')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "gl_account='$rID'")) { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'journal_item')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_v='$rID'"))  { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_acct_c='$rID'"))  { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'contacts')); }
         // @TODO - BOF - DEPRECATED
-        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_account='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'contacts')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'contacts',     'id', "gl_account='$rID'")) { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'contacts')); }
         // EOF - DEPRECATED
-        if (dbGetValue(BIZUNO_DB_PREFIX.'inventory',    'id', "gl_sales='$rID' OR gl_inv='$rID' OR gl_cogs='$rID'")) { return msgAdd(sprintf($this->lang['err_gl_chart_delete'], $rID, 'inventory')); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'inventory',    'id', "gl_sales='$rID' OR gl_inv='$rID' OR gl_cogs='$rID'")) { return msgAdd(sprintf(lang('err_gl_chart_delete', $this->moduleID), $rID, 'inventory')); }
         if ($this->chartMeta[$rID]['type']==44)                                   { return msgAdd('Sorry, you cannot delete your retained earnings account.'); }
         $maxPeriod = dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'MAX(period) as period', "", false);
         if (dbGetValue(BIZUNO_DB_PREFIX.'journal_history', 'beginning_balance', "gl_account='$rID' AND period=$maxPeriod")) { return msgAdd("The GL account cannot be deleted if the last fiscal year ending balance is not zero!"); }
@@ -388,12 +386,12 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
     {
         if (!$security = validateAccess('admin', 4)){ return; }
         $chart = clean('data', 'path', 'get');
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))  { return msgAdd($this->lang['coa_import_blocked']); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))  { return msgAdd(lang('coa_import_blocked', $this->moduleID)); }
         if (!$this->chartInstall($chart))            { return; }
         dbGetResult('TRUNCATE '.BIZUNO_DB_PREFIX.'journal_history');
         buildChartOfAccountsHistory();
-        msgAdd($this->lang['msg_gl_replace_success'], 'caution');
-        msgLog($this->lang['msg_gl_replace_success']);
+        msgAdd(lang('msg_gl_replace_success', $this->moduleID), 'caution');
+        msgLog(lang('msg_gl_replace_success', $this->moduleID));
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval', 'actionData'=>"reloadSessionStorage(chartRefresh);"]]);
         return true;
     }
@@ -411,12 +409,12 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         if (!$io->validateUpload('file_coa', '', 'xml', true))  { return; }
         $filename = $filename = clean($_FILES['file_coa']['name'], 'filename');
         $io->uploadSave('file_coa', 'temp/', '', 'xml');
-        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))  { return msgAdd($this->lang['coa_import_blocked']); }
+        if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))  { return msgAdd(lang('coa_import_blocked', $this->moduleID)); }
         if (!$this->chartInstall("temp/$filename"))             { return; }
         dbGetResult("TRUNCATE ".BIZUNO_DB_PREFIX.'journal_history');
         buildChartOfAccountsHistory();
-        msgAdd($this->lang['msg_gl_replace_success'], 'success');
-        msgLog($this->lang['msg_gl_replace_success']);
+        msgAdd(lang('msg_gl_replace_success', $this->moduleID), 'success');
+        msgLog(lang('msg_gl_replace_success', $this->moduleID));
         $io->fileDelete("temp/$filename");
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"reloadSessionStorage(chartRefresh);"]]);
     }
@@ -449,7 +447,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         if     (file_exists(BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart"; }
         else { return msgAdd('Bad path to chart!', 'trap'); }
         unset($GLOBALS['BIZUNO_TABLES']); // need to reset this as most likely the tables were just added.
-        if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || !empty(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))) { return msgAdd($this->lang['coa_import_blocked']); }
+        if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || !empty(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))) { return msgAdd(lang('coa_import_blocked', $this->moduleID)); }
         $accounts= $this->prepData($path);
         if (empty($accounts)) { return msgAdd('Invalid chart of accounts. Is the CSV properly formed?'); }
         $output = [];

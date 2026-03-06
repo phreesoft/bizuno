@@ -38,7 +38,6 @@ class apiShipping extends apiCommon
 
     function __construct($options=[])
     {
-        $this->lang = getLang($this->moduleID);
         parent::__construct($options);
     }
     /**************** REST Endpoints to retrieve shipping rates *************/

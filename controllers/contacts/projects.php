@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-12
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/projects.php
  *
  * @TODO - Add last_update field to database and use as main sort DESC
@@ -59,18 +59,18 @@ class contactsProjects extends mgrJournal
         $reps = viewRoleDropdown('all');
         $this->struc = [ 
             'id'           => ['panel'=>'general','order'=> 1,                                      'clean'=>'integer',  'attr'=>['type'=>'hidden', 'value'=>0]],
-            'proj_num'     => ['panel'=>'general','order'=> 1,'label'=>$this->lang['proj_num'],     'clean'=>'filename', 'attr'=>['type'=>'hidden', 'value'=>0]],
+            'proj_num'     => ['panel'=>'general','order'=> 1,'label'=>lang('proj_num', $this->moduleID),     'clean'=>'filename', 'attr'=>['type'=>'hidden', 'value'=>0]],
             'title'        => ['panel'=>'general','order'=>10,'label'=>lang('title'),               'clean'=>'text',     'attr'=>['value'=>'']],
             'contact_id'   => ['panel'=>'general','order'=>15,'label'=>lang('ctype_c'),             'clean'=>'integer',  'attr'=>['type'=>'hidden', 'value'=>''],'defaults'=>['type'=>'c', 'data'=>'projContact', 'callback'=>'']],
-            'oem'          => ['panel'=>'general','order'=>20,'label'=>$this->lang['oem'],          'clean'=>'integer',  'attr'=>['type'=>'hidden', 'value'=>'']],
-            'market'       => ['panel'=>'general','order'=>25,'label'=>$this->lang['market'],       'clean'=>'char',     'values'=>viewKeyDropdown($this->markets, true), 'attr'=>['type'=>'hidden', 'value'=>'']],
+            'oem'          => ['panel'=>'general','order'=>20,'label'=>lang('oem', $this->moduleID),          'clean'=>'integer',  'attr'=>['type'=>'hidden', 'value'=>'']],
+            'market'       => ['panel'=>'general','order'=>25,'label'=>lang('market', $this->moduleID),       'clean'=>'char',     'values'=>viewKeyDropdown($this->markets, true), 'attr'=>['type'=>'hidden', 'value'=>'']],
             'status'       => ['panel'=>'general','order'=>30,'label'=>lang('status'),              'clean'=>'alpha_num','values'=>viewKeyDropdown($this->status, true),'attr'=>['type'=>'hidden', 'value'=>'']],
-            'created_by'   => ['panel'=>'general','order'=>35,'label'=>$this->lang['created_by'],   'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select'], 'value'=>0],
-            'created_date' => ['panel'=>'general','order'=>40,'label'=>$this->lang['created_date'], 'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>biz_date()]],
-            'assigned_to'  => ['panel'=>'general','order'=>45,'label'=>$this->lang['assigned_to'],  'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select', 'value'=>0]],
-            'assigned_date'=> ['panel'=>'general','order'=>50,'label'=>$this->lang['assigned_date'],'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>'']],
-            'working_by'   => ['panel'=>'general','order'=>55,'label'=>$this->lang['working_by'],   'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select', 'value'=>0]],
-            'reminder_date'=> ['panel'=>'general','order'=>60,'label'=>$this->lang['reminder_date'],'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>'']],
+            'created_by'   => ['panel'=>'general','order'=>35,'label'=>lang('created_by', $this->moduleID),   'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select'], 'value'=>0],
+            'created_date' => ['panel'=>'general','order'=>40,'label'=>lang('created_date', $this->moduleID), 'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>biz_date()]],
+            'assigned_to'  => ['panel'=>'general','order'=>45,'label'=>lang('assigned_to', $this->moduleID),  'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select', 'value'=>0]],
+            'assigned_date'=> ['panel'=>'general','order'=>50,'label'=>lang('assigned_date', $this->moduleID),'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>'']],
+            'working_by'   => ['panel'=>'general','order'=>55,'label'=>lang('working_by', $this->moduleID),   'clean'=>'integer',  'values'=>$reps, 'attr'=>['type'=>'select', 'value'=>0]],
+            'reminder_date'=> ['panel'=>'general','order'=>60,'label'=>lang('reminder_date', $this->moduleID),'clean'=>'date',     'attr'=>['type'=>'date', 'value'=>'']],
             'notes'        => ['panel'=>'notes',  'order'=>10,                                      'clean'=>'text',     'attr'=>['type'=>'textarea', 'value'=>'']]];
     }
     protected function managerGrid($security=0, $args=[])
@@ -79,13 +79,13 @@ class contactsProjects extends mgrJournal
             'source' => [
                 'search' => ['title', 'contact_id', 'proj_num'],
                 'filters'=> [
-                    'market' => ['order'=>10,'label' =>$this->lang['market'],'values'=>viewKeyDropdown($this->markets),'break'=>true,'attr'=>['type'=>'select','value'=>$this->defaults['market']]],
+                    'market' => ['order'=>10,'label' =>lang('market', $this->moduleID),'values'=>viewKeyDropdown($this->markets),'break'=>true,'attr'=>['type'=>'select','value'=>$this->defaults['market']]],
                     'status' => ['order'=>20,'label' =>lang('status'),       'values'=>viewKeyDropdown($this->status), 'break'=>true,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
             'columns'=> [
-                'ref_num'     => ['order'=>10, 'label'=>$this->lang['proj_num'],'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'ref_num'     => ['order'=>10, 'label'=>lang('proj_num', $this->moduleID),'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'title'       => ['order'=>20, 'label'=>lang('title'),          'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'contact_id'  => ['order'=>30, 'label'=>lang('primary_name'),   'attr'=>['sortable'=>true, 'resizable'=>true],'format'=>'contactName'],
-                'market'      => ['order'=>40, 'label'=>$this->lang['market'],  'attr'=>['sortable'=>true, 'resizable'=>true],'events'=>['formatter'=>"function(value,row) { return bizQualMarkets[value]; }"]],
+                'market'      => ['order'=>40, 'label'=>lang('market', $this->moduleID),  'attr'=>['sortable'=>true, 'resizable'=>true],'events'=>['formatter'=>"function(value,row) { return bizQualMarkets[value]; }"]],
                 'status'      => ['order'=>50, 'label'=>lang('status'),         'attr'=>['sortable'=>true, 'resizable'=>true],'events'=>['formatter'=>"function(value,row) { return bizQualStatuses[value]; }"]],
                 'created_date'=> ['order'=>70, 'label'=>lang('date_first'),     'attr'=>['sortable'=>true, 'resizable'=>true],'format'=>'date']]]);
         return $data;

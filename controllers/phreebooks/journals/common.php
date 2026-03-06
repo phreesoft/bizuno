@@ -378,7 +378,7 @@ class jCommon
         }
         if (abs($diff) > $tolerance) {
             msgDebug("\nIn testItemOrders failed comparing calc total = ".($ttlDbt + $ttlCrt)." with submitted total = {$this->main['total_amount']}");
-            return msgAdd(sprintf($this->lang['err_total_not_match'], ($ttlDbt + $ttlCrt), $this->main['total_amount']), 'trap');
+            return msgAdd(sprintf(lang('err_total_not_match', $this->moduleID), ($ttlDbt + $ttlCrt), $this->main['total_amount']), 'trap');
         }
         $adjDbt = $ttlDbt ? ($ttlDbt - $diff) : 0;
         $adjCrt = $ttlCrt ? ($ttlCrt + $diff) : 0;
@@ -1062,7 +1062,7 @@ class jCommon
         }
         // add insert row if no future post references this order
         if ($this->testInsertAllow()) {
-            $data['source']['actions']['insertRow'] = ['order'=>20,'icon'=>'cancel','size'=>'large','label'=>lang('insert'),'events'=>['onClick'=>" var idx=prompt('".jsLang($this->lang['insert_row'])."');
+            $data['source']['actions']['insertRow'] = ['order'=>20,'icon'=>'cancel','size'=>'large','label'=>lang('insert'),'events'=>['onClick'=>" var idx=prompt('".jsLang(lang('insert_row', $this->moduleID))."');
 if (idx!=null) {
     jqBiz('#$name').edatagrid('addRow', {index:idx,row:{'qty':'1','sku':'','description':'','gl_account':def_contact_gl_acct,'tax_rate_id':def_contact_tax_id}});
     jqBiz('#$name').edatagrid('loadData', jqBiz('#$name').edatagrid('getData')); }"]]; // this is needed to force a redraw of the datagrid

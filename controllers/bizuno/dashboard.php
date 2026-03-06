@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-05
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -53,7 +53,7 @@ class bizunoDashboard
         if    ($menuID=='home')    { $label = lang('home'); }
         elseif($menuID=='settings'){ $label = lang('bizuno_company'); }
         else                       { $menus = dbGetRoleMenu(); $label=$menus['menuBar']['child'][$menuID]['label']; }
-        $title = sprintf($this->lang['edit_dashboard'], $label );
+        $title = sprintf(lang('edit_dashboard', $this->moduleID), $label );
         $data  = [
             'title'  => sprintf(lang('tbd_manager'), lang('dashboard')),
             'menu_id'=> $menuID,

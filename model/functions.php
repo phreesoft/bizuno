@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-21
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /model/functions.php
  */
 
@@ -338,7 +338,7 @@ function bizClrEncrypt() {
 function loadBaseLang($lang='en_US')
 {
     msgDebug("\nEntering loadBaseLang with lang = $lang");
-    $langCore = $langByRef = [];
+    $langCore = [];
     if (strlen($lang) <> 5) { $lang = 'en_US'; }
     if (defined('BIZUNO_DATA') && file_exists(BIZUNO_DATA."cache/lang_{$lang}.json")) {
         msgDebug("\nFetching lang from cache.");
@@ -346,8 +346,6 @@ function loadBaseLang($lang='en_US')
     } else {
         msgDebug("\nFetching lang from file system.");
         require(BIZUNO_FS_LIBRARY.'locale/en_US/language.php');  // pulls the current language in English
-        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
-        $langCache['core'] = array_merge($langCore, $langByRef);
     }
     if ($lang == 'en_US') { return $langCache; } // just english, we're done
     $otherLang = [];
@@ -355,8 +353,6 @@ function loadBaseLang($lang='en_US')
         msgDebug("\nFetching lang: $lang from file system.");
         require(BIZUNO_FS_LIBRARY."locale/$lang/language.php");  // pulls locale overlay
         $langCore = array_replace_recursive($langCache, $langCore); // overlay ISO lang on top of working cache file
-        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (reset after loading translation)
-        $otherLang = array_replace_recursive($langCore, $langByRef);
     }
     return array_replace($langCache, $otherLang);
 }

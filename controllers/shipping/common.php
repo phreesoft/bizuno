@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-07
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/common.php
  */
 
@@ -43,7 +43,6 @@ class shippingCommon
     private   $freightWt = 150; // Weight from which the shipment is palletized and shipped LTL
     private   $palletWt  = 1500;
     public $defaults; 
-    public $lang;
     public $options;
     public $settings;
     public $thermalTransport;
@@ -60,7 +59,6 @@ class shippingCommon
             'bill_hq'       => 0, 'block_trash'  =>0, 'skip_guess'  =>0, 'weight_uom'=>'LB', 'dim_uom'=>'IN',
             'max_pkg_weight'=> 70,'pallet_weight'=>25,'ltl_class'   =>'125',
             'resi_checked'  => 1, 'contact_req'  =>0, 'address1_req'=>1, 'address2_req'=>0, 'city_req'=>1, 'state_req'=>1, 'postal_code_req'=>1]];
-        $this->lang     = getExtLang($this->moduleID);
         $this->options  = $this->getOptions();
         $this->settings = array_replace_recursive($this->defaults, getModuleCache($this->moduleID, 'settings'));
         $this->thermalTransport = defined('BIZUNO_3P_QZ_TRAY') ? BIZUNO_3P_QZ_TRAY : BIZUNO_URL_SCRIPTS.'qz-tray/';
@@ -122,7 +120,7 @@ class shippingCommon
         } else {
             $shipper = new \stdClass();
             $shipper->code = '';
-            $shipper->lang['GND'] = $this->lang['GND'];
+            $shipper->lang['GND'] = lang('GND', $this->moduleID);
         }
         if (!isset($shipper->options) || !is_array($shipper->options)) { $shipper->options = []; }
         $shipper->options = array_replace_recursive([ // make sure all options have a value
@@ -202,7 +200,7 @@ class shippingCommon
         $shipper = $this->loadCarrier($carrier);
         // @TODO this is duplicated here for creating labels on the fly, should be merged and put into loadCarrier
         foreach ($shipper->options['rateCodes'] as $shortCode) {
-            $shipper->shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : $this->lang[$shortCode]];
+            $shipper->shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : lang($shortCode, $this->moduleID)];
         }
         $package = array_keys((array)$shipper->options['PackageMap']);
         $pickup  = array_keys((array)$shipper->options['PickupMap']);
@@ -250,7 +248,7 @@ class shippingCommon
                     'actions' => ['trash'=> ['icon'=>'trash','order'=>20,'size'=>'small','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'qty'     => ['order'=>20, 'label'=>lang('quantity'),'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'numberbox',options:{precision:0,value:'{$pkg['Qty']}',onChange:function(newVal, oldVal){ pkgUpdate();}}}"]],
-                'weight'  => ['order'=>30, 'label'=>$this->lang['weight_each'],'attr'=>['width'=>100,'resizable'=>true],
+                'weight'  => ['order'=>30, 'label'=>lang('weight_each', $this->moduleID),'attr'=>['width'=>100,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'numberbox',options:{precision:0,value:'{$pkg['Wt']}',onChange:function(newVal, oldVal){ pkgUpdate();}}}"]],
                 'length'  => ['order'=>50, 'label'=>lang('length'),'attr'=>['width'=>100,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'numberbox',options:{precision:0,value:'{$pkg['L']}'}}"]],

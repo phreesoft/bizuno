@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/inventory/dashboards/open_wo/open_wo.php
  */
 
@@ -47,10 +47,6 @@ class open_wo
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $order = [['id'=>'asc','text'=>lang('decreasing')],['id'=>'desc','text'=>lang('decreasing')]];
@@ -66,13 +62,6 @@ class open_wo
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render($opts=[])
     {
         msgDebug("\nEntering $this->code:render with opts = ".print_r($opts, true));

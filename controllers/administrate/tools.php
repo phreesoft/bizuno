@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -35,13 +35,12 @@ class administrateTools {
 
     function __construct()
     {
-        $this->lang        = getLang($this->moduleID);
         $this->supportEmail= defined('BIZUNO_SUPPORT_EMAIL') ? BIZUNO_SUPPORT_EMAIL : '';
         $this->reasons     = [
-            'question'  => $this->lang['ticket_question'],
-            'bug'       => $this->lang['ticket_bug'],
-            'suggestion'=> $this->lang['ticket_suggestion'],
-            'account'   => $this->lang['ticket_my_account']];
+            'question'  => lang('ticket_question', $this->moduleID),
+            'bug'       => lang('ticket_bug', $this->moduleID),
+            'suggestion'=> lang('ticket_suggestion', $this->moduleID),
+            'account'   => lang('ticket_my_account', $this->moduleID)];
     }
 
     /**
@@ -59,7 +58,7 @@ class administrateTools {
         $browsers= [['id'=>'firefox','text'=>'Firefox'],['id'=>'chrome','text'=>'Chrome'],['id'=>'safari','text'=>'Safari'],['id'=>'edge','text'=>'MS Edge'],['id'=>'ie','text'=>'Internet Explorer'],['id'=>'other','text'=>'Other (list below)']];
         $fields = [
             'ticketURL'  => ['order'=>15,'break'=>true,                                   'attr'=>['type'=>'hidden','value'=>$_SERVER['HTTP_HOST']]],
-            'langDesc'   => ['order'=>20,'break'=>true,'html'=>$this->lang['ticket_desc'],'attr'=>['type'=>'raw']],
+            'langDesc'   => ['order'=>20,'break'=>true,'html'=>lang('ticket_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'selReason'  => ['order'=>25,'break'=>true,'label'=>lang('reason'),           'attr'=>['type'=>'select'], 'values'=>$reasons],
             'ticketUser' => ['order'=>30,'break'=>true,'label'=>lang('primary_name'),     'attr'=>['value'=>$meta['title'],'size'=>40]],
             'ticketEmail'=> ['order'=>35,'break'=>true,'label'=>lang('email'),            'attr'=>['value'=>getUserCache('profile', 'email'),'size'=>60]],
@@ -68,7 +67,7 @@ class administrateTools {
             'selOS'      => ['order'=>50,'break'=>true,'label'=>lang('OS'),               'attr'=>['type'=>'select'],     'values'=>$os],
             'selBrowser' => ['order'=>55,'break'=>true,'label'=>lang('Browser'),          'attr'=>['type'=>'select'],'values'=>$browsers],
             'ticketPhone'=> ['order'=>60,'break'=>true,'label'=>lang('telephone')],
-            'ticketFile' => ['order'=>65,'label'=>$this->lang['ticket_attachment'],       'attr'=>['type'=>'file']], // break is auto-removed
+            'ticketFile' => ['order'=>65,'label'=>lang('ticket_attachment', $this->moduleID),       'attr'=>['type'=>'file']], // break is auto-removed
             'ticketPhone'=> ['order'=>70,'html'=>"<br />",'attr'=>['type'=>'raw']],
             'btnSubmit'  => ['order'=>75,'events'=>['onClick'=>"jqBiz('#frmTicket').submit();"],'attr'=>['type'=>'button','value'=>lang('submit')]]];
         $data = ['type'=>'page','title'=>lang('support'),
@@ -130,7 +129,7 @@ class administrateTools {
         $html  = "<p>"."Closing the fiscal year for the Bizuno module consist of deleting audit log entries during or before the fiscal year being closed. "
                 . "To prevent the these entries from being removed, check the box below."."</p>";
         $html .= html5('bizuno_keep', ['label' => 'Do not delete audit log entries during or before this closing fiscal year', 'position'=>'after','attr'=>['type'=>'checkbox','value'=>'1']]);
-        $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>50,'label'=>$this->lang['title'],'type'=>'html','html'=>$html];
+        $layout['tabs']['tabFyClose']['divs'][$this->moduleID] = ['order'=>50,'label'=>lang('title', $this->moduleID),'type'=>'html','html'=>$html];
     }
 
     /**

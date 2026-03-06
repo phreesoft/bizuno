@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/api.php
  */
 
@@ -38,7 +38,6 @@ class phreebooksApi
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -157,25 +156,25 @@ class phreebooksApi
         $btn_j6    = ['attr'=>['type'=>'button','value'=>lang('import')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmImpJ6').submit();"]];
         $btn_j10   = ['attr'=>['type'=>'button','value'=>lang('import')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmImpJ10').submit();"]];
         $btn_j12   = ['attr'=>['type'=>'button','value'=>lang('import')],'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmImpJ12').submit();"]];
-        return "<p>".$this->lang['desc_import_journal'].'</p>
+        return "<p>".lang('desc_import_journal', $this->moduleID).'</p>
  <table class="ui-widget" style="border-collapse:collapse;margin-left:auto;margin-right:auto;">
   <tbody>
-   <tr><td>'.$this->lang['phreebooks_import_bb']."</td><td>".html5('frmImpBB',$data['forms']['frmImpBB']).
+   <tr><td>'.lang('phreebooks_import_bb', $this->moduleID)."</td><td>".html5('frmImpBB',$data['forms']['frmImpBB']).
     html5('import_bb',$import_bb).html5('btn_bb',$btn_bb).'</form></td></tr>
    <tr><td colspan="2"><hr /></td></tr>
-   <tr><td>'.$this->lang['phreebooks_import_inv']."</td><td>".html5('frmImpInv',$data['forms']['frmImpInv']).
+   <tr><td>'.lang('phreebooks_import_inv', $this->moduleID)."</td><td>".html5('frmImpInv',$data['forms']['frmImpInv']).
     html5('import_inv',$import_inv).html5('btn_inv',$btn_inv).'</form></td></tr>
    <tr><td colspan="2"><hr /></td></tr>
-   <tr><td>'.$this->lang['phreebooks_import_po'] ."</td><td>".html5('frmImpJ4',$data['forms']['frmImpJ4']).
+   <tr><td>'.lang('phreebooks_import_po', $this->moduleID) ."</td><td>".html5('frmImpJ4',$data['forms']['frmImpJ4']).
     html5('import_j4', $import_j4) .html5('btn_j4', $btn_j4) .'</form></td></tr>
    <tr><td colspan="2"><hr /></td></tr>
-   <tr><td>'.$this->lang['phreebooks_import_ap'] ."</td><td>".html5('frmImpJ6',$data['forms']['frmImpJ6']).
+   <tr><td>'.lang('phreebooks_import_ap', $this->moduleID) ."</td><td>".html5('frmImpJ6',$data['forms']['frmImpJ6']).
     html5('import_j6', $import_j6) .html5('btn_j6', $btn_j6) .'</form></td></tr>
    <tr><td colspan="2"><hr /></td></tr>
-   <tr><td>'.$this->lang['phreebooks_import_so'] ."</td><td>".html5('frmImpJ10',$data['forms']['frmImpJ10']).
+   <tr><td>'.lang('phreebooks_import_so', $this->moduleID) ."</td><td>".html5('frmImpJ10',$data['forms']['frmImpJ10']).
     html5('import_j10',$import_j10).html5('btn_j10',$btn_j10).'</form></td></tr>
    <tr><td colspan="2"><hr /></td></tr>
-   <tr><td>'.$this->lang['phreebooks_import_ar'] ."</td><td>".html5('frmImpJ12',$data['forms']['frmImpJ12']).
+   <tr><td>'.lang('phreebooks_import_ar', $this->moduleID) ."</td><td>".html5('frmImpJ12',$data['forms']['frmImpJ12']).
     html5('import_j12',$import_j12).html5('btn_j12',$btn_j12)."</form></td></tr>\n</tbody>\n</table>";
     }
 
@@ -422,7 +421,7 @@ class phreebooksApi
             $dup = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "invoice_num='{$main['invoice_num']}'");
             if ($dup) {
                 msgDebug("duplicate order id = $dup and main = ".print_r($main, true));
-                msgAdd(sprintf($this->lang['err_dup_order'], $main['invoice_num']), 'caution');
+                msgAdd(sprintf(lang('err_dup_order', $this->moduleID), $main['invoice_num']), 'caution');
             } else {
                 $ledger = new journal(0, $jID, $main['post_date']);
                 $ledger->main = array_merge($ledger->main, $main);

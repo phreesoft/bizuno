@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -59,12 +59,12 @@ class qualityTickets extends mgrJournal
             'store_id'          => ['panel'=>'general','order'=>15,'dbField'=>'store_id',        'label'=>lang('store_id'),         'clean'=>'integer', 'attr'=>['type'=>'select',  'value'=>-1], 'values'=>viewStores()],
             'preventable'       => ['panel'=>'general','order'=>20,'dbField'=>'waiting',         'label'=>lang('preventable'),      'clean'=>'bolean',  'attr'=>['type'=>'selNoYes','value'=> 0]],
             'status'            => ['panel'=>'general','order'=>25,'dbField'=>'printed',         'label'=>lang('status'),           'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>viewKeyDropdown($this->qual_status, true)],
-            'requested_by'      => ['panel'=>'general','order'=>35,'dbField'=>'rep_id',          'label'=>$this->lang['found_by'],  'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
+            'requested_by'      => ['panel'=>'general','order'=>35,'dbField'=>'rep_id',          'label'=>lang('found_by', $this->moduleID),  'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
             'creation_date'     => ['panel'=>'general','order'=>40,'dbField'=>'post_date',       'label'=>lang('date_created'),     'clean'=>'date',    'attr'=>['type'=>'date',    'value'=>biz_date()]],
             'entered_by'        => ['panel'=>'general','order'=>45,                              'label'=>lang('entered_by'),       'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
             // detail
             'close_start_date'  => ['panel'=>'details','order'=>30,                              'label'=>lang('date_found'),       'clean'=>'date',    'attr'=>['type'=>'date']],
-            'close_start_by'    => ['panel'=>'details','order'=>35,                              'label'=>$this->lang['created_by'],'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
+            'close_start_by'    => ['panel'=>'details','order'=>35,                              'label'=>lang('created_by', $this->moduleID),'clean'=>'integer', 'attr'=>['type'=>'select'], 'values'=>$users],
             'contact_id'        => ['panel'=>'details','order'=>40,'dbField'=>'contact_id_b',    'label'=>lang('vendor'),           'clean'=>'integer', 'attr'=>['type'=>'contact'],'defaults'=>['type'=>'v','callback'=>'']],
             'audit_start_by'    => ['panel'=>'details','order'=>45,                              'label'=>lang('quantity'),         'clean'=>'float',   'attr'=>['type'=>'integer']],
             'sku_id'            => ['panel'=>'details','order'=>50,'dbField'=>'purch_order_id',  'label'=>lang('sku'),              'clean'=>'integer', 'attr'=>['type'=>'inventory'],'defaults'=>['callback'=>'']],
@@ -118,10 +118,10 @@ class qualityTickets extends mgrJournal
                 'filters'=> [
                     'store_id'=>['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]],
-                    'closed' => ['order'=>20,'break'=>true,'label' =>$this->lang['cust_feedback'],'sql'=>$f0_value,'attr'=>['type'=>'select','value'=>$this->defaults['f0']],'values'=>$selClosed],
+                    'closed' => ['order'=>20,'break'=>true,'label' =>lang('cust_feedback', $this->moduleID),'sql'=>$f0_value,'attr'=>['type'=>'select','value'=>$this->defaults['f0']],'values'=>$selClosed],
                     'status' => ['order'=>30,'break'=>true,'label' =>lang('status'),'sql'=>$f1_value,'attr'=>['type'=>'select','value'=>$this->defaults['f1']],'values'=>$statuses]]],
             'columns'=> [
-                'invoice_num'  => ['order'=>10, 'label'=>$this->lang['ca_num'],'attr'=>['width'=> 75, 'sortable'=>true, 'resizable'=>true]],
+                'invoice_num'  => ['order'=>10, 'label'=>lang('ca_num', $this->moduleID),'attr'=>['width'=> 75, 'sortable'=>true, 'resizable'=>true]],
                 'store_id'     => ['order'=>20, 'label'=>lang('store_id'),     'attr'=>['width'=> 75, 'sortable'=>true, 'resizable'=>true], 'format'=> 'storeID'],
                 'description'  => ['order'=>30, 'label'=>lang('description'),  'attr'=>['width'=>250, 'sortable'=>true, 'resizable'=>true]],
                 'printed'      => ['order'=>40, 'label'=>lang('status'),       'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],

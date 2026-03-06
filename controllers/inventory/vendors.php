@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/vendors.php
  */
 
@@ -33,7 +33,6 @@ class inventoryVendors
 
     function __construct()
     {
-        $this->lang     = getExtLang($this->moduleID);
         $this->settings = getModuleCache($this->moduleID, 'settings', false, false, []);
     }
 
@@ -122,7 +121,7 @@ class inventoryVendors
                     'events'=>  ['editor'=>"{type:'text',options:{}}"]],
                 'cost' =>  ['order'=>30,'label'=>lang('item_cost'),  'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true],
                     'events'=>  ['editor'=>"{type:'numberbox',options:{formatter:function(value){return formatCurrency(value, false);}}}"]],
-                'qty_pkg'=>  ['order'=>40,'label'=>$this->lang['qty_package'], 'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true],
+                'qty_pkg'=>  ['order'=>40,'label'=>lang('qty_package', $this->moduleID), 'attr'=>['width'=>100,'sortable'=>true,'resizable'=>true],
                     'events'=>  ['editor'=>"{type:'numberbox',options:{formatter:function(value){return formatPrecise(value);}}}"]],
                 'tax' =>  ['order'=>50,'label'=>lang('tax_rate_id'),  'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true],
                     'events'=>  ['editor'=>dgHtmlTaxData($name, 'tax', 'v')]],

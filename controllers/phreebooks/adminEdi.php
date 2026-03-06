@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-12
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/adminEdi.php
  */
 
@@ -49,17 +49,17 @@ class phreebooksAdminEdi extends mgrJournal
             '_rID'    => ['order'=> 1,                                       'clean'=>'integer','attr'=>['type'=>'hidden', 'value'=>0]],
             'cID'     => ['order'=>10,'label'=>lang('rep_id_i'),             'clean'=>'integer','defaults'=>$defs,'attr'=>['type'=>'contact', 'value'=>0]],
 //          'store_id'=> ['order'=>30,'label'=>lang('store_id'),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>!empty($values['store_id'])?$values['store_id']:0]],
-            'inst'    => ['order'=>20,'html'=>$this->lang['edi_inst'],       'clean'=>'text','attr'=>['type'=>'raw']],
-            'cTitle'  => ['order'=>30,'label'=>$this->lang['edi_ed_title'],  'clean'=>'text','attr'=>['value'=>'']],
-            'ediID'   => ['order'=>35,'label'=>$this->lang['edi_ed_srcid'],  'clean'=>'text','attr'=>['value'=>'']],
-            'sepTag'  => ['order'=>40,'label'=>$this->lang['edi_ed_septag'], 'clean'=>'char','attr'=>['value'=>'~','size'=>3,'maxlength'=>1]],
-            'sepSec'  => ['order'=>45,'label'=>$this->lang['edi_ed_sepsec'], 'clean'=>'char','attr'=>['value'=>'*','size'=>3,'maxlength'=>1]],
-            'hostName'=> ['order'=>50,'label'=>$this->lang['edi_sftp_host'], 'clean'=>'text','attr'=>['value'=>'']],
-            'userName'=> ['order'=>55,'label'=>$this->lang['edi_sftp_name'], 'clean'=>'text','attr'=>['value'=>'']],
-            'userPass'=> ['order'=>60,'label'=>$this->lang['edi_sftp_pass'], 'clean'=>'text','attr'=>['value'=>'']],
-            'pathPut' => ['order'=>65,'label'=>$this->lang['edi_ed_pathput'],'clean'=>'text','attr'=>['value'=>'']],
-            'pathGet' => ['order'=>70,'label'=>$this->lang['edi_ed_pathget'],'clean'=>'text','attr'=>['value'=>'']],
-            'rcvrID'  => ['order'=>75,'label'=>$this->lang['edi_ed_my_id'],  'clean'=>'text','attr'=>['value'=>'']]];
+            'inst'    => ['order'=>20,'html'=>lang('edi_inst', $this->moduleID),       'clean'=>'text','attr'=>['type'=>'raw']],
+            'cTitle'  => ['order'=>30,'label'=>lang('edi_ed_title', $this->moduleID),  'clean'=>'text','attr'=>['value'=>'']],
+            'ediID'   => ['order'=>35,'label'=>lang('edi_ed_srcid', $this->moduleID),  'clean'=>'text','attr'=>['value'=>'']],
+            'sepTag'  => ['order'=>40,'label'=>lang('edi_ed_septag', $this->moduleID), 'clean'=>'char','attr'=>['value'=>'~','size'=>3,'maxlength'=>1]],
+            'sepSec'  => ['order'=>45,'label'=>lang('edi_ed_sepsec', $this->moduleID), 'clean'=>'char','attr'=>['value'=>'*','size'=>3,'maxlength'=>1]],
+            'hostName'=> ['order'=>50,'label'=>lang('edi_sftp_host', $this->moduleID), 'clean'=>'text','attr'=>['value'=>'']],
+            'userName'=> ['order'=>55,'label'=>lang('edi_sftp_name', $this->moduleID), 'clean'=>'text','attr'=>['value'=>'']],
+            'userPass'=> ['order'=>60,'label'=>lang('edi_sftp_pass', $this->moduleID), 'clean'=>'text','attr'=>['value'=>'']],
+            'pathPut' => ['order'=>65,'label'=>lang('edi_ed_pathput', $this->moduleID),'clean'=>'text','attr'=>['value'=>'']],
+            'pathGet' => ['order'=>70,'label'=>lang('edi_ed_pathget', $this->moduleID),'clean'=>'text','attr'=>['value'=>'']],
+            'rcvrID'  => ['order'=>75,'label'=>lang('edi_ed_my_id', $this->moduleID),  'clean'=>'text','attr'=>['value'=>'']]];
     }
     protected function managerGrid($security=0, $args=[])
     {
@@ -68,11 +68,11 @@ class phreebooksAdminEdi extends mgrJournal
                 'search' => ['cTitle', 'hostName', 'userName']],
             'columns'=> [
                 'cID'     => ['order'=>0,'attr'=>['hidden'=>true]],
-                'cTitle'  => ['order'=>10,'label'=>$this->lang['edi_ed_title'], 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
-                'ediID'   => ['order'=>20,'label'=>$this->lang['edi_ed_srcid'], 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
-                'hostName'=> ['order'=>30,'label'=>$this->lang['edi_sftp_host'],'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
-                'userName'=> ['order'=>40,'label'=>$this->lang['edi_sftp_name'],'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
-                'rcvrID'  => ['order'=>50,'label'=>$this->lang['edi_ed_my_id'], 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]]]]);
+                'cTitle'  => ['order'=>10,'label'=>lang('edi_ed_title', $this->moduleID), 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
+                'ediID'   => ['order'=>20,'label'=>lang('edi_ed_srcid', $this->moduleID), 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
+                'hostName'=> ['order'=>30,'label'=>lang('edi_sftp_host', $this->moduleID),'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
+                'userName'=> ['order'=>40,'label'=>lang('edi_sftp_name', $this->moduleID),'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]],
+                'rcvrID'  => ['order'=>50,'label'=>lang('edi_ed_my_id', $this->moduleID), 'attr'=>['width'=>160,'sortable'=>true,'resizable'=>true]]]]);
         return $data;
     }
     protected function managerSettings()
@@ -83,7 +83,7 @@ class phreebooksAdminEdi extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        parent::managerMain($layout, $security, ['dom'=>'div','title'=>sprintf(lang('tbd_manager'), $this->lang['edi'])]);
+        parent::managerMain($layout, $security, ['dom'=>'div','title'=>sprintf(lang('tbd_manager'), lang('edi', $this->moduleID))]);
     }
     public function managerRows(&$layout=[])
     {

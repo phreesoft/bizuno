@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/renderReport.php
  */
 
@@ -30,7 +30,6 @@ namespace bizuno;
 class PDF extends \TCPDF
 {
     public $moduleID = 'phreeform';
-    public $lang;
     public $defaultFont;
     public $fontHeading;
     public $fontTitle1;
@@ -49,7 +48,6 @@ class PDF extends \TCPDF
     function __construct()
     {
         global $report;
-        $this->lang       = getLang($this->moduleID);
         $this->defaultFont= getModuleCache('phreeform','settings','general','default_font','helvetica');
         $PaperSize        = explode(':', $report->pagesize);
         parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]), true, 'UTF-8', false);
@@ -232,7 +230,7 @@ class PDF extends \TCPDF
                     $this->SetLeftMargin($CellXPos[0]);
                     $this->SetX($CellXPos[0]);
                     $this->SetY($this->y0);
-                    $Desc  = ($todo[0] == 'g') ? $this->lang['group_total'] : $this->lang['report_total'];
+                    $Desc  = ($todo[0] == 'g') ? lang('group_total', $this->moduleID) : lang('report_total', $this->moduleID);
                     $this->Cell(0, $CellHeight, "$Desc ".$todo[1], 1, 1, 'C');
                     $this->y0 = $this->GetY() + 0.35;
                     $NeedTop = 'Next';

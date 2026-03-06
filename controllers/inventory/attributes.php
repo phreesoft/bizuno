@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-14
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/attributes.php
  */
 
@@ -37,7 +37,6 @@ class inventoryAttributes
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**
@@ -51,7 +50,7 @@ class inventoryAttributes
         $attrs  = empty($invAttr) ? ['category'=>'', 'attrs'=>[]] : json_decode($invAttr, true);
         msgDebug("\nRead sku rID = $rID with values = ".print_r($invAttr, true));
         $titles = $this->getTitles(true);
-        $fields = ['invAttrCat' => ['order'=>10,'label'=>$this->lang['category'],'values'=>$titles,'attr'=>['type'=>'select', 'value'=>$attrs['category']],
+        $fields = ['invAttrCat' => ['order'=>10,'label'=>lang('category', $this->moduleID),'values'=>$titles,'attr'=>['type'=>'select', 'value'=>$attrs['category']],
             'events' => ['onChange'=>"jqBiz('#panelAttr').panel('refresh',bizunoAjax+'&bizRt=$this->moduleID/attributes/attrDetails&rID='+jqBiz('#id').val()+'&data='+bizSelGet('invAttrCat'));"]]];
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'   => [
@@ -102,12 +101,12 @@ class inventoryAttributes
     var dgRows = JSON.stringify(jqBiz('#dgInvAttr').datagrid('getData'));
     jsonAction('$this->moduleID/attributes/adminAttrSave', title, dgRows);
 }";
-        $fields = ['attrCat'=>['order'=>10,'label'=>$this->lang['category'],'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
+        $fields = ['attrCat'=>['order'=>10,'label'=>lang('category', $this->moduleID),'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
             'options' =>['editable'=>'true','onChange'=>"function() { jqBiz('#dgInvAttr').datagrid({url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/attributes/adminRows&attrCat='+bizSelGet('attrCat')}); }"]]];
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'    => [
                 'tbAttr'=> ['order'=>10, 'type'=>'toolbar', 'key' =>'tbInvAttr'],
-                'head'  => ['order'=>20, 'type'=>'html',    'html'=>$this->lang['attr_intro']."<br /><br />"],
+                'head'  => ['order'=>20, 'type'=>'html',    'html'=>lang('attr_intro', $this->moduleID)."<br /><br />"],
                 'fields'=> ['order'=>30, 'type'=>'fields',  'keys'=>['attrCat']],
                 'body'  => ['order'=>50, 'type'=>'datagrid','key' =>'dgInvAttr']],
             'toolbars'=> ['tbInvAttr'=>['icons'=>['save'=>['order'=>10,'label'=>lang('save'),'icon'=>'save','events'=>['onClick'=>"invAttrSave();"]]]]],

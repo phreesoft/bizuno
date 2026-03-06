@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/payment/adminNacha.php
  */
 
@@ -47,20 +47,20 @@ class paymentAdminNacha extends mgrJournal
             '_rID'     => ['panel'=>'general','order'=> 1,                                                                           'clean'=>'integer', 'attr'=>['type'=>'hidden', 'value'=>0]],
             'cID'      => ['panel'=>'general','order'=>10,'label'=>lang('ctype_v'),'defaults'=>['type'=>'v','data'=>'achVendor','callback'=>''],         'attr'=>['type'=>'contact','value'=>0]],
             'title'    => ['panel'=>'general','order'=>15,'label'=>lang('title'),                                                    'clean'=>'text',    'attr'=>['value'=>'']],
-            'mapID'    => ['panel'=>'general','order'=>20,'label'=>$this->lang['nacha_map_lbl'],'values'=>$this->getMaps(),          'clean'=>'db_field','attr'=>['type'=>'select']],
+            'mapID'    => ['panel'=>'general','order'=>20,'label'=>lang('nacha_map_lbl', $this->moduleID),'values'=>$this->getMaps(),          'clean'=>'db_field','attr'=>['type'=>'select']],
             'gl_acct'  => ['panel'=>'general','order'=>30,'label'=>lang('gl_account'),                                               'clean'=>'db_field','attr'=>['type'=>'ledger','id'=>'gl_acct','value'=>getModuleCache('phreebooks', 'settings', 'vendors', 'gl_cash')]], // gl cash account
-            'biz_route'=> ['panel'=>'general','order'=>40,'label'=>$this->lang['biz_route_lbl'],'tip'=>$this->lang['biz_route_tip'], 'clean'=>'db_field','attr'=>['value'=>'', 'options'=>['groupSeparator'=>"''"]]], // EFT Transit Routing Number, assigned by bank
-            'biz_id'   => ['panel'=>'general','order'=>50,'label'=>$this->lang['biz_id_lbl'],   'tip'=>$this->lang['biz_id_tip'],    'clean'=>'integer', 'attr'=>['value'=>''], 'options'=>['groupSeparator'=>"''"]], // EFT Company ID, assigned by bank
-            'biz_entry'=> ['panel'=>'general','order'=>60,'label'=>$this->lang['biz_entry_lbl'],'tip'=>$this->lang['biz_entry_tip'], 'clean'=>'db_field','attr'=>['value'=>'']], // Company Entry Description
-            'biz_name' => ['panel'=>'general','order'=>70,'label'=>$this->lang['biz_name_lbl'], 'tip'=>$this->lang['biz_name_tip'],  'clean'=>'db_field','attr'=>['value'=>'']]]; // My Company Name
+            'biz_route'=> ['panel'=>'general','order'=>40,'label'=>lang('biz_route_lbl', $this->moduleID),'tip'=>lang('biz_route_tip', $this->moduleID), 'clean'=>'db_field','attr'=>['value'=>'', 'options'=>['groupSeparator'=>"''"]]], // EFT Transit Routing Number, assigned by bank
+            'biz_id'   => ['panel'=>'general','order'=>50,'label'=>lang('biz_id_lbl', $this->moduleID),   'tip'=>lang('biz_id_tip', $this->moduleID),    'clean'=>'integer', 'attr'=>['value'=>''], 'options'=>['groupSeparator'=>"''"]], // EFT Company ID, assigned by bank
+            'biz_entry'=> ['panel'=>'general','order'=>60,'label'=>lang('biz_entry_lbl', $this->moduleID),'tip'=>lang('biz_entry_tip', $this->moduleID), 'clean'=>'db_field','attr'=>['value'=>'']], // Company Entry Description
+            'biz_name' => ['panel'=>'general','order'=>70,'label'=>lang('biz_name_lbl', $this->moduleID), 'tip'=>lang('biz_name_tip', $this->moduleID),  'clean'=>'db_field','attr'=>['value'=>'']]]; // My Company Name
     }
     protected function managerGrid($security=0, $args=[], $admin=false)
     {
         $data = array_replace_recursive(parent::gridBase($security, $args, $admin), [
             'source' => ['search'=>['title', 'biz_entry', 'biz_name']],
             'columns'=> [
-                'title'  => ['order'=>10,'label'=>$this->lang['ach_title']],
-                'mapID'  => ['order'=>20,'label'=>$this->lang['nacha_map_lbl']],
+                'title'  => ['order'=>10,'label'=>lang('ach_title', $this->moduleID)],
+                'mapID'  => ['order'=>20,'label'=>lang('nacha_map_lbl', $this->moduleID)],
                 'gl_acct'=> ['order'=>30,'label'=>lang('gl_account')]]]);
         return $data;
     }
@@ -72,7 +72,7 @@ class paymentAdminNacha extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        parent::managerMain($layout, $security, ['dom'=>'div', 'title'=>sprintf(lang('tbd_manager'),$this->lang['ach_accounts'])]);
+        parent::managerMain($layout, $security, ['dom'=>'div', 'title'=>sprintf(lang('tbd_manager'),lang('ach_accounts', $this->moduleID))]);
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']); // Don't allow copy here
     }
     public function managerRows(&$layout=[])

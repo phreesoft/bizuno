@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/accessory.php
  */
 
@@ -33,7 +33,6 @@ class inventoryAccessory
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**
@@ -57,7 +56,7 @@ function invAccessorySave() {
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs' => [
                 'invAccDG'    => ['order'=>20,'type'=>'datagrid','key'=>'dgAccessory'],
-                'invAccFooter'=> ['order'=>90,'label'=>$this->lang['accessories'],'type'=>'html','html'=>html5('invAccessory', ['attr'=>['type'=>'hidden']])]],
+                'invAccFooter'=> ['order'=>90,'label'=>lang('accessories', $this->moduleID),'type'=>'html','html'=>html5('invAccessory', ['attr'=>['type'=>'hidden']])]],
             'jsHead' => ['jsAccEdit'=>$js],
             'datagrid' => ['dgAccessory' => $this->dgAccessory('dgAccessory', $rID)]]);
     }

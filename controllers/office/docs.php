@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/office/docs.php
  *
  */
@@ -40,7 +40,7 @@ class officeDocs extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->mgrTitle = $this->lang['docs_title'];
+        $this->mgrTitle = lang('docs_title', $this->moduleID);
         $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', $this->pageID);
         $this->fieldStructure();
     }
@@ -95,10 +95,10 @@ class officeDocs extends mgrJournal
                     'panel' => ['type'=>'panel','key'=>'docBookMk'],
                     'hist'  => ['type'=>'panel','key'=>'myHist']]],
                 'docSearch'=> ['label'=>lang('search'),               'type'=>'html','html'=>$divSrch],
-                'docBookMk'=> ['label'=>$this->lang['my_bookmarks'],  'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsBookmarked'"],'html'=>'&nbsp;'],
-                'myHist'   => ['label'=>$this->lang['recently_added'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsRecent'"],    'html'=>'&nbsp;']],
+                'docBookMk'=> ['label'=>lang('my_bookmarks', $this->moduleID),  'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsBookmarked'"],'html'=>'&nbsp;'],
+                'myHist'   => ['label'=>lang('recently_added', $this->moduleID),'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/docsRecent'"],    'html'=>'&nbsp;']],
             'accordion'=> ['accDocs'=>['styles'=>['height'=>'100%'],'divs'=>[
-                'divTree'  => ['order'=>10,'label'=>$this->lang['my_docs'],'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'],
+                'divTree'  => ['order'=>10,'label'=>lang('my_docs', $this->moduleID),'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'],
                     'divs'=>[
                         'toolbar'=> ['order'=>10,'type'=>'fields','keys'=>['expand','collapse']],
                         'tree'   => ['order'=>50,'type'=>'tree',  'key' =>'treeDocs']]],
@@ -115,9 +115,9 @@ class officeDocs extends mgrJournal
                     ],
                 'menu'  => ['attr'=>['id'=>'treeMenu', 'class'=>"easyui-menu", 'style'=>"width:120px;"],
                     'actions'=> [
-                        'add'     => ['label'=>$this->lang['doc_add'],   'hidden'=>$security>1?false:true,'options'=>["iconCls"=>"'icon-docNew'"],'attr'=>['onClick'=>"docAdd('doc');"]],
+                        'add'     => ['label'=>lang('doc_add', $this->moduleID),   'hidden'=>$security>1?false:true,'options'=>["iconCls"=>"'icon-docNew'"],'attr'=>['onClick'=>"docAdd('doc');"]],
                         'addDir'  => ['label'=>lang('add_folder'),       'hidden'=>$security>1?false:true,'options'=>["iconCls"=>"'icon-dirNew'"],'attr'=>['onClick'=>"docAdd('dir');"]],
-                        'addGgl'  => ['label'=>$this->lang['add_google'],'hidden'=>$security>1?false:true,'options'=>["iconCls"=>"'icon-dirNew'"],'attr'=>['onClick'=>"if (gID = prompt('Enter Google Drive document ID:')) { docAdd('ggl', gID); }"]],
+                        'addGgl'  => ['label'=>lang('add_google', $this->moduleID),'hidden'=>$security>1?false:true,'options'=>["iconCls"=>"'icon-dirNew'"],'attr'=>['onClick'=>"if (gID = prompt('Enter Google Drive document ID:')) { docAdd('ggl', gID); }"]],
                         'edit'    => ['label'=>lang('edit'),             'hidden'=>$security>2?false:true,'options'=>["iconCls"=>"'icon-edit'"],  'attr'=>['onClick'=>"var node = jqBiz('#treeDocs').tree('getSelected'); jqBiz('#treeDocs').tree('beginEdit',node.target);"]],
                         'trash'   => ['label'=>lang('trash'),            'hidden'=>$security>3?false:true,'options'=>["iconCls"=>"'icon-trash'"], 'attr'=>['onClick'=>"docDel();"]],
                         'hr1'     => ['attr' =>['class'=>"menu-sep"]],
@@ -291,7 +291,7 @@ function docDel(){
         $args = ['dom'=>'div', 'title'=>lang('edit')." - {$meta['title']}"];
         parent::editMeta($layout, $security, $args);
         $files = $io->fileReadGlob($this->attachPath."rID_".str_pad($rID, 8, "0", STR_PAD_LEFT)."_");
-        if (empty($files) && !empty($rID)) { msgAdd($this->lang['no_files'], 'caution'); }
+        if (empty($files) && !empty($rID)) { msgAdd(lang('no_files', $this->moduleID), 'caution'); }
         // need to get bookmarks from user meta
         $metaBM = dbMetaGet(0, 'bookmarks_docs', 'contacts', getUserCache('profile', 'userID'));
         msgDebug("\nRead bookmarks for user = ".print_r($metaBM, true));
@@ -405,7 +405,7 @@ jqBiz('#treeDocs').tree('reload');";
         $rID = clean('rID', 'integer', 'get');
         if (empty($rID)) { return msgAdd(lang('bad_id')); }
         $meta = dbMetaGet($rID, $this->metaPrefix);
-        if ($this->hasChildren($meta['_rID'])) { return msgAdd($this->lang['msg_delete_error']); }
+        if ($this->hasChildren($meta['_rID'])) { return msgAdd(lang('msg_delete_error', $this->moduleID)); }
         $io->fileDelete($this->attachPath."rID_" . str_pad($rID, 8, "0", STR_PAD_LEFT) . "_*");
         msgLog($this->mgrTitle.'-'.lang('delete').": {$meta['title']} ($rID)");
         dbMetaDelete($rID);

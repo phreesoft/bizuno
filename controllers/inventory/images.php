@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-13
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/images.php
  */
 
@@ -33,7 +33,6 @@ class inventoryImages
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**
@@ -43,7 +42,7 @@ class inventoryImages
     public function imagesLoad(&$layout=[])
     {
         $rID      = clean('rID', 'integer', 'get');
-        $data     = ['fields'=>['invImageAdd'=>['icon'=>'add','label'=>$this->lang['add_image'],'events'=>['onClick'=>"invImagesAdd();"]]]];
+        $data     = ['fields'=>['invImageAdd'=>['icon'=>'add','label'=>lang('add_image', $this->moduleID),'events'=>['onClick'=>"invImagesAdd();"]]]];
         $imgCnt   = $needsUpdate = 0;
         $html = $jsReady = '';
         if ($rID) {

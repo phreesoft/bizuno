@@ -35,7 +35,6 @@ class shippingAddress extends shippingCommon
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-29
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /model/registry.php
  */
 
@@ -75,11 +75,10 @@ final class bizRegistry
     {
         global $bizunoLang;
         msgDebug("\nFetching lang from file system.");
-        $langCore = $langByRef = [];
+        $langCore = [];
         require(BIZUNO_FS_LIBRARY.'locale/en_US/language.php');  // pulls the current language in English
-        include(BIZUNO_FS_LIBRARY.'locale/en_US/langByRef.php'); // lang by reference (no translation required)
         $bizunoLang = [
-            'core'      => array_merge($langCore, $langByRef),
+            'core'      => $langCore,
             'modules'   => [],
             'dashboards'=> [],
             'methods'   => []];

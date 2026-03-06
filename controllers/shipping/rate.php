@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-12
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/rate.php
  */
 
@@ -101,9 +101,9 @@ class shippingRate extends shippingCommon
                 'postal_code' => ['order'=>30,'label'=>lang('postal_code'),'attr'=>['value'=>!empty($data['ship']['postal_code_s'])? $data['ship']['postal_code_s']: ''], 'size'=>10],
                 'country'     => ['order'=>40,'label'=>lang('country'),    'attr'=>['type'=>'country', 'value'=>!empty($data['ship']['country_s']) ? $data['ship']['country_s'] : 'USA']],
                 'num_boxes'   => ['order'=>10,'label'=>lang('num_boxes'),'attr'=>['type'=>'integer','value'=>$guess['Qty'],'size'=>5]],
-                'weight'      => ['order'=>20,'label'=>$this->lang['ship_weight'],'attr'=>['type'=>'float','value'=>$guess['Wt'], 'size'=>10]],
+                'weight'      => ['order'=>20,'label'=>lang('ship_weight', $this->moduleID),'attr'=>['type'=>'float','value'=>$guess['Wt'], 'size'=>10]],
                 'residential' => ['order'=>30,'label'=>lang('residential_address'),'attr'=>['type'=>'checkbox']],
-                'length'      => ['order'=>40,'label'=>$this->lang['dimensions'],'break'=>false,'attr' =>['type'=>'integer','value'=>$guess['L'],'size'=>3]],
+                'length'      => ['order'=>40,'label'=>lang('dimensions', $this->moduleID),'break'=>false,'attr' =>['type'=>'integer','value'=>$guess['L'],'size'=>3]],
                 'txtWidth'    => ['order'=>49,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
                 'width'       => ['order'=>50,'break'=>false,'attr'=>['type'=>'integer','value'=>$guess['W'],'size'=>3]],
                 'txtHeight'   => ['order'=>59,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
@@ -112,10 +112,10 @@ class shippingRate extends shippingCommon
                 'total_amount'=> ['order'=>40,'attr'=>['type'=>'hidden', 'value'=>$total]],
                 'ltl_class'   => ['order'=>50,'label'=>lang('ltl_class'),'options'=>['width'=>100],'values'=>viewKeyDropdown($this->options['ltlClasses'], true),
                     'attr' => ['type'=>'select','value'=>$this->settings['general']['ltl_class']]],
-                'insurance'   => ['order'=>60,'label'=>$this->lang['inc_insurance'],'attr'=>['type'=>'checkbox','checked'=>false, 'size'=>8]],
-                'ins_amount'  => ['order'=>61,'label'=>$this->lang['amt_insurance'],'attr'=>['type'=>'currency','value'=>$guess['Ins']]],
-                'extra1'      => ['order'=>70,'label'=>$this->lang['extras'],'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
-//              'hazmat'      => ['order'=>80,'label'=>$this->lang['hazardous'],'attr'=>['type'=>'checkbox','checked'=>false]],
+                'insurance'   => ['order'=>60,'label'=>lang('inc_insurance', $this->moduleID),'attr'=>['type'=>'checkbox','checked'=>false, 'size'=>8]],
+                'ins_amount'  => ['order'=>61,'label'=>lang('amt_insurance', $this->moduleID),'attr'=>['type'=>'currency','value'=>$guess['Ins']]],
+                'extra1'      => ['order'=>70,'label'=>lang('extras', $this->moduleID),'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
+//              'hazmat'      => ['order'=>80,'label'=>lang('hazardous'],'attr'=>['type'=>'checkbox','checked'=>false]],
                 ]];
 //        $addBook = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
 //        foreach ($fields['keyAddr'] as $idx) {

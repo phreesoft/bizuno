@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -36,7 +36,6 @@ class phreebooksReturns extends mgrJournal
     protected $secID     = 'returns';
     protected $nextRefIdx= 'next_return_num';
     protected $journalID = 12;
-    public $lang;
     public $struc;
     public $settings;
     public $myStore;
@@ -46,7 +45,6 @@ class phreebooksReturns extends mgrJournal
 
     function __construct()
     {
-        $this->lang          = getExtLang($this->moduleID);
         $this->settings      = getModuleCache($this->moduleID, 'settings');
         $this->myStore       = getUserCache('profile', 'store_id', false, 0);
         $this->reps          = viewRoleDropdown();
@@ -130,7 +128,7 @@ class phreebooksReturns extends mgrJournal
                 'invoice_num'  => ['order'=>50,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),'attr'=>['width'=>120, 'sortable'=>true, 'resizable'=>true]],
                 'creation_date'=> ['order'=>60,'field'=>'journal_meta.id','label'=>lang('creation_date'), 'attr'=>['width'=>120, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:creation_date:journal','format'=>'date'],
                 'closed_date'  => ['order'=>70,'field'=>'journal_meta.id','label'=>lang('close_date'),    'attr'=>['width'=> 80, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:closed_date:journal','format'=>'date']],
-                'footnotes'    => ['jType'=>lang('status').': <span class="row-inactive">'.$this->lang['rtn_status_1'].'</span>']]);
+                'footnotes'    => ['jType'=>lang('status').': <span class="row-inactive">'.lang('rtn_status_1').'</span>']]);
         switch($action) {
             case 'rtn_by_cust':   $this->addFilters($data, 'rtn_by_cust');   break;
             case 'rtn_my_biz':    $this->addFilters($data, 'rtn_my_biz');    break;
@@ -194,7 +192,7 @@ class phreebooksReturns extends mgrJournal
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow copy here
         if ($rID) { // customize JavaScript
             $layout['fields']['ref_num']['attr']['readonly'] = true;
-            $layout['divs']['heading']['html']= "<h1>".$this->lang['return_num']." ".$this->struc['ref_num']['attr']['value']." - ".$this->struc['caller_name']['attr']['value']."</h1>";
+            $layout['divs']['heading']['html']= "<h1>".lang('return_num', $this->moduleID)." ".$this->struc['ref_num']['attr']['value']." - ".$this->struc['caller_name']['attr']['value']."</h1>";
             $layout['jsHead']['dgReceiveData']= "var dgReceiveData = ".json_encode($this->struc['receive_details']['attr']['value']).";\n";
             $layout['jsHead']['dgCloseData']  = "var dgCloseData = "  .json_encode($this->struc['close_details']['attr']['value']).";\n";
         } else  {
@@ -262,7 +260,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
     private function dgItems($name, $type='close')
     {
         $on_hand = lang('qty_stock');
-        return ['id'=>$name,'type'=>'edatagrid','title'=>$type=='close' ? $this->lang['item_details'] : $this->lang['receive_details'],
+        return ['id'=>$name,'type'=>'edatagrid','title'=>$type=='close' ? lang('item_details', $this->moduleID) : lang('receive_details', $this->moduleID),
             'attr'  => ['toolbar'=>"{$name}Toolbar",'idField'=>'id','singleSelect'=>true],
             'events'=> ['data'   => "{$name}Data",
                 'onClickRow'=> "function(rowIndex) { curIndex = rowIndex; }",
@@ -289,7 +287,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
                     }}"]],
                 'desc'  => ['order'=>30,'label'=>lang('description'),'attr'=>['width'=>250,'editor'=>'text','resizable'=>true]],
                 'mfg'   => ['order'=>40,'label'=>lang('trans_code'), 'attr'=>['width'=>150,'editor'=>'text','resizable'=>true,'hidden'=>$type=='receive'?false:true]],
-                'wrnty' => ['order'=>50,'label'=>$this->lang['warranty_date'],'attr'=>['width'=>200,'editor'=>'text','resizable'=>true,'hidden'=>$type=='receive'?false:true]],
+                'wrnty' => ['order'=>50,'label'=>lang('warranty_date', $this->moduleID),'attr'=>['width'=>200,'editor'=>'text','resizable'=>true,'hidden'=>$type=='receive'?false:true]],
                 'notes' => ['order'=>60,'label'=>lang('notes'),      'attr'=>['width'=>400,'editor'=>'text','resizable'=>true, 'hidden'=>$type=='close' ?false:true]]]];
     }
 
@@ -313,7 +311,7 @@ function rtnFill(id, row) { bizTextSet('caller_name', row.primary_name); bizText
             'code'        => ['order'=>50,'label'=>lang('code'),        'attr'=>['type'=>'select',  'value'=>0],'values'=>$this->return_codes],
             'preventable' => ['order'=>60,'label'=>lang('preventable'), 'attr'=>['type'=>'selNoYes','value'=>0]],
             'notes'       => ['order'=>70,'label'=>lang('notes'),       'attr'=>['type'=>'textarea','rows' =>6]]];
-        $data = ['type'=>'popup','title'=>$this->lang['create_return'], 'attr'=>['id'=>'winReturn','width' =>650],
+        $data = ['type'=>'popup','title'=>lang('create_return', $this->moduleID), 'attr'=>['id'=>'winReturn','width' =>650],
             'toolbars'=> ['tbReturn'=>['icons'=>[
                 'cancel' =>['order'=>10,'events'=>['onClick'=>"bizWindowClose('winReturn');"]],
                 'next'   =>['order'=>50,'events'=>['onClick'=>"jqBiz('#frmReturn').submit();"]]]]],

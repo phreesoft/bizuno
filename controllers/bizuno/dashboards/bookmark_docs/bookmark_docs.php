@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/bizuno/dashboards/bookmark_docs/bookmark_docs.php
  */
 
@@ -47,10 +47,6 @@ class bookmark_docs
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [ // Admin fields
@@ -59,20 +55,12 @@ class bookmark_docs
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @param array $opts - Personalized user/menu options
-     * @return modified $layout
-     */
     public function render()
     {
         $result= dbMetaGet(0, 'bookmarks_phreeform', 'contacts', getUserCache('profile', 'userID'));
         msgDebug("\nRead bookmarks for userID: ".getUserCache('profile', 'userID')." to be: ".print_r($result, true));
         if (!empty($result)) {
             foreach ($result as $doc) {
-//                $html .= html5('', ['options'=>['value'=>$doc['id']],'attr'=>['type'=>'li']]);
                 // if the below is uncommented, the download.js javascript needs to be loaded
                 //$html .= '<div style="float:right;height:16px;">'.html5('',['icon'=>'download','size'=>'small','events'=>['onClick'=>"alert('download); jsonAction(bizunoAjax+'&bizRt=proGL/docs/docExport&rID='+{$doc['id']});"]]).'</div>';
                 $edit   = '<div style="float:right;height:16px;">'.html5('',['icon'=>'edit','size'=>'small','events'=>['onClick'=>"hrefClick(bizunoAjax+'&bizRt=proGL/docs/manager', {$doc['id']});"]]).'</div>';

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/api/locale/en_US/language.php
  */
 
@@ -40,8 +40,6 @@ $lang = [
     'sync_success'        => "All products are in Sync!",
     'confirm_success'     => "Order status update complete, the following %s order(s) were updated: %s",
     'err_no_category'     => "Could not find category title, the category must be added at the cart level admin before this product can be uploaded!",
-    'msg_sku_missing'     => "The following SKUs are on the cart but are not flagged to be there by ",
-    'msg_sku_sync_success'=> "All products are in Sync.",
     'msg_test_success'    => "Connected to cart.",
     // API and Import/Export
     'upload_all' => 'Slowest - All Data (Including Images)',

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-24
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/fields.php
  */
 
@@ -101,7 +101,7 @@ class administrateFields extends mgrJournal
         $options= [['id'=>'', 'text'=>lang('select')]];
         foreach ($this->cstmFields as $table) {  $options[] = ['id'=>$table, 'text'=>lang($table)]; }
         $fldSel = ['id'=>'table', 'props'=>['values'=>$options, 'attr'=>['type'=>'select']]];
-        $args   = ['fldSel'=>$fldSel, 'desc'=>$this->lang['new_field_desc']];
+        $args   = ['fldSel'=>$fldSel, 'desc'=>lang('new_field_desc', $this->moduleID)];
         parent::addDB($layout, $security, $args);
     }
     
@@ -112,13 +112,13 @@ class administrateFields extends mgrJournal
         if (empty($dbFld)) { // it's an add
             $table = clean('table', 'db_field', 'get');
             $field = '';
-            if (!in_array($table, $this->cstmFields)) { return msgAdd($this->lang['err_new_field_add']);}
+            if (!in_array($table, $this->cstmFields)) { return msgAdd(lang('err_new_field_add', $this->moduleID));}
         } else {
             $parts = explode('.', $dbFld, 2);
             $table = $parts[0];
             $field = $parts[1];
-            if (empty($table) || empty($field)) { return msgAdd($this->lang['err_new_field_edit']); }
-            msgAdd($this->lang['xf_msg_edit_warn'], 'caution');
+            if (empty($table) || empty($field)) { return msgAdd(lang('err_new_field_edit', $this->moduleID)); }
+            msgAdd(lang('xf_msg_edit_warn', $this->moduleID), 'caution');
         }
         $struc = dbLoadStructure(BIZUNO_DB_PREFIX.$table);
         $props = !empty($field) ? $struc[$field] : ['attr'=>['type'=>'text']];
@@ -169,28 +169,28 @@ class administrateFields extends mgrJournal
         $ints  = viewKeyDropdown(['tinyint'=>'-127 '.lang('to').' 127', 'smallint'=>'-32,768 '.lang('to').' 32,768',
             'mediumint'=>'-8,388,608 '.lang('to').' 8,388,607', 'int'=>'-2,147,483,648 '.lang('to').' 2,147,483,647',
             'bigint'   =>lang('greater_than').' 2,147,483,648']);
-        $floats= viewKeyDropdown(['float'=>$this->lang['xf_lbl_db_float'], 'double'=>$this->lang['xf_lbl_db_double']]);
+        $floats= viewKeyDropdown(['float'=>lang('xf_lbl_db_float', $this->moduleID), 'double'=>lang('xf_lbl_db_double', $this->moduleID)]);
         $checks= viewKeyDropdown(['0'=>lang('unchecked'),'1'=>lang('checked')]);
         $fields= [
             'table'           => ['attr'=>['type'=>'hidden','value'=>$table]],
             'id'              => ['attr'=>['type'=>'hidden','value'=>$field]], // holds old_field_name
-            'field'           => ['label'=>$this->lang['xf_lbl_field'],'position'=>'after','attr'=>['value'=>$field]],
-            'label'           => ['label'=>$this->lang['xf_lbl_label'],'position'=>'after','attr'=>['value'=>isset($props['label'])?$props['label']:'']],
-            'tag'             => ['label'=>$this->lang['xf_lbl_tag'],  'position'=>'after','attr'=>['value'=>isset($props['tag'])?$props['tag']:'']],
-            'tab'             => ['label'=>$this->lang['xf_lbl_tab'],  'position'=>'after','values'=>$tabs,'attr'=>['type'=>'select','value'=>isset($props['tab'])?$props['tab']:''],
+            'field'           => ['label'=>lang('xf_lbl_field', $this->moduleID),'position'=>'after','attr'=>['value'=>$field]],
+            'label'           => ['label'=>lang('xf_lbl_label', $this->moduleID),'position'=>'after','attr'=>['value'=>isset($props['label'])?$props['label']:'']],
+            'tag'             => ['label'=>lang('xf_lbl_tag', $this->moduleID),  'position'=>'after','attr'=>['value'=>isset($props['tag'])?$props['tag']:'']],
+            'tab'             => ['label'=>lang('xf_lbl_tab', $this->moduleID),  'position'=>'after','values'=>$tabs,'attr'=>['type'=>'select','value'=>isset($props['tab'])?$props['tab']:''],
                 'options'=>['width'=>200]],
-            'group'           => ['label'=>$this->lang['xf_lbl_group'],'position'=>'after','attr'=>['type'=>'select','value'=>isset($props['group'])?$props['group']:''],
+            'group'           => ['label'=>lang('xf_lbl_group', $this->moduleID),'position'=>'after','attr'=>['type'=>'select','value'=>isset($props['group'])?$props['group']:''],
                 'options'=>['editable'=>'true']],
-            'order'           => ['label'=>$this->lang['xf_lbl_order'],'position'=>'after','attr'=>['value'=>isset($props['order'])?$props['order']:'']],
+            'order'           => ['label'=>lang('xf_lbl_order', $this->moduleID),'position'=>'after','attr'=>['value'=>isset($props['order'])?$props['order']:'']],
             'type'            => ['position'=>'after', 'attr'=>['type'=>'radio','value'=>$type]],
-            'text_length'     => ['label'=>$this->lang['xf_lbl_text_length']."<br />"],
+            'text_length'     => ['label'=>lang('xf_lbl_text_length', $this->moduleID)."<br />"],
             'text_default'    => ['label'=>lang('default')."<br />", 'attr'=>  ['type'=>'textarea']],
             'link_default'    => ['label'=>lang('default')."<br />"],
             'int_select'      => ['label'=>lang('range')."<br />", 'values'=>$ints, 'attr'=>['type'=>'select']],
             'int_default'     => ['label'=>lang('default')."<br />", 'attr'=>['value'=>isset($props['attr']['value'])?$props['attr']['value']:'0']],
             'float_select'    => ['label'=>lang('precision')."<br />",'values'=>$floats, 'attr'=>['type'=>'select']],
             'float_default'   => ['label'=>lang('default')."<br />", 'attr'=>['value'=>isset($props['attr']['value'])?$props['attr']['value']:'0']],
-            'radio_default'   => ['label'=>$this->lang['xf_lbl_radio_default']."<br />", 'attr'=>['type'=>'textarea']],
+            'radio_default'   => ['label'=>lang('xf_lbl_radio_default', $this->moduleID)."<br />", 'attr'=>['type'=>'textarea']],
             'checkbox_default'=> ['label'=>lang('default')."<br />",'values'=>$checks,'attr'=>['type'=>'select']]];
         switch ($props['attr']['type']) {
             case 'varchar':
@@ -231,7 +231,7 @@ class administrateFields extends mgrJournal
         $output .= html5('id',    $fields['id']);
         $output .= '<table>
          <tbody>
-          <tr><td colspan="2">'.$this->lang['xf_lbl_field_tip'] .'</td></tr>
+          <tr><td colspan="2">'.lang('xf_lbl_field_tip', $this->moduleID) .'</td></tr>
           <tr><td colspan="2">'.html5('field', $fields['field']).'</td></tr>
           <tr><td colspan="2">'.html5('label', $fields['label']).'</td></tr>
           <tr><td colspan="2">'.html5('tag',   $fields['tag'])  .'</td></tr>
@@ -248,11 +248,11 @@ class administrateFields extends mgrJournal
         $output .= '  <tr class="panel-header"><th colspan="2">'.lang('attributes')."</th></tr>";
 
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_text'];
+        $fields['type']['label'] = lang('xf_lbl_text', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='text' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'text'; // radio button type
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_html'];
+        $fields['type']['label'] = lang('xf_lbl_html', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='html' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'html';
         $output .= html5('type', $fields['type'])."<br />";
@@ -261,15 +261,15 @@ class administrateFields extends mgrJournal
         $output .= html5('text_default', $fields['text_default']);
         $output .= '  </td></tr><tr><td colspan="2"><hr /></td></tr>';
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_link_url'];
+        $fields['type']['label'] = lang('xf_lbl_link_url', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='link_url' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'link_url';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_link_image'];
+        $fields['type']['label'] = lang('xf_lbl_link_image', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='link_image' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'link_image';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_link_inventory'];
+        $fields['type']['label'] = lang('xf_lbl_link_inventory', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='link_inventory' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'link_inventory';
         $output .= html5('type', $fields['type']);
@@ -277,7 +277,7 @@ class administrateFields extends mgrJournal
         $output .= html5('link_default', $fields['link_default']);
         $output .= '  </td></tr><tr><td colspan="2"><hr /></td></tr>';
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_int'];
+        $fields['type']['label'] = lang('xf_lbl_int', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='integer' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'integer';
         $output .= html5('type', $fields['type']);
@@ -286,7 +286,7 @@ class administrateFields extends mgrJournal
         $output .= html5('int_default', $fields['int_default']);
         $output .= '  </td></tr><tr><td colspan="2"><hr /></td></tr>';
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_float'];
+        $fields['type']['label'] = lang('xf_lbl_float', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='float' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'float';
         $output .= html5('type', $fields['type']);
@@ -296,15 +296,15 @@ class administrateFields extends mgrJournal
         $output .= html5('float_default', $fields['float_default']);
         $output .= '  </td></tr><tr><td colspan="2"><hr /></td></tr>';
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_checkbox_multi'];
+        $fields['type']['label'] = lang('xf_lbl_checkbox_multi', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='checkbox_multi' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'checkbox_multi';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_select'];
+        $fields['type']['label'] = lang('xf_lbl_select', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='select' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'select';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_radio'];
+        $fields['type']['label'] = lang('xf_lbl_radio', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='radio' ? true : false;
         $fields['type']['attr']['value'] = 'radio';
         $output .= html5('type', $fields['type'])."</td>";
@@ -312,7 +312,7 @@ class administrateFields extends mgrJournal
         $output .= html5('radio_default', $fields['radio_default']);
         $output .= '  </td></tr><tr><td colspan="2"><hr /></td></tr>';
         $output .= "  <tr><td>";
-        $fields['type']['label'] = $this->lang['xf_lbl_checkbox'];
+        $fields['type']['label'] = lang('xf_lbl_checkbox', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='checkbox' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'checkbox';
         $output .= html5('type', $fields['type']);
@@ -328,11 +328,11 @@ class administrateFields extends mgrJournal
         $fields['type']['attr']['checked'] = $type=='time' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'time';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_datetime'];
+        $fields['type']['label'] = lang('xf_lbl_datetime', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='datetime' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'datetime';
         $output .= html5('type', $fields['type'])."<br />";
-        $fields['type']['label'] = $this->lang['xf_lbl_timestamp'];
+        $fields['type']['label'] = lang('xf_lbl_timestamp', $this->moduleID);
         $fields['type']['attr']['checked'] = $type=='timestamp' ? 'checked' : false;
         $fields['type']['attr']['value'] = 'timestamp';
         $output .= html5('type', $fields['type']);
@@ -360,7 +360,7 @@ class administrateFields extends mgrJournal
         if ($new_field == '') { return msgAdd(lang('err_field_empty')); }
         if (!$old_field || $old_field <> $new_field) { // changed field name
             $exists = dbFieldExists(BIZUNO_DB_PREFIX.$table, $new_field);
-            if ($exists) { return msgAdd($this->lang['xf_err_field_exists']); }
+            if ($exists) { return msgAdd(lang('xf_err_field_exists', $this->moduleID)); }
         }
         $type   = clean('type', ['format'=>'text', 'default'=>'text'], 'post');
         $comment= [];

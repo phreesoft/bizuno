@@ -37,7 +37,6 @@ class administrateMain extends mgrJournal
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**

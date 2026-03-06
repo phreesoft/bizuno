@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -36,7 +36,6 @@ class phreebooksAdmin {
     private $defMethods = ['totals'=>[
         'achBalBeg', 'achBalEnd', 'achDiscount', 'achSubtotal', 'achTotal', 'balance', 'balanceBeg', 'balanceEnd', 'debitcredit',
         'discount', 'discountChk', 'shipping', 'subtotal', 'subtotalChk', 'tax_other', 'total', 'total_bal', 'total_pmt']];
-    public $lang;
     public $assets;
     public $settings;
     public $structure;
@@ -45,7 +44,6 @@ class phreebooksAdmin {
     public $notes;
 
     function __construct() {
-        $this->lang = getLang($this->moduleID);
         $this->assets    = [0, 2, 4, 6, 8, 12, 32, 34]; // gl_account types that are assets
         $this->settings  = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure = [
@@ -104,30 +102,30 @@ class phreebooksAdmin {
             'cTerms'    => ['text'=>lang('terms')." (contact ID)",           'module'=>'bizuno','function'=>'viewFormat'],
             'terms'     => ['text'=>lang('terms')." (".lang('customers').")",'module'=>'bizuno','function'=>'viewFormat'],
             'terms_v'   => ['text'=>lang('terms')." (".lang('vendors').")",  'module'=>'bizuno','function'=>'viewFormat'],
-            'AgeCur'    => ['text'=>$this->lang['pb_inv_age_00']],
-            'Age30'     => ['text'=>$this->lang['pb_inv_age_30']],
-            'Age60'     => ['text'=>$this->lang['pb_inv_age_60']],
-            'Age90'     => ['text'=>$this->lang['pb_inv_age_90']],
-            'Age120'    => ['text'=>$this->lang['pb_inv_age_120']],
-            'Age61'     => ['text'=>$this->lang['pb_inv_age_61']],
-            'Age91'     => ['text'=>$this->lang['pb_inv_age_91']],
-            'Age121'    => ['text'=>$this->lang['pb_inv_age_121']],
-            'age_00'    => ['text'=>$this->lang['pb_cnt_age_00']],
-            'age_30'    => ['text'=>$this->lang['pb_cnt_age_30']],
-            'age_60'    => ['text'=>$this->lang['pb_cnt_age_60']],
-            'age_90'    => ['text'=>$this->lang['pb_cnt_age_90']],
-            'age_120'   => ['text'=>$this->lang['pb_cnt_age_120']],
-            'age_61'    => ['text'=>$this->lang['pb_cnt_age_61']],
-            'age_91'    => ['text'=>$this->lang['pb_cnt_age_91']],
-            'age_121'   => ['text'=>$this->lang['pb_cnt_age_121']],
+            'AgeCur'    => ['text'=>lang('pb_inv_age_00', $this->moduleID)],
+            'Age30'     => ['text'=>lang('pb_inv_age_30', $this->moduleID)],
+            'Age60'     => ['text'=>lang('pb_inv_age_60', $this->moduleID)],
+            'Age90'     => ['text'=>lang('pb_inv_age_90', $this->moduleID)],
+            'Age120'    => ['text'=>lang('pb_inv_age_120', $this->moduleID)],
+            'Age61'     => ['text'=>lang('pb_inv_age_61', $this->moduleID)],
+            'Age91'     => ['text'=>lang('pb_inv_age_91', $this->moduleID)],
+            'Age121'    => ['text'=>lang('pb_inv_age_121', $this->moduleID)],
+            'age_00'    => ['text'=>lang('pb_cnt_age_00', $this->moduleID)],
+            'age_30'    => ['text'=>lang('pb_cnt_age_30', $this->moduleID)],
+            'age_60'    => ['text'=>lang('pb_cnt_age_60', $this->moduleID)],
+            'age_90'    => ['text'=>lang('pb_cnt_age_90', $this->moduleID)],
+            'age_120'   => ['text'=>lang('pb_cnt_age_120', $this->moduleID)],
+            'age_61'    => ['text'=>lang('pb_cnt_age_61', $this->moduleID)],
+            'age_91'    => ['text'=>lang('pb_cnt_age_91', $this->moduleID)],
+            'age_121'   => ['text'=>lang('pb_cnt_age_121', $this->moduleID)],
             'begBal'    => ['text'=>lang('beginning_balance')],
             'endBal'    => ['text'=>lang('ending_balance')],
             'subTotal'  => ['text'=>lang('subtotal')],
             'invBalance'=> ['text'=>lang('balance')],
             'invCOGS'   => ['text'=>lang('inventory_cogs')],
             'invRefNum' => ['text'=>lang('invoice_num_2')],
-            'invUnit'   => ['text'=>$this->lang['pb_inv_unit']],
-            'itmTaxAmt' => ['text'=>$this->lang['pb_line_item_tax']],
+            'invUnit'   => ['text'=>lang('pb_inv_unit', $this->moduleID)],
+            'itmTaxAmt' => ['text'=>lang('pb_line_item_tax', $this->moduleID)],
             'orderCOGS' => ['text'=>lang('pb_order_cogs')],
             'pmtDate'   => ['text'=>lang('payment_due_date')],
             'pmtDisc'   => ['text'=>lang('payment_discount')],
@@ -138,26 +136,26 @@ class phreebooksAdmin {
             'ship_bal'  => ['text'=>lang('shipped_balance')],
             'shipBalVal'=> ['text'=>lang('shipped_balance_value')],
             'ship_prior'=> ['text'=>lang('shipped_prior')],
-            'taxJrnl'   => ['text'=>$this->lang['pb_tax_by_journal']],
+            'taxJrnl'   => ['text'=>lang('pb_tax_by_journal', $this->moduleID)],
             'taxRate'   => ['text'=>lang('tax_rates_tax_rate')." (taxID)"],
-            'ttlJrnl'   => ['text'=>$this->lang['pb_total_by_journal']],
-            'soStatus'  => ['text'=>$this->lang['pb_so_status']],
+            'ttlJrnl'   => ['text'=>lang('pb_total_by_journal', $this->moduleID)],
+            'soStatus'  => ['text'=>lang('pb_so_status', $this->moduleID)],
             'isCur'     => ['text'=>lang('gl_acct_type_30')],
-            'isYtd'     => ['text'=>$this->lang['pb_is_ytd']],
+            'isYtd'     => ['text'=>lang('pb_is_ytd', $this->moduleID)],
             'isBdgt'    => ['text'=>lang('budget')],
-            'isBytd'    => ['text'=>$this->lang['pb_is_budget_ytd']],
-            'isLcur'    => ['text'=>$this->lang['ly_actual']],
-            'isLytd'    => ['text'=>$this->lang['pb_is_last_ytd']],
-            'isLBgt'    => ['text'=>$this->lang['ly_budget']],
-            'isLBtd'    => ['text'=>$this->lang['pb_is_last_bdgt_ytd']]];
-        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
+            'isBytd'    => ['text'=>lang('pb_is_budget_ytd', $this->moduleID)],
+            'isLcur'    => ['text'=>lang('ly_actual', $this->moduleID)],
+            'isLytd'    => ['text'=>lang('pb_is_last_ytd', $this->moduleID)],
+            'isLBgt'    => ['text'=>lang('ly_budget', $this->moduleID)],
+            'isLBtd'    => ['text'=>lang('pb_is_last_bdgt_ytd', $this->moduleID)]];
+        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, lang('title', $this->moduleID));
         $this->phreeformFormatting = [
             'j_desc'    => ['text'=>lang('journal_id'),    'module'=>'bizuno','function'=>'viewFormat'],
             'glType'    => ['text'=>lang('gl_acct_type'),  'module'=>'bizuno','function'=>'viewFormat'],
             'glTitle'   => ['text'=>lang('gl_acct_title'), 'module'=>'bizuno','function'=>'viewFormat'],
             'glActive'  => ['text'=>lang('gl_acct_active'),'module'=>'bizuno','function'=>'viewFormat']];
-        setProcessingDefaults($this->phreeformFormatting, $this->moduleID, $this->lang['title']);
-        $this->notes = [$this->lang['note_phreebooks_install_1'],$this->lang['note_phreebooks_install_2'],$this->lang['note_phreebooks_install_3']];
+        setProcessingDefaults($this->phreeformFormatting, $this->moduleID, lang('title', $this->moduleID));
+        $this->notes = [lang('note_phreebooks_install_1', $this->moduleID),lang('note_phreebooks_install_2', $this->moduleID),lang('note_phreebooks_install_3', $this->moduleID)];
     }
 
     /**
@@ -228,26 +226,26 @@ class phreebooksAdmin {
         $metaStat= dbMetaGet('%', 'options_return_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
         $status = [
-             '1' =>$this->lang['rtn_status_1'],  '2'=>$this->lang['rtn_status_2'],  '3'=>$this->lang['rtn_status_3'],
-             '4' =>$this->lang['rtn_status_4'],  '5'=>$this->lang['rtn_status_5'],  '6'=>$this->lang['rtn_status_6'],
-             '7' =>$this->lang['rtn_status_7'],  '8'=>$this->lang['rtn_status_8'],  '9'=>$this->lang['rtn_status_9'],
-            '10'=>$this->lang['rtn_status_10'],'90'=>$this->lang['rtn_status_90'],'99'=>$this->lang['rtn_status_99']];
+             '1' =>lang('rtn_status_1', $this->moduleID),  '2'=>lang('rtn_status_2', $this->moduleID),  '3'=>lang('rtn_status_3', $this->moduleID),
+             '4' =>lang('rtn_status_4', $this->moduleID),  '5'=>lang('rtn_status_5', $this->moduleID),  '6'=>lang('rtn_status_6', $this->moduleID),
+             '7' =>lang('rtn_status_7', $this->moduleID),  '8'=>lang('rtn_status_8', $this->moduleID),  '9'=>lang('rtn_status_9', $this->moduleID),
+            '10'=>lang('rtn_status_10', $this->moduleID),'90'=>lang('rtn_status_90', $this->moduleID),'99'=>lang('rtn_status_99', $this->moduleID)];
         asort($status);
         dbMetaSet($idxStat, 'options_return_status', $status);
         $metaCode= dbMetaGet('%', 'options_return_codes');
         $idxCode = metaIdxClean($metaCode); // remove the indexes
         $codes  = [
-            '1' =>$this->lang['rtn_code_1'],    '2'=>$this->lang['rtn_code_2'],    '3'=>$this->lang['rtn_code_3'],
-            '4' =>$this->lang['rtn_code_4'],    '5'=>$this->lang['rtn_code_5'],    '6'=>$this->lang['rtn_code_6'],
-            '7' =>$this->lang['rtn_code_7'],   '80'=>$this->lang['rtn_code_80'],  '99'=>$this->lang['rtn_code_99']];
+            '1' =>lang('rtn_code_1', $this->moduleID),    '2'=>lang('rtn_code_2', $this->moduleID),    '3'=>lang('rtn_code_3', $this->moduleID),
+            '4' =>lang('rtn_code_4', $this->moduleID),    '5'=>lang('rtn_code_5', $this->moduleID),    '6'=>lang('rtn_code_6', $this->moduleID),
+            '7' =>lang('rtn_code_7', $this->moduleID),   '80'=>lang('rtn_code_80', $this->moduleID),  '99'=>lang('rtn_code_99', $this->moduleID)];
         asort($codes);
         dbMetaSet($idxCode, 'options_return_codes', $codes);
         $metaAct= dbMetaGet('%', 'options_qa_status');
         $idxAct = metaIdxClean($metaAct); // remove the indexes
         $actions= [
-             '1'=>$this->lang['rtn_action_1'], '2'=>$this->lang['rtn_action_2'], '3'=>$this->lang['rtn_action_3'],
-             '4'=>$this->lang['rtn_action_4'], '5'=>$this->lang['rtn_action_5'], '6'=>$this->lang['rtn_action_6'],
-            '99'=>$this->lang['rtn_action_99']];
+             '1'=>lang('rtn_action_1', $this->moduleID), '2'=>lang('rtn_action_2', $this->moduleID), '3'=>lang('rtn_action_3', $this->moduleID),
+             '4'=>lang('rtn_action_4', $this->moduleID), '5'=>lang('rtn_action_5', $this->moduleID), '6'=>lang('rtn_action_6', $this->moduleID),
+            '99'=>lang('rtn_action_99', $this->moduleID)];
         asort($status);
         dbMetaSet($idxAct, 'options_qa_status', $actions);
         // Put them in the cache for runtime access
@@ -269,17 +267,17 @@ class phreebooksAdmin {
         $repost  = $this->getViewRepost();
         $period  = getModuleCache('phreebooks', 'fy', 'period') - 1;
         $fields  = [
-            'glTestDesc'   => ['order'=>10,'html'=>$this->lang['pbtools_gl_test_desc'],'attr'=>['type'=>'raw']],
+            'glTestDesc'   => ['order'=>10,'html'=>lang('pbtools_gl_test_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'btnRepairGL'  => ['order'=>20,'attr'=>['type'=>'button','value'=>lang('start')],'events'=>['onClick'=>"jsonAction('phreebooks/tools/glRepair');"]],
-            'pruneCogsDesc'=> ['order'=>10,'html'=>$this->lang['pb_prune_cogs_desc'],'attr'=>['type'=>'raw']],
+            'pruneCogsDesc'=> ['order'=>10,'html'=>lang('pb_prune_cogs_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'btnPruneCogs' => ['order'=>20,'attr'=>['type'=>'button', 'value'=>lang('start')],'events'=>['onClick'=>"jsonAction('phreebooks/tools/pruneCogs');"]],
-            'cleanAtchDesc'=> ['order'=>10,'html'=>$this->lang['pb_attach_clean_desc'],'attr'=>['type'=>'raw']],
+            'cleanAtchDesc'=> ['order'=>10,'html'=>lang('pb_attach_clean_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'btnAtchCln'   => ['order'=>80,'attr'=> ['type'=>'button','value'=>lang('start')],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['pb_attach_clean_confirm']."')) { getPurgeDates(); }"]],
-            'purgeGlDesc'  => ['order'=>10,'html'=>$this->lang['msg_gl_db_purge_confirm'],'attr'=>['type'=>'raw']],
+                'events' => ['onClick'=>"if (confirm('".lang('pb_attach_clean_confirm', $this->moduleID)."')) { getPurgeDates(); }"]],
+            'purgeGlDesc'  => ['order'=>10,'html'=>lang('msg_gl_db_purge_confirm', $this->moduleID),'attr'=>['type'=>'raw']],
             'purge_db'     => ['order'=>20,'styles'=>['text-align'=>'right'],'attr'=>['size'=>7]],
-            'btn_purge'    => ['order'=>30,'attr'=>['type'=>'button', 'value'=>$this->lang['phreebooks_purge_db_journal']],
-                'events' => ['onClick'=>"if (confirm('".$this->lang['msg_gl_db_purge_confirm']."')) jsonAction('phreebooks/tools/glPurge', 0, jqBiz('#purge_db').val());"]],
+            'btn_purge'    => ['order'=>30,'attr'=>['type'=>'button', 'value'=>lang('phreebooks_purge_db_journal', $this->moduleID)],
+                'events' => ['onClick'=>"if (confirm('".lang('msg_gl_db_purge_confirm', $this->moduleID)."')) jsonAction('phreebooks/tools/glPurge', 0, jqBiz('#purge_db').val());"]],
             'taxMonth'     => ['order'=>20,'label'=>lang('period'),'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$period]],
             'btnTaxSave'   => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#frmTaxCalc').submit();"]]];
         $data    = [
@@ -289,7 +287,7 @@ class phreebooksAdmin {
                 'tabNexus' => ['order'=>40,'label'=>lang('nexus'),          'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/restfulTax/manager'"]],
                 'tabTaxc'  => ['order'=>50,'label'=>lang('sales_tax'),      'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=c'"]],
                 'tabTaxv'  => ['order'=>55,'label'=>lang('purchase_tax'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tax/manager&type=v'"]],
-                'tabEdi'   => ['order'=>70,'label'=>$this->lang['tab_title'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
+                'tabEdi'   => ['order'=>70,'label'=>lang('tab_title', $this->moduleID),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminEdi/manager'"]],
                 'tabFY'    => ['order'=>80,'label'=>lang('fiscal_calendar'),'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=phreebooks/admin/managerFY'"]],
                 'tabTools' => ['order'=>90,'label'=>lang('tools'),'classes'=>['areaView'],'type'=>'divs','divs'=>[
@@ -302,20 +300,20 @@ class phreebooksAdmin {
                     'ediMan'   => ['order'=>70,'type'=>'panel','classes'=>['block33'],'key'=>'ediMan']]],
                     'purgeGL'  => ['order'=>90,'type'=>'panel','hidden' =>$security>4?false:true,'classes'=>['block33'],'key'=>'purgeGL']]]],
             'panels'  => [
-                'repostGL' => ['label'=>$this->lang['phreebooks_repost_title'],'type'=>'html',  'html'=>$repost],
-                'testGL'   => ['label'=>$this->lang['title_gl_test'],          'type'=>'fields','keys'=>['glTestDesc','btnRepairGL']],
-                'pruneCOGS'=> ['label'=>$this->lang['pb_prune_cogs_title'],    'type'=>'fields','keys'=>['pruneCogsDesc','btnPruneCogs']],
-                'cleanAtch'=> ['label'=>$this->lang['pb_attach_clean_title'],  'type'=>'fields','keys'=>['cleanAtchDesc','dateAtchCln','btnAtchCln']],
-                'ediGet'   => ['title'=>$this->lang['edi_get_title'],'type'=>'divs','divs'=>[
-                    'desc'   => ['order'=>10,'type'=>'html','html'=>$this->lang['edi_get_desc']],
+                'repostGL' => ['label'=>lang('phreebooks_repost_title', $this->moduleID),'type'=>'html',  'html'=>$repost],
+                'testGL'   => ['label'=>lang('title_gl_test', $this->moduleID),          'type'=>'fields','keys'=>['glTestDesc','btnRepairGL']],
+                'pruneCOGS'=> ['label'=>lang('pb_prune_cogs_title', $this->moduleID),    'type'=>'fields','keys'=>['pruneCogsDesc','btnPruneCogs']],
+                'cleanAtch'=> ['label'=>lang('pb_attach_clean_title', $this->moduleID),  'type'=>'fields','keys'=>['cleanAtchDesc','dateAtchCln','btnAtchCln']],
+                'ediGet'   => ['title'=>lang('edi_get_title', $this->moduleID),'type'=>'divs','divs'=>[
+                    'desc'   => ['order'=>10,'type'=>'html','html'=>lang('edi_get_desc', $this->moduleID)],
                     'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediGet&opt=man');"]])."</p>"]]],
-                'ediMan'   => ['title'=>$this->lang['edi_man_title'],'type'=>'divs','divs'=>[
-                    'desc'   => ['order'=>10,'type'=>'html','html'=>$this->lang['edi_man_desc']],
+                'ediMan'   => ['title'=>lang('edi_man_title', $this->moduleID),'type'=>'divs','divs'=>[
+                    'desc'   => ['order'=>10,'type'=>'html','html'=>lang('edi_man_desc', $this->moduleID)],
                     'formBOF'=> ['order'=>15,'type'=>'form','key' =>'frmEdiMan'],
                     'ediRID' => ['order'=>20,'type'=>'html','html'=>"<p>".html5('rID', ['attr'=>['type'=>'text']])."</p>"],
                     'btnGo'  => ['order'=>30,'type'=>'html','html'=>"<p>".html5('', ['attr'=>['type'=>'button','value'=>lang('go')],'events'=>['onClick'=>"jqBiz('#frmEdiMan').submit();"]])."</p>"]],
                     'formEOF'=> ['order'=>85,'type'=>'html','html'=>'</form>']],
-                'purgeGL'  => ['label'=>$this->lang['msg_gl_db_purge'],        'type'=>'fields','keys'=>['purgeGlDesc','purge_db','btn_purge']],
+                'purgeGL'  => ['label'=>lang('msg_gl_db_purge', $this->moduleID),        'type'=>'fields','keys'=>['purgeGlDesc','purge_db','btn_purge']],
                 'taxCalc'  => ['title'=>lang('tax_collected'),'type'=>'divs','divs'=>[
                     'desc'   => ['order'=>10,'type'=>'html',    'html'=>"<p>".lang('tax_calc_desc')."</p>"],
                     'formBOF'=> ['order'=>15,'type'=>'form',    'key' =>'frmTaxCalc'],
@@ -361,7 +359,7 @@ function getPurgeDates() {
         $btn_repost  = ['icon'=>'save','size'=>'large','events'=>['onClick'=>"divSubmit('phreebooks/tools/glRepostBulk', 'glRepost');"]];
 
         $output  = '<div id="glRepost">';
-        $output .= " <p>".$this->lang['msg_gl_repost_journals_confirm']."</p>\n";
+        $output .= " <p>".lang('msg_gl_repost_journals_confirm', $this->moduleID)."</p>\n";
         $output .= ' <table style="border-style:none;margin-left:auto;margin-right:auto;">'."\n";
         $output .= "  <tbody>\n";
         $output .= '   <tr class="panel-header">'."\n";
@@ -430,9 +428,9 @@ function getPurgeDates() {
         $maxFY  = $dbMaxFY['fiscal_year'] > 0 ? $dbMaxFY['fiscal_year'] : 0;
         $html   = $this->getViewFY();
         $fields = [
-            'btnNewFy'  => ['order'=>10,'attr'=>['type'=>'button','value' => $this->lang['phreebooks_new_fiscal_year']],
-                'events' => ['onClick'=>"if (confirm('".sprintf($this->lang['msg_gl_fiscal_year_confirm'], $maxFY + 1)."')) { jqBiz('body').addClass('loading'); jsonAction('phreebooks/tools/fyAdd'); }"]],
-            'btnCloseFy'=> ['order'=>20,'attr'=>['type'=>'button','value'=>$this->lang['del_fiscal_year_btn']],'events'=>['onClick'=>"jsonAction('phreebooks/tools/fyCloseValidate');"]],
+            'btnNewFy'  => ['order'=>10,'attr'=>['type'=>'button','value' => lang('phreebooks_new_fiscal_year', $this->moduleID)],
+                'events' => ['onClick'=>"if (confirm('".sprintf(lang('msg_gl_fiscal_year_confirm', $this->moduleID), $maxFY + 1)."')) { jqBiz('body').addClass('loading'); jsonAction('phreebooks/tools/fyAdd'); }"]],
+            'btnCloseFy'=> ['order'=>20,'attr'=>['type'=>'button','value'=>lang('del_fiscal_year_btn', $this->moduleID)],'events'=>['onClick'=>"jsonAction('phreebooks/tools/fyCloseValidate');"]],
         ];
         $data = ['type'=>'divHTML',
             'divs'  => ['divFY'=>['order'=>50,'type'=>'divs','divs'=>[
@@ -462,7 +460,7 @@ function getPurgeDates() {
         $dbPer     = dbGetMulti(BIZUNO_DB_PREFIX."journal_periods", "fiscal_year=$fy", "period");
         $periods   = [];
         foreach ($dbPer as $row) { $periods[$row['period']] = ['start' => $row['start_date'], 'end' => $row['end_date']]; }
-        $output    = "<p>".$this->lang['msg_gl_fiscal_year_edit'].'</p>
+        $output    = "<p>".lang('msg_gl_fiscal_year_edit', $this->moduleID).'</p>
             <div id="fyCal" style="text-align:center">'.html5('fy', $fiscalY).html5('btnSaveFy', $btnSaveFy).'
             <table style="border-style:none;margin-left:auto;margin-right:auto;">
                 <thead class="panel-header">
@@ -569,15 +567,15 @@ function getPurgeDates() {
         $journals = [0, 2, 3, 4, 6, 7, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
         foreach ($journals as $jID) { $lang['TITLE_J'.$jID] = lang("journal_id_$jID"); }
         return array_merge($lang, [
-            'PB_INVOICE_RQD'     => $this->lang['msg_invoice_rqd'],
-            'PB_INVOICE_WAITING' => $this->lang['msg_inv_waiting'],
-            'PB_NEG_STOCK'       => $this->lang['msg_negative_stock'],
-            'PB_RECUR_EDIT'      => $this->lang['msg_recur_edit'],
-            'PB_SAVE_AS_CLOSED'  => $this->lang['msg_save_as_closed'],
-            'PB_SAVE_AS_LINKED'  => $this->lang['msg_save_as_linked'],
-            'PB_GL_ASSET_INC'    => $this->lang['bal_increase'],
-            'PB_GL_ASSET_DEC'    => $this->lang['bal_decrease'],
-            'PB_DBT_CRT_NOT_ZERO'=> $this->lang['err_debits_credits_not_zero']]);
+            'PB_INVOICE_RQD'     => lang('msg_invoice_rqd', $this->moduleID),
+            'PB_INVOICE_WAITING' => lang('msg_inv_waiting', $this->moduleID),
+            'PB_NEG_STOCK'       => lang('msg_negative_stock', $this->moduleID),
+            'PB_RECUR_EDIT'      => lang('msg_recur_edit', $this->moduleID),
+            'PB_SAVE_AS_CLOSED'  => lang('msg_save_as_closed', $this->moduleID),
+            'PB_SAVE_AS_LINKED'  => lang('msg_save_as_linked', $this->moduleID),
+            'PB_GL_ASSET_INC'    => lang('bal_increase', $this->moduleID),
+            'PB_GL_ASSET_DEC'    => lang('bal_decrease', $this->moduleID),
+            'PB_DBT_CRT_NOT_ZERO'=> lang('err_debits_credits_not_zero', $this->moduleID)]);
     }
 
     /**
@@ -589,11 +587,11 @@ function getPurgeDates() {
     {
         $rID = clean('rID', 'integer', 'get');
         $role= dbMetaGet($rID, 'bizuno_role');
-        $layout['fields']['group_sales'] = ['order'=>20,'label'=>$this->lang['pb_role_cust_users'],'tip'=>$this->lang['msg_pb_admin_roles'],
+        $layout['fields']['group_sales'] = ['order'=>20,'label'=>lang('pb_role_cust_users', $this->moduleID),'tip'=>lang('msg_pb_admin_roles', $this->moduleID),
             'attr'=>['type'=>'checkbox','checked'=>!empty($role['groups']['sales']) ? true : false]];
-        $layout['fields']['group_purch'] = ['order'=>20,'label'=>$this->lang['pb_role_vend_users'], 'tip'=>$this->lang['msg_pb_admin_roles'],
+        $layout['fields']['group_purch'] = ['order'=>20,'label'=>lang('pb_role_vend_users', $this->moduleID), 'tip'=>lang('msg_pb_admin_roles', $this->moduleID),
             'attr'=>['type'=>'checkbox','checked'=>!empty($role['groups']['purch']) ? true : false]];
-        $layout['fields']['group_csr'] = ['order'=>50,'label'=>$this->lang['role_rtn'], 'tip'=>$this->lang['roles_title'],
+        $layout['fields']['group_csr'] = ['order'=>50,'label'=>lang('role_rtn', $this->moduleID), 'tip'=>lang('roles_title', $this->moduleID),
             'attr'=>['type'=>'checkbox','checked'=>!empty($role['groups']['csr'])?true:false]];
         $layout['tabs']['tabRoles']['divs']['customers']['divs']['props']= ['order'=>20,'type'=>'panel','classes'=>['block50'],'key'=>'custSettings'];
         $layout['tabs']['tabRoles']['divs']['vendors']['divs']['props']  = ['order'=>20,'type'=>'panel','classes'=>['block50'],'key'=>'vendSettings'];

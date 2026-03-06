@@ -36,7 +36,6 @@ class phreebooksRestfulTax
     protected $metaPrefix= 'nexus';
     private   $server    = 'https://www.phreesoft.com';
 //  private   $skipCity  = true;
-    public    $lang;
     private   $nexusMeta;
     private   $states;
     public    $settings;
@@ -45,7 +44,6 @@ class phreebooksRestfulTax
 
     function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->nexusMeta= getMetaCommon($this->metaPrefix);
         if (!isset($this->nexusMeta['states'])) { $this->nexusMeta = ['states'=>$this->nexusMeta]; } // patch for older versions
         msgDebug("\nRead nexus meta from common table = ".print_r($this->nexusMeta, true));

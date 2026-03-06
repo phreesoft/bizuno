@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-16
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/history.php
  */
 
@@ -30,7 +30,6 @@ namespace bizuno;
 class inventoryHistory
 {
     public $moduleID = 'inventory';
-    public $lang;
     public $percent_diff  = 0.10; // the percentage differnece from current value to notify for adjustment
     public $months_of_data= 12;   // valid values are 1, 3, 6, or 12
     public $med_avg_diff  = 0.25; // the maximum percentage difference from the median and average, for large swings
@@ -163,8 +162,8 @@ class inventoryHistory
                     'dgJ06' => ['order'=>50,'type'=>'panel','key'=>'dgJ06', 'classes'=>['block33']],
                     'dgJ12' => ['order'=>60,'type'=>'panel','key'=>'dgJ12', 'classes'=>['block33']]]]],
             'panels'  => [
-                'annual'=> ['label'=>$this->lang['annual_usage'], 'type'=>'datagrid','key' =>'annual'],
-                'usage' => ['label'=>$this->lang['average_usage'],'type'=>'fields',  'keys'=>['usage']],
+                'annual'=> ['label'=>lang('annual_usage', $this->moduleID), 'type'=>'datagrid','key' =>'annual'],
+                'usage' => ['label'=>lang('average_usage', $this->moduleID),'type'=>'fields',  'keys'=>['usage']],
                 'dates' => ['label'=>lang('details'),             'type'=>'fields',  'keys'=>['create','update','journal']],
                 'dgJ06' => ['type'=>'datagrid','key'=>'dgJ06'],
                 'dgJ12' => ['type'=>'datagrid','key'=>'dgJ12']],
@@ -182,10 +181,10 @@ class inventoryHistory
     {
         $usage  = '<div>
 <table style="width:100%"><thead class="panel-header"><tr><th style="width:50%">&nbsp;</th><th style="width:25%">'.lang('journal_id_6').'</th><th style="width:25%">'.lang('journal_id_12')."</th></tr></thead><tbody>
-    <tr><td>".$this->lang['01month'].'</td><td style="text-align:center;">'.$history['01purch'].'</td><td style="text-align:center;">'.$history['01sales']."</td></tr>
-    <tr><td>".$this->lang['03month'].'</td><td style="text-align:center;">'.$history['03purch'].'</td><td style="text-align:center;">'.$history['03sales']."</td></tr>
-    <tr><td>".$this->lang['06month'].'</td><td style="text-align:center;">'.$history['06purch'].'</td><td style="text-align:center;">'.$history['06sales']."</td></tr>
-    <tr><td>".$this->lang['12month'].'</td><td style="text-align:center;">'.$history['12purch'].'</td><td style="text-align:center;">'.$history['12sales'].'</td></tr>
+    <tr><td>".lang('01month', $this->moduleID).'</td><td style="text-align:center;">'.$history['01purch'].'</td><td style="text-align:center;">'.$history['01sales']."</td></tr>
+    <tr><td>".lang('03month', $this->moduleID).'</td><td style="text-align:center;">'.$history['03purch'].'</td><td style="text-align:center;">'.$history['03sales']."</td></tr>
+    <tr><td>".lang('06month', $this->moduleID).'</td><td style="text-align:center;">'.$history['06purch'].'</td><td style="text-align:center;">'.$history['06sales']."</td></tr>
+    <tr><td>".lang('12month', $this->moduleID).'</td><td style="text-align:center;">'.$history['12purch'].'</td><td style="text-align:center;">'.$history['12sales'].'</td></tr>
 </tbody></table>';
         if (!empty($history['id'])) { $usage .= '<br />'.lang('id').': '.$history['id']."\n"; }
         $usage  .= '</div>';
@@ -353,10 +352,10 @@ class inventoryHistory
             $low_avg       = $average_sales  * (1 - $this->med_avg_diff);
             msgDebug("\nHigh average = $high_avg and low average = $low_avg");
             if ($new_min_stock > $high_band || $new_min_stock < $low_band) {
-                if ($verbose) { msgAdd(sprintf($this->lang['msg_inv_qty_min'], $new_min_stock), 'caution'); }
+                if ($verbose) { msgAdd(sprintf(lang('msg_inv_qty_min', $this->moduleID), $new_min_stock), 'caution'); }
             }
             if ($median_sales > $high_avg || $median_sales < $low_avg) {
-                if ($verbose) { msgAdd(sprintf($this->lang['msg_inv_median'], $median_sales, $average_sales), 'caution'); }
+                if ($verbose) { msgAdd(sprintf(lang('msg_inv_median', $this->moduleID), $median_sales, $average_sales), 'caution'); }
             }
         }
         return $history;

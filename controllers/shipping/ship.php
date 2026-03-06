@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-20
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -68,7 +68,7 @@ class shippingShip extends shippingCommon
         $data  = ['type'=>'divHTML',
             'toolbars' => ['tbShipping'=>['icons'=>[
                 'print' => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmLabel').submit();"]],
-                'new'   => ['order'=>40,'events'=>['onClick'=>"accordionEdit('accShipping', 'dgShipping', 'divLabel', '{$this->lang['label_generator']}', '$this->moduleID/$this->pageID/labelMain', 0);"]],
+                'new'   => ['order'=>40,'events'=>['onClick'=>"accordionEdit('accShipping', 'dgShipping', 'divLabel', '".lang('label_generator', $this->moduleID)."', '$this->moduleID/$this->pageID/labelMain', 0);"]],
                 'rate'  => ['order'=>70,'label'=>lang('rate_quote'),'icon'=>'quote','events'=>['onClick'=>"pkgEstimate();"]]]]],
             'divs' => [
                 'toolbar' => ['order'=>10,'type'=>'toolbar', 'key'=>'tbShipping'],
@@ -81,7 +81,7 @@ class shippingShip extends shippingCommon
                     'hazmat'  => ['order'=>50,'type'=>'panel','key'=>'hazmat','styles'=>['display'=>'none'],'classes'=>['block33'],'attr'=>['id'=>'divHazmat']]]],
                 'formEOF' => ['order'=>90,'type'=>'html',     'html'=>"</form>"]],
             'panels' => [
-                'pnlPkg'  => ['label'=>$this->lang['ship_pkg_detail'],'type'=>'datagrid','key'   =>'dgPkg','attr'=>['id'=>'pnlPkg']],
+                'pnlPkg'  => ['label'=>lang('ship_pkg_detail', $this->moduleID),'type'=>'datagrid','key'   =>'dgPkg','attr'=>['id'=>'pnlPkg']],
                 'details' => ['label'=>lang('details'),               'type'=>'fields',  'keys'  =>$keys['details']],
                 'shipTo'  => ['label'=>lang('ship_to'),'type'=>'address', 'keys'=>$keys['address_d'], 'attr'=>['id'=>'address'],
                     'settings'=>['suffix'=>'','search'=>false,'clear'=>false,'validate'=>true]],
@@ -103,7 +103,7 @@ class shippingShip extends shippingCommon
         }
         if (!empty($keys['ltl'])) {
             $data['divs']['general']['divs']['ltlInfo']= ['order'=>80,       'type'=>'panel', 'key' =>'ltlInfo','classes'=>['block33']];
-            $data['panels']['ltlInfo']= ['label'=>$this->lang['ltl_details'],'type'=>'fields','keys'=>$keys['ltl']];
+            $data['panels']['ltlInfo']= ['label'=>lang('ltl_details', $this->moduleID),'type'=>'fields','keys'=>$keys['ltl']];
         }
         $layout= array_replace_recursive($layout, $data);
     }
@@ -119,15 +119,15 @@ class shippingShip extends shippingCommon
         msgDebug("\nEntering shipmentFields."); // with shipper = ".print_r($shipper, true));
         $shipMethods = $shipPkgs = $shipPickup = $shipConfirms = $shipCods = $shipCurrencies = $shipReturns = $LTLClasses = $ShipBillTo = [];
         $method      = isset($data['method_code']) ? explode(':', $data['method_code']) : [$shipper->code,'GND'];
-        $dimUOMs     = [['id'=>'IN', 'text'=>$this->lang['dim_in']],    ['id'=>'CM', 'text'=>$this->lang['dim_cm']]];
-        $weightUOMs  = [['id'=>'LBS','text'=>$this->lang['weight_lbs']],['id'=>'KGS','text'=>$this->lang['weight_kgs']]];
+        $dimUOMs     = [['id'=>'IN', 'text'=>lang('dim_in', $this->moduleID)],    ['id'=>'CM', 'text'=>lang('dim_cm', $this->moduleID)]];
+        $weightUOMs  = [['id'=>'LBS','text'=>lang('weight_lbs', $this->moduleID)],['id'=>'KGS','text'=>lang('weight_kgs', $this->moduleID)]];
         $currencyUOMs= [['id'=>'USD','text'=>'USD']];
         $ltlDesc     = !empty($shipper->settings['ltl_desc']) ? $shipper->settings['ltl_desc'] : '';
         $ltlClass    = !empty($shipper->settings['ltl_class'])? $shipper->settings['ltl_class']: $this->ltlClass;
         $shippers    = viewDropdown($this->myCarriers, 'id', 'title', true);
         $shipMethod  = '';
         foreach ($shipper->options['rateCodes'] as $shortCode) {
-            $shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : (!empty($this->lang[$shortCode]) ? $this->lang[$shortCode] : lang('none'))];
+            $shipMethods[] = ['id'=>$shortCode, 'text'=>!empty($shipper->lang[$shortCode]) ? $shipper->lang[$shortCode] : (!empty(lang($shortCode, $this->moduleID)) ? lang($shortCode, $this->moduleID) : lang('none'))];
             if ($shortCode == $method[1]) { $shipMethod = $shortCode; }
         }
         $residential = false;
@@ -160,47 +160,47 @@ class shippingShip extends shippingCommon
                 'options' => ['onChange'=>"function (newVal, oldVal) { shipGetMethods(newVal); }"]],
             'ship_method'  => ['order'=>10,'label'=>lang('method'),'values'=>$shipMethods,'attr'=> ['type'=>'select','value'=>$shipMethod]],
             'ship_bill_to' => ['order'=>15,'label'=>lang('ship_bill_to'),        'values'=>viewKeyDropdown($shipper->options['PaymentMap']), 'attr'=>['type'=>'select', 'value'=>$billType]],
-            'ship_bill_act'=> ['order'=>20,'label'=>$this->lang['bill_acct_num'],'attr'=> ['value'=>$billAcct]],
-            'ship_ref_1'   => ['order'=>25,'label'=>$this->lang['reference1'],   'attr'=>['value'=>isset($data['invoice_num']) ? $data['invoice_num'] : '']],
-            'ship_ref_2'   => ['order'=>30,'label'=>$this->lang['reference2'],   'attr'=>['value'=>isset($data['purch_order_id']) ? $data['purch_order_id'] : '']],
+            'ship_bill_act'=> ['order'=>20,'label'=>lang('bill_acct_num', $this->moduleID),'attr'=> ['value'=>$billAcct]],
+            'ship_ref_1'   => ['order'=>25,'label'=>lang('reference1', $this->moduleID),   'attr'=>['value'=>isset($data['invoice_num']) ? $data['invoice_num'] : '']],
+            'ship_ref_2'   => ['order'=>30,'label'=>lang('reference2', $this->moduleID),   'attr'=>['value'=>isset($data['purch_order_id']) ? $data['purch_order_id'] : '']],
             'ship_date'    => ['order'=>35,'label'=>lang('ship_date'),           'break'=>true,'attr'=> ['type'=>'date', 'value'=>isset($data['post_date']) ? $data['post_date'] : biz_date('Y-m-d')]],
-            'store_id_b'   => ['order'=>40,'label'=>$this->lang['billing_account'], 'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$data['store_id']]],
-            'store_id_p'   => ['order'=>45,'label'=>$this->lang['ship_pickup_from'],'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$data['store_id']]],
+            'store_id_b'   => ['order'=>40,'label'=>lang('billing_account', $this->moduleID), 'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$data['store_id']]],
+            'store_id_p'   => ['order'=>45,'label'=>lang('ship_pickup_from', $this->moduleID),'values'=>viewStores(),'attr'=>['type'=>'select','value'=>$data['store_id']]],
             // details
             'residential'  => ['order'=>10,'label'=>lang('residential_address'),'attr'=>['type'=>'checkbox','checked'=>$residential]],
-            'ship_handling'=> ['order'=>20,'label'=>$this->lang['ship_handling'],'break'=>true,'attr'=>['type'=>'checkbox']],
-            'ship_saturday'=> ['order'=>25,'label'=>$this->lang['ship_saturday'],'break'=>true,'attr'=>['type'=>'checkbox']],
-            'ship_return'  => ['order'=>30,'label'=>$this->lang['ship_return'],  'break'=>true,'attr'=>['type'=>'checkbox']],
-            'insurance'    => ['order'=>35,'label'=>$this->lang['inc_insurance'],'attr'=>['type'=>'checkbox','checked'=>false, 'size'=>8]],
-            'ship_cod'     => ['order'=>45,'label'=>$this->lang['ship_cod'],     'attr'=>['type'=>'checkbox', 'value'=>1]],
-            'ship_cod_val' => ['order'=>46,'label'=>$this->lang['ship_cod_val'], 'break'=>true,'options'=>['width'=>100],'styles'=>['text-align'=>'right'],'attr'=>['type'=>'currency', 'value'=>isset($data['total_amount']) ? $data['total_amount'] : 0]],
-            'ship_cod_cur' => ['order'=>47,'label'=>$this->lang['ship_cod_cur'], 'break'=>true,'values'=>$currencyUOMs, 'attr'=> ['type'=>'select', 'value'=>!empty($data['currency']) ? $data['currency'] : getDefaultCurrency()]],
-            'ship_cod_type'=> ['order'=>48,'label'=>$this->lang['ship_cod_type'],'break'=>true,'values'=>viewKeyDropdown($shipper->options['CODMap']),'attr'=>['type'=>'select','value'=>$shipper->ship_cod_type]],
-            'extra1'       => ['order'=>70,'label'=>$this->lang['extras'],'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
+            'ship_handling'=> ['order'=>20,'label'=>lang('ship_handling', $this->moduleID),'break'=>true,'attr'=>['type'=>'checkbox']],
+            'ship_saturday'=> ['order'=>25,'label'=>lang('ship_saturday', $this->moduleID),'break'=>true,'attr'=>['type'=>'checkbox']],
+            'ship_return'  => ['order'=>30,'label'=>lang('ship_return', $this->moduleID),  'break'=>true,'attr'=>['type'=>'checkbox']],
+            'insurance'    => ['order'=>35,'label'=>lang('inc_insurance', $this->moduleID),'attr'=>['type'=>'checkbox','checked'=>false, 'size'=>8]],
+            'ship_cod'     => ['order'=>45,'label'=>lang('ship_cod', $this->moduleID),     'attr'=>['type'=>'checkbox', 'value'=>1]],
+            'ship_cod_val' => ['order'=>46,'label'=>lang('ship_cod_val', $this->moduleID), 'break'=>true,'options'=>['width'=>100],'styles'=>['text-align'=>'right'],'attr'=>['type'=>'currency', 'value'=>isset($data['total_amount']) ? $data['total_amount'] : 0]],
+            'ship_cod_cur' => ['order'=>47,'label'=>lang('ship_cod_cur', $this->moduleID), 'break'=>true,'values'=>$currencyUOMs, 'attr'=> ['type'=>'select', 'value'=>!empty($data['currency']) ? $data['currency'] : getDefaultCurrency()]],
+            'ship_cod_type'=> ['order'=>48,'label'=>lang('ship_cod_type', $this->moduleID),'break'=>true,'values'=>viewKeyDropdown($shipper->options['CODMap']),'attr'=>['type'=>'select','value'=>$shipper->ship_cod_type]],
+            'extra1'       => ['order'=>70,'label'=>lang('extras', $this->moduleID),'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
             // Hazmat
-//          'hazmat'       => ['order'=>11,'label'=>$this->lang['hazardous'],    'break'=>true,'attr'=>['type'=>'selNoYes','checked'=>false]],
+//          'hazmat'       => ['order'=>11,'label'=>lang('hazardous'],    'break'=>true,'attr'=>['type'=>'selNoYes','checked'=>false]],
             // settings
-            'ship_pkg'     => ['order'=>10,'label'=>$this->lang['ship_pkg'],     'break'=>true,'values'=>viewKeyDropdown($shipper->options['PackageMap']),'attr'=>['type'=>'select', 'value'=>$shipper->ship_pkg]],
-            'ship_pickup'  => ['order'=>15,'label'=>$this->lang['ship_pickup'],  'break'=>true,'values'=>viewKeyDropdown($shipper->options['PickupMap']), 'attr'=>['type'=>'select', 'value'=>$shipper->ship_pickup]],
-            'weightUOM'    => ['order'=>20,'label'=>$this->lang['weight_uom'],   'break'=>true,'values'=>$weightUOMs,  'attr'=>['type'=>'select','value'=>$shipper->weightUOM]],
-            'dimUOM'       => ['order'=>25,'label'=>$this->lang['dim_uom'],      'break'=>true,'values'=>$dimUOMs,     'attr'=>['type'=>'select','value'=>$shipper->dimUOM]],
+            'ship_pkg'     => ['order'=>10,'label'=>lang('ship_pkg', $this->moduleID),     'break'=>true,'values'=>viewKeyDropdown($shipper->options['PackageMap']),'attr'=>['type'=>'select', 'value'=>$shipper->ship_pkg]],
+            'ship_pickup'  => ['order'=>15,'label'=>lang('ship_pickup', $this->moduleID),  'break'=>true,'values'=>viewKeyDropdown($shipper->options['PickupMap']), 'attr'=>['type'=>'select', 'value'=>$shipper->ship_pickup]],
+            'weightUOM'    => ['order'=>20,'label'=>lang('weight_uom', $this->moduleID),   'break'=>true,'values'=>$weightUOMs,  'attr'=>['type'=>'select','value'=>$shipper->weightUOM]],
+            'dimUOM'       => ['order'=>25,'label'=>lang('dim_uom', $this->moduleID),      'break'=>true,'values'=>$dimUOMs,     'attr'=>['type'=>'select','value'=>$shipper->dimUOM]],
             'currencyUOM'  => ['order'=>30,'label'=>lang('currency'),            'break'=>true,'values'=>$currencyUOMs,'attr'=>['type'=>'select','value'=>!empty($data['currency']) ? $data['currency'] : getDefaultCurrency()]],
             // notify
-            'ship_confirm' => ['order'=>10,'label'=>$this->lang['ship_confirm'], 'attr'=> ['type'=>'checkbox', 'checked'=>!empty($data['email_s'])?true:false]],
+            'ship_confirm' => ['order'=>10,'label'=>lang('ship_confirm', $this->moduleID), 'attr'=> ['type'=>'checkbox', 'checked'=>!empty($data['email_s'])?true:false]],
             'confirm_type' => ['order'=>20,'values'=>viewKeyDropdown($shipper->options['SignatureMap']),'attr'=> ['type'=>'select', 'value'=>$shipper->confirm_type]],
             // ltl
-            'ltl_desc'     => ['order'=>10,'label'=>$this->lang['ltl_desc'],     'attr'=> ['value'=>$ltlDesc]],
-            'ltl_class'    => ['order'=>20,'label'=>$this->lang['ltl_class'],    'values'=>viewKeyDropdown($shipper->options['LTLClasses']),'attr'=> ['type'=>'select', 'value'=>$ltlClass]],
+            'ltl_desc'     => ['order'=>10,'label'=>lang('ltl_desc', $this->moduleID),     'attr'=> ['value'=>$ltlDesc]],
+            'ltl_class'    => ['order'=>20,'label'=>lang('ltl_class', $this->moduleID),    'values'=>viewKeyDropdown($shipper->options['LTLClasses']),'attr'=> ['type'=>'select', 'value'=>$ltlClass]],
             // Rate fields
             'num_boxes'   => ['order'=>10,'label'=>lang('num_boxes'),'attr'=>['type'=>'integer','value'=>1,'size'=>5]],
-            'weight'      => ['order'=>20,'label'=>$this->lang['ship_weight'],'attr'=>['type'=>'float','value'=>1, 'size'=>10]],
-            'length'      => ['order'=>40,'label'=>$this->lang['dimensions'],'break'=>false,'attr' =>['type'=>'integer','value'=>8,'size'=>3]],
+            'weight'      => ['order'=>20,'label'=>lang('ship_weight', $this->moduleID),'attr'=>['type'=>'float','value'=>1, 'size'=>10]],
+            'length'      => ['order'=>40,'label'=>lang('dimensions', $this->moduleID),'break'=>false,'attr' =>['type'=>'integer','value'=>8,'size'=>3]],
             'txtWidth'    => ['order'=>49,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
             'width'       => ['order'=>50,'break'=>false,'attr'=>['type'=>'integer','value'=>6,'size'=>3]],
             'txtHeight'   => ['order'=>59,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
             'height'      => ['order'=>60,'attr'=>['type'=>'integer','value'=>4,'size'=>3]],
             'total_amount'=> ['order'=>40,'attr'=>['type'=>'hidden', 'value'=>0]],
-            'ins_amount'  => ['order'=>61,'label'=>$this->lang['amt_insurance'],'attr'=>['type'=>'currency','value'=>!empty($data['pkg']['Ins'])?$data['pkg']['Ins']:0]]];
+            'ins_amount'  => ['order'=>61,'label'=>lang('amt_insurance', $this->moduleID),'attr'=>['type'=>'currency','value'=>!empty($data['pkg']['Ins'])?$data['pkg']['Ins']:0]]];
         dbStructureFill($this->addrStruc, $data, '_s');
         return array_replace($fields, $this->addrStruc);
     }
@@ -404,7 +404,7 @@ function preSubmit() {
         msgLog(lang('ship')." - ".lang('reference').": {$value['ref_id']} ".lang('method')." ".viewProcess("$carrier:{$value['method']}", 'shipInfo')." ".lang('num_boxes').": ".sizeof($labelData));
         dbTransactionCommit();
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"
-            accordionEdit('accShipping', 'dgShipping', 'divLabel', '{$this->lang['label_generator']}', '$this->moduleID/ship/labelMain', 0);
+            accordionEdit('accShipping', 'dgShipping', 'divLabel', '{lang('label_generator']}', '$this->moduleID/ship/labelMain', 0);
             bizGridReload('dgShipping');
             jqBiz('#accShipping').accordion('select',0);
             jqBiz('#selInvoice').combogrid('clear');
@@ -545,7 +545,7 @@ function labelPDF(rID, path) {
         data: ''
     });
 }";
-        $data = ['type'=>'page', 'title'=>$this->lang['label_generator'],
+        $data = ['type'=>'page', 'title'=>lang('label_generator', $this->moduleID),
             'divs'    => [
                 'toolbar' => ['order'=>20,'type'=>'toolbar','key' =>'tbLabel'],
                 'divLabel'=> ['order'=>60,'type'=>'html',   'html'=>$html]],

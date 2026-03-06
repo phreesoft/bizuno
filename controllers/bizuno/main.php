@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -123,7 +123,7 @@ bizFocus('pwEncrypt');";
         $error  = false;
         $key    = clean('data', 'password', 'get');
         $encKey = getModuleCache('bizuno', 'encKey', false, false, '');
-        if (!$encKey) { return msgAdd($this->lang['err_encryption_not_set']); }
+        if (!$encKey) { return msgAdd(lang('err_encryption_not_set', $this->moduleID)); }
         if ($key && $encKey) {
             $stack = explode(':', $encKey);
             if (sizeof($stack) != 2) { $error = true; }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-03
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/budget.php
  */
 
@@ -33,7 +33,6 @@ class phreebooksBudget
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -74,17 +73,17 @@ class phreebooksBudget
         $adjVal    = ['options'=>['precision'=>1],'attr'=>['type'=>'float','value'=>'0']];
         $avgVal    = ['attr'=>['type'=>'checkbox','value'=>'1']];
         $btnSaveWiz= ['attr'=>['type'=>'button',  'value'=>lang('go')],'events'=>['onClick'=>"jqBiz('#frmWizard').submit();"]];
-        $btnNextFY = ['attr'=>['type'=>'button',  'value'=>$this->lang['phreebooks_new_fiscal_year']],
-            'events'=>  ['onClick'=>"if (confirm('".sprintf($this->lang['msg_gl_fiscal_year_confirm'], $maxFY)."')) jsonAction('phreebooks/tools/fyAdd');"]];
-        return "<p>".$this->lang['phreebooks_budget_wizard_desc']."</p>
-    <p>".$this->lang['budget_dest_fy']    .html5('destFY',    $destFY)
-        .$this->lang['budget_src_fy']     .html5('srcFY',     $srcFY)
-        .$this->lang['budget_using']      .html5('srcData',   $srcData)
-        .$this->lang['budget_adjust']     .html5('adjVal',    $adjVal)
+        $btnNextFY = ['attr'=>['type'=>'button',  'value'=>lang('phreebooks_new_fiscal_year', $this->moduleID)],
+            'events'=>  ['onClick'=>"if (confirm('".sprintf(lang('msg_gl_fiscal_year_confirm', $this->moduleID), $maxFY)."')) jsonAction('phreebooks/tools/fyAdd');"]];
+        return "<p>".lang('phreebooks_budget_wizard_desc', $this->moduleID)."</p>
+    <p>".lang('budget_dest_fy', $this->moduleID)    .html5('destFY',    $destFY)
+        .lang('budget_src_fy', $this->moduleID)     .html5('srcFY',     $srcFY)
+        .lang('budget_using', $this->moduleID)      .html5('srcData',   $srcData)
+        .lang('budget_adjust', $this->moduleID)     .html5('adjVal',    $adjVal)
         .lang('percent')."<br />"         .html5('avgVal',    $avgVal)
-        .$this->lang['budget_average']    .html5('btnSaveWiz',$btnSaveWiz)."</p>
+        .lang('budget_average', $this->moduleID)    .html5('btnSaveWiz',$btnSaveWiz)."</p>
     <hr>
-    <p>".$this->lang['build_next_fy_desc'].html5('btnNextFY', $btnNextFY)."</p>\n</form>\n</fieldset>\n";
+    <p>".lang('build_next_fy_desc', $this->moduleID).html5('btnNextFY', $btnNextFY)."</p>\n</form>\n</fieldset>\n";
     }
 
     private function getViewBudgetJS()
@@ -160,10 +159,10 @@ function budgetDistribute() {
                     'glAcct'=> ['order'=>20,'label'=>lang('gl_account'), 'values'=>dbGLDropDown(false, [34]),'attr'=>['type'=>'select', 'value'=>getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')]]]],
             'columns'=> [
                 'period'  => ['order'=>10, 'label'=>lang('period'), 'attr'=>  ['width'=>50,'resizable'=>true,'align'=>'center']],
-                'dates'   => ['order'=>20, 'label'=>$this->lang['fiscal_dates'], 'attr'=>['width'=>200,'resizable'=>true,'align'=>'center']],
-                'last_act'=> ['order'=>30, 'label'=>$this->lang['ly_actual'],'attr'=>['width'=>100,'resizable'=>true,'align'=>'right'],
+                'dates'   => ['order'=>20, 'label'=>lang('fiscal_dates', $this->moduleID), 'attr'=>['width'=>200,'resizable'=>true,'align'=>'center']],
+                'last_act'=> ['order'=>30, 'label'=>lang('ly_actual', $this->moduleID),'attr'=>['width'=>100,'resizable'=>true,'align'=>'right'],
                     'events'=> ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
-                'last_bud'=> ['order'=>40, 'label'=>$this->lang['ly_budget'],'attr'=>['width'=>120,'resizable'=>true,'align'=>'right'],
+                'last_bud'=> ['order'=>40, 'label'=>lang('ly_budget', $this->moduleID),'attr'=>['width'=>120,'resizable'=>true,'align'=>'right'],
                     'events'=> ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],
                 'cur_act' => ['order'=>50, 'label'=>lang('actuals'),'attr'=>['width'=>100,'resizable'=>true,'align'=>'right'],
                     'events'=> ['formatter'=>"function(value,row){ return formatCurrency(value); }"]],

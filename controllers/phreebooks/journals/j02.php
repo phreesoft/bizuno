@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -111,8 +111,8 @@ class j02 extends jCommon
                 break;
             }
             $incdec = '';
-            if ($found && $arrow=='inc')      { $incdec = json_decode('"\u21e7"').' '.$this->lang['bal_increase']; }
-            else if ($found && $arrow=='dec') { $incdec = json_decode('"\u21e9"').' '.$this->lang['bal_decrease']; }
+            if ($found && $arrow=='inc')      { $incdec = json_decode('"\u21e7"').' '.lang('bal_increase', $this->moduleID); }
+            else if ($found && $arrow=='dec') { $incdec = json_decode('"\u21e9"').' '.lang('bal_decrease', $this->moduleID); }
             $items[$idx]['notes'] = $incdec;
         }
     }

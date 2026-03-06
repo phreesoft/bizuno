@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/main.php
  */
 
@@ -42,7 +42,6 @@ class inventoryMain
 
     function __construct()
     {
-        $this->lang= getLang($this->moduleID);
         $defaults  = [
             'sales'   => getChartDefault(30),
             'stock'   => getChartDefault(4),
@@ -74,26 +73,26 @@ class inventoryMain
             'tax_rate_id_v'=> getModuleCache('inventory', 'settings', 'general',    'tax_rate_id_v'),
             'tax_rate_id_c'=> getModuleCache('inventory', 'settings', 'general',    'tax_rate_id_c')];
         $this->uom = [
-            'ea'  => $this->lang['uom_ea'],
-            'box' => $this->lang['uom_box'],
-            'pkg' => $this->lang['uom_pkg'],
-            'bag' => $this->lang['uom_bag'],
-            'tub' => $this->lang['uom_tub'],
-            'spl' => $this->lang['uom_spl'],
-            'plt' => $this->lang['uom_plt'],
-            'brl' => $this->lang['uom_brl'],
-            'rol' => $this->lang['uom_rol'],
-            'in'  => $this->lang['uom_in'],
-            'ft'  => $this->lang['uom_ft'],
-            'yd'  => $this->lang['uom_yd'],
-            'cm'  => $this->lang['uom_cm'],
-            'mtr' => $this->lang['uom_mtr'],
-            'oz'  => $this->lang['uom_oz'],
-            'pnt' => $this->lang['uom_pnt'],
-            'gal' => $this->lang['uom_gal'],
-            'keg' => $this->lang['uom_keg'],
-            'ml'  => $this->lang['uom_ml'],
-            'ltr' => $this->lang['uom_ltr']];
+            'ea'  => lang('uom_ea', $this->moduleID),
+            'box' => lang('uom_box', $this->moduleID),
+            'pkg' => lang('uom_pkg', $this->moduleID),
+            'bag' => lang('uom_bag', $this->moduleID),
+            'tub' => lang('uom_tub', $this->moduleID),
+            'spl' => lang('uom_spl', $this->moduleID),
+            'plt' => lang('uom_plt', $this->moduleID),
+            'brl' => lang('uom_brl', $this->moduleID),
+            'rol' => lang('uom_rol', $this->moduleID),
+            'in'  => lang('uom_in', $this->moduleID),
+            'ft'  => lang('uom_ft', $this->moduleID),
+            'yd'  => lang('uom_yd', $this->moduleID),
+            'cm'  => lang('uom_cm', $this->moduleID),
+            'mtr' => lang('uom_mtr', $this->moduleID),
+            'oz'  => lang('uom_oz', $this->moduleID),
+            'pnt' => lang('uom_pnt', $this->moduleID),
+            'gal' => lang('uom_gal', $this->moduleID),
+            'keg' => lang('uom_keg', $this->moduleID),
+            'ml'  => lang('uom_ml', $this->moduleID),
+            'ltr' => lang('uom_ltr', $this->moduleID)];
         if (validateAccess('inv_mgr', 5, false) && !defined('BIZ_RULE_ASSY_UNLOCK') ) { define('BIZ_RULE_ASSY_UNLOCK', true); }
     }
 
@@ -403,8 +402,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             $layout['panels']['genStore'] = ['label'=>lang('all_stores'),'type'=>'fields','keys'=>$storeKeys];
         }
         // options
-        $layout['toolbars']['tbInventory']['icons']['forecast'] = ['icon'=>'mimePpt', 'order'=>70, 'label'=>$this->lang['forecast'],
-            'events'=> ['onClick' => "windowEdit('$this->moduleID/tools/invForecast&rID=$rID', 'forecastChart', '{$this->lang['forecast']}', 600, 550);"]];
+        $layout['toolbars']['tbInventory']['icons']['forecast'] = ['icon'=>'mimePpt', 'order'=>70, 'label'=>lang('forecast', $this->moduleID),
+            'events'=> ['onClick' => "windowEdit('$this->moduleID/tools/invForecast&rID=$rID', 'forecastChart', '{lang('forecast']}', 600, 550);"]];
         if ($layout['fields']['inventory_type']['attr']['value'] == 'ms') {
             $rID = clean('rID', 'integer', 'get');
             $tabID = clean('tabID', 'integer', 'get');
@@ -417,9 +416,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/options/optionsEdit&rID=$rID'"]];
         }
         $defaults = ['sales'=>getChartDefault(30), 'stock'=>getChartDefault(4), 'cogs'=>getChartDefault(32), 'method'=>'f'];
-        $layout['fields']['lang']['ms_skus_created'] = $this->lang['skus_created'];
+        $layout['fields']['lang']['ms_skus_created'] = lang('skus_created', $this->moduleID);
         $layout['fields']['inventory_type']['values']['ms'] = ['id'=>'ms','text'=>lang('inventory_type_ms'),'hidden'=>0,'tracked'=>1,'order'=>20,'gl_sales'=>$defaults['sales'],'gl_inv'=>$defaults['stock'],'gl_cogs'=>$defaults['cogs'],'method'=>$defaults['method']]; // Master Stock
-        $layout['jsHead']['ms'] = "invTypeMsg['ms'] = '".addslashes($this->lang['msg_sel_ms'])."'";
+        $layout['jsHead']['ms'] = "invTypeMsg['ms'] = '".addslashes(lang('msg_sel_ms', $this->moduleID))."'";
         
         if ($tabID) { $layout['tabs']['tabInventory']['selected'] = $tabID; }
     }
@@ -486,7 +485,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $rID = isset($values['id']) && $values['id'] ? $values['id'] : 0;
         $dup = dbGetValue(BIZUNO_DB_PREFIX."inventory", 'sku', "sku='".addslashes($values['sku'])."' AND id<>$rID"); // check for duplicate sku's
         if ($dup) { return msgAdd(lang('error_duplicate_id')); }
-        if (!$values['sku']) { return msgAdd($this->lang['err_inv_sku_blank']); }
+        if (!$values['sku']) { return msgAdd(lang('err_inv_sku_blank', $this->moduleID)); }
         $readonlys = ['qty_stock','qty_po','qty_so','qty_alloc','creation_date','last_update','last_journal_date']; // some special processing
         foreach ($readonlys as $field) { unset($values[$field]); }
         if (!$rID) { $values['creation_date']= biz_date('Y-m-d h:i:s'); }
@@ -577,7 +576,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             dbTransactionStart();
             foreach ($skuData as $row) {
                 if (strlen($row['ms_sku']) > $maxSkuLen) {
-                    msgAdd(sprintf($this->lang['err_sku_too_long'], $row['ms_sku']));
+                    msgAdd(sprintf(lang('err_sku_too_long', $this->moduleID), $row['ms_sku']));
                     dbTransactionRollback();
                     return;
                 }
@@ -635,7 +634,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $oldSKU = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         $newSKU = clean('data', 'text', 'get');
         // make sure new SKU is not null
-        if (empty($newSKU)) { return msgAdd($this->lang['err_inv_sku_blank']); }
+        if (empty($newSKU)) { return msgAdd(lang('err_inv_sku_blank', $this->moduleID)); }
         // check for duplicate skus
         $found= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($newSKU)."'");
         if ($found) { return msgAdd(lang('error_duplicate_id')); }
@@ -671,7 +670,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if (!$security = validateAccess('inv_mgr', 2)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $newSKU= clean('data','text', 'get'); // new sku
-        if (!$newSKU) { return msgAdd($this->lang['err_inv_sku_blank']); }
+        if (!$newSKU) { return msgAdd(lang('err_inv_sku_blank', $this->moduleID)); }
         $sku   = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
         $oldSKU= $sku['sku'];
         // check for duplicate skus
@@ -741,9 +740,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             }
         }
 
-        if (!empty($cnt)) { return msgAdd(sprintf($this->lang['err_inv_delete_assy'], $sku)); }
+        if (!empty($cnt)) { return msgAdd(sprintf(lang('err_inv_delete_assy', $this->moduleID), $sku)); }
         $block1= dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'id', "sku='".addslashes($sku)."'");
-        if ($sku && $block1 && in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd(sprintf($this->lang['err_inv_delete_gl_entry'], $sku)); }
+        if ($sku && $block1 && in_array($item['inventory_type'], INVENTORY_COGS_TYPES)) { return msgAdd(sprintf(lang('err_inv_delete_gl_entry', $this->moduleID), $sku)); }
         $data  = ['content' => ['action'=>'eval','actionData'=>$action],
             'dbAction'=> [
                 'inventory'     => "DELETE FROM ".BIZUNO_DB_PREFIX."inventory WHERE id=$rID",
@@ -765,7 +764,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         // make sure SKU is not part of an assembly
         // @TODO - if it is and the other SKU's are not in journal then let delete AND remove sku from all assembly BOMs
 
-        if (dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku LIKE '$sku-%'"))        { $cancelDelete = msgAdd($this->lang['err_inv_delete_gl_entry']); }
+        if (dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'id', "sku LIKE '$sku-%'"))        { $cancelDelete = msgAdd(lang('err_inv_delete_gl_entry', $this->moduleID)); }
         if ($cancelDelete) { unset($layout['dbAction']); }
         else { // get all ID's for the children
             if (!$mID = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "sku LIKE '$sku-%'", '', ['id'])) { return; }
@@ -791,7 +790,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if (!$rID) { $rID = clean('rID', 'integer', 'get'); }
         $cost = dbGetInvAssyCost($rID);
         $currencies = (object)['iso'=>getDefaultCurrency(), 'rate'=>1];
-        msgAdd(sprintf($this->lang['msg_inventory_assy_cost'], viewFormat($cost, 'currency')), 'caution');
+        msgAdd(sprintf(lang('msg_inventory_assy_cost', $this->moduleID), viewFormat($cost, 'currency')), 'caution');
         if (!$security = validateAccess('inv_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer','get');
         if (empty($rID)) { return; }
@@ -870,8 +869,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                     'actions'=> [
                         'prices'=> ['order'=>20,'icon'=>'price',  'events'=>['onClick'=>"jsonAction('inventory/prices/details&type=c', idTBD);"]],
                         'edit'  => ['order'=>30,'icon'=>'edit',   'events'=>['onClick'=>"accordionEdit('accInventory', 'dgInventory', 'divInventoryDetail', '".lang('details')."', 'inventory/main/edit', idTBD);"]],
-                        'rename'=> ['order'=>40,'icon'=>'rename', 'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_rename']."'); if (title!=null) jsonAction('inventory/main/rename', idTBD, title);"]],
-                        'copy'  => ['order'=>50,'icon'=>'copy',   'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".$this->lang['msg_sku_entry_copy']."'); if (title!=null) jsonAction('inventory/main/copy', idTBD, title);"]],
+                        'rename'=> ['order'=>40,'icon'=>'rename', 'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".lang('msg_sku_entry_rename', $this->moduleID)."'); if (title!=null) jsonAction('inventory/main/rename', idTBD, title);"]],
+                        'copy'  => ['order'=>50,'icon'=>'copy',   'hidden'=>$security>2?false:true,'events'=>['onClick'=>"var title=prompt('".lang('msg_sku_entry_copy', $this->moduleID)."'); if (title!=null) jsonAction('inventory/main/copy', idTBD, title);"]],
                         'chart' => ['order'=>60,'icon'=>'mimePpt','label'=>lang('sales'),    'events'=>['onClick'=>"windowEdit('inventory/tools/chartSales&rID=idTBD', 'myInvChart', '&nbsp;', 600, 500);"]],
                         'gLineP'=> ['order'=>63,'icon'=>'mimeXls','label'=>lang('purchases'),'hidden'=>$secJ06>3?false:true,'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistPurch&rID=idTBD', 'myInvPurch', '&nbsp;', 600, 500);"]],
                         'gLineS'=> ['order'=>65,'icon'=>'mimeDoc','label'=>lang('sales'),    'hidden'=>$secJ12>3?false:true,'events'=>['onClick'=>"windowEdit('$this->moduleID/tools/chartHistSales&rID=idTBD', 'myInvSales', '&nbsp;', 600, 500);"]],
@@ -904,7 +903,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         }
         $data['columns']['qty_stock'] = ['order'=>25, 'field'=>'inventory.sku', 'alias'=>'sku','label'=>lang('qty_store'), 'process'=>'storeStock',
             'attr'=>['sortable'=>false,'resizable'=>true,'align'=>'right']];
-        $data['source']['filters']['f1'] = ['order'=>50,'sql'=>'','label'=>$this->lang['store_stock'],'values'=>$values,'attr'=>['type'=>'select','value'=>$f1]];
+        $data['source']['filters']['f1'] = ['order'=>50,'sql'=>'','label'=>lang('store_stock', $this->moduleID),'values'=>$values,'attr'=>['type'=>'select','value'=>$f1]];
         msgDebug("\nextStores set home store: $this->myStore with f1 (store filter selection) = $f1");
         switch ($f1) { // clean up the filter
             default:
@@ -1078,14 +1077,14 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if (!$sID) { return msgAdd("Bad record ID!"); }
         $bom = dbMetaGet(0, 'bill_of_materials', 'inventory', $sID);
         metaIdxClean($bom);
-        if (sizeof($bom) == 0) { return msgAdd($this->lang['err_inv_assy_error']); }
-        $shortages = [sprintf($this->lang['err_inv_assy_low_stock'], $qty)];
+        if (sizeof($bom) == 0) { return msgAdd(lang('err_inv_assy_error', $this->moduleID)); }
+        $shortages = [sprintf(lang('err_inv_assy_low_stock', $this->moduleID), $qty)];
         foreach ($bom as $row) {
             $stock = dbGetValue(BIZUNO_DB_PREFIX.'inventory', "qty_stock", "sku='{$row['sku']}'");
-            if ($row['qty']*$qty > $stock) { $shortages[] = sprintf($this->lang['err_inv_assy_low_list'], $row['sku'], $row['description'], $stock, $row['qty']*$qty); }
+            if ($row['qty']*$qty > $stock) { $shortages[] = sprintf(lang('err_inv_assy_low_list', $this->moduleID), $row['sku'], $row['description'], $stock, $row['qty']*$qty); }
         }
         if (sizeof($shortages) > 1) { msgAdd(implode("<br />", $shortages), 'caution'); }
-        else { msgAdd($this->lang['msg_inv_assy_stock_good'], 'success'); }
+        else { msgAdd(lang('msg_inv_assy_stock_good', $this->moduleID), 'success'); }
     }
 
     /**
@@ -1112,12 +1111,12 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         msgDebug("\nvalues from inventory table = ".print_r($values, true));
         $values['buy_uom'] = str_replace("'", "", $values['buy_uom']); // fixes bug in storing string
         $values['sell_uom']= str_replace("'", "", $values['sell_uom']); // fixes bug in storing string
-        $buyDesc = " (".$this->lang['uom_'.$values['buy_uom']].")";
-        $sellDesc= " (".$this->lang['uom_'.$values['sell_uom']].")";
+        $buyDesc = " (".lang('uom_'.$values['buy_uom'], $this->moduleID).")";
+        $sellDesc= " (".lang('uom_'.$values['sell_uom'], $this->moduleID).")";
         msgDebug("\nbuyDesc = $buyDesc and sellDesc = $sellDesc");
         // convert qty_stock, qty_po and add (UOM) suffix to field value
-        $layout['fields']['buy_uom']         = ['order'=>91,'break'=>false,'label'=>$this->lang['buy_uom'], 'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>100],'values'=>viewKeyDropdown($this->uom),'attr'=>['type'=>'select','value'=>$values['buy_uom']]];
-        $layout['fields']['sell_qty']        = ['order'=>92,'break'=>false,'label'=>$this->lang['sell_uom'],'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>50],'attr'=>['value'=>$values['sell_qty']]];
+        $layout['fields']['buy_uom']         = ['order'=>91,'break'=>false,'label'=>lang('buy_uom', $this->moduleID), 'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>100],'values'=>viewKeyDropdown($this->uom),'attr'=>['type'=>'select','value'=>$values['buy_uom']]];
+        $layout['fields']['sell_qty']        = ['order'=>92,'break'=>false,'label'=>lang('sell_uom', $this->moduleID),'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>50],'attr'=>['value'=>$values['sell_qty']]];
         $layout['fields']['sell_uom']        = ['order'=>93,'values'=>viewKeyDropdown($this->uom),'options'=>['width'=>100],'attr'=>['type'=>'select','value'=>$values['sell_uom']]];
         $layout['fields']['qty_stock_desc']  = ['order'=>11,'html'=>$sellDesc,'attr'=>['type'=>'raw']];
         $layout['fields']['qty_min_desc']    = ['order'=>21,'html'=>$sellDesc,'attr'=>['type'=>'raw']];

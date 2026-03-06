@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-13
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/quality/audits.php
  */
 
@@ -40,7 +40,7 @@ class qualityAudits extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->mgrTitle   = sprintf(lang('tbd_manager'), $this->lang[$this->pageID]);
+        $this->mgrTitle   = sprintf(lang('tbd_manager'), lang('audit', $this->moduleID));
         $this->stores     = getModuleCache('bizuno', 'stores');
         $this->freqs      = getModuleCache('bizuno', 'options', 'frequencies');
         $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');
@@ -107,7 +107,7 @@ class qualityAudits extends mgrJournal
             'columns'=> [
                 'inactive'  => ['order'=> 0, 'attr' =>['hidden'=>true]],
                 'closed'    => ['order'=> 0, 'attr' =>['hidden'=>true]],
-                'ref_num'   => ['order'=>10, 'field'=>'invoice_num','label'=>$this->lang['task_num'],'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'ref_num'   => ['order'=>10, 'field'=>'invoice_num','label'=>lang('task_num', $this->moduleID),'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'due_date'  => ['order'=>15, 'field'=>'post_date',  'label'=>$admin?sprintf(lang('tbd_next'), lang('audit')):lang('date_audit'), 'attr'=>['type'=>'date','sortable'=>true,'resizable'=>true], 'format'=>'date'],
                 'title'     => ['order'=>20, 'field'=>'description','label'=>lang('title'),          'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'frequency' => ['order'=>20, 'field'=>'recur_id',   'label'=>lang('frequency'),      'attr'=>['sortable'=>true, 'resizable'=>true,'hidden'=>$admin?false:true],

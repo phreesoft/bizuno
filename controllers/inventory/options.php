@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/options.php
  */
 
@@ -56,7 +56,7 @@ class inventoryOptions
                     'genOpt' => ['order'=>40,'type'=>'panel','classes'=>['block50'],'key'=>'genOpt']]]],
             'panels'  => [
                 'genProp'=> ['label'=>lang('properties'),         'type'=>'fields',  'keys'=>['invOptions','msTitle']],
-                'genSku' => ['label'=>$this->lang['skus_created'],'type'=>'datagrid','key'=>'dgSKUs'],
+                'genSku' => ['label'=>lang('skus_created', $this->moduleID),'type'=>'datagrid','key'=>'dgSKUs'],
                 'genOpt' => ['label'=>lang('options'),            'type'=>'datagrid','key'=>'dgOptions'],
                 'genAttr'=> ['label'=>lang('attributes'),         'type'=>'datagrid','key'=>'dgOptAttr']],
             'datagrid'=> [
@@ -173,7 +173,7 @@ function invOptionsEdit(idx) {
                 'action' => ['order'=>1, 'label'=>lang('action'), 'attr'=>['width'=>150],'events'=>['formatter'=>"{$name}Formatter"],
                     'actions'   => ['invAttrTrash'=> ['order'=>90,'icon'=>'trash','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'label' => ['order'=>10,'label'=>lang('label'),'attr'=>['width'=>120,'editor'=>'text','sortable'=>true,'resizable'=>true]],
-                'suffix'=> ['order'=>20,'label'=>$this->lang['sku_suffix'],'attr'=>['width'=>240,'editor'=>'text','sortable'=>true,'resizable'=>true]]]];
+                'suffix'=> ['order'=>20,'label'=>lang('sku_suffix', $this->moduleID),'attr'=>['width'=>240,'editor'=>'text','sortable'=>true,'resizable'=>true]]]];
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/phreebooks/dashboards/current_ap_ar/current_ap_ar.php
  */
 
@@ -29,18 +29,15 @@ namespace bizuno;
 
 class current_ap_ar
 {
-    public  $moduleID = 'phreebooks';
-    public  $methodDir= 'dashboards';
-    public  $code     = 'current_ap_ar';
-    public $secID     = 'j2_mgr';
-    public  $category = 'general_ledger';
-    public $noSettings= true;
+    public  $moduleID  = 'phreebooks';
+    public  $methodDir = 'dashboards';
+    public  $code      = 'current_ap_ar';
+    public  $secID     = 'j2_mgr';
+    public  $category  = 'general_ledger';
+    public  $noSettings= true;
     public  $struc;
-    public  $lang     = ['title' => 'Current A/R & A/P',
-        'description' => 'Lists current Accounts Receivables (A/R) and Accounts Payables (A/P) balances.'];
-    private $bal_tot_2     = 0;
-    private $bal_tot_3     = 0;
-    private $bal_sheet_data= [];
+    public  $lang      = ['title' => 'Current A/R & A/P',
+        'description'  => 'Lists current Accounts Receivables (A/R) and Accounts Payables (A/P) balances.'];
 
     public function __construct()
     {
@@ -48,10 +45,6 @@ class current_ap_ar
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [ // Admin fields
@@ -60,12 +53,6 @@ class current_ap_ar
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @return modified $layout
-     */
     public function render()
     {
         $period = getModuleCache('phreebooks', 'fy', 'period');

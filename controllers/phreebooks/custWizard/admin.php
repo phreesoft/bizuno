@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-26
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/custWizard/admin.php
  */
 
@@ -66,7 +66,7 @@ class custWizardAdmin {
         jqBiz('#accJournal').accordion('select', title);
     }
 }";
-            $layout['datagrid']['manager']['source']['actions']['orderWiz'] = ['order'=>15,'icon'=>'custWizard','label'=>$this->lang['title'],'events'=>['onClick'=>"custWizardEdit($jID, 0);"]];
+            $layout['datagrid']['manager']['source']['actions']['orderWiz'] = ['order'=>15,'icon'=>'custWizard','label'=>lang('title', $this->moduleID),'events'=>['onClick'=>"custWizardEdit($jID, 0);"]];
         }
     }
 
@@ -107,7 +107,7 @@ class custWizardAdmin {
                 'attach'  => ['order'=>90,'type'=>'panel','key'=>'divAtch','classes'=>['block50']]]]]];
         unset($layout['divs']['dgItems'],$layout['divs']['divAttach']); // move inside accordion
         $layout['toolbars']['tbPhreeBooks']['icons']['new']['events']['onClick'] = "custWizardEdit($jID, 0);";
-//        $layout['lang']['copy_billing'] = $this->lang['copy_billing'];
+//        $layout['lang']['copy_billing'] = lang('copy_billing', $this->moduleID);
         $layout['jsHead']['custWizard']  = "function custWizardToggle(intAcc) {
     jqBiz('#accCustWizard').accordion('select', intAcc);
     if (intAcc != 3) { return; }

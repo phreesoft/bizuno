@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/shipping/carriers/endicia/address.php
  *
  */
@@ -46,7 +46,7 @@ class endiciaAddress extends endiciaCommon
     {
         msgDebug("\nEntering validateAddress with address = ".print_r($address, true));
         $output= ['score'=>'N/A', 'status'=>lang('fail'), 'notes'=>''];
-//      if (!in_array($post['country'], ['USA'])) { $output['notes']=$this->lang['err_address_val_country']; return $output; }
+//      if (!in_array($post['country'], ['USA'])) { $output['notes']=lang('err_address_val_country', $this->moduleID); return $output; }
         $resp  = $this->queryREST('addressValidate', $this->payloadREST($address)); // endicia expects: 'addresses/validate',
         msgDebug("\nBack in validateAddress with resp = ".print_r($resp, true));
         if ( empty($resp)) { return msgAdd('No response from Endicia server! You may not be logged in.'); }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-12
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -32,12 +32,10 @@ bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebook
 class phreebooksTools
 {
     public $moduleID = 'phreebooks';
-    public $lang;
     public $dirUploads;
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
         $this->dirUploads = 'data/phreebooks/uploads/';
     }
 
@@ -174,12 +172,12 @@ class phreebooksTools
      */
     public function fyCloseValidate(&$layout=[])
     {
-        $icnFyGo = ['attr'=>['type'=>'button', 'value'=>$this->lang['fy_del_btn_go']],
+        $icnFyGo = ['attr'=>['type'=>'button', 'value'=>lang('fy_del_btn_go', $this->moduleID)],
             'events'=>  ['onClick'=>"jqBiz('#tabAdmin').tabs('add',{title:'Close FY',href:'".BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/fyCloseHome'}); bizWindowClose('winFyClose');"]];
-        $icnCancel = ['attr'=>['type'=>'button', 'value'=>$this->lang['fy_del_btn_cancel']],
+        $icnCancel = ['attr'=>['type'=>'button', 'value'=>lang('fy_del_btn_cancel', $this->moduleID)],
             'events'=>  ['onClick'=>"bizWindowClose('winFyClose');"]];
-        $html  = '<p>'.$this->lang['fy_del_desc'] .'</p><div style="float:right">'.html5('', $icnFyGo).'</div><div>'.html5('', $icnCancel).'</div>';
-        $data = ['type'=>'popup','title'=>$this->lang['fy_del_title'],'attr'=>['id'=>'winFyClose'],
+        $html  = '<p>'.lang('fy_del_desc', $this->moduleID) .'</p><div style="float:right">'.html5('', $icnFyGo).'</div><div>'.html5('', $icnCancel).'</div>';
+        $data = ['type'=>'popup','title'=>lang('fy_del_title', $this->moduleID),'attr'=>['id'=>'winFyClose'],
             'divs' => ['body'=>['order'=>50,'type'=>'html','html'=>$html]]];
         $layout= array_replace_recursive($layout, $data);
     }
@@ -197,7 +195,7 @@ class phreebooksTools
         $layout= array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'    => ['fyClose'=>['order'=>10,'type'=>'divs','attr'=>['id'=>"divCloseFY"],'divs'=>[
                 'tbClose'=> ['order'=>10,'type'=>'toolbar','key' =>'tbFyClose'],
-                'head'   => ['order'=>20,'type'=>'html',   'html'=>"<p>".sprintf($this->lang['fy_del_instr'], $fy)."</p>"],
+                'head'   => ['order'=>20,'type'=>'html',   'html'=>"<p>".sprintf(lang('fy_del_instr', $this->moduleID), $fy)."</p>"],
                 'body'   => ['order'=>50,'type'=>'html',   'html'=>$this->getViewFyClose(),'label'=>$title],
 //              'body'   => ['order'=>50,'type'=>'tabs',   'key' =>'tabFyClose'],
             ]]],
@@ -702,7 +700,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         $jIDs     = array_keys(clean('jID', 'array', 'post'));
         $dateStart= clean('repost_begin','date', 'post');
         $dateEnd  = clean('repost_end',  'date', 'post');
-        if (sizeof($jIDs) == 0) { return msgAdd($this->lang['err_pb_repost_empty']); }
+        if (sizeof($jIDs) == 0) { return msgAdd(lang('err_pb_repost_empty', $this->moduleID)); }
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "journal_id IN (".implode(',', $jIDs).") AND post_date>='$dateStart' AND post_date<='$dateEnd'", 'post_date', ['id']);
         if (sizeof($result) == 0) { return msgAdd(lang('no_results')); }
         foreach ($result as $row) { $rows[] = $row['id']; }
@@ -946,8 +944,8 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
             dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."journal_history SET beginning_balance=0, debit_amount=0, credit_amount=0, budget=0, stmt_balance=0, last_update=NULL");
             dbGetResult("UPDATE ".BIZUNO_DB_PREFIX."inventory SET qty_stock=0, qty_po=0, qty_so=0");
             $io->folderDelete("data/phreebooks/uploads");
-            msgAdd($this->lang['phreebooks_purge_success'], 'success');
-            msgLog($this->lang['phreebooks_purge_success']);
+            msgAdd(lang('phreebooks_purge_success', $this->moduleID), 'success');
+            msgLog(lang('phreebooks_purge_success', $this->moduleID));
         } else {
             msgAdd("You must type the word 'purge' in the field and press the purge button!");
         }
@@ -1046,9 +1044,9 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
         if (sizeof($mains) > 0) {
             msgDebug("\nUpdating table phreebooks, removing attach for id = ".print_r($mains, true));
             dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['attach'=>'0'], 'update', "id IN (".implode(',', $mains).")");
-            msgAdd(sprintf($this->lang['msg_attach_clean_success'], sizeof($mains)), 'success');
+            msgAdd(sprintf(lang('msg_attach_clean_success', $this->moduleID), sizeof($mains)), 'success');
         } else {
-            msgAdd($this->lang['msg_attach_clean_empty'], 'info');
+            msgAdd(lang('msg_attach_clean_empty', $this->moduleID), 'info');
         }
     }
 }

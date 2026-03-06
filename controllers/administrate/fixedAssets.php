@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/fixedAssets.php
  */
 
@@ -85,14 +85,14 @@ class administrateFixedAssets extends mgrJournal
                     'status'=> ['order'=>10,'label'=>lang('status'),'values'=>$yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
             'columns'=> [
                 'status'       => ['order'=> 0,                                     'attr'=>['hidden'=>true]],
-                'ref_num'      => ['order'=>10, 'label'=>$this->lang['ref_num'],    'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true]],
-                'type'         => ['order'=>20, 'label'=>$this->lang['asset_type'], 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_type'],
-                'purch_cond'   => ['order'=>30, 'label'=>$this->lang['purch_cond'], 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_condition'],
-                'serial_number'=> ['order'=>40, 'label'=>$this->lang['serial_number'],'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true]],
+                'ref_num'      => ['order'=>10, 'label'=>lang('ref_num', $this->moduleID),    'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true]],
+                'type'         => ['order'=>20, 'label'=>lang('asset_type', $this->moduleID), 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_type'],
+                'purch_cond'   => ['order'=>30, 'label'=>lang('purch_cond', $this->moduleID), 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_condition'],
+                'serial_number'=> ['order'=>40, 'label'=>lang('serial_number', $this->moduleID),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true]],
                 'title'        => ['order'=>50, 'label'=>lang('description'),       'attr'=>['width'=>180, 'sortable'=>true, 'resizable'=>true]],
                 'store_id'     => ['order'=>60, 'label'=>lang('store_id'),          'attr'=>['width'=> 90, 'sortable'=>true, 'resizable'=>true], 'format'=>'storeID'],
-                'date_acq'     => ['order'=>70, 'label'=>$this->lang['date_acq'],   'attr'=>['width'=> 90, 'sortable'=>true, 'resizable'=>true], 'format'=>'date'],
-                'date_retire'  => ['order'=>80, 'label'=>$this->lang['date_retire'],'attr'=>['width'=> 90, 'sortable'=>true, 'resizable'=>true], 'format'=>'date']]]);
+                'date_acq'     => ['order'=>70, 'label'=>lang('date_acq', $this->moduleID),   'attr'=>['width'=> 90, 'sortable'=>true, 'resizable'=>true], 'format'=>'date'],
+                'date_retire'  => ['order'=>80, 'label'=>lang('date_retire', $this->moduleID),'attr'=>['width'=> 90, 'sortable'=>true, 'resizable'=>true], 'format'=>'date']]]);
 //        unset($data['source']['tables']); // maybe $data['source']['filters']['jID']
         return $data;
     }
@@ -231,7 +231,7 @@ class administrateFixedAssets extends mgrJournal
         }
         $cron['cnt']++;
         if (sizeof($cron['rows']) == 0) {
-            msgLog($this->lang['title']." - Calculate Current Depreciated Values in Bulk");
+            msgLog(lang('fixed_assets')." - Calculate Current Depreciated Values in Bulk");
             $data = ['content'=>['percent'=>100,'msg'=>"Processed {$cron['total']} Assets",'baseID'=>'faCalc','urlID'=>"$this->moduleID/$this->pageID/faCalcBulkNext"]];
             clearUserCron('faCalc');
         } else { // return to update progress bar and start next step
@@ -255,12 +255,12 @@ class administrateFixedAssets extends mgrJournal
         $row  = dbGetRow(BIZUNO_DB_PREFIX.'common_meta', "id=$rID");
         $value= json_decode($row['meta_value'], true);
         msgDebug("\nEntering getSchedValue, found row = ".print_r($value, true));
-        if (empty($value['dep_sched'])) { return msgAdd(sprintf($this->lang['err_no_sched'], "{$value['title']} [$rID]")); }
+        if (empty($value['dep_sched'])) { return msgAdd(sprintf(lang('err_no_sched', $this->moduleID), "{$value['title']} [$rID]")); }
         $age  = biz_date('Y') - substr($value['date_acq'], 0, 4) - 1; // map to index of schedule
         $curValue = $value['cost'];
         msgDebug("\nWorking with age = $age and value = $curValue");
         $schedules = getModuleCache('proGL', 'sched');
-        if (!sizeof($schedules)) { return msgAdd(sprintf($this->lang['err_no_sched'], lang('all'))); }
+        if (!sizeof($schedules)) { return msgAdd(sprintf(lang('err_no_sched', $this->moduleID), lang('all'))); }
         foreach ($schedules as $title => $sched) {
             msgDebug("\nAnalyzing schedule titled: $title");
             if ($value['dep_sched'] <> $title) { continue; }
@@ -277,7 +277,7 @@ class administrateFixedAssets extends mgrJournal
         $viewValue= round($curValue, 2);
         $layout   = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"bizNumSet('dep_value', $viewValue);"]]);
         if ($verbose) {
-            msgLog($this->lang['title']."- Calculate Current Value - {$value['title']} ($rID) - $viewValue");
+            msgLog(lang('fixed_assets', $this->moduleID)."- Calculate Current Value - {$value['title']} ($rID) - $viewValue");
             msgAdd(lang('msg_database_write'), 'success');
         }
     }
@@ -305,7 +305,7 @@ function faSchedSave() {
 }";
         $layout = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'    => [
-                'head'=> ['order'=>10,'type'=>'html',    'html'=>$this->lang['fa_intro']],
+                'head'=> ['order'=>10,'type'=>'html',    'html'=>lang('fa_intro', $this->moduleID)],
                 'body'=> ['order'=>50,'type'=>'datagrid','key' =>'dgFaSched']],
             'jsHead'  => ['faSchedHead'=>$jsBody],
             'datagrid'=> ['dgFaSched'  =>$this->dgAdminSched('dgFaSched', $title, $titles)]]);
@@ -373,12 +373,12 @@ function faSchedSave() {
                 'actions'=> [
                     'schedSave'=>['order'=>10,'icon'=>'save','events'=>['onClick'=>"faSchedSave();"]],
                     'schedNew' =>['order'=>30,'icon'=>'add', 'events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]],
-                    'schedCat'=> ['order'=>70,'label'=>$this->lang['category'],'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
+                    'schedCat'=> ['order'=>70,'label'=>lang('category', $this->moduleID),'values'=>$titles,'attr'=>['type'=>'select','value'=>$title],
                         'options'=>['width'=>150,'editable'=>true,'onClick'=>"function(row) { var tab=jqBiz('#tabAdmin').tabs('getSelected'); tab.panel('refresh','".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/adminSchedLoad&rID='+row.text); }"]]]],
             'columns' => [
                 'action' => ['order'=>1, 'label'=>lang('action'), 'attr'=>  ['width'=>80],
                     'events' => ['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> ['trash'=>['icon'=>'trash','order'=>20,'size'=>'small','events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jqBiz('#$name').edatagrid('deleteRow', curIndex);"]]]],
-                'label'=> ['order'=>40,'label'=>$this->lang['percent_good'],'attr'=>['width'=>200,'editor'=>'numberbox','resizable'=>true]]]];
+                'label'=> ['order'=>40,'label'=>lang('percent_good', $this->moduleID),'attr'=>['width'=>200,'editor'=>'numberbox','resizable'=>true]]]];
     }
 }

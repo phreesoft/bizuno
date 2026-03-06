@@ -76,7 +76,7 @@ class bizAdmin
     public function main()
     {
         $homeImg = '<img type="img" src="'.BIZOFFICE_URL.'bizuno.png" height="48">';
-        $btnApp  = '<button onClick="bizMenuClick(\'folder\', xPosition, yPosition+5);"><span style="font-size:3em; color:deepskyblue;"><i class="fad fa-plus"></i></span><span style="font-size:1.5em;"> '.$this->lang['new'].'</span></button>';
+        $btnApp  = '<button onClick="bizMenuClick(\'folder\', xPosition, yPosition+5);"><span style="font-size:3em; color:deepskyblue;"><i class="fad fa-plus"></i></span><span style="font-size:1.5em;"> '.lang('new').'</span></button>';
         $btnAcct = '<button onClick="bizMenuClick(\'acct\',xPosition-150, yPosition+5);"><span style="font-size:3em; color:deepskyblue;"><i class="fad fa-user-circle"></i></span><span style="font-size:1.5em;"> '.$this->wpUser->display_name.'</span></button>';
         $btnApps = '<button onClick="bizMenuClick(\'apps\',xPosition-150, yPosition+5);"><span style="font-size:3em; color:deepskyblue;"><i class="fad fa-th"></i></span><span style="font-size:1.5em;">&nbsp;</span></button>';
         $modalHtm= '<div id="bizModal" class="modal"><span id="bizModalClose" class="close">&times;</span><img class="modal-content" id="bizModalImg"><div id="bizModalCaption"></div></div>';
@@ -489,15 +489,15 @@ class bizAdmin
     public function getFolderTree()
     {
         $folders = [
-    ['id'=>$this->padID(0, 't'),"text"=>'<span class="treeIcon"><i class="fad fa-cabinet-filing"></i></span>'.$this->lang['home'], 'state'=>['selected'=>true],'children'=>$this->getFolderTreeChildren([], 0)],
-    ['id'=>"menu_shared", "text"=>'<span class="treeIcon"><i class="fad fa-share"></i></span>'         .$this->lang['shared']],
-    ['id'=>"menu_recent", "text"=>'<span class="treeIcon"><i class="fad fa-calendar-week"></i></span>' .$this->lang['recent']],
-    ['id'=>"menu_starred","text"=>'<span class="treeIcon"><i class="fad fa-star"></i></span>'          .$this->lang['starred']],
-    ['id'=>"menu_trash",  "text"=>'<span class="treeIcon"><i class="fad fa-trash"></i></span>'         .$this->lang['trash']],
+    ['id'=>$this->padID(0, 't'),"text"=>'<span class="treeIcon"><i class="fad fa-cabinet-filing"></i></span>'.lang('home'), 'state'=>['selected'=>true],'children'=>$this->getFolderTreeChildren([], 0)],
+    ['id'=>"menu_shared", "text"=>'<span class="treeIcon"><i class="fad fa-share"></i></span>'         .lang('shared')],
+    ['id'=>"menu_recent", "text"=>'<span class="treeIcon"><i class="fad fa-calendar-week"></i></span>' .lang('recent')],
+    ['id'=>"menu_starred","text"=>'<span class="treeIcon"><i class="fad fa-star"></i></span>'          .lang('starred')],
+    ['id'=>"menu_trash",  "text"=>'<span class="treeIcon"><i class="fad fa-trash"></i></span>'         .lang('trash')],
 ];
         msgDebug("\nReturning from getFolderTree with folders = ".print_r($folders, true));
         return ['content'=>['action'=>'eval', 'actionData'=>"bizMenuCallback(".json_encode($folders).");"]];
-        // {'id'=>"menu_home", "parent"=>"node_1234",  "text"=>'<span class="treeIcon"><i class="fad fa-cabinet-filing"></i></span>'.$this->lang['home'], 'children':true, 'state':{'selected':true}},
+        // {'id'=>"menu_home", "parent"=>"node_1234",  "text"=>'<span class="treeIcon"><i class="fad fa-cabinet-filing"></i></span>'.lang('home'], 'children':true, 'state':{'selected':true}},
     }
 
     private function getFolderTreeChildren($working, $parent)
@@ -542,7 +542,7 @@ class bizAdmin
             $crumbs['r'.$parent] = ['path'=>$this->padID($parent, 'd').'/', 'label'=>$result->post_title];
             $parent = $result->post_parent;
         }
-        $output = ['r0'=>['path'=>'/','label'=>$this->lang[$this->scope]]] + array_reverse($crumbs);
+        $output = ['r0'=>['path'=>'/','label'=>lang($this->scope)]] + array_reverse($crumbs);
         $html   = $path = '';
         foreach ($output as $key => $crumb) {
             $path .= $crumb['path'];
@@ -924,7 +924,7 @@ class bizAdmin
      */
     private function viewFileHeader()
     {
-        return '<div id="fileHeader"><h3>'.$this->lang['files'].'</h3></div>';
+        return '<div id="fileHeader"><h3>'.lang('files').'</h3></div>';
     }
 
     /**
@@ -950,7 +950,7 @@ class bizAdmin
      */
     private function viewFolderHead()
     {
-        return '<div id="dirHeader"><h3>'.$this->lang['folders'].'</h3></div>';
+        return '<div id="dirHeader"><h3>'.lang('folders').'</h3></div>';
     }
 
     /**
@@ -986,16 +986,16 @@ class bizAdmin
     private function viewShareForm($userList=[])
     {
         $html  = '<form id="bizShareForm" action="'.BIZOFFICE_AJAX.'&bizRt=bizStorage/setShareUsers&rID='.$this->postID.'">';
-        $html .= '<p>'.$this->lang['share_intro'].'</p>';
-        $html .= '<label for="shareUsers">'.$this->lang['share_with'].'</label>';
+        $html .= '<p>'.lang('share_intro').'</p>';
+        $html .= '<label for="shareUsers">'.lang('share_with').'</label>';
         $html .= '<input type="select" id="shareUsers" name="shareUsers">';
-        $html .= '<br /><br /><button type="submit">'.$this->lang['invite'].'</button>';
-        $html .= '<table id="bizShareTable"><th>&nbsp;</th><th>'.$this->lang['shared_users'].'</th><th>'.$this->lang['can_edit'].'</th>';
+        $html .= '<br /><br /><button type="submit">'.lang('invite').'</button>';
+        $html .= '<table id="bizShareTable"><th>&nbsp;</th><th>'.lang('shared_users').'</th><th>'.lang('can_edit').'</th>';
         foreach ($userList as $user) {
             if ($user['can_edit']==2) {
                 $trTD = '&nbsp;';
                 $rdTD = '';
-                $edTD = $this->lang['owner'];
+                $edTD = lang('owner');
             } else {
                 $trTD = '<span id="'.$user['id'].'" onClick="if (confirm(\'Are you sure?\')) { $(this).closest(\'tr\').remove(); }" class="treeIcon"><i class="fad fa-trash"></i></span>';
                 $rdTD = '<input type="hidden" id="can_read_'.$user['id'].'" value="1">';

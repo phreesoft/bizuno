@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-01
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/quality/adminAudits.php
  */
 
@@ -43,7 +43,7 @@ class qualityAdminAudits extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->mgrTitle   = sprintf(lang('tbd_manager'), $this->lang[$this->pageID]);
+        $this->mgrTitle   = sprintf(lang('tbd_manager'), lang('audit', $this->moduleID));
         $this->stores     = getModuleCache('bizuno', 'stores');
         $this->freqs      = getModuleCache('bizuno', 'options', 'frequencies');
         $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');

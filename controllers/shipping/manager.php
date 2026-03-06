@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-20
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -108,7 +108,7 @@ class shippingManager extends mgrJournal
                 'action'      => ['order'=>1, 'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return dg{$this->domSuffix}Formatter(value,row,index); }"],
                     'actions' => [
                         'print'    => ['order'=>10,'icon'=>'print','label'=>lang('print'),                  'events'=>['onClick'=>"winOpen('shippingLabel', '$this->moduleID/ship/labelView&refID=$refID&rID=idTBD');"]],
-                        'reconcile'=> ['order'=>70,'icon'=>'apply','label'=>$this->lang['toggle_reconcile'],'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/toggleReconcile&refID=$refID', idTBD);"]]]],
+                        'reconcile'=> ['order'=>70,'icon'=>'apply','label'=>lang('toggle_reconcile', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/toggleReconcile&refID=$refID', idTBD);"]]]],
                 'ref_num'     => ['order'=>10,'field'=>BIZUNO_DB_PREFIX.'journal_meta.id','label'=>lang('shipment_id'),   'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'process'=>'meta:ref_num:journal'],
                 'invoice_num' => ['order'=>15,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]],
                 'store_id'    => ['order'=>20,'field'=>'store_id',       'label'=>lang('store_id'),      'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'format'=>'storeID'],
@@ -147,7 +147,7 @@ class shippingManager extends mgrJournal
         $jsBody = "function shippingLabelMain(rID) {
     bizSelSet('selInvoice', '');
     jqBiz('#selInvoice').combogrid('hidePanel');
-    accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'divLabel', '".jsLang($this->lang['label_generator'])."', '$this->moduleID/ship/labelMain', rID);
+    accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'divLabel', '".jsLang(lang('label_generator', $this->moduleID))."', '$this->moduleID/ship/labelMain', rID);
 }
 jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',textField:'invoice_num',mode:'remote',
   url: bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/managerRowsOrder',
@@ -173,13 +173,13 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             'accordion'=> ["acc{$this->domSuffix}"=>['label'=>lang('manager'),'divs'=>[
                 'shipment'=> ['order'=>20,'label'=>lang('ship'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'genShip' => ['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'genShip']]],
-                'divLabel'=> ['order'=>30,'label'=>$this->lang['label_generator'],'type'=>'html','html'=>'',
+                'divLabel'=> ['order'=>30,'label'=>lang('label_generator', $this->moduleID),'type'=>'html','html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/ship/labelMain'"]]]]],
             'panels'   => [
                 'manager' => ['type' =>'accordion','key'=>"acc{$this->domSuffix}"],
-                'genShip' => ['label'=>$this->lang['ship_invoice'],'type'=>'fields','keys'=>['shipInst','selInvoice']]],
+                'genShip' => ['label'=>lang('ship_invoice', $this->moduleID),'type'=>'fields','keys'=>['shipInst','selInvoice']]],
             'fields'   => [
-                'shipInst'  => ['order'=>10,'html'=>$this->lang['ship_invoice_desc'],'attr'=>['type'=>'raw']],
+                'shipInst'  => ['order'=>10,'html'=>lang('ship_invoice_desc', $this->moduleID),'attr'=>['type'=>'raw']],
                 'selInvoice'=> ['order'=>20,'attr'=>['value'=>'']]],
             'jsBody'   => ['init' => $jsBody],
             'jsReady'  => ['focus'=> "bizFocus('selInvoice');"]]; // needs to be here to collect tab js for each method
@@ -317,7 +317,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     {
         global $io;
         msgDebug("\nEntering deleteLabels with ship_date = {$meta['ship_date']} and biz_date = ".biz_date());
-        if (substr($meta['ship_date'], 0, 10) < biz_date()) { return msgAdd(sprintf($this->lang['error_cannot_delete'], viewFormat($meta['ship_date'], 'date')), 'caution'); }
+        if (substr($meta['ship_date'], 0, 10) < biz_date()) { return msgAdd(sprintf(lang('error_cannot_delete', $this->moduleID), viewFormat($meta['ship_date'], 'date')), 'caution'); }
         $carrier= explode(':', $meta['method_code']);
         $date   = explode('-', substr($meta['ship_date'], 0, 10));
         $path   = "data/shipping/labels/{$carrier[0]}/{$date[0]}/{$date[1]}/{$date[2]}";
@@ -418,16 +418,16 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $dbPkg     = !empty($dbShipment) ? json_decode($dbShipment, true) : [];
         msgDebug("\nRead dbPkg = ".print_r($dbPkg, true));
         $fields    = [
-            'shippingBoxQ' =>['order'=>10,'label'=>$this->lang['box_q'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_q']) ?$dbPkg['box_q'] :1]],
-            'shippingBoxL' =>['order'=>15,'label'=>$this->lang['box_l'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_l']) ?$dbPkg['box_l'] :0]],
-            'shippingBoxW' =>['order'=>20,'label'=>$this->lang['box_w'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_w']) ?$dbPkg['box_w'] :0]],
-            'shippingBoxH' =>['order'=>25,'label'=>$this->lang['box_h'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_h']) ?$dbPkg['box_h'] :0]],
-            'shippingBoxWt'=>['order'=>30,'label'=>$this->lang['box_wt'],'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_wt'])?$dbPkg['box_wt']:0]],
-            'shippingPltQ' =>['order'=>50,'label'=>$this->lang['plt_q'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_q']) ?$dbPkg['plt_q'] :1]],
-            'shippingPltL' =>['order'=>55,'label'=>$this->lang['plt_l'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_l']) ?$dbPkg['plt_l'] :0]],
-            'shippingPltW' =>['order'=>60,'label'=>$this->lang['plt_w'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_w']) ?$dbPkg['plt_w'] :0]],
-            'shippingPltH' =>['order'=>65,'label'=>$this->lang['plt_h'], 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_h']) ?$dbPkg['plt_h'] :0]],
-            'shippingPltWt'=>['order'=>70,'label'=>$this->lang['plt_wt'],'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_wt'])?$dbPkg['plt_wt']:0]]];
+            'shippingBoxQ' =>['order'=>10,'label'=>lang('box_q', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_q']) ?$dbPkg['box_q'] :1]],
+            'shippingBoxL' =>['order'=>15,'label'=>lang('box_l', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_l']) ?$dbPkg['box_l'] :0]],
+            'shippingBoxW' =>['order'=>20,'label'=>lang('box_w', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_w']) ?$dbPkg['box_w'] :0]],
+            'shippingBoxH' =>['order'=>25,'label'=>lang('box_h', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_h']) ?$dbPkg['box_h'] :0]],
+            'shippingBoxWt'=>['order'=>30,'label'=>lang('box_wt', $this->moduleID),'attr'=>['type'=>'integer','value'=>!empty($dbPkg['box_wt'])?$dbPkg['box_wt']:0]],
+            'shippingPltQ' =>['order'=>50,'label'=>lang('plt_q', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_q']) ?$dbPkg['plt_q'] :1]],
+            'shippingPltL' =>['order'=>55,'label'=>lang('plt_l', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_l']) ?$dbPkg['plt_l'] :0]],
+            'shippingPltW' =>['order'=>60,'label'=>lang('plt_w', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_w']) ?$dbPkg['plt_w'] :0]],
+            'shippingPltH' =>['order'=>65,'label'=>lang('plt_h', $this->moduleID), 'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_h']) ?$dbPkg['plt_h'] :0]],
+            'shippingPltWt'=>['order'=>70,'label'=>lang('plt_wt', $this->moduleID),'attr'=>['type'=>'integer','value'=>!empty($dbPkg['plt_wt'])?$dbPkg['plt_wt']:0]]];
         $layout    = array_replace_recursive($layout, ['type'=>'divHTML',
             'divs'  =>['main'=>['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'details'=> ['order'=>60,'type'=>'panel','key'=>'details','classes'=>['block33']]]]],

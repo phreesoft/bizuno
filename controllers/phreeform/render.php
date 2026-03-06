@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-03
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -36,13 +36,11 @@ class phreeformRender
     public    $moduleID    = 'phreeform';
     public    $attachments = [];
     protected $metaPrefix  = 'phreeform';
-    public    $lang;
     public    $critChoices;
     
     function __construct()
     {
         global $critChoices; // @todo this needs to be fixed, used in phreeform/functions.php (probably should be put in here!)
-        $this->lang = getLang($this->moduleID);
         $critChoices = $this->critChoices = [
             0  => '2:all:range:equal',
             1  => '0:yes:no',
@@ -180,7 +178,7 @@ class phreeformRender
 
         if (sizeof($viewData['fields']['reports']) > 1) {
           $output .= '    <div id="frm_select">'."\n";
-          $output .= "    <br /><h2>".$this->lang['phreeform_form_select']."</h2>\n";
+          $output .= "    <br /><h2>".lang('phreeform_form_select', $this->moduleID)."</h2>\n";
           foreach ($viewData['fields']['reports'] as $value) {
             $output .= '    <p style="min_height:30px">'.html5('', ['label'=>$value['title'],'position'=>'after','events'=>['onChange'=>"if (newVal) { pfGetInfo(this.value); }"],'attr'=>['type'=>'checkbox','name'=>'rIDs[]','value'=>$value['id']]])."</p>\n";
           }
@@ -222,9 +220,9 @@ class phreeformRender
             $i++;
         } }
         $output .= "    <tr>\n";
-        $output .= "      <td>".$this->lang['phreeform_groups']."</td>\n";
+        $output .= "      <td>".lang('phreeform_groups', $this->moduleID)."</td>\n";
         $output .= '      <td colspan="3">'.html5('critGrpSel', ['values'=>$group_list, 'attr'=>['type'=>'select', 'value'=>$group_default]]).' ';
-        $output .= html5('grpbreak', ['label'=>$this->lang['phreeform_page_break'], 'attr'=>['type'=>'checkbox']])."</td>\n";
+        $output .= html5('grpbreak', ['label'=>lang('phreeform_page_break', $this->moduleID), 'attr'=>['type'=>'checkbox']])."</td>\n";
         $output .= "    </tr>\n";
     }
 
@@ -239,7 +237,7 @@ class phreeformRender
             $i++;
         } }
         $output .= "    <tr>\n";
-        $output .= "      <td>".$this->lang['phreeform_sorts']."</td>\n";
+        $output .= "      <td>".lang('phreeform_sorts', $this->moduleID)."</td>\n";
         $output .= '      <td colspan="3">'.html5('critSortSel', ['values'=>$sort_list, 'attr'=>['type'=>'select', 'value'=>$sort_default]]);
         $output .= "    </tr>\n";
     }
@@ -323,11 +321,11 @@ class phreeformRender
         // alias customer payments to vendor payments (both to Bank Checks)
         if ($group == 'bnk:j22') { $group = 'bnk:j20'; }
         $meta = getMetaCommon('phreeform_cache');
-        if (empty($meta)) { return msgAdd(sprintf($this->lang['err_group_empty'], $group)); }
+        if (empty($meta)) { return msgAdd(sprintf(lang('err_group_empty', $this->moduleID), $group)); }
         $output = [];
         foreach ($meta as $value) { 
             if ($group==$value['group_id'] && $value['mime_type']<>'dir') { $output[] = $value; } }
-        if (sizeof($output) < 1) { return msgAdd(sprintf($this->lang['err_group_empty'], $group)); }
+        if (sizeof($output) < 1) { return msgAdd(sprintf(lang('err_group_empty', $this->moduleID), $group)); }
         $this->addAttachments($output, $group); // Add attachemnts if invoice so they all can be printed together
         return $output;
     }
@@ -541,7 +539,7 @@ class phreeformRender
                             'contact_id' => $cID,
                             'entered_by' => getUserCache('profile', 'userID', false, '0'),
                             'log_date'   => biz_date('Y-m-d H:i:s'),
-                            'action'     => $this->lang['mail_out'],
+                            'action'     => lang('mail_out', $this->moduleID),
                             'notes'      => "Email: {$msgTo['name']} ({$msgTo['email']}), $msgSubject"];
                         msgDebug("\nReady to write sql data: ".print_r($sql_data, true));
                         dbWrite(BIZUNO_DB_PREFIX.'contacts_log', $sql_data);
@@ -596,7 +594,7 @@ class phreeformRender
                 } else { // the field is empty, bad news, error and exit unless table with serialized data
                     if ($field->type != 'Tbl') {
                         msgDebug("Failed loading fields at index $key, report: ".print_r($report, true));
-                        return msgAdd($this->lang['err_pf_field_empty']." index($key) $field->title");
+                        return msgAdd(lang('err_pf_field_empty', $this->moduleID)." index($key) $field->title");
                     }
                 }
             }
@@ -643,7 +641,7 @@ class phreeformRender
                 $report->fieldlist->rows[$i]->settings->img_file = getModuleCache('bizuno', 'settings', 'company', 'logo');
             } elseif ($report->fieldlist->rows[$i]->type == 'CBlk') {
                 if (!isset($report->fieldlist->rows[$i]->settings->boxfield->rows)) {
-                    return msgAdd($this->lang['err_pf_field_empty'].' '.$report->fieldlist->rows[$i]->title);
+                    return msgAdd(lang('err_pf_field_empty', $this->moduleID).' '.$report->fieldlist->rows[$i]->title);
                 }
                 $tField = '';
                 foreach ($report->fieldlist->rows[$i]->settings->boxfield->rows as $entry) {
@@ -743,7 +741,7 @@ class phreeformRender
             foreach ($report->fieldlist->rows as $key => $field) { // Build the text block strings
                 if ($field->type == 'TBlk') {
                     if (!$field->settings->boxfield->rows[0]->fieldname) {
-                        return msgAdd($this->lang['err_pf_field_empty'] . $field->title);
+                        return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $field->title);
                     }
                     if (!empty($report->special_class) && method_exists($special_form, 'load_text_block_data')) {
                         $tField = $special_form->load_text_block_data($field->settings->boxfield->rows);
@@ -764,7 +762,7 @@ class phreeformRender
                 }
                 if ($field->type == 'LtrTpl') { // letter template
                     if (!$field->settings->boxfield->rows[0]->fieldname) {
-                        return msgAdd($this->lang['err_pf_field_empty'] . $field->title);
+                        return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $field->title);
                     }
                     $strTxtBlk = $this->setFieldList($field->settings->boxfield->rows);
 //                  msgDebug("\n Executing LtrTpl sql = SELECT $strTxtBlk $TrailingSQL");
@@ -787,7 +785,7 @@ class phreeformRender
             // Send the table
             foreach ($report->fieldlist->rows as $key => $TableObject) {
                 if ($TableObject->type <> 'Tbl') { continue; }
-                if (!isset($TableObject->settings->boxfield->rows)) { return msgAdd($this->lang['err_pf_field_empty'] . $TableObject->title); }
+                if (!isset($TableObject->settings->boxfield->rows)) { return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $TableObject->title); }
                 // Build the sql
                 $GLOBALS['pfFieldSettings'] = $TableObject;
                 $tblField   = '';
@@ -832,7 +830,7 @@ class phreeformRender
             foreach ($report->fieldlist->rows as $key => $field) {
                 // Set the totals (need to be on last printed page) - Handled in the Footer function in TCPDF
                 if ($field->type == 'Ttl') {
-                    if (!isset($field->settings->boxfield->rows)) { return msgAdd($this->lang['err_pf_field_empty'].' '.$field->title); }
+                    if (!isset($field->settings->boxfield->rows)) { return msgAdd(lang('err_pf_field_empty', $this->moduleID).' '.$field->title); }
                     $report->fieldlist->rows[$key]->settings->processing = isset($field->settings->processing) ? $field->settings->processing : '';
                     $report->fieldlist->rows[$key]->settings->formatting = isset($field->settings->formatting) ? $field->settings->formatting : '';
                     if (!empty($report->special_class) && method_exists($special_form, 'load_total_results')) {
@@ -914,7 +912,7 @@ class phreeformRender
                         $oneline = formatReceipt($value, $field->width, $field->align, $oneline);
                         break;
                     case 'TBlk':
-                        if (!$field->settings->boxfield->rows[0]->fieldname) { return msgAdd($this->lang['err_pf_field_empty'] . $field->title); }
+                        if (!$field->settings->boxfield->rows[0]->fieldname) { return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $field->title); }
                         if ($report->special_class) {
                             $TextField = $special_form->load_text_block_data($field->settings->boxfield->rows);
                         } else {
@@ -931,7 +929,7 @@ class phreeformRender
                         $oneline = $report->fieldlist->rows[$field->type]->text;
                         break;
                     case 'Tbl':
-                        if (!$field->settings->boxfield->rows) { return msgAdd($this->lang['err_pf_field_empty'] . $field->title); }
+                        if (!$field->settings->boxfield->rows) { return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $field->title); }
                         //          $tblHeading = [];
                         //          foreach ($field->settings->boxfield->rows as $TableField) $tblHeading[] = $TableField->title;
                         $data = [];
@@ -971,7 +969,7 @@ class phreeformRender
                         $field->rowbreak = 1;
                         break;
                     case 'Ttl':
-                        if (!$field->settings->boxfield->rows) { return msgAdd($this->lang['err_pf_field_empty'] . $field->title); }
+                        if (!$field->settings->boxfield->rows) { return msgAdd(lang('err_pf_field_empty', $this->moduleID) . $field->title); }
                         if ($report->special_class) {
                             $report->FieldValues = $special_form->load_total_results($field);
                         } else {
@@ -1029,7 +1027,7 @@ class phreeformRender
         if (isset($report->grouplist->rows)) { for ($i = 0; $i < sizeof($report->grouplist->rows); $i++) {
             if ($report->grouplist->rows[$i]->default) {
                 $strGroup   .= prefixTables($report->grouplist->rows[$i]->fieldname);
-                $filterdesc .= $this->lang['phreeform_groups'].' '.$report->grouplist->rows[$i]->title.'; ';
+                $filterdesc .= lang('phreeform_groups', $this->moduleID).' '.$report->grouplist->rows[$i]->title.'; ';
             }
         } }
         // fetch the sort order and add to group by string to finish ORDER BY string
@@ -1037,7 +1035,7 @@ class phreeformRender
         if (isset($report->sortlist->rows)) { for ($i = 0; $i < sizeof($report->sortlist->rows); $i++) {
             if (!empty($report->sortlist->rows[$i]->default)) {
                 $strSort    .= ($strSort <> '' ? ', ' : '') . prefixTables($report->sortlist->rows[$i]->fieldname);
-                $filterdesc .= $this->lang['phreeform_sorts'].' '.$report->sortlist->rows[$i]->title.'; ';
+                $filterdesc .= lang('phreeform_sorts', $this->moduleID).' '.$report->sortlist->rows[$i]->title.'; ';
             }
         } }
         sqlFilter($report); // fetch criteria and date filter info
@@ -1104,7 +1102,7 @@ class phreeformRender
             switch ($todo[0]) {
                 case "r": // Report Total
                 case "g": // Group Total
-                    $Desc = ($todo[0] == 'g') ? $this->lang['group_total'] : $this->lang['report_total'];
+                    $Desc = ($todo[0] == 'g') ? lang('group_total', $this->moduleID) : lang('report_total', $this->moduleID);
                     $CSVOutput .= $Desc.' '.$todo[1] . "\n";
                     // Now fall through write the total data like any other data row
                 case "d": // Data
@@ -1151,7 +1149,7 @@ class phreeformRender
         global $report;
         msgDebug("\nEntering emailProps.");
         $output= ['defFrom'=>'', 'defTo'=>'', 'defCC'=>'', 'valsFrom'=>[], 'valsTo'=>[],
-            'msgSubject'=> sprintf($this->lang['phreeform_email_subject'], $report->title, getModuleCache('bizuno', 'settings', 'company', 'primary_name')),
+            'msgSubject'=> sprintf(lang('phreeform_email_subject', $this->moduleID), $report->title, getModuleCache('bizuno', 'settings', 'company', 'primary_name')),
             'msgBody'   => isset($report->emailmessage) ? TextReplace(stripslashes($report->emailmessage)) : sprintf(lang('phreeform_email_body'), $report->title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'))];
         $this->getFromAddress($output);
         if (!in_array($report->xfilterlist->fieldname, ['journal_main.id','contacts.id']) || $report->xfilterlist->default <> 'equal') {
@@ -1177,7 +1175,7 @@ class phreeformRender
         if (empty($sParts[1])) { $sParts[1] = ''; }
         $title  = !empty($report->filenameprefix)? $report->filenameprefix: '';
         $title .= !empty($main[$sParts[1]])      ? $main[$sParts[1]]      : $report->title;
-        $output['msgSubject']= sprintf($this->lang['phreeform_email_subject'], $title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'));
+        $output['msgSubject']= sprintf(lang('phreeform_email_subject', $this->moduleID), $title, getModuleCache('bizuno', 'settings', 'company', 'primary_name'));
         $output['msgBody']   = TextReplace($output['msgBody'], $xKeys, $xVals);
         msgDebug("\nreturning from emailProps, output is now: ".print_r($output, true));
         return $output;

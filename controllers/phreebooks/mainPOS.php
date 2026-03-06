@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/mainPOS.php
  */
 
@@ -36,7 +36,6 @@ class mainPOSMain
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**
@@ -50,10 +49,10 @@ class mainPOSMain
         unset($layout['divs']['tbJrnl']);
         // customize it for POS
         $fields = $this->menuFooter();
-        $data    = ['type'=>'page', 'title'=> $this->lang['title'],
+        $data    = ['type'=>'page', 'title'=> lang('title', $this->moduleID),
             'header'  => ['classes'=>['m-toolbar'],'type'=>'divs','divs'=>[
                 'left'  => ['order'=>10,'type'=>'menu','classes'=>['menuHide','m-left'], 'styles'=>['display'=>'none'],'data'=>$this->menuLeft($security)],
-                'center'=> ['order'=>20,'type'=>'html','classes'=>['m-title'],'html'=>$this->lang['title']],
+                'center'=> ['order'=>20,'type'=>'html','classes'=>['m-title'],'html'=>lang('title', $this->moduleID)],
                 'right' => ['order'=>30,'type'=>'menu','classes'=>['menuHide','m-right'],'styles'=>['display'=>'none'],'data'=>$this->menuRight($security)]]],
             'divs'    => [
                 'divDetail' => ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
@@ -80,13 +79,13 @@ class mainPOSMain
     private function menuLeft($security=0)
     {
         return ['child'=>['tools'=>['order'=>50,'icon'=>'tools','child'=>[
-            'openDrwr'  => ['order'=>10,'title'=>$this->lang['open_drawer'],'icon'=>'open',   'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('open drawer');"]],
-            'closeTill' => ['order'=>20,'title'=>$this->lang['close_till'], 'icon'=>'close',  'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('close till');"]],
-            'saveAsSO'  => ['order'=>30,'title'=>$this->lang['save_so'],    'icon'=>'print',  'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('save as SO');"]],
-            'saveAsQu'  => ['order'=>40,'title'=>$this->lang['save_quote'], 'icon'=>'payment','security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('save as quote');"]],
-            'reprint'   => ['order'=>50,'title'=>$this->lang['reprint'],'child'=>[
-                'prev'       => ['order'=>10,'title'=>$this->lang['reprint_previous'],'security'=>3,'events'=>['onClick'=>"alert('reprint receipt');"]],
-                'other'      => ['order'=>20,'title'=>$this->lang['reprint_other'],'security'=>3,   'events'=>['onClick'=>"alert('reprint other receipt');"]]]],
+            'openDrwr'  => ['order'=>10,'title'=>lang('open_drawer', $this->moduleID),'icon'=>'open',   'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('open drawer');"]],
+            'closeTill' => ['order'=>20,'title'=>lang('close_till', $this->moduleID), 'icon'=>'close',  'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('close till');"]],
+            'saveAsSO'  => ['order'=>30,'title'=>lang('save_so', $this->moduleID),    'icon'=>'print',  'security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('save as SO');"]],
+            'saveAsQu'  => ['order'=>40,'title'=>lang('save_quote', $this->moduleID), 'icon'=>'payment','security'=>3,'hidden'=>$security>1?false:true,'events'=>['onClick'=>"alert('save as quote');"]],
+            'reprint'   => ['order'=>50,'title'=>lang('reprint', $this->moduleID),'child'=>[
+                'prev'       => ['order'=>10,'title'=>lang('reprint_previous', $this->moduleID),'security'=>3,'events'=>['onClick'=>"alert('reprint receipt');"]],
+                'other'      => ['order'=>20,'title'=>lang('reprint_other', $this->moduleID),'security'=>3,   'events'=>['onClick'=>"alert('reprint other receipt');"]]]],
         ]]]];
     }
 
@@ -98,8 +97,8 @@ class mainPOSMain
     {
         return ['child'=>['settings'=>['order'=>50,'icon'=>'settings','child'=>[
             'setting'=> ['order'=>20,'title'=>lang('settings'),'child'=>[
-                'changeTill' => ['order'=>10,'title'=>$this->lang['change_till'],'security'=>3, 'events'=>['onClick'=>"alert('change till');"]],
-                'changeStore'=> ['order'=>20,'title'=>$this->lang['change_store'],'security'=>3,'events'=>['onClick'=>"alert('change store');"]]]],
+                'changeTill' => ['order'=>10,'title'=>lang('change_till', $this->moduleID),'security'=>3, 'events'=>['onClick'=>"alert('change till');"]],
+                'changeStore'=> ['order'=>20,'title'=>lang('change_store', $this->moduleID),'security'=>3,'events'=>['onClick'=>"alert('change store');"]]]],
             'ticket' => ['order'=>80,'label'=>lang('support'), 'icon'=>'support', 'required'=>true,'events'=>['onClick'=>"hrefClick('bizuno/administrate/ticketMain');"],'hidden'=>defined('BIZUNO_SUPPORT_EMAIL')?false:true],
             'exit'   => ['order'=>99,'label'=>lang('exit_pos'),'icon'=>'logout',  'required'=>true,'events'=>['onClick'=>"jsonAction('');"]],
         ]]]];
@@ -134,7 +133,7 @@ class mainPOSMain
             ['title'=>lang('inventory_tax_rate_id_c'),'total'=>0],
             ['title'=>lang('total'),'total'=>0,'font_size'=>16]];
         $footer = [
-            ['title'=>$this->lang['balance_due'],'total'=>0,'font_size'=>16],
+            ['title'=>lang('balance_due', $this->moduleID),'total'=>0,'font_size'=>16],
             ['title'=>lang('change'),            'total'=>0,'font_size'=>16]];
         return "
 var paymentData = {'total':0,'rows':[]};
@@ -224,7 +223,7 @@ function bizPOSBalCalc() {
         if (!$this->setPayments($ledger)) { return; }
         dbTransactionCommit();
         msgAdd(sprintf(lang('msg_gl_post_success'), lang('invoice_num_12'), $ledger->main['invoice_num']), 'success');
-        msgLog($this->lang['title'].'-'.lang('save')." ".lang('invoice_num_12')." {$ledger->main['invoice_num']} - {$ledger->main['description']} (rID={$ledger->main['id']}) ".lang('total').": ".viewFormat($ledger->main['total_amount'], 'currency'));
+        msgLog(lang('title', $this->moduleID).'-'.lang('save')." ".lang('invoice_num_12')." {$ledger->main['invoice_num']} - {$ledger->main['description']} (rID={$ledger->main['id']}) ".lang('total').": ".viewFormat($ledger->main['total_amount'], 'currency'));
         $formID     = getDefaultFormID($this->journalID);
         $jsonAction = "paymentData = {'total':0,'rows':[]}; jqBiz('#dgPayment').datagrid({data:[]}).datagrid('reload');"; // remove payment, clear summary datagrid
         $jsonAction.= "jqBiz('#dgJournalItem').datagrid({data:[]}).datagrid('reload').edatagrid('addRow');"; // clear the item datagrid

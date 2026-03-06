@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-03
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -53,7 +53,6 @@ class inventoryPrices extends mgrJournal
     function __construct($rID=0, $iID=0, $cID=0)
     {
         msgDebug("\nConstructing inventoryPrices");
-        $this->lang       = getLang($this->moduleID);
         $this->dom        = clean('dom', ['format'=>'cmd', 'default'=>'page'],'get');
         $this->type       = clean('type',['format'=>'char','default'=>'c'],   'get');
         $this->secID      = "prices_{$this->type}";
@@ -631,11 +630,11 @@ function preSubmitPrices() {
                 'adjType' => ['order'=>30,'label'=>lang('adjustment'),'attr' =>['width'=>120,],
                     'events' => ['formatter'=>"function(value){ return getTextValue(qtyAdj, value); }",
                         'editor'=>"{type:'combobox',options:{valueField:'id',textField:'text',data:qtyAdj}}"]],
-                'adjValue'=> ['order'=>40,'label'=>$this->lang['adj_value'], 'attr'=>['width'=>60,'align'=>'center', 'size'=>10],
+                'adjValue'=> ['order'=>40,'label'=>lang('adj_value', $this->moduleID), 'attr'=>['width'=>60,'align'=>'center', 'size'=>10],
                     'events' => ['editor'=>"{type:'numberbox'}",'formatter'=>"function(value,row){ return formatNumber(value); }"]],
                 'rndType' => ['order'=>50,'label'=>lang('rounding'),'attr' =>['width'=>120,],
                     'events' => ['formatter'=>"function(value){ return getTextValue(qtyRnd, value); }",'editor'=>"{type:'combobox',options:{valueField:'id',textField:'text',data:qtyRnd}}"]],
-                'rndValue'=> ['order'=>60,'label'=>$this->lang['rnd_value'], 'attr'=>['width'=>60,'align'=>'center', 'size'=>10],
+                'rndValue'=> ['order'=>60,'label'=>lang('rnd_value', $this->moduleID), 'attr'=>['width'=>60,'align'=>'center', 'size'=>10],
                     'events' => ['editor'=>"{type:'numberbox'}",'formatter'=>"function(value,row){ return formatNumber(value); }"]],
                 'price'   => ['order'=>70,'label'=>lang('price'), 'attr'=>['width'=>120,'align'=>'right', 'size'=>10],
                     'events' => ['editor'=>"{type:'numberbox'}",'formatter'=>"function(value,row){ return formatNumber(value); }"]],

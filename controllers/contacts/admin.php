@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-07
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -71,8 +71,8 @@ class contactsAdmin
             'cIDTele4'   => ['text'=>lang('telephone4').' (Contact rID)','module'=>'bizuno','function'=>'viewFormat'],
             'cIDEmail'   => ['text'=>lang('email')     .' (Contact rID)','module'=>'bizuno','function'=>'viewFormat'],
             'cIDWeb'     => ['text'=>lang('website')   .' (Contact rID)','module'=>'bizuno','function'=>'viewFormat'],
-            'contactGID' => ['text'=>lang('contacts_gov_id_number') .' ('.lang('id').')','group'=>$this->lang['title'],'module'=>'bizuno','function'=>'viewFormat']];
-        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, $this->lang['title']);
+            'contactGID' => ['text'=>lang('contacts_gov_id_number') .' ('.lang('id').')','group'=>lang('title', $this->moduleID),'module'=>'bizuno','function'=>'viewFormat']];
+        setProcessingDefaults($this->phreeformProcessing, $this->moduleID, lang('title', $this->moduleID));
     }
 
     /**
@@ -106,8 +106,8 @@ class contactsAdmin
         
         $metaCRM= dbMetaGet('%', 'options_crm_actions');
         $idxFreq= metaIdxClean($metaCRM); // remove the indexes
-        $crm0   = ['new' =>$this->lang['contacts_crm_new_call'], 'ret' =>$this->lang['contacts_crm_call_back'], 'flw' =>$this->lang['contacts_crm_follow_up'],
-                   'lead'=>$this->lang['contacts_crm_new_lead'], 'trn' =>lang('training'), 'inac'=>lang('inactive')];
+        $crm0   = ['new' =>lang('contacts_crm_new_call', $this->moduleID), 'ret' =>lang('contacts_crm_call_back', $this->moduleID), 'flw' =>lang('contacts_crm_follow_up', $this->moduleID),
+                   'lead'=>lang('contacts_crm_new_lead', $this->moduleID), 'trn' =>lang('training'), 'inac'=>lang('inactive')];
         asort($crm0);
         dbMetaSet($idxFreq, 'options_crm_actions', $crm0);
         // Put them in the cache for runtime access
@@ -126,11 +126,11 @@ class contactsAdmin
         if (!$security = validateAccess('admin', 1)) { return; }
         $clnDefault = localeCalculateDate(biz_date('Y-m-d'), 0, -1);
         $fields = [
-            'j9CloseDesc'  => ['order'=>10,'html' =>$this->lang['close_j9_desc'],'attr'=>['type'=>'raw']],
-            'dateJ9Close'  => ['order'=>20,'label'=>$this->lang['close_j9_label'],'attr'  =>['type'=>'date','value'=>$clnDefault]],
+            'j9CloseDesc'  => ['order'=>10,'html' =>lang('close_j9_desc', $this->moduleID),'attr'=>['type'=>'raw']],
+            'dateJ9Close'  => ['order'=>20,'label'=>lang('close_j9_label', $this->moduleID),'attr'  =>['type'=>'date','value'=>$clnDefault]],
             'btnJ9Close'   => ['order'=>30,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('contacts/tools/j9Close', 0, jqBiz('#dateJ9Close').datebox('getValue'));"],
                 'attr' => ['type'=>'button','value'=>lang('start')]],
-            'syncAtchDesc' => ['order'=>10,'html'=>$this->lang['sync_attach_desc'],'attr'=>['type'=>'raw']],
+            'syncAtchDesc' => ['order'=>10,'html'=>lang('sync_attach_desc', $this->moduleID),'attr'=>['type'=>'raw']],
             'btnSyncAttach'=> ['order'=>20,'events'=>['onClick' => "jqBiz('body').addClass('loading'); jsonAction('contacts/tools/syncAttachments&verbose=1');"],
                 'attr' => ['type'=>'button','value'=>lang('go')]]];
         $data  = [
@@ -141,8 +141,8 @@ class contactsAdmin
                         'closeJ9' => ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'closeJ9'],
                         'syncAtch'=> ['order'=>40,'type'=>'panel','classes'=>['block33'],'key'=>'syncAtch']]]]]]]],
             'panels'  => [
-                'closeJ9' => ['label'=>$this->lang['close_j9_title'],   'type'=>'fields','keys'=>['j9CloseDesc','dateJ9Close','btnJ9Close']],
-                'syncAtch'=> ['label'=>$this->lang['sync_attach_title'],'type'=>'fields','keys'=>['syncAtchDesc','btnSyncAttach']]],
+                'closeJ9' => ['label'=>lang('close_j9_title', $this->moduleID),   'type'=>'fields','keys'=>['j9CloseDesc','dateJ9Close','btnJ9Close']],
+                'syncAtch'=> ['label'=>lang('sync_attach_title', $this->moduleID),'type'=>'fields','keys'=>['syncAtchDesc','btnSyncAttach']]],
             'fields'  => $fields];
         $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
         // crm

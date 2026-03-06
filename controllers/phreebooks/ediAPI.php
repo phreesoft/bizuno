@@ -50,7 +50,6 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     protected $ediCntrlNum= 0;
     protected $log        = ['errors'=>[]]; // To store the entire transaction on disk
     protected $errors     = [];
-    public $lang;
     public $struc;
     public $prices;
     public $creds = [];
@@ -82,7 +81,6 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     
     function __construct()
     {
-        $this->lang   = getLang($this->moduleID);
         $this->prices = new inventoryPrices();
         $this->prices->type = 'c';
         $creds  = dbMetaGet('%','edi_client');

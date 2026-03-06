@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -50,10 +50,10 @@ class contactsTools
         $icnSave= ['icon'=>'save','label'=>lang('merge'),
             'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/mergeSave', jqBiz('#mergeSrc').val(), jqBiz('#mergeDest').val());"]];
         $props  = ['defaults'=>['type'=>'a', 'callback'=>''],'attr'=>['type'=>'contact']];
-        $html   = '<p>'.$this->lang['msg_contacts_merge_src'] .'</p><p>'.html5('mergeSrc', $props).'</p>'.
-                  '<p>'.$this->lang['msg_contacts_merge_dest'].'</p><p>'.html5('mergeDest',$props).'</p>'.
-                  '<p>'.$this->lang['msg_contacts_merge_bill'].'</p>'   .html5('icnMergeSave', $icnSave);
-        $data   = ['type'=>'popup','title'=>$this->lang['contacts_merge'],'attr'=>['id'=>'winMerge'],
+        $html   = '<p>'.lang('msg_contacts_merge_src', $this->moduleID) .'</p><p>'.html5('mergeSrc', $props).'</p>'.
+                  '<p>'.lang('msg_contacts_merge_dest', $this->moduleID).'</p><p>'.html5('mergeDest',$props).'</p>'.
+                  '<p>'.lang('msg_contacts_merge_bill', $this->moduleID).'</p>'   .html5('icnMergeSave', $icnSave);
+        $data   = ['type'=>'popup','title'=>lang('contacts_merge', $this->moduleID),'attr'=>['id'=>'winMerge'],
             'divs'   => ['body'=>['order'=>50,'type'=>'html','html'=>$html]],
             'jsReady'=> ['init'=>"bizFocus('mergeSrc');"]];
         $layout = array_replace_recursive($layout, $data);
@@ -244,7 +244,7 @@ class contactsTools
         $def = localeCalculateDate(biz_date('Y-m-d'), 0, -1);
         $date= clean('data', ['format'=>'date', 'default'=>$def], 'get');
         $cnt = dbWrite(BIZUNO_DB_PREFIX."journal_main", ['closed'=>'1'], 'update', "journal_id=9 AND post_date<'$date'");
-        msgAdd(sprintf($this->lang['close_j9_success'], $cnt), 'success');
+        msgAdd(sprintf(lang('close_j9_success', $this->moduleID), $cnt), 'success');
     }
 
     /**
@@ -258,7 +258,7 @@ class contactsTools
         $type  = clean('cType', 'char', 'get');
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $struc = $this->chartSalesData($rID, $type);
-        $title = $type=='v' ? $this->lang['purchases_by_month'] : $this->lang['sales_by_month'];
+        $title = $type=='v' ? lang('purchases_by_month', $this->moduleID) : lang('sales_by_month', $this->moduleID);
         $action= BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/chartSalesGo&rID=$rID&type=$type";
         $layout = array_merge_recursive($layout, ['type'=>'divHTML',
             'divs'=>[

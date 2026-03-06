@@ -34,7 +34,6 @@ class shippingReconcile
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**

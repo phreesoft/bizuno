@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/drillDown.php
  */
 
@@ -76,7 +76,7 @@ class proGLDrillDown
     return state.columnMenu;
 }
 jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buildMenu(jq[0]); } });";
-        $data = ['title'=> $this->lang['title'],
+        $data = ['title'=> lang('title', $this->moduleID),
             'divs'    => ['main'   =>['order'=>50,'label'=>lang('details'), 'type'=>'datagrid', 'key'=>'manager']],
             'datagrid'=> ['manager'=>$this->dgDrillDown('dgDrillDown')],
             'jsReady' => ['init'   =>$jsReady, 'dgDrillDown'=>"jqBiz('#dgDrillDown').datagrid('enableFilter');"]];
@@ -155,7 +155,7 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
                 'onClickRow'         => "function(rowIndex, rowData) { jqBiz('#$name').edatagrid('editRow', rowIndex); }",
                 'onHeaderContextMenu'=> "function(e, field) { e.preventDefault(); jqBiz(this).edatagrid('columnMenu').menu('show', { left:e.pageX, top:e.pageY }); }",
                 'rowStyler'          => "function(index, row) { if (row.closed==1) { return {class:'row-Yellow'}; }}"],
-            'footnotes'=> ['dbc2edit'=>$this->lang['dgNotes'],
+            'footnotes'=> ['dbc2edit'=>lang('dgNotes', $this->moduleID),
                 'codes'   => jsLang('color_codes').': <span class="row-Yellow">'.jsLang('closed').'</span>'],
             'source'   => [
                 'tables'  => ['inventory'=>['table'=>BIZUNO_DB_PREFIX.'journal_main']],

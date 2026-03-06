@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-16
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/payment/nacha.php
  *
  */
@@ -39,13 +39,11 @@ class paymentNacha
     private $totalDeb  = 0;
     private $totalCred = 0;
     private $totalHash = 0;
-    public  $lang;
     public  $refNum;
     public  $myData;
 
     function __construct($mapID='')
     {
-        $this->lang= getExtLang($this->moduleID);
         $this->refNum = 'ACH'.biz_date('ymdHi'); // .'-'; // bank groups these into single withdrawal
         $banks = getMetaCommon('ach_banks');
         msgDebug("\nConstucting nacha with mapID = $mapID and banks meta = ".print_r($banks, true));
@@ -63,15 +61,15 @@ class paymentNacha
                     'nacha'  => ['order'=>20,'type'=>'panel','key'=>'nacha',  'classes'=>['block33']],
                     'divAtch'=> ['order'=>30,'type'=>'panel','key'=>'divAtch','classes'=>['block66']]]]]]],
             'panels'=> [
-                'nacha' => ['label'=>$this->lang['panel_nacha'],'type'=>'divs','divs'=>[
+                'nacha' => ['label'=>lang('panel_nacha', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmNacha'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['nachaDesc','btnBackup']], // 'incFiles' is a later feature ???
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>$this->lang['file_nacha'],'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/nacha/mgrRows",'ext'=>$io->getValidExt('txt')]]],
+                'divAtch'=> ['type'=>'attach','defaults'=>['dgName'=>'dgBackup','path'=>$this->dirBackup,'title'=>lang('file_nacha', $this->moduleID),'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/nacha/mgrRows",'ext'=>$io->getValidExt('txt')]]],
             'forms'  => [
                 'frmNacha'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=bizuno/nacha/save"]]],
             'fields' => [
-                'nachaDesc' => ['order'=>10,'html'=>$this->lang['desc_nacha'],'attr'=>['type'=>'raw']],
+                'nachaDesc' => ['order'=>10,'html'=>lang('desc_nacha', $this->moduleID),'attr'=>['type'=>'raw']],
                 'btnBackup' => ['order'=>30,'icon'=>'nacha','label'=>lang('go'),'align'=>'right','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmNacha').submit();"]]],
             'jsReady'=> ['init'=>"ajaxForm('frmNacha');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);

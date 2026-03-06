@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-08
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/bizPOS.php
  *
  * POS printer library: https://github.com/mike42/escpos-php
@@ -35,11 +35,10 @@ class extBizPOSAdmin
 
     function __construct()
     {
-        $this->lang     = getExtLang($this->moduleID);
         $this->settings = getModuleCache($this->moduleID, 'settings', false, false, []);
         $this->tillDefaults = [
             'id'      => '',
-            'title'   => $this->lang['till_title'],
+            'title'   => lang('till_title', $this->moduleID),
             'store_id'=> 0,
             'gl_cash' => getChartDefault(0),
             'gl_diff' => getChartDefault(0),
@@ -59,7 +58,7 @@ class extBizPOSAdmin
             'divs' => [
                 "divtill" => ['order'=>50,'type'=>'accordion','key'=>'accTills']],
             'accordion'=>['accTills'=>['divs'=>[
-                'manager'=> ['order'=>30,'label'=>$this->lang['tills'],'type'=>'datagrid','key' =>'dgTills'],
+                'manager'=> ['order'=>30,'label'=>lang('tills', $this->moduleID),'type'=>'datagrid','key' =>'dgTills'],
                 'detail' => ['order'=>70,'label'=>lang('details'),     'type'=>'html',    'html'=>'&nbsp;'],]]],
             'datagrid' =>['dgTills'=>$this->dgTills('dgTills', $security)]]);
     }
@@ -92,7 +91,7 @@ class extBizPOSAdmin
         $data    = ['type'=>'divHTML',
             'divs'    => [
                 'toolbar' => ['order'=>10,'type'=>'toolbar','key' =>'tbTills'],
-                'heading' => ['order'=>15,'type'=>'html',   'html'=>"<h1>{$this->lang['till']}</h1>"],
+                'heading' => ['order'=>15,'type'=>'html',   'html'=>"<h1>{lang('till']}</h1>"],
                 'formBOF' => ['order'=>20,'type'=>'form',   'key' =>'frmTills'],
                 'body'    => ['order'=>50,'type'=>'fields', 'keys'=>['id','title','store_id','gl_cash','gl_diff','max_disc','printer']],
                 'formEOF' => ['order'=>99,'type'=>'html',   'html'=>'</form>']],
@@ -100,13 +99,13 @@ class extBizPOSAdmin
                 'save' => ['order'=>10,'icon'=>'save','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmTills').submit();"]]]]],
             'forms'   => ['frmTills'=>  ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/tillSave"]]],
             'fields'  => [
-                'id'      => ['label'=>$this->lang['till_id'],   'break'=>true,'position'=>'after','attr'=>['value'=>$values['id']]],
-                'title'   => ['label'=>$this->lang['till_title'],'break'=>true,'position'=>'after','attr'=>['value'=>$values['title']]],
+                'id'      => ['label'=>lang('till_id', $this->moduleID),   'break'=>true,'position'=>'after','attr'=>['value'=>$values['id']]],
+                'title'   => ['label'=>lang('till_title', $this->moduleID),'break'=>true,'position'=>'after','attr'=>['value'=>$values['title']]],
                 'store_id'=> ['label'=>lang('store_id'),         'break'=>true,'position'=>'after','attr'=>['type'=>'hidden','value'=>$values['store_id']]],
-                'gl_cash' => ['label'=>$this->lang['gl_cash'],   'break'=>true,'position'=>'after','attr'=>['type'=>'ledger','value'=>$values['gl_cash']]],
-                'gl_diff' => ['label'=>$this->lang['gl_diff'],   'break'=>true,'position'=>'after','attr'=>['type'=>'ledger','value'=>$values['gl_diff']]],
-                'max_disc'=> ['label'=>$this->lang['max_disc'],  'break'=>true,'position'=>'after','attr'=>['value'=>$values['max_disc']]],
-                'printer' => ['label'=>$this->lang['printer'],   'break'=>true,'position'=>'after','values'=>$printers,'attr'=>['type'=>'select','value'=>$values['printer']]]],
+                'gl_cash' => ['label'=>lang('gl_cash', $this->moduleID),   'break'=>true,'position'=>'after','attr'=>['type'=>'ledger','value'=>$values['gl_cash']]],
+                'gl_diff' => ['label'=>lang('gl_diff', $this->moduleID),   'break'=>true,'position'=>'after','attr'=>['type'=>'ledger','value'=>$values['gl_diff']]],
+                'max_disc'=> ['label'=>lang('max_disc', $this->moduleID),  'break'=>true,'position'=>'after','attr'=>['value'=>$values['max_disc']]],
+                'printer' => ['label'=>lang('printer', $this->moduleID),   'break'=>true,'position'=>'after','values'=>$printers,'attr'=>['type'=>'select','value'=>$values['printer']]]],
             'jsReady' => ['init'=>"ajaxForm('frmTills');"]];
         if ($values['id']) { $data['fields']['id']['attr']['readonly'] = 'readonly'; }
         if (sizeof(getModuleCache('bizuno', 'stores')) > 1) {
@@ -153,8 +152,8 @@ class extBizPOSAdmin
         } }
         $tills[$rID] = $values;
         setModuleCache($this->moduleID, 'tills', false, $tills);
-        msgAdd($this->lang['tills'].": {$values['title']} - ".lang('msg_settings_saved'), 'success');
-        msgLog($this->lang['tills'].": {$values['title']} ($rID) - ".lang('msg_settings_saved'));
+        msgAdd(lang('tills', $this->moduleID).": {$values['title']} - ".lang('msg_settings_saved'), 'success');
+        msgLog(lang('tills', $this->moduleID).": {$values['title']} ($rID) - ".lang('msg_settings_saved'));
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accTills').accordion('select', 0); jqBiz('#dgTills').datagrid('reload'); jqBiz('#detail').html('&nbsp;');"]]);
     }
 
@@ -170,7 +169,7 @@ class extBizPOSAdmin
         if (!$rID) { return msgAdd("Bad data!"); }
         $title = getModuleCache($this->moduleID, 'tills', $rID, 'title');
         clearModuleCache($this->moduleID, 'tills', $rID);
-        msgLog($this->lang['till'].": $title ($rID) - ".lang('deleted'));
+        msgLog(lang('till', $this->moduleID).": $title ($rID) - ".lang('deleted'));
         $layout= array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accTills').accordion('select', 0); jqBiz('#dgTills').datagrid('reload'); jqBiz('#detail').html('&nbsp;');"]]);
     }
 
@@ -184,10 +183,10 @@ class extBizPOSAdmin
         if (!$security = validateAccess('admin', 1)) { return; }
         if (getUserCache('profile', 'tillID')) { return; }
         $tills = getModuleCache($this->moduleID, 'tills');
-        if (!sizeof($tills)) { return msgAdd($this->lang['err_no_tills']); }
+        if (!sizeof($tills)) { return msgAdd(lang('err_no_tills', $this->moduleID)); }
         if ( sizeof($tills)==1) { return setUserCache('profile', 'tillID', 0); } // only one till use it and don't ask
         $viewTills = viewDropdown(getModuleCache($this->moduleID, 'tills'), 'id', 'title', true);
-        $html   = '<p>'.$this->lang['till_select_desc']."</p>".html5('tillID',['values'=>$viewTills,'attr'=>['type'=>'select', 'value'=>'']]);
+        $html   = '<p>'.lang('till_select_desc', $this->moduleID)."</p>".html5('tillID',['values'=>$viewTills,'attr'=>['type'=>'select', 'value'=>'']]);
         $html  .= html5('iconGO',['icon'=>'next','events'=>['onClick'=>"jsonAction('$this->moduleID/admin/tillSet', 0, jqBiz('#tillID').val());"]]);
         $data   = ['type'=>'popup','title'=>'','attr'=>['id'=>'winNewTill','width'=>400,'height'=>200],
             'divs'=>['winNewTill'=>['order'=>50,'type'=>'html','html'=>$html]]];
@@ -228,12 +227,12 @@ class extBizPOSAdmin
                     'events' => ['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> ['delete'=> ['icon'=>'trash','size'=>'small','order'=>90,'hidden'=>$security>3?false:true,
                         'events'=> ['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/admin/tillDelete', 0, jqBiz('#$name').datagrid('getRows')[indexTBD]['id']);"]]]],
-                'id'      => ['order'=>10,'label'=>$this->lang['till_id'],   'attr'=>['width'=> 50,'resizable'=>true]],
+                'id'      => ['order'=>10,'label'=>lang('till_id', $this->moduleID),   'attr'=>['width'=> 50,'resizable'=>true]],
                 'title'   => ['order'=>20,'label'=>lang('title'),            'attr'=>['width'=>150,'resizable'=>true]],
                 'store_id'=> ['order'=>30,'label'=>lang('store_id'),'attr'=>['width'=> 75,'resizable'=>true]],
-                'gl_cash' => ['order'=>40,'label'=>$this->lang['gl_cash'],   'attr'=>['width'=> 75,'resizable'=>true]],
-                'gl_diff' => ['order'=>50,'label'=>$this->lang['gl_diff'],   'attr'=>['width'=> 75,'resizable'=>true]],
-                'max_disc'=> ['order'=>70,'label'=>$this->lang['max_disc'],  'attr'=>['width'=> 75,'resizable'=>true]],
-                'printer' => ['order'=>80,'label'=>$this->lang['printer'],   'attr'=>['width'=> 75,'resizable'=>true]]]];
+                'gl_cash' => ['order'=>40,'label'=>lang('gl_cash', $this->moduleID),   'attr'=>['width'=> 75,'resizable'=>true]],
+                'gl_diff' => ['order'=>50,'label'=>lang('gl_diff', $this->moduleID),   'attr'=>['width'=> 75,'resizable'=>true]],
+                'max_disc'=> ['order'=>70,'label'=>lang('max_disc', $this->moduleID),  'attr'=>['width'=> 75,'resizable'=>true]],
+                'printer' => ['order'=>80,'label'=>lang('printer', $this->moduleID),   'attr'=>['width'=> 75,'resizable'=>true]]]];
     }
 }

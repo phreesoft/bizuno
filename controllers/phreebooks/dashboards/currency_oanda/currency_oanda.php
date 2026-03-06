@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/phreebooks/dashboards/currency_oanda/currency_oanda.php
  */
 
@@ -47,10 +47,6 @@ class currency_oanda
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [
@@ -60,12 +56,6 @@ class currency_oanda
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @return modified $layout
-     */
     public function render()
     {
         global $html5;

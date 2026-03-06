@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-03
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -65,7 +65,7 @@ class bizunoProfile extends mgrJournal
         $rID  = metaIdxClean($metaVal); // need a rID since we enter directly from a menu selection
         $args = ['dom'=>'page', '_rID'=>$rID, '_table'=>'contacts', '_refID'=>getUserCache('profile', 'userID'), 'title'=>lang('edit_profile')];
         parent::editMeta($layout, 3, $args);
-        $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>$this->lang['reminders'],'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=bizuno/reminder/manager'"]];
+        $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>lang('reminders', $this->moduleID),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=bizuno/reminder/manager'"]];
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow new, copy here
     }
     public function save()

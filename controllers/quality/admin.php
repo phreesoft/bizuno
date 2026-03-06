@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/quality/admin.php
  */
 
@@ -32,13 +32,11 @@ class qualityAdmin
 {
     public $moduleID= 'quality';
     public $pageID  = 'admin';
-    public $lang;
     public $settings;
     public $structure;
 
     function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->defaults = ['manual'=>['manual_title'=>lang('quality_manual')]];
         msgDebug("\nModule Cache = ".print_r(getModuleCache($this->moduleID, 'settings'), true));
         $this->settings = array_replace_recursive($this->defaults, getModuleCache($this->moduleID, 'settings'));
@@ -71,28 +69,28 @@ class qualityAdmin
     public function settingsStructure()
     {
         $fields = [
-            'proc_sales'    => ['label'=>$this->lang['proc_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_sales']]],
-            'stnd_sales'    => ['label'=>$this->lang['stnd_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_sales']]],
-            'inst_sales'    => ['label'=>$this->lang['inst_sales'],    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_sales']]],
-            'proc_inv_mgr'  => ['label'=>$this->lang['proc_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_inv_mgr']]],
-            'stnd_inv_mgr'  => ['label'=>$this->lang['stnd_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_inv_mgr']]],
-            'inst_inv_mgr'  => ['label'=>$this->lang['inst_inventory'],'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_inv_mgr']]],
-            'proc_receiving'=> ['label'=>$this->lang['proc_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_receiving']]],
-            'stnd_receiving'=> ['label'=>$this->lang['stnd_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_receiving']]],
-            'inst_receiving'=> ['label'=>$this->lang['inst_receive'],  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_receiving']]],
-            'proc_woProd'   => ['label'=>$this->lang['proc_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_woProd']]],
-            'stnd_woProd'   => ['label'=>$this->lang['stnd_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_woProd']]],
-            'inst_woProd'   => ['label'=>$this->lang['inst_build'],    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_woProd']]],
-            'proc_qa_ticket'=> ['label'=>$this->lang['proc_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_qa_ticket']]],
-            'stnd_qa_ticket'=> ['label'=>$this->lang['stnd_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_qa_ticket']]],
-            'inst_qa_ticket'=> ['label'=>$this->lang['inst_quality'],  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_qa_ticket']]],
-            'proc_shipping' => ['label'=>$this->lang['proc_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_shipping']]],
-            'stnd_shipping' => ['label'=>$this->lang['stnd_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_shipping']]],
-            'inst_shipping' => ['label'=>$this->lang['inst_shipping'], 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_shipping']]]];
+            'proc_sales'    => ['label'=>lang('proc_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_sales']]],
+            'stnd_sales'    => ['label'=>lang('stnd_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_sales']]],
+            'inst_sales'    => ['label'=>lang('inst_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_sales']]],
+            'proc_inv_mgr'  => ['label'=>lang('proc_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_inv_mgr']]],
+            'stnd_inv_mgr'  => ['label'=>lang('stnd_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_inv_mgr']]],
+            'inst_inv_mgr'  => ['label'=>lang('inst_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_inv_mgr']]],
+            'proc_receiving'=> ['label'=>lang('proc_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_receiving']]],
+            'stnd_receiving'=> ['label'=>lang('stnd_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_receiving']]],
+            'inst_receiving'=> ['label'=>lang('inst_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_receiving']]],
+            'proc_woProd'   => ['label'=>lang('proc_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_woProd']]],
+            'stnd_woProd'   => ['label'=>lang('stnd_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_woProd']]],
+            'inst_woProd'   => ['label'=>lang('inst_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_woProd']]],
+            'proc_qa_ticket'=> ['label'=>lang('proc_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_qa_ticket']]],
+            'stnd_qa_ticket'=> ['label'=>lang('stnd_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_qa_ticket']]],
+            'inst_qa_ticket'=> ['label'=>lang('inst_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_qa_ticket']]],
+            'proc_shipping' => ['label'=>lang('proc_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_shipping']]],
+            'stnd_shipping' => ['label'=>lang('stnd_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_shipping']]],
+            'inst_shipping' => ['label'=>lang('inst_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_shipping']]]];
         $data = [
             'manual' => ['order'=>20,'label'=>lang('quality_manual'),'fields'=>[
-                'manual_title'=> ['label'=>$this->lang['manual_title'],'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_title']]],
-                'manual_link' => ['label'=>$this->lang['manual_link'], 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_link']]]]],
+                'manual_title'=> ['label'=>lang('manual_title', $this->moduleID),'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_title']]],
+                'manual_link' => ['label'=>lang('manual_link', $this->moduleID), 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_link']]]]],
             'general'=> ['order'=>30,'label'=>lang('general'),'fields'=>$fields]];
 //        settingsFill($data, $this->moduleID);
         return $data;
@@ -104,10 +102,10 @@ class qualityAdmin
         $metaStat= dbMetaGet('%', 'options_qa_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
         $status = [
-             '1'=>$this->lang['qa_status_1'],  '2'=>$this->lang['qa_status_2'],  '3'=>$this->lang['qa_status_3'],
-             '4'=>$this->lang['qa_status_4'],  '5'=>$this->lang['qa_status_5'],  '6'=>$this->lang['qa_status_6'],
-             '7'=>$this->lang['qa_status_7'],  '8'=>$this->lang['qa_status_8'], '85'=>$this->lang['qa_status_85'],
-            '90'=>$this->lang['qa_status_90'],'99'=>$this->lang['qa_status_99']];
+             '1'=>lang('qa_status_1', $this->moduleID),  '2'=>lang('qa_status_2', $this->moduleID),  '3'=>lang('qa_status_3', $this->moduleID),
+             '4'=>lang('qa_status_4', $this->moduleID),  '5'=>lang('qa_status_5', $this->moduleID),  '6'=>lang('qa_status_6', $this->moduleID),
+             '7'=>lang('qa_status_7', $this->moduleID),  '8'=>lang('qa_status_8', $this->moduleID), '85'=>lang('qa_status_85', $this->moduleID),
+            '90'=>lang('qa_status_90', $this->moduleID),'99'=>lang('qa_status_99', $this->moduleID)];
         asort($status);
         dbMetaSet($idxStat, 'options_qa_status', $status);
         // Put them in the cache for runtime access
@@ -224,9 +222,9 @@ class qualityAdmin
             $layout['tabs']['tabRoles']['divs']['quality']['divs']['props'] = ['order'=>20,'type'=>'panel','classes'=>['block50'],'key'=>'qualSettings'];
             $layout['panels']['qualSettings'] = ['label'=>lang('settings'),'type'=>'fields','keys'=>[]];
         }
-        $layout['fields']['group_qa'] = ['order'=>50,'label'=>$this->lang['role_qa'], 'tip'=>'',
+        $layout['fields']['group_qa'] = ['order'=>50,'label'=>lang('role_qa', $this->moduleID), 'tip'=>'',
             'attr'=>['type'=>'checkbox','checked'=>!empty($role['groups']['qa']) ?true:false]];
-        $layout['fields']['training'] = ['order'=>52,'label'=>$this->lang['roles_title'],'options'=>['multiple'=>'true'],'values'=>$lstTrain,'tip'=>$this->lang['roles_description'],
+        $layout['fields']['training'] = ['order'=>52,'label'=>lang('roles_title', $this->moduleID),'options'=>['multiple'=>'true'],'values'=>$lstTrain,'tip'=>lang('roles_description', $this->moduleID),
             'attr'=>['type'=>'select','name'=>'training[]','value'=>$selTrain]];
         $layout['panels']['qualSettings']['keys'][] = 'training';
         $layout['panels']['qualSettings']['keys'][] = 'group_qa';

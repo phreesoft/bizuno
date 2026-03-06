@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-18
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/contacts/promos.php
  */
 
@@ -55,12 +55,12 @@ class contactsPromos extends mgrJournal
 //            '_rID'         => ['panel'=>'properties','order'=> 1,                                     'clean'=>'integer',  'attr'=>['type'=>'hidden', 'value'=>0]], // For common_meta
 //            '_table'       => ['panel'=>'properties','order'=> 1,                                     'clean'=>'alpha_num','attr'=>['type'=>'hidden', 'value'=>'']],
 //            'type'         => ['panel'=>'properties','order'=> 1,                                     'clean'=>'alpha_num','attr'=>['type'=>'select', 'value'=>''], 'values'=>viewKeyDropdown($this->faTypes)],
-//            'ref_num'      => ['panel'=>'properties','order'=>10, 'label'=>$this->lang['asset_num'],  'clean'=>'cmd',      'attr'=>['value'=>'']],
+//            'ref_num'      => ['panel'=>'properties','order'=>10, 'label'=>lang('asset_num', $this->moduleID),  'clean'=>'cmd',      'attr'=>['value'=>'']],
 //            'title'        => ['panel'=>'properties','order'=>20, 'label'=>lang('title'),             'clean'=>'text',     'attr'=>['value'=>'']],
 //            'description'  => ['panel'=>'properties','order'=>30, 'label'=>lang('description'),       'clean'=>'text',     'attr'=>['value'=>'']],
 //            'status'       => ['panel'=>'properties','order'=>40, 'label'=>lang('status'),            'clean'=>'alpha_num','attr'=>['type'=>'hidden', 'value'=>0],'values'=>viewKeyDropdown($this->status)],
 //            'store_id'     => ['panel'=>'properties','order'=>50, 'label'=>lang('store_id'),          'clean'=>'integer',  'attr'=>['type'=>sizeof($stores)>1?'select':'hidden', 'value'=>0], 'values'=>$stores],
-//            'date_acq'     => ['panel'=>'properties','order'=>60, 'label'=>$this->lang['date_acq'],   'clean'=>'dateMeta', 'attr'=>['type'=>'date',   'value'=>biz_date()]],
+//            'date_acq'     => ['panel'=>'properties','order'=>60, 'label'=>lang('date_acq', $this->moduleID),   'clean'=>'dateMeta', 'attr'=>['type'=>'date',   'value'=>biz_date()]],
 //            'cost'         => ['panel'=>'properties','order'=>70, 'label'=>lang('cost'),              'clean'=>'currency', 'attr'=>['type'=>'currency','value'=>'']],
 //            'serial_number'=> ['panel'=>'properties','order'=>80, 'label'=>lang('serial_number'),     'clean'=>'cmd',      'attr'=>['value'=>'']],
             ];
@@ -91,16 +91,16 @@ class contactsPromos extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->moduleID, 1)) { return; }
-        $data = ['title'=>$this->lang['title'],
+        $data = ['title'=>lang('title', $this->moduleID),
             'divs'     => [$this->moduleID=>['order'=>30,'type'=>'accordion','key'=>'accPromos']],
             'accordion'=> ['accPromos'=>['divs'=>[
-                'divPromosMgr'   => ['order'=>30,'label'=>$this->lang['promos_mgr'],'type'=>'divs','divs'=>[
+                'divPromosMgr'   => ['order'=>30,'label'=>lang('promos_mgr', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF' => ['order'=>15,'type'=>'form',    'key' =>'frmPromoMgr'],
                     'fields'  => ['order'=>40,'type'=>'html',    'html'=>$this->getViewMgr()],
                     'datagrid'=> ['order'=>60,'type'=>'datagrid','key' =>'dgHistory'],
                     'formEOF' => ['order'=>85,'type'=>'html',    'html'=>"</form>"]]],
-                'divPromosRows'  => ['order'=>50,'label'=>$this->lang['promos_list'],'type'=>'datagrid','key'=>'dgPromos'],
-                'divPromosDetail'=> ['order'=>70,'label'=>lang('details'),'type'=>'html', 'html'=>$this->lang['desc_promo_empty']]]]],
+                'divPromosRows'  => ['order'=>50,'label'=>lang('promos_list', $this->moduleID),'type'=>'datagrid','key'=>'dgPromos'],
+                'divPromosDetail'=> ['order'=>70,'label'=>lang('details'),'type'=>'html', 'html'=>lang('desc_promo_empty', $this->moduleID)]]]],
             'forms'    => ['frmPromoMgr'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/sendMain"]]],
             'datagrid' => [
                 'dgPromos' => $this->dgPromos ('dgPromos',  $security),
@@ -119,10 +119,10 @@ class contactsPromos extends mgrJournal
         $validTitles = dbGetMulti(BIZUNO_DB_PREFIX.$this->moduleID, "start_date <= '".biz_date('Y-m-d')."' AND end_date >= '".biz_date('Y-m-d')."'");
         $titles = [['id'=>'0', 'text'=>lang('select')]];
         foreach ($validTitles as $row) { $titles[] = ['id'=>$row['id'], 'text'=>$row['title']]; }
-        $options = [['id'=>'newsletter', 'text'=>$this->lang['newsletter']], ['id'=>'all', 'text'=>lang('all')]];
-        return '<p>'.$this->lang['promo_desc']."</p>"
-        .html5('selTitle',   ['label' => $this->lang['promos_list'],  'values'=>$titles, 'attr'=>['type'=>'select']]).'<br />'
-        .html5('selOption',  ['label' => $this->lang['promos_option'],'values'=>$options,'attr'=>['type'=>'select']]).'<br />'
+        $options = [['id'=>'newsletter', 'text'=>lang('newsletter', $this->moduleID)], ['id'=>'all', 'text'=>lang('all')]];
+        return '<p>'.lang('promo_desc', $this->moduleID)."</p>"
+        .html5('selTitle',   ['label' => lang('promos_list', $this->moduleID),  'values'=>$titles, 'attr'=>['type'=>'select']]).'<br />'
+        .html5('selOption',  ['label' => lang('promos_option', $this->moduleID),'values'=>$options,'attr'=>['type'=>'select']]).'<br />'
         .html5('senderName', ['label' => lang('from'), 'attr'=>['size'=>32, 'value'=>getModuleCache('bizuno', 'settings', 'company', 'primary_name')]]) .'<br />'
         .html5('senderEmail',['label' => lang('email'),'attr'=>['type'=>'email','value'=>getModuleCache('bizuno', 'settings', 'company', 'email')]])
         .html5('btnEmail',   ['events'=> ['onClick'=>"jqBiz('#frmPromoMgr').submit();"],'attr'=>['type'=>'button','value'=>lang('start')]]).'
@@ -208,15 +208,15 @@ function xfrResponse(json) {
                         'edit' => ['order'=>30,'icon'=>'edit','label'=>lang('edit'),
                             'events'=> ['onClick' => "accordionEdit('accPromos', 'dgPromos', 'divPromosDetail', '".jsLang('details')."', '$this->moduleID/promos/edit', idTBD);"]],
                         'copy' => ['order'=>50,'icon'=>'copy',
-                            'events' => ['onClick'=>"var title=prompt('".$this->lang['msg_copy_promo']."'); if (title!=null) jsonAction('$this->moduleID/promos/copy', idTBD, title);"]],
+                            'events' => ['onClick'=>"var title=prompt('".lang('msg_copy_promo', $this->moduleID)."'); if (title!=null) jsonAction('$this->moduleID/promos/copy', idTBD, title);"]],
                         'trash'=> ['order'=>90,'icon'=>'trash','label'=>lang('delete'), 'hidden'=>$security>3?false:true,
                             'events'=> ['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('$this->moduleID/promos/delete', idTBD);"]]]],
                 'title'     => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX."title",
                     'label' => lang('title'),'attr'=>['width'=>40,'sortable'=>true,'resizable'=>true]],
                 'start_date'=> ['order'=>60, 'field'=>BIZUNO_DB_PREFIX."start_date",
-                    'label' => $this->lang['start_date'],'format'=>'date','attr'=>['width'=>40,'sortable'=>true,'resizable'=>true]],
+                    'label' => lang('start_date', $this->moduleID),'format'=>'date','attr'=>['width'=>40,'sortable'=>true,'resizable'=>true]],
                 'end_date'  => ['order'=>70, 'field'=>BIZUNO_DB_PREFIX."end_date",
-                    'label' => $this->lang['end_date'],'format'=>'date','attr'=>['width'=>40,'sortable'=>true,'resizable'=>true]]]];
+                    'label' => lang('end_date', $this->moduleID),'format'=>'date','attr'=>['width'=>40,'sortable'=>true,'resizable'=>true]]]];
     }
 
     /**
@@ -236,7 +236,7 @@ function xfrResponse(json) {
             'columns'=> [
                 'id'     => ['order'=>0, 'field'=>BIZUNO_DB_PREFIX."id", 'attr'=>['hidden'=>true]],
                 'send_date'=> ['order'=>20, 'field'=>BIZUNO_DB_PREFIX."crmPromos.start_date",
-                    'label' => $this->lang['promo_date'],'format'=>'date','attr'=>['width'=>50,'sortable'=>true,'resizable'=>true]],
+                    'label' => lang('promo_date', $this->moduleID),'format'=>'date','attr'=>['width'=>50,'sortable'=>true,'resizable'=>true]],
                 'title'     => ['order'=>50, 'field'=>BIZUNO_DB_PREFIX."crmPromos.title",
                     'label' => lang('title'),'attr'=>['width'=>200,'sortable'=>true,'resizable'=>true]]]];
     }
@@ -252,8 +252,8 @@ function xfrResponse(json) {
         $rID   = clean('rID', 'integer', 'get');
         $struc = dbLoadStructure(BIZUNO_DB_PREFIX.$this->moduleID);
         if ($rID) { dbStructureFill($struc, dbGetRow(BIZUNO_DB_PREFIX."crmPromos", "id=$rID")); }
-        $struc['start_date']['label']= $this->lang['start_date'];
-        $struc['end_date']['label']  = $this->lang['end_date'];
+        $struc['start_date']['label']= lang('start_date', $this->moduleID);
+        $struc['end_date']['label']  = lang('end_date', $this->moduleID);
         $struc['email_body']['label']= '';
         $data  = ['type'=>'divHTML',
             'divs'     => [
@@ -283,7 +283,7 @@ function xfrResponse(json) {
         unset($orig['id']);
         $orig['title'] = $title;
         $nID = dbWrite(BIZUNO_DB_PREFIX."crmPromos", $orig);
-        msgLog($this->lang['title'].'-'.lang('copy')." $title ($oID => $nID)");
+        msgLog(lang('title', $this->moduleID).'-'.lang('copy')." $title ($oID => $nID)");
         $layout = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"jqBiz('#dgPromos').datagrid('reload'); accordionEdit('accPromos', 'dgPromos', 'divPromosDetail', '".lang('details')."', '$this->moduleID/promos/edit', $nID);"]]);
     }
 
@@ -300,7 +300,7 @@ function xfrResponse(json) {
         $result = dbWrite(BIZUNO_DB_PREFIX."crmPromos", $values, $values['id']?'update':'insert', "id={$values['id']}");
         if (!$values['id']) { $values['id'] = $_POST['id'] = $result; }
         msgLog(lang($this->moduleID).' - '.lang('save')." - {$values['title']} (rID={$values['id']})");
-        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accPromos').accordion('select', 1); jqBiz('#dgPromos').datagrid('reload'); jqBiz('#divPromosDetail').html('".$this->lang['desc_promo_empty']."');"]]);
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#accPromos').accordion('select', 1); jqBiz('#dgPromos').datagrid('reload'); jqBiz('#divPromosDetail').html('".lang('desc_promo_empty', $this->moduleID)."');"]]);
     }
 
     /**
@@ -314,7 +314,7 @@ function xfrResponse(json) {
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd('The record was not deleted, the proper id was not passed!'); }
         $title = dbGetValue(BIZUNO_DB_PREFIX."crmPromos", 'title', "id=$rID");
-        msgLog($this->lang['title'].' '.lang('delete')." - $title (rID=$rID)");
+        msgLog(lang('title', $this->moduleID).' '.lang('delete')." - $title (rID=$rID)");
         $data = [
             'content' => ['action'=>'eval', 'actionData'=>"jqBiz('#dgPromos').datagrid('reload');"],
             'dbAction'=> [BIZUNO_DB_PREFIX."crmPromos" => "DELETE FROM ".BIZUNO_DB_PREFIX."crmPromos WHERE id=$rID"]];
@@ -386,13 +386,13 @@ function xfrResponse(json) {
             $cnt--;
         }
         if ($cron['done'] || sizeof($cron['rows']) == 0) {
-            msgLog("{$this->lang['title']} {$this->lang['msg_email_complete']} - ({$cron['total']} contacts) {$cron['title']}");
+            msgLog("{lang('title']} {lang('msg_email_complete']} - ({$cron['total']} contacts) {$cron['title']}");
             dbWrite(BIZUNO_DB_PREFIX."{$this->moduleID}_history", ['title'=>$cron['title'], 'send_date'=>biz_date('Y-m-d')]);
-            $data = ['content'=>['percent'=>'100','msg'=>$this->lang['msg_email_complete']]];
+            $data = ['content'=>['percent'=>'100','msg'=>lang('msg_email_complete', $this->moduleID)]];
             clearUserCron($this->moduleID);
         } else { // return to update progress bar and start next step
             $percent = floor(100*$cron['cnt']/$cron['total']);
-            $data = ['content'=>['percent'=>$percent,'msg'=>sprintf($this->lang['msg_email_progress'], $cron['cnt'], $cron['total'])]];
+            $data = ['content'=>['percent'=>$percent,'msg'=>sprintf(lang('msg_email_progress', $this->moduleID), $cron['cnt'], $cron['total'])]];
         }
         $layout = array_replace_recursive($layout, $data);
     }

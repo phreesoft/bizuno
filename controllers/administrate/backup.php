@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/backup.php
  */
 
@@ -37,7 +37,6 @@ class administrateBackup
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
         $this->max_execution_time = 20000;
         $this->dirBackup = 'backups/';
     }
@@ -66,7 +65,7 @@ class administrateBackup
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmBackup'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['backupDesc','btnBackup']], // 'incFiles' is a later feature ???
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'audit'  => ['title'=>$this->lang['audit_log_backup'],'type'=>'divs','divs'=>[
+                'audit'  => ['title'=>lang('audit_log_backup', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmAudit'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['auditDesc','btnAudit','audClnDesc','dateClean','btnClean']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
@@ -75,12 +74,12 @@ class administrateBackup
                 'frmBackup'=> ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/save"]],
                 'frmAudit' => ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/backup/cleanAudit"]]],
             'fields'  => [
-                'backupDesc'=> ['order'=>10,'html'=>$this->lang['desc_backup'],          'attr'=>['type'=>'raw']],
-//              'incFiles'  => ['order'=>20,'label'=>$this->lang['desc_backup_all'],'attr'=>['type'=>'checkbox', 'value'=>'all']],
+                'backupDesc'=> ['order'=>10,'html'=>lang('desc_backup', $this->moduleID),          'attr'=>['type'=>'raw']],
+//              'incFiles'  => ['order'=>20,'label'=>lang('desc_backup_all'],'attr'=>['type'=>'checkbox', 'value'=>'all']],
                 'btnBackup' => ['order'=>30,'icon'=>'backup','label'=>lang('go'),'align'=>'right','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmBackup').submit();"]],
-                'auditDesc' => ['order'=>10,'html'=>$this->lang['audit_log_backup_desc'],'attr'=>['type'=>'raw']],
+                'auditDesc' => ['order'=>10,'html'=>lang('audit_log_backup_desc', $this->moduleID),'attr'=>['type'=>'raw']],
                 'btnAudit'  => ['order'=>20,'icon'=>'backup','label'=>lang('go'),'align'=>'right','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/backup/saveAudit');"]],
-                'audClnDesc'=> ['order'=>30,'html'=>"<br /><hr />".$this->lang['desc_audit_log_clean'],'attr'=>['type'=>'raw']],
+                'audClnDesc'=> ['order'=>30,'html'=>"<br /><hr />".lang('desc_audit_log_clean', $this->moduleID),'attr'=>['type'=>'raw']],
                 'dateClean' => ['order'=>40,'attr'=>['type'=>'date', 'value'=>localeCalculateDate(biz_date('Y-m-d'), 0, -1)]],
                 'btnClean'  => ['order'=>50,'icon'=>'next',  'label'=>lang('go'),'align'=>'right','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmAudit').submit();"]]],
             'jsReady' => ['init'=>"ajaxForm('frmBackup'); ajaxForm('frmAudit');"]];
@@ -149,8 +148,8 @@ class administrateBackup
         if (ini_get('max_execution_time') < $this->max_execution_time) { set_time_limit($this->max_execution_time); }
         $filename = clean(getModuleCache('bizuno', 'settings', 'company', 'id'), 'filename').'-'.biz_date('Ymd-His');
         if (!dbDump($filename, $this->dirBackup)) { return msgAdd(lang('err_io_write_failed'), 'trap'); }
-        msgLog($this->lang['msg_backup_success']);
-        msgAdd($this->lang['msg_backup_success'], 'success');
+        msgLog(lang('msg_backup_success', $this->moduleID));
+        msgAdd(lang('msg_backup_success', $this->moduleID), 'success');
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizGridReload('dgBackup');"]]);
     }
 
@@ -163,7 +162,7 @@ class administrateBackup
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
         if (!dbDump('bizuno_log-'.biz_date('Ymd-His'), $this->dirBackup, BIZUNO_DB_PREFIX.'audit_log')) { return msgAdd(lang('err_io_write_failed')); }
-        msgAdd($this->lang['msg_backup_success'], 'success');
+        msgAdd(lang('msg_backup_success', $this->moduleID), 'success');
         $layout = array_replace_recursive($layout,['content'=>['action'=>'eval','actionData'=>"bizGridReload('dgBackup');"]]);
     }
 
@@ -255,7 +254,7 @@ class administrateBackup
                 'action'=> ['order'=> 1,'label'=>lang('action'),  'attr'=>['width'=>60],
                     'events' =>['formatter'=>"function(value,row,index) { return {$name}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'start' => ['order'=>30,'icon'=>'import','label'=>lang('restore'),'events'=>['onClick'=>"if(confirm('".$this->lang['msg_restore_confirm']."')) { jqBiz('body').addClass('loading'); jsonAction('administrate/backup/saveRestore', 0, '{$this->dirBackup}idTBD'); }"]],
+                        'start' => ['order'=>30,'icon'=>'import','label'=>lang('restore'),'events'=>['onClick'=>"if(confirm('".jsLang('msg_restore_confirm', $this->moduleID)."')) { jqBiz('body').addClass('loading'); jsonAction('administrate/backup/saveRestore', 0, '{$this->dirBackup}idTBD'); }"]],
                         'trash' => ['order'=>70,'icon'=>'trash','events'=>['onClick'=>"if(confirm('".jsLang('msg_confirm_delete')."')) jsonAction('bizuno/main/fileDelete','$name','{$this->dirBackup}idTBD');"]]]],
                 'title' => ['order'=>10,'label'=>lang('filename'),'attr'=>['width'=>200,'align'=>'center','resizable'=>true]],
                 'size'  => ['order'=>20,'label'=>lang('size'),    'attr'=>['width'=>100,'align'=>'center','resizable'=>true]],

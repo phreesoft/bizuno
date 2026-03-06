@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-17
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/autoAssy.php
  */
 
@@ -32,7 +32,6 @@ class phreebooksAutoAssy {
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
     }
 
     /**
@@ -69,7 +68,7 @@ class phreebooksAutoAssy {
                 $acted++;
             }
         }
-        msgAdd(sprintf($this->lang['msg_assy_success'], $acted), 'success');
+        msgAdd(sprintf(lang('msg_assy_success', $this->moduleID), $acted), 'success');
     }
 
     /**
@@ -83,7 +82,7 @@ class phreebooksAutoAssy {
     private function buildSKU($skuInfo, $qty, $main=[], $item=[]) {
         dbTransactionStart();
         $glEntry = new journal(0, 14);
-        $glEntry->main['description'] = "{$this->lang['auto_assy']} ($qty) {$skuInfo['sku']} - {$skuInfo['description_short']}";
+        $glEntry->main['description'] = lang('auto_assy', $this->moduleID)." ($qty) {$skuInfo['sku']} - {$skuInfo['description_short']}";
         $glEntry->main['invoice_num'] = $main['invoice_num']."-{$item['item_cnt']}";
         $glEntry->main['store_id']    = $main['store_id'];
         $glEntry->main['gl_acct_id']  = $skuInfo['gl_inv'];

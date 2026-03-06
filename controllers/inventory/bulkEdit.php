@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/bulkEdit.php
  */
 
@@ -34,7 +34,6 @@ class inventoryBulkEdit
 
     function __construct()
     {
-        $this->lang    = getExtLang($this->moduleID);
         $this->invTable= dbLoadStructure(BIZUNO_DB_PREFIX.'inventory');
         $this->readonly= ['id','inventory_type','sku','attach','qty_stock','qty_po','qty_so','qty_alloc','serialize','cost_method','store_id',
             'tax_rate_id_c','price_sheet_c','tax_rate_id_v','price_sheet_v','image_with_path','creation_date','last_update','last_journal_date',
@@ -80,7 +79,7 @@ class inventoryBulkEdit
     return state.columnMenu;
 }
 jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buildMenu(jq[0]); } });";
-        $data = ['title'=> $this->lang['title_bulk_edit'],
+        $data = ['title'=> lang('title_bulk_edit', $this->moduleID),
             'divs'    => ['dgBulkEdit'=>['order'=>50,'label'=>lang('details'), 'type'=>'datagrid', 'key' =>'manager']],
             'datagrid'=> ['manager'   =>$this->dgInvBulk('dgInvBulk')],
             'jsReady' => ['init'      =>$jsReady, 'invBulkEdit'=>"jqBiz('#dgInvBulk').datagrid('enableFilter');"]];

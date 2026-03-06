@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/tax.php
  */
 
@@ -93,7 +93,7 @@ class phreebooksTax extends mgrJournal
                     'bulk' => ['order'=>80,'icon'=>'merge','events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/bulkChange&type=$this->type', 0);"]]],
                 'filters'=> [
                     'status'=> ['order'=>10, 'label'=>lang('status'),'break'=>true,'values'=>$this->status,'attr'=>['type'=>'select']]]],
-                'footnotes'=> ['status'=>lang('status').':<span class="journal-waiting">'.$this->lang['not_current'].'</span><span class="row-inactive">'.lang('inactive').'</span>'],
+                'footnotes'=> ['status'=>lang('status').':<span class="journal-waiting">'.lang('not_current', $this->moduleID).'</span><span class="row-inactive">'.lang('inactive').'</span>'],
                 'columns'  => [
                     'inactive'  => ['order'=>0,                              'attr'=>['hidden'=>true]],
                     'title'     => ['order'=>10, 'label'=>lang('title'),     'attr'=>['type'=>'text', 'sortable'=>true, 'resizable'=>true]],
@@ -206,9 +206,9 @@ function preSubmit() {
         $icnGo = ['icon'=>'next', 'label'=>lang('go'),
             'events'=>  ['onClick'=>"var data='&type=$type&subject='+jqBiz('#subject').val()+'&srcID='+jqBiz('#taxSrc').combogrid('getValue')+'&destID='+jqBiz('#taxDest').combogrid('getValue');
                 jsonAction('phreebooks/tax/bulkChangeSave'+data);"]];
-        $html  = $this->lang['tax_bulk_src'] .'<br /><input id="taxSrc" name="taxSrc"><br />'.
-                 $this->lang['tax_bulk_dest'].'<br /><input id="taxDest" name="taxDest"><br />'.
-                 $this->lang['tax_subject']  .'<br />'.html5('subject', ['values'=>$subjects,'attr'=>['type'=>'select']]).'<br />'.html5('', $icnGo).'<br />';
+        $html  = lang('tax_bulk_src', $this->moduleID) .'<br /><input id="taxSrc" name="taxSrc"><br />'.
+                 lang('tax_bulk_dest', $this->moduleID).'<br /><input id="taxDest" name="taxDest"><br />'.
+                 lang('tax_subject', $this->moduleID)  .'<br />'.html5('subject', ['values'=>$subjects,'attr'=>['type'=>'select']]).'<br />'.html5('', $icnGo).'<br />';
         $jsBody= "function taxBulkChange(id, taxData) {
     jqBiz('#'+id).combogrid({data:taxData,width:120,panelWidth:210,idField:'id',textField:'text',
         rowStyler:function(idx, row) { if (row.status==1) { return {class:'journal-waiting'}; } else if (row.status==2) { return {class:'row-inactive'}; }  },
@@ -218,7 +218,7 @@ function preSubmit() {
     });
 }";
         $jsReady= "taxBulkChange('taxSrc', bizDefaults.taxRates.$type.rows);\ntaxBulkChange('taxDest', bizDefaults.taxRates.$type.rows);";
-        $data = ['type'=>'popup','title'=>$this->lang['tax_bulk_title'],'attr'=>['id'=>'winTaxChange'],
+        $data = ['type'=>'popup','title'=>lang('tax_bulk_title', $this->moduleID),'attr'=>['id'=>'winTaxChange'],
             'divs'   => ['body'=> ['order'=>50,'type'=>'html', 'html'=>$html]],
             'jsBody' => ['taxJSBody'=> $jsBody],
             'jsReady'=> ['taxJSRdy' => $jsReady]];
@@ -240,9 +240,9 @@ function preSubmit() {
         } else {
             $cnt = dbWrite(BIZUNO_DB_PREFIX.'contacts', ['tax_rate_id'=>$destID], 'update', "tax_rate_id=$srcID");
         }
-        msgAdd(sprintf($this->lang['tax_bulk_success'], $cnt), 'success');
+        msgAdd(sprintf(lang('tax_bulk_success', $this->moduleID), $cnt), 'success');
         $table = $subject=='i' ? lang('inventory') : lang('contacts');
-        msgLog(lang("phreebooks").'-'.$this->lang['tax_bulk_title']." $table: $srcID => $destID)");
+        msgLog(lang("phreebooks").'-'.lang('tax_bulk_title', $this->moduleID)." $table: $srcID => $destID)");
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizWindowClose('winTaxChange');"]]);
     }
     private function dgTaxVendors($name)

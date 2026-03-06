@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-09
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -87,38 +87,38 @@ final class phreeformDesign extends mgrJournal
 //            'emailsubject'  => ['tab'=>'general', 'panel'=>'email','order'=>10,'label'=>lang('email_subject'),'clean'=>'text',    'attr'=>['type'=>'text','size'=>64,'maxlength'=>64]],
             'emailmessage'  => ['tab'=>'general', 'panel'=>'email','order'=>20,                               'clean'=>'text',    'attr'=>['type'=>'editor']],
             // Tab: general - Panel: page
-            'pagesize'      => ['tab'=>'general', 'panel'=>'page',      'order'=>50,'label'=>$this->lang['phreeform_paper_size'],   'options'=>['width'=>150],'values'=>phreeformPages($this->lang),
+            'pagesize'      => ['tab'=>'general', 'panel'=>'page',      'order'=>50,'label'=>lang('phreeform_paper_size', $this->moduleID),   'options'=>['width'=>150],'values'=>phreeformPages($this->lang),
                 'clean'=>'cmd', 'attr'=>['type'=>'select',  'value'=>'LETTER:216:279']],
-            'pageorient'    => ['tab'=>'general', 'panel'=>'page',      'order'=>52,'break'=>true,'label'=>$this->lang['phreeform_orientation'],  'options'=>['width'=>100],'values'=>phreeformOrientation($this->lang),
+            'pageorient'    => ['tab'=>'general', 'panel'=>'page',      'order'=>52,'break'=>true,'label'=>lang('phreeform_orientation', $this->moduleID),  'options'=>['width'=>100],'values'=>phreeformOrientation($this->lang),
                 'clean'=>'char', 'attr'=>['type'=>'select',  'value'=>'P']],
-            'margintop'     => ['tab'=>'general', 'panel'=>'page',      'order'=>54,'label'=>$this->lang['phreeform_margin_top'],   'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
+            'margintop'     => ['tab'=>'general', 'panel'=>'page',      'order'=>54,'label'=>lang('phreeform_margin_top', $this->moduleID),   'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
                 'clean'=>'integer', 'attr'=>['size'=>'4','maxlength'=>'3','value'=>8]],
-            'marginbottom'  => ['tab'=>'general', 'panel'=>'page',      'order'=>55,'label'=>$this->lang['phreeform_margin_bottom'],'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
+            'marginbottom'  => ['tab'=>'general', 'panel'=>'page',      'order'=>55,'label'=>lang('phreeform_margin_bottom', $this->moduleID),'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
                 'clean'=>'integer', 'attr'=>['size'=>'4','maxlength'=>'3','value'=>8]],
-            'marginleft'    => ['tab'=>'general', 'panel'=>'page',      'order'=>56,'label'=>$this->lang['phreeform_margin_left'],  'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
+            'marginleft'    => ['tab'=>'general', 'panel'=>'page',      'order'=>56,'label'=>lang('phreeform_margin_left', $this->moduleID),  'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
                 'clean'=>'integer', 'attr'=>['size'=>'4','maxlength'=>'3','value'=>8]],
-            'marginright'   => ['tab'=>'general', 'panel'=>'page',      'order'=>57,'label'=>$this->lang['phreeform_margin_right'], 'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
+            'marginright'   => ['tab'=>'general', 'panel'=>'page',      'order'=>57,'label'=>lang('phreeform_margin_right', $this->moduleID), 'options'=>['width'=>50],'styles'=>['text-align'=>'right'],
                 'clean'=>'integer', 'attr'=>['size'=>'4','maxlength'=>'3','value'=>8]],
             'users'         => ['tab'=>'settings','panel'=>'security',  'order'=>10,'label'=>lang('users'),'options'=>['multiple'=>'true'],'values'=>listUsers(),
                 'clean'=>'array', 'attr'=>['type'=>'select','name'=>'users[]','value'=>[]]],
             'roles'         => ['tab'=>'settings','panel'=>'security',  'order'=>20,'label'=>lang('roles'),'options'=>['multiple'=>'true'],'values'=>listRoles(),
                 'clean'=>'array', 'attr'=>['type'=>'select','name'=>'roles[]','value'=>[]]],
-            'restrict_rep'  => ['tab'=>'settings','panel'=>'security',  'order'=>65,'label'=>$this->lang['lbl_restrict_rep'],'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]],
+            'restrict_rep'  => ['tab'=>'settings','panel'=>'security',  'order'=>65,'label'=>lang('lbl_restrict_rep', $this->moduleID),'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]],
             // Tab: filters - Panel:
             'dateperiod'    => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,                     'clean'=>'char', 'attr'=>['type'=>'radio', 'value'=>'d']],
             'datelist'      => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'position'=>'after', 'clean'=>'array','attr'=>['value'=>['a']]],
-            'datefield'     => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>$this->lang['phreeform_date_field'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'datefield'     => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>lang('phreeform_date_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'datedefault'   => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>$this->lang['date_default_selected'],'values'=>viewDateChoices(),  'clean'=>'char', 'attr'=>['type'=>'select', 'value'=>'c']],
+            'datedefault'   => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>lang('date_default_selected', $this->moduleID),'values'=>viewDateChoices(),  'clean'=>'char', 'attr'=>['type'=>'select', 'value'=>'c']],
             // Tab: settings - Panel: options
             'filenamefield' => ['tab'=>'settings','panel'=>'options',   'order'=>45,'label'=>lang('fieldname'), 'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'filename', 'attr'=> ['type'=>'select']],
             'filenameprefix'=> ['tab'=>'settings','panel'=>'options',   'order'=>50,'label'=>lang('prefix'),                 'clean'=>'filename', 'attr'=>['size'=>10]],
             // Tab: settings - Panel: advanced
-            'special_class' => ['tab'=>'settings','panel'=>'advanced',  'order'=>90,'label'=>$this->lang['phreeform_special_class'], 'clean'=>'db_field', 'attr'=>[]]];
+            'special_class' => ['tab'=>'settings','panel'=>'advanced',  'order'=>90,'label'=>lang('phreeform_special_class', $this->moduleID), 'clean'=>'db_field', 'attr'=>[]]];
         if (in_array($type, ['rpt', 'lst'])) { $this->struc = array_merge($this->struc, [
             'truncate'      => ['tab'=>'settings','panel'=>'options','order'=>20,'label'=>lang('truncate_fit'),   'clean'=>'boolean', 'attr'=>['type'=>'selNoYes']],
-            'totalonly'     => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>$this->lang['show_total_only'],'clean'=>'boolean', 'attr'=>['type'=>'selNoYes']],
+            'totalonly'     => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>lang('show_total_only', $this->moduleID),'clean'=>'boolean', 'attr'=>['type'=>'selNoYes']],
             'headingshow'   => ['tab'=>'general', 'panel'=>'heading','order'=>10,'clean'=>'integer', 'attr'=>['type'=>'selNoYes']],
             'headingfont'   => ['tab'=>'general', 'panel'=>'heading','order'=>12,'values'=>$selFont, 'options'=>['width'=>150], 'clean'=>'db_field', 'attr'=>['type'=>'select','value'=>'helvetica']],
             'headingsize'   => ['tab'=>'general', 'panel'=>'heading','order'=>14,'values'=>$selSize, 'options'=>['width'=> 75], 'clean'=>'integer', 'attr'=>['type'=>'select','value'=>12]],
@@ -151,16 +151,16 @@ final class phreeformDesign extends mgrJournal
         }
         if (in_array($type, ['frm'])) { $this->struc = array_merge($this->struc, [
             // Tab: Settings - Panel: settings
-            'formbreakfield'=> ['tab'=>'settings','panel'=>'options','order'=>10,'label'=>$this->lang['page_break_field'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'formbreakfield'=> ['tab'=>'settings','panel'=>'options','order'=>10,'label'=>lang('page_break_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'skipnullfield' => ['tab'=>'settings','panel'=>'options','order'=>15,'label'=>$this->lang['lbl_skip_null'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'skipnullfield' => ['tab'=>'settings','panel'=>'options','order'=>15,'label'=>lang('lbl_skip_null', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'contactlog'    => ['tab'=>'settings','panel'=>'options','order'=>20,'label'=>$this->lang['lbl_phreeform_contact'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'contactlog'    => ['tab'=>'settings','panel'=>'options','order'=>20,'label'=>lang('lbl_phreeform_contact', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'printedfield'  => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>$this->lang['lbl_set_printed_flag'],'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'printedfield'  => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>lang('lbl_set_printed_flag', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'breakfield'    => ['tab'=>'settings','panel'=>'options','order'=>30,'label'=>$this->lang['phreeform_field_break'],'clean'=>'db_field', 'attr'=>['maxlength'=>64]],
-            'serialform'    => ['tab'=>'settings','panel'=>'options','order'=>35,'label'=>$this->lang['lbl_serial_form'],      'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]]]);
+            'breakfield'    => ['tab'=>'settings','panel'=>'options','order'=>30,'label'=>lang('phreeform_field_break', $this->moduleID),'clean'=>'db_field', 'attr'=>['maxlength'=>64]],
+            'serialform'    => ['tab'=>'settings','panel'=>'options','order'=>35,'label'=>lang('lbl_serial_form', $this->moduleID),      'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]]]);
         }
     }
 
@@ -198,16 +198,16 @@ final class phreeformDesign extends mgrJournal
             'tabs'      => ["tab{$this->domSuffix}"=>['divs'=>[
                 'general' => ['divs'=>[ // 'order'=>10,'label'=>lang('general'),'type'=>'divs','classes'=>['areaView'],
                     'heading' => ['order'=>40,'type'=>'panel','key'=>'heading', 'classes'=>['block66']]]],
-                'db'      => ['order'=>20,'label'=>$this->lang['phreeform_title_db'],   'type'=>'datagrid', 'key'=>'tables'],
-                'fields'  => ['order'=>30,'label'=>$this->lang['phreeform_title_field'],'type'=>'datagrid', 'key'=>'fields'],
+                'db'      => ['order'=>20,'label'=>lang('phreeform_title_db', $this->moduleID),   'type'=>'datagrid', 'key'=>'tables'],
+                'fields'  => ['order'=>30,'label'=>lang('phreeform_title_field', $this->moduleID),'type'=>'datagrid', 'key'=>'fields'],
                 'filters' => ['order'=>40,'label'=>lang('filters'),'type'=>'divs','divs'=>[
                     'fields'  => ['order'=>10,'type'=>'panel',   'key'=>'dates','classes'=>['block99']], // ['order'=>20,'type'=>'html','html'=>$this->getViewFilters($this->struc, $type)],
                     'dgSort'  => ['order'=>40,'type'=>'datagrid','key'=>'sort'],
                     'dgGroups'=> ['order'=>50,'type'=>'datagrid','key'=>'groups'],
                     'dgFilter'=> ['order'=>60,'type'=>'datagrid','key'=>'filters']]]]]],
             'panels' => [
-                'dates'   => ['label'=>$this->lang['phreeform_date_info'],  'type'=>'html','html'=>$this->getViewFilters($this->struc, $type)],
-                'heading' => ['label'=>$this->lang['phreeform_header_info'],'type'=>'html','html'=>$this->getViewPage($this->struc)]],
+                'dates'   => ['label'=>lang('phreeform_date_info', $this->moduleID),  'type'=>'html','html'=>$this->getViewFilters($this->struc, $type)],
+                'heading' => ['label'=>lang('phreeform_header_info', $this->moduleID),'type'=>'html','html'=>$this->getViewPage($this->struc)]],
             'datagrid'  => [
                 'tables' => $this->dgTables ('dgTables'),
                 'fields' => $this->dgFields ('dgFields', $type),
@@ -275,11 +275,11 @@ function pfTableUpdate() {
         <tr><th>&nbsp;</th><th>'.lang('show') ."</th><th>".lang('font') ."</th><th>".lang('size') ."</th><th>".lang('color')."</th><th>".lang('align').'</th></tr>
     </thead>
     <tbody>
-        <tr><td>'.$this->lang['name_business'].'</td><td>'.html5('headingshow', $fields['headingshow']) .'</td><td>'.html5('headingfont', $fields['headingfont']) .'</td><td>'.html5('headingsize', $fields['headingsize']) .'</td><td>'.html5('headingcolor',$fields['headingcolor']).'</td><td>'.html5('headingalign',$fields['headingalign']).'</td></tr>
-        <tr><td>'.$this->lang['phreeform_page_title1'].' '.html5('title1text',$fields['title1text']).'</td><td>'.html5('title1show', $fields['title1show']) .'</td><td>'.html5('title1font', $fields['title1font']) .'</td><td>'.html5('title1size', $fields['title1size']) .'</td><td>'.html5('title1color',$fields['title1color']).'</td><td>'.html5('title1align',$fields['title1align']).'</td></tr>
-        <tr><td>'.$this->lang['phreeform_page_title2'].' '.html5('title2text',$fields['title2text']).'</td><td>'.html5('title2show', $fields['title2show']) .'</td><td>'.html5('title2font', $fields['title2font']) .'</td><td>'.html5('title2size', $fields['title2size']) .'</td><td>'.html5('title2color',$fields['title2color']).'</td><td>'.html5('title2align',$fields['title2align']).'</td></tr>
-        <tr><td colspan="2">'.$this->lang['phreeform_filter_desc'].'</td><td>'.html5('filterfont',$fields['filterfont']).'</td><td>'.html5('filtersize',$fields['filtersize']).'</td><td>'.html5('filtercolor',$fields['filtercolor']).'</td><td>'.html5('filteralign',$fields['filteralign']).'</td></tr>
-        <tr><td colspan="2">'.$this->lang['phreeform_heading']    .'</td><td>'.html5('datafont',  $fields['datafont'])  .'</td><td>'.html5('datasize',  $fields['datasize'])  .'</td><td>'.html5('datacolor',  $fields['datacolor'])  .'</td><td>'.html5('dataalign',  $fields['dataalign'])  .'</td></tr>
+        <tr><td>'.lang('name_business', $this->moduleID).'</td><td>'.html5('headingshow', $fields['headingshow']) .'</td><td>'.html5('headingfont', $fields['headingfont']) .'</td><td>'.html5('headingsize', $fields['headingsize']) .'</td><td>'.html5('headingcolor',$fields['headingcolor']).'</td><td>'.html5('headingalign',$fields['headingalign']).'</td></tr>
+        <tr><td>'.lang('phreeform_page_title1', $this->moduleID).' '.html5('title1text',$fields['title1text']).'</td><td>'.html5('title1show', $fields['title1show']) .'</td><td>'.html5('title1font', $fields['title1font']) .'</td><td>'.html5('title1size', $fields['title1size']) .'</td><td>'.html5('title1color',$fields['title1color']).'</td><td>'.html5('title1align',$fields['title1align']).'</td></tr>
+        <tr><td>'.lang('phreeform_page_title2', $this->moduleID).' '.html5('title2text',$fields['title2text']).'</td><td>'.html5('title2show', $fields['title2show']) .'</td><td>'.html5('title2font', $fields['title2font']) .'</td><td>'.html5('title2size', $fields['title2size']) .'</td><td>'.html5('title2color',$fields['title2color']).'</td><td>'.html5('title2align',$fields['title2align']).'</td></tr>
+        <tr><td colspan="2">'.lang('phreeform_filter_desc', $this->moduleID).'</td><td>'.html5('filterfont',$fields['filterfont']).'</td><td>'.html5('filtersize',$fields['filtersize']).'</td><td>'.html5('filtercolor',$fields['filtercolor']).'</td><td>'.html5('filteralign',$fields['filteralign']).'</td></tr>
+        <tr><td colspan="2">'.lang('phreeform_heading', $this->moduleID)    .'</td><td>'.html5('datafont',  $fields['datafont'])  .'</td><td>'.html5('datasize',  $fields['datasize'])  .'</td><td>'.html5('datacolor',  $fields['datacolor'])  .'</td><td>'.html5('dataalign',  $fields['dataalign'])  .'</td></tr>
         <tr><td colspan="2">'.lang('totals').'</td><td>'.html5('totalfont', $fields['totalfont']) .'</td><td>'.html5('totalsize', $fields['totalsize']) .'</td><td>'.html5('totalcolor',$fields['totalcolor']).'</td><td>'.html5('totalalign',$fields['totalalign']).'</td></tr>
     </tbody>
 </table>';
@@ -309,12 +309,12 @@ function pfTableUpdate() {
         if ($dateType == 'p') { $fields['dateperiod']['attr']['checked'] = true; }
         else                  { unset($fields['dateperiod']['attr']['checked']); }
         $fields['dateperiod']['attr']['value'] = 'p';
-        $output .= '    <tr><td colspan="3">'.html5('dateperiod', $fields['dateperiod']).' '.$this->lang['use_periods']."</td></tr>\n";
+        $output .= '    <tr><td colspan="3">'.html5('dateperiod', $fields['dateperiod']).' '.lang('use_periods', $this->moduleID)."</td></tr>\n";
         $output .= '    <tr><td colspan="3">'."<hr></td></tr>\n";
         if ($dateType == 'd') { $fields['dateperiod']['attr']['checked'] = true; }
         else                  { unset($fields['dateperiod']['attr']['checked']); }
         $fields['dateperiod']['attr']['value'] = 'd';
-        $output .= '    <tr><td colspan="3">'.html5('dateperiod', $fields['dateperiod']).' '.$this->lang['phreeform_date_list']."</td></tr>\n";
+        $output .= '    <tr><td colspan="3">'.html5('dateperiod', $fields['dateperiod']).' '.lang('phreeform_date_list', $this->moduleID)."</td></tr>\n";
         $output .= $dateList."\n";
         $output .= '    <tr><td colspan="2">'.html5('datedefault', $fields['datedefault'])."</td>\n";
         $output .= "        <td>".html5('datefield', $fields['datefield'])."</td></tr>\n";
@@ -336,7 +336,7 @@ function pfTableUpdate() {
             $value = substr($value, 2);
             $temp = explode(':', $value);
             $words = [];
-            foreach ($temp as $word) { $words[] = !empty($this->lang[$word]) ? $this->lang[$word] : lang($word); }
+            foreach ($temp as $word) { $words[] = lang($word, $this->moduleID); }
             $output[] = ['id'=>"$key", 'text'=>implode(':', $words)];
         }
         return $output;
@@ -385,7 +385,7 @@ function pfTableUpdate() {
      */
     private function dgTables($name)
     {
-        return ['id'=>$name, 'type'=>'edatagrid', 'tip'=>$this->lang['tip_phreeform_database_syntax'],
+        return ['id'=>$name, 'type'=>'edatagrid', 'tip'=>lang('tip_phreeform_database_syntax', $this->moduleID),
             'attr'  => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'singleSelect'=>true],
             'events'=> ['data'=> 'dataTables',
                 'onAfterEdit' => "function(rowIndex, rowData, changes) { pfTableUpdate(); }"],
@@ -399,9 +399,9 @@ function pfTableUpdate() {
                     'actions' => [
                         'tblEdit' =>['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                         'tblTrash'=>['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
-                'join_type'   => ['order'=>10, 'label'=>$this->lang['join_type'], 'attr'=>['width'=>100, 'resizable'=>true],
+                'join_type'   => ['order'=>10, 'label'=>lang('join_type', $this->moduleID), 'attr'=>['width'=>100, 'resizable'=>true],
                     'events'  => ['editor'=>"{type:'combobox',options:{editable:false,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getTablesJoin',valueField:'id',textField:'text'}}"]],
-                'tablename'   => ['order'=>20, 'label'=>$this->lang['table_name'], 'attr'=>['width'=>200, 'resizable'=>true],
+                'tablename'   => ['order'=>20, 'label'=>lang('table_name', $this->moduleID), 'attr'=>['width'=>200, 'resizable'=>true],
                     'events'  => ['editor'=>"{type:'combobox',options:{mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getTables',valueField:'id',textField:'text'}}"]],
                 'relationship'=> ['order'=>30, 'label'=>lang('relationship'), 'attr'=>['width'=>300,'resizable'=>true,'editor'=>'text']]]];
     }
@@ -469,7 +469,7 @@ function pfTableUpdate() {
      */
     private function dgFields($name, $type='rpt')
     {
-        $data = ['id'=>$name, 'type'=>'edatagrid', 'tip'=>$this->lang['tip_phreeform_field_settings'],
+        $data = ['id'=>$name, 'type'=>'edatagrid', 'tip'=>lang('tip_phreeform_field_settings', $this->moduleID),
             'attr'  => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'singleSelect'=>true],
             'events'=> ['data'=> "dataFields"],
             'source'=> ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]]];
@@ -488,8 +488,8 @@ function pfTableUpdate() {
                             'fldTrash'=> ['order'=>80,'icon'=>'trash',   'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                     'boxfield'=> ['order'=> 0,'attr'=>['type'=>'textarea', 'hidden'=>'true']],
                     'title'   => ['order'=>20,'label'=>lang('title'), 'attr'=>['width'=>200,'resizable'=>true,'editor'=>'text']],
-                    'abscissa'=> ['order'=>30,'label'=>$this->lang['abscissa'],'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
-                    'ordinate'=> ['order'=>40,'label'=>$this->lang['ordinate'],'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
+                    'abscissa'=> ['order'=>30,'label'=>lang('abscissa', $this->moduleID),'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
+                    'ordinate'=> ['order'=>40,'label'=>lang('ordinate', $this->moduleID),'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
                     'width'   => ['order'=>50,'label'=>lang('width'), 'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
                     'height'  => ['order'=>60,'label'=>lang('height'),'attr'=>['width'=> 80,'resizable'=>true,'editor'=>'text']],
                     'type'    => ['order'=>70,'label'=>lang('type'),  'attr'=>['width'=>200,'resizable'=>true],
@@ -507,13 +507,13 @@ function pfTableUpdate() {
                     'fieldname'  => ['order'=> 5, 'label'=>lang('fieldname'),          'attr'=>['width'=>200, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'combobox',options:{editable:true,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
                     'title'      => ['order'=>10, 'label'=>lang('title'),              'attr'=>['width'=>150, 'resizable'=>true, 'editor'=>'text']],
-                    'break'      => ['order'=>20, 'label'=>$this->lang['column_break'],'attr'=>['width'=> 80, 'resizable'=>true],
+                    'break'      => ['order'=>20, 'label'=>lang('column_break', $this->moduleID),'attr'=>['width'=> 80, 'resizable'=>true],
                         'events'=>  ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
                     'width'      => ['order'=>30, 'label'=>lang('width'),              'attr'=>['width'=> 80, 'resizable'=>true,'editor'=>'text']],
-                    'widthTotal' => ['order'=>40, 'label'=>$this->lang['total_width'], 'attr'=>['width'=> 80, 'resizable'=>true]],
+                    'widthTotal' => ['order'=>40, 'label'=>lang('total_width', $this->moduleID), 'attr'=>['width'=> 80, 'resizable'=>true]],
                     'visible'    => ['order'=>50, 'label'=>lang('show'),               'attr'=>['width'=> 50, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                    'processing' => ['order'=>60, 'label'=> $this->lang['processing'], 'attr'=>['width'=>160, 'resizable'=>true],
+                    'processing' => ['order'=>60, 'label'=> lang('processing', $this->moduleID), 'attr'=>['width'=>160, 'resizable'=>true],
                         'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
 //                  'meta_index' => ['order'=>61, 'label'=>lang('meta_index'),         'attr'=>['width'=>125, 'resizable'=>true, 'editor'=>'text']],
                     'formatting' => ['order'=>70, 'label'=>lang('format'),             'attr'=>['width'=>160, 'resizable'=>true],
@@ -560,8 +560,8 @@ function pfTableUpdate() {
         if (!isset($fData->type)) { return msgAdd("No type received, I do not know what to display!"); }
         $settings  = is_string($fData->settings) ? json_decode($fData->settings) : $fData->settings;
         msgDebug("\nReceived index: $index and settings array: ".print_r($settings, true));
-        $pageShow  = [['id'=>'0','text'=>$this->lang['page_all']],  ['id'=>'1','text'=>$this->lang['page_first']],['id'=>'2','text'=>$this->lang['page_last']]];
-        $lineTypes = [['id'=>'H','text'=>$this->lang['horizontal']],['id'=>'V','text'=>$this->lang['vertical']],  ['id'=>'C','text'=>lang('custom')]];
+        $pageShow  = [['id'=>'0','text'=>lang('page_all', $this->moduleID)],  ['id'=>'1','text'=>lang('page_first', $this->moduleID)],['id'=>'2','text'=>lang('page_last', $this->moduleID)]];
+        $lineTypes = [['id'=>'H','text'=>lang('horizontal', $this->moduleID)],['id'=>'V','text'=>lang('vertical', $this->moduleID)],  ['id'=>'C','text'=>lang('custom')]];
         $linePoints= [];
         for ($i=1; $i<7; $i++) { $linePoints[] = ['id'=>$i,'text'=>$i]; }
         $selFont   = phreeformFonts();
@@ -613,8 +613,8 @@ function pfTableUpdate() {
                 'hbcolor'    => ['attr'=>['type'=>'color','value'=>isset($settings->hbcolor) ? convertHex($settings->hbcolor):'#000000', 'size'=>10]],
                 'hfshow'     => ['attr'   =>['type'=>'checkbox', 'value'=>'1']],
                 'hfcolor'    => ['attr'=>['type'=>'color','value'=>isset($settings->hfcolor) ? convertHex($settings->hfcolor):'#000000', 'size'=>10]],
-                'endAbscissa'=> ['label'  =>$this->lang['abscissa'],'attr'=>['size'=>5]],
-                'endOrdinate'=> ['label'  =>$this->lang['ordinate'],'attr'=>['size'=>5]],
+                'endAbscissa'=> ['label'  =>lang('abscissa', $this->moduleID),'attr'=>['size'=>5]],
+                'endOrdinate'=> ['label'  =>lang('ordinate', $this->moduleID),'attr'=>['size'=>5]],
                 'img_cur'    => ['attr'   =>['type'=>'hidden']],
                 'img_file'   => ['attr'   =>['type'=>'hidden']],
                 'img_upload' => ['attr'   =>['type'=>'file']]],
@@ -676,32 +676,32 @@ jqBiz('#frmFieldSettings').submit(function (e) {
         switch ($viewData['fields']['type']['attr']['value']) {
             case 'BarCode':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".$this->lang['processing']."</th><th>".$this->lang['formatting']."</th></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".lang('processing')."</th><th>".lang('formatting')."</th></tr></thead>";
                 $output .= " <tbody><tr>";
                 $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
                 $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
                 $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
                 $output .= "   </tr>";
-                $output .= '   <tr><td colspan="2">'.$this->lang['phreeform_barcode_type'].' '.html5('barcode', $viewData['fields']['barcodes'])."</td></tr>";
+                $output .= '   <tr><td colspan="2">'.lang('phreeform_barcode_type', $this->moduleID).' '.html5('barcode', $viewData['fields']['barcodes'])."</td></tr>";
                 $output .= "  </tbody></table>";
                 $output .= $this->box_build_attributes($viewData, false, false);
                 break;
             case 'CDta':
             case 'Data':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".$this->lang['processing']."</th><th>".$this->lang['formatting']."</th></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".lang('processing')."</th><th>".lang('formatting')."</th></tr></thead>";
                 $output .= " <tbody><tr>";
                 $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
                 $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
                 $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
                 $output .= "  </tr><tr>";
-                $output .= '    <td colspan="2">'.$this->lang['phreeform_encoded_field'].' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
+                $output .= '    <td colspan="2">'.lang('phreeform_encoded_field', $this->moduleID).' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
                 $output .= "  </tr></tbody></table>";
                 $output .= $this->box_build_attributes($viewData);
                 break;
             case 'ImgLink':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".$this->lang['processing']."</th><th>".$this->lang['formatting']."</th></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th>'.lang('fieldname')."</th><th>".lang('processing')."</th><th>".lang('formatting')."</th></tr></thead>";
                 $output .= " <tbody><tr>";
                 $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
                 $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
@@ -716,28 +716,28 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 break;
             case 'Line':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th colspan="3">'.$this->lang['phreeform_line_type']."</th></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th colspan="3">'.lang('phreeform_line_type', $this->moduleID)."</th></tr></thead>";
                 $output .= " <tbody>";
                 $output .= "  <tr><td>".html5('linetype', $viewData['fields']['linetype']).' '.html5('length', $viewData['fields']['length'])."</td></tr>";
-                $output .= "  <tr><td>".$this->lang['end_position'].' '.html5('endAbscissa', $viewData['fields']['endAbscissa']).' '.html5('endOrdinate', $viewData['fields']['endOrdinate'])."</td></tr>";
+                $output .= "  <tr><td>".lang('end_position', $this->moduleID).' '.html5('endAbscissa', $viewData['fields']['endAbscissa']).' '.html5('endOrdinate', $viewData['fields']['endOrdinate'])."</td></tr>";
                 $output .= " </tbody></table>";
                 $output .= $this->box_build_attributes($viewData, false, false, true, false);
                 break;
             case 'LtrTpl':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th>'.$this->lang['phreeform_text_disp']."</td></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th>'.lang('phreeform_text_disp', $this->moduleID)."</td></tr></thead>";
                 $output .= " <tbody><tr><td>".html5('ltrText', $viewData['fields']['ltrText'])."</td></tr></tbody>";
                 $output .= "</table>";
                 $output .= $this->box_build_attributes($viewData);
                 break;
             case 'TDup':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <tbody><tr><td style="text-align:center">'.$this->lang['msg_no_settings']."</td></tr></tbody>";
+                $output .= ' <tbody><tr><td style="text-align:center">'.lang('msg_no_settings', $this->moduleID)."</td></tr></tbody>";
                 $output .= "</table>";
                 break;
             case 'Text':
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
-                $output .= ' <thead class="panel-header"><tr><th>'.$this->lang['phreeform_text_disp']."</td></tr></thead>";
+                $output .= ' <thead class="panel-header"><tr><th>'.lang('phreeform_text_disp', $this->moduleID)."</td></tr></thead>";
                 $output .= " <tbody><tr><td>".html5('text', $viewData['fields']['text'])."</td></tr></tbody>";
                 $output .= "</table>";
                 $output .= $this->box_build_attributes($viewData);
@@ -747,15 +747,15 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 $output .= $this->box_build_attributes($viewData, false, false, true, true, '',  lang('body'));
                 $output .= '<table style="border-collapse:collapse;margin-left:auto;margin-right:auto;">';
                 $output .= ' <thead class="panel-header">';
-                $output .= '  <tr><th colspan="3">'.$this->lang['encoded_table_title']."</th></tr>";
-                $output .= "  <tr><th>".lang('fieldname')."</th><th>".$this->lang['processing']."</th><th>".$this->lang['formatting']."</th></tr>";
+                $output .= '  <tr><th colspan="3">'.lang('encoded_table_title', $this->moduleID)."</th></tr>";
+                $output .= "  <tr><th>".lang('fieldname')."</th><th>".lang('processing')."</th><th>".lang('formatting')."</th></tr>";
                 $output .= " </thead>";
                 $output .= " <tbody><tr>";
                 $output .= '    <td>'.html5('fieldname',  $viewData['fields']['fieldname']) ."</td>";
                 $output .= '    <td>'.html5('processing', $viewData['fields']['processing'])."</td>";
                 $output .= '    <td>'.html5('formatting', $viewData['fields']['formatting'])."</td>";
                 $output .= "  </tr><tr>";
-                $output .= '    <td colspan="2">'.$this->lang['phreeform_encoded_field'].' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
+                $output .= '    <td colspan="2">'.lang('phreeform_encoded_field', $this->moduleID).' '.html5('procFld', $viewData['fields']['procFld'])."</td><td>&nbsp;</td>";
                 $output .= "  </tr></tbody></table>";
                 break;
             case 'PgNum':  $output .= $this->box_build_attributes($viewData, false);        break;
@@ -776,11 +776,11 @@ jqBiz('#frmFieldSettings').submit(function (e) {
         if ($showtrunc) {
             $output .= " <tr>";
             $output .= '  <td colspan="2">'.lang('truncate_fit').html5('truncate',$viewData['fields']['truncate']) . "</td>";
-            $output .= '  <td colspan="3">'.$this->lang['display_on']  .html5('display', $viewData['fields']['display']) . "</td>";
+            $output .= '  <td colspan="3">'.lang('display_on', $this->moduleID)  .html5('display', $viewData['fields']['display']) . "</td>";
             $output .= " </tr>";
         }
         if ($showfont) {
-            $output .= ' <tr class="panel-header"><th>&nbsp;'.'</th><th>'.lang('style').'</th><th>'.lang('size').'</th><th>'.$this->lang['align'].'</th><th>'.$this->lang['color']."</th></tr>";
+            $output .= ' <tr class="panel-header"><th>&nbsp;'.'</th><th>'.lang('style').'</th><th>'.lang('size').'</th><th>'.lang('align', $this->moduleID).'</th><th>'.lang('color', $this->moduleID)."</th></tr>";
             $output .= " <tr>";
             $output .= "  <td>".lang('font')."</td>";
             $output .= "  <td>".html5($pre.'font',  $viewData['fields'][$pre.'font']) . "</td>";
@@ -791,16 +791,16 @@ jqBiz('#frmFieldSettings').submit(function (e) {
         }
         if ($showborder) {
             $output .= " <tr>";
-            $output .= "  <td>".$this->lang['border'] . "</td>";
+            $output .= "  <td>".lang('border', $this->moduleID) . "</td>";
             $output .= "  <td>".html5($pre.'bshow', $viewData['fields'][$pre.'bshow'])."</td>";
-            $output .= "  <td>".html5($pre.'bsize', $viewData['fields'][$pre.'bsize']).$this->lang['points']."</td>";
+            $output .= "  <td>".html5($pre.'bsize', $viewData['fields'][$pre.'bsize']).lang('points', $this->moduleID)."</td>";
             $output .= "  <td>&nbsp;</td>";
             $output .= "  <td>".html5($pre.'bcolor', $viewData['fields'][$pre.'bcolor'])."</td>";
             $output .= "</tr>";
         }
         if ($showfill) {
             $output .= "<tr>";
-            $output .= '  <td>'. $this->lang['fill_area'] . "</td>";
+            $output .= '  <td>'. lang('fill_area', $this->moduleID) . "</td>";
             $output .= '  <td>'.html5($pre.'fshow',  $viewData['fields'][$pre.'fshow'])."</td>";
             $output .= "  <td>&nbsp;</td>";
             $output .= "  <td>&nbsp;</td>";
@@ -828,7 +828,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                     'events' => ['formatter'=>"function(value,row,index){ return {$name}Formatter(value,row,index); }"],
                     'actions'=> ['trash' => ['order'=>50,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'title'         => ['order'=>10, 'label'=>lang('title'), 'attr'=>['width'=>150, 'resizable'=>true, 'editor'=>'text']],
-                'processing' => ['order'=>20, 'label' => $this->lang['processing'], 'attr'=>['width'=>160, 'resizable'=>true],
+                'processing' => ['order'=>20, 'label' => lang('processing'), 'attr'=>['width'=>160, 'resizable'=>true],
                     'events' => [
                         'formatter'=>"function(value,row){ return getTextValue(dataProcessing, value); }",
                         'editor'   =>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
@@ -891,7 +891,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
     private function dgOrder($name)
     {
         return ['id'=>$name, 'type'=>'edatagrid',
-            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'title'=>$this->lang['sort_list'], 'idField'=>'id', 'singleSelect'=>true],
+            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'title'=>lang('sort_list', $this->moduleID), 'idField'=>'id', 'singleSelect'=>true],
             'events' => ['data'   =>'dataOrder'],
             'source' => ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
             'columns' => [
@@ -930,9 +930,9 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 'title'     => ['order'=>20, 'label' => lang('title'),     'attr'=>['width'=>150,'resizable'=>true, 'editor'=>'text']],
                 'default'   => ['order'=>30, 'label' => lang('default'),   'attr'=>['width'=>120,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                'page_break'=> ['order'=>40, 'label' => $this->lang['page_break'],'attr'=>['width'=>120,'resizable'=>true],
+                'page_break'=> ['order'=>40, 'label' => lang('page_break', $this->moduleID),'attr'=>['width'=>120,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
-                'processing'=> ['order'=>50, 'label' => $this->lang['processing'],'attr'=>['width'=>200,'resizable'=>true],
+                'processing'=> ['order'=>50, 'label' => lang('processing'),'attr'=>['width'=>200,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataProcessing,valueField:'id',textField:'text',groupField:'group'}}"]],
                 'formatting'=> ['order'=>50, 'label' => lang('format'),'attr'=>['width'=>200,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'combobox',options:{editable:false,data:dataFormatting,valueField:'id',textField:'text',groupField:'group'}}"]]]];
@@ -946,7 +946,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
     private function dgFilters($name)
     {
         return ['id' =>$name, 'type'=>'edatagrid',
-            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'title'=> $this->lang['filter_list'], 'singleSelect'=>true, 'idField'=>'id'],
+            'attr'   => ['toolbar'=>"#{$name}Toolbar", 'title'=> lang('filter_list', $this->moduleID), 'singleSelect'=>true, 'idField'=>'id'],
             'events' => ['data'   =>'dataFilters'],
             'source' => ['actions'=>['new'=>['order'=>10,'icon'=>'add','events'=>['onClick'=>"jqBiz('#$name').edatagrid('addRow');"]]]],
             'columns'=> [
@@ -973,21 +973,21 @@ jqBiz('#frmFieldSettings').submit(function (e) {
     function phreeformTypes()
     {
         return [
-            ['id'=>'Data',   'text'=>$this->lang['fld_type_data_line']],
-            ['id'=>'TBlk',   'text'=>$this->lang['fld_type_data_block']],
-            ['id'=>'Tbl',    'text'=>$this->lang['fld_type_data_table']],
-            ['id'=>'TDup',   'text'=>$this->lang['fld_type_data_table_dup']],
-            ['id'=>'Ttl',    'text'=>$this->lang['fld_type_data_total']],
-            ['id'=>'LtrTpl', 'text'=>$this->lang['fld_type_letter_tpl']],
-            ['id'=>'Text',   'text'=>$this->lang['fld_type_fixed_txt']],
-            ['id'=>'Img',    'text'=>$this->lang['fld_type_image']],
-            ['id'=>'ImgLink','text'=>$this->lang['fld_type_image_link']],
-            ['id'=>'Rect',   'text'=>$this->lang['fld_type_rectangle']],
-            ['id'=>'Line',   'text'=>$this->lang['fld_type_line']],
-            ['id'=>'CImg',   'text'=>$this->lang['fld_type_biz_logo']],
-            ['id'=>'CDta',   'text'=>$this->lang['fld_type_biz_data']],
-            ['id'=>'CBlk',   'text'=>$this->lang['fld_type_biz_block']],
-            ['id'=>'PgNum',  'text'=>$this->lang['fld_type_page_num']],
-            ['id'=>'BarCode','text'=>$this->lang['fld_type_barcode']]];
+            ['id'=>'Data',   'text'=>lang('fld_type_data_line', $this->moduleID)],
+            ['id'=>'TBlk',   'text'=>lang('fld_type_data_block', $this->moduleID)],
+            ['id'=>'Tbl',    'text'=>lang('fld_type_data_table', $this->moduleID)],
+            ['id'=>'TDup',   'text'=>lang('fld_type_data_table_dup', $this->moduleID)],
+            ['id'=>'Ttl',    'text'=>lang('fld_type_data_total', $this->moduleID)],
+            ['id'=>'LtrTpl', 'text'=>lang('fld_type_letter_tpl', $this->moduleID)],
+            ['id'=>'Text',   'text'=>lang('fld_type_fixed_txt', $this->moduleID)],
+            ['id'=>'Img',    'text'=>lang('fld_type_image', $this->moduleID)],
+            ['id'=>'ImgLink','text'=>lang('fld_type_image_link', $this->moduleID)],
+            ['id'=>'Rect',   'text'=>lang('fld_type_rectangle', $this->moduleID)],
+            ['id'=>'Line',   'text'=>lang('fld_type_line', $this->moduleID)],
+            ['id'=>'CImg',   'text'=>lang('fld_type_biz_logo', $this->moduleID)],
+            ['id'=>'CDta',   'text'=>lang('fld_type_biz_data', $this->moduleID)],
+            ['id'=>'CBlk',   'text'=>lang('fld_type_biz_block', $this->moduleID)],
+            ['id'=>'PgNum',  'text'=>lang('fld_type_page_num', $this->moduleID)],
+            ['id'=>'BarCode','text'=>lang('fld_type_barcode', $this->moduleID)]];
     }
 }

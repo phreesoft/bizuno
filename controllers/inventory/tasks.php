@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-03
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/tasks.php
  */
 
@@ -46,13 +46,13 @@ class inventoryTasks extends mgrJournal
         $this->struc = [
             'title'      => ['panel'=>'general','order'=>10,'label'=>lang('title'),             'clean'=>'text',   'attr'=>['type'=>'text']],
             'description'=> ['panel'=>'general','order'=>15,'label'=>lang('description'),       'clean'=>'text',   'attr'=>['type'=>'textarea']],
-            'ref_doc'    => ['panel'=>'general','order'=>20,'label'=>$this->lang['ref_doc'],    'clean'=>'text',   'attr'=>['type'=>'text']],
-            'ref_spec'   => ['panel'=>'general','order'=>25,'label'=>$this->lang['ref_spec'],   'clean'=>'text',   'attr'=>['type'=>'text']],
-            'dept_id'    => ['panel'=>'general','order'=>30,'label'=>$this->lang['dept_id'],    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>viewRoleDropdown('mfg')],
-            'mfg'        => ['panel'=>'general','order'=>35,'label'=>$this->lang['mfg_signoff'],'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>1]],
-            'qa'         => ['panel'=>'general','order'=>40,'label'=>$this->lang['qa_signoff'], 'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]],
-            'data_entry' => ['panel'=>'general','order'=>45,'label'=>$this->lang['data_value'], 'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]],
-            'erp_entry'  => ['panel'=>'general','order'=>50,'label'=>$this->lang['erp_entry'],  'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]]];
+            'ref_doc'    => ['panel'=>'general','order'=>20,'label'=>lang('ref_doc', $this->moduleID),    'clean'=>'text',   'attr'=>['type'=>'text']],
+            'ref_spec'   => ['panel'=>'general','order'=>25,'label'=>lang('ref_spec', $this->moduleID),   'clean'=>'text',   'attr'=>['type'=>'text']],
+            'dept_id'    => ['panel'=>'general','order'=>30,'label'=>lang('dept_id', $this->moduleID),    'clean'=>'integer','attr'=>['type'=>'select'], 'values'=>viewRoleDropdown('mfg')],
+            'mfg'        => ['panel'=>'general','order'=>35,'label'=>lang('mfg_signoff', $this->moduleID),'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>1]],
+            'qa'         => ['panel'=>'general','order'=>40,'label'=>lang('qa_signoff', $this->moduleID), 'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]],
+            'data_entry' => ['panel'=>'general','order'=>45,'label'=>lang('data_value', $this->moduleID), 'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]],
+            'erp_entry'  => ['panel'=>'general','order'=>50,'label'=>lang('erp_entry', $this->moduleID),  'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0]]];
     }
     protected function managerGrid($security, $args=[])
     {
@@ -62,8 +62,8 @@ class inventoryTasks extends mgrJournal
             'columns'=> [
                 'title'      => ['order'=>10,'label'=>lang('title'),          'attr'=>['resizable'=>true,'sortable'=>true]],
                 'description'=> ['order'=>20,'label'=>lang('description'),    'attr'=>['resizable'=>true,'sortable'=>true]],
-                'ref_doc'    => ['order'=>30,'label'=>$this->lang['ref_doc'], 'attr'=>['resizable'=>true]],
-                'ref_spec'   => ['order'=>40,'label'=>$this->lang['ref_spec'],'attr'=>['resizable'=>true]]]]);
+                'ref_doc'    => ['order'=>30,'label'=>lang('ref_doc', $this->moduleID), 'attr'=>['resizable'=>true]],
+                'ref_spec'   => ['order'=>40,'label'=>lang('ref_spec', $this->moduleID),'attr'=>['resizable'=>true]]]]);
         return $data;
     }
     private function managerSettings()

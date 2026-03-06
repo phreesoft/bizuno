@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/io.php
  */
 
@@ -35,7 +35,6 @@ class phreeformIo
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -51,14 +50,14 @@ class phreeformIo
         $fields= [
             'imp_name'    => ['order'=> 0,'attr'=>['type'=>'hidden']],
             'selLang'     => ['order'=>10,'label'=>lang('language'),'values'=>$selLangs,'attr'=>['type'=>'select']],
-            'cbReplace'   => ['order'=>20,'label'=>$this->lang['msg_replace_existing'],'attr'=>['type'=>'checkbox']],
+            'cbReplace'   => ['order'=>20,'label'=>lang('msg_replace_existing', $this->moduleID),'attr'=>['type'=>'checkbox']],
             'selModule'   => ['order'=>30,'label'=>lang('module'),  'values'=>$selMods, 'attr'=>['type'=>'select', 'readonly'=>true]],
             'new_name'    => ['order'=>40,'label'=>'('.lang('optional').') '.lang('msg_entry_rename'),'attr'=>['width'=>160]],
-            'fileUpload'  => ['order'=>50,'label'=>$this->lang['import_upload_report'],'attr'=>['type'=>'file']],
+            'fileUpload'  => ['order'=>50,'label'=>lang('import_upload_report', $this->moduleID),'attr'=>['type'=>'file']],
             'btnUpload'   => ['order'=>60,'attr' =>['type'=>'button','value'=>lang('import')],'events'=>['onClick'=>"jqBiz('#imp_name').val(''); jqBiz('#frmImport').submit();"]],
-            'selReports'  => ['order'=>70,'label'=>$this->lang['phreeform_reports_available'],'attr'=>['type'=>'select'], 'values'=>$reports],
-            'btnImport'   => ['order'=>80,'attr' =>['type'=>'button','value'=>$this->lang['btn_import_selected']],'events'=>['onClick'=>"bizTextSet('imp_name', bizSelGet('selReports')); jqBiz('#frmImport').submit();"]],
-            'btnImportAll'=> ['order'=>90,'attr' =>['type'=>'button','value'=>$this->lang['btn_import_all']],     'events'=>['onClick'=>"bizTextSet('imp_name', 'all'); jqBiz('#frmImport').submit();"]],
+            'selReports'  => ['order'=>70,'label'=>lang('phreeform_reports_available', $this->moduleID),'attr'=>['type'=>'select'], 'values'=>$reports],
+            'btnImport'   => ['order'=>80,'attr' =>['type'=>'button','value'=>lang('btn_import_selected', $this->moduleID)],'events'=>['onClick'=>"bizTextSet('imp_name', bizSelGet('selReports')); jqBiz('#frmImport').submit();"]],
+            'btnImportAll'=> ['order'=>90,'attr' =>['type'=>'button','value'=>lang('btn_import_all', $this->moduleID)],     'events'=>['onClick'=>"bizTextSet('imp_name', 'all'); jqBiz('#frmImport').submit();"]],
         ];
         $data  = [
             'title'=> lang('import'),
@@ -66,14 +65,14 @@ class phreeformIo
                 'back' => ['order'=>10,'events'=>['onClick'=>"location.href='".BIZUNO_URL_PORTAL."?bizRt=phreeform/main/manager'"]]]]],
             'divs'     => [
                 'toolbar'=> ['order'=>10,'type'=>'toolbar','key'=>'tbImport'],
-                'heading'=> ['order'=>15,'type'=>'html',   'html'=>"<h1>dave - ".$this->lang['phreeform_import']."</h1>"],
+                'heading'=> ['order'=>15,'type'=>'html',   'html'=>"<h1>dave - ".lang('phreeform_import', $this->moduleID)."</h1>"],
                 'formBOF'=> ['order'=>20,'type'=>'form',   'key'=>'frmImport'],
                 'body'   => ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'import' => ['order'=>10,'type'=>'panel','classes'=>['block66'],'key'=>'import']]],
                 'formEOF'=> ['order'=>90,'type'=>'html',   'html'=>"</form>"]],
             'forms'    => ['frmImport'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreeform/io/importReport"]]],
             'panels'  => [
-                'import' => ['label'=>$this->lang['phreeform_import'], 'type'=>'fields','keys'=>array_keys($fields)]],
+                'import' => ['label'=>lang('phreeform_import', $this->moduleID), 'type'=>'fields','keys'=>array_keys($fields)]],
             'fields'   => $fields,
             'jsReady'  => ['init'=>"ajaxForm('frmImport');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);

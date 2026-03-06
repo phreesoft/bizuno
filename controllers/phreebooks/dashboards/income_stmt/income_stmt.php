@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-01
  * @filesource /controllers/phreebooks/dashboards/income_stmt/income_stmt.php
  */
 
@@ -46,10 +46,6 @@ class income_stmt
         $this->fieldStructure();
     }
 
-    /**
-     * Sets the page fields with their structure
-     * @return array - page structure
-     */
     private function fieldStructure()
     {
         $this->struc = [ // Admin fields
@@ -58,12 +54,6 @@ class income_stmt
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
     }
 
-    /**
-     * Generates the structure for the dashboard view
-     * @global object $currencies - Sets the currency values for proper display
-     * @param array $layout - structure coming in
-     * @return modified $layout
-     */
     public function render()
     {
         $period = getModuleCache('phreebooks', 'fy', 'period');

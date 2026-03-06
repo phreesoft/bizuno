@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreeform/main.php
  */
 
@@ -89,9 +89,9 @@ class phreeformMain extends mgrJournal
                     'history'=> ['order'=>60,'type'=>'panel','key'=>'myHist','classes'=>['block33']]]]],
             'toolbars' => ['tbManager'=>['icons'=>[
                 'mimeRpt' => ['order'=>30,'icon'=>'mimeTxt','hidden'=>($security>1)?false:true,'events'=>['onClick'=>"hrefClick('$this->moduleID/design/edit&type=rpt', 0);"],
-                    'label'=>$this->lang['new_report']],
+                    'label'=>lang('new_report', $this->moduleID)],
                 'mimeFrm' => ['order'=>40,'icon'=>'mimeDoc','hidden'=>($security>1)?false:true,'events'=>['onClick'=>"hrefClick('$this->moduleID/design/edit&type=frm', 0);"],
-                    'label'=>$this->lang['new_form']],
+                    'label'=>lang('new_form', $this->moduleID)],
                 'import'  => ['order'=>90,'hidden'=>($security>1)?false:true, 'events'=>['onClick'=>"hrefClick('phreeform/io/manager');"]]]]],
             'panels' => [
                 'accDoc'    => ['type'=>'accordion','key' =>'accDocs','options'=>['height'=>640]],
@@ -99,10 +99,10 @@ class phreeformMain extends mgrJournal
                     'search'=> ['type'=>'panel','key'=>'docSearch'],
                     'panel' => ['type'=>'panel','key'=>'myBookMark']]],
                 'docSearch' => ['label'=>lang('search'),               'type'=>'html','html'=>$divSrch],
-                'myBookMark'=> ['label'=>$this->lang['my_favorites'],  'type'=>'html','id'=>'myBookMark','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/favorites'"],'html'=>'&nbsp;'],
-                'myHist'    => ['label'=>$this->lang['recent_reports'],'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/recent'"],   'html'=>'&nbsp;']],
+                'myBookMark'=> ['label'=>lang('my_favorites', $this->moduleID),  'type'=>'html','id'=>'myBookMark','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/favorites'"],'html'=>'&nbsp;'],
+                'myHist'    => ['label'=>lang('recent_reports', $this->moduleID),'type'=>'html','options'=>['collapsible'=>'true','href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/main/recent'"],   'html'=>'&nbsp;']],
             'accordion'=> ['accDocs'=>['styles'=>['height'=>'100%'],'divs'=>[ // 'attr'=>['halign'=>'left'], crashes older versions of Chrome and Safari
-                'divTree'  => ['order'=>10,'label'=>$this->lang['my_reports'],'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'], // 'attr'=>['titleDirection'=>'up'],
+                'divTree'  => ['order'=>10,'label'=>lang('my_reports', $this->moduleID),'type'=>'divs','styles'=>['overflow'=>'auto','padding'=>'10px'], // 'attr'=>['titleDirection'=>'up'],
                     'divs'=>[
                         'toolbar'=> ['order'=>10,'type'=>'fields','keys'=>['expand','collapse']],
                         'tree'   => ['order'=>50,'type'=>'tree',  'key' =>'treePhreeform']]],
@@ -181,7 +181,7 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
         if (!$security = validateAccess($this->secID, 3)) { return; }
         $rID   = clean('rID',  'integer', 'get');
         $title = clean('data', 'text', 'get');
-        if (empty($rID) || empty($title)) { return msgAdd($this->lang['err_rename_fail']); }
+        if (empty($rID) || empty($title)) { return msgAdd(lang('err_rename_fail', $this->moduleID)); }
         $meta  = dbMetaGet(0, $this->metaPrefix);
         $metaID= metaIdxClean($meta);
         $meta['title']      = $title;
@@ -202,7 +202,7 @@ jqBiz('#treePhreeform').tree('expand', node.target); }";
         if (!$security = validateAccess($this->secID, 2)) { return; }
         $rID  = clean('rID',  'integer', 'get');
         $title= clean('data', 'text', 'get');
-        if (empty($rID) || empty($title)) { return msgAdd($this->lang['err_copy_fail']); }
+        if (empty($rID) || empty($title)) { return msgAdd(lang('err_copy_fail', $this->moduleID)); }
         parent::copyMeta($layout);
         $newID = clean('newID', 'integer', 'get');
         $layout['content']['actionData'] = "bizTreeReload('treePhreeform'); bizPanelRefresh('myBookMark'); jqBiz('#docRecent').panel('refresh'); jqBiz('#divDetail').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/edit&rID=$newID');";

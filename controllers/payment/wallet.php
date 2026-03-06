@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-13
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/payment/wallet.php
  */
 
@@ -36,7 +36,6 @@ class paymentWallet
 {
     public  $moduleID = 'payment';
     private $mode     = 'prod'; // choices are 'test' (Test) or 'prod' (Production)
-    public $lang;
     public $props;
     public $cID;
     public $type;
@@ -45,7 +44,6 @@ class paymentWallet
 
     function __construct()
     {
-        $this->lang = getExtLang($this->moduleID);
         $this->props= getMetaMethod('gateways', 'payfabric');
         msgDebug("\nConstructing wallet with props = ".print_r($this->props, true));
         if (!empty($this->props)) {
@@ -223,7 +221,7 @@ class paymentWallet
     private function viewCard($card)
     {
         if (in_array($card['type'], ['checking'])) { // e-check
-            $html = "<table style=\"width:100%;\"><tr><th>".$this->lang['name_on_card']."</th><th>".lang('address_type_b')."</th></tr>";
+            $html = "<table style=\"width:100%;\"><tr><th>".lang('name_on_card', $this->moduleID)."</th><th>".lang('address_type_b')."</th></tr>";
             $html.= "<tr><td>".html5('',['attr'=>['type'=>'address']])."</th><th>".html5('',['attr'=>['type'=>'address']])."</th></tr>";
             $html.= "<tr><td>".html5('',['attr'=>['type'=>'address']])."</th><th>".html5('',['attr'=>['type'=>'address']])."</th></tr>";
         } else { // credit card

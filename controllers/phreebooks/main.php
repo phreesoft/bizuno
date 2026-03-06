@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -36,7 +36,6 @@ class phreebooksMain
     public  $journalID= 0;
     private $achTotals= ['achBalBeg','achSubtotal','achDiscount','achTotal','achBalEnd'];
     public  $gl_type  = '';
-    public  $lang;
     public  $myStore;
     public  $defaults;
     public  $rID;
@@ -49,7 +48,6 @@ class phreebooksMain
 
     function __construct()
     {
-        $this->lang   = getLang($this->moduleID);
         $this->myStore= getUserCache('profile', 'store_id', '', 0);
         $this->rID    = clean('rID', 'integer', 'get');
         $this->action = clean('bizAction', 'text', 'get');
@@ -634,7 +632,7 @@ function bizUnitDiscDisc(newValue) {
         $ledger->main['description'] = lang("journal_id_{$this->journalID}").": ".(!empty($values['primary_name_b']) ? $values['primary_name_b'] : '');
         $ledger->main = array_replace($ledger->main, $values);
         if (!$ledger->updateContact()) { return; } // Create/Update contact information
-        if (in_array($ledger->journalID, [3,4,6,7,9,10,12,13]) && empty($ledger->main['contact_id_b'])) { return msgAdd($this->lang['msg_missing_contact_id']); }
+        if (in_array($ledger->journalID, [3,4,6,7,9,10,12,13]) && empty($ledger->main['contact_id_b'])) { return msgAdd(lang('msg_missing_contact_id', $this->moduleID)); }
         if (!$this->getItems($ledger))  { return; }
         if (!$this->getTotals($ledger)) { return; }
         msgDebug("\nMapped journal rows = ".print_r($ledger->items, true));
@@ -859,7 +857,7 @@ function bizUnitDiscDisc(newValue) {
             // check calculated total against submitted total, course error check
             if (round($current_total, 2) <> round($ledger->main['total_amount'], 2)) {
                 msgDebug("\nin SaveBulk, failed comparing calc total =  ".round($current_total, 2)." with submitted total = ".round($ledger->main['total_amount'], 2));
-                return msgAdd(sprintf($this->lang['err_total_not_match'], round($current_total, 2), round($ledger->main['total_amount'], 2)), 'trap');
+                return msgAdd(sprintf(lang('err_total_not_match', $this->moduleID), round($current_total, 2), round($ledger->main['total_amount'], 2)), 'trap');
             }
             $nacha->process($ledger);
             if (!$ledger->Post())      { return; }
@@ -983,16 +981,16 @@ function bizUnitDiscDisc(newValue) {
         switch ($this->journalID) { // some rules checking
             case  4: // Purchase Order Journal
             case 10: // Sales Order Journal
-                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', "id", "so_po_ref_id=$rID")) { return msgAdd(sprintf($this->lang['err_journal_delete'], "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
+                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', "id", "so_po_ref_id=$rID")) { return msgAdd(sprintf(lang('err_journal_delete', $this->moduleID), "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
                 break;
             case  6: // Purchase Journal
             case  7: // Vendor Credit Memo Journal
             case 12: // Sales/Invoice Journal
             case 13: // Customer Credit Memo Journal
                 // first check for main entries that refer to delete id (credit memos)
-                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', "id", "so_po_ref_id=$rID")) { return msgAdd(sprintf($this->lang['err_journal_delete'], "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
+                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', "id", "so_po_ref_id=$rID")) { return msgAdd(sprintf(lang('err_journal_delete', $this->moduleID), "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
                 // next check for payments that link to deleted id (payments)
-                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', "id", "gl_type='pmt' AND item_ref_id=$rID")) { return msgAdd(sprintf($this->lang['err_journal_delete'], "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
+                if ($xID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', "id", "gl_type='pmt' AND item_ref_id=$rID")) { return msgAdd(sprintf(lang('err_journal_delete', $this->moduleID), "(id=$xID) ".lang('journal_id_'.$this->journalID))); }
                 break;
             default:
         }
@@ -1070,7 +1068,7 @@ function bizUnitDiscDisc(newValue) {
             }
             $item_cnt++;
         }
-        if (empty($ledger->items)) { return msgAdd($this->lang['msg_no_items']); }
+        if (empty($ledger->items)) { return msgAdd(lang('msg_no_items', $this->moduleID)); }
         $this->mapStoreGL($ledger);
         return true;
     }
@@ -1140,7 +1138,7 @@ function bizUnitDiscDisc(newValue) {
         // check calculated total against submitted total, course error check
         if (!in_array($this->journalID, array(2,14,15,16)) && number_format($current_total, 2) <> number_format($ledger->main['total_amount'], 2)) {
             msgDebug("\nIn getTotals, failed comparing calc total =  ".number_format($current_total, 2)." with submitted total = ".number_format($ledger->main['total_amount'], 2));
-            return msgAdd(sprintf($this->lang['err_total_not_match'], number_format($current_total, 2), number_format($ledger->main['total_amount'], 2)), 'trap');
+            return msgAdd(sprintf(lang('err_total_not_match', $this->moduleID), number_format($current_total, 2), number_format($ledger->main['total_amount'], 2)), 'trap');
         }
         return true;
     }
@@ -1187,9 +1185,9 @@ function bizUnitDiscDisc(newValue) {
             $statusHtml.= '<p style="font-weight:bold;text-align:center;" class="row-'.$stat['color'].'">'.$stat['text'].'</p>';
         } }
         // set the customer/vendor status in order of importance
-        if ($new_data['past_due'] > 0)                         { $statusBg='yellow'; $statusMsg=$this->lang['msg_contact_status_past_due']; }
-        elseif ($new_data['total'] > $new_data['credit_limit']){ $statusBg='yellow'; $statusMsg=$this->lang['msg_contact_status_over_limit']; }
-        else                                                   { $statusBg='green';  $statusMsg=$this->lang['msg_contact_status_good']; }
+        if ($new_data['past_due'] > 0)                         { $statusBg='yellow'; $statusMsg=lang('msg_contact_status_past_due', $this->moduleID); }
+        elseif ($new_data['total'] > $new_data['credit_limit']){ $statusBg='yellow'; $statusMsg=lang('msg_contact_status_over_limit', $this->moduleID); }
+        else                                                   { $statusBg='green';  $statusMsg=lang('msg_contact_status_good', $this->moduleID); }
         if ($acctActive) { $statusHtml.= '<p style="font-weight:bold;text-align:center;background-color:'.$statusBg.'">'.$statusMsg."</p>"; }
         $fields = [
             'status'     => ['order'=>10,'html'=>$statusHtml,     'break'=>false,'attr'=>['type'=>'raw']],
@@ -1200,11 +1198,11 @@ function bizUnitDiscDisc(newValue) {
             'late120'    => ['order'=>28,'label'=>'Late 91-120',  'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_120']]],
             'late121'    => ['order'=>30,'label'=>'Late Over 120','break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_121']]],
             'total'      => ['order'=>32,'label'=>lang('total'),'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['total']]],
-            'inv_orders' => ['order'=>10,'label'=>$this->lang['status_orders_invoice'],'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
-            'open_quotes'=> ['order'=>20,'label'=>$this->lang['status_open_j9'], 'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
-            'open_orders'=> ['order'=>30,'label'=>$this->lang['status_open_j10'],'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
-            'unpaid_inv' => ['order'=>40,'label'=>$this->lang['status_open_j12'],'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
-            'unpaid_crd' => ['order'=>50,'label'=>$this->lang['status_open_j13'],'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']]];
+            'inv_orders' => ['order'=>10,'label'=>lang('status_orders_invoice', $this->moduleID),'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
+            'open_quotes'=> ['order'=>20,'label'=>lang('status_open_j9', $this->moduleID), 'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
+            'open_orders'=> ['order'=>30,'label'=>lang('status_open_j10', $this->moduleID),'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
+            'unpaid_inv' => ['order'=>40,'label'=>lang('status_open_j12', $this->moduleID),'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
+            'unpaid_crd' => ['order'=>50,'label'=>lang('status_open_j13', $this->moduleID),'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']]];
         if ($contact['ctype_v']=='1') { $idx='vendors';   $jQuote=3; $jOrder= 4; $jSale= 6; $jRtn= 7; }
         else                          { $idx='customers'; $jQuote=9; $jOrder=10; $jSale=12; $jRtn=13; }
         if (!empty($new_data['inv_orders']) && sizeof($new_data['inv_orders']) >1) { $fields['inv_orders'] = array_merge($fields['inv_orders'], ['values'=>$this->getStatusOpen($new_data, 'inv_orders'),
@@ -1406,17 +1404,17 @@ function bizUnitDiscDisc(newValue) {
                         'toggle_j12' => ['order'=>40,'icon'=>'toggle', 'label'=>lang('toggle_status'),'hidden'=>$sec6_12>3?false:true,
                             'events' => ['onClick' => "jsonAction('phreebooks/main/toggleWaiting&jID=jrnlTBD', idTBD);"],
                             'display'=> "row.journal_id=='12'"],
-                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>$this->lang['auto_assy'],
-                            'events' => ['onClick'=>"if (confirm('".$this->lang['msg_confirm_auto_assy']."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
+                        'xAutoAssy'  => ['order'=>46,'icon'=>'work','label'=>lang('auto_assy', $this->moduleID),
+                            'events' => ['onClick'=>"if (confirm('".lang('msg_confirm_auto_assy', $this->moduleID)."')) jsonAction('$this->moduleID/autoAssy/autoAssy', idTBD);"],
                             'display'=> "(row.journal_id=='9' || row.journal_id=='10' || row.journal_id=='12')"],
                         'dates'      => ['order'=>50,'icon'=>'date',   'label'=>lang('delivery_dates'), 'hidden'=>$sec4_10>1?false:true,
                             'events' => ['onClick' => "windowEdit('phreebooks/main/deliveryDates&rID=idTBD', 'winDelDates', '".lang('delivery_dates')."', 500, 400);"],
                             'display'=> "row.journal_id=='4' || row.journal_id=='10'"],
-                        'invoice'    => ['order'=>70,'icon'=>'invoice','label'=>$this->lang['set_invoice_num'],'hidden'=>$sec6_12>2?false:true,
-                            'events' => ['onClick' => "var row = jqBiz('#dgPhreeBooks').datagrid('getRows')[indexTBD]; var invNum=prompt('".$this->lang['enter_invoice_num']."', row.invoice_num); if (invNum) { jsonAction('phreebooks/main/setInvoiceNum&jID=6', idTBD, invNum); }"],
+                        'invoice'    => ['order'=>70,'icon'=>'invoice','label'=>lang('set_invoice_num', $this->moduleID),'hidden'=>$sec6_12>2?false:true,
+                            'events' => ['onClick' => "var row = jqBiz('#dgPhreeBooks').datagrid('getRows')[indexTBD]; var invNum=prompt('".lang('enter_invoice_num', $this->moduleID)."', row.invoice_num); if (invNum) { jsonAction('phreebooks/main/setInvoiceNum&jID=6', idTBD, invNum); }"],
                             'display'=> "row.waiting=='1' && row.journal_id=='6'"],
-                        'reference'  => ['order'=>70,'icon'=>'invoice','label'=>$this->lang['set_ref_num'],
-                            'events' => ['onClick' => "var invNum=prompt('".$this->lang['enter_ref_num']."'); if (invNum) jsonAction('phreebooks/main/setReferenceNum&jID=18', idTBD, invNum);"],
+                        'reference'  => ['order'=>70,'icon'=>'invoice','label'=>lang('set_ref_num', $this->moduleID),
+                            'events' => ['onClick' => "var invNum=prompt('".lang('enter_ref_num', $this->moduleID)."'); if (invNum) jsonAction('phreebooks/main/setReferenceNum&jID=18', idTBD, invNum);"],
                             'display'=> "row.journal_id=='18' || row.journal_id=='20'"],
                         'purchase'   => ['order'=>70,'icon'=>'purchase','label'=>lang('fill_purchase'),'hidden'=>$sec6_12>1?false:true,
                             'events' => ['onClick' => "jsonAction('phreebooks/main/getJournalFill&jID=jrnlTBD&cID=cIDTBD', idTBD);"],
@@ -1617,7 +1615,7 @@ function bizUnitDiscDisc(newValue) {
         }
         if (validateAccess('j12_mgr', 2, false)) { // Create RMA action
             $data['columns']['action']['actions'][$this->moduleID] = ['order'=>85,'icon'=>'return',
-                'label'  =>$this->lang['create_return'],'events'=>['onClick'=>"jsonAction('$this->moduleID/returns/getInfoForm', idTBD);"],
+                'label'  =>lang('create_return', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/returns/getInfoForm', idTBD);"],
                 'display'=>"row.journal_id=='12' && row.waiting=='0'"];
         }
         // Stores
@@ -1634,13 +1632,13 @@ function bizUnitDiscDisc(newValue) {
 // @TODO - THIS NEEDS TO BE MADE INTO A META VALUE FOR SPEED
         if (in_array($this->journalID, [9,10,12,13])) {
             $data['columns']['action']['actions']['ediConfirm'] = ['order'=>5,'icon'=>'apply',
-                'label'=>$this->lang['edi_confirm_po'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '855');"],
+                'label'=>lang('edi_confirm_po', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '855');"],
                 'display'=>"row.journal_id=='10' && row.contact_id_b==206"]; // EDI 855 - PO confirmation
             $data['columns']['action']['actions']['ediInvoice'] = ['order'=>6,'icon'=>'mimeHtml',
-                'label'=>$this->lang['edi_send_invoice'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '810');"],
+                'label'=>lang('edi_send_invoice', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '810');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 810 - Invoice
             $data['columns']['action']['actions']['ediTrack']   = ['order'=>7,'icon'=>'truck',
-                'label'=>$this->lang['edi_send_tracking'],'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '856');"],
+                'label'=>lang('edi_send_tracking', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/ediAPI/ediTransmit', idTBD, '856');"],
                 'display'=>"row.journal_id=='12' && row.contact_id_b==206"]; // EDI 856 - Shipment confirmation with tracking
         }
                 
@@ -1931,7 +1929,7 @@ function bizUnitDiscDisc(newValue) {
         $invNum = clean('data', 'text',   'get');
         $panel  = clean('panel','cmd',    'get');
         if (empty($rID))    { return msgAdd(lang('bad_id')); }
-        if (empty($invNum)) { return msgAdd($this->lang['msg_inv_waiting']); }
+        if (empty($invNum)) { return msgAdd(lang('msg_inv_waiting', $this->moduleID)); }
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'0','invoice_num'=>$invNum], 'update', "id=$rID");
         $action = !empty($panel) ? "bizPanelRefresh('$panel');" : "bizGridReload('dgPhreeBooks');";
         $layout = array_replace_recursive($layout,['content'=>['action'=>'eval','actionData'=>$action]]);
@@ -2060,10 +2058,10 @@ function bizUnitDiscDisc(newValue) {
         $times = clean('rID', ['format'=>'integer', 'default'=>2], 'get');
         $freq  = clean('data',['format'=>'integer', 'default'=>3], 'get');
         $fields= [
-            'txtIntro'=> ['order'=> 1,'html' =>"<p>{$this->lang['recur_desc']}</p>",'attr'=>['type'=>'raw']],
-            'rcrTimes'=> ['order'=>10,'label'=>$this->lang['recur_times'],'position'=>'after','attr'=>['type'=>'integer','value'=>$times,'size'=>3,'maxlength'=>2]],
+            'txtIntro'=> ['order'=> 1,'html' =>"<p>{lang('recur_desc']}</p>",'attr'=>['type'=>'raw']],
+            'rcrTimes'=> ['order'=>10,'label'=>lang('recur_times', $this->moduleID),'position'=>'after','attr'=>['type'=>'integer','value'=>$times,'size'=>3,'maxlength'=>2]],
             'hr1'     => ['order'=>20,'html' =>'<hr>','attr'=>['type'=>'raw']],
-            'txtFreq' => ['order'=>21,'html' =>"<p>{$this->lang['recur_frequency']}</p>",'attr'=>['type'=>'raw']],
+            'txtFreq' => ['order'=>21,'html' =>"<p>{lang('recur_frequency']}</p>",'attr'=>['type'=>'raw']],
             'radio0'  => ['order'=>30,'break'=>true,'label'=>lang('dates_weekly'),   'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>1,'checked'=>$freq==1?true:false]],
             'radio1'  => ['order'=>40,'break'=>true,'label'=>lang('dates_bi_weekly'),'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>2,'checked'=>$freq==2?true:false]],
             'radio2'  => ['order'=>50,'break'=>true,'label'=>lang('dates_monthly'),  'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>3,'checked'=>$freq==3?true:false]],

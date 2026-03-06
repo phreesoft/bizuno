@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/inventory/build.php
  */
 
@@ -188,7 +188,7 @@ class inventoryBuild extends mgrJournal
             'toolbars'=> ["tb{$this->domSuffix}"=>['icons'=>[
                 'print'=> ['order'=>40,'hidden'=>$rID==0 && $security>1?false:true,'events'=>['onClick'=>"jqBiz('#xChild').val('print'); jqBiz('#frmJournal').submit();"]]]]],
             'panels'  => [
-                'build'  => ['label'=>$this->lang['msg_build_num'],'id'=>'build','type'=>'html','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/build/details&woID=$rID'"],'html'=>'&nbsp;']],
+                'build'  => ['label'=>lang('msg_build_num', $this->moduleID),'id'=>'build','type'=>'html','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/build/details&woID=$rID'"],'html'=>'&nbsp;']],
             'jsBody'  => ['init'=>$jsBody]];
         $layout= array_replace_recursive($layout, $data);
         // Stores
@@ -280,7 +280,7 @@ class inventoryBuild extends mgrJournal
         $output = html5('step_id',$fields['step_id']).html5('step_notes',$fields['step_notes']).html5('id',$fields['woID']).'
 <table id="tblJournal" style="border-collapse:collapse;width:100%;">
 <thead class="panel-header">
-    <tr><th>'.lang('step')."</th><th>".lang('title')."</th><th>".lang('description')."</th><th>".$this->lang['mfg_signoff']."</th><th>".$this->lang['qa_signoff']."</th><th>".$this->lang['erp_entry']."</th><th>".lang('action')."</th></tr>
+    <tr><th>'.lang('step')."</th><th>".lang('title')."</th><th>".lang('description')."</th><th>".lang('mfg_signoff', $this->moduleID)."</th><th>".lang('qa_signoff', $this->moduleID)."</th><th>".lang('erp_entry', $this->moduleID)."</th><th>".lang('action')."</th></tr>
 </thead><tbody>\n";
         $cnt = false;
         if (empty($fields['steps']) || !is_array($fields['steps'])) { return $output .= "Error: No Steps found!</tbody>\n</table>"; }
@@ -291,7 +291,7 @@ class inventoryBuild extends mgrJournal
             $output .= "<td>".$step['title']   ."</td>\n";
             if (!is_null($onStep) && $onStep==$idx) {
                 if ($step['data_entry']) {
-                    if (!empty($step['data_value'])) { $output .= "<td>".$step['description']."<br />".$this->lang['data_value'].": {$step['data_value']}</td>\n"; }
+                    if (!empty($step['data_value'])) { $output .= "<td>".$step['description']."<br />".lang('data_value', $this->moduleID).": {$step['data_value']}</td>\n"; }
                     else                             { $output .= "<td>".$step['description']."<br />".html5('step_data', ['attr'=>  ['size'=>'60']])."</td>\n"; }
                 } else { $output .= "<td>".$step['description']."</td>\n"; }
                 if ($step['mfg']) {
@@ -305,7 +305,7 @@ class inventoryBuild extends mgrJournal
                 $output .= "<td>&nbsp;</td>\n<td>".html5('', ['icon'=>'save','size'=>'large','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmSteps').submit();"]])."</td>\n";
             } else {
                 $output .= "<td>".$step['description'];
-                $output .= !empty($step['data_value']) ? ("<br />".$this->lang['data_value'].": {$step['data_value']}") : "";
+                $output .= !empty($step['data_value']) ? ("<br />".lang('data_value', $this->moduleID).": {$step['data_value']}") : "";
                 $output .= "</td>\n";
                 $output .= '<td style="text-align:center">'.(!empty($step['mfg'])?(!empty($step['mfg_id'])? getContactById($step['mfg_id']): lang('yes')): ' ')."</td>\n";
                 $output .= '<td style="text-align:center">'.(!empty($step['qa']) ?(!empty($step['qa_id']) ? getContactById($step['qa_id']) : lang('yes')): ' ')."</td>\n";
@@ -417,12 +417,12 @@ class inventoryBuild extends mgrJournal
         dbTransactionCommit();
         // *************** END TRANSACTION *************************
         if (!empty($mainData['closed'])) {
-            msgLog(sprintf($this->lang['msg_build_complete'], $main['invoice_num'], $item['qty'], $item['sku']));
-            msgAdd(sprintf($this->lang['msg_build_complete'], $main['invoice_num'], $item['qty'], $item['sku']),'success');
+            msgLog(sprintf(lang('msg_build_complete', $this->moduleID), $main['invoice_num'], $item['qty'], $item['sku']));
+            msgAdd(sprintf(lang('msg_build_complete', $this->moduleID), $main['invoice_num'], $item['qty'], $item['sku']),'success');
             $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select', 0); jqBiz('#dg{$this->domSuffix}').datagrid('reload'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]]);
         } else {
-            msgLog(sprintf($this->lang['msg_build_step'], $main['invoice_num'], $step_id+1));
-            msgAdd(sprintf($this->lang['msg_build_step'], $main['invoice_num'], $step_id+1),'success');
+            msgLog(sprintf(lang('msg_build_step', $this->moduleID), $main['invoice_num'], $step_id+1));
+            msgAdd(sprintf(lang('msg_build_step', $this->moduleID), $main['invoice_num'], $step_id+1),'success');
             $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#build').panel('refresh', bizunoAjax+'&bizRt=$this->moduleID/build/details&woID={$main['id']}');"]]);
         }
     }
@@ -432,7 +432,7 @@ class inventoryBuild extends mgrJournal
         $glInv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'gl_inv', "sku='".addslashes($item['sku'])."'");
         bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journal.php", 'journal');
         $glEntry = new journal(0, 14);
-        $glEntry->main['description'] = "{$this->lang['msg_build_num']} ({$item['qty']}) {$main['description']}";
+        $glEntry->main['description'] = "{lang('msg_build_num']} ({$item['qty']}) {$main['description']}";
         $glEntry->main['invoice_num'] = $main['invoice_num'];
         $glEntry->main['store_id']    = $main['store_id'];
         $glEntry->main['gl_acct_id']  = $glInv;

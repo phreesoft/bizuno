@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/administrate/roles.php
  */
 
@@ -52,9 +52,9 @@ class administrateRoles extends mgrJournal
             'security'    => ['panel'=>'general','order'=> 1,                                 'clean'=>'array',  'attr'=>['type'=>'hidden',  'value'=>'']],
             'title'       => ['panel'=>'general','order'=>10,'label'=>lang('title'),          'clean'=>'text',   'attr'=>['value'=>'']],
             'inactive'    => ['panel'=>'general','order'=>20,'label'=>lang('inactive'),       'clean'=>'char',   'attr'=>['type'=>'selNoYes','value'=>0]],
-            'restrict'    => ['panel'=>'general','order'=>30,'label'=>lang('restrict_access'),'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0], 'tip'=>$this->lang['roles_restrict']],
+            'restrict'    => ['panel'=>'general','order'=>30,'label'=>lang('restrict_access'),'clean'=>'boolean','attr'=>['type'=>'selNoYes','value'=>0], 'tip'=>lang('roles_restrict', $this->moduleID)],
             'administrate'=> ['panel'=>'general','order'=>40,'label'=>lang('administrator'),  'clean'=>'char',   'attr'=>['type'=>'selNoYes','value'=>0]],
-            'selFill'     => ['panel'=>'general','order'=>50,'label'=>$this->lang['desc_security_fill'],'clean'=>'integer','attr'=>['type'=>'select',  'value'=>-1],'values'=>$this->securityChoices,'events'=>['onChange'=>"autoFill();"]],
+            'selFill'     => ['panel'=>'general','order'=>50,'label'=>lang('desc_security_fill', $this->moduleID),'clean'=>'integer','attr'=>['type'=>'select',  'value'=>-1],'values'=>$this->securityChoices,'events'=>['onChange'=>"autoFill();"]],
             'notes'       => ['panel'=>'notes',  'order'=>10,                                 'clean'=>'text',   'attr'=>['type'=>'editor',  'value'=>'']]];
     }
     protected function managerGrid($security=0, $args=[])
@@ -122,7 +122,7 @@ class administrateRoles extends mgrJournal
         if (!$rID) { return msgAdd('Illegal Access!'); }
         $users= getModuleCache('bizuno', 'users');
         foreach ($users as $user) { if ($user['role']==$rID) { $block[] = $user['text']; } }
-        if (sizeof($block) > 0) { return msgAdd(sprintf($this->lang['err_delete_role'], implode(', ', $block))); }
+        if (sizeof($block) > 0) { return msgAdd(sprintf(lang('err_delete_role', $this->moduleID), implode(', ', $block))); }
         parent::deleteMeta($layout, ['table'=>'common']);
     }
 

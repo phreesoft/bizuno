@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/api/admin.php
  */
 

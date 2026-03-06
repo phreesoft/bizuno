@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-02
+ * @version    7.x Last Update: 2026-02-28
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -62,7 +62,7 @@ class bizunoSettings
                 $settings['properties']['status'] = 1;
                 $bizunoMod[$module] = $settings;
                 dbWrite(BIZUNO_DB_PREFIX.'configuration', ['config_value'=>json_encode($settings)], 'update', "config_key='$module'");
-            } else { return msgAdd(sprintf($this->lang['err_install_module_exists'], $module), 'caution'); }
+            } else { return msgAdd(sprintf(lang('err_install_module_exists'), $module), 'caution'); }
         } else {
             $path = rtrim($path, '/') . '/';
             msgDebug("\nInstalling module: $module at path: $path");
