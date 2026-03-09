@@ -70,6 +70,10 @@ class j02 extends jCommon
      */
     public function customizeView(&$data, $rID=0)
     {
+        global $bizunoLang;
+        msgTrap();
+        msgDebug("\nphreebooks lang = ".msgPrint($bizunoLang['modules']['phreebooks']));
+        msgDebu("\n");
         $fldKeys = ['id','journal_id','recur_id','recur_frequency','item_array','store_id','invoice_num','post_date','currency','currency_rate','closed','rep_id'];
         $fldAddr = ['contact_id','address_id','primary_name','contact','address1','address2','city','state','postal_code','country','telephone1','email'];
         $data['fields']['currency']['callback'] = 'totalsCurrency';
@@ -238,7 +242,7 @@ class j02 extends jCommon
                 'action'       => ['order'=>1, 'label'=>lang('action'),'attr'=>['width'=>60],
                     'events'=>['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"],
                     'actions'  => ['delete'   =>['order'=>20,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
-                'gl_account'   => ['order'=>20,'label'=>lang("gl_account_{$this->journalID}"),'attr'=>['width'=>200,'resizable'=>true,'align'=>'center'],
+                'gl_account'   => ['order'=>20,'label'=>lang('gl_account'),'attr'=>['width'=>200,'resizable'=>true,'align'=>'center'],
                     'events'   => ['editor'=>dgEditGL()]],
                 'description'  => ['order'=>30,'label'=>lang('description'), 'attr'=>['width'=>400,'editor'=>dgEditText(),'resizable'=>true]],
                 'debit_amount' => ['order'=>40,'label'=>lang('debit_amount'),'attr'=>['width'=>150,'resizable'=>true, 'align'=>'right'],

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2026-03-08
  * @filesource /controllers/shipping/carriers/odfl/odfl.php
  */
 
@@ -72,8 +72,7 @@ class odfl
         $this->settings = ['order'=>90,'username'=>'','password'=>'','account'=>'','min_weight'=>150,'service_types'=>'GDF:ECF','default'=>'0',
             'gl_acct_c'=> getModuleCache('shipping','settings','general','gl_shipping_c'),
             'gl_acct_v'=> getModuleCache('shipping','settings','general','gl_shipping_v')];
-        $usrSettings = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);
-        settingsReplace($this->settings, $usrSettings, $this->settingsStructure());
+        settingsReplace($this->settings, getMetaMethod($this->methodDir, $this->code)['settings'], $this->settingsStructure());
         $this->settings['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
     }
 

@@ -302,8 +302,8 @@ function clean($idx, $processing='text', $src='')
 function lang($idx, $module='core')
 {
     global $bizunoLang;
-    if (!is_null($bizunoLang[$module][$idx]) && isset($bizunoLang[$module][$idx])) { return $bizunoLang[$module][$idx]; }
-    return isset($bizunoLang['core'][$idx]) ? $bizunoLang['core'][$idx] : $idx;
+    if ($module !== 'core' && isset($bizunoLang['modules'][$module][$idx])) { return $bizunoLang['modules'][$module][$idx]; }
+    return $bizunoLang['core'][$idx] ?? $idx;
 }
 
 /**
