@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-01
+ * @version    7.x Last Update: 2026-03-09
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -71,9 +71,6 @@ class j02 extends jCommon
     public function customizeView(&$data, $rID=0)
     {
         global $bizunoLang;
-        msgTrap();
-        msgDebug("\nphreebooks lang = ".msgPrint($bizunoLang['modules']['phreebooks']));
-        msgDebu("\n");
         $fldKeys = ['id','journal_id','recur_id','recur_frequency','item_array','store_id','invoice_num','post_date','currency','currency_rate','closed','rep_id'];
         $fldAddr = ['contact_id','address_id','primary_name','contact','address1','address2','city','state','postal_code','country','telephone1','email'];
         $data['fields']['currency']['callback'] = 'totalsCurrency';

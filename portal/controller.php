@@ -72,6 +72,7 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
+msgTrap();
         new view($this->layout);
     }
 
@@ -241,7 +242,7 @@ class portalCtl
     {
         if (empty($this->userValidated)) { return; }
         $cacheExp = bizCacheExpGet();
-        msgDebug("\nCache expiration time = $cacheExp and time = ".time());
+        msgDebug("\nIn cacheValidate with Cache expiration time = $cacheExp and time = ".time());
         if ($cacheExp < time()) { // cache expired
             msgDebug("\n  Cache expired! reloading...");
             $this->cacheReload();

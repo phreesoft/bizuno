@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-03-09
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -29,12 +29,13 @@ namespace bizuno;
 
 class jCommon
 {
+    public  $moduleID = 'phreebooks';
     private $cogs_entry = [];
-    public $action;
-    public $rounding;
-    public $isolate_cogs;
-    public $storeGL;
-    public $sku_cogs;
+    public  $action;
+    public  $rounding;
+    public  $isolate_cogs;
+    public  $storeGL;
+    public  $sku_cogs;
 
     public function __construct()
     {
