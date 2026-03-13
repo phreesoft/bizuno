@@ -38,10 +38,25 @@ function bizAutoLoad($path, $method='', $type='class')
 {
     if (function_exists('msgDebug')) { msgDebug("\nAutoloading path: $path, and method: $method of type: $type"); }
     if     (!empty($method)) { $method = __NAMESPACE__.'\\'. str_replace(__NAMESPACE__, '', $method); } // check for just one namespace
+    msgDebug("\nEntering bizAutoLoad with method = $method and path = $path");
     if     ($type=='class'    && !empty($method) && class_exists   ($method)) { return true; }
     elseif ($type=='function' && !empty($method) && function_exists($method)) { return true; }
     $absPath = bizAutoLoadMap($path);
-    if     (file_exists($absPath) && is_file($absPath)) { require_once($absPath); return true; }
+    msgDebug("\nabsPath = $absPath and file exists = ".file_exists($absPath));
+    msgDebug("\nopen_basedir = " . ini_get('open_basedir'));
+//return;
+    if (file_exists($absPath) && is_file($absPath)) {
+    msgDebug("\nis_readable = " . (is_readable($absPath) ? 'yes' : 'NO'));
+    if (is_readable($absPath)) {
+        require_once($absPath);
+        msgDebug("\nrequire_once completed OK");
+        return true;
+    } else {
+        msgDebug("\nrequire_once skipped - not readable");
+        return false;
+    }
+}
+//    if     (file_exists($absPath) && is_file($absPath)) { require_once($absPath); return true; }
     return false;
 }
 

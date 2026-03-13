@@ -252,7 +252,7 @@ msgTrap();
     private function cacheReload()
     {
         msgDebug("\nEntering reloadCache");
-        bizAutoLoad(BIZUNO_FS_LIBRARY.'model/registry.php', 'bizRegistry');
+        if (!bizAutoLoad(BIZUNO_FS_LIBRARY.'model/registry.php', 'bizRegistry')) { return msgAdd("Cannot locate bizRegistry. BIZUNO_FS_LIBRARY = ".BIZUNO_FS_LIBRARY); }
         $registry = new bizRegistry();
         $registry->initRegistry(getUserCache('profile', 'email'), getUserCache('business', 'bizID'));
         bizCacheExpSet(time() + $this->bizTimer);

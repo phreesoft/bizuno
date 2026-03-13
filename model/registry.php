@@ -141,7 +141,7 @@ final class bizRegistry
         }
         msgDebug("\nBuilding registry for module $module, relPath = $relPath and path $path");
         $fqcn  = "\\bizuno\\{$module}Admin";
-        bizAutoLoad("{$path}admin.php", $fqcn);
+        if (!bizAutoLoad("{$path}admin.php", $fqcn)) { return msgAdd("Cannot find module: $module at path: $path"); }
         $admin = new $fqcn();
 // Temporary for now but doesn't slow things down
 unset($bizunoMod[$module]['dashboards']);
