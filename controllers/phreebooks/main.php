@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -340,7 +340,6 @@ if (!formValidate()) return false;\n\treturn true;\n}";
         }
         $ledger = new journal($rID, $this->journalID, false, $cID, $structure, $this->action);
         $ledger->journal->type  = $this->type;
-        $ledger->journal->lang  = $this->lang;
         $ledger->journal->rID   = $this->rID;
         $ledger->journal->totals= $this->loadTotals($this->journalID);
         msgDebug("\ntotals to render = ".print_r($ledger->journal->totals, true));

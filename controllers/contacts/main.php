@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/contacts/main.php
  */
 
@@ -42,7 +42,6 @@ class contactsMain
         'email', 'email2', 'email3', 'email4', 'telephone1', 'telephone2', 'telephone3', 'telephone4',
         'website' , 'contact_first', 'contact_last', 'flex_field_1'];
     public    $defaults;
-    public    $lang;
     public    $type;
     private   $f0_default;
     public    $contact;
@@ -52,7 +51,6 @@ class contactsMain
 
     function __construct($type='c')
     {
-        $this->lang      = getLang($this->moduleID);
         $this->type      = clean('type', ['format'=>'char', 'default'=>$type], 'get');
         $this->secID     = getContactSecID($this->type);
         $this->stores    = getModuleCache('bizuno', 'stores');
@@ -242,7 +240,7 @@ class contactsMain
         }
         $fldAddr = ['primary_name', 'contact', 'address1', 'address2', 'city', 'state', 'postal_code', 'country'];
         $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'email2', 'email3', 'email4', 'website'];
-        $fldAcct = ['short_name','inactive','rep_id','tax_rate_id','price_sheet','store_id','terms','terms_text','terms_edit','first_date','date_last','last_date_1','last_date_2','histPay'];
+        $fldAcct = ['short_name','inactive','rep_id','tax_rate_id','price_sheet','store_id','terms','terms_text','terms_edit','first_date','date_last','histPay']; // ,'last_date_1','last_date_2'
         $fldProp = ['id','account_number','gov_id_number','gl_account','recordID','tax_exempt','marketplace'];
         // set some special cases
 //      $structure['type']['attr']['value']  = $this->type;
@@ -403,7 +401,7 @@ class contactsMain
     {
         $output = ['label'=>'', 'fields'=>[]];
         msgDebug("\nEntering contacts::editStatus with rID = $rID");
-        if (!in_array($this->type, ['c','v'])) { return $output; }
+        if (empty($rID) || !in_array($this->type, ['c','v'])) { return $output; }
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/main.php', 'phreebooksMain');
         $layout = [];
         $pb = new phreebooksMain();

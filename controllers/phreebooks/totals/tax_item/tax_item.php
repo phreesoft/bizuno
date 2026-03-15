@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/tax_item/tax_item.php
  */
 
@@ -42,7 +42,6 @@ class tax_item
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->cType   = 'c'; // @todo is there different language for customer versus vendor? if not then not needed.
         $this->settings= ['gl_type'=>'tax','journals'=>'[3,4,6,7,9,10,12,13,19,21]','order'=>50];
         $usrSettings   = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);

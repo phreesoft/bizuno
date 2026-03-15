@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -34,7 +34,6 @@ class bizunoMain
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**

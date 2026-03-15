@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -58,7 +58,6 @@ class bizInstall // Checking users:
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**

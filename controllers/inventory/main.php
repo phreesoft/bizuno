@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/inventory/main.php
  */
 
@@ -104,7 +104,7 @@ class inventoryMain
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess('inv_mgr', 1)) { return; }
-        $title = sprintf(lang('tbd_manager'),lang('gl_acct_type_4'));
+        $title = sprintf(lang('tbd_manager'), lang('inventory'));
         $layout= array_replace_recursive($layout, viewMain(), ['title'=>$title,
             'divs'     => [
                 'invMgr' => ['order'=>50,'type'=>'accordion','key' =>'accInventory']],

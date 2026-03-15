@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -67,6 +67,9 @@ class bizunoProfile extends mgrJournal
         parent::editMeta($layout, 3, $args);
         $layout['tabs']['tabProfile']['divs']['reminders'] = ['order'=>50,'label'=>lang('reminders', $this->moduleID),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=bizuno/reminder/manager'"]];
         unset($layout['toolbars']["tb{$this->domSuffix}"]['icons']['new'], $layout['toolbars']["tb{$this->domSuffix}"]['icons']['copy']); // Don't allow new, copy here
+        $layout['fields']['gmail_app_pw2']['attr']['type'] = 'hidden'; // not used for profile
+        $layout['fields']['gmail_app_pw3']['attr']['type'] = 'hidden';
+        $layout['fields']['gmail_app_pw4']['attr']['type'] = 'hidden';
     }
     public function save()
     {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/api/funnels/ifGoogle/ifGoogle.php
  */
 
@@ -62,8 +62,6 @@ class ifGoogle extends apiExport
     function __construct()
     {
         parent::__construct();
-        localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
         $this->defaults= ['feed_fn'=>'google_products.txt','ftp_url'=>'uploads.google.com','ftp_port'=>21,'ftp_user'=>'','ftp_pass'=>''];
         $userMeta      = getMetaMethod($this->methodDir, $this->code);
         $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);

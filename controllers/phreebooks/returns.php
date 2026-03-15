@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -128,7 +128,7 @@ class phreebooksReturns extends mgrJournal
                 'invoice_num'  => ['order'=>50,'field'=>'invoice_num',    'label'=>lang('invoice_num_12'),'attr'=>['width'=>120, 'sortable'=>true, 'resizable'=>true]],
                 'creation_date'=> ['order'=>60,'field'=>'journal_meta.id','label'=>lang('creation_date'), 'attr'=>['width'=>120, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:creation_date:journal','format'=>'date'],
                 'closed_date'  => ['order'=>70,'field'=>'journal_meta.id','label'=>lang('close_date'),    'attr'=>['width'=> 80, 'type'=>'date', 'sortable'=>true, 'resizable'=>true],'process'=>'meta:closed_date:journal','format'=>'date']],
-                'footnotes'    => ['jType'=>lang('status').': <span class="row-inactive">'.lang('rtn_status_1').'</span>']]);
+                'footnotes'    => ['jType'=>lang('status').': <span class="row-inactive">'.lang('rtn_status_1', $this->moduleID).'</span>']]);
         switch($action) {
             case 'rtn_by_cust':   $this->addFilters($data, 'rtn_by_cust');   break;
             case 'rtn_my_biz':    $this->addFilters($data, 'rtn_my_biz');    break;

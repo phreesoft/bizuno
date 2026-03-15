@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -226,26 +226,26 @@ class phreebooksAdmin {
         $metaStat= dbMetaGet('%', 'options_return_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
         $status = [
-             '1' =>lang('rtn_status_1', $this->moduleID),  '2'=>lang('rtn_status_2', $this->moduleID),  '3'=>lang('rtn_status_3', $this->moduleID),
-             '4' =>lang('rtn_status_4', $this->moduleID),  '5'=>lang('rtn_status_5', $this->moduleID),  '6'=>lang('rtn_status_6', $this->moduleID),
-             '7' =>lang('rtn_status_7', $this->moduleID),  '8'=>lang('rtn_status_8', $this->moduleID),  '9'=>lang('rtn_status_9', $this->moduleID),
-            '10'=>lang('rtn_status_10', $this->moduleID),'90'=>lang('rtn_status_90', $this->moduleID),'99'=>lang('rtn_status_99', $this->moduleID)];
+             '1' =>lang('rtn_status_1'),  '2'=>lang('rtn_status_2'),  '3'=>lang('rtn_status_3'),
+             '4' =>lang('rtn_status_4'),  '5'=>lang('rtn_status_5'),  '6'=>lang('rtn_status_6'),
+             '7' =>lang('rtn_status_7'),  '8'=>lang('rtn_status_8'),  '9'=>lang('rtn_status_9'),
+            '10'=>lang('rtn_status_10'),'90'=>lang('rtn_status_90'),'99'=>lang('rtn_status_99')];
         asort($status);
         dbMetaSet($idxStat, 'options_return_status', $status);
         $metaCode= dbMetaGet('%', 'options_return_codes');
         $idxCode = metaIdxClean($metaCode); // remove the indexes
         $codes  = [
-            '1' =>lang('rtn_code_1', $this->moduleID),    '2'=>lang('rtn_code_2', $this->moduleID),    '3'=>lang('rtn_code_3', $this->moduleID),
-            '4' =>lang('rtn_code_4', $this->moduleID),    '5'=>lang('rtn_code_5', $this->moduleID),    '6'=>lang('rtn_code_6', $this->moduleID),
-            '7' =>lang('rtn_code_7', $this->moduleID),   '80'=>lang('rtn_code_80', $this->moduleID),  '99'=>lang('rtn_code_99', $this->moduleID)];
+            '1' =>lang('rtn_code_1'),    '2'=>lang('rtn_code_2'),    '3'=>lang('rtn_code_3'),
+            '4' =>lang('rtn_code_4'),    '5'=>lang('rtn_code_5'),    '6'=>lang('rtn_code_6'),
+            '7' =>lang('rtn_code_7'),   '80'=>lang('rtn_code_80'),  '99'=>lang('rtn_code_99')];
         asort($codes);
         dbMetaSet($idxCode, 'options_return_codes', $codes);
         $metaAct= dbMetaGet('%', 'options_qa_status');
         $idxAct = metaIdxClean($metaAct); // remove the indexes
         $actions= [
-             '1'=>lang('rtn_action_1', $this->moduleID), '2'=>lang('rtn_action_2', $this->moduleID), '3'=>lang('rtn_action_3', $this->moduleID),
-             '4'=>lang('rtn_action_4', $this->moduleID), '5'=>lang('rtn_action_5', $this->moduleID), '6'=>lang('rtn_action_6', $this->moduleID),
-            '99'=>lang('rtn_action_99', $this->moduleID)];
+             '1'=>lang('rtn_action_1'), '2'=>lang('rtn_action_2'), '3'=>lang('rtn_action_3'),
+             '4'=>lang('rtn_action_4'), '5'=>lang('rtn_action_5'), '6'=>lang('rtn_action_6'),
+            '99'=>lang('rtn_action_99')];
         asort($status);
         dbMetaSet($idxAct, 'options_qa_status', $actions);
         // Put them in the cache for runtime access

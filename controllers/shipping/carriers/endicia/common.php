@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/endicia/common.php
  */
 
@@ -123,8 +123,6 @@ class endiciaCommon
 
     function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->defaults = ['client_key'=>'', 'gl_acct'=>getModuleCache('shipping', 'settings', 'general', 'gl_shipping_c'), 'handling_fee'=>0,
             'order'        => 50, 'default'=>false, 'funds_min'=>25, 'funds_purch'=>'100',
             'lbl_msg_1'    => '', 'lbl_msg_2'=>'', 'lbl_msg_3'=>'', 'label_thermal'=>'4x6.75-doctab',
@@ -239,9 +237,9 @@ class endiciaCommon
                '500' => $this->lang['0500_dollars'],
               '1000' => $this->lang['1000_dollars']],
             'paperTypes' => [
-                ['id'=>'4x6',          'text'=>$this->lang['label_07']],
-                ['id'=>'4x6.75-doctab','text'=>$this->lang['label_08']],
-                ['id'=>'4x8.25-doctab','text'=>$this->lang['label_10']]]];
+                ['id'=>'4x6',          'text'=>lang('label_07', $this->moduleID)],
+                ['id'=>'4x6.75-doctab','text'=>lang('label_08', $this->moduleID)],
+                ['id'=>'4x8.25-doctab','text'=>lang('label_10', $this->moduleID)]]];
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-21
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/shipping/carriers/xpo/common.php
  *
  * Docs website: http://www.xpo.com/content/xml
@@ -62,8 +62,6 @@ class xpoCommon
 
     function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->defaults = ['order'=>90,'test_mode'=>'Y','username'=>'','password'=>'','acct_id'=>'','authorization'=>'',
             'gl_acct_c' => getModuleCache('shipping','settings','general','gl_shipping_c'),
             'gl_acct_v' => getModuleCache('shipping','settings','general','gl_shipping_v'),
@@ -147,13 +145,13 @@ class xpoCommon
                 'XPO_FREIGHT_PRIORITY' => 'ECF'],
             'CODMap'    => [
                 'ANY'             => lang('any'),
-                'GUARANTEED_FUNDS'=> $this->lang['guaranteed_funds'],
+                'GUARANTEED_FUNDS'=> lang('guaranteed_funds', $this->moduleID),
                 'CASH'            => lang('cash')],
             'PaymentMap'=> [
-                'SENDER'          => $this->lang['sender'],
-                'RECIPIENT'       => $this->lang['recipient'],
-                'THIRD_PARTY'     => $this->lang['third_party'],
-                'COLLECT'         => $this->lang['collect']],
+                'SENDER'          => lang('sender', $this->moduleID),
+                'RECIPIENT'       => lang('recipient', $this->moduleID),
+                'THIRD_PARTY'     => lang('third_party', $this->moduleID),
+                'COLLECT'         => lang('collect', $this->moduleID)],
             'LTLClasses'=> ['0'=>lang('select'),'50'=>'50','55'=>'55','60'=>'60','65'=>'65','70'=>'70','77'=>'77.5','85'=>'85',
                 '92'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300']];
     }

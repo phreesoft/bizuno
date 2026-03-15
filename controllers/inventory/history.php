@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/inventory/history.php
  */
 
@@ -36,7 +36,6 @@ class inventoryHistory
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -433,8 +432,9 @@ class inventoryHistory
                 'rep_id'        => ['order'=>60,'label'=>lang('rep_id_c'),             'attr'=>['resizable'=>true,'align'=>'center']],
                 'post_date'     => ['order'=>70,'label'=>lang('post_date'),            'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center']],
                 'qty'           => ['order'=>80,'label'=>lang('balance'),              'attr'=>['resizable'=>true,'align'=>'center']],
-                'date_1'        => ['order'=>90,'label'=>lang('last_date_1'),          'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center'],
-                    'events'=>['styler'=>"function(value,row,index) { if (row.waiting==1) { return {style:'background-color:yellowgreen'}; } }"]]]];
+                'date_1'        => ['order'=>90,'label'=>lang('terminal_date'),        'attr'=>['resizable'=>true,'sortable'=>true,'align'=>'center'],
+                    'events'=>['styler'=>"function(value,row,index) { if (row.waiting==1) { return {style:'background-color:yellowgreen'}; } }"]],
+                ]];
         if (in_array($jID, [3,9])) { // remove some action items
             unset($data['columns']['action']['actions']['toggle'],$data['columns']['action']['actions']['dates'],$data['columns']['action']['actions']['fill']);
         }

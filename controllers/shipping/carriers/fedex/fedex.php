@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-22
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -102,14 +102,14 @@ class fedex extends fedexCommon
                 'track' => ['order'=>20,'type'=>'panel','key'=>'pnlTrack','classes'=>['block25']],
                 'recon' => ['order'=>30,'type'=>'panel','key'=>'pnlRecon','classes'=>['block50']]],
             'panels' => [
-                'pnlTrack' => ['title'=>$this->lang['track_shipments_title'],'type'=>'divs','divs'=>[
+                'pnlTrack' => ['title'=>lang('track_shipments_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',    'key' =>'frmFedExTrack'],
-                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>"<p>{$this->lang['track_shipments_desc']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>"<p>".lang('track_shipments_desc', $this->moduleID)."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields',  'keys'=>['frmFedExTrack','dateFedExTrack','btnFedExTrack']],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]],
-                'pnlRecon' => ['title'=>$this->lang['reconcile_bill_title'],'type'=>'divs','divs'=>[
+                'pnlRecon' => ['title'=>lang('reconcile_bill_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',    'key' =>'frmFedExRecon'],
-                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>"<p>{$this->lang['reconcile_bill_desc']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>"<p>".lang('reconcile_bill_desc', $this->moduleID)."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields',  'keys'=>['fileFedExRecon','btnFedExRecon']],
                     'dgRecon'=> ['order'=>70,'type'=>'datagrid','key' =>"dgReconcile{$this->code}"],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]],

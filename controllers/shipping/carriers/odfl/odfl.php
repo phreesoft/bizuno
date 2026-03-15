@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-08
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/odfl/odfl.php
  */
 
@@ -60,8 +60,6 @@ class odfl
 
     public function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->getSettings();
@@ -83,15 +81,15 @@ class odfl
         $services = [];
         foreach ($this->rateCodes as $code) { $services[] = ['id'=>$code, 'text'=>$this->lang[$code]]; }
         return [
-            'gl_acct_c' => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v' => ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'gl_acct_c' => ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v' => ['label'=>lang('gl_shipping_v_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
             'order'     => ['label'=>lang('sort_order'),'position'=>'after','attr'=>['type'=>'integer','size'=>'3','value'=>$this->settings['order']]],
-            'username'  => ['label'=>$this->lang['username'], 'position'=>'after','attr'=>['value'=>$this->settings['username']]],
-            'password'  => ['label'=>$this->lang['password'], 'position'=>'after','attr'=>['value'=>$this->settings['password']]],
-            'account'   => ['label'=>$this->lang['account'], 'position'=>'after','attr'=>['type'=>'integer', 'size'=>'10', 'maxlength'=>'9','value'=>$this->settings['account']]],
-            'min_weight'=> ['label'=>$this->lang['min_weight'], 'position'=>'after','attr'=>['type'=>'integer','size'=>'4','maxlength'=>'3','value'=>$this->settings['min_weight']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
-            'default'   => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
+            'username'  => ['label'=>lang('username'), 'position'=>'after','attr'=>['value'=>$this->settings['username']]],
+            'password'  => ['label'=>lang('password'), 'position'=>'after','attr'=>['value'=>$this->settings['password']]],
+            'account'   => ['label'=>lang('account'), 'position'=>'after','attr'=>['type'=>'integer', 'size'=>'10', 'maxlength'=>'9','value'=>$this->settings['account']]],
+            'min_weight'=> ['label'=>lang('min_weight', $this->moduleID), 'position'=>'after','attr'=>['type'=>'integer','size'=>'4','maxlength'=>'3','value'=>$this->settings['min_weight']]],
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID),'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'default'   => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
     }
 
     public function settingSave()

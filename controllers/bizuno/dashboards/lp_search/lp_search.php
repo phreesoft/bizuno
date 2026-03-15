@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-15
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/bizuno/dashboards/lp_search/lp_search.php
  */
 
@@ -42,7 +42,6 @@ class lp_search
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
     }
 
     public function render()

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-26
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -90,7 +90,6 @@ $lang = [
     'warranty_exp_date'=>'Warranty Exp Date',
     'preventable' => 'Preventable',
     'at_fault' => 'At Fault',
-    'return_num' => 'Return #',
     'entered_by' => 'Entered By',
     'caller_name' => 'Caller Name',
     'received_by' => 'Received By',

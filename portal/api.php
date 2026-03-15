@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-05
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /portal/api.php
  */
 
@@ -466,7 +466,6 @@ class portalApi
      */
     public function ediCron(&$layout=[])
     {
-        getLang('phreebooks');
         loadBusinessCache();
         $user   = getModuleCache('api', 'settings', 'phreesoft_api', 'api_user');
         $userID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$user'");

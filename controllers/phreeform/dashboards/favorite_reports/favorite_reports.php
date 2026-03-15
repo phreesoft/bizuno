@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-11
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreeform/dashboards/favorite_reports/favorite_reports.php
  */
 
@@ -40,7 +40,6 @@ class favorite_reports
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->allRpts = getMetaCommon('phreeform_cache');
         $this->fieldStructure();
     }

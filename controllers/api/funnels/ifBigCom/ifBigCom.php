@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/api/funnels/ifBigCom/ifBigCom.php
  */
 
@@ -79,8 +79,6 @@ class ifBigCom extends apiExport
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
         $this->defaults= ['store_id'=>0,'ship_std'=>0,'ship_exp'=>0,'auto_journal'=>0,'prefix_order'=>'BC','prefix_cust'=>'BC',
             'gl_acct_sales'=>getModuleCache('phreebooks','settings','customers','gl_sales'),
             'gl_acct_ar'   =>getModuleCache('phreebooks','settings','customers','gl_receivables'),

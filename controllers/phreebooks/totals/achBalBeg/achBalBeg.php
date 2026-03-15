@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-16
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/achBalBeg/achBalBeg.php
  */
 
@@ -39,7 +39,6 @@ class achBalBeg
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->settings= ['gl_type'=>'','journals'=>'[20]','order'=>0];
         $usrSettings   = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);
         settingsReplace($this->settings, $usrSettings, $this->settingsStructure());

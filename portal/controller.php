@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /portal/controller.php
  */
 
@@ -43,7 +43,6 @@ class portalCtl
     {
         global $msgStack, $io, $cleaner;
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
-
         $msgStack= new messageStack();
         $io      = new io();
         $cleaner = new cleaner();
@@ -72,7 +71,6 @@ class portalCtl
             case 'install':$this->goInstall(); break; // Shows install screen, after verifying credentials
             case 'migrate':$this->goMigrate(); break; // Shows migrate screen after verifying credentials
         }
-msgTrap();
         new view($this->layout);
     }
 
@@ -261,8 +259,8 @@ msgTrap();
     private function loadLanguage($lang='en_US')
     {
         global $bizunoLang;
-        $getLang = clean('bizunoLang', ['format'=>'cmd', 'default'=>'en_US'], 'get');
-        if ($getLang<>'en_US') { $lang = $getLang; }
+        $myLang = clean('bizunoLang', ['format'=>'cmd', 'default'=>'en_US'], 'get');
+        if ($myLang<>'en_US') { $lang = $myLang; }
         $bizunoLang = loadBaseLang($lang);
     }
 

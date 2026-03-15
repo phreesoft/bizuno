@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/discountChk/discountChk.php
  */
 
@@ -42,7 +42,6 @@ class discountChk
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->jID     = clean('jID', ['format'=>'cmd', 'default'=>'2'], 'get');
         $type          = in_array($this->jID, [17,20,21]) ? 'vendors' : 'customers';
         $this->settings= ['gl_type'=>'dsc','journals'=>'[17,18,20,22]','gl_account'=>getModuleCache('phreebooks','settings',$type,'gl_discount'),'order'=>30];

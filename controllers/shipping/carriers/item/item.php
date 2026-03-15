@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-08
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/item/item.php
  */
 
@@ -48,8 +48,6 @@ class item {
 
     public function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->getSettings();
     }
 
@@ -67,12 +65,12 @@ class item {
         $noYes    = [['id'=>'0',  'text'=>lang('no')], ['id'=>'1', 'text'=>lang('yes')]];
         $services = [['id'=>'GND','text'=>$this->lang['GND']]]; // only one type
         return [
-            'gl_acct_c'=> ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v'=> ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
-            'rate'     => ['label'=>$this->lang['rate'], 'position'=>'after','attr' =>['type'=>'float','size'=>'10','value'=>$this->settings['rate']]],
+            'gl_acct_c'=> ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v'=> ['label'=>lang('gl_shipping_v_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'rate'     => ['label'=>lang('rate'), 'position'=>'after','attr' =>['type'=>'float','size'=>'10','value'=>$this->settings['rate']]],
             'order'    => ['label'=>lang('sort_order'), 'position'=>'after', 'attr'=>['type'=>'integer', 'size'=> '3','value'=>$this->settings['order']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'], 'position'=>'after', 'values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
-            'default'  => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID), 'position'=>'after', 'values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'default'  => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
     }
 
     public function settingSave()

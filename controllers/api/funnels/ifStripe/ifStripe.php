@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/api/funnels/ifStripe/ifStripe.php
  */
 
@@ -56,8 +56,6 @@ class ifStripe {
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
         $this->defaults= ['contact_id'=>0,'catalog_field'=>'amazon','ship_std'=>0,'ship_exp'=>0,'gift_wrap_sku'=>'','notes_sku'=>'','auto_journal'=>0,
             'gl_acct_purch'=>getModuleCache('phreebooks','settings','vendors',  'gl_purchases'),
             'gl_acct_sales'=>getModuleCache('phreebooks','settings','customers','gl_sales'),

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/dashboards/store_sales_today/store_sales_today.php
  */
 
@@ -42,7 +42,6 @@ class store_sales_today
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
 

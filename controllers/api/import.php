@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-08
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/api/import.php
  */
 
@@ -35,7 +35,6 @@ class apiImport
 
     function __construct()
     {
-        $this->lang = getLang('bizuno'); // needs to be hardcoded as this is extended by extensions
     }
 
     /**

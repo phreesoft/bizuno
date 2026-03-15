@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /locale/cleaner.php
  */
 
@@ -332,43 +332,9 @@ function jsLang($idx, $module='core')
 }
 
 /**
- * Pulls language files from an extension, overwrites with locale, will keep English if ANY locale index is not set, helps for upgrades where language lags.
- * @return boolean false - But sets the session lang array with the admin language file
+ * DEPRECATED
  */
-function getLang($module='')
-{
-    global $bizunoLang;
-    msgDebug("\nEntering getLang with module = $module.");
-    $myLang= getUserCache('profile', 'language', false, 'en_US');
-    $output= [];
-    if (!empty($bizunoLang['modules'][$module]) && is_array($bizunoLang['modules'][$module])) {
-        msgDebug("\nLoaded from cache, returning with size = ".sizeof((array)$bizunoLang['modules'][$module]));
-        $output = $bizunoLang['modules'][$module];
-    } else { // try to load it from disk
-        $lang = [];
-        $path = getModuleCache($module, 'settings', 'path');
-        $fullPath = bizAutoLoadMap($path);
-        $fullPath.= "locale/en_US/modules/$module/language.php";
-        msgDebug("\nTrying to load language for module $module from disk at: $fullPath");
-        if (file_exists($fullPath)) { require($fullPath); } // populates $lang
-        $output = $bizunoLang['modules'][$module] = $lang;
-    }
-    if ($myLang == 'en_US') { return $output; }
-    $lang = [];
-    if (file_exists(BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/language.php")) {
-        require    (BIZUNO_FS_LIBRARY."locale/$myLang/modules/$module/language.php"); // populates $lang
-        $output = array_replace($output, $lang);
-    }
-    return $output;
-}
-
-/**
- * @TODO - DEPRECATED - REMOVE WHEN TIME PERMITS
- */
-function getExtLang($module)
-{
-    return getLang($module);
-}
+function getLang($module='') { return; }
 
 /**
  * Overwrites the default language with the locale language from the cache

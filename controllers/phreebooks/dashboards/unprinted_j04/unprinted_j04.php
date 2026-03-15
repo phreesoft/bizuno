@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/dashboards/unprinted_j04/unprinted_j04.php
  */
 
@@ -40,7 +40,6 @@ class unprinted_j04
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
 

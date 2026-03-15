@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-01
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/quality/dashboards/training_tasks/training_tasks.php
  */
 
@@ -44,7 +44,6 @@ class training_tasks
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
 

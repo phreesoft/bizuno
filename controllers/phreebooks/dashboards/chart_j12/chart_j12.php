@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-29
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/dashboards/chart_j12/chart_j12.php
  *
  */
@@ -45,7 +45,6 @@ class chart_j12
     
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->dates = localeDates(true, true, true, false, true);
         $this->fieldStructure();
     }
@@ -63,12 +62,12 @@ class chart_j12
             'selRep'=> ['order'=>40,'label'=>lang('rep_id_c'), 'clean'=>'integer','attr'=>['type'=>$admin?'select':'hidden','value'=>0],'values'=>$roles],
             'range' => ['order'=>80,'label'=>lang('range'),    'clean'=>'char',   'attr'=>['type'=>'select',  'value'=>'l'],'values'=>viewKeyDropdown($this->dates)]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings
+        if (!array_key_exists($this->struc['range']['attr']['value'], $this->dates)) { $this->struc['range']['attr']['value'] = 'l'; }
     }
     public function render($opts=[])
     {
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php', 'phreebooksProcess', 'function');
         $selRep = !empty($opts['reps']) && empty(getUserCache('role', 'administrate')) ? 0 : $opts['selRep'];
-        msgDebug("\nselRep = ".$selRep);
         $action = BIZUNO_URL_AJAX."&bizRt=$this->moduleID/tools/exportSales&range={$opts['range']}&selRep=$selRep";
         $cData  = chartSales($this->journalID, $opts['range'], $this->pieces, $selRep);
         $title  = sprintf($this->lang['chart_title'], $this->dates[$opts['range']], $cData['count'], viewFormat($cData['total'], 'currency'));

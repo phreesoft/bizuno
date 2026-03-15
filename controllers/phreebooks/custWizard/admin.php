@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/custWizard/admin.php
  */
 
@@ -36,7 +36,6 @@ class custWizardAdmin {
 
     function __construct()
     {
-        $this->lang     = getExtLang($this->moduleID);
         $this->settings = getModuleCache($this->moduleID, 'settings', false, false, []);
         $this->structure= [
             'prerequisites'=> ['bizuno'=>'3.0'],

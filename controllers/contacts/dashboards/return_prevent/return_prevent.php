@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-09
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/contacts/dashboards/return_prevent/return_prevent.php
  */
 
@@ -42,7 +42,6 @@ class return_prevent
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->dates = [0=>lang('dates_quarter'), 1=>lang('dates_lqtr'), 2=>lang('quarter_neg2'), 3=>lang('quarter_neg3'), 4=>lang('quarter_neg4'), 5=>lang('quarter_neg5')];
         $this->fieldStructure();
     }

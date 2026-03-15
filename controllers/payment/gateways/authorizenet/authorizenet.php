@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -61,8 +61,6 @@ class authorizenet
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
         $pmtDef        = getModuleCache($this->moduleID, 'settings', 'general', false, []);
         $this->defaults= ['cash_gl_acct'=>$pmtDef['gl_payment_c'],'disc_gl_acct'=>$pmtDef['gl_discount_c'],'order'=>10,'user_id'=>'','txn_key'=>'',
             'auth_type'=>'Authorize/Capture','prefix'=>'CC','prefixAX'=>'AX','allowRefund'=>'0'];

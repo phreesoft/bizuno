@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-30
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/dashboards/profit_loss/profit_loss.php
  *
  */
@@ -42,7 +42,6 @@ class profit_loss
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
     private function fieldStructure()
@@ -64,7 +63,7 @@ class profit_loss
         $cData[] = [lang('gl_acct_type_34'), ['v'=>$expenses, 'f'=>viewFormat($expenses, 'currency')]];
         $netInc  = $sales - $cogs - $expenses;
         $cData[] = [lang('net_income'), ['v'=>max(0, $netInc), 'f'=>viewFormat($netInc, 'currency')]]; // Net Income
-        return ['type'=>'gChart', 'data'=>$cData];
+        return ['type'=>'gChart', 'title'=>'', 'data'=>$cData];
     }
     function getValue($type, $period, $negate=false)
     {

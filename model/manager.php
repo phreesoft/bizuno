@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-18
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /model/manager.php
  */
 
@@ -38,7 +38,6 @@ class mgrJournal
 
     protected function __construct()
     {
-        $this->lang    = getLang($this->moduleID);
         $this->mgrTitle= sprintf(lang('tbd_manager'), lang($this->pageID));
         $this->restrict= getUserCache('profile', 'restrict_store',false, 0);
         $this->myStore = getUserCache('profile', 'store_id',      false, 0);

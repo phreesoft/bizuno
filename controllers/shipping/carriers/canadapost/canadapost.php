@@ -22,7 +22,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-08
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/canadapost/canadapost.php
  */
 
@@ -130,8 +130,6 @@ class canadapost
 
     function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $tabImage = BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/tab_logo.png";
         $this->lang['tabTitle']= "<span class='ui-tab-image'><img src='".$tabImage."' height='30' /></span>";
         $this->getSettings();
@@ -159,25 +157,25 @@ class canadapost
     {
         $noYes   = [['id' => '0', 'text' => lang('no')], ['id' => '1', 'text' => lang('yes')]];
         $servers = [['id' => 'test', 'text' => lang('test')], ['id' => 'prod', 'text' => lang('production')]];
-        $printers= [['id' => 'pdf', 'text' => $this->lang['plain_paper']], ['id' => 'thermal', 'text' => $this->lang['thermal']]];
+        $printers= [['id' => 'pdf', 'text' => lang('plain_paper', $this->moduleID)], ['id' => 'thermal', 'text' => lang('thermal', $this->moduleID)]];
         $services= [];
         foreach ($this->rateCodes as $code) { $services[] = ['id' => $code, 'text' => $this->lang[$code]]; }
         $paperTypes = [
-                ['id' => 'PAPER_4X6', 'text' => $this->lang['label_01']],
-                ['id' => 'PAPER_4X8', 'text' => $this->lang['label_02']],
-                ['id' => 'PAPER_4X9', 'text' => $this->lang['label_03']],
-                ['id' => 'PAPER_7X4.75', 'text' => $this->lang['label_04']],
-                ['id' => 'PAPER_8.5X11_BOTTOM_HALF_LABEL', 'text' => $this->lang['label_05']],
-                ['id' => 'PAPER_8.5X11_TOP_HALF_LABEL', 'text' => $this->lang['label_06']],
-                ['id' => 'STOCK_4X6', 'text' => $this->lang['label_07']],
-                ['id' => 'STOCK_4X6.75_LEADING_DOC_TAB', 'text' => $this->lang['label_08']],
-                ['id' => 'STOCK_4X6.75_TRAILING_DOC_TAB', 'text' => $this->lang['label_09']],
-                ['id' => 'STOCK_4X8', 'text' => $this->lang['label_10']],
-                ['id' => 'STOCK_4X9_LEADING_DOC_TAB', 'text' => $this->lang['label_11']],
-                ['id' => 'STOCK_4X9_TRAILING_DOC_TAB', 'text' => $this->lang['label_12']]];
+                ['id' => 'PAPER_4X6', 'text' => lang('label_01', $this->moduleID)],
+                ['id' => 'PAPER_4X8', 'text' => lang('label_02', $this->moduleID)],
+                ['id' => 'PAPER_4X9', 'text' => lang('label_03', $this->moduleID)],
+                ['id' => 'PAPER_7X4.75', 'text' => lang('label_04', $this->moduleID)],
+                ['id' => 'PAPER_8.5X11_BOTTOM_HALF_LABEL', 'text' => lang('label_05', $this->moduleID)],
+                ['id' => 'PAPER_8.5X11_TOP_HALF_LABEL', 'text' => lang('label_06', $this->moduleID)],
+                ['id' => 'STOCK_4X6', 'text' => lang('label_07', $this->moduleID)],
+                ['id' => 'STOCK_4X6.75_LEADING_DOC_TAB', 'text' => lang('label_08', $this->moduleID)],
+                ['id' => 'STOCK_4X6.75_TRAILING_DOC_TAB', 'text' => lang('label_09', $this->moduleID)],
+                ['id' => 'STOCK_4X8', 'text' => lang('label_10', $this->moduleID)],
+                ['id' => 'STOCK_4X9_LEADING_DOC_TAB', 'text' => lang('label_11', $this->moduleID)],
+                ['id' => 'STOCK_4X9_TRAILING_DOC_TAB', 'text' => lang('label_12', $this->moduleID)]];
         return [
-            'gl_acct_c'    => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v'    => ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'gl_acct_c'    => ['label'=>lang('gl_shipping_c_lbl'),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v'    => ['label'=>lang('gl_shipping_v_lbl'),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
             'order'        => ['label'=>lang('sort_order'),          'position'=>'after','attr'=>['type'=>'integer','size'=>'3','value'=>$this->settings['order']]],
             'test_mode'    => ['label'=>$this->lang['test_mode'],    'position'=>'after','values'=>$servers,'attr'=>['type'=>'select','value'=>$this->settings['test_mode']]],
             'cust_num'     => ['label'=>$this->lang['cust_num'],     'position'=>'after','attr'=>['size'=>'35','value'=>$this->settings['cust_num']]],
@@ -190,8 +188,8 @@ class canadapost
             'printer_name' => ['label'=>$this->lang['printer_name'], 'position'=>'after','attr'=>['value'=>$this->settings['printer_name']]],
             'label_pdf'    => ['label'=>$this->lang['label_pdf'],    'position'=>'after','values'=>$paperTypes,'attr'=>['type'=>'select','value'=>$this->settings['label_pdf']]],
             'label_thermal'=> ['label'=>$this->lang['label_thermal'],'position'=>'after','values'=>$paperTypes,'attr'=>['type'=>'select','value'=>$this->settings['label_thermal']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
-            'default'      => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID),'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>'15','multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'default'      => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','values'=>$noYes,'attr'=>['type'=>'select','value'=>$this->settings['default']]]];
     }
 
     public function settingSave()

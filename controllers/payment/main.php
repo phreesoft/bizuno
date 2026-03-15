@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-09
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/payment/main.php
  */
 
@@ -30,11 +30,9 @@ namespace bizuno;
 class paymentMain
 {
     public $moduleID = 'payment';
-    public $lang;
 
     public function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -186,7 +184,9 @@ class paymentMain
         }
         bizAutoLoad($gateway['path']."$method.php");
         $fqcn   = "\\bizuno\\$method";
-        return new $fqcn();
+        $myMeth = new $fqcn();
+        localizeLang($myMeth->lang, $myMeth->methodDir, $myMeth->code);
+        return $myMeth;
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-08
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -146,8 +146,6 @@ Replace the test URL and test credentials with the production URL and production
 
     function __construct()
     {
-        $this->lang = array_replace(getLang($this->moduleID), $this->lang);
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->defaults = [
             'order'        => 10, 'test_mode'   =>'prod', // 'transport' =>'wsdl',
             'acct_number'  => '', 'rest_api_key'=> '', 'rest_secret'=> '',
@@ -746,11 +744,11 @@ return '';
                 'INTERNATIONAL_ECONOMY_FREIGHT'      => 'IFE',
                 'INTERNATIONAL_PRIORITY_FREIGHT'     => 'IFP'],
             'PickupMap' => [
-                'REGULAR_PICKUP'         => $this->lang['regular_pickup'],
-                'REQUEST_COURIER'        => $this->lang['request_courier'],
-                'DROP_BOX'               => $this->lang['drop_box'],
-                'BUSINESS_SERVICE_CENTER'=> $this->lang['service_center'],
-                'STATION'                => $this->lang['station']],
+                'REGULAR_PICKUP'         => lang('regular_pickup', $this->moduleID),
+                'REQUEST_COURIER'        => lang('request_courier', $this->moduleID),
+                'DROP_BOX'               => lang('drop_box', $this->moduleID),
+                'BUSINESS_SERVICE_CENTER'=> lang('service_center', $this->moduleID),
+                'STATION'                => lang('station', $this->moduleID)],
             'PackageMap' => [
                 'YOUR_PACKAGING'=> $this->lang['pkg_your_box'],
                 'FEDEX_BOX'     => $this->lang['pkg_box'],
@@ -761,7 +759,7 @@ return '';
                 'FEDEX_25KG_BOX'=> $this->lang['pkg_25kg_box']],
             'CODMap' => [
                 'ANY'             => lang('any'),
-                'GUARANTEED_FUNDS'=> $this->lang['guaranteed_funds'],
+                'GUARANTEED_FUNDS'=> lang('guaranteed_funds', $this->moduleID),
                 'CASH'            => lang('cash')],
     /*
             'HandlingMap' => [
@@ -771,31 +769,31 @@ return '';
                 'PERCENTAGE_OF_NET_EXCL_TAXES'=> $this->lang['PERCENTAGE_OF_NET_EXCL_TAXES']],
     */
             'PaymentMap' => [
-                'SENDER'     => $this->lang['sender'],
-                'RECIPIENT'  => $this->lang['recipient'],
-                'THIRD_PARTY'=> $this->lang['third_party'],
-                'COLLECT'    => $this->lang['collect']],
+                'SENDER'     => lang('sender', $this->moduleID),
+                'RECIPIENT'  => lang('recipient', $this->moduleID),
+                'THIRD_PARTY'=> lang('third_party', $this->moduleID),
+                'COLLECT'    => lang('collect', $this->moduleID)],
             'SignatureMap' => [
-//              'INDIRECT'             => $this->lang['sig_rqd'],
+//              'INDIRECT'             => lang('sig_rqd', $this->moduleID),
 //              'SERVICE_DEFAULT'      => 'SERVICE_DEFAULT',
-                'NO_SIGNATURE_REQUIRED'=> $this->lang['no_sig_rqd'],
-                'ADULT'                => $this->lang['adult_sig'],
-                'DIRECT'               => $this->lang['sig_rqd']],
+                'NO_SIGNATURE_REQUIRED'=> lang('no_sig_rqd', $this->moduleID),
+                'ADULT'                => lang('adult_sig', $this->moduleID),
+                'DIRECT'               => lang('sig_rqd', $this->moduleID)],
             'LTLClasses' => ['0'=>lang('select'),'050'=>'50','055'=>'55','060'=>'60','065'=>'65','070'=>'70','077'=>'77.5','085'=>'85',
                 '092'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300'],
             'paperTypes' => [
-                ['id'=>'PAPER_4X6',                     'text'=>$this->lang['label_01']],
-                ['id'=>'PAPER_4X8',                     'text'=>$this->lang['label_02']],
-                ['id'=>'PAPER_4X9',                     'text'=>$this->lang['label_03']],
-                ['id'=>'PAPER_7X4.75',                  'text'=>$this->lang['label_04']],
-                ['id'=>'PAPER_8.5X11_BOTTOM_HALF_LABEL','text'=>$this->lang['label_05']],
-                ['id'=>'PAPER_8.5X11_TOP_HALF_LABEL',   'text'=>$this->lang['label_06']],
-                ['id'=>'STOCK_4X6',                     'text'=>$this->lang['label_07']],
-                ['id'=>'STOCK_4X6.75_LEADING_DOC_TAB',  'text'=>$this->lang['label_08']],
-                ['id'=>'STOCK_4X6.75_TRAILING_DOC_TAB', 'text'=>$this->lang['label_09']],
-                ['id'=>'STOCK_4X8',                     'text'=>$this->lang['label_10']],
-                ['id'=>'STOCK_4X9_LEADING_DOC_TAB',     'text'=>$this->lang['label_11']],
-                ['id'=>'STOCK_4X9_TRAILING_DOC_TAB',    'text'=>$this->lang['label_12']]]];
+                ['id'=>'PAPER_4X6',                     'text'=>lang('label_01', $this->moduleID)],
+                ['id'=>'PAPER_4X8',                     'text'=>lang('label_02', $this->moduleID)],
+                ['id'=>'PAPER_4X9',                     'text'=>lang('label_03', $this->moduleID)],
+                ['id'=>'PAPER_7X4.75',                  'text'=>lang('label_04', $this->moduleID)],
+                ['id'=>'PAPER_8.5X11_BOTTOM_HALF_LABEL','text'=>lang('label_05', $this->moduleID)],
+                ['id'=>'PAPER_8.5X11_TOP_HALF_LABEL',   'text'=>lang('label_06', $this->moduleID)],
+                ['id'=>'STOCK_4X6',                     'text'=>lang('label_07', $this->moduleID)],
+                ['id'=>'STOCK_4X6.75_LEADING_DOC_TAB',  'text'=>lang('label_08', $this->moduleID)],
+                ['id'=>'STOCK_4X6.75_TRAILING_DOC_TAB', 'text'=>lang('label_09', $this->moduleID)],
+                ['id'=>'STOCK_4X8',                     'text'=>lang('label_10', $this->moduleID)],
+                ['id'=>'STOCK_4X9_LEADING_DOC_TAB',     'text'=>lang('label_11', $this->moduleID)],
+                ['id'=>'STOCK_4X9_TRAILING_DOC_TAB',    'text'=>lang('label_12', $this->moduleID)]]];
         return $options;
     }
 }

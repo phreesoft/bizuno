@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/shipping/shipping.php
  */
 
@@ -46,7 +46,6 @@ class shipping
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         if (!defined('JOURNAL_ID')) { define('JOURNAL_ID', 2); }
         $glV           = getModuleCache('shipping','settings','general','gl_shipping_v', getModuleCache('phreebooks','settings','vendors',  'gl_expense'));
         $glC           = getModuleCache('shipping','settings','general','gl_shipping_c', getModuleCache('phreebooks','settings','customers','gl_sales'));

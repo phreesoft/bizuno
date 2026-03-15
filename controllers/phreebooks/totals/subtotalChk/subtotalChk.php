@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/subtotalChk/subtotalChk.php
  */
 
@@ -40,7 +40,6 @@ class subtotalChk {
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->settings= ['gl_type'=>'sub','journals'=>'[17,18,20,22]','order'=>0];
         $usrSettings   = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);
         settingsReplace($this->settings, $usrSettings, $this->settingsStructure());

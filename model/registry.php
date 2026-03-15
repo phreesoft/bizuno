@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-01
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /model/registry.php
  */
 
@@ -404,7 +404,7 @@ unset($bizunoMod[$module]['dashboards']);
                 'path'       => $path,
                 'url'        => $url,
                 'menuID'     => !empty($clsMeth->menuID) ? $clsMeth->menuID : ''];
-            if (!isset($meta[$method]['settings'])) { $meta[$method]['settings'] = $clsMeth->settings; } // on migrations, this is sometimes not set.
+            if (!empty($meta[$method]['settings'])) { $meta[$method]['settings'] = $clsMeth->settings; } // on migrations, this is sometimes not set.
 //msgDebug("\nregistry args array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
 //msgDebug("\nmerged array = ".print_r($merged, true));

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -73,7 +73,7 @@ class administrateAdmin
         $layout['fields']['email']['order'] = 5;
         $fldAddr = ['telephone2','telephone3','telephone4','website'];
         $layout['panels']['genCont']['keys'] = array_diff($layout['panels']['genCont']['keys'], $fldAddr);
-        $fldAcct = ['rep_id','tax_rate_id','price_sheet','terms','terms_text','terms_edit','last_date_1','last_date_2','histPay'];
+        $fldAcct = ['rep_id','tax_rate_id','price_sheet','terms','terms_text','terms_edit','histPay']; // ,'last_date_1','last_date_2'
         $layout['panels']['genAcct']['keys'] = array_diff($layout['panels']['genAcct']['keys'], $fldAcct);
         // Get the meta to add the new options and process
         $meta    = getMetaContact($rID, 'user_profile');

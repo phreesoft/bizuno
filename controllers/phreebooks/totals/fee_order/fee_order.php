@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/fee_order/fee_order.php
  */
 
@@ -41,7 +41,6 @@ class fee_order
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->jID     = clean('jID', ['format'=>'integer', 'default'=>2], 'get');
         $type          = in_array($this->jID, [3,4,6,7,21]) ? 'vendors' : 'customers';
         $this->settings= ['gl_type'=>'fee','journals'=>'[3,4,6,7,9,10,12,13,19,21]','gl_account'=>getModuleCache('phreebooks','settings',$type,'gl_discount'),'order'=>70];

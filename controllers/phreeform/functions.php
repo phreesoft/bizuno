@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-01
+ * @version    7.x Last Update: 2026-03-14
  * @filesource /controllers/phreeform/functions.php
  */
 
@@ -512,11 +512,11 @@ function ReplaceNonAllowedCharacters($string)
  * @param array $lang - language translations for textual titles
  * @return array - list of page sizes
  */
-function phreeformPages($lang)
+function phreeformPages()
 { // TBD make the key just the PDF supported paper sizes, pull dimensions from array
     return [
-        ['id'=>'LETTER:216:279', 'text'=>$lang['paper_letter']],
-        ['id'=>'LEGAL:216:357',  'text'=>$lang['paper_legal']],
+        ['id'=>'LETTER:216:279', 'text'=>lang('paper_letter', 'phreeform')],
+        ['id'=>'LEGAL:216:357',  'text'=>lang('paper_legal', 'phreeform')],
         ['id'=>'A3:297:420',     'text'=>'A3'],
         ['id'=>'A4:210:297',     'text'=>'A4'],
         ['id'=>'A5:148:210',     'text'=>'A5'],
@@ -527,7 +527,7 @@ function phreeformPages($lang)
         ['id'=>'A7:74:105',      'text'=>'A7'],
         ['id'=>'A8:52:74',       'text'=>'A8'],
         ['id'=>'A9:37:52',       'text'=>'A9'],
-        ['id'=>'TABLOID:279:432','text'=>$lang['paper_tabloid']]];
+        ['id'=>'TABLOID:279:432','text'=>lang('paper_tabloid', 'phreeform')]];
 }
 
 /**
@@ -535,11 +535,11 @@ function phreeformPages($lang)
  * @param array $lang - Locale language file
  * @return array - ready to render
  */
-function phreeformOrientation($lang)
+function phreeformOrientation()
 {
     $output = [
-        ['id'=>'P', 'text'=>$lang['orient_portrait']],
-        ['id'=>'L', 'text'=>$lang['orient_landscape']]];
+        ['id'=>'P', 'text'=>lang('orient_portrait', 'phreeform')],
+        ['id'=>'L', 'text'=>lang('orient_landscape', 'phreeform')]];
     return $output;
 }
 

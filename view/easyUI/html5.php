@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-25
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /view/easyUI/html5.php
  */
 
@@ -722,21 +722,20 @@ columns:  [[
                 $this->jsReady[] = "bizRegionInit('{$attr['suffix']}');";
             }
 // temp patch
-if ('state'==$key) { 
-    $data['fields'][$key]['attr']['type'] = 'state';
-}
+if ('state'==$key) { $data['fields'][$key]['attr']['type'] = 'state'; }
+
             if (!empty($attr['required']) && getModuleCache('contacts', 'settings', 'address_book', $key)) { 
                 $data['fields'][$key]['options']['required'] = true;
             }
-            if ($attr['format']<>'long' && !empty($data['fields'][$key]['label'])) { 
+/*            if ($attr['format']<>'long' && !empty($data['fields'][$key]['label'])) { 
                 $data['fields'][$key]['options']['prompt'] = "'".jsLang($data['fields'][$key]['label'])."'";
                 unset($data['fields'][$key]['label']);
-            }
+            } */
             if (in_array($key, ['email', 'email2', 'email3', 'email4'])) { 
                 $data['fields'][$key] = array_merge_recursive($data['fields'][$key], ['options'=>['multiline'=>true,'width'=>250,'height'=>60]]);
             }
         }
-        $output .= $this->layoutFields($data, ['keys'=>$props['keys'],'settings'=>['suffix'=>$attr['suffix']]]);
+        $output .= $this->layoutFields($data, ['keys'=>$props['keys'],'settings'=>['suffix'=>$attr['suffix'], 'format'=>$attr['format']]]);
         if ($close) { $output .= "</div>\n"; }
     }
 
@@ -982,7 +981,7 @@ if ('state'==$key) {
             if (!isset($props['break'])) { $props['break'] = true; }
             $id = !empty($props['attr']['id']) ? $props['attr']['id'] : $key;
             if ($attr['format']<>'long' && !empty($props['label'])) { 
-                $props['options']['prompt'] = "'".jsLang($props['label'])."'";
+                $props['options']['prompt'] = "'".jsLang($key)."'";
                 unset($props['label']);
             }
             $output .= $this->render($id.$attr['suffix'], $props);

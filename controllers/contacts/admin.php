@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -31,14 +31,12 @@ class contactsAdmin
 {
     public $moduleID = 'contacts';
     public $pageID = 'admin';
-    public $lang;
     public $settings;
     public $structure;
     public $phreeformProcessing;
 
     function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure= [
             'api'       => ['path'=>'contacts/api/contactsAPI'],
@@ -46,13 +44,13 @@ class contactsAdmin
             'menuBar'   => ['child'=>[
                 'customers'=> ['order'=>10,'label'=>('customers'),'group'=>'cust','icon'=>'sales','child'=>[
                     'mgr_c'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_c')),'icon'=>'users','route'=>'contacts/main/manager&type=c'],
-                    'prices_c'=> ['order'=>70,'label'=>('ctype_c_prc'),'icon'=>'price',  'route'=>'inventory/prices/manager&type=c'],
+                    'prices_c'=> ['order'=>70,'label'=>('prices_mgr'), 'icon'=>'price',  'route'=>'inventory/prices/manager&type=c'],
                     'projects'=> ['order'=>80,'label'=>('projects'),   'icon'=>'support','route'=>"$this->moduleID/projects/manager"],
                     'promos'  => ['order'=>90,'label'=>('promotions'), 'icon'=>'email',  'route'=>"$this->moduleID/promos/manager"],
                     'rpt_c'   => ['order'=>99,'label'=>('reports'),    'icon'=>'mimeDoc','route'=>'phreeform/main/manager&gID=cust']]],
                 'vendors'  => ['order'=>20,'label'=>('vendors'),  'group'=>'vend','icon'=>'purchase','child'=>[
                     'mgr_v'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_v')),'icon'=>'users','route'=>"contacts/main/manager&type=v"],
-                    'prices_v'=> ['order'=>70,'label'=>('ctype_v_prc'),'icon'=>'price',  'route'=>'inventory/prices/manager&type=v'],
+                    'prices_v'=> ['order'=>70,'label'=>('prices_mgr'), 'icon'=>'price',  'route'=>'inventory/prices/manager&type=v'],
                     'rpt_v'   => ['order'=>99,'label'=>('reports'),    'icon'=>'mimeDoc','route'=>'phreeform/main/manager&gID=vend']]]]],
 //          'hooks'     => ['phreebooks'=>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]],
             ];

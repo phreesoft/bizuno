@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource controllers/administrate/dashboards/adm_role/adm_role.php
  */
 
@@ -43,7 +43,6 @@ class adm_role
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
     }
 
     /**

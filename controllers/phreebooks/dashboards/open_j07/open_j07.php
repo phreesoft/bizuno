@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-24
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/dashboards/open_j07/open_j07.php
  */
 
@@ -41,7 +41,6 @@ class open_j07
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->fieldStructure();
     }
 

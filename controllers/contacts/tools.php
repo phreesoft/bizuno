@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/contacts/tools.php
  */
 
@@ -37,7 +37,6 @@ class contactsTools
 
     function __construct()
     {
-        $this->lang = getLang($this->moduleID);
     }
 
     /**
@@ -118,9 +117,10 @@ class contactsTools
     {
         $noteS = dbMetaGet(0, 'notes', 'contacts', $this->srcID);
         $noteD = dbMetaGet(0, 'notes', 'contacts', $this->destID);
+        $idxD  = metaIdxClean($noteD);
         $noteM = implode("\n<br />", [!empty($noteD['value'])?$noteD['value']:'', !empty($noteS['value'])?$noteS['value']:'']);
         msgDebug("\nMerged notes:", 'info');
-        if (!empty($noteM)) { dbMetaSet($noteD['_rID'], 'notes', $noteM, 'contacts', $this->destID); }
+        if (!empty($noteM)) { dbMetaSet($idxD, 'notes', $noteM, 'contacts', $this->destID); }
     }
     private function mergeBookmarks()
     {

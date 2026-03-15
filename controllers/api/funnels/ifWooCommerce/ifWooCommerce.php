@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-13
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -59,8 +59,6 @@ class ifWooCommerce extends apiExport
     function __construct()
     {
         parent::__construct();
-        localizeLang($this->lang, $this->methodDir, $this->code);
-        $this->lang    = array_replace(getLang($this->moduleID), $this->lang);
         $userMeta      = getMetaMethod($this->methodDir, $this->code);
         $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
     }
@@ -102,7 +100,8 @@ class ifWooCommerce extends apiExport
                     'setInv' => ['order'=>20,'type'=>'panel','key'=>'setInv', 'classes'=>['block33']],
                     'setSync'=> ['order'=>30,'type'=>'panel','key'=>'setSync','classes'=>['block33']],
                     'setConf'=> ['order'=>40,'type'=>'panel','key'=>'setConf','classes'=>['block33']],
-                    'testTax'=> ['order'=>80,'type'=>'panel','key'=>'testTax','classes'=>['block33']]]]]]],
+//                  'testTax'=> ['order'=>80,'type'=>'panel','key'=>'testTax','classes'=>['block33']],
+                    ]]]]],
             'panels' => [
                 'setInv' => ['title'=>$this->lang['upload_title'],'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmInv'],

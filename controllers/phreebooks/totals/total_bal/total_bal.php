@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/phreebooks/totals/total_bal/total_bal.php
  */
 
@@ -39,7 +39,6 @@ class total_bal
 
     public function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
         $this->settings= ['journals'=>'[19]','order'=>98];
      }
 

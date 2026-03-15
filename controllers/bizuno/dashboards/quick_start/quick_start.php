@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-11-22
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /controllers/bizuno/dashboards/quick_start/quick_start.php
  */
 
@@ -50,7 +50,6 @@ class quick_start
 
     function __construct()
     {
-        localizeLang($this->lang, $this->methodDir, $this->code);
     }
 
     public function render(&$layout=[])

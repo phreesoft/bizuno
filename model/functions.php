@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-01
+ * @version    7.x Last Update: 2026-03-15
  * @filesource /model/functions.php
  */
 
@@ -42,21 +42,7 @@ function bizAutoLoad($path, $method='', $type='class')
     if     ($type=='class'    && !empty($method) && class_exists   ($method)) { return true; }
     elseif ($type=='function' && !empty($method) && function_exists($method)) { return true; }
     $absPath = bizAutoLoadMap($path);
-    msgDebug("\nabsPath = $absPath and file exists = ".file_exists($absPath));
-    msgDebug("\nopen_basedir = " . ini_get('open_basedir'));
-//return;
-    if (file_exists($absPath) && is_file($absPath)) {
-    msgDebug("\nis_readable = " . (is_readable($absPath) ? 'yes' : 'NO'));
-    if (is_readable($absPath)) {
-        require_once($absPath);
-        msgDebug("\nrequire_once completed OK");
-        return true;
-    } else {
-        msgDebug("\nrequire_once skipped - not readable");
-        return false;
-    }
-}
-//    if     (file_exists($absPath) && is_file($absPath)) { require_once($absPath); return true; }
+    if     (file_exists($absPath) && is_file($absPath) && is_readable($absPath)) { require_once($absPath); return true; }
     return false;
 }
 
@@ -181,6 +167,7 @@ function myErrorHandler($errno, $errstr, $errfile, $errline)
 {
     if (!(error_reporting() & $errno)) { return; } // This error code is not included in error_reporting
     $debug = defined('BIZUNO_DEBUG') && constant('BIZUNO_DEBUG')===true ? true : false;
+$debug=true;
      switch ($errno) {
         case E_USER_ERROR:
             msgAdd("<b>ERROR</b> [$errno] $errstr<br />\n  Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\nAborting...<br />\n", 'trap');
@@ -422,6 +409,7 @@ function getDashboard($dashID='')
         bizAutoLoad("{$path}$dashID.php", $fqcn);
         $dash = new $fqcn();
         if (empty($dash->struc)) { $dash->struc = []; } // for dashboards that don't have admin settings
+        localizeLang($dash->lang, $dash->methodDir, $dash->code);
         return $dash;
     } elseif (getUserCache('profile', 'userID')) { // delete from profile as the dashboard is no longer there
         msgDebug("\nDeleting dashboard $dashID from the users profile since it no longer exists!");

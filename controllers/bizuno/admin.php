@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-14
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -29,9 +29,7 @@ namespace bizuno;
 
 class bizunoAdmin
 {
-    public  $moduleID    = 'bizuno';
-    private $mailDefaults= ['smtp_host'=>'mail.mydomain.com', 'smtp_port'=>587, 'smtp_user'=>'', 'smtp_pass'=>''];
-    public $lang;
+    public $moduleID = 'bizuno';
     public $settings;
     public $structure;
     public $dirlist;
@@ -41,7 +39,6 @@ class bizunoAdmin
 
     function __construct()
     {
-        $this->lang     = getLang($this->moduleID);
         $this->settings = array_replace_recursive(getStructureValues($this->settingsStructure()), getModuleCache($this->moduleID, 'settings', false, false, []));
         $this->structure= [
             'attachPath'=> ['docs'=>'data/docs/uploads/', 'fixedAssets'=>'data/fixedAssets/uploads/', 'maint'=>'data/maint/uploads/'],
@@ -295,7 +292,7 @@ class bizunoAdmin
             'jsHead'  => [$this->moduleID=>"var bizStatsData = ".json_encode($stats).";"],
             'jsBody'  => ['company_logo'=>"imgManagerInit('company_logo', '$imgSrc', '$imgDir', ".json_encode(['style'=>"max-height:200px;max-width:200px;"]).");"],
             'jsReady' => [$this->moduleID=>"ajaxForm('frmStatus'); jqBiz('#bizStats').datagrid({data:bizStatsData}).datagrid('clientPaging');"]];
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()), $data);
     }
 
     private function getAdminFields()
@@ -303,9 +300,7 @@ class bizunoAdmin
         $status = [];
         $result = getMetaCommon('bizuno_refs');
         foreach ($result as $key => $value) {
-            if       (isset(lang($key, $this->moduleID)))     { $label = lang($key, $this->moduleID); }
-            elseif (strpos($key, 'next_ref_j')===0) { $label = sprintf(lang('next_ref'), lang('journal_id_'.substr($key, 10))); }
-            else                                    { $label = sprintf(lang('next_ref'), lang($key)); }
+            $label = sprintf(lang('next_ref'), lang($key));
             $status[$key]['position']= 'after';
             $status[$key]['label']   = $label;
             $status[$key]['attr']['value'] = $value;

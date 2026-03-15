@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-14
  * @filesource /controllers/phreeform/admin.php
  */
 
@@ -57,8 +57,8 @@ class phreeformAdmin
                 'margin'      => ['attr'=>['value'=>8]],
                 'title1'      => ['attr'=>['value'=>'%reportname%']],
                 'title2'      => ['attr'=>['value'=>lang('phreeform_heading_2', $this->moduleID)]], // 'Report Generated %date%'
-                'paper_size'  => ['values'=>phreeformPages($this->lang), 'attr'=>  ['type'=>'select', 'value'=>'Letter:216:282']],
-                'orientation' => ['values'=>phreeformOrientation($this->lang),'attr'=>  ['type'=>'select', 'value'=>'P']],
+                'paper_size'  => ['values'=>phreeformPages(), 'attr'=>  ['type'=>'select', 'value'=>'Letter:216:282']],
+                'orientation' => ['values'=>phreeformOrientation(),'attr'=>  ['type'=>'select', 'value'=>'P']],
                 'truncate_len'=> ['attr'=>['value'=>'25']]]]];
         settingsFill($data, $this->moduleID);
         return $data;
