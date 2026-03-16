@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /view/main.php
  */
 
@@ -1351,7 +1351,7 @@ function viewMain()
  * @param string $lang -
  * @return array - Newly formed layout
  */
-function adminStructure($module, $structure=[], $lang=[])
+function adminStructure($module, $structure=[])
 {
     $props= getModuleCache($module, 'properties');
     msgDebug("\nmodule $module properties = ".print_r($props, true));
@@ -1369,7 +1369,7 @@ function adminStructure($module, $structure=[], $lang=[])
             'body'   => ['order'=>50,'type'=>'accordion','key' =>'accSettings'],
             'formEOF'=> ['order'=>85,'type'=>'html',     'html'=>"</form>"]]]]]],
         'jsReady'=>['init'=>"ajaxForm('frmAdmin');"]];
-    if (!empty($structure)) { adminSettings($data, $structure, $lang); }
+    if (!empty($structure)) { adminSettings($data, $module, $structure); }
     else                    { unset($data['tabs']['tabAdmin']['divs']['settings'], $data['jsReady']['init']); }
     $methDirs = []; // ['dashboards'];
     if     (isset($props['dirMethods']) && is_array($props['dirMethods'])) { $methDirs = array_merge($methDirs, $props['dirMethods']); }
@@ -1383,25 +1383,22 @@ function adminStructure($module, $structure=[], $lang=[])
     return $data; // since this now just a div, don't need viewMain()
 }
 
-function adminSettings(&$data, $structure, $lang)
+function adminSettings(&$data, $module, $structure)
 {
     $order = 50;
-    msgDebug("\nlang = ".print_r($lang, true));
     foreach ($structure as $category => $entry) {
         $data['accordion']['accSettings']['divs'][$category] = ['order'=>$order,'ui'=>'none','label'=>$entry['label'],'type'=>'list','key'=>$category];
         if (empty($entry['fields'])) { continue; }
         msgDebug("\naccordion data = ".print_r($entry['fields'], true));
-        langFillLabels($entry['fields'], $lang);
+        langFillLabels($entry['fields'], $module);
         foreach ($entry['fields'] as $key => $props) {
             $props['attr']['id'] = $category."_".$key;
             if ( empty($props['attr']['type'])){ $props['attr']['type']= 'text'; }
             if ( empty($props['langKey']))     { $props['langKey']     = $key; }
             if ($props['attr']['type']=='password') { $props['attr']['value']= ''; }
-            $label = isset($props['label'])? $props['label']: lang($key);
-            $tip   = isset($props['tip'])  ? $props['tip']  : (isset($lang['set_'.$key]) ? $lang['set_'.$key] : '');
-            $props['label']= !empty($lang[$props['langKey']."_lbl"]) ? $lang[$props['langKey']."_lbl"] : $label;
-            $props['tip']  = !empty($lang[$props['langKey']."_tip"]) ? $lang[$props['langKey']."_tip"] : $tip;
-            $props['desc'] = !empty($lang[$props['langKey']."_desc"])? $lang[$props['langKey']."_desc"]: '';
+            $props['label']??= lang($key.'_lbl', $module);
+            $props['tip']  ??= lang($key.'_tip', $module);
+            $props['desc'] ??= lang($key.'_desc',$module);
             $data['lists'][$category][$key] = $props;
         }
         $order++;

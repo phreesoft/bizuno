@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-09
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/administrate/adminMaint.php
  */
 
@@ -68,7 +68,7 @@ class administrateAdminMaint extends mgrJournal
             'role_id'   => ['panel'=>'general','order'=>60,'label'=>lang('role'),      'clean'=>'integer',  'attr'=>['type'=>'select','value'=>-1], 'values'=>$this->roles],
             'maint_date'=> ['panel'=>'general','order'=>80,'label'=>sprintf(lang('tbd_next'), lang('maintenance')),'clean'=>'dateMeta', 'attr'=>['type'=>'date', 'value'=>biz_date()]],
             'doc_link'  => ['panel'=>'general','order'=>90,'label'=>lang('doc_link'),  'clean'=>'text',     'attr'=>['type'=>'text']],
-            'notes'     => ['panel'=>'notes',  'order'=>10,'label'=>lang('notes'),     'clean'=>'text',     'attr'=>['type'=>'editor','value'=>'']]];
+            'notes'     => ['panel'=>'notes',  'order'=>10,                            'clean'=>'text',     'attr'=>['type'=>'editor','value'=>'']]];
     }
     protected function managerGrid($security=0, $args=[])
     {

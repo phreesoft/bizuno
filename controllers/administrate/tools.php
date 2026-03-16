@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -196,9 +196,9 @@ class administrateTools {
         if (!$security = validateAccess('admin', 3)) { return; }
         $meta= dbMetaGet(0, 'bizuno_refs');
         $rID = metaIdxClean($meta);
-        foreach ($meta as $key => $value) {
+        foreach ($meta as $key => $row) {
             $value = clean('stat_'.$key, 'alpha_num', 'post');
-            if (!empty($value)) { $meta[$key] = $value; }
+            if (!empty($value)) { $meta[$key]['value'] = $value; }
         }
         dbMetaSet($rID, 'bizuno_refs', $meta);
         msgAdd(lang('msg_settings_saved'), 'success');

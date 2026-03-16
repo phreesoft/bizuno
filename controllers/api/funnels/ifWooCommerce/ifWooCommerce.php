@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -454,7 +454,7 @@ function productUpload(rID) {
     public function adminHome(&$layout=[])
     {
         if (!$security = validateAccess('admin', 1)) { return; }
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang));
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()));
     }
     public function install()
     {

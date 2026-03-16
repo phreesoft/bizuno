@@ -359,21 +359,13 @@ function loadBaseLang($lang='en_US')
     return array_replace($langCache, $otherLang);
 }
 
-function langFillLabels(&$data, $lang=[])
+function langFillLabels(&$data, $module='')
 {
     global $bizunoLang;
     msgDebug("\nEntering langFillLabels");
     foreach (array_keys($data) as $key) {
-        $bizLabel= isset($bizunoLang['core'][$key.'_lbl']) ? $bizunoLang['core'][$key.'_lbl'] : false;
-        $bizTip  = isset($bizunoLang['core'][$key.'_tip']) ? $bizunoLang['core'][$key.'_tip'] : false;
-        if     (!empty($data[$key]['label'])){ $data[$key]['label']= $data[$key]['label']; }
-        elseif (!empty($bizLabel))           { $data[$key]['label']= $bizLabel; }
-        elseif (!empty($lang[$key.'_lbl']))  { $data[$key]['label']= $lang[$key.'_lbl']; }
-        else                                 { $data[$key]['label']= lang($key); }
-        if     (!empty($data[$key]['tip']))  { $data[$key]['tip']  = $data[$key]['tip']; }
-        elseif (!empty($bizTip))             { $data[$key]['tip']  = $bizTip; }
-        elseif (!empty($lang[$key.'_tip']))  { $data[$key]['tip']  = $lang[$key.'_tip']; }
-//      else                                 { $data[$key]['tip']  = ''; } // Don't set it if nothing to show
+        $data[$key]['label']??= lang($key.'_lbl', $module);
+        $data[$key]['tip']  ??= lang($key.'_tip', $module);
     }
 }
 
@@ -1143,11 +1135,18 @@ function getNextReference($idx, $default='R1000')
 {
     $meta= dbMetaGet(0, 'bizuno_refs');
     $rID = metaIdxClean($meta);
-    $ref = !empty($meta[$idx]) ? $meta[$idx] : $default;
-    $output = $ref;
-    $ref++;
-    msgDebug("\nIn getNextReference, retrieved for field: $idx value: $output and incremented to get $ref");
-    $meta[$idx] = $ref;
+    if (is_array($meta[$idx])) { // new way
+        $ref = !empty($meta[$idx]['value']) ? $meta[$idx]['value'] : $default;
+        $output = $ref;
+        $ref++;
+        $meta[$idx]['value'] = $ref;
+    } else { // old way
+        $ref = !empty($meta[$idx]) ? $meta[$idx] : $default;
+        $output = $ref;
+        $ref++;
+        $meta[$idx] = $ref;
+    }
+    msgDebug("\nLeaving getNextReference, retrieved for field: $idx value: $output and incremented to get $ref");
     dbMetaSet($rID, 'bizuno_refs', $meta);
     return $output;
 }
@@ -1156,7 +1155,8 @@ function setNextReference($idx, $value='R1000')
 {
     $meta= dbMetaGet(0, 'bizuno_refs');
     $rID = metaIdxClean($meta);
-    $meta[$idx] = $value;
+    if (is_array($meta[$idx])) { $meta[$idx]['value'] = $value; } // New way
+    else                       { $meta[$idx] = $value; } // Old way
     dbMetaSet($rID, 'bizuno_refs', $meta);
 }
 

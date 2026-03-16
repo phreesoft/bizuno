@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-14
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -149,7 +149,7 @@ function bizunoUpgrade()
             $crnt = getModuleCache('bizuno', 'references');
             $inst = new bizInstall();
             $meta = [];
-            foreach ($inst->refs as $key => $value) { $meta[$key] = isset($crnt[$key]) ? $crnt[$key] : $value; }
+            foreach ($inst->refs as $key => $row) { $meta[$key] = isset($crnt[$key]) ? $crnt[$key] : $row['value']; }
             $null= dbMetaGet(0, 'bizuno_refs');
             $rID = metaIdxClean($null);
             dbMetaSet($rID, 'bizuno_refs', $meta);
@@ -187,4 +187,36 @@ function bizunoUpgrade()
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
     bizCacheExpClear(); // clear cache to force reload 
+}
+
+function UpgradeNextRefs()
+{
+    $meta= dbMetaGet(0, 'bizuno_refs');
+    $rID = metaIdxClean($meta);
+    $newMeta = [
+            'next_audit_num'   => ['label'=>'audit',         'value'=>$meta['next_audit_num']],
+            'next_cproj_num'   => ['label'=>'ctype_j',       'value'=>$meta['next_cproj_num']],
+            'next_cust_id_num' => ['label'=>'ctype_c',       'value'=>$meta['next_cust_id_num']],
+            'next_edi_num'     => ['label'=>'edi',           'value'=>$meta['next_edi_num']],
+            'next_fxdast_num'  => ['label'=>'gl_acct_type_8','value'=>$meta['next_fxdast_num']],
+            'next_maint_num'   => ['label'=>'maintenance',   'value'=>$meta['next_maint_num']],
+            'next_promo_num'   => ['label'=>'promotions',    'value'=>$meta['next_promo_num']],
+            'next_qaobj_num'   => ['label'=>'objectives',    'value'=>$meta['next_qaobj_num']],
+            'next_ref_j2'      => ['label'=>'journal_id_2',  'value'=>$meta['next_ref_j2']],
+            'next_ref_j3'      => ['label'=>'journal_id_3',  'value'=>$meta['next_ref_j3']],
+            'next_ref_j4'      => ['label'=>'journal_id_4',  'value'=>$meta['next_ref_j4']],
+            'next_ref_j7'      => ['label'=>'journal_id_7',  'value'=>$meta['next_ref_j7']],
+            'next_ref_j9'      => ['label'=>'journal_id_9',  'value'=>$meta['next_ref_j9']],
+            'next_ref_j10'     => ['label'=>'journal_id_10', 'value'=>$meta['next_ref_j10']],
+            'next_ref_j12'     => ['label'=>'journal_id_12', 'value'=>$meta['next_ref_j12']],
+            'next_ref_j13'     => ['label'=>'journal_id_13', 'value'=>$meta['next_ref_j13']],
+            'next_ref_j18'     => ['label'=>'journal_id_18', 'value'=>$meta['next_ref_j18']],
+            'next_ref_j20'     => ['label'=>'journal_id_20', 'value'=>$meta['next_ref_j20']],
+            'next_return_num'  => ['label'=>'returns',       'value'=>$meta['next_return_num']],
+            'next_shipment_num'=> ['label'=>'shipment_id',   'value'=>$meta['next_shipment_num']],
+            'next_ticket_num'  => ['label'=>'ticket',        'value'=>$meta['next_ticket_num']],
+            'next_training_num'=> ['label'=>'training',      'value'=>$meta['next_training_num']],
+            'next_vend_id_num' => ['label'=>'ctype_v',       'value'=>$meta['next_vend_id_num']],
+            'next_wo_num'      => ['label'=>'work_orders',   'value'=>$meta['next_wo_num']]];
+    dbMetaSet($rID, 'bizuno_refs', $newMeta);
 }

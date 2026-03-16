@@ -40,7 +40,8 @@ final class html5 {
     public  $jsReady = [];
     public  $jsResize= [];
 
-    function __construct() {
+    function __construct()
+    {
     }
 
     /**
@@ -49,7 +50,8 @@ final class html5 {
      * @param array $data - data structure to be processed (typically within the div)
      * @param string $type - [default: divs] specifies where to pull source, choices are 'divs', 'head', 'foot'
      */
-    public function buildDivs($data, $type='divs'){
+    public function buildDivs($data, $type='divs')
+    {
         msgDebug("\nEntering buildDivs with type = $type");
         $html = '';
         if (empty($data[$type])) { return $html; }
@@ -60,7 +62,8 @@ final class html5 {
         return $html;
     }
 
-    private function buildDivProp(&$output, $prop) {
+    private function buildDivProp(&$output, $prop)
+    {
         if (empty($prop['classes']) && empty($prop['styles']) && empty($prop['options']) && empty($prop['attr'])) { return false; }
         $prop['attr']['type'] = 'div';
         $output .= $this->render(!empty($prop['attr']['id'])?$prop['attr']['id']:'', $prop);
@@ -73,7 +76,8 @@ final class html5 {
      * @param array $data - data structure to be processed (typically within the div)
      * @param array $prop - type of div to build and structure
      */
-    public function buildDiv(&$output, $prop) {
+    public function buildDiv(&$output, $prop)
+    {
         global $viewData;
         if (!empty($prop['hidden'])) { return ''; }
         if ( empty($prop['type']))   { $prop['type'] = 'template'; } // default

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -142,7 +142,7 @@ class contactsAdmin
                 'closeJ9' => ['label'=>lang('close_j9_title', $this->moduleID),   'type'=>'fields','keys'=>['j9CloseDesc','dateJ9Close','btnJ9Close']],
                 'syncAtch'=> ['label'=>lang('sync_attach_title', $this->moduleID),'type'=>'fields','keys'=>['syncAtchDesc','btnSyncAttach']]],
             'fields'  => $fields];
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()), $data);
         // crm
         $layout['fields']['enable_crm']= ['order'=>60, 'attr'=>['type'=>'selNoYes','checked'=>!empty($this->settings['enable_crm'])?true:false]];
         $layout['fields']['restrict']  = ['order'=>70, 'attr'=>['type'=>'selNoYes','checked'=>!empty($this->settings['restrict'])?true:false]];

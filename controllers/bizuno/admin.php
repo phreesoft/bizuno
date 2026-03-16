@@ -274,7 +274,7 @@ class bizunoAdmin
                 'sched'   => ['order'=>30,'label'=>lang('fa_schedules', $this->moduleID),'type'=>'html', 'html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fixedAssets/adminSchedLoad'"]],
                 'tabs'    => ['order'=>40,'label'=>lang('extra_tabs'),   'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/tabs/manager'"]],
                 'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager'"]],
-                'tools'   => ['order'=>90,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
+                'tools'   => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'recalc' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'recalc'],
                     'fixTbl' => ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'fixTbl'],
                     'stsSet' => ['order'=>40,'type'=>'panel','classes'=>['block66'],'key'=>'stsSet']]],
@@ -299,11 +299,10 @@ class bizunoAdmin
     {
         $status = [];
         $result = getMetaCommon('bizuno_refs');
-        foreach ($result as $key => $value) {
-            $label = sprintf(lang('next_ref'), lang($key));
+        foreach ($result as $key => $row) {
             $status[$key]['position']= 'after';
-            $status[$key]['label']   = $label;
-            $status[$key]['attr']['value'] = $value;
+            $status[$key]['label']   = sprintf(lang('next_ref'), lang($row['label']));
+            $status[$key]['attr']['value'] = is_array($row) ? $row['value'] : (string)$row;
         }
         ksort($status);
         $output = [

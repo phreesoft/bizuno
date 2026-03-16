@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/administrate/fixedAssets.php
  */
 
@@ -85,7 +85,7 @@ class administrateFixedAssets extends mgrJournal
                     'status'=> ['order'=>10,'label'=>lang('status'),'values'=>$yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
             'columns'=> [
                 'status'       => ['order'=> 0,                                     'attr'=>['hidden'=>true]],
-                'ref_num'      => ['order'=>10, 'label'=>lang('ref_num', $this->moduleID),    'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true]],
+                'ref_num'      => ['order'=>10, 'label'=>lang('asset_num'),    'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true]],
                 'type'         => ['order'=>20, 'label'=>lang('asset_type', $this->moduleID), 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_type'],
                 'purch_cond'   => ['order'=>30, 'label'=>lang('purch_cond', $this->moduleID), 'attr'=>['width'=> 70, 'sortable'=>true, 'resizable'=>true], 'format'=>'fa_condition'],
                 'serial_number'=> ['order'=>40, 'label'=>lang('serial_number', $this->moduleID),'attr'=>['width'=>120,'sortable'=>true,'resizable'=>true]],
@@ -106,7 +106,7 @@ class administrateFixedAssets extends mgrJournal
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        parent::managerMain($layout, $security, ['dom'=>'div','title'=>sprintf(lang('tbd_manager'), lang('fixed_assets'))]);
+        parent::managerMain($layout, $security, ['dom'=>'div','title'=>sprintf(lang('tbd_manager'), lang('gl_acct_type_8'))]);
         $layout['jsHead'] = [
             'faType' => "var extFixedAssetsType = ".json_encode($this->faTypes,  JSON_UNESCAPED_UNICODE).";\n",
             'faCond' => "var extFixedAssetsCond = ".json_encode($this->condition,JSON_UNESCAPED_UNICODE).";\n"];
@@ -149,8 +149,13 @@ class administrateFixedAssets extends mgrJournal
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::editMeta($layout, $security);
         // Add image
-        $imgSrc  = $this->struc['image_with_path']['attr']['value']; // clean($structure['image_with_path']['attr']['value'], 'path_rel')
-        $imgDir  = dirname($this->struc['image_with_path']['attr']['value']).'/';
+        if (!empty($this->struc['image_with_path']['attr']['value'])) {
+            $imgSrc  = $this->struc['image_with_path']['attr']['value']; // clean($structure['image_with_path']['attr']['value'], 'path_rel')
+            $imgDir  = dirname($this->struc['image_with_path']['attr']['value']).'/';
+        } else {
+            $imgSrc  = '';
+            $imgDir  = '/';
+        }
         $layout['jsReady']['image'] = "imgManagerInit('image_with_path', '$imgSrc', '$imgDir', ".json_encode(['style'=>"max-height:200px;max-width:100%;"]).");";
         // add the attachment panel
         $layout['divs']['content']['divs']['atch'] = ['order'=>80,'type'=>'panel','key'=>"atch{$this->domSuffix}",'classes'=>['block50']];
@@ -231,7 +236,7 @@ class administrateFixedAssets extends mgrJournal
         }
         $cron['cnt']++;
         if (sizeof($cron['rows']) == 0) {
-            msgLog(lang('fixed_assets')." - Calculate Current Depreciated Values in Bulk");
+            msgLog(lang('gl_acct_type_8')." - Calculate Current Depreciated Values in Bulk");
             $data = ['content'=>['percent'=>100,'msg'=>"Processed {$cron['total']} Assets",'baseID'=>'faCalc','urlID'=>"$this->moduleID/$this->pageID/faCalcBulkNext"]];
             clearUserCron('faCalc');
         } else { // return to update progress bar and start next step
@@ -277,7 +282,7 @@ class administrateFixedAssets extends mgrJournal
         $viewValue= round($curValue, 2);
         $layout   = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"bizNumSet('dep_value', $viewValue);"]]);
         if ($verbose) {
-            msgLog(lang('fixed_assets', $this->moduleID)."- Calculate Current Value - {$value['title']} ($rID) - $viewValue");
+            msgLog(lang('gl_acct_type_8')."- Calculate Current Value - {$value['title']} ($rID) - $viewValue");
             msgAdd(lang('msg_database_write'), 'success');
         }
     }

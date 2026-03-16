@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/api/admin.php
  */
 
@@ -284,7 +284,7 @@ class apiAdmin extends apiCommon
     public function adminHome(&$layout=[])
     {
         if (!$security = validateAccess('admin', 1)) { return; }
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang));
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()));
     }
     
     /**

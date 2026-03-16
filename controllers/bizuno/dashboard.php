@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/bizuno/dashboard.php
  */
 
@@ -267,7 +267,7 @@ class bizunoDashboard
             }
             $dashboard[] = [
                 'id'         => $dashID,
-                'title'      => empty($myDash->lang['title'])? $dashID: $myDash->lang['title'],
+                'title'      => langDash('title', $dashID),
                 'noHeader'   => empty($myDash->noHeader)     ? true   : false,
                 'collapsible'=> empty($myDash->noCollapse)   ? true   : false,
                 'closable'   => empty($myDash->noClose)      ? true   : false,
@@ -308,8 +308,8 @@ class bizunoDashboard
                         msgDebug("\nPassed Security");
                         $output[$category][] = [
                             'id'         => $dashID,
-                            'title'      => $myDash->lang['title'],
-                            'description'=> $myDash->lang['description'],
+                            'title'      => langDash('title', $dashID),
+                            'description'=> langDash('description', $dashID),
                             'module'     => $module,
                             'security'   => $myDash->security,
                             'active'     => in_array($dashID, $loaded) ? true : false];

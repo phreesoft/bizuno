@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -55,7 +55,6 @@ class bizunoProfile extends mgrJournal
             'icons'      => ['tab'=>'options','panel'=>'general','order'=>40, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'default'],'values'=>portalIcons()],
             'theme'      => ['tab'=>'options','panel'=>'general','order'=>45, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'bizuno'], 'values'=>portalSkins()]];
         $this->struc = array_replace($this->struc, $mail->struc); // bring in the mail settings
-        langFillLabels($this->struc, $this->lang);
     }
     public function edit(&$layout=[])
     {

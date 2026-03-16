@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /locale/cleaner.php
  */
 
@@ -312,11 +312,11 @@ function lang($idx, $module='core')
  * @param string $dash - Dashboard ID used as index in language array
  * @return string - translation if found, original $idx if not
  */
-function langDash($idx, $dash='')
+function langDash($idx, $dashID='')
 {
     global $bizunoLang;
-    if (!is_null($bizunoLang['dashboards'][$dash][$idx]) && isset($bizunoLang['dashboards'][$dash][$idx])) { return $bizunoLang['dashboards'][$dash][$idx]; }
-    return isset($bizunoLang['core'][$idx]) ? $bizunoLang['core'][$idx] : $idx;
+    if (isset($bizunoLang['dashboards'][$dashID][$idx])) { return $bizunoLang['dashboards'][$dashID][$idx]; }
+    return isset($bizunoLang['core'][$idx]) ? $bizunoLang['core'][$idx] : $dashID.'-'.$idx;
 }
 
 /**

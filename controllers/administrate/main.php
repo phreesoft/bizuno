@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-24
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/administrate/main.php
  */
 
@@ -88,17 +88,17 @@ class administrateMain extends mgrJournal
                 'users'     => ['order'=>10,'label'=>('users'),       'icon'=>'users',    'route'=>'contacts/main/manager&type=u&dom=div'],
                 'mgr_e'     => ['order'=>30,'label'=>('employees'),   'icon'=>'employee', 'route'=>'contacts/main/manager&type=e&dom=div'],
                 'factory'   => ['order'=>40,'label'=>('stores'),      'icon'=>'pallet',   'route'=>'contacts/main/manager&type=b&dom=div'],
-                'fxdasts'   => ['order'=>50,'label'=>('fixed_assets'),'icon'=>'fixedAsset','route'=>'administrate/fixedAssets/manager']]],
+                'fxdasts'   => ['order'=>50,'label'=>('gl_acct_type_8'),'icon'=>'fixedAsset','route'=>'administrate/fixedAssets/manager']]],
             'apps'     => ['order'=>30,'label'=>('apps'),             'icon'=>'apps',     'child'=>[]], // Apps are filled in real time
             'security' => ['order'=>40,'label'=>('security'),         'icon'=>'shield',   'child'=>[
                 'roles'     => ['order'=>10,'label'=>('roles'),       'icon'=>'roles',    'route'=>'administrate/roles/manager'],
                 'dashboard' => ['order'=>50,'label'=>('dashboards'),  'icon'=>'dashboard','route'=>'administrate/dashboard/manager']]],
             'data'     => ['order'=>50,'label'=>('storage'),          'icon'=>'disk',     'child'=>[
                 'backup'    => ['order'=>10,'label'=>('backup'),      'icon'=>'backup',   'route'=>'administrate/backup/manager']]],
-//          'reporting'=> ['order'=>60,'label'=>lang('reporting'),        'icon'=>'report',   'route'=>'phreeform/main/manager'],
-            'billing'  => ['order'=>70,'label'=>('billing'),          'icon'=>'checkbook','child' =>[
-                'purchases' => ['order'=>10,'label'=>('purchases'),   'icon'=>'money',    'route'=>'administrate/dashboard/manager'],
-                'wallet'    => ['order'=>20,'label'=>('wallet'),      'icon'=>'wallet',   'route'=>'administrate/dashboard/manager']]],
+//          'reporting'=> ['order'=>60,'label'=>lang('reporting'),    'icon'=>'report',   'route'=>'phreeform/main/manager'],
+//          'billing'  => ['order'=>70,'label'=>('billing'),          'icon'=>'checkbook','child' =>[
+//              'purchases' => ['order'=>10,'label'=>('purchases'),   'icon'=>'money',    'route'=>'administrate/dashboard/manager'],
+//              'wallet'    => ['order'=>20,'label'=>('wallet'),      'icon'=>'wallet',   'route'=>'administrate/dashboard/manager']]],
             'account'  => ['order'=>80,'label'=>('account'),          'icon'=>'account',  'child'=>[
                 'phreesoft' => ['order'=>10,'label'=>('my_phreesoft'),'icon'=>'phreesoft','route'=>'administrate/main/redir&url=psAcct']]]]];
         return $data;

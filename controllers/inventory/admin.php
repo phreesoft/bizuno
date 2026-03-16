@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -239,7 +239,7 @@ class inventoryAdmin
 //              'analyze'  => ['label'=>lang('inv_sku_drill_title'],   'type'=>'fields','keys'=>['analyzeDesc',  'analyzeBtn']],
                 ],
             'fields' => $fields];
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()), $data);
     }
 
     public function adminSave()

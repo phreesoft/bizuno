@@ -37,7 +37,7 @@ class adm_module
     public $noCollapse= true;
     public $noReload  = true;
     public $noClose   = true;
-    public  $struc;
+    public $struc;
     public $lang      = ['title' => 'Admin - Modules',
         'description' => 'Module administration dashboard with summary information and quick links.'];
 
@@ -54,7 +54,7 @@ class adm_module
         $data = [ // Generate the content for this dashboard
             'divs'  => [
                 'body' =>['order'=>50,'type'=>'divs','attr'=>['id'=>$this->code],'divs'=>[
-                    'title'  => ['order'=>10,'type'=>'html',  'html'=>"<h1>".langDash('title', $this->code)."</h1>"],
+                    'title'  => ['order'=>10,'type'=>'html',  'html'=>"<h1>".langDash('description', $this->code)."</h1>"],
                     'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>"frm{$this->code}"],
                     'content'=> ['order'=>50,'type'=>'fields','keys'=>['field0']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</div></form>"],

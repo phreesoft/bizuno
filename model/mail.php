@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-18
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /model/mail.php
  */
 
@@ -86,7 +86,6 @@ class bizunoMailer
             'gmail_app_pw2'=> ['tab'=>'options','panel'=>'mail','order'=>75,'clean'=>'text',   'attr'=>['value'=>'']],
             'gmail_app_pw3'=> ['tab'=>'options','panel'=>'mail','order'=>75,'clean'=>'text',   'attr'=>['value'=>'']],
             'gmail_app_pw4'=> ['tab'=>'options','panel'=>'mail','order'=>75,'clean'=>'text',   'attr'=>['value'=>'']]];
-        langFillLabels($this->struc);
     }
 
     /**

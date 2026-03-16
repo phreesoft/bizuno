@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /model/registry.php
  */
 
@@ -163,10 +163,29 @@ unset($bizunoMod[$module]['dashboards']);
         if (method_exists($admin, 'initialize')) { $admin->initialize(); }
         unset($admin->structure['lang'], $admin->structure['hooks'], $admin->structure['api']);
         $bizunoMod[$module]['properties']= $admin->structure;
+        $this->initLangDashboards($path);
         // Restore Bizuno database version for upgrade check. If the dbVersion is the same, then nothing is done
         if ($module=='bizuno') { $bizunoMod['bizuno']['properties']['version'] = $this->dbVersion; }
         msgDebug("\nFinished initModule for module: $module, updating cache.");
         $GLOBALS['updateModuleCache'][$module] = true;
+    }
+
+    private function initLangDashboards($path)
+    {
+        global $bizunoLang;
+        $dashPath = "{$path}dashboards/";
+        if (!file_exists($dashPath) || !is_dir($dashPath)) { return; }
+        $dirs = scandir($dashPath);
+        msgDebug("\nEntering initLangDashboards, read all dashboards = ".msgPrint($dirs));
+        foreach ($dirs as $dash) {
+            if ($dash=='.' || $dash=='..') { continue; }
+            $fqcn = "\\bizuno\\$dash";
+            if (!bizAutoLoad("{$dashPath}$dash/$dash.php", $fqcn)) { continue; }
+            $clsMeth = new $fqcn();
+            if (is_array($clsMeth->lang)) { ksort($clsMeth->lang); }
+//          msgDebug("\nRead dashboard $dash with lang = ".msgPrint($clsMeth->lang));
+            $bizunoLang['dashboards'][$dash] = $clsMeth->lang;
+        }
     }
 
     private function setLangCache()
@@ -377,7 +396,7 @@ unset($bizunoMod[$module]['dashboards']);
     {
         global $bizunoLang;
         $module = $structure['id'];
-        msgDebug("\ninitMethodList is looking at methods = ".print_r($methods, true));
+        msgDebug("\ninitMethodList is looking at methods = ".msgPrint($methods));
         $meta = dbMetaGet(0, "methods_{$folderID}");
         $metaIdx= metaIdxClean($meta);
         $newMeta= [];
@@ -388,7 +407,7 @@ unset($bizunoMod[$module]['dashboards']);
             } else {
                 $url   = isset($structure['url']) ? "{$structure['url']}$folderID/$method/" : '';
             }
-            msgDebug("\nregistry looking for method $method at path = ".print_r($path, true));
+            msgDebug("\nregistry looking for method $method at path = ".msgPrint($path));
             $fqcn = "\\bizuno\\$method";
             if (!bizAutoLoad("{$path}$method.php", $fqcn)) { continue; }
             $clsMeth = new $fqcn();
@@ -405,13 +424,13 @@ unset($bizunoMod[$module]['dashboards']);
                 'url'        => $url,
                 'menuID'     => !empty($clsMeth->menuID) ? $clsMeth->menuID : ''];
             if (!empty($meta[$method]['settings'])) { $meta[$method]['settings'] = $clsMeth->settings; } // on migrations, this is sometimes not set.
-//msgDebug("\nregistry args array = ".print_r($args, true));
+//msgDebug("\nregistry args array = ".msgPrint($args));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
-//msgDebug("\nmerged array = ".print_r($merged, true));
+//msgDebug("\nmerged array = ".msgPrint($merged));
             $newMeta[$method] = $merged;
             if (isset($clsMeth->structure)) { $this->setHooks($clsMeth->structure, $method, $path); }
         }
-        msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID"); // with data = ".print_r($newMeta, true));
+        msgDebug("\ninitMethodList is writing to module cache: {$structure['id']} folder: $folderID"); // with data = ".msgPrint($newMeta));
         dbMetaSet($metaIdx, "methods_{$folderID}", $newMeta);
     }
 
@@ -472,7 +491,7 @@ unset($bizunoMod[$module]['dashboards']);
         msgDebug("\nFound path {$relPath}dashboards");
         if (!getModuleCache($module, 'properties', 'status')) { return; } // skip if module not loaded
         $theList = scandir("{$path}dashboards"); // can't use $io as the folders are not within BIZUNO_DATA path
-        msgDebug("\nin scanDashFolder with theList read from disk = ".print_r($theList, true));
+        msgDebug("\nin scanDashFolder with theList read from disk = ".msgPrint($theList));
         foreach ($theList as $dashID) {
             if (in_array($dashID, ['.', '..'])) { continue; }
             if (!file_exists("{$path}dashboards/$dashID/$dashID.php")) { continue; }
@@ -487,7 +506,7 @@ unset($bizunoMod[$module]['dashboards']);
                 'hidden'     => isset($myDash->hidden) ? $myDash->hidden : false,
                 'path'       => "{$relPath}dashboards/$dashID/",
                 'opts'       => !empty($myDash->struc) ? metaExtract($myDash->struc) : []];
-//          msgDebug("\nSetting dashboard opts with ID: $dashID = ".print_r($opts, true));
+//          msgDebug("\nSetting dashboard opts with ID: $dashID = ".msgPrint($opts));
             $output[$dashID] = $opts;
         }
     }

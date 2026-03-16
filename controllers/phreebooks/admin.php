@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -337,7 +337,7 @@ class phreebooksAdmin {
             $data['panels']['cleanAtch']['keys'][] = "atchCln_{$jID}";
             $order++;
         }
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()), $data);
     }
 
     private function getViewPurgeAttach()

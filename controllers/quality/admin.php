@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/quality/admin.php
  */
 
@@ -256,7 +256,7 @@ class qualityAdmin
         $data = ['tabs'=>['tabAdmin'=>['divs'=>[
             'tabTrain' => ['order'=>20,'label'=>lang('tasks_training'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminTraining/manager'"]],
             'tabAudit' => ['order'=>30,'label'=>lang('tasks_audit'),   'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/adminAudits/manager'"]]]]]];
-        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure(), $this->lang), $data);
+        $layout = array_replace_recursive($layout, adminStructure($this->moduleID, $this->settingsStructure()), $data);
     }
 
     /**

@@ -31,30 +31,30 @@ class bizInstall // Checking users:
 {
     public  $moduleID = 'common';
     public $refs = [
-            'next_audit_num'   => 'QA00001',
-            'next_cproj_num'   => 'PJ00001',
-            'next_cust_id_num' => 'C000001',
-            'next_edi_num'     => 'EDI0000001',
-            'next_fxdast_num'  => 'FA00001',
-            'next_maint_num'   => 'PM00001',
-            'next_promo_num'   => 'PR00001',
-            'next_qaobj_num'   => 'QO00001',
-            'next_ref_j2'      => 'GL00001',
-            'next_ref_j3'      => 'VQ00001',
-            'next_ref_j4'      => 'VPO00001',
-            'next_ref_j7'      => 'VCM00001',
-            'next_ref_j9'      => 'QU00001',
-            'next_ref_j10'     => 'SO00001',
-            'next_ref_j12'     => 'INV00001',
-            'next_ref_j13'     => 'CM00001',
-            'next_ref_j18'     => 'INV00001',
-            'next_ref_j20'     => 'CK00001',
-            'next_return_num'  => 'RMA00001',
-            'next_shipment_num'=> 'SH00001',
-            'next_ticket_num'  => 'QT00001',
-            'next_training_num'=> 'TR00001',
-            'next_vend_id_num' => 'V000001',
-            'next_wo_num'      => 'WO00001'];
+            'next_audit_num'   => ['label'=>'audit',         'value'=>'QA00001'],
+            'next_cproj_num'   => ['label'=>'ctype_j',       'value'=>'PJ00001'],
+            'next_cust_id_num' => ['label'=>'ctype_c',       'value'=>'C000001'],
+            'next_edi_num'     => ['label'=>'edi',           'value'=>'EDI0000001'],
+            'next_fxdast_num'  => ['label'=>'gl_acct_type_8','value'=>'FA00001'],
+            'next_maint_num'   => ['label'=>'maintenance',   'value'=>'PM00001'],
+            'next_promo_num'   => ['label'=>'promotions',    'value'=>'PR00001'],
+            'next_qaobj_num'   => ['label'=>'objectives',    'value'=>'QO00001'],
+            'next_ref_j2'      => ['label'=>'journal_id_2',  'value'=>'GL00001'],
+            'next_ref_j3'      => ['label'=>'journal_id_3',  'value'=>'VQ00001'],
+            'next_ref_j4'      => ['label'=>'journal_id_4',  'value'=>'VPO00001'],
+            'next_ref_j7'      => ['label'=>'journal_id_7',  'value'=>'VCM00001'],
+            'next_ref_j9'      => ['label'=>'journal_id_9',  'value'=>'QU00001'],
+            'next_ref_j10'     => ['label'=>'journal_id_10', 'value'=>'SO00001'],
+            'next_ref_j12'     => ['label'=>'journal_id_12', 'value'=>'INV00001'],
+            'next_ref_j13'     => ['label'=>'journal_id_13', 'value'=>'CM00001'],
+            'next_ref_j18'     => ['label'=>'journal_id_18', 'value'=>'RCT00001'],
+            'next_ref_j20'     => ['label'=>'journal_id_20', 'value'=>'CK00001'],
+            'next_return_num'  => ['label'=>'returns',       'value'=>'RMA00001'],
+            'next_shipment_num'=> ['label'=>'shipment_id',   'value'=>'SH00001'],
+            'next_ticket_num'  => ['label'=>'ticket',        'value'=>'QT00001'],
+            'next_training_num'=> ['label'=>'training',      'value'=>'TR00001'],
+            'next_vend_id_num' => ['label'=>'ctype_v',       'value'=>'V000001'],
+            'next_wo_num'      => ['label'=>'work_orders',   'value'=>'WO00001']];
 
     function __construct()
     {
@@ -112,7 +112,7 @@ class bizInstall // Checking users:
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 6, 'meta_key'=>'methods_funnels',     'meta_value'=>'{}']); // Collected lsit of API funnels 
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 7, 'meta_key'=>'dashboards',          'meta_value'=>'{}']); // Collected list of dashbaords from all modules
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']); // Cache to store phreeform reports and forms to speed things up
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>'[]']); // Phreebooks references for journal entries
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>$this->refs]); // Phreebooks references for journal entries
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=>$roleID,'meta_key'=>'bizuno_role',     'meta_value'=>json_encode($roleMeta)]);
         // insert a record into the contacts table, use email as the short name for now
         msgDebug("\nFinished installing modules, next up, setting first user.");
@@ -134,7 +134,6 @@ class bizInstall // Checking users:
         msgDebug("\nFinished building registry with bizunoMod = ".print_r($bizunoMod, true));
         setModuleCache('phreebooks', 'currency', false, ['defISO'=>$curISO, 'iso'=>[$curISO =>$cur->currencySettings($curISO)]]);
         $this->initDashboards($cID, $bAdmin->notes); // create some starting dashboards
-        $this->installRefs();  // Pre set the references for the journal entries
         $company = getModuleCache('bizuno', 'settings', 'company'); // set the business title and id
         $company['id'] = $company['primary_name'] = clean('biz_title', 'text', 'post');
         setModuleCache('bizuno', 'settings', 'company', $company);
@@ -189,15 +188,6 @@ class bizInstall // Checking users:
         dbMetaSet(0, 'dashboard_home', $panels, 'contacts', $cID);
     }
     
-    private function installRefs()
-    {
-        $meta = [];
-        foreach ($this->refs as $key => $value) { $meta[$key] = $value; }
-        $null= dbMetaGet(0, 'bizuno_refs');
-        $rID = metaIdxClean($null);
-        dbMetaSet($rID, 'bizuno_refs', $meta);
-    }
-
     public function installReports() // Adds full suite of default reports and forms
     {
         msgDebug("\nEntering installReports, building phreeForm folder tree");
