@@ -301,7 +301,7 @@ class bizunoAdmin
         $result = getMetaCommon('bizuno_refs');
         foreach ($result as $key => $row) {
             $status[$key]['position']= 'after';
-            $status[$key]['label']   = sprintf(lang('next_ref'), lang($row['label']));
+            $status[$key]['label']   = sprintf(lang('next_ref'), lang(is_array($row) ? $row['label'] : $key));
             $status[$key]['attr']['value'] = is_array($row) ? $row['value'] : (string)$row;
         }
         ksort($status);

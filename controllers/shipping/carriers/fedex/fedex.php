@@ -36,6 +36,8 @@ bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'viewCarrier
 
 class fedex extends fedexCommon
 {
+    public  $moduleID  = 'shipping';
+    public  $methodDir = 'carriers';
     private $frtCollect= []; // used to aggregate Freight Collect by Invoice number
     private $reconcile_path;
 
@@ -50,23 +52,23 @@ class fedex extends fedexCommon
     public function settingsStructure()
     {
         $servers  = [['id'=>'test','text'=>lang('test')],['id'=>'prod','text'=>lang('production')]];
-        $printers = [['id'=>'pdf', 'text'=>$this->lang['plain_paper']], ['id'=>'thermal', 'text'=>$this->lang['thermal']]];
+        $printers = [['id'=>'pdf', 'text'=>lang('plain_paper', $this->moduleID)], ['id'=>'thermal', 'text'=>lang('thermal', $this->moduleID)]];
         $services = [];
         foreach ($this->options['rateCodes'] as $code) { $services[] = ['id'=>$code, 'text'=>$this->lang[$code]]; }
         return [
             'test_mode'    => ['label'=>$this->lang['test_mode'],    'position'=>'after','values'=>$servers,'attr'=>['type'=>'select','value'=>$this->settings['test_mode']]],
-            'default'      => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]],
+            'default'      => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]],
             'order'        => ['label'=>lang('sort_order'),          'position'=>'after','attr'=>['type'=>'integer','size'=>3,'value'=>$this->settings['order']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID),'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
             'acct_number'  => ['label'=>$this->lang['acct_number'],  'position'=>'after','attr'=>['value'=>$this->settings['acct_number']]],
-            'rest_api_key' => ['label'=>$this->lang['rest_api_key_lbl'],'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_api_key']]],
-            'rest_secret'  => ['label'=>$this->lang['rest_secret_lbl'], 'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_secret']]],
+            'rest_api_key' => ['label'=>lang('rest_api_key_lbl', $this->moduleID),'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_api_key']]],
+            'rest_secret'  => ['label'=>lang('rest_secret_lbl', $this->moduleID), 'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_secret']]],
             'ltl_acct_num' => ['label'=>$this->lang['ltl_acct_num'], 'position'=>'after','attr'=>['value'=>$this->settings['ltl_acct_num']]],
             'ltl_class'    => ['label'=>$this->lang['def_ltl_class'],'position'=>'after','values'=>viewKeyDropdown($this->options['LTLClasses']),'attr'=>['type'=>'select','value'=>$this->settings['ltl_class']]],
             'ltl_desc'     => ['label'=>$this->lang['def_ltl_desc'], 'position'=>'after','attr'=>['value'=>$this->settings['ltl_desc']]],
-            'bill_hq'      => ['label'=>$this->lang['bill_hq_lbl'],  'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['bill_hq']]],
-            'gl_acct_c'    => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v'    => ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'bill_hq'      => ['label'=>lang('bill_hq_lbl', $this->moduleID),  'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['bill_hq']]],
+            'gl_acct_c'    => ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v'    => ['label'=>lang('gl_shipping_v_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
             'max_weight'   => ['label'=>$this->lang['max_weight'],   'position'=>'after','attr'=>['type'=>'integer','size'=>3,'maxlength'=>3,'value'=>$this->settings['max_weight']]],
             'sp_hub'       => ['label'=>$this->lang['sp_hub'],       'position'=>'after','attr'=>['size'=>35,'value'=>$this->settings['sp_hub']]],
             'max_sp_weight'=> ['label'=>$this->lang['max_sp_weight'],'position'=>'after','attr'=>['size'=>35,'value'=>$this->settings['max_sp_weight']]],

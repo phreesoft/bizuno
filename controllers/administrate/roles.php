@@ -133,17 +133,48 @@ class administrateRoles extends mgrJournal
      */
     private function roleTabs(&$data, $security=[])
     {
-        $order   = 50;
-        $theList = portalModuleList();
+        $order  = 50;
+        $theList= portalModuleList();
         foreach ($theList as $mID => $path) {
             $fqcn = "\\bizuno\\{$mID}Admin";
             bizAutoLoad("{$path}admin.php", $fqcn);
             $tmp = new $fqcn();
             $this->setMenus($tmp->structure);
         }
-        $html    = '';
-        $menuBar = sortOrder($this->menuBar['child']);
-        $html   .= $this->roleTabsMain($data, $order, $menuBar, $security);
+        $html   = '';
+        $this->menuFillLabels($this->menuBar['child']);
+        $html  .= $this->roleTabsMain($data, $order, $this->menuBar['child'], $security);
+    }
+
+    private function menuFillLabels(&$menu=[])
+    {
+        msgDebug("\nEntering menuSort with menu = ".msgPrint($menu));
+        foreach ($menu as $key => $cat) {
+            $menu[$key]['label'] = !empty($cat['label']) ? lang($cat['label']) : lang($key);
+            $menu[$key]['child'] = $this->menuFillLabelsChildren($menu[$key]['child']);
+        }
+        $menu = sortOrder($menu, 'label');
+        msgDebug("\noutput after menuFillLabels = ".msgPrint($menu));
+    }
+
+    /**
+     * Sets the possible role security levels for menu children
+     * @param array $children - list of menu children
+     * @param string $title - Category title
+     * @param array $security - Security setting of parent
+     * @return string - HTML view
+     */
+    private function menuFillLabelsChildren(&$children=[])
+    {
+        foreach ($children as $id => $props) {
+            if (isset($props['child'])) {
+                $children[$id]['child'] = $this->menuFillLabelsChildren($props['child']);
+            } elseif (empty($props['required'])) {
+                if (empty($props['label'])) { msgAdd("label not set: ".print_r($props, true)); }
+                $children[$id]['label'] = lang($props['label']);
+            }
+        }
+        return sortOrder($children, 'label');
     }
 
     private function roleTabsMain(&$data, &$order, $menu, $security)
@@ -173,13 +204,11 @@ class administrateRoles extends mgrJournal
         foreach ($children as $id => $props) {
             if (isset($props['child'])) {
                 $value = array_key_exists($id, $security) ? $security[$id] : 0;
-                $tab .= html5("security[$id]", ['label'=>$props['label'],'values'=>$this->securityChoices,'attr'=>['type'=>'select','value'=>$value]])."<br />\n";
+//                $tab .= html5("security[$id]", ['label'=>$props['label'],'values'=>$this->securityChoices,'attr'=>['type'=>'select','value'=>$value]])."<br />\n";
                 $tab .= $this->roleTabsChildren($props['child'], $title, $security);
             } elseif (empty($props['required'])) {
                 $value = array_key_exists($id, $security) ? $security[$id] : 0;
-                if (empty($props['label'])) { msgAdd("label not set: ".print_r($props, true)); }
-                $label = $props['label']=='reports' ? lang($title).' - '.lang($props['label']) : lang($props['label']);
-                $tab  .= html5("security[$id]", ['label'=>$label,'values'=>$this->securityChoices,'attr'=>['type'=>'select','value'=>$value]])."<br />\n";
+                $tab  .= html5("security[$id]", ['label'=>$props['label'],'values'=>$this->securityChoices,'attr'=>['type'=>'select','value'=>$value]])."<br />\n";
             }
         }
         return $tab;

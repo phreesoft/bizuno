@@ -51,9 +51,9 @@ class moneyorder
     public function settingsStructure()
     {
         return [
-            'cash_gl_acct'=>['label'=>$this->lang['gl_payment_c_lbl'], 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
-            'disc_gl_acct'=>['label'=>$this->lang['gl_discount_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
-            'prefix'      =>['label'=>$this->lang['prefix_lbl'],       'position'=>'after','attr'=>['size'=>'5','value'=>$this->settings['prefix']]],
+            'cash_gl_acct'=>['label'=>lang('gl_payment_c_lbl', $this->moduleID), 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
+            'disc_gl_acct'=>['label'=>lang('gl_discount_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
+            'prefix'      =>['label'=>lang('prefix_lbl', $this->moduleID),       'position'=>'after','attr'=>['size'=>'5','value'=>$this->settings['prefix']]],
             'order'       =>['label'=>lang('order'),                   'position'=>'after','attr'=>['type'=>'integer','size'=>'3','value'=>$this->settings['order']]]];
     }
 

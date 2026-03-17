@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/payment/adminNacha.php
  */
 
@@ -34,6 +34,7 @@ class paymentAdminNacha extends mgrJournal
     protected $secID     = 'admin';
     protected $domSuffix = 'Nacha';
     protected $metaPrefix= 'nacha';
+    
 
     public function __construct()
     {
@@ -59,7 +60,7 @@ class paymentAdminNacha extends mgrJournal
         $data = array_replace_recursive(parent::gridBase($security, $args, $admin), [
             'source' => ['search'=>['title', 'biz_entry', 'biz_name']],
             'columns'=> [
-                'title'  => ['order'=>10,'label'=>lang('ach_title', $this->moduleID)],
+                'title'  => ['order'=>10,'label'=>lang('title')],
                 'mapID'  => ['order'=>20,'label'=>lang('nacha_map_lbl', $this->moduleID)],
                 'gl_acct'=> ['order'=>30,'label'=>lang('gl_account')]]]);
         return $data;

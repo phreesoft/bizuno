@@ -73,13 +73,13 @@ class authorizenet
         $noYes = [['id'=>'0','text'=>lang('no')], ['id'=>'1','text'=>lang('yes')]];
         $auths = [['id'=>'Authorize/Capture','text'=>lang('capture')], ['id'=>'Authorize','text'=>lang('authorize')]];
         return [
-            'cash_gl_acct'=> ['label'=>$this->lang['gl_payment_c_lbl'], 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
-            'disc_gl_acct'=> ['label'=>$this->lang['gl_discount_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
+            'cash_gl_acct'=> ['label'=>lang('gl_payment_c_lbl', $this->moduleID), 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
+            'disc_gl_acct'=> ['label'=>lang('gl_discount_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
             'order'       => ['label'=>lang('order'), 'position'=>'after', 'attr'=>  ['type'=>'integer', 'size'=>'3','value'=>$this->settings['order']]],
             'user_id'     => ['label'=>$this->lang['user_id'],    'position'=>'after', 'attr'=>['type'=>'text', 'size'=>'20','value'=>$this->settings['user_id']]],
             'txn_key'     => ['label'=>$this->lang['txn_key'],    'position'=>'after', 'attr'=>['type'=>'text','value'=>$this->settings['txn_key']]],
             'auth_type'   => ['label'=>$this->lang['auth_type'],  'values'=>$auths,    'attr'=>['type'=>'select','value'=>$this->settings['auth_type']]],
-            'prefix'      => ['label'=>$this->lang['prefix_lbl'], 'position'=>'after', 'attr'=>['size'=>'5','value'=>$this->settings['prefix']]],
+            'prefix'      => ['label'=>lang('prefix_lbl', $this->moduleID), 'position'=>'after', 'attr'=>['size'=>'5','value'=>$this->settings['prefix']]],
             'prefixAX'    => ['label'=>$this->lang['prefix_amex'],'position'=>'after', 'attr'=>['size'=>'5','value'=>$this->settings['prefixAX']]],
             'allowRefund' => ['label'=>$this->lang['allow_refund'],'values'=>$noYes,   'attr'=>['type'=>'select','value'=>$this->settings['allowRefund']]]];
     }

@@ -168,7 +168,16 @@ class paymentMain
         if (empty($pairs)) { return; }
         $j12mID= array_shift($pairs);
         $j18mID= dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'ref_id', "item_ref_id={$j12mID['ref_id']}");
-        msgDebug("\nRead j18 mID row: ".print_r($j18mID, true));
+        if (empty($j18mID) && sizeof($pairs)) { // may have been a SO, try again
+            msgDebug(" ... EMPTY ... Trying next mID");
+            $j12mID= array_shift($pairs); 
+            $j18mID= dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'ref_id', "item_ref_id={$j12mID['ref_id']}");
+        }
+        msgDebug("\nRead j18 mID value: ".print_r($j18mID, true));
+        if (empty($j18mID)) { 
+            msgAdd('Transaction code cannot be found, the refund must be handled at the Gateway interface!', 'caution');
+            return '';
+        }
         // get the trans_code from the cash receipt
         $j18row= dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "ref_id=$j18mID AND gl_type='ttl'");
         msgDebug("\nRead j18row = ".print_r($j18row, true));

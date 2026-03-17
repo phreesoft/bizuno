@@ -92,9 +92,11 @@ class administrateDashboard
         $fqcn  = "\\bizuno\\$dashID";
         bizAutoLoad("{$this->allDash[$dashID]['path']}$dashID.php", $fqcn);
         $cls   = new $fqcn();
-        foreach ($cls->struc as $setting => $values) {
-            $mult = !empty($values['attr']['multiple']) || in_array($setting, ['users', 'roles']) ? '[]' : '';
-            $html .= html5($dashID.'_'.$setting.$mult, $values)."<br />\n";
+        if (!empty($cls->struc) && is_array($cls->struc)) {
+            foreach ($cls->struc as $setting => $values) {
+                $mult = !empty($values['attr']['multiple']) || in_array($setting, ['users', 'roles']) ? '[]' : '';
+                $html .= html5($dashID.'_'.$setting.$mult, $values)."<br />\n";
+            }
         }
         $fields['settingSave']['events']['onClick'] = "jqBiz('#frmMethod_{$dashID}').submit();";
         $html .= '<div style="text-align:right">'.html5("imgMethod_{$dashID}", $fields['settingSave']).'</div>';

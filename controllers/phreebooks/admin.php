@@ -74,10 +74,8 @@ class phreebooksAdmin {
                     'j16_mgr' => ['order'=>50,'label'=>'journal_id_16',    'icon'=>'inv-adj',  'route'=>"$this->moduleID/main/manager&jID=16"]]],
                 'ledger'    => ['order'=>50,'label'=>'general_ledger','group'=>'gl','icon'=>'journal','child'=>[
                     'j2_mgr'  => ['order'=>10, 'label'=>'journal_id_2',    'icon'=>'journal',  'route'=>"$this->moduleID/main/manager&jID=2&mgr=1"],
-//                  'cashflow'=> ['order'=>80,'label'=>lang('cash_flow')),   'icon'=>'linechart','route'=>"hrefClick('phreebooks/budget/cashFlow');"],
                     'budget'  => ['order'=>90,'label'=>'budget',           'icon'=>'budget',    'route'=>"$this->moduleID/budget/manager"],
-                    'rpt_jrnl'=> ['order'=>99,'label'=>'reports',          'icon'=>'mimeDoc',   'route'=>"phreeform/main/manager&gID=gl"],
-                    'rpt_gl'  => ['order'=>99,'label'=>'reports',          'icon'=>'mimeDoc',   'route'=>'phreeform/main/manager&gID=gl']]],
+                    'rpt_jrnl'=> ['order'=>99,'label'=>'reports',          'icon'=>'mimeDoc',   'route'=>'phreeform/main/manager&gID=gl']]],
                 'tools'     => ['child'=>[
                     'j0_mgr'  => ['order'=>75,'label'=>'journal_id_0',                           'icon'=>'search','route'=>"$this->moduleID/main/manager&jID=0"],
                     'edi'     => ['order'=>85,'label'=>sprintf(lang('tbd_manager'), lang('edi')),'icon'=>'edi',   'route'=>"$this->moduleID/ediMain/manager"]]],
@@ -460,7 +458,7 @@ function getPurgeDates() {
         $dbPer     = dbGetMulti(BIZUNO_DB_PREFIX."journal_periods", "fiscal_year=$fy", "period");
         $periods   = [];
         foreach ($dbPer as $row) { $periods[$row['period']] = ['start' => $row['start_date'], 'end' => $row['end_date']]; }
-        $output    = "<p>".lang('msg_gl_fiscal_year_edit', $this->moduleID).'</p>
+        $output    = '<p>'.lang('msg_gl_fiscal_year_edit', $this->moduleID).'</p>
             <div id="fyCal" style="text-align:center">'.html5('fy', $fiscalY).html5('btnSaveFy', $btnSaveFy).'
             <table style="border-style:none;margin-left:auto;margin-right:auto;">
                 <thead class="panel-header">

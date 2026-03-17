@@ -151,10 +151,10 @@ class qualityTickets extends mgrJournal
 //      $props= dbMetaGet(0, "dashboard_{$menu}", 'contacts', getUserCache('profile', 'userID'));
         $dash = getDashboard($dashID); // , $props['$dashID']['opts']
         $cData= $dash->getData($range);
-        unset($data['source']['filters']['period']['sql'], $data['source']['filters']['jID']['sql']);
+        unset($data['source']['filters']['jID']['sql']); // $data['source']['filters']['period']['sql'],
         $data['source']['filters']['search']['attr']['value'] = '';
-        $data['source']['filters']['period']['attr']['value'] = 'a';
-        $data['source']['filters']['period']['sql'] = '';
+//      $data['source']['filters']['period']['attr']['value'] = 'a';
+//      $data['source']['filters']['period']['sql'] = '';
         $data['source']['filters']['status']['attr']['value'] = 'a';
         $data['source']['filters']['status']['sql'] = '';
         $data['source']['filters']['closed']['attr']['value'] = '0';
@@ -165,10 +165,12 @@ class qualityTickets extends mgrJournal
     private function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>getUserCache('profile', 'def_periods', '', 'l')], 'post');
+//      $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>getUserCache('profile', 'def_periods', '', 'l')], 'post');
         $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1], 'post');
         $this->defaults['closed']  = clean('closed',  ['format'=>'char',    'default'=>'a'],'post');
         $this->defaults['status']  = clean('status',  ['format'=>'db_field','default'=>'a'],'post');
+        $this->defaults['f0']      = clean('f0',      ['format'=>'char',    'default'=>'a'],'post');
+        $this->defaults['f1']      = clean('f1',      ['format'=>'integer', 'default'=> 0], 'post');
     }
 
     /******************************** Journal Manager ********************************/

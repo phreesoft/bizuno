@@ -128,6 +128,8 @@ class qualityAudits extends mgrJournal
         $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1],  'post');
         $this->defaults['closed']  = clean('closed',  ['format'=>'char',    'default'=>'a'], 'post');
         $this->defaults['status']  = clean('status',  ['format'=>'db_field','default'=>'a'], 'post');
+        $this->defaults['f0']      = clean('f0',      ['format'=>'char',    'default'=>'a'], 'post');
+        $this->defaults['f1']      = clean('f1',      ['format'=>'db_field','default'=> ''], 'post');
     }
 
     /******************************** Journal Manager ********************************/

@@ -351,16 +351,38 @@ jqBiz(window).on('resize', function() {
 });
 function resizeEverything() { ".implode(" ", $jsResize)." }"; }
         if ($addMsg) { $jsReady['msgStack'] = $html5->addMsgStack(); }
-        // Render the output
-        if (!empty($jsHead)) { // first
-            if ($this->is_multidimensional($jsHead)) { msgDebug("\nTrying to catch this error for jsHead: ".print_r($jsHead, true), 'trap'); } // trying to catch this weird error.
-            $dom .= '<script type="text/javascript">'."\n".implode("\n", is_array($jsHead) ? $jsHead : (array)$jsHead)."\n</script>\n";
+        if (!empty($jsHead)) {
+            $lines = [];
+            foreach ((array) $jsHead as $value) {
+                if (is_array($value)) {
+                    foreach ($value as $sub) { if (is_string($sub)) { $lines[] = $sub; } }
+                } elseif (is_string($value)) {
+                    $lines[] = $value;
+                }
+            }
+            if (!empty($lines)) { $dom .= '<script type="text/javascript">' . "\n" . implode("\n", $lines) . "\n</script>\n"; }
         }
-        if (!empty($jsBody)) { // second
-            $dom .= '<script type="text/javascript">'."\n".implode("\n", is_array($jsBody) ? $jsBody : (array)$jsBody)."\n</script>\n";
+        if (!empty($jsBody)) {
+            $scripts = [];
+            foreach ((array) $jsBody as $value) {
+                if (is_array($value)) { $scripts = array_merge($scripts, $value); } else { $scripts[] = $value; }
+            }
+            $scripts1 = array_filter($scripts, 'is_string');
+            if (!empty($scripts1)) { $dom .= '<script type="text/javascript">' . "\n" . implode("\n", $scripts) . "\n</script>\n"; }
         }
-        if (!empty($jsReady)) { // doc ready, last
-            $dom .= '<script type="text/javascript">'."jqBiz(document).ready(function() {\n".implode("\n", (array)$jsReady)."\n});\n</script>\n";
+        if (!empty($jsReady)) {
+            $readyLines = [];
+            foreach ((array)$jsReady as $value) {
+                if (is_array($value)) {
+                    foreach ($value as $item) { if (is_string($item)) { $readyLines[] = $item; } }
+                } elseif (is_string($value)) {
+                    $readyLines[] = $value;
+                }
+            }
+            $readyLines = array_filter(array_map('trim', $readyLines));
+            if (!empty($readyLines)) {
+                $dom .= '<script type="text/javascript">' . "jqBiz(document).ready(function() {\n" . implode("\n", $readyLines) . "\n});\n</script>\n";
+            }
         }
         return $dom;
     }
@@ -1355,8 +1377,8 @@ function adminStructure($module, $structure=[])
 {
     $props= getModuleCache($module, 'properties');
     msgDebug("\nmodule $module properties = ".print_r($props, true));
-    $title= getModuleCache($module, 'properties', 'title').' - '.lang('settings');
-    $html = "<h1>$title</h1><p>".getModuleCache($module, 'properties', 'description').'</p>';
+    $title= lang('title', $module).' - '.lang('settings');
+    $html = "<h1>$title</h1><p>".lang('description', $module).'</p>';
     $data = ['type'=>'divHTML', 'statsModule'=>$module, 'security'=>getUserCache('role', 'administrate'),
         'divs'    => [
             'intro'  => ['order'=>15,'type'=>'html', 'html'=>$html],

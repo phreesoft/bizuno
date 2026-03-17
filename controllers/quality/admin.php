@@ -69,30 +69,30 @@ class qualityAdmin
     public function settingsStructure()
     {
         $fields = [
-            'proc_sales'    => ['label'=>lang('proc_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_sales']]],
-            'stnd_sales'    => ['label'=>lang('stnd_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_sales']]],
-            'inst_sales'    => ['label'=>lang('inst_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_sales']]],
-            'proc_inv_mgr'  => ['label'=>lang('proc_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_inv_mgr']]],
-            'stnd_inv_mgr'  => ['label'=>lang('stnd_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_inv_mgr']]],
-            'inst_inv_mgr'  => ['label'=>lang('inst_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_inv_mgr']]],
-            'proc_receiving'=> ['label'=>lang('proc_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_receiving']]],
-            'stnd_receiving'=> ['label'=>lang('stnd_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_receiving']]],
-            'inst_receiving'=> ['label'=>lang('inst_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_receiving']]],
-            'proc_woProd'   => ['label'=>lang('proc_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_woProd']]],
-            'stnd_woProd'   => ['label'=>lang('stnd_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_woProd']]],
-            'inst_woProd'   => ['label'=>lang('inst_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_woProd']]],
-            'proc_qa_ticket'=> ['label'=>lang('proc_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_qa_ticket']]],
-            'stnd_qa_ticket'=> ['label'=>lang('stnd_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_qa_ticket']]],
-            'inst_qa_ticket'=> ['label'=>lang('inst_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_qa_ticket']]],
-            'proc_shipping' => ['label'=>lang('proc_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['proc_shipping']]],
-            'stnd_shipping' => ['label'=>lang('stnd_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['stnd_shipping']]],
-            'inst_shipping' => ['label'=>lang('inst_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>$this->settings['general']['inst_shipping']]]];
+            'proc_sales'    => ['label'=>lang('proc_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_sales'    => ['label'=>lang('stnd_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_sales'    => ['label'=>lang('inst_sales', $this->moduleID),    'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'proc_inv_mgr'  => ['label'=>lang('proc_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_inv_mgr'  => ['label'=>lang('stnd_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_inv_mgr'  => ['label'=>lang('inst_inventory', $this->moduleID),'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'proc_receiving'=> ['label'=>lang('proc_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_receiving'=> ['label'=>lang('stnd_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_receiving'=> ['label'=>lang('inst_receive', $this->moduleID),  'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'proc_woProd'   => ['label'=>lang('proc_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_woProd'   => ['label'=>lang('stnd_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_woProd'   => ['label'=>lang('inst_build', $this->moduleID),    'parent'=>'inventory','options'=>['width'=>600],'attr'=>['value'=>'']],
+            'proc_qa_ticket'=> ['label'=>lang('proc_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_qa_ticket'=> ['label'=>lang('stnd_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_qa_ticket'=> ['label'=>lang('inst_quality', $this->moduleID),  'parent'=>'quality',  'options'=>['width'=>600],'attr'=>['value'=>'']],
+            'proc_shipping' => ['label'=>lang('proc_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']],
+            'stnd_shipping' => ['label'=>lang('stnd_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']],
+            'inst_shipping' => ['label'=>lang('inst_shipping', $this->moduleID), 'parent'=>'tools',    'options'=>['width'=>600],'attr'=>['value'=>'']]];
         $data = [
             'manual' => ['order'=>20,'label'=>lang('quality_manual'),'fields'=>[
-                'manual_title'=> ['label'=>lang('manual_title', $this->moduleID),'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_title']]],
-                'manual_link' => ['label'=>lang('manual_link', $this->moduleID), 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>$this->settings['manual']['manual_link']]]]],
+                'manual_title'=> ['label'=>lang('manual_title', $this->moduleID),'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']],
+                'manual_link' => ['label'=>lang('manual_link', $this->moduleID), 'parent'=>'customers','options'=>['width'=>600],'attr'=>['value'=>'']]]],
             'general'=> ['order'=>30,'label'=>lang('general'),'fields'=>$fields]];
-//        settingsFill($data, $this->moduleID);
+        settingsFill($data, $this->moduleID);
         return $data;
     }
 

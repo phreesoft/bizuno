@@ -53,7 +53,7 @@ class ups extends upsCommon
     public function settingsStructure()
     {
         $servers  = [['id'=>'test','text'=>lang('test')],['id'=>'prod','text'=>lang('production')]];
-        $printers = [['id'=>'pdf', 'text'=>$this->lang['plain_paper']], ['id'=>'thermal', 'text'=>$this->lang['thermal']]];
+        $printers = [['id'=>'pdf', 'text'=>lang('plain_paper', $this->moduleID)], ['id'=>'thermal', 'text'=>lang('thermal', $this->moduleID)]];
         $services = [];
         foreach ($this->options['rateCodes'] as $code) { $services[] = ['id'=>$code, 'text'=>$this->lang[$code]]; }
         return [
@@ -62,12 +62,12 @@ class ups extends upsCommon
             'order'        => ['label'=>lang('sort_order'),          'position'=>'after','attr'=>['type'=>'integer','size'=>3,'value'=>$this->settings['order']]],
             'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
             'acct_number'  => ['label'=>$this->lang['acct_number'],  'position'=>'after','attr'=>['value'=>$this->settings['acct_number']]],
-            'rest_api_key' => ['label'=>$this->lang['rest_api_key_lbl'],'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_api_key']]],
-            'rest_secret'  => ['label'=>$this->lang['rest_secret_lbl'], 'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_secret']]],
+            'rest_api_key' => ['label'=>lang('rest_api_key_lbl', $this->moduleID),'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_api_key']]],
+            'rest_secret'  => ['label'=>lang('rest_secret_lbl', $this->moduleID), 'position'=>'after','attr'=>['size'=>48,'value'=>$this->settings['rest_secret']]],
             'ltl_class'    => ['label'=>$this->lang['def_ltl_class'],'position'=>'after','values'=>viewKeyDropdown($this->options['LTLClasses']),'attr'=>['type'=>'select','value'=>$this->settings['ltl_class']]],
             'ltl_desc'     => ['label'=>$this->lang['def_ltl_desc'], 'position'=>'after','attr'=>['value'=>$this->settings['ltl_desc']]],
-            'gl_acct_c'    => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v'    => ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'gl_acct_c'    => ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v'    => ['label'=>lang('gl_shipping_v_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
             'max_weight'   => ['label'=>$this->lang['max_weight'],   'position'=>'after','attr'=>['type'=>'integer','size'=>3,'maxlength'=>3,'value'=>$this->settings['max_weight']]],
             'recon_fee'    => ['label'=>$this->lang['recon_fee'],    'position'=>'after','styles'=>['text-align'=>'right'],'attr'=>['type'=>'float', 'size'=>10,'value'=>$this->settings['recon_fee']]],
             'recon_percent'=> ['label'=>$this->lang['recon_percent'],'position'=>'after','styles'=>['text-align'=>'right'],'attr'=>['type'=>'float', 'size'=> 5,'value'=>$this->settings['recon_percent']]],

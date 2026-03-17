@@ -43,13 +43,13 @@ class contactsAdmin
             'attachPath'=> ['contacts'=>'data/contacts/uploads/'],
             'menuBar'   => ['child'=>[
                 'customers'=> ['order'=>10,'label'=>('customers'),'group'=>'cust','icon'=>'sales','child'=>[
-                    'mgr_c'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_c')),'icon'=>'users','route'=>'contacts/main/manager&type=c'],
+                    'mgr_c'   => ['order'=>10,'label'=>'manager','icon'=>'users','route'=>'contacts/main/manager&type=c'],
                     'prices_c'=> ['order'=>70,'label'=>('prices_mgr'), 'icon'=>'price',  'route'=>'inventory/prices/manager&type=c'],
                     'projects'=> ['order'=>80,'label'=>('projects'),   'icon'=>'support','route'=>"$this->moduleID/projects/manager"],
                     'promos'  => ['order'=>90,'label'=>('promotions'), 'icon'=>'email',  'route'=>"$this->moduleID/promos/manager"],
                     'rpt_c'   => ['order'=>99,'label'=>('reports'),    'icon'=>'mimeDoc','route'=>'phreeform/main/manager&gID=cust']]],
                 'vendors'  => ['order'=>20,'label'=>('vendors'),  'group'=>'vend','icon'=>'purchase','child'=>[
-                    'mgr_v'   => ['order'=>10,'label'=>sprintf(lang('tbd_manager'), lang('ctype_v')),'icon'=>'users','route'=>"contacts/main/manager&type=v"],
+                    'mgr_v'   => ['order'=>10,'label'=>'manager','icon'=>'users','route'=>"contacts/main/manager&type=v"],
                     'prices_v'=> ['order'=>70,'label'=>('prices_mgr'), 'icon'=>'price',  'route'=>'inventory/prices/manager&type=v'],
                     'rpt_v'   => ['order'=>99,'label'=>('reports'),    'icon'=>'mimeDoc','route'=>'phreeform/main/manager&gID=vend']]]]],
 //          'hooks'     => ['phreebooks'=>['tools'=>['fyCloseHome'=>['order'=>50,'page'=>'tools'],'fyClose'=>['order'=>50,'page'=>'tools']]]],
@@ -147,9 +147,8 @@ class contactsAdmin
         $layout['fields']['enable_crm']= ['order'=>60, 'attr'=>['type'=>'selNoYes','checked'=>!empty($this->settings['enable_crm'])?true:false]];
         $layout['fields']['restrict']  = ['order'=>70, 'attr'=>['type'=>'selNoYes','checked'=>!empty($this->settings['restrict'])?true:false]];
         $settings = $this->settingsStructure();
-        $layout['lists']['crm'] = $settings['crm']['fields'];
+        $layout['lists']['crm'] = !empty($settings['crm']['fields']) ? $settings['crm']['fields'] : [];
         $layout['accordion']['accSettings']['divs']['crm'] = ['order'=>80, 'ui'=>'none', 'label'=>lang('ctype_i'), 'type'=>'list', 'key'=>'crm'];
-//      $layout['panel']['settings']['keys'] = array_merge($layout['panel']['settings']['keys'], ['enable_crm', 'restrict']);
         msgDebug("\nAfter cutomization adminHomeContact with layout = ".print_r($layout, true));
     }
 

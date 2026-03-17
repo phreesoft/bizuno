@@ -72,19 +72,19 @@ class endicia extends endiciaCommon
         foreach ($this->options['PackageMap'] as $key => $style)      { $packages[]  = ['id'=>$key, 'text'=>$style]; }
         foreach ($this->options['buyPostageAmounts'] as $amt => $text){ $buyAmounts[]= ['id'=>$amt, 'text'=>$text]; }
         return [
-            'client_key'   => ['label'=>$this->lang['client_key'],       'position'=>'after','attr'=>['size'=>80,'value'=>$this->settings['client_key']]],
+            'client_key'   => ['label'=>lang('client_key', $this->moduleID),       'position'=>'after','attr'=>['size'=>80,'value'=>$this->settings['client_key']]],
             'order'        => ['label'=>lang('sort_order'),              'position'=>'after','attr'=>['type'=>'integer','size'=>3,'value'=>$this->settings['order']]],
             'lbl_msg_1'    => ['label'=>$this->lang['lbl_msg_1'],        'position'=>'after','attr'=>['size'=>80,'value'=>$this->settings['lbl_msg_1']]],
             'lbl_msg_2'    => ['label'=>$this->lang['lbl_msg_2'],        'position'=>'after','attr'=>['size'=>80,'value'=>$this->settings['lbl_msg_2']]],
             'lbl_msg_3'    => ['label'=>$this->lang['lbl_msg_3'],        'position'=>'after','attr'=>['size'=>80,'value'=>$this->settings['lbl_msg_3']]],
             'handling_fee' => ['label'=>$this->lang['handling_fee'],     'position'=>'after','attr'=>['type'=>'float','size'=>6,'value'=>$this->settings['handling_fee']]],
-            'gl_acct'      => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct",'value'=>$this->settings['gl_acct']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'gl_acct'      => ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct",'value'=>$this->settings['gl_acct']]],
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID),'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
             'package_types'=> ['label'=>$this->lang['package_types'],    'position'=>'after','values'=>$packages,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['package_types']]],
             'funds_min'    => ['label'=>$this->lang['funds_min'],        'position'=>'after','attr'=>['type'=>'currency','value'=>$this->settings['funds_min']]],
             'funds_purch'  => ['label'=>$this->lang['funds_purch'],      'position'=>'after','values'=>$buyAmounts,'attr'=>['type'=>'select','value'=>$this->settings['funds_purch']]],
             'label_thermal'=> ['label'=>$this->lang['label_thermal'],    'position'=>'after','values'=>$this->options['paperTypes'],'attr'=>['type'=>'select','value'=>$this->settings['label_thermal']]],
-            'default'      => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
+            'default'      => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
     }
 
     /**

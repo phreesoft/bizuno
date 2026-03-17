@@ -83,7 +83,7 @@ class shippingAdmin extends shippingCommon
         $wghts = [['id'=>'LB', 'text'=>lang('pounds')], ['id'=>'KG', 'text'=>lang('kgs')]];
         $dims  = [['id'=>'IN', 'text'=>lang('inches')], ['id'=>'CM', 'text'=>lang('centimeters')]];
         return ['general' => ['order'=>10,'label'=>lang('general'),'fields'=>[
-            'bill_hq'        => ['attr'=>['type'=>'selNoYes','value'=>$this->settings['general']['general']['bill_hq']]],
+            'bill_hq'        => ['attr'=>['type'=>'selNoYes','value'=>$this->settings['general']['bill_hq']]],
             'block_trash'    => ['attr'=>['type'=>'selNoYes','value'=>$this->settings['general']['block_trash']]],
             'skip_guess'     => ['attr'=>['type'=>'selNoYes','value'=>$this->settings['general']['skip_guess']]],
             'gl_shipping_c'  => ['attr'=>['type'=>'ledger','id'=>'general_gl_shipping_c','value'=>$this->settings['general']['gl_shipping_c']]],

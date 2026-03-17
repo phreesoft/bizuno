@@ -179,6 +179,10 @@ function bizunoUpgrade()
         }
     }
 
+    if (version_compare($dbVer, '7.3.8') < 0) {
+        UpgradeNextRefs(); // Upgrade next refs meta to new structure
+    }
+
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
     require_once(BIZUNO_FS_LIBRARY.'controllers/administrate/tools.php');
     $ctl = new administrateTools();
@@ -193,6 +197,7 @@ function UpgradeNextRefs()
 {
     $meta= dbMetaGet(0, 'bizuno_refs');
     $rID = metaIdxClean($meta);
+    if (is_array($meta['next_ref_j12'])) { return; } // already converted, skip
     $newMeta = [
             'next_audit_num'   => ['label'=>'audit',         'value'=>$meta['next_audit_num']],
             'next_cproj_num'   => ['label'=>'ctype_j',       'value'=>$meta['next_cproj_num']],

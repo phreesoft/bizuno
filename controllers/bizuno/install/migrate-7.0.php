@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-21
+ * @version    7.x Last Update: 2026-03-16
  * @filesource /controllers/bizuno/install/migrate-7.0.php
  */
 
@@ -1656,6 +1656,7 @@ function migrate_rm_tables_pt1(&$cron=[])
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_prices');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_cogs_usage');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_cogs_owed');
+    dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'inventory_ms_list');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'sales_tax');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'tax_rates');
     dbGetResult('DROP TABLE IF EXISTS '.BIZUNO_DB_PREFIX.'phreeform');

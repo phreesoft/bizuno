@@ -52,8 +52,8 @@ class inventoryAdmin
             'api'       => ['path'=>'inventory/api/inventoryAPI'],
             'attachPath'=> ['inventory'=>'data/inventory/uploads/', 'production'=>'data/production/uploads/'],
             'menuBar'   => ['child'=>[
-                'inventory'=> ['order'=>30,       'label'=>('inventory'),'group'=>'inv','icon'=>'inventory','child'=>[
-                    'inv_mgr'    => ['order'=>20, 'label'=>('inentory_mgr'),'icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
+                'inventory'=> ['order'=>30,       'label'=>'inventory','group'=>'inv','icon'=>'inventory','child'=>[
+                    'inv_mgr'    => ['order'=>20, 'label'=>'manager','icon'=>'inventory','route'=>"$this->moduleID/$this->pageID/manager"],
                     'invBulkEdit'=> ['order'=>70, 'label'=>('bulk_edit'),   'icon'=>'edit',     'route'=>"$this->moduleID/bulkEdit/manager"],
                     'woProd'     => ['order'=>80, 'label'=>('production'),  'icon'=>'work',     'route'=>"$this->moduleID/build/manager",'child'=>[
                         'woDesign'=>['order'=>10,'label'=>('wo_design'),    'icon'=>'design',   'route'=>"$this->moduleID/design/manager"],
@@ -129,7 +129,7 @@ class inventoryAdmin
                 'stock_usage'    => ['attr'=>['type'=>'selNoYes', 'value'=>1]],
                 'inc_assemblies' => ['attr'=>['type'=>'selNoYes', 'value'=>1]],
                 'inc_committed'  => ['attr'=>['type'=>'selNoYes', 'value'=>1]]]],
-            'phreebooks'=> ['order'=>20,'label'=>getModuleCache('phreebooks', 'properties', 'title'),'fields'=>[
+            'phreebooks'=> ['order'=>20,'label'=>lang('phreebooks'),'fields'=>[
                 'sales_si'  => ['label'=>sprintf(lang('inv_sales_lbl', $this->moduleID), $si),'tip'=>lang('inv_sales_', $this->moduleID).lang('inventory_type_si'),'attr'=>['type'=>'ledger','id'=>'phreebooks_sales_si','value'=>$this->defaults['sales']]],
                 'inv_si'    => ['label'=>sprintf(lang('inv_inv_lbl', $this->moduleID), $si),  'tip'=>lang('inv_inv_', $this->moduleID)  .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_inv_si',  'value'=>$this->defaults['stock']]],
                 'cogs_si'   => ['label'=>sprintf(lang('inv_cogs_lbl', $this->moduleID), $si), 'tip'=>lang('inv_cogs_', $this->moduleID) .$si,'attr'=>['type'=>'ledger','id'=>'phreebooks_cogs_si', 'value'=>$this->defaults['cogs']]],

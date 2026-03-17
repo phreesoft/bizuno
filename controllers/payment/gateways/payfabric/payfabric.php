@@ -87,13 +87,13 @@ class payfabric
     public function settingsStructure()
     {
         return [
-            'cash_gl_acct'=> ['label'=>$this->lang['gl_payment_c_lbl'], 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
-            'disc_gl_acct'=> ['label'=>$this->lang['gl_discount_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
+            'cash_gl_acct'=> ['label'=>lang('gl_payment_c_lbl', $this->moduleID), 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
+            'disc_gl_acct'=> ['label'=>lang('gl_discount_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
             'order'       => ['label'=>lang('order'),             'position'=>'after','attr'=>['type'=>'integer', 'size'=>'3','value'=>$this->settings['order']]],
             'setup_id'    => ['label'=>$this->lang['setup_id'],   'position'=>'after','attr'=>['size'=>'32','value'=>$this->settings['setup_id']]],
             'device_id'   => ['label'=>$this->lang['device_id'],  'position'=>'after','attr'=>['size'=>'48','value'=>$this->settings['device_id']]],
             'device_pw'   => ['label'=>$this->lang['device_pw'],  'position'=>'after','attr'=>['size'=>'24','value'=>$this->settings['device_pw']]],
-            'prefix'      => ['label'=>$this->lang['prefix_lbl'], 'position'=>'after','attr'=>['size'=> '5','value'=>$this->settings['prefix']]],
+            'prefix'      => ['label'=>lang('prefix_lbl', $this->moduleID), 'position'=>'after','attr'=>['size'=> '5','value'=>$this->settings['prefix']]],
             'allowRefund' => ['label'=>$this->lang['allow_refund'],                   'attr'=>['type'=>'selNoYes','value'=>$this->settings['allowRefund']]]];
     }
 

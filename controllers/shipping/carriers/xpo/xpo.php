@@ -47,8 +47,8 @@ class xpo extends xpoCommon
         $services = [];
         foreach ($this->options['rateCodes'] as $code) { $services[] = ['id'=>$code, 'text'=>$this->lang[$code]]; }
         return [
-            'gl_acct_c'    => ['label'=>$this->lang['gl_shipping_c_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
-            'gl_acct_v'    => ['label'=>$this->lang['gl_shipping_v_lbl'],'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
+            'gl_acct_c'    => ['label'=>lang('gl_shipping_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_c",'value'=>$this->settings['gl_acct_c']]],
+            'gl_acct_v'    => ['label'=>lang('gl_shipping_v_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_gl_acct_v",'value'=>$this->settings['gl_acct_v']]],
             'order'        => ['label'=>lang('sort_order'),'position'=>'after','attr'=>['type'=>'integer','size'=>3,'value'=>$this->settings['order']]],
             'test_mode'    => ['label'=>$this->lang['test_mode'],    'position'=>'after','values'=>$servers,'attr'=>['type'=>'select','value'=>$this->settings['test_mode']]],
             'username'     => ['label'=>$this->lang['username'],     'position'=>'after','attr'=>['value'=>$this->settings['username']]],
@@ -56,10 +56,10 @@ class xpo extends xpoCommon
             'acct_id'      => ['label'=>$this->lang['acct_id'],      'position'=>'after','attr'=>['type'=>'integer', 'size'=>10, 'maxlength'=>9,'value'=>$this->settings['acct_id']]],
             'authorization'=> ['label'=>$this->lang['authorization'],'position'=>'after','attr'=>['value'=>$this->settings['authorization']]],
             'min_weight'   => ['label'=>$this->lang['min_weight'],   'position'=>'after','attr'=>['type'=>'integer','size'=>4,'maxlength'=>3,'value'=>$this->settings['min_weight']]],
-            'ltl_class'    => ['label'=>$this->lang['def_ltl_class'],'position'=>'after','values'=>viewKeyDropdown($this->LTLClasses),'attr'=>['type'=>'select','value'=>$this->settings['ltl_class']]],
+            'ltl_class'    => ['label'=>lang('def_ltl_class', $this->moduleID),'position'=>'after','values'=>viewKeyDropdown($this->options['LTLClasses']),'attr'=>['type'=>'select','value'=>$this->settings['ltl_class']]],
             'ltl_desc'     => ['label'=>$this->lang['def_ltl_desc'], 'position'=>'after','attr'=>['value'=>$this->settings['ltl_desc']]],
-            'service_types'=> ['label'=>$this->lang['shipping_settings_default_service'],'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
-            'default'      => ['label'=>$this->lang['shipping_settings_default_rate'],'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
+            'service_types'=> ['label'=>lang('shipping_settings_default_service', $this->moduleID),'position'=>'after','values'=>$services,'attr'=>['type'=>'select','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>$this->settings['service_types']]],
+            'default'      => ['label'=>lang('shipping_settings_default_rate', $this->moduleID),'position'=>'after','attr'=>['type'=>'selNoYes','value'=>$this->settings['default']]]];
     }
 
     public function settingSave()
