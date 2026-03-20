@@ -250,21 +250,18 @@ public function passkeySetup(&$layout = [])
     {
         global $currentUser;
         if (!BIZUNO_WEBAUTHN_ENABLED || empty($_SESSION['webauthn_challenge_reg'])) {
-            jsonReply(['success' => false, 'message' => 'Invalid session or not enabled']);
-            return;
+            return msgAdd('Invalid session or not enabled');
         }
 
         $userID = $currentUser['profile']['userID'] ?? 0;
         if (empty($userID)) {
-            jsonReply(['success' => false, 'message' => 'Not authenticated']);
-            return;
+            return msgAdd('Not authenticated');
         }
 
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         if (!$data) {
-            jsonReply(['success' => false, 'message' => 'Invalid request data']);
-            return;
+            return msgAdd('Invalid request data');
         }
 
         try {
@@ -293,16 +290,10 @@ public function passkeySetup(&$layout = [])
             saveMetaContact($userID, 'webauthn_credentials', $jsonSave);
             // Clean up session
             unset($_SESSION['webauthn_challenge_reg']);
-            jsonReply([
-                'success' => true,
-                'message' => 'Passkey registered successfully!'
-            ]);
+            msgAdd('Passkey registered successfully!', 'success');
         } catch (\Exception $e) {
             msgDebug("\nPasskey registration error: " . $e->getMessage());
-            jsonReply([
-                'success' => false,
-                'message' => 'Registration failed: ' . $e->getMessage()
-            ]);
+            msgAdd('Registration failed: ' . $e->getMessage());
         }
     }
     
