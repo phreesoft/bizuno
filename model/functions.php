@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-17
  * @filesource /model/functions.php
  */
 
@@ -295,6 +295,41 @@ function bizClrCookie($name)
     }
 }
 
+/**
+ * Get parsed 2FA + passkey settings from contacts_meta.webauthn_credentials
+ * Returns merged structure with safe defaults
+ *
+ * @param int $contactID
+ * @return array
+ */
+ function getUserAuthMethods($cID)
+{
+    if (empty($cID)) return ['passkeys' => [], '2fa' => ['enabled' => false, 'method' => 'none']];
+    $meta = getMetaContact($cID, 'webauthn_credentials');
+    // If not array or empty → defaults
+    if (!is_array($meta) || empty($meta)) {
+        return ['passkeys'=>[], '2fa'=>['enabled'=>false, 'method'=>'none']];
+    }
+    $normalized = [ // Normalize structure (handle legacy just-passkeys data)
+        'passkeys' => isset($meta['passkeys']) ? $meta['passkeys'] : (is_array($meta) ? $meta : []),
+        '2fa'      => $meta['2fa'] ?? ['enabled' => false, 'method' => 'none'],
+        'settings' => $meta['settings'] ?? []];
+    return $normalized;
+}
+
+/**
+ * Update only specific parts of webauthn_credentials meta, preserves existing passkeys and other data
+ * @param int   $cID
+ * @param array $updates    e.g. ['2fa' => ['enabled'=>true, 'method'=>'email']]
+ */
+function updateUserAuthMethods($cID, array $updates)
+{
+    if (empty($cID)) { return; }
+    $current = dbMetaGet(0, 'webauthn_credentials', 'contacts', $cID);
+    $rID = metaIdxClean($current); // note: this function modifies by ref, returns rID
+    $merged = array_replace_recursive($current, $updates);
+    dbMetaSet($rID, 'webauthn_credentials', $merged, 'contacts', $cID);
+}
 
 /**
  * Clears the Bizuno module cache forcing a reload at next page load
@@ -365,7 +400,9 @@ function langFillLabels(&$data, $module='')
     msgDebug("\nEntering langFillLabels");
     foreach (array_keys($data) as $key) {
         $data[$key]['label']??= lang($key.'_lbl', $module);
+        if ($data[$key]['label'] == $key.'_lbl') { $data[$key]['label'] = lang($key, 'module'); } // if no label, then try just the key
         $data[$key]['tip']  ??= lang($key.'_tip', $module);
+        if ($data[$key]['tip'] == $key.'_tip') { unset($data[$key]['tip']); } // if no tip, then don't show anything
     }
 }
 

@@ -44,6 +44,7 @@ class portalCtl
         global $msgStack, $io, $cleaner;
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         $msgStack= new messageStack();
+//msgTrap();
         $io      = new io();
         $cleaner = new cleaner();
         if (class_exists('lbuchs\\WebAuthn\\WebAuthn')) {

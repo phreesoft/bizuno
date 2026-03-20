@@ -99,9 +99,7 @@ class ifWooCommerce extends apiExport
                 'manager'=> ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'setInv' => ['order'=>20,'type'=>'panel','key'=>'setInv', 'classes'=>['block33']],
                     'setSync'=> ['order'=>30,'type'=>'panel','key'=>'setSync','classes'=>['block33']],
-                    'setConf'=> ['order'=>40,'type'=>'panel','key'=>'setConf','classes'=>['block33']],
-//                  'testTax'=> ['order'=>80,'type'=>'panel','key'=>'testTax','classes'=>['block33']],
-                    ]]]]],
+                    'setConf'=> ['order'=>40,'type'=>'panel','key'=>'setConf','classes'=>['block33']]]]]]],
             'panels' => [
                 'setInv' => ['title'=>$this->lang['upload_title'],'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmInv'],

@@ -67,13 +67,13 @@ class portalViewAuth
 // Temporary – run once for your user
 /*
 $userID = 808;  // e.g. 2 or whatever your contacts.id is
-$settings = $this->getUserAuthMethods($userID);
+$settings = getUserAuthMethods($userID);
 $settings['2fa'] = [
     'enabled' => true,
     'method'  => 'email'
     // leave other sub-keys empty for now
 ];
-$this->updateUserAuthMethods($userID, $settings);
+updateUserAuthMethods($userID, $settings);
 msgDebug("\n2FA enabled manually for testing on user $userID");
  */
         
@@ -100,7 +100,12 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
                     ];
                     setUserCookie($userData);
                     msgDebug("\n2FA verified → user logged in");
-                    $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]];
+                    $authMethods = getUserAuthMethods($userID);
+                    if (empty($authMethods['passkeys'])) { // Redirect to a dedicated setup page instead of immediate reload
+                        $layout = ['type'=>'guest', 'jsReady'=>['reload'=>"window.location.href = '".BIZUNO_URL_PORTAL."';"]];
+                    } else {
+                        $layout = ['type'=>'guest', 'jsReady'=>['reload'=>"location.reload();"]];
+                    }
                     return;
                 }
             } else {
@@ -125,12 +130,12 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
             } else {
                 msgDebug("\nEmail exists, checking if passkey is enabled.");
                 $this->viewAuth($layout, $email);
-                $creds = getMetaContact($user['id'], 'webauthn_credentials');
-                if (empty($creds)) { // Add sign up for passkey language
+//                $creds = getMetaContact($user['id'], 'webauthn_credentials');
+/*                if (empty($creds)) { // Add sign up for passkey language
                     $layout['divs']['body']['divs']['body']['html'] .= $this->addPasskey();
                 } else {
                     $layout['divs']['body']['divs']['body']['html'] .= $this->showPasskey();
-                }
+                } */
             }
         } elseif (isset($_POST['bizUser']) && isset($_POST['bizPass'])) { // Step 3: Password has been entered (not using webauthn)
             msgDebug("\nCredentials sent, trying to validate.");
@@ -150,10 +155,10 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
     private function viewIntro(&$layout=[])
     {
         $html = '<div>'.html5('', $this->logo).'</div>
-<div class="text">'.$this->lang['welcome'].'</div>
-<div class="field"><input type="text" name="bizUser" placeholder="'.$this->lang['email'].'"></div>
-<div class="field"><select name="bizLang"><option value="en_US">English (US)</option></select></div>
-<button>'.$this->lang['signin'].'</button>';
+    <div class="text">'.$this->lang['welcome'].'</div>
+    <div class="field"><input type="text" name="bizUser" placeholder="'.$this->lang['email'].'" autofocus></div>
+    <div class="field"><select name="bizLang"><option value="en_US">English (US)</option></select></div>
+    <button type="submit">'.$this->lang['continue'].' →</button>';
         if (!empty($this->errors)) { $html .= '<div class="error">'.$this->errors.'</div>'; }
         $layout = ['type'=>'guest',
             'divs' => ['body' =>['order'=>50,'type'=>'divs','classes'=>['login-form'],'divs'=>[
@@ -171,18 +176,33 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
      */
     public function viewAuth(&$layout=[], $email='')
     {
+        $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id'], "ctype_u='1' AND email='".clean('bizUser','email','post')."'");
+        $userID = $user['id'] ?? 0;
+        $hasPasskeys = false;
+        if ($userID && BIZUNO_WEBAUTHN_ENABLED) {
+            $authMethods = getUserAuthMethods($userID);
+            $hasPasskeys = !empty($authMethods['passkeys']);
+        }
         $jsAuth = "";
         $htmlExtra = "";
+        $passkeyHtml = "";
         if (BIZUNO_WEBAUTHN_ENABLED) {
-            $jsAuth    = $this->viewAuthnJS();
+            $jsAuth = $this->viewAuthnJS();
             $htmlExtra = '<script src="https://unpkg.com/@simplewebauthn/browser@13/dist/bundle/index.umd.min.js"></script>'."\n";
+            if ($hasPasskeys) { $passkeyHtml = $this->showPasskey(); }
+//            else              { $passkeyHtml = $this->addPasskey(); } // too early in the process, need to auth with password first
         }
         $html = '<div>'.html5('', $this->logo).'</div>
-<div class="text">'.$this->lang['please_auth'].'<input type="hidden" name="bizUser" value="'.$email.'"></div>
-<div class="field"><input type="password" name="bizPass" placeholder="'.$this->lang['password'].'"></div>
-<button>'.$this->lang['signin'].'</button>
-' . $htmlExtra . '
-<div><a href="'.BIZUNO_URL_PORTAL.'?bizRt=portal/api/lostPW">'.$this->lang['password_lost'].'</a></div>';
+    <div class="text">'.$this->lang['please_auth'].'<input type="hidden" name="bizUser" value="'.htmlspecialchars($email).'"></div>';
+        // If passkeys exist → make biometric the most prominent
+        if ($hasPasskeys) {
+            $html .= $passkeyHtml . '<hr><div class="small text-center">or use password below</div>';
+        }
+        $html .= '<div class="field"><input type="password" name="bizPass" placeholder="'.$this->lang['password'].'" '.($hasPasskeys ? 'autocomplete="off"' : '').'></div>
+    <button type="submit">'.$this->lang['signin'].'</button><br />
+    <div><a href="'.BIZUNO_URL_PORTAL.'?bizRt=portal/api/lostPW">'.$this->lang['password_lost'].'</a></div>';
+        if (!$hasPasskeys) { $html .= $passkeyHtml; }
+        $html .= $htmlExtra;
         if (!empty($this->errors)) { $html .= '<div class="error">'.$this->errors.'</div>'; }
         $layout = ['type'=>'guest',
             'divs' => ['body' =>['order'=>50,'type'=>'divs','classes'=>['login-form'],'divs'=>[
@@ -193,68 +213,20 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
             'jsReady'=> ['authn'=>$jsAuth]];
     }
 
-public function view2faCodeEntry(&$layout, $email)
-{
-    $attemptsUsed = isset($_SESSION['biz_2fa_temp']['attempts']) ? $_SESSION['biz_2fa_temp']['attempts'] : 0;
-    $remaining    = max(0, 5 - $attemptsUsed);
-
-    $html = '<div>' . html5('', $this->logo) . '</div>'
-          . '<div class="text">Two-Factor Authentication</div>'
-          . '<div class="info">Enter the 6-digit code sent to <strong>' . htmlspecialchars($email) . '</strong></div>';
-
-    if ($remaining < 5 && $remaining > 0) {
-        $html .= '<div class="info small">Attempts remaining: ' . $remaining . '</div>';
-    }
-
-    $html .= '<div class="field">'
-           . '<input type="hidden" name="bizUser" value="' . htmlspecialchars($email) . '">'
-           . '<input type="hidden" name="step" value="verify_2fa">'
-           . '<input type="text" name="code" placeholder="123456" maxlength="6" pattern="[0-9]{6}" '
-           . 'inputmode="numeric" required autofocus autocomplete="one-time-code">'
-           . '</div>'
-           . '<button type="submit">' . ($this->lang['verify'] ?? 'Verify') . '</button>'
-           . '<div class="small"><a href="' . BIZUNO_URL_PORTAL . '">Start over</a> | '
-           . '<a href="#" onclick="event.preventDefault(); location.reload();">Resend code</a></div>';
-
-    if (!empty($this->errors)) {
-        $html .= '<div class="error">' . htmlspecialchars($this->errors) . '</div>';
-    }
-
-    $layout = [
-        'type'  => 'guest',
-        'divs'  => [
-            'body' => [
-                'order'   => 50,
-                'type'    => 'divs',
-                'classes' => ['login-form'],
-                'divs'    => [
-                    'formBOF' => ['order'=>20, 'type'=>'form', 'key'=>'frm2fa'],
-                    'body'    => ['order'=>51, 'type'=>'html', 'html'=>$html],
-                    'formEOF' => ['order'=>90, 'type'=>'html', 'html'=>'</form>']
-                ]
-            ]
-        ],
-        'forms' => [
-            'frm2fa' => ['attr'=>['type'=>'form', 'method'=>'post']]
-        ],
-        'jsReady' => ['focus'=>"document.querySelector('input[name=\"code\"]').focus();"]
-    ];
-}
-
     /**
      * Adds the passkey HTML if needed to get user to sign up.
      * @return string
      */
-    private function addPasskey()
+/*    private function addPasskey()
     {
         msgDebug("\nEntering addPasskey");
         if (!BIZUNO_WEBAUTHN_ENABLED) { return ''; }
-        return '<hr />
+        return '<br /><hr /><br />
 <div class="info">'.'Would you like to add a <strong>passkey</strong> for faster, more secure, passwordless login using your fingerprint, face ID, or device PIN?'.'</div>
 <div class="info">'.'This takes ~15 seconds and makes future logins much easier and more secure.'.'</div>
 <input type="hidden" name="addPasskey" value="1">
 <button id="btn-register-passkey" type="button">'.'Yes — Set Up Passkey Now'.'</button>';
-    }
+    } */
     
     /**
      * Handles the HTML to sign in with Passkey
@@ -269,10 +241,57 @@ public function view2faCodeEntry(&$layout, $email)
 <button id="btn-passkey-login" type="button">Sign In with Passkey / Biometric</button>';
     }
     
+    public function view2faCodeEntry(&$layout, $email)
+    {
+        $attemptsUsed = isset($_SESSION['biz_2fa_temp']['attempts']) ? $_SESSION['biz_2fa_temp']['attempts'] : 0;
+        $remaining    = max(0, 5 - $attemptsUsed);
+
+        $html = '<div>' . html5('', $this->logo) . '</div>'
+              . '<div class="text">Two-Factor Authentication</div>'
+              . '<div class="info">Enter the 6-digit code sent to <strong>' . htmlspecialchars($email) . '</strong></div>';
+
+        if ($remaining < 5 && $remaining > 0) {
+            $html .= '<div class="info small">Attempts remaining: ' . $remaining . '</div>';
+        }
+
+        $html .= '<div class="field">'
+               . '<input type="hidden" name="bizUser" value="' . htmlspecialchars($email) . '">'
+               . '<input type="hidden" name="step" value="verify_2fa">'
+               . '<input type="text" name="code" placeholder="123456" maxlength="6" pattern="[0-9]{6}" '
+               . 'inputmode="numeric" required autofocus autocomplete="one-time-code">'
+               . '</div>'
+               . '<button type="submit">' . ($this->lang['verify'] ?? 'Verify') . '</button>'
+               . '<div class="small"><a href="' . BIZUNO_URL_PORTAL . '">Start over</a> | '
+               . '<a href="#" onclick="event.preventDefault(); location.reload();">Resend code</a></div>';
+
+        if (!empty($this->errors)) {
+            $html .= '<div class="error">' . htmlspecialchars($this->errors) . '</div>';
+        }
+
+        $layout = [
+            'type'  => 'guest',
+            'divs'  => [
+                'body' => [
+                    'order'   => 50,
+                    'type'    => 'divs',
+                    'classes' => ['login-form'],
+                    'divs'    => [
+                        'formBOF' => ['order'=>20, 'type'=>'form', 'key'=>'frm2fa'],
+                        'body'    => ['order'=>51, 'type'=>'html', 'html'=>$html],
+                        'formEOF' => ['order'=>90, 'type'=>'html', 'html'=>'</form>']
+                    ]
+                ]
+            ],
+            'forms' => [
+                'frm2fa' => ['attr'=>['type'=>'form', 'method'=>'post']]
+            ],
+            'jsReady' => ['focus'=>"document.querySelector('input[name=\"code\"]').focus();"]
+        ];
+    }
+
     private function viewAuthnJS()
     {
         return "const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
-// Register passkey (shown after password login or in profile)
 document.getElementById('btn-register-passkey')?.addEventListener('click', async () => {
   try {
     const resp = await fetch('".BIZUNO_URL_PORTAL."?bizRt=portal/api/webauthnRegisterOptions', { method: 'POST' });
@@ -295,12 +314,11 @@ document.getElementById('btn-register-passkey')?.addEventListener('click', async
     alert('Error: ' + err.message);
   }
 });
-// Login with passkey
 document.getElementById('btn-passkey-login')?.addEventListener('click', async () => {
   const email = document.querySelector('input[name=\"bizUser\"]')?.value.trim();
   if (!email) return alert('Please enter your email first');
   try {
-    const resp = await fetch('".BIZUNO_URL_PORTAL."?bizRt=portal/api/webauthnAuthOptions?bizUser=' + encodeURIComponent(email), { method: 'POST' });
+    const resp = await fetch('".BIZUNO_URL_PORTAL."?bizRt=portal/api/webauthnAuthOptions&bizUser=' + encodeURIComponent(email), { method: 'POST' });
     if (!resp.ok) throw new Error(await resp.text());
     const opts = await resp.json();
     const assertion = await startAuthentication(opts);
@@ -310,7 +328,24 @@ document.getElementById('btn-passkey-login')?.addEventListener('click', async ()
       body: JSON.stringify(assertion)
     });
     if (verify.ok) {
-      location.reload();
+      // Instead of reload → submit hidden form to trigger validateUser with bypass
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '';
+      form.style.display = 'none';
+
+      const inputEmail = document.createElement('input');
+      inputEmail.name = 'bizUser';
+      inputEmail.value = email;
+      form.appendChild(inputEmail);
+
+      const inputPasskey = document.createElement('input');
+      inputPasskey.name = 'usePasskey';
+      inputPasskey.value = 'verified';
+      form.appendChild(inputPasskey);
+
+      document.body.appendChild(form);
+      form.submit();
     } else {
       alert('Authentication failed');
     }
@@ -321,89 +356,64 @@ document.getElementById('btn-passkey-login')?.addEventListener('click', async ()
 });";
     }
 
-    /**
-     * Update only specific parts of webauthn_credentials meta
-     * Preserves existing passkeys and other data
-     *
-     * @param int   $contactID
-     * @param array $updates    e.g. ['2fa' => ['enabled'=>true, 'method'=>'email']]
-     */
-    private function updateUserAuthMethods($contactID, array $updates)
-    {
-        if (empty($contactID)) return;
-        $current = $this->getUserAuthMethods($contactID);
-        // Merge updates recursively (protects passkeys array especially)
-        $merged = array_replace_recursive($current, $updates);
-        // Clean for save (get rID if exists)
-        $metaForSave = $merged;
-        $rID = metaIdxClean($metaForSave); // note: this function modifies by ref, returns rID
-        dbMetaSet($rID, 'webauthn_credentials', $merged, 'contacts', $contactID);
-    }
-
     private function validateUser(&$layout=[])
     {
         msgDebug("\nEntering validateUser.");
-        $email= clean('bizUser', 'email', 'post'); // email address
+        $email = clean('bizUser', 'email', 'post');
         $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");
-        if (empty($user['id']) || empty($_POST['bizPass'])) {
+        if (empty($user['id'])) {
             $this->errors = $this->lang['err_invalid_creds'];
-            return;
+            return false;
         }
-        $encPW   = getMetaContact($user['id'], 'user_auth');
-        $profile = getMetaContact($user['id'], 'user_profile');
-        $peppered= hash_hmac('sha256', $_POST['bizPass'], BIZUNO_KEY);
-        if (password_verify($peppered, $encPW['value'])) {
-            $userID = $user['id'];
-            $authMethods = $this->getUserAuthMethods($userID);
-            if (!empty($authMethods['2fa']['enabled'])) {
-                $method = $authMethods['2fa']['method'] ?? 'none';
-
-                if ($method === 'email') {
-                    $this->sendEmailVerificationCode($userID, $email);
-                    // Instead of completing login, show 2FA form
-                    $this->view2faCodeEntry($layout, $email);
-                    return false;  // prevent completing login yet
-                }
-                // Later branches: 'sms', 'totp' ...
-            }
-            // If no 2FA required (or method=none), proceed as before
-            msgDebug("\nNo 2FA required or not enabled.");
+        // Check if this is a passkey login attempt (we'll set this flag later in verify)
+        if (!empty($_POST['usePasskey']) && $_POST['usePasskey'] === 'verified') {
+            // Passkey already verified in webauthnAuthVerify → skip password & 2FA
+            $profile = getMetaContact($user['id'], 'user_profile');
             $userData = [
-                'userID'    => $userID,
-                'psID'      => 0,
+                'userID' => $user['id'],
+                'psID'   => 0,
                 'userEmail' => $email,
-                'userRole'  => $profile['role_id'],
-                'userName'  => $user['primary_name']
+                'userRole' => $profile['role_id'] ?? 0,
+                'userName' => $user['primary_name']
             ];
             setUserCookie($userData);
             $layout['jsReady']['reload'] = "window.location.href = '".BIZUNO_URL_PORTAL."'";
+            msgDebug("\nPasskey login successful - 2FA bypassed");
             return true;
         }
-        $this->errors = $this->lang['err_invalid_creds'];
-    }
-
-    /**
-     * Get parsed 2FA + passkey settings from contacts_meta.webauthn_credentials
-     * Returns merged structure with safe defaults
-     *
-     * @param int $contactID
-     * @return array
-     */
-    private function getUserAuthMethods($contactID)
-    {
-        if (empty($contactID)) return ['passkeys' => [], '2fa' => ['enabled' => false, 'method' => 'none']];
-        $meta = getMetaContact($contactID, 'webauthn_credentials');
-        // If not array or empty → defaults
-        if (!is_array($meta) || empty($meta)) {
-            return ['passkeys'=>[], '2fa'=>['enabled'=>false, 'method'=>'none']];
+        // Normal password flow
+        if (empty($_POST['bizPass'])) {
+            $this->errors = $this->lang['err_invalid_creds'];
+            return false;
         }
-        // Normalize structure (handle legacy just-passkeys data)
-        $normalized = [
-            'passkeys' => isset($meta['passkeys']) ? $meta['passkeys'] : (is_array($meta) ? $meta : []),
-            '2fa'      => $meta['2fa'] ?? ['enabled' => false, 'method' => 'none'],
-            'settings' => $meta['settings'] ?? []
+        $encPW = getMetaContact($user['id'], 'user_auth');
+        $peppered = hash_hmac('sha256', $_POST['bizPass'], BIZUNO_KEY);
+        if (!password_verify($peppered, $encPW['value'] ?? '')) {
+            $this->errors = $this->lang['err_invalid_creds'];
+            return false;
+        }
+        $userID = $user['id'];
+        $authMethods = getUserAuthMethods($userID);
+        if (!empty($authMethods['2fa']['enabled'])) {
+            $method = $authMethods['2fa']['method'] ?? 'none';
+            if ($method === 'email') {
+                $this->sendEmailVerificationCode($userID, $email);
+                $this->view2faCodeEntry($layout, $email);
+                return false; // pause here
+            }
+        }
+        // No 2FA or completed → login
+        $profile = getMetaContact($userID, 'user_profile');
+        $userData = [
+            'userID' => $userID,
+            'psID'   => 0,
+            'userEmail' => $email,
+            'userRole' => $profile['role_id'] ?? 0,
+            'userName' => $user['primary_name']
         ];
-        return $normalized;
+        setUserCookie($userData);
+        $layout['jsReady']['reload'] = "window.location.href = '".BIZUNO_URL_PORTAL."'";
+        return true;
     }
 
     /**
@@ -440,7 +450,7 @@ document.getElementById('btn-passkey-login')?.addEventListener('click', async ()
         msgDebug("\n2FA email code ($code) sent to {$email}");
     }
     
-        /**
+    /**
     * Check if submitted code matches the session-stored hash
     * Includes basic brute-force protection (max 5 attempts)
     *
