@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /portal/controller.php
  */
 
@@ -44,17 +44,8 @@ class portalCtl
         global $msgStack, $io, $cleaner;
         if (session_status() === PHP_SESSION_NONE) { session_start(); }
         $msgStack= new messageStack();
-//msgTrap();
         $io      = new io();
         $cleaner = new cleaner();
-        if (class_exists('lbuchs\\WebAuthn\\WebAuthn')) {
-            define('BIZUNO_WEBAUTHN_ENABLED', true);
-            msgDebug("\nlbuchs/WebAuthn DETECTED - enabling passkeys.");
-            $this->initWebAuthn();
-        } else {
-            define('BIZUNO_WEBAUTHN_ENABLED', false);
-            msgDebug("\nlbuchs/WebAuthn NOT detected - skipping passkey support.");
-        }
 
 //bizClrCookie('bizunoUser');
 //bizClrCookie('bizunoSession');
@@ -263,16 +254,6 @@ class portalCtl
         $myLang = clean('bizunoLang', ['format'=>'cmd', 'default'=>'en_US'], 'get');
         if ($myLang<>'en_US') { $lang = $myLang; }
         $bizunoLang = loadBaseLang($lang);
-    }
-
-    private function initWebAuthn()
-    {
-        $rpName = 'Bizuno ERP';
-        $rpId   = parse_url(BIZUNO_URL_PORTAL, PHP_URL_HOST);
-        $this->webauthn = new WebAuthn($rpName, $rpId);
-        // Optional: customize (e.g., timeout in seconds, algorithms)
-        $this->webauthn->timeout = 60;
-        // $this->webauthn->addRootCertificates(...); // if using attestation 'direct'
     }
 
     private function cleanBizRt()

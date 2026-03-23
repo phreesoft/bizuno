@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-09
+ * @version    7.x Last Update: 2026-03-20
  * @filesource /view/easyUI/common.js
  */
 
@@ -115,63 +115,6 @@ if (typeof sessionStorage.bizuno !== 'undefined') {
 } else if (typeof bizDefaults.regions==='undefined') { // issue loading cache try again
     reloadSessionStorage();
 } 
-
-window.performPasskeyRegistration = function(rawInput) {
-    console.log('[performPasskeyRegistration] Input received');
-
-    // 1. Parse if string, otherwise use as-is
-    let data = (typeof rawInput === 'string') ? JSON.parse(rawInput) : rawInput;
-
-    /**
-     * 2. Extract the core options. 
-     * SimpleWebAuthn's startRegistration() expects the options object DIRECTLY.
-     * Do NOT wrap it in { publicKey: ... } yourself; the library handles that.
-     */
-    const options = data.publicKey || data; 
-
-    console.log('[performPasskeyRegistration] Calling startRegistration with options:', options);
-
-    if (!window.SimpleWebAuthnBrowser?.startRegistration) {
-        console.error('SimpleWebAuthnBrowser.startRegistration not found');
-        alert('Passkey library not ready');
-        return;
-    }
-
-    // 3. CALL THE LIBRARY - pass the options object directly
-    window.SimpleWebAuthnBrowser.startRegistration(options)
-        .then(credential => {
-            console.log('[performPasskeyRegistration] Credential generated:', credential);
-            
-            // 4. Send the result back to your server for verification
-            return fetch('?bizRt=bizuno/profile/passkeyVerify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(credential)
-            });
-        })
-        .then(resp => {
-            if (!resp.ok) throw new Error('Network error during verification');
-            return resp.json();
-        })
-        .then(result => {
-            if (result.success) {
-                alert(result.message || 'Passkey registered successfully!');
-                location.reload();
-            } else {
-                alert('Verification failed: ' + (result.message || 'Unknown error'));
-            }
-        })
-        .catch(err => {
-            // Handle user cancellation gracefully
-            if (err.name === 'NotAllowedError') {
-                console.warn('User cancelled passkey creation.');
-                return;
-            }
-            console.error('[performPasskeyRegistration] Error:', err);
-            alert('Passkey error: ' + (err.message || 'Unknown error'));
-        });
-};
-
 
 jqBiz.cachedScript = function( url, options ) {
     options = jqBiz.extend( options || {}, { dataType: "script", cache: true, url: url });
