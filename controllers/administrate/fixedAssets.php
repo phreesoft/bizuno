@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-03-25
  * @filesource /controllers/administrate/fixedAssets.php
  */
 
@@ -40,12 +40,15 @@ class administrateFixedAssets extends mgrJournal
     {
         parent::__construct();
         $this->faTypes   = getModuleCache('bizuno', 'options', 'faTypes');
+        $this->schedules = getMetaCommon('fixed_assets_schedules');
+        msgDebug("\nRead schedules = ".print_r($this->schedules, true));
         $this->condition = ['n'=>lang('new'),   'u'=>lang('used')];
         $this->status    = [ 0 =>lang('active'), 1 =>lang('inactive')];
         $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', $this->pageID);
         $this->managerSettings();
         $this->fieldStructure();
     }
+
     private function fieldStructure()
     {
         $stores = getModuleCache('bizuno', 'stores');
@@ -161,7 +164,7 @@ class administrateFixedAssets extends mgrJournal
         $layout['divs']['content']['divs']['atch'] = ['order'=>80,'type'=>'panel','key'=>"atch{$this->domSuffix}",'classes'=>['block50']];
         $layout['panels']["atch{$this->domSuffix}"]= ['type'=>'attach','attr'=>['id'=>"atch{$this->domSuffix}"],'defaults'=>['path'=>$this->attachPath, 'prefix'=>"rID_{$rID}_"]];
         // add calculate depreciation button
-        $layout['fields']['calc_dep'] = ['order'=>50, 'label'=>lang('calculate_cost'), 'icon'=>'price', 'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/getSchedValue', jqBiz(this).prev('input').attr('id'));"]];
+        $layout['fields']['calc_dep'] = ['order'=>50, 'label'=>lang('calculate_cost'), 'icon'=>'price', 'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/getSchedValue', $rID);"]];
         $layout['panels']['status']['keys'][] = 'calc_dep';
         // Stores
         $rID = clean('rID', 'integer', 'get');
@@ -264,16 +267,15 @@ class administrateFixedAssets extends mgrJournal
         $age  = biz_date('Y') - substr($value['date_acq'], 0, 4) - 1; // map to index of schedule
         $curValue = $value['cost'];
         msgDebug("\nWorking with age = $age and value = $curValue");
-        $schedules = getModuleCache('proGL', 'sched');
-        if (!sizeof($schedules)) { return msgAdd(sprintf(lang('err_no_sched', $this->moduleID), lang('all'))); }
-        foreach ($schedules as $title => $sched) {
+        if (!sizeof($this->schedules)) { return msgAdd(sprintf(lang('err_no_sched', $this->moduleID), lang('all'))); }
+        foreach ($this->schedules as $title => $sched) {
             msgDebug("\nAnalyzing schedule titled: $title");
             if ($value['dep_sched'] <> $title) { continue; }
             msgDebug("\nMatched title: $title and schedule: ".print_r($sched, true));
             foreach ($sched as $idx => $percent) {
                 if ($age >= $idx) {
                     msgDebug("\nCalculating cost off of index $idx");
-                    $curValue = $value['cost'] * $percent;
+                    $curValue = $value['cost'] * ($percent/100);
                 }
             }
         }
@@ -298,9 +300,8 @@ class administrateFixedAssets extends mgrJournal
         $titles = $this->getTitles();
         if (!$title && sizeof($titles) > 0) { $title = $titles[0]['id']; }
         $dgRows = [];
-        $scheds = dbMetaGet(0, 'fixed_assets_schedules');
-        if (empty($scheds[$title])) { $scheds[$title] = []; }
-        foreach ($scheds[$title] as $row) { $dgRows[] = ['label'=>$row]; }
+        if (empty($this->schedules[$title])) { $this->schedules[$title] = []; }
+        foreach ($this->schedules[$title] as $row) { $dgRows[] = ['label'=>$row]; }
         $jsBody = "var faSchedData = ".json_encode(['total'=>sizeof($dgRows),'rows'=>$dgRows]).";
 function faSchedSave() {
     var title = jqBiz('#schedCat').combobox('getValue');
@@ -348,11 +349,8 @@ function faSchedSave() {
      */
     private function getTitles($addNull = false)
     {
-        msgDebug("\nEntering getTitles");
-        $schedules = dbMetaGet(0, 'fixed_assets_schedules');
-        metaIdxClean($schedules);
-        msgDebug("\nRead schedules = ".print_r($schedules, true));
-        $tmp = array_keys($schedules);
+        msgDebug("\nEntering getTitles with addNull = $addNull");
+        $tmp = array_keys($this->schedules);
         $titles = $addNull ? [['id'=>'','text'=>lang('new')]] : [];
         foreach ($tmp as $value) { $titles[] = ['id'=>$value, 'text'=>$value]; }
         return $titles;

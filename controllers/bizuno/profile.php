@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-03-25
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -60,7 +60,6 @@ class bizunoProfile extends mgrJournal
     
     public function edit(&$layout=[])
     {
-        msgTrap();
         if (empty(getUserCache('profile', 'userID'))) { return; }
         $metaVal = dbMetaGet(0, $this->metaPrefix, 'contacts', getUserCache('profile', 'userID'));
         msgDebug("\nRead meta pre process = ".print_r($metaVal, true));

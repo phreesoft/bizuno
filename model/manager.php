@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-25
  * @filesource /model/manager.php
  */
 
@@ -252,7 +252,7 @@ class mgrJournal
             msgDebug("\nRead db row = ".print_r($dbRow, true));
             $dbData  = mapDBtoMeta($this->struc, $dbRow);
             msgDebug("\nMapped db to meta = ".print_r($dbData, true));
-            $defs['title'] = '<h1>'.lang('edit').': '.$dbData['title']."</h1>";
+            $defs['title'] = '<h1>'.lang('edit').': '.$dbRow['invoice_num'].' - '.$dbData['title']."</h1>";
         } elseif (!empty($taskID)) { // it's a new task direct from the journal tab
             $metaData= dbMetaGet($taskID, $this->metaPrefix);
             $dbData  = array_replace($metaData, ['id'=>0, 'user_id'=>getUserCache('profile', 'userID')]); 

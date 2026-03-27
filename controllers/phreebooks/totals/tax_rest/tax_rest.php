@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-25
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -138,27 +138,39 @@ class tax_rest
         $html .= html5($this->code.'_gl', $this->fields[$this->code.'_gl']);
         $html .= "</div>";
         htmlQueue("
-function totals_$this->code(begBalance) {
-    var tax_rest  = 0;
-    var newBalance= begBalance;
-    var address1  = bizTextGet('address1_s');
-    var address2  = bizTextGet('address2_s');
-    var city      = bizTextGet('city_s');
-    var bizState  = bizSelGet('state_s');
-    var zip       = bizTextGet('postal_code_s');
-    var bizCntry  = bizSelGet('country_s');
-    var ship      = bizNumGet('freight');
-    var total     = bizNumGet('total_amount');
-    var curTax    = bizNumGet('totals_$this->code');
-    if (0==bizCheckBoxGet('tax_exempt') && zip !=='' && begBalance !== 0) {
-        jqBiz.ajax({ url:bizunoAjax+'&bizRt=phreebooks/restfulTax/getTaxRate&address1='+address1+'&address2='+address2+'&city='+city+'&state='+bizState+'&postal_code='+zip+'&country='+bizCntry+'&shipping='+ship+'&total='+begBalance, async:false, success:function(resp) {
-        tax_rest = resp;
- } });
-    } else { tax_rest = 0; }
-    newBalance   += parseFloat(tax_rest);
-    var curISO    = jqBiz('#currency').val() ? jqBiz('#currency').val() : bizDefaults.currency.defaultCur;
-    var decLen    = parseInt(bizDefaults.currency.currencies[curISO].dec_len);
-    bizNumSet('totals_$this->code', tax_rest);
+function totals_{$this->code}(begBalance) {
+    var tax_rest = 0;
+    var newBalance = begBalance;
+    var address1 = bizTextGet('address1_s');
+    var address2 = bizTextGet('address2_s');
+    var city     = bizTextGet('city_s');
+    var bizState = bizSelGet('state_s');
+    var zip      = bizTextGet('postal_code_s');
+    var bizCntry = bizSelGet('country_s');
+    var ship     = bizNumGet('freight');
+    var total    = bizNumGet('total_amount'); // not used in AJAX but kept for consistency
+    if (0 == bizCheckBoxGet('tax_exempt') && zip !== '' && begBalance !== 0) {
+        jqBiz.ajax({
+            url: bizunoAjax + '&bizRt=phreebooks/restfulTax/getTaxRate' +
+                '&address1='    + encodeURIComponent(address1 || '') +
+                '&address2='    + encodeURIComponent(address2 || '') +
+                '&city='        + encodeURIComponent(city || '') +
+                '&state='       + encodeURIComponent(bizState || '') +
+                '&postal_code=' + encodeURIComponent(zip || '') +
+                '&country='     + encodeURIComponent(bizCntry || '') +
+                '&shipping='    + encodeURIComponent(ship || 0) +
+                '&total='       + encodeURIComponent(begBalance),
+            async: false,
+            success: function(resp) { tax_rest = resp; },
+            error: function() { tax_rest = 0; }
+        });
+    } else {
+        tax_rest = 0;
+    }
+    newBalance += parseFloat(tax_rest || 0);
+    var curISO = jqBiz('#currency').val() ? jqBiz('#currency').val() : bizDefaults.currency.defaultCur;
+    var decLen = parseInt(bizDefaults.currency.currencies[curISO].dec_len);
+    bizNumSet('totals_{$this->code}', tax_rest);
     return parseFloat(newBalance.toFixed(decLen));
 }", 'jsHead');
         return $html;

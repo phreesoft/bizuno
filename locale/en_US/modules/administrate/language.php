@@ -109,8 +109,9 @@ $lang = [
         Percent Good values are represented as decimals (i.e. 80% => 0.80) and all % Good fields are limited to numerical values.<br /><br />
         To add a new schedule, replace the schedule title with a new title and add/delete/edit rows as necessary, press Save.<br />
         To remove a schedule, select the schedule and delete all the rows of the table and press Save.',
-    'category'      => 'Category',
-    'schedules'     => 'Schedules',
+    'percent_good' => '% Good',
+    'category'     => 'Category',
+    'schedules'    => 'Schedules',
     'asset_num'    => 'Asset ID',
     'asset_type'   => 'Asset Type',
     'dep_value'    => 'Current Value',

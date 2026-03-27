@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-03-25
  * @filesource /controllers/inventory/history.php
  */
 
@@ -109,13 +109,13 @@ class inventoryHistory
         $output = $skus = [];
         $skuID  = clean('skuID', 'integer', 'get');
         $sku    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$skuID");
-        $stmt   = dbGetResult("SELECT m.id as id, i.sku, i.qty, m.notes, m.post_date, m.terminal_date, m.store_id
+        $stmt   = dbGetResult("SELECT m.id as id, i.sku, i.qty, m.notes, m.invoice_num, m.post_date, m.terminal_date, m.store_id
             FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id WHERE journal_id=32 AND closed='0'");
         $openWOs= $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         msgDebug("\nRead ".sizeof($openWOs)." open WO's while searching for sku: $sku = ");
         foreach ($openWOs as $row) { // search within the BOM for each skuID for this SKU
             if ($row['sku']==$sku) {
-                $output[]= ['id'=>$row['id'], 'sku'=>$row['sku'], 'qty'=>$row['qty'], 'store_id'=>viewFormat($row['store_id'], 'storeID'),
+                $output[]= ['id'=>$row['id'], 'sku'=>$row['sku'], 'qty'=>$row['qty'], 'invoice_num'=>$row['invoice_num'], 'store_id'=>viewFormat($row['store_id'], 'storeID'),
                     'post_date'=>$row['post_date'], 'terminal_date'=>$row['terminal_date'], 'notes'=>substr($row['notes'], 0, 30)];
             }
             // get the skuID and then meta for that SKU
@@ -521,13 +521,14 @@ class inventoryHistory
                         'edit'       => ['order'=>20,'icon'=>'edit',    'label'=>lang('edit'),
                             'events' => ['onClick' => "winHref(bizunoHome+'?bizRt=inventory/build/manager&rID=idTBD');"]],
                         'print'=>['order'=>20,'icon'=>'print','label'=>lang('print'),'hidden'=>$hide>0?false:true,'events'=>['onClick'=>"winOpen('phreeformOpen', 'phreeform/render/open&group=mfg:wo&date=a&xfld=journal_main.id&xcr=equal&xmin=idTBD');"]]]],
-                'sku'          => ['order'=>10,'field'=>'sku',          'label'=>lang('sku'),      'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true],
+                'invoice_num'  => ['order'=>10,'field'=>'invoice_num',  'label'=>lang('reference'),'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'sku'          => ['order'=>20,'field'=>'sku',          'label'=>lang('sku'),      'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true],
                     'events' => ['styler'=>"function(value,row,index) { if (row.started=='1') { return {style:'background-color:lightgreen'}; } }"]],
-                'store_id'     => ['order'=>20,'field'=>'store_id',     'label'=>lang('store_id'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true]],
-                'post_date'    => ['order'=>30,'field'=>'post_dte',     'label'=>lang('post_date'),'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true], 'format'=>'date'],
-                'terminal_date'=> ['order'=>40,'field'=>'terminal_date','label'=>lang('due_date'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true], 'format'=>'date',],
-                'qty'          => ['order'=>50,'field'=>'qty',          'label'=>lang('quantity'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true]],
-                'notes'        => ['order'=>60,'field'=>'notes',        'label'=>lang('notes'),    'attr'=>['sortable'=>true,'resizable'=>true]]],
+                'store_id'     => ['order'=>30,'field'=>'store_id',     'label'=>lang('store_id'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true]],
+                'post_date'    => ['order'=>40,'field'=>'post_dte',     'label'=>lang('post_date'),'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true], 'format'=>'date'],
+                'terminal_date'=> ['order'=>50,'field'=>'terminal_date','label'=>lang('due_date'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true], 'format'=>'date',],
+                'qty'          => ['order'=>60,'field'=>'qty',          'label'=>lang('quantity'), 'attr'=>['align'=>'center','sortable'=>true,'resizable'=>true]],
+                'notes'        => ['order'=>70,'field'=>'notes',        'label'=>lang('notes'),    'attr'=>['sortable'=>true,'resizable'=>true]]],
             'footnotes'=> ['status'=>lang('status').': <span style="background-color:lightgreen">'.'Work Order Started'.'</span>']];
         return $data;
     }

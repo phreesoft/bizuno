@@ -258,7 +258,6 @@ $lang = [
     'no_files' => 'No files could be found for this Document in your data folder! Please upload a new copy!',
     'msg_delete_error'=> 'Cannot delete this folder as it has documents/folders inside!',
     'msg_no_security' => 'No security settings were selected, defaulting to access for everyone.',
-    'percent_good'  => '% Good',
     // EDI
     'tab_title' => 'EDI Clients',
     'email_to_lbl' => 'Email Destination',
