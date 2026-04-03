@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -112,7 +112,7 @@ class bizInstall // Checking users:
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 6, 'meta_key'=>'methods_funnels',     'meta_value'=>'{}']); // Collected lsit of API funnels 
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 7, 'meta_key'=>'dashboards',          'meta_value'=>'{}']); // Collected list of dashbaords from all modules
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 8, 'meta_key'=>'phreeform_cache',     'meta_value'=>'[]']); // Cache to store phreeform reports and forms to speed things up
-        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>$this->refs]); // Phreebooks references for journal entries
+        dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=> 9, 'meta_key'=>'bizuno_refs',         'meta_value'=>json_encode($this->refs)]); // Phreebooks references for journal entries
         dbWrite(BIZUNO_DB_PREFIX.'common_meta', ['id'=>$roleID,'meta_key'=>'bizuno_role',     'meta_value'=>json_encode($roleMeta)]);
         // insert a record into the contacts table, use email as the short name for now
         msgDebug("\nFinished installing modules, next up, setting first user.");

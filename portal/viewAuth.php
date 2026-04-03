@@ -21,7 +21,7 @@
  * @author Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright 2008-2026, PhreeSoft, Inc.
  * @license https://www.gnu.org/licenses/agpl-3.0.txt
- * @version 7.x Last Update: 2026-03-20
+ * @version 7.x Last Update: 2026-04-03
  * @filesource /portal/viewAuth.php
  */
 namespace bizuno;
@@ -95,7 +95,7 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
                     ];
                     setUserCookie($userData);
                     msgDebug("\n2FA verified → user logged in");
-                    $authMethods = getUserAuthMethods($userID);
+                    $authMethods = getUserAuthMethods($userData['userID']);
                     if (empty($authMethods['passkeys'])) { // Redirect to a dedicated setup page instead of immediate reload
                         $layout = ['type'=>'guest', 'jsReady'=>['reload'=>"window.location.href = '".BIZUNO_URL_PORTAL."';"]];
                     } else {

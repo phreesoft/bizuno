@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /model/db.php
  */
 
@@ -639,6 +639,13 @@ function dbFieldExists($table, $field)
     }
 }
 
+function dbIsConnected()
+{
+    global $db;
+    if (!is_object($db)) { return false; }
+    return $db->connected ? true : false;
+}
+
 /**
  * Installs db tables when a module is installed based on the list passed
  * @param array $tables - list of tables to create
@@ -816,6 +823,7 @@ function dbTableReadOrder($sorts=[])
 function dbMetaGet($rID, $key, $table='common', $refID=0, $args=[])
 {
     msgDebug("\nEntering dbMetaGet with rID = $rID, refID = $refID, table = $table, key = $key");
+    if (!dbIsConnected()) { return null; }
     $opts = array_replace(['object'=>false], $args);
     $multi= strpos($key, '%')!==false ? true : false;
     $crit = [];

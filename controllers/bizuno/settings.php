@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -72,8 +72,8 @@ class bizunoSettings
             $bizunoMod[$module]['settings']                 = isset($adm->settings) ? $adm->settings : [];
             $bizunoMod[$module]['properties']               = $adm->structure;
             $bizunoMod[$module]['properties']['id']         = $module;
-            $bizunoMod[$module]['properties']['title']      = $adm->lang['title'];
-            $bizunoMod[$module]['properties']['description']= $adm->lang['description'];
+//          $bizunoMod[$module]['properties']['title']      = $adm->lang['title']; // These are now handled in the locale process
+//          $bizunoMod[$module]['properties']['description']= $adm->lang['description'];
             $bizunoMod[$module]['properties']['status']     = 1;
             $bizunoMod[$module]['properties']['path']       = $relPath;
             $this->adminInstDirs($adm);

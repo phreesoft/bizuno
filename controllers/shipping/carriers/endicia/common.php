@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/shipping/carriers/endicia/common.php
  */
 
@@ -128,7 +128,7 @@ class endiciaCommon
             'lbl_msg_1'    => '', 'lbl_msg_2'=>'', 'lbl_msg_3'=>'', 'label_thermal'=>'4x6.75-doctab',
             'service_types'=> '1DA:1DP:2DA:2DM:2DP:3DM:3DP:GND:GDR', 'package_types'=>'package:usps_flat_rate_envelope'];
         $this->options = $this->getOptions();
-        $this->settings= array_replace_recursive($this->defaults, getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []));
+        $this->settings= array_replace_recursive($this->defaults, getMetaMethod($this->methodDir, $this->code)['settings'] ?? []);
         $this->settings['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang, $this->options['rateCodes']);
     }
 

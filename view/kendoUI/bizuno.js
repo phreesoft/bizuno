@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2026-04-01
  * @filesource /view/themes/kendoUI/portal.js
  */
 
@@ -42,4 +42,42 @@ function appendPrefs() {
     if (!action.includes('mode='))   { action += (action.includes('?') ? '&' : '?') + 'mode=' + isDarkMode; }
     if (!action.includes('screen=')) { action += (action.includes('?') ? '&' : '?') + 'screen=' + screenWidth; }
     form.attr('action', action);
+}
+
+/**
+ * This function extracts the returned messageStack messages and displays then according to the severity
+ */
+function displayMessage(message) {
+    var msgText = '';
+    var imgIcon = '';
+    // Process errors and warnings
+    if (message.error) for (var i=0; i<message.error.length; i++) {
+        msgText += '<span>'+message.error[i].text+'</span><br />';
+        imgIcon = 'error';
+    }
+    if (message.warning) for (var i=0; i<message.warning.length; i++) {
+        msgText += '<span>'+message.warning[i].text+'</span><br />';
+        if (!imgIcon) imgIcon = 'warning';
+    }
+    if (message.caution) for (var i=0; i<message.caution.length; i++) {
+        msgText += '<span>'+message.caution[i].text+'</span><br />';
+        if (!imgIcon) imgIcon = 'warning';
+    }
+    if (msgText) alert( '<p>Error/Caution/Warning</p>' + msgText );
+    // Now process Info and Success
+    if (message.info) {
+        msgText = '';
+        msgTitle= bizLangJS('INFORMATION');
+        msgID   = Math.floor((Math.random() * 1000000) + 1); // random ID to keep boxes from stacking and crashing easyui
+        for (var i=0; i<message.info.length; i++) {
+            if (typeof message.info[i].title !== 'undefined') { msgTitle = message.info[i].title; }
+            msgText += '<span>'+message.info[i].text+'</span><br />';
+        }
+        alert ( '<p>Info</p>' + msgText );
+    }
+    if (message.success) {
+        msgText = '';
+//        for (var i=0; i<message.success.length; i++) { msgText += '<span>'+message.success[i].text+'</span><br />'; }
+//        jqBiz.messager.show({title:bizLangJS('MESSAGE'), msg:msgText, timeout:5000, width:400, height:200, style:{ right:'', top:'', bottom:-document.body.scrollTop-document.documentElement.scrollTop }});
+    }
 }

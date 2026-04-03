@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-17
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /model/functions.php
  */
 
@@ -197,21 +197,9 @@ function myExceptionHandler($e)
     msgTrap ();
     msgDebug("\nFatal error on line ".$e->getLine()." in file ".$e->getFile().". Description: ".$e->getCode()." - ".$e->getMessage());
     msgAdd("Fatal error on line ".$e->getLine()." in file ".$e->getFile().". Description: ".$e->getCode()." - ".$e->getMessage());
-    if (bizDbConnected()) { msgDebugWrite(); }
+    if (dbIsConnected()) { msgDebugWrite(); }
     exit(json_encode(['message' => isset($msgStack->error) && !empty($msgStack->error) ? $msgStack->error : 'undefined']));
 //  exit("Program Exception! Please fill out a support ticket with the details that got you here.");
-}
-
-/**
- * Wrapper to test if the users db connection is valid
- * @global object $db - database object to do the work
- * @return boolean - true if connected to db, false otherwise
- */
-function bizDbConnected()
-{
-    global $db;
-    if (!is_object($db)) { return false; }
-    return $db->connected ? true : false;
 }
 
 /**
@@ -302,7 +290,7 @@ function bizClrCookie($name)
  * @param int $contactID
  * @return array
  */
- function getUserAuthMethods($cID)
+function getUserAuthMethods($cID)
 {
     if (empty($cID)) return ['passkeys' => [], '2fa' => ['enabled' => false, 'method' => 'none']];
     $meta = getMetaContact($cID, 'webauthn_credentials');
@@ -383,6 +371,7 @@ function loadBaseLang($lang='en_US')
     } else {
         msgDebug("\nFetching lang from file system.");
         require(BIZUNO_FS_LIBRARY.'locale/en_US/language.php');  // pulls the current language in English
+        $langCache = $langCore;
     }
     if ($lang == 'en_US') { return $langCache; } // just english, we're done
     $otherLang = [];
@@ -613,24 +602,25 @@ function mapMetaGridToDB(&$dg, $struc)
  * @return type
  */
 function getMetaCommon($key, $args=[]) {
+    if (!dbIsConnected()) { return null; }
     $meta = dbMetaGet(0, $key, 'common', 0, $args);
     metaIdxClean($meta); // remove the db indexes
     return $meta;
 }
 function getMetaContact($cID, $key) {
-    if (empty($cID)) { return []; }
+    if (!dbIsConnected() || empty($cID)) { return []; }
     $meta = dbMetaGet(0, $key, 'contacts', $cID);
     metaIdxClean($meta); // remove the db indexes
     return $meta;    
 }
 function getMetaInventory($iID, $key) {
-    if (empty($iID)) { return []; }
+    if (!dbIsConnected() || empty($iID)) { return []; }
     $meta = dbMetaGet(0, $key, 'inventory', $iID);
     metaIdxClean($meta); // remove the db indexes
     return $meta;
 }
 function getMetaJournal($jID, $key) {
-    if (empty($jID)) { return []; }
+    if (!dbIsConnected() || empty($jID)) { return []; }
     $meta = dbMetaGet(0, $key, 'journal', $jID);
     metaIdxClean($meta); // remove the db indexes
     return $meta;

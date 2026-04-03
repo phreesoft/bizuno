@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/shipping/carriers/best_way/best_way.php
  */
 
@@ -59,7 +59,7 @@ class best_way {
         $this->settings= ['rate'=>0,'order'=>50,'service_types'=>'GND','default'=>'0',
             'gl_acct_c'=> getModuleCache('shipping','settings','general','gl_shipping_c'),
             'gl_acct_v'=> getModuleCache('shipping','settings','general','gl_shipping_v')];
-        settingsReplace($this->settings, getMetaMethod($this->methodDir, $this->code)['settings'], $this->settingsStructure());
+        settingsReplace($this->settings, getMetaMethod($this->methodDir, $this->code)['settings'] ?? [], $this->settingsStructure());
         $this->settings['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
     }
 

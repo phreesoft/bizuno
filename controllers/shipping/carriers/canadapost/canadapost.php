@@ -22,7 +22,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/shipping/carriers/canadapost/canadapost.php
  */
 
@@ -149,7 +149,7 @@ class canadapost
             'printer_type' => 'PDF', 'printer_name' => '', 'label_pdf' => 'PAPER_8.5X11_TOP_HALF_LABEL', 'label_thermal' => 'STOCK_4X6.75_LEADING_DOC_TAB',
             'service_types' => 'GND:GDR:1DM:1DA:1DP:2DA:I1D:I2D:IGD',
             'default'=>'0'];
-        settingsReplace($this->settings, getMetaMethod($this->methodDir, $this->code)['settings'], $this->settingsStructure());
+        settingsReplace($this->settings, getMetaMethod($this->methodDir, $this->code)['settings'] ?? [], $this->settingsStructure());
         $this->settings['services'] = viewCarrierServices($this->code, $this->settings['service_types'], $this->lang);
     }
 

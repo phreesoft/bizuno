@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -158,8 +158,7 @@ Replace the test URL and test credentials with the production URL and production
             'gl_acct_v'    => getModuleCache('shipping','settings','general','gl_shipping_v'),
             'default'      => '1', 'token'=>'', 'token_date'=>''];
         $this->options = $this->getOptions();
-        $settings      = empty(getMetaMethod($this->methodDir, $this->code)['settings']) ? [] : (array)getMetaMethod($this->methodDir, $this->code)['settings'];
-        $this->settings= array_replace_recursive($this->defaults, $settings);
+        $this->settings= array_replace_recursive($this->defaults, getMetaMethod($this->methodDir, $this->code)['settings'] ?? []);
         $this->today   = biz_date('Y-m-d');
         $this->currency= 'USD';
         $this->test    = $this->settings['test_mode']=='test' ? true : false;

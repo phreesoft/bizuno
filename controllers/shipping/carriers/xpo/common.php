@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-03
  * @filesource /controllers/shipping/carriers/xpo/common.php
  *
  * Docs website: http://www.xpo.com/content/xml
@@ -67,7 +67,7 @@ class xpoCommon
             'gl_acct_v' => getModuleCache('shipping','settings','general','gl_shipping_v'),
             'min_weight'=>150,'ltl_class'=>125,'ltl_desc'=>'','service_types'=>'ECF','default'=>'0', 'token'=>'', 'token_date'=>''];
         $this->options = $this->getOptions();
-        $this->settings= array_replace_recursive($this->defaults, getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []));
+        $this->settings= array_replace_recursive($this->defaults, getMetaMethod($this->methodDir, $this->code)['settings'] ?? []);
         $this->today   = biz_date('Y-m-d');
         $this->currency= 'USD';
         $this->test    = $this->settings['test_mode']=='Y' ? true : false;
