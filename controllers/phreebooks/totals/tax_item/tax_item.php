@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/phreebooks/totals/tax_item/tax_item.php
  */
 
@@ -47,7 +47,7 @@ class tax_item
         $usrSettings   = getModuleCache($this->moduleID, $this->methodDir, $this->code, 'settings', []);
         settingsReplace($this->settings, $usrSettings, $this->settingsStructure());
         $this->fields  = [
-            'totals_tax_item'     => ['label'=>lang("tax_rate_id_{$this->cType}").' '.$this->lang['extra_title'],
+            'totals_tax_item'     => ['label'=>lang('sales_tax').' '.$this->lang['extra_title'],
                 'attr'=>['type'=>'currency','value'=>0,'readonly'=>'readonly']],
             'totals_tax_item_text'=> ['attr' =>['value'=>'textTBD','size'=>16,'readonly'=>'readonly']],
 //          'totals_tax_item_gl'  => ['label'=>lang('gl_account'),'attr'=>['type'=>'text','value'=>'glTBD','size'=>5,'readonly'=>'readonly']],

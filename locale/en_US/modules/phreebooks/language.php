@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -301,6 +301,20 @@ $lang = [
     'edi_rcv_date' => 'EDI Create Date',
     'edi_ack_date' => 'EDI Ack Date',
     // Returns
+    'msg_return_reason' => 'What is the reason for this return?',
+    'close_details' => 'Closing Information',
+    'item_details' => 'Items to be Returned',
+    'receive_details' => 'Items Received',
+    'warranty_exp_date'=>'Warranty Exp Date',
+    'preventable' => 'Preventable',
+    'at_fault' => 'At Fault',
+    'entered_by' => 'Entered By',
+    'caller_name' => 'Caller Name',
+    'received_by' => 'Received By',
+    'closed_by' => 'Closed By',
+    'invoice_date' => 'Date Invoiced',
+    'receive_date' => 'Date Received',
+    'warranty_date' => 'Warranty Exp Date',
     'rtn_status_1' => 'RMA Created/Waiting for Parts',
     'rtn_status_2' => 'Parts Received',
     'rtn_status_3' => 'Receiving Inspection',

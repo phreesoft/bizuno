@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -52,10 +52,10 @@ $lang = [
     'err_contacts_delete_address' => 'The address cannot be deleted since it is a main address, delete the contact instead!',
     // CRM Defines
     'crm_dg_notes' => 'To enter a valid Contacts entry, the Contact ID and Name/Business must be present. If either is left blank, the record will not be saved.',
-    'contacts_crm_new_call' =>'New Call',
-    'contacts_crm_call_back' =>'Return Call',
-    'contacts_crm_follow_up' =>'Follow Up',
-    'contacts_crm_new_lead' =>'New Lead',
+    'crm_new_call' =>'New Call',
+    'crm_call_back' =>'Return Call',
+    'crm_follow_up' =>'Follow Up',
+    'crm_new_lead' =>'New Lead',
     // API
     'conapi_desc' => 'The Contacts API currently supports the base contacts table, one main address and one shipping address for both inserts and updates. Extra custom fields are supported. To import an contacts file:<br>1. Download the contacts template which lists the field headers and descriptions.<br>2. Add your data to your .csv file.<br>3. Select the file and press the import icon.<br>The results will be displayed after the script completes. Any errors will also be displayed.',
     'conapi_template' => 'Step 1: Download the contacts template => ',
@@ -83,20 +83,6 @@ $lang = [
     'projects_desc' => 'New customer project tracker',
     'pos_title' => 'Point of Sale',
     'pos_desc' => 'This extension creates a Point of Sale (POS) system integrated with Bizuno and PhreeBooks accounting.',
-    'msg_return_reason' => 'What is the reason for this return?',
-    'close_details' => 'Closing Information',
-    'item_details' => 'Items to be Returned',
-    'receive_details' => 'Items Received',
-    'warranty_exp_date'=>'Warranty Exp Date',
-    'preventable' => 'Preventable',
-    'at_fault' => 'At Fault',
-    'entered_by' => 'Entered By',
-    'caller_name' => 'Caller Name',
-    'received_by' => 'Received By',
-    'closed_by' => 'Closed By',
-    'invoice_date' => 'Date Invoiced',
-    'receive_date' => 'Date Received',
-    'warranty_date' => 'Warranty Exp Date',
     // custPromo
     'promos_mgr' => 'Promotion Manager',
     'promo_desc' => 'Select from the list of available promotions and recipient list below to send out promotion emails. Click Start to begin.',

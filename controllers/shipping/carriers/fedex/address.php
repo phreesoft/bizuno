@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-14
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/shipping/carriers/fedex/address.php
  *
  */
@@ -95,7 +95,7 @@ class fedexAddress extends fedexCommon
                 'address'=> [
                     'streetLines'        => $streetLines,
                     'city'               => clean($post['city'], 'alpha_num'),
-                    'stateOrProvinceCode'=> clean($post['state'], 'text'),
+                    'stateOrProvinceCode'=> clean($post['state']?? '', 'text'),
                     'postalCode'         => clean($post['postal_code'], 'text'),
                     'countryCode'        => 'US',
 //                  'urbanizationCode'   => 'EXT VISTA BELLA', // only valid for Puerto Rico

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-05
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1434,7 +1434,7 @@ function bizUnitDiscDisc(newValue) {
 //                          'display'=> "(row.journal_id!='12' && row.journal_id!='6') || (row.journal_id=='12' && (row.closed=='0' || row.total_amount==0)) || (row.journal_id=='6' && (row.closed=='0' || row.total_amount==0))",
                             'events' => ['onClick' => "if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('phreebooks/main/delete&jID={$this->journalID}', idTBD);"]]]],
                 'post_date' => ['order'=>10, 'field'=>BIZUNO_DB_PREFIX.'journal_main.post_date', 'format'=>'date', 'label' => lang('post_date'),'attr'=>['sortable'=>true, 'resizable'=>true]],
-                'invoice_num' => ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num', 'label' => lang("invoice_num_{$this->journalID}"),'attr'=>['sortable'=>true, 'resizable'=>true]],
+                'invoice_num' => ['order'=>20, 'field'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num', 'label'=>lang("invoice_num_{$this->journalID}"),'attr'=>['sortable'=>true, 'resizable'=>true]],
                 'so_po_ref_id' => ['order'=>25, 'field'=>BIZUNO_DB_PREFIX.'journal_main.so_po_ref_id','format'=>'storeID', 'label' => lang("so_po_ref_id_{$this->journalID}"),
                     'attr'  => ['width'=>120, 'sortable'=>true, 'resizable'=>true, 'hidden'=> in_array($this->journalID, [15]) ? false : true]],
                 'store_id' => ['order'=>27, 'field' => BIZUNO_DB_PREFIX.'journal_main.store_id','format'=>'storeID','label'=>lang('store_id'),'attr'=>['sortable'=>false,'resizable'=>true]],
@@ -1478,7 +1478,7 @@ function bizUnitDiscDisc(newValue) {
 
                 $sql2 = $this->searchCriteriaSQL('refID', [BIZUNO_DB_PREFIX.'journal_main.invoice_num', BIZUNO_DB_PREFIX.'journal_main.purch_order_id']);
                 $temp2 = explode(':', $this->defaults['refID']);
-                $data['source']['filters']['refID']    = ['order'=>63,'sql'=>$sql2,'label'=>lang('invoice_num'),'events'=>['onChange'=>"pbSetPrompt('refID', 'refIDMin','refIDMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp2[0]]];
+                $data['source']['filters']['refID']    = ['order'=>63,'sql'=>$sql2,'label'=>lang('invoice_num_0'),'events'=>['onChange'=>"pbSetPrompt('refID', 'refIDMin','refIDMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp2[0]]];
                 $data['source']['filters']['refIDMin'] = ['order'=>64,              'attr'=>['value'=>$temp2[1]]];
                 $data['source']['filters']['refIDMax'] = ['order'=>65,'break'=>true,'attr'=>['value'=>$temp2[2]]];
 
@@ -1490,7 +1490,7 @@ function bizUnitDiscDisc(newValue) {
 
                 $sql4 = $this->searchCriteriaSQL('sku', BIZUNO_DB_PREFIX.'journal_item.sku');
                 $temp4 = explode(':', $this->defaults['sku']);
-                $data['source']['filters']['sku']    = ['order'=>69,'sql'=>$sql4,'label'=>('sku'),'events'=>['onChange'=>"pbSetPrompt('sku', 'skuMin','skuMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp4[0]]];
+                $data['source']['filters']['sku']    = ['order'=>69,'sql'=>$sql4,'label'=>lang('sku'),'events'=>['onChange'=>"pbSetPrompt('sku', 'skuMin','skuMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp4[0]]];
                 $data['source']['filters']['skuMin'] = ['order'=>70,              'attr'=>['value'=>$temp4[1]]];
                 $data['source']['filters']['skuMax'] = ['order'=>71,'break'=>true,'attr'=>['value'=>$temp4[2]]];
 
@@ -1502,13 +1502,13 @@ function bizUnitDiscDisc(newValue) {
 
                 $sql6 = $this->searchCriteriaSQL('glAcct',  [BIZUNO_DB_PREFIX.'journal_main.gl_acct_id', BIZUNO_DB_PREFIX.'journal_item.gl_account']);
                 $temp6 = explode(':', $this->defaults['glAcct']);
-                $data['source']['filters']['glAcct']    = ['order'=>75,'sql'=>$sql6,'label'=>lang('gl_acct_id'),'events'=>['onChange'=>"pbSetPrompt('glAcct', 'glAcctMin','glAcctMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp6[0]]];
+                $data['source']['filters']['glAcct']    = ['order'=>75,'sql'=>$sql6,'label'=>lang('gl_account'),'events'=>['onChange'=>"pbSetPrompt('glAcct', 'glAcctMin','glAcctMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp6[0]]];
                 $data['source']['filters']['glAcctMin'] = ['order'=>76,              'attr'=>['value'=>$temp6[1]]];
                 $data['source']['filters']['glAcctMax'] = ['order'=>77,'break'=>true,'attr'=>['value'=>$temp6[2]]];
 
                 $sql7 = $this->searchCriteriaSQL('rID', BIZUNO_DB_PREFIX.'journal_main.id');
                 $temp7 = explode(':', $this->defaults['rID']);
-                $data['source']['filters']['rID']    = ['order'=>78,'sql'=>$sql7,'label'=>lang('users_admin_id'),'events'=>['onChange'=>"pbSetPrompt('rID', 'rIDMin','rIDMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp7[0]]];
+                $data['source']['filters']['rID']    = ['order'=>78,'sql'=>$sql7,'label'=>lang('id'),'events'=>['onChange'=>"pbSetPrompt('rID', 'rIDMin','rIDMax')"],'values'=>selChoices(),'attr'=>['type'=>'select','value'=>$temp7[0]]];
                 $data['source']['filters']['rIDMin'] = ['order'=>79,              'attr'=>['value'=>$temp7[1]]];
                 $data['source']['filters']['rIDMax'] = ['order'=>80,'break'=>true,'attr'=>['value'=>$temp7[2]]];
                 unset($data['source']['filters']['period']);

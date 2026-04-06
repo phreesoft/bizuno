@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-05
  * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
  */
 
@@ -88,9 +88,9 @@ class ifWooCommerce extends apiExport
             'fltr'      => ['order'=>25,'break' =>true,'label' =>$this->lang['upload_fltr'],'attr'=>['size'=>6]],
             'btnInv'    => ['order'=>80,'events'=>['onClick'=>"bulkUpload();"],             'attr'=>['type'=>'button',  'value'=>lang('go')]],
             'btnQkInv'  => ['order'=>10,'events'=>['onClick'=>"jqBiz('#btnQkInv').hide(); jsonAction('$this->moduleID/admin/invRefresh&modID=$this->code');"],'attr'=>['type'=>'button','value'=>$this->lang['inventory_refresh']]],
-            'selSync'   => ['order'=>10,'break' =>true,'label'=>$this->lang['sync_delete'], 'attr'=>['type'=>'checkbox','value'=>1]],
+            'selSync'   => ['order'=>10,'break' =>true,'label'=>lang('sync_delete', $this->moduleID), 'attr'=>['type'=>'checkbox','value'=>1]],
             'btnSync'   => ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartSync&modID=$this->code&syncDelete='+bizCheckBoxGet('selSync'));"],  'attr'=>['type'=>'button','value'=>lang('go')]],
-            'calConfirm'=> ['order'=>10,'break' =>true,'label'=>$this->lang['status_date'], 'attr'=>['type'=>'date',    'value'=>biz_date('Y-m-d')]],
+            'calConfirm'=> ['order'=>10,'break' =>true,'label'=>lang('status_date', $this->moduleID), 'attr'=>['type'=>'date',    'value'=>biz_date('Y-m-d')]],
             'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val());"],'attr'=>['type'=>'button','value'=>lang('confirm')]]];
         $data = ['title'=>$this->lang['title'],
             'divs'   => ['divIfWC'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
@@ -101,21 +101,21 @@ class ifWooCommerce extends apiExport
                     'setSync'=> ['order'=>30,'type'=>'panel','key'=>'setSync','classes'=>['block33']],
                     'setConf'=> ['order'=>40,'type'=>'panel','key'=>'setConf','classes'=>['block33']]]]]]],
             'panels' => [
-                'setInv' => ['title'=>$this->lang['upload_title'],'type'=>'divs','divs'=>[
+                'setInv' => ['title'=>lang('upload_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmInv'],
-                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['upload_info']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>'<p>'.lang('upload_info', $this->moduleID).'</p>'],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['radio1','radio2','radio3','fltr','btnInv']],
                     'status' => ['order'=>50,'type'=>'html',  'html'=>"<progress></progress>"],
                     'refresh'=> ['order'=>70,'type'=>'fields','keys'=>['btnQkInv']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'setSync'=> ['title'=>$this->lang['sync_title'],'type'=>'divs','divs'=>[
+                'setSync'=> ['title'=>lang('sync_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmSync'],
-                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['sync_info']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>".lang('sync_info', $this->moduleID)."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['selSync','btnSync']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]],
-                'setConf'=> ['title'=>$this->lang['status_title'],'type'=>'divs','divs'=>[
+                'setConf'=> ['title'=>lang('status_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmConfirm'],
-                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>{$this->lang['status_info']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>".lang('status_info', $this->moduleID)."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['calConfirm','btnConfirm']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'  => [

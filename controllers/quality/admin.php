@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/quality/admin.php
  */
 
@@ -99,17 +99,14 @@ class qualityAdmin
     public function initialize()
     {
         // Rebuild some option values
-        $metaStat= dbMetaGet('%', 'options_qa_status');
+        $metaStat= dbMetaGet(0, 'options_qa_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
         $status = [
-             '1'=>lang('qa_status_1', $this->moduleID),  '2'=>lang('qa_status_2', $this->moduleID),  '3'=>lang('qa_status_3', $this->moduleID),
-             '4'=>lang('qa_status_4', $this->moduleID),  '5'=>lang('qa_status_5', $this->moduleID),  '6'=>lang('qa_status_6', $this->moduleID),
-             '7'=>lang('qa_status_7', $this->moduleID),  '8'=>lang('qa_status_8', $this->moduleID), '85'=>lang('qa_status_85', $this->moduleID),
-            '90'=>lang('qa_status_90', $this->moduleID),'99'=>lang('qa_status_99', $this->moduleID)];
+             '1'=>'qa_status_1',  '2'=>'qa_status_2',  '3'=>'qa_status_3', '4'=>'qa_status_4',
+             '5'=>'qa_status_5',  '6'=>'qa_status_6',  '7'=>'qa_status_7', '8'=>'qa_status_8',
+            '85'=>'qa_status_85','90'=>'qa_status_90','99'=>'qa_status_99'];
         asort($status);
         dbMetaSet($idxStat, 'options_qa_status', $status);
-        // Put them in the cache for runtime access
-        setModuleCache('bizuno', 'options', 'qa_status', $status);
         return true;
     }
 

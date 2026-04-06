@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/phreebooks/totals/tax_other/tax_other.php
  */
 
@@ -87,7 +87,7 @@ class tax_other
             'totals_tax_other_id' => ['label'=>'', 'attr'=>['type'=>'hidden']],
             'totals_tax_other_gl' => ['label'=>lang('gl_account'),'attr'=>['type'=>'ledger','value'=>$this->settings['gl_account']]],
             'totals_tax_other_opt'=> ['icon'=>'settings','size'=>'small','events'=>['onClick'=>"jqBiz('#phreebooks_totals_tax_other').toggle('slow');"]],
-            'totals_tax_other'    => ['label'=>lang("tax_rate_id_{$type}").' '.$this->lang['extra_title'], 'events'=>['onBlur'=>"totalUpdate('tax_other');"],
+            'totals_tax_other'    => ['label'=>lang('sales_tax').' '.$this->lang['extra_title'], 'events'=>['onBlur'=>"totalUpdate('tax_other');"],
                 'attr' => ['type'=>'currency','value'=>0]]];
         if (!empty($data['items'])) { foreach ($data['items'] as $row) { // fill in the data if available
             if ($row['gl_type'] == $this->settings['gl_type']) {

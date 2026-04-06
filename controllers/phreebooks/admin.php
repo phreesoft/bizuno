@@ -221,35 +221,24 @@ class phreebooksAdmin {
     public function initialize() {
         periodAutoUpdate();
         // Rebuild some option values
-        $metaStat= dbMetaGet('%', 'options_return_status');
+        $metaStat= dbMetaGet(0, 'options_return_status');
+        msgDebug("\n COMMON DUP TRAP, status = ".msgPrint($metaStat));
         $idxStat = metaIdxClean($metaStat); // remove the indexes
-        $status = [
-             '1' =>lang('rtn_status_1'),  '2'=>lang('rtn_status_2'),  '3'=>lang('rtn_status_3'),
-             '4' =>lang('rtn_status_4'),  '5'=>lang('rtn_status_5'),  '6'=>lang('rtn_status_6'),
-             '7' =>lang('rtn_status_7'),  '8'=>lang('rtn_status_8'),  '9'=>lang('rtn_status_9'),
-            '10'=>lang('rtn_status_10'),'90'=>lang('rtn_status_90'),'99'=>lang('rtn_status_99')];
+        $status  = [
+             '1'=>'rtn_status_1',  '2'=>'rtn_status_2',  '3'=>'rtn_status_3',
+             '4'=>'rtn_status_4',  '5'=>'rtn_status_5',  '6'=>'rtn_status_6',
+             '7'=>'rtn_status_7',  '8'=>'rtn_status_8',  '9'=>'rtn_status_9',
+            '10'=>'rtn_status_10','90'=>'rtn_status_90','99'=>'rtn_status_99'];
         asort($status);
         dbMetaSet($idxStat, 'options_return_status', $status);
-        $metaCode= dbMetaGet('%', 'options_return_codes');
+        $metaCode= dbMetaGet(0, 'options_return_codes');
         $idxCode = metaIdxClean($metaCode); // remove the indexes
-        $codes  = [
-            '1' =>lang('rtn_code_1'),    '2'=>lang('rtn_code_2'),    '3'=>lang('rtn_code_3'),
-            '4' =>lang('rtn_code_4'),    '5'=>lang('rtn_code_5'),    '6'=>lang('rtn_code_6'),
-            '7' =>lang('rtn_code_7'),   '80'=>lang('rtn_code_80'),  '99'=>lang('rtn_code_99')];
+        $codes   = [
+            '1' =>'rtn_code_1',    '2'=>'rtn_code_2',    '3'=>'rtn_code_3',
+            '4' =>'rtn_code_4',    '5'=>'rtn_code_5',    '6'=>'rtn_code_6',
+            '7' =>'rtn_code_7',   '80'=>'rtn_code_80',  '99'=>'rtn_code_99'];
         asort($codes);
         dbMetaSet($idxCode, 'options_return_codes', $codes);
-        $metaAct= dbMetaGet('%', 'options_qa_status');
-        $idxAct = metaIdxClean($metaAct); // remove the indexes
-        $actions= [
-             '1'=>lang('rtn_action_1'), '2'=>lang('rtn_action_2'), '3'=>lang('rtn_action_3'),
-             '4'=>lang('rtn_action_4'), '5'=>lang('rtn_action_5'), '6'=>lang('rtn_action_6'),
-            '99'=>lang('rtn_action_99')];
-        asort($status);
-        dbMetaSet($idxAct, 'options_qa_status', $actions);
-        // Put them in the cache for runtime access
-        setModuleCache('bizuno', 'options', 'return_status', $status);
-        setModuleCache('bizuno', 'options', 'return_codes',  $codes);
-        setModuleCache('bizuno', 'options', 'return_actions',$actions);
         return true;
     }
 

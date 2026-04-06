@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -96,21 +96,17 @@ class contactsAdmin
     public function initialize()
     {
         // Rebuild some option values
-        $metaStat= dbMetaGet('%', 'options_contact_status');
+        $metaStat= dbMetaGet(0, 'options_contact_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
-        $stat0   = [['id'=>'0','text'=>lang('active')], ['id'=>'1','text'=>lang('inactive'),'color'=>'DarkRed'], ['id'=>'2','text'=>lang('locked'),'color'=>'DarkOrange']];
+        $stat0   = [['id'=>'0','text'=>'active'], ['id'=>'1','text'=>'inactive','color'=>'DarkRed'], ['id'=>'2','text'=>'locked','color'=>'DarkOrange']];
         $stat1   = sortOrder($stat0, 'text');
         dbMetaSet($idxStat, 'options_contact_status', $stat1);
-        
-        $metaCRM= dbMetaGet('%', 'options_crm_actions');
+        $metaCRM= dbMetaGet(0, 'options_crm_actions');
         $idxFreq= metaIdxClean($metaCRM); // remove the indexes
-        $crm0   = ['new' =>lang('contacts_crm_new_call', $this->moduleID), 'ret' =>lang('contacts_crm_call_back', $this->moduleID), 'flw' =>lang('contacts_crm_follow_up', $this->moduleID),
-                   'lead'=>lang('contacts_crm_new_lead', $this->moduleID), 'trn' =>lang('training'), 'inac'=>lang('inactive')];
+        $crm0   = ['new' =>'crm_new_call', 'ret' =>'crm_call_back', 'flw' =>'crm_follow_up',
+                   'lead'=>'crm_new_lead', 'trn' =>'training', 'inac'=>'inactive'];
         asort($crm0);
         dbMetaSet($idxFreq, 'options_crm_actions', $crm0);
-        // Put them in the cache for runtime access
-        setModuleCache('contacts', 'statuses', false, $stat1);
-        setModuleCache('contacts', 'actions_crm', false, $crm0);
         return true;
     }
 

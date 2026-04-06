@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -181,6 +181,10 @@ function bizunoUpgrade()
 
     if (version_compare($dbVer, '7.3.8') < 0) {
         UpgradeNextRefs(); // Upgrade next refs meta to new structure
+        // Repair mal-formed common options, then rebuild upon cache reload
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key IN ('options_return_status', 
+            'options_return_codes', 'options_qa_status', 'options_lead_times', 'options_contact_status',
+            'options_frequencies', 'options_lead_times', 'options_fxdast_types', 'options_crm_actions');");
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
@@ -193,35 +197,35 @@ function bizunoUpgrade()
     bizCacheExpClear(); // clear cache to force reload 
 }
 
-function UpgradeNextRefs()
+function UpgradeNextRefs($default='R1000')
 {
     $meta= dbMetaGet(0, 'bizuno_refs');
     $rID = metaIdxClean($meta);
     if (is_array($meta['next_ref_j12'])) { return; } // already converted, skip
     $newMeta = [
-            'next_audit_num'   => ['label'=>'audit',         'value'=>$meta['next_audit_num']],
-            'next_cproj_num'   => ['label'=>'ctype_j',       'value'=>$meta['next_cproj_num']],
-            'next_cust_id_num' => ['label'=>'ctype_c',       'value'=>$meta['next_cust_id_num']],
-            'next_edi_num'     => ['label'=>'edi',           'value'=>$meta['next_edi_num']],
-            'next_fxdast_num'  => ['label'=>'gl_acct_type_8','value'=>$meta['next_fxdast_num']],
-            'next_maint_num'   => ['label'=>'maintenance',   'value'=>$meta['next_maint_num']],
-            'next_promo_num'   => ['label'=>'promotions',    'value'=>$meta['next_promo_num']],
-            'next_qaobj_num'   => ['label'=>'objectives',    'value'=>$meta['next_qaobj_num']],
-            'next_ref_j2'      => ['label'=>'journal_id_2',  'value'=>$meta['next_ref_j2']],
-            'next_ref_j3'      => ['label'=>'journal_id_3',  'value'=>$meta['next_ref_j3']],
-            'next_ref_j4'      => ['label'=>'journal_id_4',  'value'=>$meta['next_ref_j4']],
-            'next_ref_j7'      => ['label'=>'journal_id_7',  'value'=>$meta['next_ref_j7']],
-            'next_ref_j9'      => ['label'=>'journal_id_9',  'value'=>$meta['next_ref_j9']],
-            'next_ref_j10'     => ['label'=>'journal_id_10', 'value'=>$meta['next_ref_j10']],
-            'next_ref_j12'     => ['label'=>'journal_id_12', 'value'=>$meta['next_ref_j12']],
-            'next_ref_j13'     => ['label'=>'journal_id_13', 'value'=>$meta['next_ref_j13']],
-            'next_ref_j18'     => ['label'=>'journal_id_18', 'value'=>$meta['next_ref_j18']],
-            'next_ref_j20'     => ['label'=>'journal_id_20', 'value'=>$meta['next_ref_j20']],
-            'next_return_num'  => ['label'=>'returns',       'value'=>$meta['next_return_num']],
-            'next_shipment_num'=> ['label'=>'shipment_id',   'value'=>$meta['next_shipment_num']],
-            'next_ticket_num'  => ['label'=>'ticket',        'value'=>$meta['next_ticket_num']],
-            'next_training_num'=> ['label'=>'training',      'value'=>$meta['next_training_num']],
-            'next_vend_id_num' => ['label'=>'ctype_v',       'value'=>$meta['next_vend_id_num']],
-            'next_wo_num'      => ['label'=>'work_orders',   'value'=>$meta['next_wo_num']]];
+            'next_audit_num'   => ['label'=>'audit',         'value'=>$meta['next_audit_num']   ?? $default],
+            'next_cproj_num'   => ['label'=>'ctype_j',       'value'=>$meta['next_cproj_num']   ?? $default],
+            'next_cust_id_num' => ['label'=>'ctype_c',       'value'=>$meta['next_cust_id_num'] ?? $default],
+            'next_edi_num'     => ['label'=>'edi',           'value'=>$meta['next_edi_num']     ?? $default],
+            'next_fxdast_num'  => ['label'=>'gl_acct_type_8','value'=>$meta['next_fxdast_num']  ?? $default],
+            'next_maint_num'   => ['label'=>'maintenance',   'value'=>$meta['next_maint_num']   ?? $default],
+            'next_promo_num'   => ['label'=>'promotions',    'value'=>$meta['next_promo_num']   ?? $default],
+            'next_qaobj_num'   => ['label'=>'objectives',    'value'=>$meta['next_qaobj_num']   ?? $default],
+            'next_ref_j2'      => ['label'=>'journal_id_2',  'value'=>$meta['next_ref_j2']      ?? $default],
+            'next_ref_j3'      => ['label'=>'journal_id_3',  'value'=>$meta['next_ref_j3']      ?? $default],
+            'next_ref_j4'      => ['label'=>'journal_id_4',  'value'=>$meta['next_ref_j4']      ?? $default],
+            'next_ref_j7'      => ['label'=>'journal_id_7',  'value'=>$meta['next_ref_j7']      ?? $default],
+            'next_ref_j9'      => ['label'=>'journal_id_9',  'value'=>$meta['next_ref_j9']      ?? $default],
+            'next_ref_j10'     => ['label'=>'journal_id_10', 'value'=>$meta['next_ref_j10']     ?? $default],
+            'next_ref_j12'     => ['label'=>'journal_id_12', 'value'=>$meta['next_ref_j12']     ?? $default],
+            'next_ref_j13'     => ['label'=>'journal_id_13', 'value'=>$meta['next_ref_j13']     ?? $default],
+            'next_ref_j18'     => ['label'=>'journal_id_18', 'value'=>$meta['next_ref_j18']     ?? $default],
+            'next_ref_j20'     => ['label'=>'journal_id_20', 'value'=>$meta['next_ref_j20']     ?? $default],
+            'next_return_num'  => ['label'=>'returns',       'value'=>$meta['next_return_num']  ?? $default],
+            'next_shipment_num'=> ['label'=>'shipment_id',   'value'=>$meta['next_shipment_num']?? $default],
+            'next_ticket_num'  => ['label'=>'ticket',        'value'=>$meta['next_ticket_num']  ?? $default],
+            'next_training_num'=> ['label'=>'training',      'value'=>$meta['next_training_num']?? $default],
+            'next_vend_id_num' => ['label'=>'ctype_v',       'value'=>$meta['next_vend_id_num'] ?? $default],
+            'next_wo_num'      => ['label'=>'work_orders',   'value'=>$meta['next_wo_num']      ?? $default]];
     dbMetaSet($rID, 'bizuno_refs', $newMeta);
 }

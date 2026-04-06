@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -40,17 +40,20 @@ class phreebooksReturns extends mgrJournal
     public $settings;
     public $myStore;
     public $reps;
-    public $return_status;
-    public $return_codes;
+    public $return_status = [];
+    public $return_codes = [];
 
     function __construct()
     {
-        $this->settings      = getModuleCache($this->moduleID, 'settings');
-        $this->myStore       = getUserCache('profile', 'store_id', false, 0);
-        $this->reps          = viewRoleDropdown();
-        $this->return_status = viewKeyDropdown(getModuleCache('bizuno', 'options', 'return_status'),false, true);
+        $this->settings= getModuleCache($this->moduleID, 'settings');
+        $this->myStore = getUserCache('profile', 'store_id', false, 0);
+        $this->reps    = viewRoleDropdown();
+        $metaStat      = getMetaCommon('options_return_status');
+        msgDebug("\nstatuses = ".msgPrint($metaStat));
+        foreach ($metaStat as $key => $value) { $this->return_status[] = ['id'=>$key, 'text'=>lang($value, $this->moduleID)]; }
         array_unshift($this->return_status,['id'=>0, 'text'=>lang('none')]);
-        $this->return_codes  = viewKeyDropdown(getModuleCache('bizuno', 'options', 'return_codes'), false, true);
+        $metaCode      = getMetaCommon('options_return_codes');
+        foreach ($metaCode as $key => $value) { $this->return_codes[] = ['id'=>$key, 'text'=>lang($value, $this->moduleID)]; }
         array_unshift($this->return_codes, ['id'=>0, 'text'=>lang('none')]);
         $this->managerSettings();
         $this->fieldStructure();

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-08
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/shipping/carriers/ups/manager.php
  *
  * UPS Developer Site:
@@ -100,9 +100,9 @@ class ups extends upsCommon
             'divs'   => [
                 'track' => ['order'=>20,'type'=>'panel','key'=>'pnlTrack','classes'=>['block25']]],
             'panels' => [
-                'pnlTrack' => ['label'=>$this->lang['track_shipments_title'],'type'=>'divs','divs'=>[
+                'pnlTrack' => ['title'=>lang('track_shipments_title', $this->moduleID),'type'=>'divs','divs'=>[
                     'formBOF'=> ['order'=>10,'type'=>'form',    'key' =>'frmUPSTrack'],
-                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>"<p>{$this->lang['track_shipments_desc']}</p>"],
+                    'desc'   => ['order'=>20,'type'=>'html',    'html'=>'<p>'.lang('track_shipments_desc', $this->moduleID).'</p>'],
                     'body'   => ['order'=>30,'type'=>'fields',  'keys'=>['frmUPSTrack','dateUPSTrack','btnUPSTrack']],
                     'formEOF'=> ['order'=>90,'type'=>'html',    'html'=>"</form>"]]]],
             'forms'  => [

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-05
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -141,7 +141,7 @@ class payfabric
         $html  =
 html5($this->code.'_action', ['label'=>lang('capture'),            'attr'=>['type'=>'radio','value'=>'c','checked'=>$checked=='c'?true:false],'hidden'=>$show_c?false:true,
     'events'=>['onChange'=>"jqBiz('#div{$this->code}s').hide(); jqBiz('#div{$this->code}w').hide(); jqBiz('#div{$this->code}c').show();"]]).
-html5($this->code.'_action', ['label'=>$this->lang['stored'],      'attr'=>['type'=>'radio','value'=>'s','checked'=>$checked=='s'?true:false],
+html5($this->code.'_action', ['label'=>lang('stored'),      'attr'=>['type'=>'radio','value'=>'s','checked'=>$checked=='s'?true:false],
     'events'=>['onChange'=>"jqBiz('#div{$this->code}c').hide(); jqBiz('#div{$this->code}w').hide(); jqBiz('#div{$this->code}s').show();"]]).
 html5($this->code.'_action', ['label'=>$this->lang['at_payfabric'],'attr'=>['type'=>'radio','value'=>'w','checked'=>$checked=='w'?true:false],
     'events'=>['onChange'=>"jqBiz('#div{$this->code}c').hide(); jqBiz('#div{$this->code}s').hide(); jqBiz('#div{$this->code}w').show();"]]).'<br />';

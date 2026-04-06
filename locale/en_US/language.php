@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-30
+ * @version    7.x Last Update: 2026-04-05
  * @filesource /local/en_US/language.php
  */
 
@@ -1078,7 +1078,9 @@ $langCore = [
     'invoice_num_15' => 'Transfer #',
     'invoice_num_16' => 'Adjustment #',
     'invoice_num_17' => 'Deposit Ref #',
+    'invoice_num_18' => 'Reference #',
     'invoice_num_20' => 'Payment Ref #',
+    'invoice_num_22' => 'Reference #',
     'purch_order_id' => 'PO Reference',
     'recur_id' => 'Recur ID',
     'admin_id' => 'User ID',

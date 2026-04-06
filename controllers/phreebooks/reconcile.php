@@ -244,7 +244,7 @@ msgDebug("\nRead not in period = ".print_r($not_in_period, true));
             'source' => [
                 'filters'=> [
                     'period'=> ['order'=>10,'options'=>['width'=>300],'label'=>lang('period'),'break'=>true,'values'=>viewKeyDropdown(localeDates(false, false, false, false, true)),'attr'=>['type'=>'select','value'=>$this->defaults['period']]],
-                    'glAcct'=> ['order'=>20,'options'=>['width'=>350],'label'=>lang('gl_acct_id'),'values'=>dbGLDropDown(false,['0']), 'attr'=>['type'=>'select','value'=>$this->defaults['glAcct']]]],
+                    'glAcct'=> ['order'=>20,'options'=>['width'=>350],'label'=>lang('gl_account'),'values'=>dbGLDropDown(false,['0']), 'attr'=>['type'=>'select','value'=>$this->defaults['glAcct']]]],
                 'fields' => ['stmt_balance'=>['order'=>50,'label'=>lang('statement_balance'),'attr'=>['type'=>'currency','value'=>$stmt_balance]]]],
             'columns'=> [
                 'id'         => ['order'=> 0,'attr'=>['hidden'=>true]],

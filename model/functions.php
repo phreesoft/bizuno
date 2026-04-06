@@ -1213,7 +1213,7 @@ function sortOrder($arrToSort=[], $sortKey='order', $order='asc')
     foreach ($arrToSort as $key => $value) {
         $temp[$key] = isset($value[$sortKey]) ? strtolower($value[$sortKey]) : 999;
     }
-    $type = $order=='desc' ? SORT_DESC : SORT_ASC;
+    $type = strtolower($order)=='desc' ? SORT_DESC : SORT_ASC;
     array_multisort($temp, $type, $arrToSort);
     return $arrToSort;
 }

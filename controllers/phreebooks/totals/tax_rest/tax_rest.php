@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-25
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -105,7 +105,7 @@ class tax_rest
             'tax_exempt'        => ['label'=>lang('tax_exempt'),'events'=>['onChange'=>"totalUpdate('tax_exempt');"],'attr'=>['type'=>'checkbox','value'=>1]],
             $this->code.'_gl'   => ['label'=>lang('gl_account'),'attr'=>['type'=>'ledger','value'=>$this->settings['gl_account']]],
             $this->code.'_opt'  => ['icon'=>'settings','size'=>'small','events'=>['onClick'=>"jqBiz('#phreebooks_$this->code').toggle('slow');"]],
-            "totals_$this->code"=> ['label'=>lang("tax_rate_id_{$type}").' '.$this->lang['extra_title'],
+            "totals_$this->code"=> ['label'=>lang('sales_tax').' '.$this->lang['extra_title'],
                 'attr' => ['type'=>'currency','value'=>0]]];
         msgDebug("\nTotal class: $this->code method: render working with items: ".print_r($data['items'], true));
         $present = false;

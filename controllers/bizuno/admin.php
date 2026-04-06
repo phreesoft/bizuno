@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-14
+ * @version    7.x Last Update: 2026-04-04
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -159,26 +159,22 @@ class bizunoAdmin
     public function initialize()
     {
         // Rebuild some option values
-        $metaFreqs= dbMetaGet('%', 'options_frequencies');
+        $metaFreqs= dbMetaGet(0, 'options_frequencies');
         $idxFreq  = metaIdxClean($metaFreqs); // remove the indexes
-        $freqs    = ['d'=>lang('daily'), 'w'=>lang('weekly'), 'b'=>lang('bi-weekly'), 'h'=>lang('semi-monthly'), 'm'=>lang('monthly'),
-            'q'=>lang('quarterly'), 'y'=>lang('yearly'), '3'=>lang('3-yearly'), 'z'=>lang('one_time')];
+        $freqs    = ['d'=>'daily',    'w'=>'weekly','b'=>'bi-weekly','h'=>'semi-monthly', 'm'=>'monthly',
+                     'q'=>'quarterly','y'=>'yearly','3'=>'3-yearly', 'z'=>'one_time'];
         dbMetaSet($idxFreq, 'options_frequencies', $freqs);
         
-        $metaLT   = dbMetaGet('%', 'options_lead_times');
+        $metaLT   = dbMetaGet(0, 'options_lead_times');
         $idxLT    = metaIdxClean($metaLT); // remove the indexes
-        $leadTimes= ['1d'=>lang('lead01', $this->moduleID), '2d'=>lang('lead02', $this->moduleID), '1w'=>lang('lead07', $this->moduleID), '2w'=>lang('lead14', $this->moduleID), '1m'=>lang('lead30', $this->moduleID)];
+        $leadTimes= ['1d'=>'lead01', '2d'=>'lead02', '1w'=>'lead07', '2w'=>'lead14', '1m'=>'lead30'];
         dbMetaSet($idxLT, 'options_lead_times', $leadTimes);
         
-        $metaFA   = dbMetaGet('%', 'options_fxdast_types');
+        $metaFA   = dbMetaGet(0, 'options_fxdast_types');
         $idxFA    = metaIdxClean($metaFA); // remove the indexes
-        $faTypes  = ['bd'=>lang('fa_type_bd', $this->moduleID), 'pc'=>lang('fa_type_pc', $this->moduleID), 'fn'=>lang('fa_type_fn', $this->moduleID), 'ld'=>lang('fa_type_ld', $this->moduleID),
-            'ma'=>lang('fa_type_ma', $this->moduleID), 'sw'=>lang('fa_type_sw', $this->moduleID), 'te'=>lang('fa_type_te', $this->moduleID), 'vh'=>lang('fa_type_vh', $this->moduleID)];
+        $faTypes  = ['bd'=>'fa_type_bd', 'pc'=>'fa_type_pc', 'fn'=>'fa_type_fn', 'ld'=>'fa_type_ld',
+            'ma'=>'fa_type_ma', 'sw'=>'fa_type_sw', 'te'=>'fa_type_te', 'vh'=>'fa_type_vh'];
         dbMetaSet($idxFA, 'options_fxdast_types', $faTypes);
-        // Put them in the cache for runtime access
-        setModuleCache('bizuno', 'options', 'frequencies', $freqs);
-        setModuleCache('bizuno', 'options', 'lead_times',  $leadTimes);
-        setModuleCache('bizuno', 'options', 'faTypes',     $faTypes);
         return true;
     }
 
