@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-09
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/phreebooks/journals/j02.php
  */
 
@@ -31,6 +31,7 @@ bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/phreebooks/journals/common.php", 'jCo
 
 class j02 extends jCommon
 {
+    public $moduleID = 'phreebooks';
     public  $journalID = 2;
     public $main;
     public $items;
@@ -99,6 +100,7 @@ class j02 extends jCommon
      */
     private function addGLNotes(&$items)
     {
+        $arrow = '';
         foreach ($items as $idx => $row) {
             $found = false;
             foreach (getModuleCache('phreebooks', 'chart') as $acct) {

@@ -93,7 +93,6 @@ class shippingManager extends mgrJournal
      */
     protected function managerGrid($security=0, $args=[])
     {
-        $refID = isset($args['refID']) ? $args['refID'] : 0;
         $stores= getModuleCache('bizuno', 'stores');
         $data  = array_replace_recursive(parent::gridBase($security, $args), [
             'source'  => [
@@ -102,12 +101,12 @@ class shippingManager extends mgrJournal
                     'store_id'=> ['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]]]],
             'columns' => [
-//                '_rID'        => ['order'=>0, 'attr'=>['hidden'=>true]],
-//                '_table'      => ['order'=>0, 'attr'=>['hidden'=>true]],
                 'action'      => ['order'=>1, 'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index){ return dg{$this->domSuffix}Formatter(value,row,index); }"],
                     'actions' => [
-                        'print'    => ['order'=>10,'icon'=>'print','label'=>lang('print'),                  'events'=>['onClick'=>"winOpen('shippingLabel', '$this->moduleID/ship/labelView&refID=$refID&rID=idTBD');"]],
-                        'reconcile'=> ['order'=>70,'icon'=>'apply','label'=>lang('toggle_reconcile', $this->moduleID),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/toggleReconcile&refID=$refID', idTBD);"]]]],
+                        'print'    => ['order'=>10,'icon'=>'print','label'=>lang('print'),
+                            'events'=>['onClick'=>"winOpen('shippingLabel', '$this->moduleID/ship/labelView&metaID=idTBD&table=tableTBD');"]],
+                        'reconcile'=> ['order'=>70,'icon'=>'apply','label'=>lang('toggle_reconcile', $this->moduleID),
+                            'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/toggleReconcile&metaID=idTBD&table=tableTBD', idTBD);"]]]],
                 'ref_num'     => ['order'=>10,'label'=>lang('shipment_id'),   'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]],
                 'invoice_num' => ['order'=>15,'label'=>lang('invoice_num_12'),'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true]],
                 'store_id'    => ['order'=>20,'label'=>lang('store_id'),      'attr'=>['width'=> 80,'sortable'=>true,'resizable'=>true],'format'=>'storeID'],
@@ -151,7 +150,7 @@ class shippingManager extends mgrJournal
     accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'divLabel', '".jsLang(lang('label_generator', $this->moduleID))."', '$this->moduleID/ship/labelMain', rID);
 }
 jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',textField:'invoice_num',mode:'remote',
-  url: bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/managerRows',
+  url: bizunoAjax+'&bizRt=$this->moduleID/$this->pageID/getUnshippedOrders',
   onLoadSuccess: function (data) {
       jqBiz.parser.parse(jqBiz(this).datagrid('getPanel'));
       var g=jqBiz('#selInvoice').combogrid('grid');
@@ -160,12 +159,12 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
   },
   onClickRow: function (id, data) { shippingLabelMain(data.id); },
   columns:[[
-    {field:'id', hidden:true},
-    {field:'invoice',title:'".jsLang('invoice_num_12')."', width: 80},
-    {field:'bill_to',title:'".jsLang('primary_name_b')."', width:150},
-    {field:'ship_to',title:'".jsLang('primary_name_s')."', width:150},
-    {field:'date',   title:'".jsLang('post_date_12')  ."', width:100},
-    {field:'method', title:'".jsLang('method_code')   ."', width:200}]]
+    {field:'id',      hidden:true},
+    {field:'invoice', title:'".jsLang('invoice_num_12')."', width: 80},
+    {field:'bill_to', title:'".jsLang('primary_name_b')."', width:180},
+    {field:'store_id',title:'".jsLang('store_id')      ."', width:120},
+    {field:'date',    title:'".jsLang('post_date_12')  ."', width:100},
+    {field:'method',  title:'".jsLang('method_code')   ."', width:200}]]
 });\n";
         $data = [
             'divs'     => ["div{$this->domSuffix}"=>['type'=>'tabs','order'=>30,'key'=>"tab{$this->domSuffix}"]],
@@ -210,6 +209,24 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $output= $this->getMgrRows();
         $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($this->managerRowsSort($grid, $output))]);
     }
+    public function getUnshippedOrders(&$layout=[])
+    {
+        $output= [];
+        $search= getSearch();
+        $crit  = "waiting='1' && journal_id=12";
+        if (!empty($search)) { $crit .= " AND invoice_num LIKE '".addslashes($search)."'"; }
+        $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $crit, 'invoice_num', ['id', 'post_date', 'invoice_num', 'primary_name_b', 'store_id', 'method_code']);
+        foreach ($rows as $row) {
+            $output[] = [
+                'id'      => $row['id'],
+                'invoice' => $row['invoice_num'],
+                'bill_to' => $row['primary_name_b'],
+                'store_id'=> viewFormat($row['store_id'], 'storeID'),
+                'date'    => viewFormat($row['post_date'], 'date'),
+                'method'  => viewFormat($row['method_code'], 'shipInfo')];
+        }
+        $layout= array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode(['total'=>sizeof($output), 'rows'=>$output])]);
+    }
     private function getMgrRows()
     {
         msgDebug("\nEntering getMgrRows");
@@ -226,6 +243,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             msgDebug("\nmeta from journal table = ".msgPrint($meta));
             $output[] = [
                 'id'          => $row['metaID'],
+                '_rID'        => $row['metaID'],
                 '_table'      => 'journal',
                 'ref_num'     => $meta['ref_num'],
                 'invoice_num' => $row['invoice_num'],
@@ -243,6 +261,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             msgDebug("\nMatched meta from common with value = ".msgPrint($value));
             $output[] = [
                 'id'          => $value['_rID'],
+                '-rID'        => $value['_rID'],
                 '_table'      => 'common',
                 'ref_num'     => $value['ref_num'],
                 'invoice_num' => '',
@@ -387,7 +406,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $path   = "data/shipping/labels/{$carrier[0]}/{$date[0]}/{$date[1]}/{$date[2]}";
         foreach ($meta['packages']['rows'] as $pkg) {
             if (empty($pkg['tracking_id'])) { continue; }
-            $success = $carrier[0] ? retrieve_carrier_function($carrier[0], 'labelDelete', $pkg['tracking_id'], $carrier[1], $pkg['store_id']) : true; // true if successful
+            $success = $carrier[0] ? retrieve_carrier_function($carrier[0], 'labelDelete', $pkg['tracking_id'], $carrier[1], $pkg['store_id']??0) : true; // true if successful
             if (!$success) { return msgAdd("There was an error deleting the label from {$carrier[0]}."); }
             $io->fileDelete("$path/{$pkg['tracking_id']}*");
         }

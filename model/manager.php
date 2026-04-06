@@ -418,7 +418,8 @@ class mgrJournal
         if (empty($defs['_rID'])) { return msgAdd('Illegal Access!'); }
         $metaVal= dbMetaGet($defs['_rID'], $this->metaPrefix, $defs['_table']);
         dbMetaDelete($defs['_rID'], $defs['_table']);
-        msgLog("$this->mgrTitle - ".lang('delete').": {$metaVal['title']}");
+        $title = $metaVal['title'] ?? '';
+        msgLog("$this->mgrTitle - ".lang('delete').": $title");
         $io->fileDelete("{$this->attachPath}rID_{$defs['_rID']}_*.zip");
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select',{$defs['tabID']}); bizGridReload('dg{$this->domSuffix}'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]]);
     }

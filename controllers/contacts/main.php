@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/contacts/main.php
  */
 
@@ -250,7 +250,7 @@ class contactsMain
         $structure['email4']['label']        = lang('email_ap');
         $structure['short_name']['tooltip']  = lang('msg_leave_null_to_assign_ref');
         $structure['inactive']['label']      = lang('status');
-        $structure['inactive']['values']     = getModuleCache('contacts', 'statuses');
+        $structure['inactive']['values']     = getMetaCommon('options_contact_status');
         $structure['rep_id']['values']       = viewRoleDropdown();
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields
@@ -680,7 +680,7 @@ class contactsMain
     protected function dgContacts($name, $type, $security=0, $rID=false)
     {
         $this->managerSettings($type);
-        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], getModuleCache('contacts','statuses'));
+        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], getMetaCommon('options_contact_status'));
         $f0_value = "";
         if ($this->defaults['f0']<>'a') { $f0_value = "inactive='{$this->defaults['f0']}'"; }
         $data = ['id'=>"dg$name", 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
@@ -773,10 +773,9 @@ class contactsMain
 
     private function dgContactsStyler()
     {
+        $rows = getMetaCommon('options_contact_status');
         $html = 'function(value,row,index) { ';
-        $statuses = getModuleCache('contacts','statuses');
-        msgDebug("\nstatuses = ".print_r($statuses, true));
-        foreach ($statuses as $status) {
+        foreach ($rows as $status) {
             if (empty($status['color'])) { continue; }
             $html .= "if (row.inactive=='{$status['id']}') { return {class:'row-{$status['color']}'}; }";
         }
@@ -786,10 +785,10 @@ class contactsMain
     private function dgContactsFootnotes()
     {
         $html = lang('color_codes').': ';
-        $statuses = getModuleCache('contacts','statuses');
-        foreach ($statuses as $status) {
+        $rows = getMetaCommon('options_contact_status');
+        foreach ($rows as $status) {
             if (empty($status['color'])) { continue; }
-            $html .= '<span class="row-'.$status['color'].'">&nbsp;'.$status['text'].'&nbsp;</span>&nbsp;';
+            $html .= '<span class="row-'.$status['color'].'">&nbsp;'.lang($status['text']).'&nbsp;</span>&nbsp;';
         }
         return ['codes'=>$html];
     }

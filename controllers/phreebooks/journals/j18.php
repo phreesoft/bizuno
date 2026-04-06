@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-09
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/phreebooks/journals/j18.php
  */
 
@@ -94,7 +94,7 @@ class j18 extends jCommon
                 'events'=> ['onClick'=>"windowEdit('phreebooks/main/toggleStatus&cID=$cID&jID=$this->journalID"."','winNewStat','".lang('status_change')."',400,150);"]];
             if ($rID || $cID) {
                 $curStat   = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'inactive', "id=$cID");
-                $valuesStat= getModuleCache('contacts', 'statuses');
+                $valuesStat= getMetaCommon('options_contact_status');
                 switch ($curStat) {
                     case '0': $color = 'green'; break;
                     case '1':

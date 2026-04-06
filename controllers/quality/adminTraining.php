@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/quality/adminTraining.php
  */
 
@@ -69,7 +69,7 @@ class qualityAdminTraining extends mgrJournal
     }
     protected function managerGrid($security=0, $args=[])
     {
-        $statuses= array_merge([['id'=>'a','text'=>lang('all')]], getModuleCache('contacts', 'statuses'));
+        $statuses= array_merge([['id'=>'a','text'=>lang('all')]], getMetaCommon('options_contact_status'));
         $data    = array_replace_recursive(parent::gridBase($security, $args), [
             'source' => [
                 'search' => ['ref_num', 'title', 'notes'],

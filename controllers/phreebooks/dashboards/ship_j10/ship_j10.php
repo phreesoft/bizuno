@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/phreebooks/dashboards/ship_j10/ship_j10.php
  */
 
@@ -35,7 +35,6 @@ class ship_j10
     public  $secID    = 'j10_mgr';
     public  $category = 'customers';
     public  $struc;
-    private $choices;
     private $today;
     public  $lang     = ['title'=>'Sales Orders Due to Ship',
         'description' => 'Lists open customer Sales Orders that are due to ship today (or past due). Links to review the invoice are also provided. Settings are available for enhanced security and control.',
@@ -48,7 +47,6 @@ class ship_j10
     function __construct()
     {
         $this->today  = biz_date();
-        $this->choices= getModuleCache('contacts','statuses');
         $this->fieldStructure();
     }
 
@@ -168,9 +166,9 @@ class ship_j10
     }
     private function rowStyler($cID, $cText)
     {
-        msgDebug("\nEntering rowStyler with cID = $cID and cText = $cText");
         $cStatus= dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'inactive', "id=$cID");
-        foreach ($this->choices as $status) {
+        $choices= getMetaCommon('options_contact_status');
+        foreach ($choices as $status) {
             if (empty($status['color'])) { continue; }
             if ($status['id']==$cStatus) { return '<span class="row-'.$status['color'].'">'.$cText.'</span>'; }
         }

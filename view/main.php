@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /view/main.php
  */
 
@@ -456,8 +456,8 @@ function viewFormat($value, $format = '')
         case 'contactType':return lang("type_{$value}");
         case 'cIDStatus':
             $result  = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'short_name',   "id='$value'");
-            $statuses= getModuleCache('contacts', 'statuses');
-            foreach ($statuses as $stat) { if ($stat['id']==$result) { return $stat['text']; } }
+            $statuses= getMetaCommon('options_contact_status');
+            foreach ($statuses as $stat) { if ($stat['id']==$result) { return lang($stat['text']); } }
             return '';
         case 'cIDAttn':    return ($result = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'contact',   "id='$value'")) ? $result : '';
         case 'cIDTele1':   return ($result = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'telephone1',"id='$value'")) ? $result : '';

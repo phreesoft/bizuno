@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-05
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /local/en_US/language.php
  */
 
@@ -208,6 +208,7 @@ $langCore = [
     'cost' => 'Cost',
     'create_date' => 'Date Created',
     'create_po' => 'Create Drop Ship PO',
+    'credit_hold' => 'Credit Hold',
     'credit_limit' => 'Credit Limit',
     'criteria' => 'Criteria',
     'csv' => 'CSV Format',

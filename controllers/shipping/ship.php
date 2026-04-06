@@ -68,7 +68,7 @@ class shippingShip extends shippingCommon
         $data  = ['type'=>'divHTML',
             'toolbars' => ['tbShipping'=>['icons'=>[
                 'print' => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmLabel').submit();"]],
-                'new'   => ['order'=>40,'events'=>['onClick'=>"accordionEdit('accShipping', 'dgShipping', 'divLabel', '".lang('label_generator', $this->moduleID)."', '$this->moduleID/$this->pageID/labelMain', 0);"]],
+                'new'   => ['order'=>40,'events'=>['onClick'=>"accordionEdit('accShipping', 'dgShipping', 'divLabel', '".jsLang(lang('label_generator', $this->moduleID))."', '$this->moduleID/$this->pageID/labelMain', 0);"]],
                 'rate'  => ['order'=>70,'label'=>lang('rate_quote'),'icon'=>'quote','events'=>['onClick'=>"pkgEstimate();"]]]]],
             'divs' => [
                 'toolbar' => ['order'=>10,'type'=>'toolbar', 'key'=>'tbShipping'],
@@ -397,20 +397,20 @@ function preSubmit() {
         $meta['total_book'] = $bookTotal;
         $meta['packages']= ['total'=>sizeof($package), 'rows'=>$package];
         $refID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "journal_id=12 AND invoice_num='{$value['ref_id']}'"); // ref_id should be the same for all packages
-        $meta['table'] = empty($refID) ? 'common' : 'journal';
+        $meta['_table'] = empty($refID) ? 'common' : 'journal';
         if (!empty($refID)) { dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'0'], 'update', "id=$refID"); }
         else {  msgAdd('Bizuno could not find an invoice to tie this label to.'); }
-        $metaID = dbMetaSet(0, 'shipment', $meta, $meta['table'], $refID);
+        $metaID = dbMetaSet(0, 'shipment', $meta, $meta['_table'], $refID);
         msgLog(lang('ship')." - ".lang('reference').": {$value['ref_id']} ".lang('method')." ".viewProcess("$carrier:{$value['method']}", 'shipInfo')." ".lang('num_boxes').": ".sizeof($labelData));
         dbTransactionCommit();
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"
-            accordionEdit('accShipping', 'dgShipping', 'divLabel', '{lang('label_generator']}', '$this->moduleID/ship/labelMain', 0);
+            accordionEdit('accShipping', 'dgShipping', 'divLabel', '".jsLang(lang('label_generator', $this->moduleID))."', '$this->moduleID/ship/labelMain', 0);
             bizGridReload('dgShipping');
             jqBiz('#accShipping').accordion('select',0);
             jqBiz('#selInvoice').combogrid('clear');
             jqBiz('#selInvoice').combogrid('grid').datagrid({data:[]});
             bizFocus('selInvoice');
-            winOpen('shippingLabel', '$this->moduleID/$this->pageID/labelView&table={$meta['table']}&metaID=$metaID');"]]);
+            winOpen('shippingLabel', '$this->moduleID/$this->pageID/labelView&table={$meta['_table']}&metaID=$metaID');"]]);
     }
 
     /**
@@ -474,15 +474,10 @@ function preSubmit() {
     {
         global $io;
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $rID   = clean('rID',   'integer', 'get');
-        $metaID= clean('metaID','integer', 'get');
-        $table = clean('table', 'db_field','get');
-        $html  = $jsHead = $jsBody = $jsReady = '';
-        if (!empty($rID)) { // passed from the manager  
-            $meta = getMetaJournal($rID, 'shipment');
-        } else {
-            $meta = dbMetaGet($metaID, 'shipment', $table);
-        }
+        $metaID = clean('metaID','integer', 'get');
+        $table  = clean('table', 'db_field','get');
+        $html   = $jsHead = $jsBody = $jsReady = '';
+        $meta   = dbMetaGet($metaID, 'shipment', $table);
         msgDebug("\nRead meta for shipping = ".print_r($meta, true));
         if (empty($meta)) { return msgAdd("Failed to pull the record for rID = $metaID and table $table"); }
         $date   = explode('-', substr($meta['ship_date'], 0, 10));

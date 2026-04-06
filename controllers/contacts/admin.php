@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -98,7 +98,8 @@ class contactsAdmin
         // Rebuild some option values
         $metaStat= dbMetaGet(0, 'options_contact_status');
         $idxStat = metaIdxClean($metaStat); // remove the indexes
-        $stat0   = [['id'=>'0','text'=>'active'], ['id'=>'1','text'=>'inactive','color'=>'DarkRed'], ['id'=>'2','text'=>'locked','color'=>'DarkOrange']];
+        $stat0   = [['id'=>'0','text'=>'active'], ['id'=>'1','text'=>'inactive','color'=>'DarkRed'],
+            ['id'=>'2','text'=>'locked','color'=>'DarkOrange'], ['id'=>'H','text'=>'credit_hold','color'=>'BlueViolet']];
         $stat1   = sortOrder($stat0, 'text');
         dbMetaSet($idxStat, 'options_contact_status', $stat1);
         $metaCRM= dbMetaGet(0, 'options_crm_actions');

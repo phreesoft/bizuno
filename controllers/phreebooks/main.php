@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-05
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -647,7 +647,7 @@ function bizUnitDiscDisc(newValue) {
                     if ($i > 0) { // Remove row id's for future posts, keep if re-posting single entry
                         for ($j = 0; $j < count($ledger->items); $j++) { $ledger->items[$j]['id'] = 0; }
                     } else { // allow for changes to some main fields in the recur, first post only
-                        $ledger->main = array_replace($ledger->main, ['post_date'=>$values['post_date'],'invoice_num'=>$values['invoice_num'],'terminal_date'=>$values['terminal_date']]);
+                        $ledger->main = array_replace($ledger->main, ['post_date'=>$values['post_date'],'invoice_num'=>$values['invoice_num'],'terminal_date'=>$values['terminal_date']??'null']);
                     }
                     msgDebug("\n************ Re-posting recur id = {$ledger->main['id']} ******************");
                     if (!$ledger->Post()) { return; }
@@ -1178,10 +1178,10 @@ function bizUnitDiscDisc(newValue) {
     {
         $statusHtml = '';
         $acctActive = true;
-        $statuses   = getModuleCache('contacts', 'statuses');
+        $statuses   = getMetaCommon('options_contact_status');
         foreach ($statuses as $stat) { if ($stat['id']==$contact['inactive'] && !empty($stat['id'])) { // only for non-active
             $acctActive = false;
-            $statusHtml.= '<p style="font-weight:bold;text-align:center;" class="row-'.$stat['color'].'">'.$stat['text'].'</p>';
+            $statusHtml.= '<p style="font-weight:bold;text-align:center;" class="row-'.$stat['color'].'">'.lang($stat['text']).'</p>';
         } }
         // set the customer/vendor status in order of importance
         if ($new_data['past_due'] > 0)                         { $statusBg='yellow'; $statusMsg=lang('msg_contact_status_past_due', $this->moduleID); }
@@ -2011,7 +2011,7 @@ function bizUnitDiscDisc(newValue) {
         msgDebug("\nEntering toggleStatus with cID = $cID and jID = $jID");
         $curStat= dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'inactive', "id=$cID");
         $html  = '<p>'.lang('Selecte a new status:').'</p>';
-        $html .= html5('statusID',['values'=>getModuleCache('contacts', 'statuses'),'attr'=>['type'=>'select', 'value'=>$curStat]]);
+        $html .= html5('statusID',['values'=>getMetaCommon('options_contact_status'), 'attr'=>['type'=>'select', 'value'=>$curStat]]);
         $html .= html5('iconGO',  ['icon'=>'next','events'=>['onClick'=>"jsonAction('phreebooks/main/toggleStatusSet&jID=$jID&cID=$cID&selStat='+bizSelGet('statusID')); bizWindowClose('winNewStat');"]]);
         $layout = array_replace_recursive($layout, ['type'=>'divHTML','divs'=>['winNewStat'=>['order'=>50,'type'=>'html','html'=>$html]]]);
     }
@@ -2057,10 +2057,10 @@ function bizUnitDiscDisc(newValue) {
         $times = clean('rID', ['format'=>'integer', 'default'=>2], 'get');
         $freq  = clean('data',['format'=>'integer', 'default'=>3], 'get');
         $fields= [
-            'txtIntro'=> ['order'=> 1,'html' =>"<p>{lang('recur_desc']}</p>",'attr'=>['type'=>'raw']],
+            'txtIntro'=> ['order'=> 1,'html' =>'<p>'.lang('recur_desc', $this->moduleID).'</p>','attr'=>['type'=>'raw']],
             'rcrTimes'=> ['order'=>10,'label'=>lang('recur_times', $this->moduleID),'position'=>'after','attr'=>['type'=>'integer','value'=>$times,'size'=>3,'maxlength'=>2]],
             'hr1'     => ['order'=>20,'html' =>'<hr>','attr'=>['type'=>'raw']],
-            'txtFreq' => ['order'=>21,'html' =>"<p>{lang('recur_frequency']}</p>",'attr'=>['type'=>'raw']],
+            'txtFreq' => ['order'=>21,'html' =>'<p>'.lang('recur_frequency', $this->moduleID).'</p>','attr'=>['type'=>'raw']],
             'radio0'  => ['order'=>30,'break'=>true,'label'=>lang('dates_weekly'),   'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>1,'checked'=>$freq==1?true:false]],
             'radio1'  => ['order'=>40,'break'=>true,'label'=>lang('dates_bi_weekly'),'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>2,'checked'=>$freq==2?true:false]],
             'radio2'  => ['order'=>50,'break'=>true,'label'=>lang('dates_monthly'),  'attr'=>['type'=>'radio','id'=>'radioRecur','name'=>'radioRecur','value'=>3,'checked'=>$freq==3?true:false]],

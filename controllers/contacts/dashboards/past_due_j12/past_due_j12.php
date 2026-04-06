@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-06
  * @filesource /controllers/contacts/dashboards/past_due_j12/past_due_j12.php
  */
 
@@ -35,14 +35,12 @@ class past_due_j12
     public  $secID    = 'j12_mgr';
     public  $category = 'banking';
     public  $struc;
-    private $choices;
     public  $lang     = ['title'=>'Past Due Invoices',
         'description'=> 'Lists past due customer invoices. A link to edit the customer record is provided to set/clear account status. Settings are available for enhanced security and control.'];
     private $journalID= 12;
     
     function __construct()
     {
-        $this->choices = getModuleCache('contacts','statuses');
         $this->fieldStructure();
     }
 
@@ -112,8 +110,9 @@ class past_due_j12
 
     private function rowStyler($cID, $cText)
     {
+        $choices = getMetaCommon('options_contact_status');
         $cStatus= dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'inactive', "id=$cID");
-        foreach ($this->choices as $status) {
+        foreach ($choices as $status) {
             if (empty($status['color'])) { continue; }
             if ($status['id']==$cStatus) { return '<span class="row-'.$status['color'].'">'.$cText.'</span>'; }
         }
