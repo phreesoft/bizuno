@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-03
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /model/db.php
  */
 
@@ -1056,9 +1056,9 @@ function dbReportsCache()
     msgDebug("\nResult from dbMetaGet row count = ".sizeof($metaVal));
     $output = [];
     foreach ($metaVal as $row) {
-        $output['r'.$row['_rID']] = ['_rID'   =>$row['_rID'],     'id'       =>$row['_rID'], 'parent_id'=>$row['parent_id'],
-            'title'=>$row['title'],'mime_type'=>$row['mime_type'],'group_id' =>isset($row['groupname']) ? $row['groupname'] : $row['group_id'], // for legacy
-            'users'=>$row['users'],'roles'    =>$row['roles']];
+        $output['r'.$row['_rID']] = ['_rID'=>$row['_rID'], 'id'=>$row['_rID'], 'parent_id'=>$row['parent_id'],
+            'title'=>$row['title']??lang('none'), 'mime_type'=>$row['mime_type'], 'group_id' =>isset($row['groupname']) ? $row['groupname'] : $row['group_id'], // for legacy
+            'users'=>$row['users'],'roles' =>$row['roles']];
     }
     $sort0  = sortOrder($output,'title');
     msgDebug("\nWriting ".sizeof((array)$sort0)." sorted report/form from list."); // = ".print_r($sort0, true));

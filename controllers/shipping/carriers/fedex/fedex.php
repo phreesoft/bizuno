@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -206,7 +206,7 @@ class fedex extends fedexCommon
                 $jMain   = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : [];
                 msgDebug("\nRead invoice data from db = ".print_r($jMain, true));
                 if (empty($jMain)) {
-                    $issues['NoRec'][] = sprintf($this->lang['recon_no_records'], $ship_date, $ref_num, $track_num, $ship_name, $rcv_name, $cost);
+                    $issues['NoRec'][] = sprintf(lang('recon_no_records', $this->moduleID), $ship_date, $ref_num, $track_num, $ship_name, $rcv_name, $cost);
                     continue;
                 }
                 if (empty($metaVals['r'.$jMain['metaID']])) { $metaVals['r'.$jMain['metaID']] = json_decode($jMain['meta_value'], true); }
@@ -217,21 +217,21 @@ class fedex extends fedexCommon
                 if (empty($metaVals['r'.$jMain['metaID']]['actual_cost'])) { $metaVals['r'.$jMain['metaID']]['actual_cost'] = 0; }
                 $metaVals['r'.$jMain['metaID']]['actual_cost'] += $cost;
             } else {
-                $issues['NoRec'][] = sprintf($this->lang['recon_no_records'], $ship_date, $ref_num, $track_num, $ship_name, $rcv_name, $cost);
+                $issues['NoRec'][] = sprintf(lang('recon_no_records', $this->moduleID), $ship_date, $ref_num, $track_num, $ship_name, $rcv_name, $cost);
                 continue;
             }
             $estimate = ($estCost + $this->settings['recon_fee']) * (1 + $this->settings['recon_percent']/100);
             msgDebug("\ncost = $cost and adjusted estimate = $estimate");
             if ($cost > $estimate) {
                 $extra = ". Customer: {$jMain['primary_name_b']}".$extraRef;
-                $issues['OverQuote'][] = sprintf($this->lang['recon_cost_over'], $ship_date, $ref_num, $track_num, $cost, $estCost).$extra;
+                $issues['OverQuote'][] = sprintf(lang('recon_cost_over', $this->moduleID), $ship_date, $ref_num, $track_num, $cost, $estCost).$extra;
             }
             $custInv = !empty($jMain['freight']) ? $jMain['freight'] : 0;
 //          $quoteplus= ($custInv + $this->settings['recon_fee']) * (1 + $this->settings['recon_percent']/100);
             msgDebug("\nRead from customer invoice freight charge: $custInv and FedEx Net Charge: $cost");
             if ($cost > $custInv) {
                 $extra = ". Customer: {$jMain['primary_name_b']}".$extraRef;
-                $issues['OverInv'][] = sprintf($this->lang['recon_cost_over_inv'], $ship_date, $ref_num, $track_num, $cost, $custInv).$extra;
+                $issues['OverInv'][] = sprintf(lang('recon_cost_over_inv', $this->moduleID), $ship_date, $ref_num, $track_num, $cost, $custInv).$extra;
             }
             if (!empty($metaVals['r'.$jMain['metaID']]['packages']['rows'][$pkg_num]['reconciled'])) { $issues['Dups'][] = $inv_num; }
             else { $metaVals['r'.$jMain['metaID']]['packages']['rows'][$pkg_num]['reconciled'] = 1; }
@@ -265,8 +265,8 @@ class fedex extends fedexCommon
 
     private function viewRecon($stmt_num, $inv_date, $count, $issues=[])
     {
-        $output  = $this->lang['recon_title'].biz_date('Y-m-d')."\n";
-        $output .= sprintf($this->lang['recon_intro'], $stmt_num, $inv_date)."\n\n";
+        $output  = lang('recon_title', $this->moduleID).biz_date('Y-m-d')."\n";
+        $output .= sprintf(lang('recon_intro', $this->moduleID), $stmt_num, $inv_date)."\n\n";
         $output .= "NO RECORDS FOUND\n";
         $output .= implode("\n", $issues['NoRec'])."\n";
         $output .= "\n\nTOO MANY RECORDS FOUND\n";
@@ -285,7 +285,7 @@ class fedex extends fedexCommon
             }
             $output .= "\n";
         }
-        $output .= "\n".sprintf($this->lang['recon_summary'], $count)."\n";
+        $output .= "\n".sprintf(lang('recon_summary', $this->moduleID), $count)."\n";
         return $output;
     }
 

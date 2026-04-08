@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/contacts/main.php
  */
 
@@ -236,7 +236,7 @@ class contactsMain
             $structure['short_name']['attr']['value'] = getNextReference($type);
             $structure['first_date']['attr']['type'] = 'hidden';
             $structure['date_last']['attr']['type']= 'hidden';
-            $structure['country']['attr']['value']   = getModuleCache('bizuno','settings','company','country');
+            $structure['country']['attr']['value']   = getModuleCache('bizuno','settings','company','country') ?? 'USA';
         }
         $fldAddr = ['primary_name', 'contact', 'address1', 'address2', 'city', 'state', 'postal_code', 'country'];
         $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'email2', 'email3', 'email4', 'website'];
@@ -250,7 +250,10 @@ class contactsMain
         $structure['email4']['label']        = lang('email_ap');
         $structure['short_name']['tooltip']  = lang('msg_leave_null_to_assign_ref');
         $structure['inactive']['label']      = lang('status');
-        $structure['inactive']['values']     = getMetaCommon('options_contact_status');
+        $statVals = [];
+        $statMeta = getMetaCommon('options_contact_status');
+        foreach ($statMeta as $stat) { $statVals[] = ['id'=>$stat['id'],'text'=>lang($stat['text'])]; }
+        $structure['inactive']['values']     = $statVals;
         $structure['rep_id']['values']       = viewRoleDropdown();
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /view/easyUI/html5.php
  */
 
@@ -939,11 +939,13 @@ if ('state'==$key) { $data['fields'][$key]['attr']['type'] = 'state'; }
         $src     = $logoPath ? BIZUNO_URL_FS."$bizID/images/$logoPath" : BIZUNO_LOGO;
         $hostIP  = explode('.', $_SERVER['SERVER_ADDR']);
         $version = MODULE_BIZUNO_VERSION."-{$hostIP[3]}-".getUserCache('profile', 'language')."-".getDefaultCurrency();
+msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties')));
         if (!empty($bizID)) {
-            $title = getModuleCache('bizuno', 'settings', 'company', 'primary_name');
+            $title   = getModuleCache('bizuno', 'settings', 'company', 'primary_name');
+            $modTitle= !empty($menuID) ? lang($menuID) : lang('title');
             if (empty($title)) { $title = portalGetBizIDVal($bizID, 'title'); }
             $company = $title.' - '.lang('period').': '.getModuleCache('phreebooks', 'fy', 'period').' | '.$version;
-            $company.= ' - '.getModuleCache('bizuno', 'properties', 'title').' | '.lang('copyright').' &copy;'.biz_date('Y').' <a href="http://www.PhreeSoft.com" target="_blank">PhreeSoft&trade;</a>';
+            $company.= " - $modTitle | ".lang('copyright').' &copy;'.biz_date('Y').' <a href="http://www.PhreeSoft.com" target="_blank">PhreeSoft&trade;</a>';
             if ($GLOBALS['bizunoModule'] <> 'bizuno') { $company .= '-'.$GLOBALS['bizunoModule'].' '.getModuleCache($GLOBALS['bizunoModule'], 'properties', 'status'); }
             $menus   = dbGetRoleMenu();
         } else {
@@ -1449,7 +1451,7 @@ if ('state'==$key) { $data['fields'][$key]['attr']['type'] = 'state'; }
 
     public function inputCountry($id, $prop) {
         msgDebug("\nEntering inputCountry with id = $id and prop = ".print_r($prop, true));
-        $value = !empty($prop['attr']['value']) ? $prop['attr']['value'] : getModuleCache('bizuno','settings','company','country','USA');
+        $value = !empty($prop['attr']['value']) ? $prop['attr']['value'] : (getModuleCache('bizuno','settings','company','country') ?? 'USA');
         $prop['classes'] = ['easyui-combogrid'];
         $prop['options']['data']      = "bizDefaults.countries";
         $prop['options']['width']     = 150;
@@ -1694,7 +1696,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         $prop['options']['textField']= "'title'";
         unset($prop['attr']['size'], $prop['attr']['maxlength']);
         $locales = localeLoadDB(); // load countries
-        $iso3 = getModuleCache('bizuno','settings','company','country','USA');
+        $iso3 = getModuleCache('bizuno','settings','company','country') ?? 'USA';
         if (isset($locales['Locale'][$iso3]['Regions']) && sizeof($locales['Locale'][$iso3]['Regions'])>0) {
             $prop['options']['valueField']=  "'code'";
             $prop['options']['data']      = "bizDefaults.regions['$iso3']";

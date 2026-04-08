@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /model/registry.php
  */
 
@@ -148,7 +148,7 @@ unset($bizunoMod[$module]['dashboards']);
         $bizunoMod[$module]['settings'] = isset($admin->settings) ? $admin->settings : [];
         // set some system properties
         $admin->structure['id']         = $module;
-        $admin->structure['title']      = !empty($admin->lang['title'])       ? $admin->lang['title']       : $fqcn;
+        $admin->structure['title']      = lang('title', $module);
         $admin->structure['description']= !empty($admin->lang['description']) ? $admin->lang['description'] : $fqcn." description";
         $admin->structure['path']       = $relPath;
         $admin->structure['url']        = str_replace('BIZUNO_FS_LIBRARY', 'BIZUNO_URL_PORTAL', $relPath);

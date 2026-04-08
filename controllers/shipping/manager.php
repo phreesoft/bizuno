@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-05
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -96,7 +96,7 @@ class shippingManager extends mgrJournal
         $stores= getModuleCache('bizuno', 'stores');
         $data  = array_replace_recursive(parent::gridBase($security, $args), [
             'source'  => [
-                'search' => ['invoice_num', 'ref_num', 'primary_name', 'ship_date'],
+                'search' => ['invoice_num', 'ref_num', 'primary_name', 'ship_date', 'tracking'],
                 'filters'=> [
                     'store_id'=> ['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]]]],
@@ -239,8 +239,6 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $hits = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         foreach ($hits as $row) {
             $meta = json_decode($row['meta_value'], true);
-            msgDebug("\nrow from journal table = ".msgPrint($row));
-            msgDebug("\nmeta from journal table = ".msgPrint($meta));
             $output[] = [
                 'id'          => $row['metaID'],
                 '_rID'        => $row['metaID'],
@@ -251,14 +249,13 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                 'primary_name'=> $row['primary_name_b'],
                 'method_code' => $meta['method_code'],
                 'ship_date'   => $meta['ship_date'],
-                'deliver_date'=> $meta['deliver_date'],
-                'reconciled'  => $meta['reconciled'] ?? ''];
+                'deliver_date'=> $meta['deliver_date']?? '',
+                'tracking'    => $this->extractTracking($meta['packages']??[]),
+                'reconciled'  => $this->extractReconcile($meta['packages']??[])];
         }
         $cHits = getMetaCommon($this->metaPrefix);
         foreach ($cHits as $value) {
             if ($value['ship_date']<$dates['start_date'] || $value['ship_date']>$dates['end_date']) { continue; }
-//          if ($this->defaults['store_id']>=0 && $value['store_id']<>$this->defaults['store_id']) { continue; }
-            msgDebug("\nMatched meta from common with value = ".msgPrint($value));
             $output[] = [
                 'id'          => $value['_rID'],
                 '-rID'        => $value['_rID'],
@@ -269,8 +266,9 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                 'primary_name'=> '',
                 'method_code' => $value['method_code'],
                 'ship_date'   => $value['ship_date'],
-                'deliver_date'=> $value['deliver_date'],
-                'reconciled'  => $value['reconciled'] ?? ''];
+                'deliver_date'=> $value['deliver_date']?? '',
+                'tracking'    => $this->extractTracking($meta['packages']??[]),
+                'reconciled'  => $this->extractReconcile($meta['packages']??[])];
         }
         return $output;
     }
@@ -290,26 +288,24 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         msgDebug("\nPost processing, returning row count = ".sizeof($results));
         return ['total'=>sizeof($output), 'rows'=>$results];
     }
-
-/*    public function managerRowsOrder(&$layout=[])
+    private function extractTracking($pkgs=[])
     {
-        if (!$security = validateAccess($this->secID, 1)) { return; }
-        $search = getSearch();
-        $crit = "waiting='1' AND journal_id IN (7,12,15)";
-        if (!empty($search)) { $crit .= " AND invoice_num LIKE '%$search%'"; }
-        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', $crit, 'invoice_num');
-        $output= [];
-        foreach ($rows as $row) {
-            $output[] = [
-                'id'     => $row['id'],
-                'invoice'=> $row['invoice_num'],
-                'bill_to'=> $row['primary_name_b'],
-                'ship_to'=> $row['primary_name_s'],
-                'date'   => viewFormat($row['post_date'], 'date'),
-                'method' => viewFormat($row['method_code'],'shipInfo')];
+        if (empty($pkgs['rows'])) { return ''; }
+        $output = [];
+        foreach ($pkgs['rows'] as $row) { $output[] = $row['tracking_id']; }
+        return (implode(', ', $output));
+    }
+
+    private function extractReconcile($pkgs=[])
+    {
+        if (empty($pkgs['rows'])) { return ''; }
+        $recon = $notRecon = false;
+        foreach ($pkgs['rows'] as $row) {
+            if   (!empty($row['reconciled'])) { $recon = true; }
+            else { $notRecon = true; }
         }
-        $layout = array_replace_recursive($layout, ['type'=>'raw','content'=>json_encode(['total'=>sizeof($output),'rows'=>array_values($output)])]);
-    }*/
+        return $recon && $notRecon ? lang('partial') : ($recon ? lang('yes') : '');
+    }
 
     /**
      * Adds a shipping record with partial information from the journal entry
@@ -569,16 +565,18 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     public function toggleReconcile(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 2)) { return; }
-        $refID = clean('rID', 'integer', 'get'); // rID contains the journal_main record
-        if (empty($refID)) { return msgAdd(lang('illegal_access')); }
-        $meta  = dbMetaGet(0, $this->metaPrefix, 'journal', $refID);
+        $rID   = clean('rID',  'integer', 'get');
+        $table = clean('table','db_field','get');
+        if (empty($rID)) { return msgAdd(lang('illegal_access')); }
+        $meta  = dbMetaGet($rID, $this->metaPrefix, $table);
+        $refID = $meta['_refID'];
         msgDebug("\nRead shipment meta data = ".print_r($meta, true));
-        $rID   = metaIdxClean($meta);
+        metaIdxClean($meta);
         foreach ($meta['packages']['rows'] as $idx => $box) {
             $meta['packages']['rows'][$idx]['reconciled'] = empty($box['reconciled']) ? '1' : '0';
         }
         msgDebug("\nReady to write rID = $rID and meta: ".print_r($meta, true));
-        dbMetaSet($rID, $this->metaPrefix, $meta, 'journal', $refID);
+        dbMetaSet($rID, $this->metaPrefix, $meta, $table, $refID);
         $layout= array_replace_recursive($layout,['content'=>['action'=>'eval','actionData'=>"jqBiz('#dg{$this->domSuffix}').datagrid('reload');"]]);
     }
 }

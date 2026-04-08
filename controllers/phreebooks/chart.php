@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -79,12 +79,12 @@ class phreebooksChart extends mgrJournal
                 'onDblClickRow'=>"function(rowIndex, rowData){ accordionEdit('acc{$this->domSuffix}', 'dg{$this->domSuffix}', 'dtl{$this->domSuffix}', '".lang('details')."', '$this->moduleID/$this->pageID/edit', rowData.id); }"],
             'footnotes' => ['codes'=>$ftNote],
             'source' => [
-                'search' => ['account', 'title', 'cur'],
+                'search' => ['id', 'title', 'cur'],
                 'actions'=>[
                     'mergeGL'=>['order'=>30,'icon'=>'merge', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/merge', 0);"]],
                     'export' =>['order'=>80,'icon'=>'export','events'=>['onClick'=>"hrefClick('$this->moduleID/$this->pageID/export');"]]],
                 'filters'=> [
-                    'inactive' => ['order'=>10,'label'=>lang('status'),'values'=>$yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['status']]]]],
+                    'inactive' => ['order'=>10,'label'=>lang('status'),'values'=>$yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['inactive']]]]],
             'columns'  => [
                 'action' => [
                     'actions'=> [
@@ -103,9 +103,9 @@ class phreebooksChart extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['sort']  = clean('sort',  ['format'=>'cmd', 'default'=>'id'], 'post');
-        $this->defaults['order'] = clean('order', ['format'=>'cmd', 'default'=>'ASC'],'post');
-        $this->defaults['status']= clean('status',['format'=>'char','default'=>'a'],  'post');
+        $this->defaults['sort']    = clean('sort',    ['format'=>'cmd', 'default'=>'id'], 'post');
+        $this->defaults['order']   = clean('order',   ['format'=>'cmd', 'default'=>'ASC'],'post');
+        $this->defaults['inactive']= clean('inactive',['format'=>'char','default'=>'a'],  'post');
     }
     public function manager(&$layout=[])
     {
@@ -129,13 +129,11 @@ class phreebooksChart extends mgrJournal
         $_POST['search'] = getSearch();
         // regular parent::mgrRowsMeta won't work as these are combined in single meta record.
         $grid = $this->managerGrid($security);
-        msgDebug("\nread grid = ".print_r($grid, true));
-        if ($this->defaults['status']=='a') { unset($grid['source']['filters']['inactive']); } // all statuses
+        if ($this->defaults['inactive']=='a') { unset($grid['source']['filters']['inactive']); } // all statuses
         $row = dbGetRow(BIZUNO_DB_PREFIX.'common_meta', "meta_key='$this->metaPrefix'");
         $meta = json_decode($row['meta_value'], true);
-        msgDebug("\nRead chart before processing = ".print_r($meta, true));
+        msgDebug("\nRead first 10 rows of chart before processing = ".msgPrint(array_slice($meta, 0, 10)));
         $this->mgrRowsDBFltr($layout, $grid, $meta);
-        msgDebug("\nlayout before render = ".print_r($layout, true));
     }
 
     /**
@@ -219,7 +217,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         $account = clean('rID', 'filename', 'get');
         if (!$security = validateAccess($this->secID, 1)) { return; }
         if (empty($this->chartMeta[$account])) { unset($this->struc['id']['attr']['readonly']); } // allow GL account entry if new
-        metaPopulate($this->struc, $this->chartMeta[$account]);
+        metaPopulate($this->struc, $this->chartMeta[$account]??'');
         msgDebug("\nUpdated meta for account $account to get: ".print_r($this->struc, true));
         $title = !empty($account) ? lang('edit').': '.$this->chartMeta[$account]['title'] : lang('new');
         $args  = ['_rID'=>$account, 'title'=>$title]; // '_refID'=>0, '_table'=>'common', 
@@ -228,23 +226,25 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
     }
     public function save(&$layout=[])
     {
-        $rID = clean('id', 'filename', 'post');
-        if (!validateAccess($this->secID, empty($rID)?2:3)) { return; }
-        $metaVal= !empty($rID) ? $this->chartMeta[$rID] : [];
+        $glID = clean('id', 'filename', 'post');
+        if (!validateAccess($this->secID, empty($glID)?2:3)) { return; }
+        $metaVal= !empty($this->chartMeta[$glID]) ? $this->chartMeta[$glID] : [];
         $output = metaUpdate($metaVal, $this->struc);
         // error check
         // @TODO - Need to verify the commented out tests
-//      if (!empty($rID) && empty($output['title'])){ return msgAdd(lang('chart_save_01']); }
+//      if (!empty($glID) && empty($output['title'])){ return msgAdd(lang('chart_save_01']); }
         if ( empty($output['title']))                { return msgAdd(lang('chart_save_02', $this->moduleID)); }
-        if ( empty($rID) && isset($this->chartMeta[$output['id']])) { return msgAdd(lang('chart_save_03')); }
-        if ( empty($rID) && $output['type']==44)     { foreach ($this->chartMeta as $row) { if ($row['type']==44) { return msgAdd(lang('chart_save_04')); } } }
+        if ( empty($this->chartMeta[$glID]) && isset($this->chartMeta[$output['id']])) { return msgAdd(lang('chart_save_03')); }
+        if ( empty($this->chartMeta[$glID]) && $output['type']==44) { 
+            foreach ($this->chartMeta as $row) { if ($row['type']==44) { return msgAdd(lang('chart_save_04')); } }
+        }
 //      if ($used && $heading)      { return msgAdd(lang('chart_save_05']); }
 //      if (!empty($output['parent']) && empty($glAccounts[$parent]['heading'])) { return msgAdd(sprintf(lang('chart_save_06'], $parent)); }
         msgDebug("\nReady to write updated chart record = ".print_r($output, true));
-        if (empty($rID)) { $this->chartMeta[$output['id']]= $output; }
-        else             { $this->chartMeta[$rID]         = $output; }
+        if (empty($this->chartMeta[$glID])) { $this->chartMeta[$output['id']]= $output; }
+        else                                { $this->chartMeta[$glID]         = $output; }
         $this->chartMeta = sortOrder($this->chartMeta, 'id');
-// On 7.0 releases, this reorderd the indexes if they are numeric so re-index them by chart of accounts ID
+// On 7.0 releases, this reordered the indexes if they are numeric so re-index them by chart of accounts ID
         $temp = [];
         foreach ($this->chartMeta as $acct) { $temp[$acct['id']] = $acct; }
         $this->chartMeta = $temp;

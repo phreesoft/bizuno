@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-25
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -53,7 +53,7 @@ class bizunoProfile extends mgrJournal
             'def_periods'=> ['tab'=>'options','panel'=>'general','order'=>30, 'clean'=>'db_field', 'attr'=>['type'=>'select',  'value'=>'l'],      'values'=>$periods],
             'grid_rows'  => ['tab'=>'options','panel'=>'general','order'=>35, 'clean'=>'integer',  'attr'=>['type'=>'select',  'value'=>20],       'values'=>$rows],
             'icons'      => ['tab'=>'options','panel'=>'general','order'=>40, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'default'],'values'=>portalIcons()],
-            'theme'      => ['tab'=>'options','panel'=>'general','order'=>45, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'bizuno'], 'values'=>portalSkins()]];
+            'theme'      => ['tab'=>'options','panel'=>'general','order'=>45, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'auto'],   'values'=>portalSkins()]];
         langFillLabels($this->struc);
         $this->struc = array_replace($this->struc, $mail->struc); // bring in the mail settings
     }

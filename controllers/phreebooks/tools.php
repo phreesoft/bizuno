@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -311,7 +311,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         $cron['msg']= []; // reset the message array every step
         $msg    = "Completed step: {$cron['curStep']} of {$cron['ttlSteps']}<br />Block {$cron['curBlk']} of {$cron['ttlBlk']}<br />Total of $ttlRecords records.<br />";
         if ($cron['curStep']>=$cron['ttlSteps']) { // wrap up this iteration
-            msgLog("BSI Tools - Completed {$cron['cnt']} records.)");
+            msgLog("BSI Tools - Fiscal Year {$cron['fy']} Delete Completed!");
             $data = ['content'=>['percent'=>100,'msg'=>'Finished! '.$msg,'baseID'=>'fyClose','urlID'=>"$this->moduleID/tools/fyCloseNext"]];
             clearUserCron('fyClose');
         } else { // return to update progress bar and start next step
@@ -438,7 +438,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         dbGetResult("DELETE FROM $tableM WHERE post_date <='{$cron['fyEndDate']}'");
 //      $cron['msg'][] = "Read $cntI records to delete from table: $tableI";
         $cron['msg'][] = "Executing SQL: DELETE FROM $tableI WHERE post_date <='{$cron['fyEndDate']}'"; // This should delete all journal item entries remaining
-        dbGetResult("DELETE FROM $tableH WHERE $crit");
+        dbGetResult("DELETE FROM $tableI WHERE post_date <='{$cron['fyEndDate']}'");
         $cron['msg'][] = "Read $cntH records to delete from table: $tableH";
         $cron['msg'][] = "Executing SQL: DELETE FROM $tableH WHERE $crit";
         dbGetResult("DELETE FROM $tableH WHERE $crit");

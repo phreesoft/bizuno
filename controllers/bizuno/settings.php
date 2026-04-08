@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-03
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -269,7 +269,6 @@ class bizunoSettings
     public function adminInstMethods($module, $dirMeth, $defaults=[])
     {
         msgDebug("\nEntering adminInstMethods with module = $module and dirMeth = $dirMeth and sizeof defaults = ".sizeof($defaults, true));
-        global $io;
         $newMeta= [];
         $meta   = dbMetaGet(0, "methods_{$dirMeth}"); // get the existing meta, probably won't be there since we are installing
         $metaIdx= metaIdxClean($meta);
@@ -289,8 +288,8 @@ class bizunoSettings
                 'status'     => in_array($method, $defaults) ? 1 : 0,
                 'description'=> !empty($clsMeth->lang['description']) ? $clsMeth->lang['description'] : "Description - $method",
                 'path'       => $path,
-                'url'        => BIZUNO_URL_PORTAL."/controllers/$module/$dirMeth/$method/", // @TODO - url is broken
-                ];
+//              'url'        => BIZUNO_URL_PORTAL."/controllers/$module/$dirMeth/$method/", // @TODO - url is broken - NOT SURE IF IT IS EVEN USED AS DIRECT ACCESS IS VIA API
+                'settings'   => (property_exists($clsMeth, 'settings') ? $clsMeth->settings : []) ?? []];
             msgDebug("\nargs array = ".print_r($args, true));
             $merged = array_replace(!empty($meta[$method])?$meta[$method]:[], $args);
             msgDebug("\nmerged array = ".print_r($merged, true));

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-08
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -46,7 +46,8 @@ class bizunoMain
         $title = getModuleCache('bizuno', 'settings', 'company', 'primary_name');
         if (empty($title)) { $title = portalGetBizIDVal(getUserCache('business', 'bizID'), 'title'); }
         $menuID= clean('menuID', ['format'=>'text','default'=>$mIDdef], 'get');
-        $data  = ['title'=>"$title - ".getModuleCache('bizuno', 'properties', 'title'),
+        $modTitle= !empty($menuID) ? lang($menuID) : lang('title');
+        $data  = ['title'=>"$title - ".$modTitle,
             'jsHead'=>['menu_id'=>"var menuID='$menuID';"]];
         viewDashJS($data);
         $layout = array_replace_recursive(viewMain(), $data);
