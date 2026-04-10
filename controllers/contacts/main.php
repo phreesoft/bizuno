@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-09
  * @filesource /controllers/contacts/main.php
  */
 
@@ -250,10 +250,7 @@ class contactsMain
         $structure['email4']['label']        = lang('email_ap');
         $structure['short_name']['tooltip']  = lang('msg_leave_null_to_assign_ref');
         $structure['inactive']['label']      = lang('status');
-        $statVals = [];
-        $statMeta = getMetaCommon('options_contact_status');
-        foreach ($statMeta as $stat) { $statVals[] = ['id'=>$stat['id'],'text'=>lang($stat['text'])]; }
-        $structure['inactive']['values']     = $statVals;
+        $structure['inactive']['values']     = getContactStatuses();
         $structure['rep_id']['values']       = viewRoleDropdown();
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields
@@ -507,7 +504,7 @@ class contactsMain
             'contacts_log' => 'DELETE FROM '.BIZUNO_DB_PREFIX."contacts_log WHERE contact_id=$rID"]];
         $files = glob(getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_*.zip");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
-        msgLog(lang('contacts_title')." ".lang('delete')." - $short_name (rID=$rID)");
+        msgLog(lang('contacts')." ".lang('delete')." - $short_name (rID=$rID)");
         $layout = array_replace_recursive($layout, $data);
     }
 
@@ -683,7 +680,7 @@ class contactsMain
     protected function dgContacts($name, $type, $security=0, $rID=false)
     {
         $this->managerSettings($type);
-        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], getMetaCommon('options_contact_status'));
+        $statuses = getContactStatuses(true);
         $f0_value = "";
         if ($this->defaults['f0']<>'a') { $f0_value = "inactive='{$this->defaults['f0']}'"; }
         $data = ['id'=>"dg$name", 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],

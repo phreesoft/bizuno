@@ -1149,11 +1149,11 @@ function bizUnitDiscDisc(newValue) {
      */
     public function detailStatus(&$layout=[], $rID=0)
     {
-        $cID     = !empty($rID) ? $rID : clean('rID', 'integer', 'get');
+        $cID    = !empty($rID) ? $rID : clean('rID', 'integer', 'get');
         if (empty($cID)) { return("Bad ID"); }
-        $contact = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");
-        $new_data= calculate_aging($cID);
-        $data = ['type'=>'popup','attr'=>['id'=>'winStatus'],
+        $contact= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");
+        $aging  = calculate_aging($cID);
+        $data   = ['type'=>'popup','attr'=>['id'=>'winStatus'],
             'title'=> lang('summary'),
             'divs' => [
                 'general' => ['order'=>10,'type'=>'divs','classes'=>['areaView'],'divs'=>[
@@ -1163,18 +1163,18 @@ function bizUnitDiscDisc(newValue) {
             'panels' => [
                 'genStat' => ['label'=>lang('status'),         'type'=>'fields','keys'=>['status']], // ,'terms'
                 'genHist' => ['label'=>lang('history'),        'type'=>'fields','keys'=>['inv_orders','open_quotes','open_orders','unpaid_inv','unpaid_crd']],
-                'genBal'  => ['label'=>$new_data['terms_lang'],'type'=>'fields','keys'=>['current','late30','late60','late90','late120','late121','total']]],
-            'fields'=> $this->getStatusFields($contact, $new_data)];
+                'genBal'  => ['label'=>$aging['terms_lang'],'type'=>'fields','keys'=>['current','late30','late60','late90','late120','late121','total']]],
+            'fields'=> $this->getStatusFields($contact, $aging)];
         $notes = dbMetaGet(0, 'notes', 'contacts', $cID);
         if (!empty($notes['value'])) {
             $data['fields']['notes'] = ['order'=>15,'html'=>str_replace("\n", "<br />", $notes['value']),'attr'=>['type'=>'raw']];
             $data['panels']['genStat']['keys'][] = 'notes';
         }
-        $GLOBALS['aging'] = $new_data;
+        $GLOBALS['aging'] = $aging;
         $layout = array_replace_recursive($layout, $data);
     }
 
-    private function getStatusFields($contact, $new_data)
+    private function getStatusFields($contact, $aging)
     {
         $statusHtml = '';
         $acctActive = true;
@@ -1184,19 +1184,19 @@ function bizUnitDiscDisc(newValue) {
             $statusHtml.= '<p style="font-weight:bold;text-align:center;" class="row-'.$stat['color'].'">'.lang($stat['text']).'</p>';
         } }
         // set the customer/vendor status in order of importance
-        if ($new_data['past_due'] > 0)                         { $statusBg='yellow'; $statusMsg=lang('msg_contact_status_past_due', $this->moduleID); }
-        elseif ($new_data['total'] > $new_data['credit_limit']){ $statusBg='yellow'; $statusMsg=lang('msg_contact_status_over_limit', $this->moduleID); }
-        else                                                   { $statusBg='green';  $statusMsg=lang('msg_contact_status_good', $this->moduleID); }
+        if ($aging['past_due'] > 0)                      { $statusBg='yellow'; $statusMsg=lang('msg_contact_status_past_due',  $this->moduleID); }
+        elseif ($aging['total'] > $aging['credit_limit']){ $statusBg='yellow'; $statusMsg=lang('msg_contact_status_over_limit',$this->moduleID); }
+        else                                             { $statusBg='green';  $statusMsg=lang('msg_contact_status_good',      $this->moduleID); }
         if ($acctActive) { $statusHtml.= '<p style="font-weight:bold;text-align:center;background-color:'.$statusBg.'">'.$statusMsg."</p>"; }
         $fields = [
             'status'     => ['order'=>10,'html'=>$statusHtml,     'break'=>false,'attr'=>['type'=>'raw']],
-            'current'    => ['order'=>20,'label'=>'Current',      'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_0']]],
-            'late30'     => ['order'=>22,'label'=>'Late 0-30',    'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_30']]],
-            'late60'     => ['order'=>24,'label'=>'Late 31-60',   'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_60']]],
-            'late90'     => ['order'=>26,'label'=>'Late 61-90',   'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_90']]],
-            'late120'    => ['order'=>28,'label'=>'Late 91-120',  'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_120']]],
-            'late121'    => ['order'=>30,'label'=>'Late Over 120','break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['balance_121']]],
-            'total'      => ['order'=>32,'label'=>lang('total'),'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$new_data['total']]],
+            'current'    => ['order'=>20,'label'=>'Current',      'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_0']]],
+            'late30'     => ['order'=>22,'label'=>'Late 0-30',    'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_30']]],
+            'late60'     => ['order'=>24,'label'=>'Late 31-60',   'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_60']]],
+            'late90'     => ['order'=>26,'label'=>'Late 61-90',   'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_90']]],
+            'late120'    => ['order'=>28,'label'=>'Late 91-120',  'break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_120']]],
+            'late121'    => ['order'=>30,'label'=>'Late Over 120','break'=>true,'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['balance_121']]],
+            'total'      => ['order'=>32,'label'=>lang('total'),'attr'=>['type'=>'currency','readonly'=>'readonly','value'=>$aging['total']]],
             'inv_orders' => ['order'=>10,'label'=>lang('status_orders_invoice', $this->moduleID),'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
             'open_quotes'=> ['order'=>20,'label'=>lang('status_open_j9', $this->moduleID), 'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
             'open_orders'=> ['order'=>30,'label'=>lang('status_open_j10', $this->moduleID),'break'=>true,'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']],
@@ -1204,15 +1204,15 @@ function bizUnitDiscDisc(newValue) {
             'unpaid_crd' => ['order'=>50,'label'=>lang('status_open_j13', $this->moduleID),'html'=>lang('none')."<br />",'attr'=>['type'=>'raw']]];
         if ($contact['ctype_v']=='1') { $idx='vendors';   $jQuote=3; $jOrder= 4; $jSale= 6; $jRtn= 7; }
         else                          { $idx='customers'; $jQuote=9; $jOrder=10; $jSale=12; $jRtn=13; }
-        if (!empty($new_data['inv_orders']) && sizeof($new_data['inv_orders']) >1) { $fields['inv_orders'] = array_merge($fields['inv_orders'], ['values'=>$this->getStatusOpen($new_data, 'inv_orders'),
+        if (!empty($aging['inv_orders']) && sizeof($aging['inv_orders']) >1) { $fields['inv_orders'] = array_merge($fields['inv_orders'], ['values'=>$this->getStatusOpen($aging, 'inv_orders'),
             'options'=>['width'=>300],'attr'=>['type'=>'select'],'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jSale, 0, 0, 'inv', '', newVal);"]]); }
-        if (!empty($new_data['open_quotes'])&& sizeof($new_data['open_quotes'])>1) { $fields['open_quotes']= array_merge($fields['open_quotes'],['values'=>$this->getStatusOpen($new_data, 'open_quotes'),
+        if (!empty($aging['open_quotes'])&& sizeof($aging['open_quotes'])>1) { $fields['open_quotes']= array_merge($fields['open_quotes'],['values'=>$this->getStatusOpen($aging, 'open_quotes'),
             'options'=>['width'=>300],'attr'=>['type'=>'select'],'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jQuote, newVal);"]]); }
-        if (!empty($new_data['open_orders'])&& sizeof($new_data['open_orders'])>1) { $fields['open_orders']= array_merge($fields['open_orders'],['values'=>$this->getStatusOpen($new_data, 'open_orders'),
+        if (!empty($aging['open_orders'])&& sizeof($aging['open_orders'])>1) { $fields['open_orders']= array_merge($fields['open_orders'],['values'=>$this->getStatusOpen($aging, 'open_orders'),
              'options'=>['width'=>300],'attr'=>['type'=>'select'],'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jOrder, newVal);"]]); }
-        if (!empty($new_data['unpaid_inv']) && sizeof($new_data['unpaid_inv']) >1) { $fields['unpaid_inv'] = array_merge($fields['unpaid_inv'], ['values'=>$this->getStatusOpen($new_data, 'unpaid_inv'),
+        if (!empty($aging['unpaid_inv']) && sizeof($aging['unpaid_inv']) >1) { $fields['unpaid_inv'] = array_merge($fields['unpaid_inv'], ['values'=>$this->getStatusOpen($aging, 'unpaid_inv'),
             'options'=>['width'=>300],'attr'=>['type'=>'select'], 'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jSale, newVal);"]]); }
-        if (!empty($new_data['unpaid_crd']) && sizeof($new_data['unpaid_crd']) >1) { $fields['unpaid_crd'] = array_merge($fields['unpaid_crd'], ['values'=>$this->getStatusOpen($new_data, 'unpaid_crd'),
+        if (!empty($aging['unpaid_crd']) && sizeof($aging['unpaid_crd']) >1) { $fields['unpaid_crd'] = array_merge($fields['unpaid_crd'], ['values'=>$this->getStatusOpen($aging, 'unpaid_crd'),
             'options'=>['width'=>300],'attr'=>['type'=>'select'], 'events'=>['onChange'=>"jqBiz(this).combogrid('destroy'); bizWindowClose('winStatus'); journalEdit($jRtn, newVal);"]]); }
         return $fields;
     }

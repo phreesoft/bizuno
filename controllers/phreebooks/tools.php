@@ -445,6 +445,15 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         $cron['msg'][] = "Read $cntP records to delete from table: $tableP";
         $cron['msg'][] = "Executing SQL: DELETE FROM $tableP WHERE $crit";
         dbGetResult("DELETE FROM $tableP WHERE $crit");
+        // Some catchalls to remove orphaned records
+        //dbGetResult("SELECT ji.* FROM journal_item ji LEFT JOIN journal_main jm ON ji.ref_id = jm.id WHERE jm.id IS NULL");
+        // dbGetResult("DELETE ji FROM journal_item ji LEFT JOIN journal_main jm ON ji.ref_id = jm.id WHERE jm.id IS NULL");
+        // dbGetResult("SELECT jm.* FROM journal_meta jm LEFT JOIN journal_main j ON jm.ref_id = j.id WHERE j.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM journal_meta WHERE ref_id NOT IN (SELECT id FROM journal_main)");
+        // dbGetResult("DELETE jm FROM journal_meta jm LEFT JOIN journal_main j ON jm.ref_id = j.id WHERE j.id IS NULL");
+        // dbGetResult("SELECT ih.* FROM journal_cogs_usage ih LEFT JOIN journal_main j ON ih.journal_main_id = j.id WHERE j.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM journal_cogs_usage WHERE journal_main_id NOT IN (SELECT id FROM journal_main)");
+        // dbGetResult("DELETE ih FROM journal_cogs_usage ih LEFT JOIN journal_main j ON ih.journal_main_id = j.id WHERE j.id IS NULL");
         $cron['curStep']++;
         $cron['curBlk']++;
         $cron['msg'][] = "Completed Step 2: fyCloseTableGenJournal.";
@@ -592,6 +601,13 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
                 }
             }
         }
+        // Removed orphaned records
+        // dbGetResult("SELECT cm.* FROM contacts_meta cm LEFT JOIN contacts c ON cm.ref_id = c.id WHERE c.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM contacts_meta WHERE ref_id NOT IN (SELECT id FROM contacts)");
+        // dbGetResult("DELETE cm FROM contacts_meta cm LEFT JOIN contacts c ON cm.ref_id = c.id WHERE c.id IS NULL");
+        // dbGetResult("SELECT cm.* FROM contacts_log cm LEFT JOIN contacts c ON cm.contact_id = c.id WHERE c.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM contacts_log WHERE contact_id NOT IN (SELECT id FROM contacts)");
+        // dbGetResult("DELETE cm FROM contacts_log cm LEFT JOIN contacts c ON cm.contact_id = c.id WHERE c.id IS NULL");
         dbTransactionCommit();
     }
     private function fyCloseCleanInventory(&$cron=[], $cntOnly=false) // inventory_meta
@@ -625,6 +641,13 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
                 }
             }
         }
+        // Removed orphaned records
+        // dbGetResult("SELECT im.* FROM inventory_meta im LEFT JOIN inventory i ON im.ref_id = i.id WHERE i.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM inventory_meta WHERE ref_id NOT IN (SELECT id FROM inventory)");
+        // dbGetResult("DELETE im FROM inventory_meta im LEFT JOIN inventory i ON im.ref_id = i.id WHERE i.id IS NULL");
+        // dbGetResult("SELECT ih.* FROM inventory_history ih LEFT JOIN journal_main j ON ih.ref_id = j.id WHERE j.id IS NULL");
+        // dbGetResult("SELECT COUNT(*) AS orphaned_count FROM inventory_history WHERE ref_id NOT IN (SELECT id FROM journal_main)");
+        // dbGetResult("DELETE ih FROM inventory_history ih LEFT JOIN journal_main j ON ih.ref_id = j.id WHERE j.id IS NULL");
         dbTransactionCommit();
     }
     private function fyCloseCleanInvUsage(&$cron=[], $cntOnly=false)

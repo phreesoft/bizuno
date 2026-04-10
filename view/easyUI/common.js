@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-09
  * @filesource /view/easyUI/common.js
  */
 
@@ -1847,17 +1847,17 @@ function bizParse(id) {
 }
 
 function bizRegionInit(suffix) {
-    var iso3 = bizSelGet('country' + suffix);  // e.g. "USA", "CAN", "MEX"...
-    jqBiz('#country'+suffix).combogrid({ onSelect: function(index,row) { jqBiz('#country'+suffix).combogrid('hidePanel'); bizRegionChange(row.iso3, suffix); } });
+    var iso3 = bizSelGet('country' + suffix) || '';  // e.g. "USA", "CAN", "MEX"...
+    jqBiz('#country'+suffix).combogrid({ onSelect: function(index,row) { jqBiz('#country'+suffix).combogrid('hidePanel'); bizRegionChange(row ? row.iso3 : '', suffix); } });
     bizRegionChange(iso3, suffix);
 }
 function bizRegionChange(iso3, suffix) {
     if (iso3 && bizDefaults?.regions?.[iso3] && Array.isArray(bizDefaults.regions[iso3]) || typeof bizDefaults.regions[iso3] === 'object') {
         jqBiz('#state'+suffix).combobox({data:bizDefaults.regions[iso3], editable:false}).combobox('loadData', bizDefaults.regions[iso3]);
     } else { // No regions available for this country → free text input
-        jqBiz('#state'+suffix).combobox({data:[], value:'', editable:true}).combogrid('clear').combobox('loadData', []);
+        jqBiz('#state'+suffix).combobox({data:[], value:'', editable:true}).combobox('loadData', []);
     }
-}
+} 
 function bizSelGet(id) {
     if (jqBiz("#"+id).hasClass( "easyui-combobox" )) {
         return jqBiz('#'+id).combobox('getValue');

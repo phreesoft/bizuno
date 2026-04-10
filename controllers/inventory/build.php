@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-25
+ * @version    7.x Last Update: 2026-04-09
  * @filesource /controllers/inventory/build.php
  */
 
@@ -290,17 +290,17 @@ class inventoryBuild extends mgrJournal
             $output .= "<td>".($idx+1)."</td>\n";
             $output .= "<td>".$step['title']   ."</td>\n";
             if (!is_null($onStep) && $onStep==$idx) {
-                if ($step['data_entry']) {
+                if (!empty($step['data_entry'])) {
                     if (!empty($step['data_value'])) { $output .= "<td>".$step['description']."<br />".lang('data_value', $this->moduleID).": {$step['data_value']}</td>\n"; }
                     else                             { $output .= "<td>".$step['description']."<br />".html5('step_data', ['attr'=>  ['size'=>'60']])."</td>\n"; }
                 } else { $output .= "<td>".$step['description']."</td>\n"; }
-                if ($step['mfg']) {
+                if (!empty($step['mfg'])) {
                     if (!empty($step['mfg_id'])) { $output .= '<td style="text-align:center">'.getContactById($step['mfg_id'])."</td>\n"; }
-                    else                 { $output .= "<td>".html5('bldr_pin',  ['label'=>lang('sign_off_pin'), 'attr'=>['type'=>'password']])."</td>\n"; }
+                    else                         { $output .= "<td>".html5('bldr_pin',  ['label'=>lang('sign_off_pin'), 'attr'=>['type'=>'password']])."</td>\n"; }
                 } else { $output .= "<td>&nbsp;</td>\n"; }
-                if ($step['qa']) {
-                    if ($step['qa_id'])  { $output .= '<td style="text-align:center">'.getContactById($step['qa_id'])."</td>\n"; }
-                    else                 { $output .= "<td>".html5('qa_pin', ['label'=>lang('sign_off_pin'), 'attr'=>['type'=>'password']])."</td>\n"; }
+                if (!empty($step['qa'])) {
+                    if (!empty($step['qa_id']))  { $output .= '<td style="text-align:center">'.getContactById($step['qa_id'])."</td>\n"; }
+                    else                         { $output .= "<td>".html5('qa_pin', ['label'=>lang('sign_off_pin'), 'attr'=>['type'=>'password']])."</td>\n"; }
                 } else { $output .= "<td>&nbsp;</td>\n"; }
                 $output .= "<td>&nbsp;</td>\n<td>".html5('', ['icon'=>'save','size'=>'large','events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmSteps').submit();"]])."</td>\n";
             } else {
@@ -375,7 +375,7 @@ class inventoryBuild extends mgrJournal
             } else { $mfg_val = false; }
         } else { $mfg_val = true; } // mfg signoff has passed or not needed
         if (!empty($task['qa']) && empty($stepData['qa_id'])) {
-            msgDebug("\nQA is required in this step, qa_id = {$stepData['qa_id']}");
+            msgDebug("\nQA is required in this step!");
             if (!empty($qa_pin)) {
                 $qa_user = validateSignoff($qa_pin, 'qa');
                 if (!empty($qa_user)) { // the qa signoff is required and present

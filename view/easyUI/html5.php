@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-10
  * @filesource /view/easyUI/html5.php
  */
 
@@ -116,10 +116,10 @@ final class html5 {
                 break;
             case 'tabs': $this->layoutTab($output, $prop); break;
             case 'toolbar':
-                if (isset($prop['key'])) {
-                    $prop = array_merge((array)$viewData['toolbars'][$prop['key']], ['id' => $prop['key']]);
+                if (!empty($viewData['toolbars'])) {
+                    if (isset($prop['key'])) { $prop = array_merge((array)$viewData['toolbars'][$prop['key']], ['id' => $prop['key']]); }
+                    $this->layoutToolbar($output, $prop);
                 }
-                $this->layoutToolbar($output, $prop);
                 break;
             case 'totals':
                 $meta = getMetaCommon('methods_totals');

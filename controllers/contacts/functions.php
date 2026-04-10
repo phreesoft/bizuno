@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-02
+ * @version    7.x Last Update: 2026-04-09
  * @filesource /controllers/contacts/functions.php
  */
 
@@ -77,6 +77,14 @@ function getContactSecID($type='c')
         case 'v': $secID='mgr_v'; break; // vendors
     }
     return $secID;
+}
+
+function getContactStatuses($incAll=false)
+{
+    $statVals = $incAll ? [['id'=>'a','text'=>lang('all')]] : [];
+    $statMeta = getMetaCommon('options_contact_status');
+    foreach ($statMeta as $stat) { $statVals[] = ['id'=>$stat['id'],'text'=>lang($stat['text'])]; }
+    return $statVals;
 }
 
 /**
