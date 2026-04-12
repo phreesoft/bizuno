@@ -3,7 +3,7 @@
  * Plugin Name:       Bizuno – Full ERP/Accounting Portal
  * Plugin URI:        https://www.phreesoft.com
  * Description:       Powerful open-source ERP, double-entry accounting, inventory, CRM & business management portal for WordPress. Activate, click the Bizuno menu in admin, and complete the quick install to launch your full system.
- * Version:           7.3.7
+ * Version:           7.3.8
  * Requires at least: 6.5
  * Tested up to:      6.9
  * Requires PHP:      8.2
