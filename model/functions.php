@@ -167,8 +167,7 @@ function myErrorHandler($errno, $errstr, $errfile, $errline)
 {
     if (!(error_reporting() & $errno)) { return; } // This error code is not included in error_reporting
     $debug = defined('BIZUNO_DEBUG') && constant('BIZUNO_DEBUG')===true ? true : false;
-$debug=true;
-     switch ($errno) {
+    switch ($errno) {
         case E_USER_ERROR:
             msgAdd("<b>ERROR</b> [$errno] $errstr<br />\n  Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\nAborting...<br />\n", 'trap');
             msgDebugWrite();

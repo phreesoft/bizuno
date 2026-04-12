@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-11
  * @filesource /controllers/contacts/dashboards/aged_receivables/aged_receivables.php
  */
 
@@ -34,6 +34,7 @@ class aged_receivables
     public $code      = 'aged_receivables';
     public $secID     = 'j18_mgr';
     public $category  = 'customers';
+    public $type      = 'cust';
     public $noSettings= true;
     public  $struc;
     public $lang      = ['title'=>'Aged Receivables',
@@ -80,8 +81,9 @@ class aged_receivables
             'balance_121'=>0, 'balance_120'=>0, 'balance_91'=>0, 'balance_90'=>0, 'balance_61'=>0, 'balance_60'=>0, 'balance_30'=>0, 'balance_0'=>0];
         $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "journal_id IN (12, 13) AND closed='0'", 'primary_name_b', ['DISTINCT contact_id_b'], 0, false);
         foreach ($rows as $row) {
-            $aging = calculate_aging($row['contact_id_b']);
-            $output['balance_0']  += $aging['balance_0'];
+            $agingAll= calculate_aging($row['contact_id_b']);
+            $aging   = $agingAll[$this->type];
+            $output['balance_0']  += $aging['cust']['balance_0'];
             $output['balance_30'] += $aging['balance_30'];
             $output['balance_60'] += $aging['balance_60'];
             $output['balance_90'] += $aging['balance_90'];

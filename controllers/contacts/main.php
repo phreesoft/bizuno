@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-09
+ * @version    7.x Last Update: 2026-04-11
  * @filesource /controllers/contacts/main.php
  */
 
@@ -294,9 +294,9 @@ class contactsMain
                     'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/manager&type=$this->type&rID=$rID'"]],
                 'wallet'  => ['order'=>35,'label'=>lang('wallet'),'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=payment/wallet/manager&type=$this->type&rID=$rID'"]],
-                'prices_c'=> ['order'=>40, 'label'=>sprintf(lang('tbd_prices'), lang('ctype_c')),'hidden'=>!empty($cData['ctype_c'])?false:true,'type'=>'html', 'html'=>'',
+                'prices_c'=> ['order'=>40, 'label'=>lang('prices'),'hidden'=>!empty($cData['ctype_c'])&&$this->type=='c'?false:true,'type'=>'html', 'html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/prices/manager&dom=div&type=c&cID=$rID&table=contacts'"]],
-                'prices_v'=> ['order'=>40, 'label'=>sprintf(lang('tbd_prices'), lang('ctype_v')),'hidden'=>!empty($cData['ctype_v'])?false:true,'type'=>'html', 'html'=>'',
+                'prices_v'=> ['order'=>40, 'label'=>lang('prices'),'hidden'=>!empty($cData['ctype_v'])&&$this->type=='v'?false:true,'type'=>'html', 'html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=inventory/prices/manager&dom=div&type=v&cID=$rID&table=contacts'"]],
                 'bill_add'=> ['order'=>45,'label'=>lang('address_type_b'), 'type'=>'html', 'html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/address/manager&dom=div&type=$this->type&aType=b&refID=$rID'"]],

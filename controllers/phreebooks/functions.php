@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-10
+ * @version    7.x Last Update: 2026-04-11
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -321,32 +321,34 @@ function calculate_aging($cID, $bb_date=false, $eb_date=false)
         'balance_90'=>0, 'balance_91'=>0, 'balance_120'=>0, 'balance_121' =>0];
     if (empty($cID)) { return $defaults; }
     $result= dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['ctype_c', 'ctype_v', 'terms'], "id=$cID");
+    // @TODO - terms is generic, need to separate into terms_c and terms_v
     $today = biz_date('Y-m-d');
-    $terms = localeDueDate($today, $result['terms']); //, $idx);
-    $output= array_merge($defaults, ['credit_limit'=>$terms['credit_limit'],'terms_lang'=>viewTerms($result['terms'], false, !empty($result['ctype_v'])?'v':'c', true)]);
+    $terms = localeDueDate($today, $result['terms']);
+    $output['cust'] = array_merge($defaults, ['credit_limit'=>$terms['credit_limit'],'terms_lang'=>viewTerms($result['terms'], false, 'c', true)]);
+    $output['vend'] = array_merge($defaults, ['credit_limit'=>$terms['credit_limit'],'terms_lang'=>viewTerms($result['terms'], false, 'v', true)]);
     $addr  = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");
-    $jIDs  = !empty($result['ctype_v']) ? '6,7' : '12,13';
-    $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "contact_id_b=$cID AND journal_id IN ($jIDs) AND closed='0'", 'post_date');
+    $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "contact_id_b=$cID AND journal_id IN (6, 7, 12, 13) AND closed='0'", 'post_date');
     foreach ($rows as $row) {
-        $aging = pbGetAging($row['id']);
-        $output['total']      += $aging['total'];
-        $output['past_due']   += $aging['past_due'];
-        $output['balance_0']  += $aging['bal0'];  // Current
-        $output['balance_30'] += $aging['bal30']; // Up to 30 days past terms
-        $output['balance_60'] += $aging['bal60']; // 31-60 days past terms
-        $output['balance_90'] += $aging['bal90']; // 61-90 days past terms
-        $output['balance_120']+= $aging['bal120'];// 91-120 days past terms
-        $output['balance_61'] += $aging['bal61']; // Over 60
-        $output['balance_91'] += $aging['bal91']; // Over 90
-        $output['balance_121']+= $aging['bal121'];// Over 120
-        $output['data'][]      = [$addr['primary_name'],viewFormat($row['post_date'], 'date'),$row['invoice_num'],
-            $aging['bal0'],$aging['bal30'],$aging['bal60'],$aging['bal90'],$aging['bal120'],$aging['bal121']];
+        $type = in_array($row['journal_id'], [6,7]) ? 'vend' : 'cust';
+        $aging= pbGetAging($row['id']);
+        $output[$type]['total']      += $aging['total'];
+        $output[$type]['past_due']   += $aging['past_due'];
+        $output[$type]['balance_0']  += $aging['bal0'];  // Current
+        $output[$type]['balance_30'] += $aging['bal30']; // Up to 30 days past terms
+        $output[$type]['balance_60'] += $aging['bal60']; // 31-60 days past terms
+        $output[$type]['balance_90'] += $aging['bal90']; // 61-90 days past terms
+        $output[$type]['balance_120']+= $aging['bal120'];// 91-120 days past terms
+        $output[$type]['balance_61'] += $aging['bal61']; // Over 60
+        $output[$type]['balance_91'] += $aging['bal91']; // Over 90
+        $output[$type]['balance_121']+= $aging['bal121'];// Over 120
+        $output[$type]['data'][]      = [$addr['primary_name'], viewFormat($row['post_date'], 'date'), $row['invoice_num'],
+            $aging['bal0'], $aging['bal30'], $aging['bal60'], $aging['bal90'], $aging['bal120'], $aging['bal121']];
     }
     if (!empty($bb_date)) {
-        $output['beg_bal'] = $output['total'] - pbGetBegBal($cID, !empty($result['ctype_v'])?'v':'c', $bb_date);
+        $output[$type]['beg_bal'] = $output[$type]['total'] - pbGetBegBal($cID, !empty($result['ctype_v'])?'v':'c', $bb_date);
     }
     if (!empty($eb_date)) {
-        $output['end_bal'] = $output['total'] - pbGetBegBal($cID, !empty($result['ctype_v'])?'v':'c', $eb_date);        
+        $output[$type]['end_bal'] = $output[$type]['total'] - pbGetBegBal($cID, !empty($result['ctype_v'])?'v':'c', $eb_date);        
     }
     msgDebug("\nCalculated aging for cID = $cID, returning = ".print_r($output, true));
     return $output;

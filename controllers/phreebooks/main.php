@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-04-11
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1152,7 +1152,8 @@ function bizUnitDiscDisc(newValue) {
         $cID    = !empty($rID) ? $rID : clean('rID', 'integer', 'get');
         if (empty($cID)) { return("Bad ID"); }
         $contact= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");
-        $aging  = calculate_aging($cID);
+        $ageAll = calculate_aging($cID);
+        $aging  = $contact['ctype_v']=='1' ? $ageAll['vend'] : $ageAll['cust'];
         $data   = ['type'=>'popup','attr'=>['id'=>'winStatus'],
             'title'=> lang('summary'),
             'divs' => [
