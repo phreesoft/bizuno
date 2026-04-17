@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-04-13
  * @filesource /local/en_US/language.php
  */
 
@@ -386,6 +386,7 @@ $langCore = [
     'maintainer' => 'Maintainer',
     'maintenance' => 'Maintenance',
     'manager' => 'Manager',
+    'manual_entry' => 'Manual Entry',
     'manufacturing' => 'Manufacturing',
     'marketplace' => 'Marketplace',
     'margin' => 'Margin',

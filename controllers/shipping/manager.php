@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-13
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -128,10 +128,10 @@ class shippingManager extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['sort']    = clean('sort', ['format'=>'db_field','default'=>'ship_date'],'post'); // change the default entry sorting/order
-        $this->defaults['order']   = clean('order',['format'=>'db_field','default'=>'DESC'],     'post');
-        $this->defaults['store_id']= clean('store_id',['format'=>'integer','default'=>-1],       'post');
-        $this->defaults['period']  = clean('period',  ['format'=>'cmd',    'default'=>'l'],      'post');
+        $this->defaults['sort']    = clean('sort',    ['format'=>'db_field','default'=>'ship_date'],'post'); // change the default entry sorting/order
+        $this->defaults['order']   = clean('order',   ['format'=>'db_field','default'=>'DESC'],     'post');
+        $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1],         'post');
+        $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>'l'],        'post');
     }
 
     /**
@@ -253,7 +253,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                 'tracking'    => $this->extractTracking($meta['packages']??[]),
                 'reconciled'  => $this->extractReconcile($meta['packages']??[])];
         }
-        $cHits = getMetaCommon($this->metaPrefix);
+        $cHits = dbMetaGet('%', $this->metaPrefix);
         foreach ($cHits as $value) {
             if ($value['ship_date']<$dates['start_date'] || $value['ship_date']>$dates['end_date']) { continue; }
             $output[] = [
@@ -328,8 +328,8 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     }
     public function edit(&$layout=[])
     {
-        $rID  = clean('rID', 'integer',   'get'); // this is the journal_meta/common_meta id field
-        $table= clean('table', 'db_field','get');
+        $rID  = clean('rID',  'integer', 'get'); // this is the journal_meta/common_meta id field
+        $table= clean('table','db_field','get');
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $meta = dbMetaGet($rID, $this->metaPrefix, $table);
         if (!empty($rID) && $table=='journal') { // We're here because an order was shipped but the method had no label method. Create and pre-load the record.
@@ -366,11 +366,13 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $refID = clean('_refID','integer', 'post');
         $table = clean('_table','db_field','post');
         $invNum= clean('invoice_num', 'text', 'post');
-        if (empty($refID) && !empty($invNum)) { // if $refID is blank and post invoice_num is not then we need to find the record to add
-            $mainID = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "invoice_num LIKE '$invNum%' AND journal_id=12");
-            $refID  = !empty($mainID) ? $mainID : 0;
+        if (empty($refID) && !empty($invNum)) { // manually added a new record, find the record to add
+            $mainID= dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "invoice_num LIKE '$invNum%' AND journal_id=12");
+            if (!empty($mainID)) {
+                $refID = $mainID;
+                $table = 'journal';
+            }
         }
-        if (empty($refID)) { $table = 'common'; }
         $args = ['_rID'=>$rID, '_table'=>$table, '_refID'=>$refID, 'tabID'=>2];
         parent::saveMeta($layout, $args);
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'0'], 'update', "id=$refID");

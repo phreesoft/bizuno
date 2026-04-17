@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-13
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -31,7 +31,9 @@ bizAutoLoad(dirname(__FILE__).'/common.php', 'shippingCommon');
 
 class shippingShip extends shippingCommon
 {
-    public $pageID = 'ship';
+    public    $pageID    = 'ship';
+    protected $metaPrefix= 'shipment';
+    protected $nextRefIdx= 'next_shipment_num';
 
     function __construct()
     {
@@ -54,8 +56,9 @@ class shippingShip extends shippingCommon
         $shipper = $this->loadCarrier($dbData['carrier']);
         if ($rID && !method_exists($shipper, 'labelGet')) {
             msgDebug("\nNo label method, just a log entry");
-            $js  = "accordionEdit('accShipping', 'dgShipping', 'dtlShipping', '".jslang('details')."', '$this->moduleID/manager/edit', '$rID');";
-            $layout = array_replace_recursive($layout, ['type'=>'divHTML',
+            $refID = $this->addNewRecord($dbData); // create a log record since we have the info here and pass the meta_id to the editor as $rID
+            $js    = "accordionEdit('accShipping', 'dgShipping', 'dtlShipping', '".jslang('details')."', '$this->moduleID/manager/edit&table=journal', '$refID');";
+            $layout= array_replace_recursive($layout, ['type'=>'divHTML',
                 'divs'   => ['divLabel'=>['order'=>50,'label'=>lang('shipment'),'type'=>'html','html'=>'<div id="divLabel">&nbsp;</div>']],
                 'jsReady'=> ['jsLabel'=>$js]]);
             return;
@@ -568,5 +571,24 @@ function labelPDF(rID, path) {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         $path = clean('data','filename','get'); // relative file path from BIZUNO_DATA
         $io->download('file', pathinfo($path, PATHINFO_DIRNAME)."/", pathinfo($path, PATHINFO_BASENAME), false); // doesn't return if successful
+    }
+    
+    /**
+     * Adds a shipping record with partial information from the journal entry
+     * @param type $data - journal_main record data 
+     */
+    public function addNewRecord($data=[])
+    {
+        $meta = [
+            '_table'      => 'journal',
+            '_refID'      => $data['id'],
+            'ref_num'     => getNextReference($this->nextRefIdx),
+            'invoice_num' => $data['invoice_num'],
+            'store_id'    => $data['store_id'],
+            'method_code' => $data['method_code'],
+            'ship_date'   => biz_date(),
+            'total_billed'=> $data['freight'],
+            'packages' => ['total'=>0, 'rows'=>[]]];
+        return dbMetaSet(0, $this->metaPrefix, $meta, 'journal', $data['id']);
     }
 }
