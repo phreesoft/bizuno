@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-17
  * @filesource /controllers/api/admin.php
  */
 
@@ -114,6 +114,14 @@ class apiAdmin extends apiCommon
     {
         $chan = $this->getMethod();
         $chan->cartConfirm($layout);
+    }
+
+    public function validateCreds(&$layout=[])
+    {
+        // Make sure we are logged in
+        if (!$security = validateAccess('admin', 1)) { return msgAdd('illegal_access'); }
+        $chan = $this->getMethod();
+        $chan->validateCreds($layout);
     }
 
     public function apiInvCount(&$layout=[], $result=[])

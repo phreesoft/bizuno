@@ -1815,6 +1815,10 @@ function csvEncapsulate($value)
     return $tmp2;
 }
 
+/**
+ * Creates a Universal Unique ID string for API's mostly
+ * @return string - UUID
+ */
 function format_uuidv4()
 {
     $strong = false;
