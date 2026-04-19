@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-11
+ * @version    7.x Last Update: 2026-04-18
  * @filesource /controllers/contacts/main.php
  */
 
@@ -434,7 +434,7 @@ class contactsMain
             dbWrite(BIZUNO_DB_PREFIX.'contacts', ['attach'=>'1'], 'update', "id=$rID");
         }
         msgAdd(lang('msg_record_saved'), 'success'); // doesn't hang if returning to manager
-        msgLog(sprintf(lang('tbd_manager'), lang("type_{$this->type}"))." - ".lang('save')." - $title (rID=$rID)");
+        msgLog(sprintf(lang('tbd_manager'), lang("ctype_{$this->type}"))." - ".lang('save')." - $title (rID=$rID)");
         $data = ['content' => ['action'=>'eval','actionData'=>"jqBiz('#accContacts').accordion('select', 0); bizGridReload('dgContacts'); jqBiz('#divContactsDetail').html('&nbsp;');"]];
         $layout = array_replace_recursive($layout, $data);
     }
@@ -504,7 +504,7 @@ class contactsMain
             'contacts_log' => 'DELETE FROM '.BIZUNO_DB_PREFIX."contacts_log WHERE contact_id=$rID"]];
         $files = glob(getModuleCache('contacts', 'properties', 'attachPath', 'contacts')."rID_{$rID}_*.zip");
         if (is_array($files)) { foreach ($files as $filename) { @unlink($filename); } }
-        msgLog(lang('contacts')." ".lang('delete')." - $short_name (rID=$rID)");
+        msgLog(sprintf(lang('tbd_manager'), lang("ctype_{$this->type}"))." - ".lang('delete')." - $short_name (rID=$rID)");
         $layout = array_replace_recursive($layout, $data);
     }
 
@@ -853,9 +853,9 @@ class contactsMain
     {
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd("Bad ID submitted!"); }
-        msgLog(lang('contacts_log').' '.lang('delete')." - ($rID)");
+        msgLog(lang('log').' - '.lang('delete')." - ($rID)");
         $layout = array_replace_recursive($layout, ['content' => ['action'=>'eval','actionData'=>"bizGridReload('dgLog');"],
-            'dbAction'=> [BIZUNO_DB_PREFIX."contacts_log"=>"DELETE FROM ".BIZUNO_DB_PREFIX."contacts_log WHERE id=$rID"]]);
+            'dbAction'=> [BIZUNO_DB_PREFIX.'contacts_log'=>"DELETE FROM ".BIZUNO_DB_PREFIX."contacts_log WHERE id=$rID"]]);
     }
 
     /**

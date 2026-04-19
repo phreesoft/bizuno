@@ -31,12 +31,13 @@
         }
     ],
     "require": {
+        "authorizenet/authorizenet": "2.0.3",
         "phpmailer/phpmailer": "^6.9",
         "phpseclib/phpseclib": "~3.0",
-        "tecnickcom/tcpdf": "^6.8",
         "setasign/fpdf": "^1.8",
 	"setasign/fpdi": "^2.5",
         "setasign/fpdi_pdf-parser": "2.1.4",
+        "tecnickcom/tcpdf": "^6.8",
         "web-auth/webauthn-lib": "^5.2"
     }
 }

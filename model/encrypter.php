@@ -46,6 +46,41 @@ final class encryption {
         $this->mod = 3;
     }
 
+
+
+/*
+ * @TODO - move this to the functions.php file and delete this class.
+
+function encryptWithKey(string $data, string $key): string
+{
+    $method = 'aes-256-gcm';
+    $iv = random_bytes(12);                    // Secure IV for GCM
+    $tag = '';                                 // Authentication tag
+    $encrypted = openssl_encrypt($data, $method, $key, OPENSSL_RAW_DATA, $iv, $tag);
+    // Combine IV + tag + ciphertext (all needed for decryption)
+    return base64_encode($iv . $tag . $encrypted);
+}
+
+function decryptWithKey(string $encryptedData, string $key): string|false
+{
+    $method = 'aes-256-gcm';
+    $decoded = base64_decode($encryptedData);
+    $iv = substr($decoded, 0, 12);
+    $tag = substr($decoded, 12, 16);
+    $ciphertext = substr($decoded, 28);
+    return openssl_decrypt($ciphertext, $method, $key, OPENSSL_RAW_DATA, $iv, $tag);
+}
+// ====================== Usage Example ======================
+$yourKey = "MySuperSecretKey123!@#MySuperSecretKey123!@#";  // Use a strong key (at least 32 chars)
+$message = "This is my secret data that I want to protect.";
+$encrypted = encryptWithKey($message, $yourKey);
+echo "Encrypted: " . $encrypted . "\n";
+$decrypted = decryptWithKey($encrypted, $yourKey);
+echo "Decrypted: " . $decrypted . "\n";
+*/
+    
+    
+    
     /**
      * Decrypts a string using the provided key
      * @param string $key  - Key to use to decrypt the string

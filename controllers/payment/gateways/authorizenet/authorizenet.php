@@ -21,19 +21,29 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-20
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
  * @link http://developer.authorize.net/api/ - Main Website
  * @link https://developer.authorize.net/api/reference/index.html - API Documentation
+ * 
+ * HTTP Request Method: POST
+ * Sandbox API Endpoint: https://apitest.authorize.net/xml/v1/request.api
+ * Production API Endpoint: https://api.authorize.net/xml/v1/request.api
+ * JSON Content-Type: application/json
  */
 
 namespace bizuno;
 
-if (!defined('PAYMENT_AUTHORIZENET_URL'))      { define('PAYMENT_AUTHORIZENET_URL', 'https://secure2.authorize.net/gateway/transact.dll'); }
-if (!defined('PAYMENT_AUTHORIZENET_URL_TEST')) { define('PAYMENT_AUTHORIZENET_URL_TEST', 'https://test.authorize.net/gateway/transact.dll'); }
-bizAutoLoad(BIZUNO_FS_LIBRARY.'model/encrypter.php', 'encryption');
+use net\authorize\api\contract\v1 as AnetAPI;
+use net\authorize\api\controller as AnetController;
+//require 'vendor/autoload.php';
+//require_once 'constants/SampleCodeConstants.php';
+//define("AUTHORIZENET_LOG_FILE", "phplog");
+
+//if (!defined('PAYMENT_AUTHORIZENET_URL'))      { define('PAYMENT_AUTHORIZENET_URL', 'https://secure2.authorize.net/gateway/transact.dll'); }
+//if (!defined('PAYMENT_AUTHORIZENET_URL_TEST')) { define('PAYMENT_AUTHORIZENET_URL_TEST', 'https://test.authorize.net/gateway/transact.dll'); }
 
 class authorizenet
 {
@@ -61,11 +71,11 @@ class authorizenet
 
     public function __construct()
     {
-        $pmtDef        = getModuleCache($this->moduleID, 'settings', 'general', false, []);
-        $this->defaults= ['cash_gl_acct'=>$pmtDef['gl_payment_c'],'disc_gl_acct'=>$pmtDef['gl_discount_c'],'order'=>10,'user_id'=>'','txn_key'=>'',
+        $pmtDef  = getModuleCache($this->moduleID, 'settings', 'general', false, []);
+        $defaults= ['cash_gl_acct'=>$pmtDef['gl_payment_c'],'disc_gl_acct'=>$pmtDef['gl_discount_c'],'order'=>10,'user_id'=>'','txn_key'=>'',
             'auth_type'=>'Authorize/Capture','prefix'=>'CC','prefixAX'=>'AX','allowRefund'=>'0'];
-        $userMeta      = getMetaMethod($this->methodDir, $this->code);
-        $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
+        $userMeta= getMetaMethod($this->methodDir, $this->code);
+        $this->settings= array_replace($defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
     }
 
     public function settingsStructure()
@@ -174,6 +184,196 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return $html;
     }
 
+    public function payment($action, $fields, $ledger)
+    {
+        switch ($action) {
+            case 'capture':  return $this->pmtCapture(); // authorize and capture a credit card payment
+            case 'authorize':return $this->pmtAuthorize(); // authorize a credit card payment
+            case 'capAuth':  return $this->pmtCapAuth(); // capture funds reserved with a previous authOnlyTransaction transaction request
+//          case 'capChan':  return $this->pmtChannel(); // capture funds which have been authorized through another channel
+            case 'refund':   return $this->pmtRefund(); // refund a customer for a transaction that was successfully settled through the payment gateway
+            case 'void':     return $this->pmtVoid(); // cancel either an original transaction that is not yet settled or an entire order
+//          case 'achDebit': return $this->achDebit(); // process an ACH debit transaction using bank account details
+//          case 'achCredit':return $this->achCredit(); // refund a customer using a bank account credit transaction
+            case 'wltCap':   return $this->walletCapture(); // authorize and capture a payment using a stored customer payment profile
+//          case 'tknCharge':return $this->tokenCharge();
+//          case 'applePay': return $this->applePay(); // create an Authorize.net payment transaction request using Apple Pay data in place of card data
+//          case 'googlePay':return $this->googlePay(); // create an Authorize.net payment transaction request using Google Pay data in place of card data
+//          case 'recurring':return $this->subscription(); // manage regular payment subscriptions
+        }
+        msgAdd(lang('illegal_access'));
+    }
+    
+    private function pmtCapture()
+    {
+        
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+
+        // Create the payment data for a credit card
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber("4111111111111111");
+        $creditCard->setExpirationDate("2038-12");
+        $creditCard->setCardCode("123");
+
+        // Add the payment data to a paymentType object
+        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne->setCreditCard($creditCard);
+
+        // Create order information
+        $order = new AnetAPI\OrderType();
+        $order->setInvoiceNumber("10101");
+        $order->setDescription("Golf Shirts");
+
+        // Set the customer's Bill To address
+        $customerAddress = new AnetAPI\CustomerAddressType();
+        $customerAddress->setFirstName("Ellen");
+        $customerAddress->setLastName("Johnson");
+        $customerAddress->setCompany("Souveniropolis");
+        $customerAddress->setAddress("14 Main Street");
+        $customerAddress->setCity("Pecan Springs");
+        $customerAddress->setState("TX");
+        $customerAddress->setZip("44628");
+        $customerAddress->setCountry("USA");
+
+        // Set the customer's identifying information
+        $customerData = new AnetAPI\CustomerDataType();
+        $customerData->setType("individual");
+        $customerData->setId("99999456654");
+        $customerData->setEmail("EllenJohnson@example.com");
+
+        // Add values for transaction settings
+        $duplicateWindowSetting = new AnetAPI\SettingType();
+        $duplicateWindowSetting->setSettingName("duplicateWindow");
+        $duplicateWindowSetting->setSettingValue("60");
+
+/*      // Add some merchant defined fields. These fields won't be stored with the transaction,
+        // but will be echoed back in the response.
+        $merchantDefinedField1 = new AnetAPI\UserFieldType();
+        $merchantDefinedField1->setName("customerLoyaltyNum");
+        $merchantDefinedField1->setValue("1128836273");
+
+        $merchantDefinedField2 = new AnetAPI\UserFieldType();
+        $merchantDefinedField2->setName("favoriteColor");
+        $merchantDefinedField2->setValue("blue");
+ */
+
+        // Create a TransactionRequestType object and add the previous objects to it
+        $transactionRequestType = new AnetAPI\TransactionRequestType();
+        $transactionRequestType->setTransactionType("authCaptureTransaction");
+        $transactionRequestType->setAmount($amount);
+        $transactionRequestType->setOrder($order);
+        $transactionRequestType->setPayment($paymentOne);
+        $transactionRequestType->setBillTo($customerAddress);
+        $transactionRequestType->setCustomer($customerData);
+        $transactionRequestType->addToTransactionSettings($duplicateWindowSetting);
+//      $transactionRequestType->addToUserFields($merchantDefinedField1);
+//      $transactionRequestType->addToUserFields($merchantDefinedField2);
+
+        if ($response != null) {
+            // Check to see if the API request was successfully received and acted upon
+            if ($response->getMessages()->getResultCode() == "Ok") {
+                // Since the API request was successful, look for a transaction response
+                // and parse it to display the results of authorizing the card
+                $tresponse = $response->getTransactionResponse();
+
+                if ($tresponse != null && $tresponse->getMessages() != null) {
+                    echo " Successfully created transaction with Transaction ID: " . $tresponse->getTransId() . "\n";
+                    echo " Transaction Response Code: " . $tresponse->getResponseCode() . "\n";
+                    echo " Message Code: " . $tresponse->getMessages()[0]->getCode() . "\n";
+                    echo " Auth Code: " . $tresponse->getAuthCode() . "\n";
+                    echo " Description: " . $tresponse->getMessages()[0]->getDescription() . "\n";
+                } else {
+                    echo "Transaction Failed \n";
+                    if ($tresponse->getErrors() != null) {
+                        echo " Error Code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n";
+                        echo " Error Message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                    }
+                }
+                // Or, print errors if the API request wasn't successful
+            } else {
+                echo "Transaction Failed \n";
+                $tresponse = $response->getTransactionResponse();
+
+                if ($tresponse != null && $tresponse->getErrors() != null) {
+                    echo " Error Code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n";
+                    echo " Error Message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                } else {
+                    echo " Error Code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n";
+                    echo " Error Message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
+                }
+            }
+        } else {
+            echo  "No response returned \n";
+        }
+        return $response;
+    }
+    
+    private function pmtAuthorize()
+    {
+        
+    }
+    
+    private function pmtCapAuth()
+    {
+        
+    }
+    
+    public function wallet($action)
+    {
+        switch ($action) {
+            case 'custCreate': return $this->custCreate(); // create a new customer profile including any customer payment profiles and customer shipping addresses
+            case 'custGet':    return $this->custGet(); // retrieve an existing customer profile along with all the associated payment profiles and shipping addresses
+            case 'custGetIDs': return $this->custGetIDs(); // retrieve all existing customer profile IDs
+            case 'custUpdate': return $this->TBD(); // update an existing customer profile
+            case 'custDelete': return $this->TBD(); // delete an existing customer profile along with all associated customer payment profiles and customer shipping addresses
+            case 'wltNew':     return $this->TBD(); // create a new customer payment profile for an existing customer profile
+            case 'wltGet':     return $this->TBD(); // retrieve the details of a customer payment profile associated with an existing customer profile
+            case 'wltList':    return $this->TBD(); // get list of all the payment profiles that match the submitted searchType
+            case 'wltTest':    return $this->TBD(); // generate a test transaction that verifies an existing customer payment profile
+            case 'wltUpdate':  return $this->TBD(); // update a payment profile for an existing customer profile
+            case 'wltDelete':  return $this->TBD(); // delete a customer payment profile from an existing customer profile
+            case 'addrNew':    return $this->TBD(); // create a new customer shipping address for an existing customer profile
+            case 'addrGet':    return $this->TBD(); // retrieve the details of a customer shipping address associated with an existing customer profile
+            case 'addrUpdate': return $this->TBD(); // update a shipping address for an existing customer profile
+            case 'addrDelete': return $this->TBD(); // delete a customer shipping address from an existing customer profile
+            case 'custAuto':   return $this->TBD(); // create a customer profile, payment profile, and shipping profile from an existing successful transaction
+        }
+        msgAdd(lang('illegal_access'));
+    }
+    
+    public function report($action)
+    {
+        switch ($action)
+        {
+            case 'rptRagne':  return $this->TBD(); // returns Batch ID, Settlement Time, & Settlement State for all settled batches with a range of dates
+            case 'rptBatch':  return $this->TBD(); // return data for all transactions in a specified batch
+            case 'rptPending':return $this->TBD(); // get data for unsettled transactions
+            case 'rptCust':   return $this->TBD(); // retrieve transactions for a specific customer profile or customer payment profile
+            case 'rptTrans':  return $this->TBD(); // get detailed information about a specific transaction
+            case 'rptStats':  return $this->TBD(); // returns statistics for a single batch, specified by the batch ID
+//          case 'rptMerch':  return $this->TBD(); // supply your authentication information to receive merchant details in the response
+//          case 'rptMvmnt':  return $this->TBD(); // get a summary of the results of the Account Updater process for a particular month
+//          case 'rptEdits':  return $this->TBD(); // get details of each card updated or deleted by the Account Updater process for a particular month
+        }
+        msgAdd(lang('illegal_access'));
+    }
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public function paymentAuth($fields, $ledger)
     {
         msgDebug("\nEntering Authorize.net paymentAuth working with fields = ".print_r($fields, true));
@@ -297,8 +497,26 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     private function queryMerchant($submit_data=[])
     {
-        global $io;
-        $txnReq = array_merge([
+//        global $io;
+        /* Create a merchantAuthenticationType object with authentication details retrieved from the constants file */
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName($this->settings['user_id']);
+        $merchantAuthentication->setTransactionKey($this->settings['txn_key']);
+
+        // Assemble the complete transaction request
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequestType);
+
+        // Create the controller and get the response
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        return $reposnse;
+        
+        
+/*        $txnReq = array_merge([
             'x_login'          => $this->settings['user_id'],
             'x_tran_key'       => $this->settings['txn_key'],
             'x_relay_response' => 'FALSE',
@@ -342,6 +560,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             return ['txID'=>$resp[6], 'txTime'=>biz_date('Y-m-d h:i:s'), 'code'=>$resp[4]];
         } // else other error
         msgAdd($this->lang['err_process_failed'].' - '.$resp[3]);
+*/
     }
 
     private function getDiscGL($data)
