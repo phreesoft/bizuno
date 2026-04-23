@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-17
+ * @version    7.x Last Update: 2026-04-23
  * @filesource /controllers/phreebooks/ediAPI.php
  *
  * Handles specs:
@@ -368,7 +368,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
             if ($key=='NX') { // address line, need to sort
                 foreach ($line as $address) { $this->N1($address); }
             } elseif (!in_array($key, ['ISA','GS','ST','CTT','SE','GE','IEA'])) {
-                if (!method_exists($key)) {
+                if (!method_exists($this, $key)) {
                     msgDebug("\nUnexpected segment $key, with data: ".msgPrint($line), 'trap');
                     continue;
                 }

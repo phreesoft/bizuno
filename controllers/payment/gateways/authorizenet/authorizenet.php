@@ -27,6 +27,8 @@
  * Source Information:
  * @link http://developer.authorize.net/api/ - Main Website
  * @link https://developer.authorize.net/api/reference/index.html - API Documentation
+ * @link https://github.com/AuthorizeNet/sdk-php - GitHub PHP Docs
+ * @link https://github.com/AuthorizeNet/sample-code-php - GitHub Sample PHP code
  * 
  * HTTP Request Method: POST
  * Sandbox API Endpoint: https://apitest.authorize.net/xml/v1/request.api
@@ -38,9 +40,8 @@ namespace bizuno;
 
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
-//require 'vendor/autoload.php';
-//require_once 'constants/SampleCodeConstants.php';
-//define("AUTHORIZENET_LOG_FILE", "phplog");
+
+define("AUTHORIZENET_LOG_FILE", "phplog");
 
 //if (!defined('PAYMENT_AUTHORIZENET_URL'))      { define('PAYMENT_AUTHORIZENET_URL', 'https://secure2.authorize.net/gateway/transact.dll'); }
 //if (!defined('PAYMENT_AUTHORIZENET_URL_TEST')) { define('PAYMENT_AUTHORIZENET_URL_TEST', 'https://test.authorize.net/gateway/transact.dll'); }
@@ -184,8 +185,19 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return $html;
     }
 
+    private function merchantAuthentication()
+    {
+        /* Create a merchantAuthenticationType object with authentication details retrieved from the constants file */
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName($this->settings['user_id']);
+        $merchantAuthentication->setTransactionKey($this->settings['txn_key']);
+        return $merchantAuthentication;
+    }
+
     public function payment($action, $fields, $ledger)
     {
+msgTrap();
+        msgDebug("\nEntering authorize.net::payment");
         switch ($action) {
             case 'capture':  return $this->pmtCapture(); // authorize and capture a credit card payment
             case 'authorize':return $this->pmtAuthorize(); // authorize a credit card payment
@@ -206,7 +218,6 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     
     private function pmtCapture()
     {
-        
         // Set the transaction's refId
         $refId = 'ref' . time();
 
@@ -270,6 +281,16 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 //      $transactionRequestType->addToUserFields($merchantDefinedField1);
 //      $transactionRequestType->addToUserFields($merchantDefinedField2);
 
+        // Assemble the complete transaction request
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($this->merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequestType);
+
+        // Create the controller and get the response
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
         if ($response != null) {
             // Check to see if the API request was successfully received and acted upon
             if ($response->getMessages()->getResultCode() == "Ok") {
@@ -319,8 +340,10 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         
     }
     
-    public function wallet($action)
+    public function wallet($action='')
     {
+msgTrap();
+        msgDebug("\nEntering authorize.net::wallet");
         switch ($action) {
             case 'custCreate': return $this->custCreate(); // create a new customer profile including any customer payment profiles and customer shipping addresses
             case 'custGet':    return $this->custGet(); // retrieve an existing customer profile along with all the associated payment profiles and shipping addresses
@@ -342,11 +365,101 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         msgAdd(lang('illegal_access'));
     }
     
+    private function custCreate()
+    {
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+
+        // Create a Customer Profile Request
+        //  1. (Optionally) create a Payment Profile
+        //  2. (Optionally) create a Shipping Profile
+        //  3. Create a Customer Profile (or specify an existing profile)a
+        //  4. Submit a CreateCustomerProfile Request
+        //  5. Validate Profile ID returned
+
+        // Create the Bill To info for new payment type
+        $billTo = new AnetAPI\CustomerAddressType();
+        $billTo->setFirstName("Ellen");
+        $billTo->setLastName("Johnson");
+        $billTo->setCompany("Souveniropolis");
+        $billTo->setAddress("14 Main Street");
+        $billTo->setCity("Pecan Springs");
+        $billTo->setState("TX");
+        $billTo->setZip("44628");
+        $billTo->setCountry("USA");
+        $billTo->setPhoneNumber("888-888-8888");
+        $billTo->setfaxNumber("999-999-9999");
+
+        // [Optional] Set credit card information for payment profile
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber("4242424242424242");
+        $creditCard->setExpirationDate("2038-12");
+        $creditCard->setCardCode("142");
+        $paymentCreditCard = new AnetAPI\PaymentType();
+        $paymentCreditCard->setCreditCard($creditCard);
+        // Create a new CustomerPaymentProfile object
+        $paymentProfile = new AnetAPI\CustomerPaymentProfileType();
+        $paymentProfile->setCustomerType('individual');
+        $paymentProfile->setBillTo($billTo);
+        $paymentProfile->setPayment($paymentCreditCard);
+        $paymentProfiles[] = $paymentProfile;
+
+        // [Optional] Create a customer shipping address
+        $customerShippingAddress = new AnetAPI\CustomerAddressType();
+        $customerShippingAddress->setFirstName("James");
+        $customerShippingAddress->setLastName("White");
+        $customerShippingAddress->setCompany("Addresses R Us");
+        $customerShippingAddress->setAddress(rand() . " North Spring Street");
+        $customerShippingAddress->setCity("Toms River");
+        $customerShippingAddress->setState("NJ");
+        $customerShippingAddress->setZip("08753");
+        $customerShippingAddress->setCountry("USA");
+        $customerShippingAddress->setPhoneNumber("888-888-8888");
+        $customerShippingAddress->setFaxNumber("999-999-9999");
+        // Create an array of any shipping addresses
+        $shippingProfiles[] = $customerShippingAddress;
+
+
+
+
+        // Create a new CustomerProfileType and add the payment profile object
+        $customerProfile = new AnetAPI\CustomerProfileType();
+        $customerProfile->setDescription("Customer 2 Test PHP");
+        $customerProfile->setMerchantCustomerId("M_" . time());
+        $customerProfile->setEmail($email);
+        $customerProfile->setpaymentProfiles($paymentProfiles);
+        $customerProfile->setShipToList($shippingProfiles);
+
+
+        // Assemble the complete transaction request
+        $request = new AnetAPI\CreateCustomerProfileRequest();
+        $request->setMerchantAuthentication($this->merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setProfile($customerProfile);
+
+        // Create the controller and get the response
+        $controller = new AnetController\CreateCustomerProfileController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            echo "Succesfully created customer profile : " . $response->getCustomerProfileId() . "\n";
+            $paymentProfiles = $response->getCustomerPaymentProfileIdList();
+            echo "SUCCESS: PAYMENT PROFILE ID : " . $paymentProfiles[0] . "\n";
+        } else {
+            msgAdd("ERROR : Invalid response");
+            $errorMessages = $response->getMessages()->getMessage();
+            msgAdd("Response : " . $errorMessages[0]->getCode() . "  " .$errorMessages[0]->getText());
+        }
+        return $response;
+    }
+
     public function report($action)
     {
+msgTrap();
+        msgDebug("\nEntering authorize.net::report");
         switch ($action)
         {
-            case 'rptRagne':  return $this->TBD(); // returns Batch ID, Settlement Time, & Settlement State for all settled batches with a range of dates
+            case 'rptRange':  return $this->TBD(); // returns Batch ID, Settlement Time, & Settlement State for all settled batches with a range of dates
             case 'rptBatch':  return $this->TBD(); // return data for all transactions in a specified batch
             case 'rptPending':return $this->TBD(); // get data for unsettled transactions
             case 'rptCust':   return $this->TBD(); // retrieve transactions for a specific customer profile or customer payment profile
@@ -374,7 +487,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     
     
     
-    public function paymentAuth($fields, $ledger)
+/*    public function paymentAuth($fields, $ledger)
     {
         msgDebug("\nEntering Authorize.net paymentAuth working with fields = ".print_r($fields, true));
         $refs = $this->guessInv($ledger);
@@ -402,14 +515,14 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
         if (!$resp = $this->queryMerchant($submit_data)) { return; }
         return $resp;
-    }
+    } */
 
     /**
      * @method sale - This method will capture payment, if payment was authorized in a prior transaction, a ccComplete is done
      * @param integer $rID - record id from table journal_main to generate the capture, the transaction ID will be pulled from there.
      * @return array - On success, false (with messageStack message) on unsuccessful deletion
      */
-    public function sale($fields, $ledger)
+/*    public function sale($fields, $ledger)
     {
         msgDebug("\nEntering Authorize.net sale working with fields = ".print_r($fields, true));
         $action = clean("{$this->code}_action", 'db_field', 'post');
@@ -453,14 +566,14 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
         if (!$resp = $this->queryMerchant($submit_data)) { return; }
         return $resp;
-    }
+    } */
 
     /**
      * @method void will delete/void a payment made BEFORE the processor commits the payment, typically must be run the same day as the sale
      * @param integer $rID Record id from table journal_main to generate the void
      * @return array merchant response On success, false (with messageStack message) on unsuccessful deletion
      */
-    public function void($rID=0)
+/*    public function void($rID=0)
     {
         if (!$rID) { return msgAdd('Bad record ID passed'); }
         $txID = dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'trans_code', "ref_id=$rID AND gl_type='ttl'");
@@ -470,7 +583,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             'x_trans_id' => $txID, // Unique identifier returned on the original transaction.
             ];
         return $this->queryMerchant($submit_data);
-    }
+    } */
 
     /**
      * @method refund This method will refund a payment made AFTER the batch is processed, typically must be run any day after the sale
@@ -478,7 +591,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
      * @param float $amount - amount to be refunded (leave blank for full amount)
      * @return array - On success, false (with messageStack message) on unsuccessful deletion
      */
-    public function refund($rID=0, $amount=false)
+/*    public function refund($rID=0, $amount=false)
     {
         if (!$rID) { return msgAdd('Bad record ID passed'); }
         $results = dbGetValue(BIZUNO_DB_PREFIX."journal_item", ['debit_amount', 'credit_amount', 'trans_code'], "ref_id=$rID AND gl_type='ttl'");
@@ -493,30 +606,16 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             'x_amount'   => number_format($amount, 2, '.', ''), // Amount to be refunded in full or partial. Must be less or equal to the original purchase, if not supplied original full amount is refunded.
             ];
         return $this->queryMerchant($submit_data);
-    }
+    } */
 
-    private function queryMerchant($submit_data=[])
+/*    private function queryMerchant($submit_data=[])
     {
 //        global $io;
-        /* Create a merchantAuthenticationType object with authentication details retrieved from the constants file */
-        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
-        $merchantAuthentication->setName($this->settings['user_id']);
-        $merchantAuthentication->setTransactionKey($this->settings['txn_key']);
-
-        // Assemble the complete transaction request
-        $request = new AnetAPI\CreateTransactionRequest();
-        $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($refId);
-        $request->setTransactionRequest($transactionRequestType);
-
-        // Create the controller and get the response
-        $controller = new AnetController\CreateTransactionController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
 
         return $reposnse;
         
         
-/*        $txnReq = array_merge([
+        $txnReq = array_merge([
             'x_login'          => $this->settings['user_id'],
             'x_tran_key'       => $this->settings['txn_key'],
             'x_relay_response' => 'FALSE',
@@ -560,8 +659,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             return ['txID'=>$resp[6], 'txTime'=>biz_date('Y-m-d h:i:s'), 'code'=>$resp[4]];
         } // else other error
         msgAdd($this->lang['err_process_failed'].' - '.$resp[3]);
-*/
-    }
+    } */
 
     private function getDiscGL($data)
     {

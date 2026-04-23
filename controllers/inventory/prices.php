@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-23
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -468,6 +468,7 @@ function preSubmitPrices() {
         msgDebug("\nRead number of price sheets = ".sizeof($sheets));
         $prices['price'] = $this->type=='v' ? $args['iCost'] : $args['iList'];
         foreach ($sheets as $sheet) { // Find the best price
+            if  ($this->locked || !empty($sheet['postCalc'])) { continue; }
             if (!isset($sheet['cType']) && isset($sheet['contact_type'])) { $sheet['cType'] = $sheet['contact_type']; } // fixes bug in pre 7.0 stored price_sheets
             $this->priceQuote($prices, $sheet, $args);
         }
@@ -490,16 +491,16 @@ function preSubmitPrices() {
     {
         msgDebug("\nEntering prices::getSheets");
         $sheets = $iSheets = $cSheets = [];
-        $mSheets = getMetaCommon($this->metaPrefix.'%'); // get common sheets
-        if (!empty($mSheets)) { $sheets = array_merge($sheets, $mSheets); }
-        if (!empty($args['iID'])) { // get inventory sheets
-            $iSheets = getMetaInventory($args['iID'], $this->metaPrefix.'%'); // Inventory Sheets
-            if (!empty($iSheets)) { $sheets = array_merge($sheets, $iSheets); }
-        }
-        if (!empty($args['cID'])) { // get contact sheets
+        if (!empty($args['cID'])) { // get contact sheets first, as they have highest priority, if found locks pricing and skips everything else.
             $cSheets = getMetaContact($args['cID'], $this->metaPrefix.'%'); // Contact Sheets
             if (!empty($cSheets)) { $sheets = array_merge($sheets, $cSheets); }
         }
+        if (!empty($args['iID'])) { // get inventory sheets second
+            $iSheets = getMetaInventory($args['iID'], $this->metaPrefix.'%'); // Inventory Sheets
+            if (!empty($iSheets)) { $sheets = array_merge($sheets, $iSheets); }
+        }
+        $mSheets = getMetaCommon($this->metaPrefix.'%'); // get common sheets last, used for global discounts, i.e. silver, gold, platinum
+        if (!empty($mSheets)) { $sheets = array_merge($sheets, $mSheets); }
         msgDebug(" ... returning with sizeof sheets = ".sizeof($sheets));
         return $sheets;
     }
@@ -535,7 +536,7 @@ function preSubmitPrices() {
                     (!empty($args['iSheetv']) && $args['iSheetv']==$sheet['_rID'])) { // Inventory (vendor) has specified this sheet
                         msgDebug("\nSetting a new price as the conditions have been met!");
                         $prices['price'] = min($prices['price'], $price);
-                    }
+                }
             }
             $choices[] = ['label'=>!empty($level['label'])?$level['label']:'', 'qty'=>$level['qty'], 'price'=>$price, 'weight'=>!empty($level['weight'])?$level['weight']:0];
             if (empty($idx)) { $this->first = $price; } // save level 1 pricing for later if needed
@@ -587,7 +588,6 @@ function preSubmitPrices() {
         $userPrec = getModuleCache('phreebooks', 'currency', 'iso')[getDefaultCurrency()]['dec_len'];
         $precision = is_numeric($userPrec) ? (int)$userPrec : 2;
         msgDebug("\nReturning from calcPrice with price = $price");
-//      return $price; // this was the original, may cause issues with orders with large number of line items.
         return round($price, $precision);
     }
 
