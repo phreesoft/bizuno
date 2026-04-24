@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /model/db.php
  */
 
@@ -50,7 +50,10 @@ class db extends \PDO
             default:
             case "mysql":
                 try { parent::__construct($dns, $user, $pass); }
-                catch (\PDOException $e) { return msgAdd("\nDB Connection failed, error: ".$e->getMessage()); } // ." with db settings: ".print_r($dbData, true)
+                catch (\PDOException $e) {
+                    msgDebug("\nDB Connection failed, error: ".$e->getMessage());
+                    return msgAdd("Database connection failed. Please contact your administrator.");
+                }
                 $this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
                 $this->exec("SET character_set_results='utf8', character_set_client='utf8', character_set_connection='utf8', character_set_database='utf8', character_set_server='utf8'");
                 break;

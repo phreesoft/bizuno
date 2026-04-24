@@ -263,7 +263,7 @@ function bizSetCookie($name, $value, $time=86400, $options=[]) // 24 hours
     if (PHP_VERSION_ID < 70300) {
         setcookie($name, $value, $time, '/; samesite=lax');
     } else {
-        $opts = array_merge($options, ['expires'=>$time,'path'=>'/','secure'=>true,'samesite'=>'lax']);
+        $opts = array_merge(['expires'=>$time,'path'=>'/','secure'=>true,'samesite'=>'lax'], $options);
         setcookie($name, $value, $opts);
     }
 }

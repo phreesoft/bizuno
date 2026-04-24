@@ -328,6 +328,7 @@ function calculate_aging($cID, $bb_date=false, $eb_date=false)
     $output['vend'] = array_merge($defaults, ['credit_limit'=>$terms['credit_limit'],'terms_lang'=>viewTerms($result['terms'], false, 'v', true)]);
     $addr  = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");
     $rows  = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main', "contact_id_b=$cID AND journal_id IN (6, 7, 12, 13) AND closed='0'", 'post_date');
+    $type  = !empty($result['ctype_v']) ? 'vend' : 'cust'; // default when contact has no journal rows
     foreach ($rows as $row) {
         $type = in_array($row['journal_id'], [6,7]) ? 'vend' : 'cust';
         $aging= pbGetAging($row['id']);
@@ -540,9 +541,9 @@ function glFindAPacct(&$row, $type='ap')
     $typeNum = $type=='ar' ? 2 : 20;
     $iRows = dbGetMulti(BIZUNO_DB_PREFIX."journal_item", "ref_id='{$row['id']}'");
     foreach ($iRows as $item) {
-        $type = getModuleCache('phreebooks', 'chart', $item['gl_account'], 'type');
-        msgDebug("\ngl_account = {$item['gl_account']} and type = $type");
-        if ($type <> $typeNum) { continue; } // Accounts Payable type gl account
+        $glType = getModuleCache('phreebooks', 'chart', $item['gl_account'], 'type');
+        msgDebug("\ngl_account = {$item['gl_account']} and type = $glType");
+        if ($glType <> $typeNum) { continue; } // Accounts Payable type gl account
         if (empty($row['gl_acct_id'])) {
             $row['gl_acct_id']   = $item['gl_account'];
             $row['total_amount'] = $item['debit_amount'] + $item['credit_amount'];

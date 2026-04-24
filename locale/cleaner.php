@@ -53,15 +53,15 @@ class cleaner
             $processing['format'] = 'text'; } // use the field type if no processing specified
         // Some applications add slashes to all unput variables, strip them here for most formats
         if (defined('BIZUNO_STRIP_SLASHES') && BIZUNO_STRIP_SLASHES && !is_array($value)) {
-            if (!in_array($processing['format'], ['array','implode','password'])) { $value = stripslashes($value); }
+            if (!in_array($processing['format'], ['array','implode','password'])) { $value = stripslashes((string)$value); }
         }
         switch ($processing['format']) {
             case 'alpha_num':return !empty($value) ? preg_replace("/[^a-zA-Z0-9 \_\-]/", "", $value) : $default; // added default capability
             case 'array':    return is_array($value) ? $value : [];
             case 'bool':
-            case 'boolean':  return substr(trim($value), 0 , 1) == '1' ? 1 : 0;
+            case 'boolean':  return substr(trim((string)$value), 0 , 1) == '1' ? 1 : 0;
             case 'bizunzip': return $this->cleanBizUnzip($value, $default);
-            case 'char':     return strlen(trim($value))==0 ? $default : substr(trim($value), 0, 1); // tbd what about length? char(3), etc
+            case 'char':     $tc = trim((string)$value); return strlen($tc)==0 ? $default : substr($tc, 0, 1); // tbd what about length? char(3), etc
             case 'chars':    return !empty($value) ? preg_replace("/[^a-zA-Z0-9]/", "", $value) : $default;
             case 'cmd':      return !empty($value) ? preg_replace("/[^a-zA-Z0-9\_\-\:]/", '', trim($value)) : $default;
             case 'command':  return $this->cleanCommand();
@@ -84,21 +84,24 @@ class cleaner
             case 'numeric':  return preg_replace("/[^0-9 ]/", "", $value);
             case 'password': return (string)$value; // verbatim — no trim, no slash-strip; users may have significant whitespace or backslashes
             case 'path_rel': // relative path with file, removes leading and trailing slashes and double slashes
+                $value = (string)$value;
                 if (substr($value, 0, 1)== '/') { $value = substr($value, 1); }
                 if (substr($value, 0, 2)== './'){ $value = substr($value, 2); }
                 if (substr($value, -1)  == '/') { $value = substr($value, 0, strlen($value)-1); }
                 return str_replace('//', '/', $value);
-            case 'stringify': return trim($value); // has been converted from json to string, DO NOT REMOVE SLASHES
+            case 'stringify': return trim((string)$value); // has been converted from json to string, DO NOT REMOVE SLASHES
             case 'select':
             case 'text':
             case 'textarea': return $this->cleanTextarea($value, $default);
             case 'time':     return $this->localeTimeToDb($value, $separator = ':');
             case 'url':      return urlencode(str_replace([' ','/','\\'], '-', $value));
-            case 'url_full': if (strpos(strtolower($value), 'http')!==0) { $value = 'https://'.$value; }
-                return str_replace('http:', 'https:', filter_var(strtolower($value), FILTER_VALIDATE_URL));
+            case 'url_full':
+                $value = (string)$value;
+                if (strpos(strtolower($value), 'http')!==0) { $value = 'https://'.$value; }
+                return str_replace('http://', 'https://', filter_var($value, FILTER_VALIDATE_URL));
             default:
 //              msgDebug("\nCleaning with format = {$processing['format']} the value: ".print_r($value, true));
-                return trim(stripslashes($value));
+                return trim(stripslashes((string)$value));
         }
     }
 

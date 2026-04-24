@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-12
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /model/msg.php
  */
 
@@ -45,12 +45,27 @@ final class messageStack
         $version = defined('MODULE_BIZUNO_VERSION') ? MODULE_BIZUNO_VERSION : 'unknown';
         $this->trace  = "Trace information for debug purposes. Bizuno release $version, ip: {$_SERVER['SERVER_ADDR']} and domain {$_SERVER['SERVER_NAME']} - generated $date\n";
         $this->trace .= "Trace Start Time: ".(int)(1000 * (microtime(true) - SCRIPT_START_TIME))." ms\n\n";
-        $this->trace .= "GET Vars = " .print_r($_GET, true)."\n";
-        if (!empty($_POST['UserPW'])) { $temp = $_POST['UserPW']; $_POST['UserPW'] = '****'; } // remove the password if it is there
-        $this->trace .= "POST Vars = ".print_r($_POST,true)."\n";
-        if (!empty($_POST['UserPW'])) { $_POST['UserPW'] = $temp; }
+        $this->trace .= "GET Vars = " .print_r($this->scrubSensitive($_GET), true)."\n";
+        $this->trace .= "POST Vars = ".print_r($this->scrubSensitive($_POST), true)."\n";
         set_error_handler("\bizuno\myErrorHandler");
         set_exception_handler("\bizuno\myExceptionHandler");
+    }
+
+    /**
+     * Returns a copy of $data with values redacted when the key matches a sensitive-field pattern
+     * (passwords, card numbers, CVV, API keys, auth tokens, 2FA codes). Recurses into nested arrays.
+     */
+    private function scrubSensitive($data)
+    {
+        if (!is_array($data)) { return $data; }
+        $pattern = '/pass|pwd|userpw|secret|token|api[_-]?key|txn[_-]?key|card|pan|cvv|cvc|card[_-]?code|otp|2fa|tfa|twofa/i';
+        $output = [];
+        foreach ($data as $key => $val) {
+            if (is_array($val)) { $output[$key] = $this->scrubSensitive($val); }
+            elseif (is_string($key) && preg_match($pattern, $key)) { $output[$key] = '***'; }
+            else { $output[$key] = $val; }
+        }
+        return $output;
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-10
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /model/io.php
  */
 
@@ -287,7 +287,7 @@ final class io
             return msgAdd(sprintf(lang('err_io_file_open'), $path));
         }
         $size = filesize($myPath);
-        $data = fread($handle, $size);
+        $data = $size > 0 ? fread($handle, $size) : '';
         msgDebug("\n Read file of size = $size");
         fclose($handle);
         return ['data'=>$data, 'size'=>$size];
