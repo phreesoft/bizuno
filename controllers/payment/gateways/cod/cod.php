@@ -21,8 +21,11 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/payment/gateways/cod.php
+ *
+ * Cash-on-delivery: no external gateway. `payment('capture')` just records the
+ * posted reference; everything else is notImplemented by design.
  */
 
 namespace bizuno;
@@ -83,5 +86,40 @@ function payment_".$this->code."() {
             if ($row['gl_type'] == 'dsc') { return $row['gl_account']; }
         } }
         return $this->settings['disc_gl_acct']; // not found, return default
+    }
+
+    // ========================================================================
+    // Generic dispatchers — see authorize.net for the canonical implementation.
+    // COD has no external gateway; payment actions just acknowledge success.
+    // ========================================================================
+
+    public function payment($action, $data=[])
+    {
+        switch ($action) {
+            case 'capture':
+            case 'authorize':
+                return ['ok'=>true, 'txID'=>'', 'code'=>'', 'msg'=>'Cash on delivery recorded', 'data'=>[], 'raw'=>null];
+        }
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: payment/$action", 'data'=>[], 'raw'=>null];
+    }
+
+    public function wallet($action, $data=[])
+    {
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: wallet/$action", 'data'=>[], 'raw'=>null];
+    }
+
+    public function report($action, $data=[])
+    {
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: report/$action", 'data'=>[], 'raw'=>null];
+    }
+
+    // ========================================================================
+    // Legacy shims — remove once callers use the dispatchers directly.
+    // ========================================================================
+
+    /** Legacy: called by paymentMain::sale(). COD has nothing to charge; just acknowledge. */
+    public function sale($fields=[], $ledger=null)
+    {
+        return ['txID'=>'', 'txTime'=>biz_date('c'), 'code'=>''];
     }
 }

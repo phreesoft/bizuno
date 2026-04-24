@@ -21,8 +21,12 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /lib/controllers/payment/gateways/paypal.php
+ *
+ * Hosted PayPal redirect: there's no server-side API integration. `payment('capture')`
+ * records the posted reference; `void`/`refund` instruct the user to handle the
+ * action at paypal.com. Other actions are notImplemented.
  */
 
 namespace bizuno;
@@ -96,30 +100,58 @@ function payment_{$this->code}() {
         return $html;
     }
 
-    public function sale($fields=[])
+    // ========================================================================
+    // Generic dispatchers — see authorize.net for the canonical implementation.
+    // PayPal here is a hosted redirect integration; we don't call an API.
+    // ========================================================================
+
+    public function payment($action, $data=[])
     {
-        return ['txID'=>!empty($fields['ref_1']) ? $fields['ref_1'] : '', 'txTime'=>biz_date('c')];
+        switch ($action) {
+            case 'capture':
+            case 'authorize':
+                $ref = !empty($data['fields']['ref_1']) ? $data['fields']['ref_1'] : '';
+                return ['ok'=>true, 'txID'=>$ref, 'code'=>'', 'msg'=>'PayPal payment recorded', 'data'=>[], 'raw'=>null];
+            case 'void':
+                msgAdd($this->lang['msg_delete_manual'].' '.$this->lang['msg_website'], 'caution');
+                return ['ok'=>true, 'txID'=>'', 'code'=>'manual', 'msg'=>$this->lang['msg_delete_manual'], 'data'=>[], 'raw'=>null];
+            case 'refund':
+                msgAdd($this->lang['msg_refund_manual'].' '.$this->lang['msg_website'], 'caution');
+                return ['ok'=>true, 'txID'=>'', 'code'=>'manual', 'msg'=>$this->lang['msg_refund_manual'], 'data'=>[], 'raw'=>null];
+        }
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: payment/$action", 'data'=>[], 'raw'=>null];
     }
 
-    /**
-     * @method paymentDelete - This method will delete/void a payment made BEFORE the processor commits the payment, typically must be run the same day as the sale
-     * @param string $request - data from which to pull transaction and perform delete
-     * @return boolean - true on success, false (with messageStack message) on unsuccessful deletion
-     */
+    public function wallet($action, $data=[])
+    {
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: wallet/$action", 'data'=>[], 'raw'=>null];
+    }
+
+    public function report($action, $data=[])
+    {
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: report/$action", 'data'=>[], 'raw'=>null];
+    }
+
+    // ========================================================================
+    // Legacy shims — remove once callers use the dispatchers directly.
+    // ========================================================================
+
+    public function sale($fields=[], $ledger=null)
+    {
+        $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
+        return ['txID'=>$r['txID'], 'txTime'=>biz_date('c')];
+    }
+
     public function paymentDelete()
     {
-        msgAdd('Deletions through the PayPal API must be handled directly through the PayPal website.', 'caution');
-        return true;
+        $r = $this->payment('void');
+        return !empty($r['ok']);
     }
 
-    /**
-     * @param string $request - data from which to pull transaction and perform refund/credit
-     * @return boolean - true on success, false (with messageStack message) on unsuccessful deletion
-     */
     public function refund()
     {
-        msgAdd('Refunds through the PayPal API must be handled directly through the PayPal website.', 'caution');
-        return true;
+        $r = $this->payment('refund');
+        return !empty($r['ok']);
     }
 
     private function getDiscGL($data)
