@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/payment/gateways/converge.php
  *
  * Source Information:
@@ -42,8 +42,6 @@ namespace bizuno;
 
 if (!defined('PAYMENT_CONVERGE_URL'))     { define('PAYMENT_CONVERGE_URL',     'https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do'); }
 if (!defined('PAYMENT_CONVERGE_URL_TEST')){ define('PAYMENT_CONVERGE_URL_TEST','https://demo.myvirtualmerchant.com/VirtualMerchantDemo/processxml.do'); }
-
-bizAutoLoad(BIZUNO_FS_LIBRARY."model/encrypter.php", 'encryption');
 
 class converge
 {

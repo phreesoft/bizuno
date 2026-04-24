@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-03
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /bizunoCFG.php
  */
 
@@ -70,7 +70,6 @@ require_once ( BIZUNO_FS_LIBRARY . 'model/functions.php' ); // Core functions, n
 require_once ( BIZUNO_FS_LIBRARY . 'locale/cleaner.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'locale/currency.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/db.php' );
-require_once ( BIZUNO_FS_LIBRARY . 'model/encrypter.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/io.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/manager.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/msg.php' );

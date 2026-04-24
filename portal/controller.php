@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /portal/controller.php
  */
 
@@ -142,11 +142,9 @@ class portalCtl
     }
     private function getCodex()
     {
-        global $mixer, $bizunoUser;
+        global $bizunoUser;
         bizAutoLoad(BIZUNO_FS_LIBRARY.'locale/currency.php','currency');
-        bizAutoLoad(BIZUNO_FS_LIBRARY.'model/encrypter.php','encryption');
         $this->loadLanguage(); // Just load the minimal language for the portal operation, more can be loaded as needed
-        $mixer     = new encryption();
         $bizunoUser= $this->setGuestCache();
         $this->validateCookie(); // Validates sign in status
         if (!$this->userValidated) { // not logged in, changed ip's (laptop changing locations) or an attack in progress, sign out

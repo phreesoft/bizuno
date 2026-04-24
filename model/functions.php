@@ -1587,6 +1587,49 @@ function pullExpDates()
     return $output;
 }
 
+/**
+ * Encrypts a string with AES-256-GCM. Output is base64(IV||tag||ciphertext),
+ * safe to stash in a VARCHAR/TEXT column. The key is normalized to 32 bytes
+ * via SHA-256 so callers can pass a passphrase of any length.
+ * @param string $data - plaintext to encrypt (non-empty)
+ * @param string $key  - encryption key / passphrase (non-empty)
+ * @return string|false - base64 ciphertext on success, false on error
+ */
+function bizEncrypt($data, $key)
+{
+    if (!is_string($data) || $data === '') { return msgAdd('No value supplied for encryption'); }
+    if (!is_string($key)  || $key  === '') { return msgAdd(lang('err_encrypt_key_missing')); }
+    $normKey = hash('sha256', $key, true); // 32 raw bytes
+    $iv  = random_bytes(12);
+    $tag = '';
+    $ct  = openssl_encrypt($data, 'aes-256-gcm', $normKey, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($ct === false) { msgDebug("\nbizEncrypt openssl_encrypt failed"); return false; }
+    return base64_encode($iv . $tag . $ct);
+}
+
+/**
+ * Decrypts output produced by bizEncrypt(). Returns false on any failure
+ * (bad key, tampered ciphertext, malformed input) — callers should treat
+ * false as authentication failure, not just "empty result".
+ * @param string $encoded - base64(IV||tag||ciphertext) from bizEncrypt
+ * @param string $key     - the same key used for encryption
+ * @return string|false   - plaintext on success, false on any failure
+ */
+function bizDecrypt($encoded, $key)
+{
+    if (!is_string($encoded) || $encoded === '') { return false; }
+    if (!is_string($key)     || $key     === '') { return false; }
+    $raw = base64_decode($encoded, true);
+    if ($raw === false || strlen($raw) < 28) { msgDebug("\nbizDecrypt input too short or not base64"); return false; }
+    $iv  = substr($raw, 0, 12);
+    $tag = substr($raw, 12, 16);
+    $ct  = substr($raw, 28);
+    $normKey = hash('sha256', $key, true);
+    $pt  = openssl_decrypt($ct, 'aes-256-gcm', $normKey, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($pt === false) { msgDebug("\nbizDecrypt openssl_decrypt failed (auth tag mismatch or bad key)"); }
+    return $pt;
+}
+
 if (!function_exists('json_validate')) { // For pre-php 8.3 installs
     function json_validate($json, $depth = 512, $flags = 0) {
         if (!is_string($json)) { return false; }
