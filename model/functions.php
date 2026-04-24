@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-03
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /model/functions.php
  */
 
@@ -1578,11 +1578,11 @@ function pullExpDates()
     $output['years'][] = ['id'=>0, 'text'=>lang('select')];
     for ($i = 1; $i < 13; $i++) {
         $j = ($i < 10) ? '0' . $i : $i;
-        $output['months'][] = ['id'=>sprintf('%02d', $i), 'text'=>$j.'-'.strftime('%B',mktime(0,0,0,$i,1,2000))];
+        $output['months'][] = ['id'=>sprintf('%02d', $i), 'text'=>$j.'-'.date('F',mktime(0,0,0,$i,1,2000))];
     }
     $today = getdate();
     for ($i = $today['year']; $i < $today['year'] + 10; $i++) {
-        $output['years'][] = ['id'=>strftime('%Y',mktime(0,0,0,1,1,$i)), 'text'=>strftime('%Y',mktime(0,0,0,1,1,$i))];
+        $output['years'][] = ['id'=>date('Y',mktime(0,0,0,1,1,$i)), 'text'=>date('Y',mktime(0,0,0,1,1,$i))];
     }
     return $output;
 }

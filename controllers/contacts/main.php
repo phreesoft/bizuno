@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-18
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/contacts/main.php
  */
 
@@ -242,8 +242,8 @@ class contactsMain
         $fldCont = ['contact_first', 'contact_last', 'flex_field_1', 'telephone1', 'telephone2', 'telephone3', 'telephone4', 'email', 'email2', 'email3', 'email4', 'website'];
         $fldAcct = ['short_name','inactive','rep_id','tax_rate_id','price_sheet','store_id','terms','terms_text','terms_edit','first_date','date_last','histPay']; // ,'last_date_1','last_date_2'
         $fldProp = ['id','account_number','gov_id_number','gl_account','recordID','tax_exempt','marketplace'];
+        $fldRole = ['ctype_b','ctype_c','ctype_e','ctype_i','ctype_j','ctype_u','ctype_v'];
         // set some special cases
-//      $structure['type']['attr']['value']  = $this->type;
         $structure['email']['label']         = lang('email_sales');
         $structure['email2']['label']        = lang('email_ar');
         $structure['email3']['label']        = lang('email_purch');
@@ -289,6 +289,7 @@ class contactsMain
                     'genStat' => ['order'=>30,'type'=>'panel','key'=>'genStat','classes'=>['block33']],
                     'genAcct' => ['order'=>40,'type'=>'panel','key'=>'genAcct','classes'=>['block33']],
                     'genProp' => ['order'=>50,'type'=>'panel','key'=>'genProp','classes'=>['block33']],
+                    'genRole' => ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']],
                     'genAtch' => ['order'=>85,'type'=>'panel','key'=>'genAtch','classes'=>['block66']]]],
                 'history' => ['order'=>30,'label'=>lang('history'), 'hidden'=>$rID?false:true,'type'=>'html', 'html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/manager&type=$this->type&rID=$rID'"]],
@@ -310,11 +311,17 @@ class contactsMain
                 'genStat' => ['label'=>$status['label'],      'type'=>'fields', 'keys'=>$status['fields']],
                 'genAcct' => ['label'=>lang('account'),       'type'=>'fields', 'keys'=>$fldAcct],
                 'genProp' => ['label'=>lang('properties'),    'type'=>'fields', 'keys'=>$fldProp],
+                'genRole' => ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole],
                 'genAtch' => ['type'=>'attach','defaults'=>['dgName'=>$this->moduleID.'Attach','path'=>getModuleCache($this->moduleID,'properties','attachPath','contacts'),'prefix'=>"rID_{$rID}_"]]],
             'forms'   => ['frmContact'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/save&type=$this->type"]]],
             'fields'  => $structure,
             'jsReady' => ['init'=>"ajaxForm('frmContact');"]];
-        if (!validateAccess('admin', 4, false)) { unset($data['tabs']['tabContacts']['divs']['general']['divs']['genRole']); }
+        foreach ($fldRole as $role) { // Filter roles to only show customers/vendors if not admin
+            if (!in_array($role, ['ctype_c', 'ctype_v']) && !validateAccess('admin', 4, false)) { 
+                $data['fields'][$role]['attr']['type'] = 'hidden';
+                $data['fields'][$role]['attr']['value'] = !empty($cData[$role]) ? 1 : 0;
+            }
+        }
         // Some mods for new records
         if (!$rID) { unset($data['tabs']['tabContacts']['divs']['bill_add'], $data['tabs']['tabContacts']['divs']['ship_add']); }
         if       (!$rID && !empty($this->restrict)) { // Stores

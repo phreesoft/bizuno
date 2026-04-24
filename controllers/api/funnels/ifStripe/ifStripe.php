@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/api/funnels/ifStripe/ifStripe.php
  */
 
@@ -140,7 +140,6 @@ class ifStripe {
     {
         global $io;
         if (!$io->validateUpload('fileOrders', '', ['csv','txt'])) { return; }
-        ini_set('auto_detect_line_endings', TRUE);
         $handle= fopen($_FILES['fileOrders']['tmp_name'], 'r');
         $keys  = false; //fgetcsv($handle);
         while (($values = fgetcsv($handle)) !== FALSE) {
@@ -180,7 +179,6 @@ class ifStripe {
         }
         msgDebug("\nFinished parsing csv with total = $this->totAll and fee = $this->totFee");
         fclose($handle);
-        ini_set('auto_detect_line_endings', FALSE);
         return true;
     }
 

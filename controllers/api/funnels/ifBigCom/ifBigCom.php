@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/api/funnels/ifBigCom/ifBigCom.php
  */
 
@@ -201,7 +201,6 @@ class ifBigCom extends apiExport
         $strucMain = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_main');
         $strucItem = dbLoadStructure(BIZUNO_DB_PREFIX.'journal_item');
         if (!$io->validateUpload('fileOrders', '', ['csv','txt'])) { return; }
-        ini_set('auto_detect_line_endings', true);
         // ***************************** START TRANSACTION *******************************
         dbTransactionStart();
         $handle= fopen($_FILES['fileOrders']['tmp_name'], 'r');

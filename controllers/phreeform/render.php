@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -620,7 +620,7 @@ class phreeformRender
 
 //msgDebug("\nresult = ".print_r($result, true));
         // set the filename for download or email
-        if (isset($report->filenameprefix) || isset($report->filenamefield)) {
+        if (!empty($report->filenameprefix) || !empty($report->filenamefield)) {
             $report->filename  = isset($report->filenameprefix)? $report->filenameprefix : '';
             $report->filename .= isset($report->filenamefield) ? $result[0][stripTablename($report->filenamefield)] : '';
         } else {

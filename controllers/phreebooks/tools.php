@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -659,13 +659,14 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         
         // Let's go
         dbTransactionStart();
+        $jm    = BIZUNO_DB_PREFIX.'journal_main';
         $cron['msg'][] = "Cleaning up orphaned records from table: $table";
-        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table jcu LEFT JOIN journal_main jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL";
-        $stmt = dbGetResult("SELECT jm.id FROM $table jcu LEFT JOIN journal_main jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL");
+        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table jcu LEFT JOIN $jm jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL";
+        $stmt = dbGetResult("SELECT jm.id FROM $table jcu LEFT JOIN $jm jm ON jcu.journal_main_id = jm.id WHERE jm.id IS NULL");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         msgDebug("\nFinding orphaned cogs_usage records and fetched ".sizeof($rows)." rows.");
         $cron['msg'][] = "Read ".sizeof($rows)." records to delete from table: $table";
-        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM journal_main jm WHERE jm.id = $table.journal_main_id)");
+        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM $jm jm WHERE jm.id = $table.journal_main_id)");
         $cron['curStep']++;
         $cron['curBlk']++;
         $cron['msg'][] = "Completed Step 10: fyCloseCleanInvUsage.";
@@ -681,16 +682,17 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         
         // Let's go
         dbTransactionStart();
+        $jm    = BIZUNO_DB_PREFIX.'journal_main';
         $cron['msg'][] = "Cleaning up orphaned records from table: $table";
-        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table ih LEFT JOIN journal_main jm ON ih.ref_id = jm.id WHERE jm.id IS NULL";
-        $stmt = dbGetResult("SELECT jm.id FROM $table ih LEFT JOIN journal_main jm ON ih.ref_id = jm.id WHERE jm.id IS NULL");
+        $cron['msg'][] = "    Executing SQL: SELECT * FROM $table ih LEFT JOIN $jm jm ON ih.ref_id = jm.id WHERE jm.id IS NULL";
+        $stmt = dbGetResult("SELECT jm.id FROM $table ih LEFT JOIN $jm jm ON ih.ref_id = jm.id WHERE jm.id IS NULL");
         $rows = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         msgDebug("\nFinding orphaned inventory history records and fetched ".sizeof($rows)." rows.");
         $cron['msg'][] = "Read ".sizeof($rows)." records to delete from table: $table";
-        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM journal_main jm WHERE jm.id = $table.ref_id)");
+        dbGetResult("DELETE FROM $table WHERE NOT EXISTS (SELECT 1 FROM $jm jm WHERE jm.id = $table.ref_id)");
         $cron['curStep']++;
         $cron['curBlk']++;
-        $cron['msg'][] = "Completed Step 10: fyCloseCleanInvHist.";
+        $cron['msg'][] = "Completed Step 11: fyCloseCleanInvHist.";
         dbTransactionCommit();
     }
 

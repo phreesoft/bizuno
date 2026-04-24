@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-07
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/phreebooks/payroll/patriotPayroll/patriotPayroll.php
  */
 
@@ -122,7 +122,6 @@ class patriotPayroll
     {
         global $io;
         if (!$io->validateUpload('selFile', '', ['csv','txt'])) { return; }
-        ini_set('auto_detect_line_endings', TRUE);
         $handle= fopen($_FILES['selFile']['tmp_name'], 'r');
         $keys  = false; //fgetcsv($handle);
         while (($values = fgetcsv($handle)) !== FALSE) {
@@ -151,7 +150,6 @@ class patriotPayroll
             $this->totals['scorp']['total']   += $row['S-Corp Owner Health'];  // should be zero as this is only for W-2 reporting
         }
         fclose($handle);
-        ini_set('auto_detect_line_endings', FALSE);
         return true;
     }
 

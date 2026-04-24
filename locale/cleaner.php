@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /locale/cleaner.php
  */
 
@@ -53,7 +53,7 @@ class cleaner
             $processing['format'] = 'text'; } // use the field type if no processing specified
         // Some applications add slashes to all unput variables, strip them here for most formats
         if (defined('BIZUNO_STRIP_SLASHES') && BIZUNO_STRIP_SLASHES && !is_array($value)) {
-            if (!in_array($processing['format'], ['array','implode'])) { $value = stripslashes($value); }
+            if (!in_array($processing['format'], ['array','implode','password'])) { $value = stripslashes($value); }
         }
         switch ($processing['format']) {
             case 'alpha_num':return !empty($value) ? preg_replace("/[^a-zA-Z0-9 \_\-]/", "", $value) : $default; // added default capability
@@ -82,6 +82,7 @@ class cleaner
             case 'json':     return json_decode($value, true);
             case 'jsonObj':  return json_decode($value); // return object format
             case 'numeric':  return preg_replace("/[^0-9 ]/", "", $value);
+            case 'password': return (string)$value; // verbatim — no trim, no slash-strip; users may have significant whitespace or backslashes
             case 'path_rel': // relative path with file, removes leading and trailing slashes and double slashes
                 if (substr($value, 0, 1)== '/') { $value = substr($value, 1); }
                 if (substr($value, 0, 2)== './'){ $value = substr($value, 2); }

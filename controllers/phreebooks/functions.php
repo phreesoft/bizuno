@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-11
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -86,7 +86,7 @@ function phreebooksProcess($value, $format = '')
         case 'Age91':
         case 'Age120': return procInvAging($value, $format);
         // *********** Statement Processing ***************
-        case 'age_00': // Calculates aging for the contact covering all invoices
+        case 'age_00': // Calculates aging for the contact covering all invoices, assumes customers @TODO - this needs to be fixed!
         case 'age_30':
         case 'age_60':
         case 'age_61':
@@ -107,16 +107,16 @@ function phreebooksProcess($value, $format = '')
                 $GLOBALS['curBal'] = $output['beg_bal'];
                 $GLOBALS['aging']['c'.$cID] = $output;
             }
-            if ($format=='age_00') { return $GLOBALS['aging']['c'.$cID]['balance_0'];  } // current
-            if ($format=='age_30') { return $GLOBALS['aging']['c'.$cID]['balance_30']; } // aging  1-30
-            if ($format=='age_60') { return $GLOBALS['aging']['c'.$cID]['balance_60']; } // aging 31-60
-            if ($format=='age_90') { return $GLOBALS['aging']['c'.$cID]['balance_90']; } // aging Over 60 past due date
-            if ($format=='age_120'){ return $GLOBALS['aging']['c'.$cID]['balance_120']; } // aging Over 60 past due date
-            if ($format=='age_61') { return $GLOBALS['aging']['c'.$cID]['balance_61']; } // aging 61-90
-            if ($format=='age_91') { return $GLOBALS['aging']['c'.$cID]['balance_91']; } // aging 91-120
-            if ($format=='age_121'){ return $GLOBALS['aging']['c'.$cID]['balance_121'];} // aging over 120
-            if ($format=='begBal') { return $GLOBALS['aging']['c'.$cID]['beg_bal'];    } // beginning balance
-            if ($format=='endBal') { return $GLOBALS['aging']['c'.$cID]['end_bal'];    } // ending balance, total balance oustanding
+            if ($format=='age_00') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_0'];  } // current
+            if ($format=='age_30') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_30']; } // aging  1-30
+            if ($format=='age_60') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_60']; } // aging 31-60
+            if ($format=='age_90') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_90']; } // aging Over 60 past due date
+            if ($format=='age_120'){ return $GLOBALS['aging']['c'.$cID]['cust']['balance_120'];} // aging Over 60 past due date
+            if ($format=='age_61') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_61']; } // aging 61-90
+            if ($format=='age_91') { return $GLOBALS['aging']['c'.$cID]['cust']['balance_91']; } // aging 91-120
+            if ($format=='age_121'){ return $GLOBALS['aging']['c'.$cID]['cust']['balance_121'];} // aging over 120
+            if ($format=='begBal') { return $GLOBALS['aging']['c'.$cID]['cust']['beg_bal'];    } // beginning balance
+            if ($format=='endBal') { return $GLOBALS['aging']['c'.$cID]['cust']['end_bal'];    } // ending balance, total balance oustanding
             break;
         // ************ Bank Processing *******************
         case 'bnkReg':

@@ -21,7 +21,7 @@
  * @author Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright 2008-2026, PhreeSoft, Inc.
  * @license https://www.gnu.org/licenses/agpl-3.0.txt
- * @version 7.x Last Update: 2026-04-03
+ * @version 7.x Last Update: 2026-04-24
  * @filesource /portal/viewAuth.php
  */
 namespace bizuno;
@@ -260,12 +260,13 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
             return true;
         } */
         // Normal password flow
-        if (empty($_POST['bizPass'])) {
+        $bizPass = clean('bizPass', 'password', 'post');
+        if (empty($bizPass)) {
             $this->errors = $this->lang['err_invalid_creds'];
             return false;
         }
         $encPW = getMetaContact($user['id'], 'user_auth');
-        $peppered = hash_hmac('sha256', $_POST['bizPass'], BIZUNO_KEY);
+        $peppered = hash_hmac('sha256', $bizPass, BIZUNO_KEY);
         if (!password_verify($peppered, $encPW['value'] ?? '')) {
             $this->errors = $this->lang['err_invalid_creds'];
             return false;
@@ -366,13 +367,13 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
         // Consistent verify (no password_verify needed)
         $submittedHash = hash('sha256', (string)$code);
 
-        if ($submittedHash === $session['hash']) {
+        if (hash_equals((string)$session['hash'], $submittedHash)) {
             msgDebug("\n2FA code verified successfully for $email");
             unset($_SESSION['biz_2fa_temp']);
             return true;
         }
 
-        msgDebug("\nIncorrect 2FA code attempt #{$session['attempts']} for $email | Submitted hash: $submittedHash | Stored hash: {$session['hash']}");
+        msgDebug("\nIncorrect 2FA code attempt #{$session['attempts']} for $email");
         return false;
     }
 

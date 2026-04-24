@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-20
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -196,7 +196,6 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     public function payment($action, $fields, $ledger)
     {
-msgTrap();
         msgDebug("\nEntering authorize.net::payment");
         switch ($action) {
             case 'capture':  return $this->pmtCapture(); // authorize and capture a credit card payment
@@ -342,7 +341,6 @@ msgTrap();
     
     public function wallet($action='')
     {
-msgTrap();
         msgDebug("\nEntering authorize.net::wallet");
         switch ($action) {
             case 'custCreate': return $this->custCreate(); // create a new customer profile including any customer payment profiles and customer shipping addresses
@@ -455,7 +453,6 @@ msgTrap();
 
     public function report($action)
     {
-msgTrap();
         msgDebug("\nEntering authorize.net::report");
         switch ($action)
         {

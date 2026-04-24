@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-24
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -57,11 +57,6 @@ class administrateAdmin
         $type= clean('type', 'char', 'get');
         $rID = clean('rID', 'integer', 'get');
         msgDebug("\nEntering administrate::contactsEdit with type = $type");
-        if (validateAccess('admin', 4, false)) { // add contact type access panel if admin
-            $fldRole= ['ctype_b','ctype_c','ctype_e','ctype_i','ctype_j','ctype_u','ctype_v'];
-            $layout['tabs']['tabContacts']['divs']['general']['divs']['genRole'] = ['order'=>80,'type'=>'panel','key'=>'genRole','classes'=>['block33']];
-            $layout['panels']['genRole'] = ['label'=>lang('contact_type'),  'type'=>'fields', 'keys'=>$fldRole];
-        }
         if (!in_array($type, ['u']) || !validateAccess('admin', 4, false)) { return; } // Only existing records, admins and type user
         // unset some panels
         unset($layout['tabs']['tabContacts']['divs']['history'],$layout['tabs']['tabContacts']['divs']['wallet'],
