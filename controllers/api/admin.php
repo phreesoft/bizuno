@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-17
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/api/admin.php
  */
 
@@ -75,7 +75,8 @@ class apiAdmin extends apiCommon
                 'tax_rate_id'   => ['values'=>viewSalesTaxDropdown('c'),'attr'=>['type'=>'select','value'=>0]]]],
             'phreesoft_api' => ['order'=>60,'label'=>lang('phreesoft_api'),'fields'=>[
                 'api_user'      => ['attr'=>['value'=>'']],
-                'api_pass'      => ['attr'=>['type'=>'password','value'=>'']]]]];
+                'api_pass'      => ['attr'=>['type'=>'password','value'=>'']],
+                'api_token'     => ['attr'=>['type'=>'password','value'=>'']]]]];
         settingsFill($data, $this->moduleID);
         return $data;
     }

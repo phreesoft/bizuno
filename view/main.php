@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /view/main.php
  */
 
@@ -996,7 +996,14 @@ function viewProcess($strData, $Process=false)
         }
         $meta = dbMetaGet($strData, '', $table);
 //        msgDebug("\nFetched meta = ".print_r($meta, true));
-        return isset($meta[$parts[1]]) ? $meta[$parts[1]] : ''; // return null if not found
+        // EasyUI datagrid cells render values as HTML by default. The meta-table values
+        // returned here are user-editable free-text (journal `notes`, EDI `spec`, contact
+        // status text, etc.) — pass them through htmlspecialchars to prevent stored XSS.
+        // None of the current `meta:*:*` callers (returns.php, ediMain.php) use rich-text
+        // values that would suffer from being escaped.
+        if (!isset($meta[$parts[1]])) { return ''; }
+        $val = $meta[$parts[1]];
+        return is_scalar($val) ? htmlspecialchars((string)$val, ENT_QUOTES, 'UTF-8') : '';
     }
     msgDebug(" ... function not found!");
     return $strData;

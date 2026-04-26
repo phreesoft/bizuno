@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /model/functions.php
  */
 
@@ -202,16 +202,106 @@ function myExceptionHandler($e)
 }
 
 /**
- * Validates the user is logged in and returns the creds if true
+ * Validates the user is logged in and returns the creds if true.
+ * Cookie format: base64(json([userID, psID, email, role, ip, hmac])) — 6 elements.
+ * The trailing HMAC is recomputed and compared with hash_equals() against
+ * bizSessionMAC() of the leading 5 fields. Returns the 5-element array on
+ * success (signature stripped); false on missing, malformed, or tampered cookie.
+ *
+ * Older 5-element (unsigned) cookies issued before the HMAC rollout will fail
+ * verification and force the user back to the sign-in page — that is intended.
  */
 function getUserCookie() {
-    if (!isset($_COOKIE['bizunoSession'])) { return false;}
+    if (!isset($_COOKIE['bizunoSession'])) { return false; }
     $scramble = preg_replace("/[^a-zA-Z0-9\+\/\=]/", '', $_COOKIE['bizunoSession']);
     msgDebug("\nChecking cookie to validate creds. read scrambled value = $scramble");
     if (empty($scramble)) { return false; }
     $creds = json_decode(base64_decode($scramble), true);
-    msgDebug("\nDecoded creds = ".print_r($creds ,true));
-    return !empty($creds) ? $creds : false;
+    msgDebug("\nDecoded creds = ".print_r($creds, true));
+    if (!is_array($creds) || count($creds) !== 6) {
+        msgDebug("\nbizunoSession cookie has wrong arity (got ".(is_array($creds) ? count($creds) : 'non-array')." elements; expected 6).");
+        return false;
+    }
+    $sig = array_pop($creds);
+    if (!is_string($sig) || !hash_equals(bizSessionMAC($creds), $sig)) {
+        msgDebug("\nbizunoSession cookie signature mismatch — rejecting.");
+        return false;
+    }
+    return $creds;
+}
+
+/**
+ * HMAC-SHA256 of the canonical JSON of $args, single source of truth for
+ * session-cookie signing/verification.
+ *
+ * Secret-selection order:
+ *   1. `BIZUNO_INSTANCE_KEY` — auto-generated per-install, persisted to
+ *      `BIZUNO_DATA/biz-instance-key.php` by ensureInstanceKey() at boot.
+ *      Always prefer this when available — it is unique per install and
+ *      never matches the shipped portalCFG default.
+ *   2. `BIZUNO_KEY` — operator-defined in portalCFG.php. Used as a fallback
+ *      when BIZUNO_DATA is not writable and the instance-key file can't be
+ *      created. Also still used elsewhere (password peppering, PII
+ *      encryption); rotating BIZUNO_KEY would break existing accounts so
+ *      this function deliberately does NOT change it — the per-install
+ *      INSTANCE_KEY is scoped to cookies only.
+ *   3. Hard-coded literal as a last-resort marker — debug-warning is logged.
+ */
+function bizSessionMAC($args)
+{
+    $secret = '';
+    if (defined('BIZUNO_INSTANCE_KEY') && BIZUNO_INSTANCE_KEY !== '') {
+        $secret = BIZUNO_INSTANCE_KEY;
+    } elseif (defined('BIZUNO_KEY') && BIZUNO_KEY !== '' && BIZUNO_KEY !== '0123456789abcdef') {
+        $secret = BIZUNO_KEY;
+    } else {
+        msgDebug("\nWARNING: no per-install instance key and BIZUNO_KEY is unset/default — session-cookie signatures are not effectively secret. Make BIZUNO_DATA writable so ensureInstanceKey() can persist a generated key.");
+        $secret = 'biz-default-mac-key';
+    }
+    return hash_hmac('sha256', json_encode($args), (string)$secret);
+}
+
+/**
+ * On first boot of any install, generate a strong random secret and persist it
+ * as `BIZUNO_INSTANCE_KEY` in `BIZUNO_DATA/biz-instance-key.php`. On every
+ * subsequent boot, just `require` that file so the constant is defined.
+ *
+ * Called once from bizunoCFG.php after `model/functions.php` is loaded and
+ * before anything that might touch the cookie MAC. Idempotent and safe to
+ * call multiple times in the same request.
+ *
+ * Race notes: two simultaneous fresh-install requests can both find the file
+ * missing and write competing keys. The is_file()-after-temp-write recheck
+ * narrows the window to a kernel rename race — the loser's process holds an
+ * in-memory key that no longer matches disk; that one user re-authenticates.
+ * Acceptable trade-off vs. cross-process locking.
+ *
+ * If BIZUNO_DATA isn't writable, this function is a silent no-op and
+ * bizSessionMAC() falls through to BIZUNO_KEY. The msgDebug warning surfaces
+ * in trace.txt so the operator can spot a misconfigure.
+ */
+function ensureInstanceKey()
+{
+    if (defined('BIZUNO_INSTANCE_KEY')) { return; }
+    if (!defined('BIZUNO_DATA') || !BIZUNO_DATA) { return; }
+    $path = rtrim(BIZUNO_DATA, '/\\') . DIRECTORY_SEPARATOR . 'biz-instance-key.php';
+    if (is_file($path)) { require_once $path; return; }
+    if (!is_dir(BIZUNO_DATA) || !is_writable(BIZUNO_DATA)) {
+        if (function_exists('bizuno\\msgDebug')) {
+            msgDebug("\nensureInstanceKey: BIZUNO_DATA is not a writable directory; skipping per-install key generation.");
+        }
+        return;
+    }
+    $key = bin2hex(random_bytes(32)); // 256-bit secret
+    $body = "<?php\n// Auto-generated per-install secret used by bizSessionMAC() to sign session cookies.\n"
+          . "// Do not edit — losing this file forces every active user to re-authenticate.\n"
+          . "if (!defined('BIZUNO_INSTANCE_KEY')) { define('BIZUNO_INSTANCE_KEY', '" . addslashes($key) . "'); }\n";
+    $tmp = $path . '.tmp.' . bin2hex(random_bytes(4));
+    if (@file_put_contents($tmp, $body, LOCK_EX) === false) { return; }
+    @chmod($tmp, 0600);
+    if (is_file($path)) { @unlink($tmp); require_once $path; return; }
+    if (@rename($tmp, $path)) { require_once $path; return; }
+    @unlink($tmp);
 }
 
 function setUserCookie($user)
@@ -244,7 +334,9 @@ function setUserCookie($user)
     setUserCache('profile', 'userRole',$user['userRole']);
     $args   = [$user['userID'], $user['psID'], $user['userEmail'], $user['userRole'], $_SERVER['REMOTE_ADDR']];
     msgDebug("\nSetting user session cookie bizunoSession with args = ".print_r($args, true));
-    $cookie = base64_encode(json_encode($args));
+    // Append HMAC signature as the 6th element so the cookie is tamper-evident on the read path.
+    $signed = array_merge($args, [bizSessionMAC($args)]);
+    $cookie = base64_encode(json_encode($signed));
     bizSetCookie('bizunoUser',    $user['userEmail'], time()+(60*60*24*7)); // 7 days
     bizSetCookie('bizunoSession', $cookie, time()+(60*60*10)); // 10 hours
 }
@@ -261,9 +353,10 @@ function bizSetCookie($name, $value, $time=86400, $options=[]) // 24 hours
     msgDebug("\nSetting cookie $name with value = $value and exp time = $time");
     $_COOKIE[$name] = $value;
     if (PHP_VERSION_ID < 70300) {
-        setcookie($name, $value, $time, '/; samesite=lax');
+        // setcookie($name, $value, $expires, $path, $domain, $secure, $httponly)
+        setcookie($name, $value, $time, '/; samesite=lax', '', true, true);
     } else {
-        $opts = array_merge(['expires'=>$time,'path'=>'/','secure'=>true,'samesite'=>'lax'], $options);
+        $opts = array_merge(['expires'=>$time,'path'=>'/','secure'=>true,'httponly'=>true,'samesite'=>'lax'], $options);
         setcookie($name, $value, $opts);
     }
 }
@@ -276,9 +369,9 @@ function bizClrCookie($name)
 {
     $_COOKIE[$name] = '';
     if (PHP_VERSION_ID < 70300) {
-        setcookie($name, '', time()-1, '/; samesite=lax');
+        setcookie($name, '', time()-1, '/; samesite=lax', '', true, true);
     } else {
-        setcookie($name, '', ['expires'=>time()-1,'path'=>'/','secure'=>true,'samesite'=>'lax']);
+        setcookie($name, '', ['expires'=>time()-1,'path'=>'/','secure'=>true,'httponly'=>true,'samesite'=>'lax']);
     }
 }
 
@@ -428,9 +521,17 @@ function getDashboard($dashID='')
         if (empty($dash->struc)) { $dash->struc = []; } // for dashboards that don't have admin settings
         localizeLang($dash->lang, $dash->methodDir, $dash->code);
         return $dash;
-    } elseif (getUserCache('profile', 'userID')) { // delete from profile as the dashboard is no longer there
-        msgDebug("\nDeleting dashboard $dashID from the users profile since it no longer exists!");
-// @ TODO - This is broken as only the key needs to be deleted.
+    } elseif (getUserCache('profile', 'userID')) {
+        // Orphaned dashboard reference (extension uninstalled, file moved, etc.).
+        // Runtime impact is already handled — the caller in `controllers/bizuno/dashboard.php`
+        // skips dashboards whose getDashboard() returns null, so the user just sees nothing
+        // for the orphan. The remaining cleanup is purely persistence: removing the row from
+        // contacts_meta where meta_key='dashboard_<menu_id>' and the user's saved attrs
+        // reference $dashID. This function doesn't know which menu_id the orphan lives
+        // under (the dashboard list is keyed by menu and we'd have to scan every
+        // `dashboard_*` row for the user). Left as a future maintenance script rather than
+        // an inline write here, where it would mean an extra round-trip on every page load.
+        msgDebug("\nDashboard $dashID referenced by user but no longer present on disk; runtime ignores it, persistence cleanup is a separate task.");
     }
 }
 

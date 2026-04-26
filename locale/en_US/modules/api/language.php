@@ -21,13 +21,19 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/api/locale/en_US/language.php
  */
 
 $lang = [
     'title' => 'Bizuno API',
     'description' => 'Controls the defaults and credentials for all API transactions in and out of your Business.',
+    'api_user_lbl'  => 'API User Email',
+    'api_user_tip'  => 'Email of the existing local user account that the unauthenticated portal endpoints (orderAdd, ediCron) will execute as. Must already exist as a user (ctype_u=1) in this Business.',
+    'api_pass_lbl'  => 'API Password',
+    'api_pass_tip'  => 'Optional password — used by integrations that authenticate against the legacy API user/pass scheme. Leave blank if you only use the API token.',
+    'api_token_lbl' => 'API Token',
+    'api_token_tip' => 'Shared secret required by the unauthenticated portal endpoints (shipGetRates, orderAdd, ediCron). Pass it as `token=...` in the request POST or query string. Leave blank to disable those endpoints entirely.',
     // API Settings
     'cart_sync' => '%s Product',
     'cart_cat' => '%s Category Path',

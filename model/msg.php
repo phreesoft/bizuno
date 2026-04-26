@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /model/msg.php
  */
 
@@ -295,9 +295,20 @@ function msgTempRead($idx='idx')
  */
 function msgSysWrite($msgs=[])
 {
+    global $db;
     foreach ($msgs as $row) {
-        // check db to see if the index exists
-        $found = dbGetValue(BIZUNO_DB_PREFIX.'phreemsg', 'id', "msg_id='{$row['msg_id']}'");
+        // check db to see if the index exists — use a prepared statement instead of
+        // string-concatenated SQL so a non-internal caller can't slip a malicious
+        // msg_id through. dbGetValue() builds its WHERE clause as a string, so we
+        // drop down to the underlying PDO connection here.
+        $found = 0;
+        if (is_object($db) && !empty($db->connected)) {
+            $stmt = $db->prepare("SELECT id FROM `".BIZUNO_DB_PREFIX."phreemsg` WHERE msg_id = :msg_id LIMIT 1");
+            if ($stmt && $stmt->execute([':msg_id' => $row['msg_id']])) {
+                $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+                $found = !empty($r['id']) ? (int)$r['id'] : 0;
+            }
+        }
         $data = ['msg_id'=>$row['msg_id'], 'subject'=>$row['subject']];
         if (!$found) { $data['post_date'] = biz_date('Y-m-d h:i:s'); }
         dbWrite(BIZUNO_DB_PREFIX.'phreemsg', $data, $found?'update':'insert', "id=$found");

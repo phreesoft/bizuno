@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/administrate/backup.php
  */
 
@@ -218,23 +218,30 @@ class administrateBackup
         $output = $retValue = null;
         $bizCreds= getUserCache('business');
         $dbFile  = BIZUNO_DATA.$filename;
-        $dbHost  = BIZUNO_DB_CREDS['host'];
         $dbName  = !empty(BIZUNO_DB_CREDS['name']) ? BIZUNO_DB_CREDS['name'] : (!empty($bizCreds['bizDB']) ? $bizCreds['bizDB'] : '');
         $dbUser  = BIZUNO_DB_CREDS['user'];
         $dbPass  = BIZUNO_DB_CREDS['pass'];
         if (empty($dbName) || empty($dbUser) || empty($dbPass)) { return msgAdd('invalid_credentials'); }
-        $ext     = strtolower(pathinfo($dbFile, PATHINFO_EXTENSION));
-        msgDebug("\nLooking for how to process extension: $ext");
-        if (in_array($ext, ['sql'])) { // raw sql in text format
-            $cmd = "mysql --host=$dbHost --user=$dbUser --password=$dbPass --default_character_set=utf8 --database=$dbName < $dbFile";
-        } elseif (in_array($ext, ['zip'])) { // in zip format
-           $cmd = "unzip -p $dbFile | mysql --host=$dbHost --user=$dbUser --password=$dbPass --default_character_set=utf8 --database=$dbName";
-        } else { // assume gz format
-            $cmd = "gunzip < $dbFile | mysql --host=$dbHost --user=$dbUser --password=$dbPass --default_character_set=utf8 --database=$dbName";
-        }
-        msgDebug("\n Executing command: $cmd");
         if (!function_exists('exec')) { return msgAdd("php exec is disabled, the restore cannot be achieved this way!"); }
+        $ext = strtolower(pathinfo($dbFile, PATHINFO_EXTENSION));
+        msgDebug("\nLooking for how to process extension: $ext");
+        // Route credentials through a chmod-600 --defaults-extra-file rather than the mysql client
+        // argv (which would be visible via `ps`). dbMysqlAuthFile() lives in model/db.php.
+        $authFile = dbMysqlAuthFile();
+        if (!$authFile) { return msgAdd('Could not create temporary MySQL credentials file'); }
+        $authArg = "--defaults-extra-file=".escapeshellarg($authFile);
+        $dbArg   = escapeshellarg($dbName);
+        $fileArg = escapeshellarg($dbFile);
+        if (in_array($ext, ['sql'])) { // raw sql in text format
+            $cmd = "mysql $authArg --default_character_set=utf8 --database=$dbArg < $fileArg";
+        } elseif (in_array($ext, ['zip'])) { // in zip format
+            $cmd = "unzip -p $fileArg | mysql $authArg --default_character_set=utf8 --database=$dbArg";
+        } else { // assume gz format
+            $cmd = "gunzip < $fileArg | mysql $authArg --default_character_set=utf8 --database=$dbArg";
+        }
+        msgDebug("\n Executing mysql restore (credentials hidden) for db=$dbName, ext=$ext");
         $result = exec($cmd, $output, $retValue); // start the restore, script may time out but restore will continue until it's finished
+        @unlink($authFile);
         msgDebug("\n returned result: ".print_r($result, true));
 //      msgDebug("\n returned output: ".print_r($output, true)); // echoes the uncompressed sql, VERY LONG makes large debug files!
         msgDebug("\n returned status value: " .print_r($retValue, true));

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /index.php
  */
 
@@ -39,7 +39,14 @@ if ( !defined( 'BIZUNO_BIZID' ) ) { define( 'BIZUNO_BIZID', '123456' ); }
 // Can be outside of your web server direct access but mush be within the path of PHP.
 if ( !defined( 'BIZUNO_DATA' ) ) { define( 'BIZUNO_DATA', $_SERVER['DOCUMENT_ROOT'].'/data/' ); }
 
-// Encryption key for cookies, and other publically viewable information
+// Encryption key for password peppering and PII encryption.
+// As of v7.x, session cookies are signed with a separate per-install secret
+// (BIZUNO_INSTANCE_KEY) that bizuno auto-generates into BIZUNO_DATA/biz-instance-key.php
+// on first boot — that file is the cookie root of trust and must be backed up.
+// BIZUNO_KEY is still used elsewhere (password hashes, PII encryption) and MUST be
+// set to a unique value per install — leaving it as the shipped default is a known
+// vulnerability. The Bizuno installer rotates this automatically; if you copied this
+// file by hand, change the literal below before going to production.
 // 16 alpha-numeric characters, randomly generated
 if ( !defined( 'BIZUNO_KEY' ) ) { define( 'BIZUNO_KEY', '0123456789abcdef' ); }
 

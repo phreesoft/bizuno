@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /bizunoCFG.php
  */
 
@@ -67,6 +67,9 @@ define('BIZTHEMES_EASYUI', ['auto', // Auto Detect, chooses either Bizuno theme 
 
 // Fetch the Bizuno library classes and functions
 require_once ( BIZUNO_FS_LIBRARY . 'model/functions.php' ); // Core functions, needs to be included first
+// Generate (or load) the per-install secret used to sign session cookies.
+// Must run after model/functions.php is loaded and before any cookie/session work.
+ensureInstanceKey();
 require_once ( BIZUNO_FS_LIBRARY . 'locale/cleaner.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'locale/currency.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'model/db.php' );

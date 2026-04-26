@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/contacts/main.php
  */
 
@@ -257,7 +257,7 @@ class contactsMain
         $structure['terms_text']= ['order'=>61,'label'=>lang('terms'),'break'=>false,
             'attr'=>['value'=>viewTerms($structure['terms']['attr']['value'], true, $this->type), 'readonly'=>'readonly']];
         $structure['terms_edit']= ['order'=>62,'icon'=>'settings','label'=>lang('terms'),'events'=>['onClick'=>"jsonAction('$this->moduleID/$this->pageID/editTerms&type=$this->type',$rID,jqBiz('#terms').val());"]];
-        $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.$structure['id']['attr']['value']."</p>",'attr'=>['type'=>'raw']];
+        $structure['recordID']  = ['order'=>99,'html'=>'<p>Record ID: '.htmlspecialchars((string)$structure['id']['attr']['value'], ENT_QUOTES, 'UTF-8')."</p>",'attr'=>['type'=>'raw']];
         $structure['histPay']   = ['order'=>95,'attr'=>['type'=>'button','value'=>lang('payment_history', $this->moduleID)],'events'=>['onClick'=>"jsonAction('$this->moduleID/history/payment', $rID);"]];
         $status = $this->editStatus($structure, $rID);
         $prices = [['id'=>0, 'text'=>lang('none')]];

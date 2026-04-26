@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /portal/controller.php
  */
 
@@ -138,7 +138,64 @@ class portalCtl
     }
     private function goAuth()
     {
+        if (!$this->validateOrigin()) {
+            // CSRF Layer 1: cross-origin write attempt against an authenticated session.
+            // Reject before getCodex() runs — the attacker doesn't get to learn anything
+            // about the target user beyond what the public sign-in page already shows.
+            msgDebug("\nCSRF: rejecting bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} from off-origin caller");
+            msgAdd('Illegal Access');
+            $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
+            return;
+        }
         if ($this->getCodex()) { compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout); }
+    }
+
+    /**
+     * CSRF Layer 1 — Origin/Referer same-site check on every authenticated bizRt route.
+     *
+     * Rules:
+     *  - If `Origin` is present, its host must match the host derived from `BIZUNO_URL_PORTAL`.
+     *  - Else if `Referer` is present, its host must match.
+     *  - Else (cold navigation: bookmark, address-bar typing, link from a no-referrer
+     *    source) — allow. The session cookie carries `SameSite=lax`, so a no-referrer
+     *    cross-site request can't ride the user's session anyway.
+     *
+     * Method-agnostic: bizuno's `jsonAction()` issues GETs for state-changing routes,
+     * so a POST-only check would miss the dominant write pattern.
+     *
+     * Scheme is *not* compared — many production installs run behind a TLS-terminating
+     * reverse proxy where PHP sees `HTTPS=off` while the browser sends `Origin: https://…`.
+     * Host comparison is sufficient for CSRF; the `Secure` flag on the session cookie
+     * already guarantees credentials only travel over HTTPS in a properly-configured setup.
+     *
+     * @return bool true to allow the request, false to reject
+     */
+    private function validateOrigin()
+    {
+        $origin  = isset($_SERVER['HTTP_ORIGIN'])  ? trim((string)$_SERVER['HTTP_ORIGIN'])  : '';
+        $referer = isset($_SERVER['HTTP_REFERER']) ? trim((string)$_SERVER['HTTP_REFERER']) : '';
+        if ($origin === '' && $referer === '') { return true; } // cold nav; SameSite=lax handles the cookie story
+        $supplied = $origin !== '' ? $origin : $referer;
+        return $this->originHostMatches($supplied);
+    }
+
+    private function originHostMatches($url)
+    {
+        if (!defined('BIZUNO_URL_PORTAL') || !BIZUNO_URL_PORTAL) {
+            msgDebug("\noriginHostMatches: BIZUNO_URL_PORTAL not defined; cannot validate.");
+            return false;
+        }
+        $expected = parse_url(BIZUNO_URL_PORTAL);
+        $actual   = parse_url($url);
+        if (!$expected || !$actual || empty($expected['host']) || empty($actual['host'])) {
+            return false;
+        }
+        if (strcasecmp($expected['host'], $actual['host']) !== 0) { return false; }
+        // If both URLs declare an explicit port, require equality. Otherwise accept (default ports).
+        $expPort = $expected['port'] ?? null;
+        $actPort = $actual['port']   ?? null;
+        if ($expPort !== null && $actPort !== null && $expPort !== $actPort) { return false; }
+        return true;
     }
     private function getCodex()
     {
@@ -170,8 +227,14 @@ class portalCtl
     private function validateCookie()
     {
         msgDebug("\nEntering validateCookie.");
-        // typical case, cookie not expired, now have user, email and role
-        if (is_array($this->creds) && sizeof($this->creds)==5 && $this->creds[4]==$_SERVER['REMOTE_ADDR']) {
+        // typical case, cookie not expired, now have user, email and role.
+        // IP pinning is now a /16 (IPv4) or /48 (IPv6) prefix match instead of full equality —
+        // exact pinning kicked mobile/CGNAT users back to login every time their carrier rotated
+        // their public IP. The HMAC + Secure + HttpOnly + SameSite=lax stack added by the
+        // session-cookie hardening work is the primary defense; this prefix check is now
+        // defense-in-depth catching gross network jumps (stolen cookie replayed from a
+        // different ISP/continent) without breaking legit mobile sessions.
+        if (is_array($this->creds) && sizeof($this->creds)==5 && $this->ipPrefixMatch($this->creds[4], $_SERVER['REMOTE_ADDR'])) {
             setUserCache('profile', 'userID',  $this->creds[0]);
             setUserCache('profile', 'admin_id',$this->creds[0]); // DEPRECATED - for compatibility to older versions
             setUserCache('profile', 'psID',    $this->creds[1]);
@@ -185,6 +248,31 @@ class portalCtl
         setlocale(LC_COLLATE,getUserCache('profile', 'language'));
         setlocale(LC_CTYPE,  getUserCache('profile', 'language'));
         msgDebug("\nLeaving validateUser with user validated = ".($this->userValidated?'true':'false'));
+    }
+
+    /**
+     * Returns true iff $a and $b share the same network prefix — /16 for IPv4, /48 for IPv6.
+     * Used by validateCookie() to permit IP changes within a carrier's CGNAT pool while still
+     * rejecting cookies replayed from an entirely different network.
+     */
+    private function ipPrefixMatch($a, $b)
+    {
+        if ($a === '' || $b === '' || !is_string($a) || !is_string($b)) { return false; }
+        if ($a === $b) { return true; } // fast path, common case
+        // IPv4: compare top two octets.
+        if (strpos($a, '.') !== false && strpos($b, '.') !== false) {
+            $aP = explode('.', $a, 3);
+            $bP = explode('.', $b, 3);
+            return isset($aP[1], $bP[1]) && $aP[0] === $bP[0] && $aP[1] === $bP[1];
+        }
+        // IPv6: compare top three hextets (/48).
+        if (strpos($a, ':') !== false && strpos($b, ':') !== false) {
+            $aBin = @inet_pton($a);
+            $bBin = @inet_pton($b);
+            if ($aBin === false || $bBin === false) { return false; }
+            return substr($aBin, 0, 6) === substr($bBin, 0, 6);
+        }
+        return false; // mixed v4/v6 between cookie and current request — treat as a network change
     }
 
     private function initUserCache()

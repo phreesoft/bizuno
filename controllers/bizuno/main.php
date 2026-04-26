@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/bizuno/main.php
  */
 
@@ -126,8 +126,14 @@ bizFocus('pwEncrypt');";
         if (!$encKey) { return msgAdd(lang('err_encryption_not_set', $this->moduleID)); }
         if ($key && $encKey) {
             $stack = explode(':', $encKey);
-            if (sizeof($stack) != 2) { $error = true; }
-            if (md5($stack[1] . $key) <> $stack[0]) { $error = true; }
+            if (sizeof($stack) != 2) {
+                $error = true;
+            } elseif (!hash_equals((string)$stack[0], md5($stack[1] . $key))) {
+                // Constant-time comparison — replaces the original `<>` byte-by-byte compare.
+                // MD5 retained for compatibility with any encKey rows persisted by 6.x installs;
+                // upgrading the digest needs to be paired with restoring the writer that 7.x dropped.
+                $error = true;
+            }
         } else { $error = true; }
         if ($error) { return msgAdd(lang('err_login_failed')); }
         setUserCache('profile', 'admin_encrypt', $key);

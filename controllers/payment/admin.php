@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/payment/admin.php
  */
 
@@ -54,14 +54,39 @@ class paymentAdmin
      */
     public function settingsStructure()
     {
+        $current = getModuleCache($this->moduleID, 'settings', 'general', 'wallet_provider', '');
         $data = ['general'=>['order'=>10,'label'=>lang('general'),'fields'=>[
-            'gl_payment_c' =>['attr'=>['type'=>'ledger','id'=>'general_gl_payment_c', 'value'=>$this->defaults['gl_payment_c']]],
-            'gl_discount_c'=>['attr'=>['type'=>'ledger','id'=>'general_gl_discount_c','value'=>$this->defaults['gl_discount_c']]],
-            'gl_payment_v' =>['attr'=>['type'=>'ledger','id'=>'general_gl_payment_v', 'value'=>$this->defaults['gl_payment_v']]],
-            'gl_discount_v'=>['attr'=>['type'=>'ledger','id'=>'general_gl_discount_v','value'=>$this->defaults['gl_discount_v']]],
-            'prefix'       =>['attr'=>['value'=>'DP']]]]];
+            'gl_payment_c'   =>['attr'=>['type'=>'ledger','id'=>'general_gl_payment_c', 'value'=>$this->defaults['gl_payment_c']]],
+            'gl_discount_c'  =>['attr'=>['type'=>'ledger','id'=>'general_gl_discount_c','value'=>$this->defaults['gl_discount_c']]],
+            'gl_payment_v'   =>['attr'=>['type'=>'ledger','id'=>'general_gl_payment_v', 'value'=>$this->defaults['gl_payment_v']]],
+            'gl_discount_v'  =>['attr'=>['type'=>'ledger','id'=>'general_gl_discount_v','value'=>$this->defaults['gl_discount_v']]],
+            'prefix'         =>['attr'=>['value'=>'DP']],
+            'wallet_provider'=>['values'=>$this->walletProviderOptions(),'attr'=>['type'=>'select','value'=>$current]]]]];
         settingsFill($data, $this->moduleID);
         return $data;
+    }
+
+    /**
+     * Build the option list for the "wallet provider" select on the payment settings page.
+     * Only active gateways (status=1 in methods_gateways meta) that expose a walletList()
+     * method qualify — keeps the dropdown in sync with whatever the user has actually enabled.
+     * The leading "(auto)" entry tells paymentWallet::resolveGateway() to pick the first match.
+     */
+    private function walletProviderOptions()
+    {
+        $opts = [['id'=>'', 'text'=>'(auto)']];
+        $methods = getMetaMethod('gateways');
+        if (empty($methods) || !is_array($methods)) { return $opts; }
+        foreach ($methods as $key => $row) {
+            if (empty($row['status']) || empty($row['path'])) { continue; }
+            $code = !empty($row['id']) ? $row['id'] : $key;
+            // bizAutoLoad resolves the BIZUNO_FS_LIBRARY/BIZUNO_DATA placeholder in $row['path'].
+            if (!bizAutoLoad($row['path']."$code.php")) { continue; }
+            $cls = "\\bizuno\\$code";
+            if (!class_exists($cls) || !method_exists($cls, 'walletList')) { continue; }
+            $opts[] = ['id'=>$code, 'text'=>!empty($row['title']) ? $row['title'] : $code];
+        }
+        return $opts;
     }
 
     /**

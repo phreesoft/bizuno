@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -50,6 +50,8 @@ class authorizenet
     public  $code      = 'authorizenet';
     public  $defaults;
     public  $settings;
+    /** Cached customerProfileId from walletList()/lookupCustomerProfileId() so we don't refetch in the same request. */
+    private $cachedCustID = '';
     public  $lang      = [
         'title'              => 'Authorize.net',
         'description'        => 'Accept credit card payments through the Authorize.net payment gateway.',
@@ -62,6 +64,7 @@ class authorizenet
         'allow_refund'       => 'Allow Void/Refunds? This must be enabled by Authorize.net for your merchant account or refunds will not be allowed.',
         'msg_website'        => 'This must be done manually at the Authorize.net website.',
         'msg_capture_manual' => 'The payment was not processed through the Authorize.net gateway.',
+        'save_to_wallet'     => 'Save card to wallet',
         'msg_address_result' => 'Address verification results: %s',
         'err_process_decline'=> 'Decline Code #%s: %s',
         'err_process_failed' => 'The credit card did not process, the response from Authorize.net:'];
@@ -104,7 +107,8 @@ class authorizenet
             'number'    => ['options'=>['width'=>200],'break'=>true,'label'=>lang('payment_number'),'events'=>['onChange'=>"authorizenetRefNum('number');"]],
             'month'     => ['label'=>lang('payment_expiration'),'options'=>['width'=>130],'values'=>$cc_exp['months'],'attr'=>['type'=>'select','value'=>biz_date('m')]],
             'year'      => ['break'=>true,'options'=>['width'=>70],'values'=>$cc_exp['years'],'attr'=>['type'=>'select','value'=>biz_date('Y')]],
-            'cvv'       => ['options'=>['width'=> 45],'label'=>lang('payment_cvv')]];
+            'cvv'       => ['options'=>['width'=> 45],'label'=>lang('payment_cvv')],
+            'save'      => ['break'=>true,'label'=>$this->lang['save_to_wallet'],'attr'=>['type'=>'checkbox','value'=>'1']]];
         if (isset($values['method']) && $values['method']==$this->code && !empty($data['fields']['id']['attr']['value'])) { // edit
             $this->viewData['number']['attr']['value'] = isset($values['hint']) ? $values['hint'] : '****';
             $invoice_num = $invoice_amex = $data['fields']['invoice_num']['attr']['value'];
@@ -122,16 +126,16 @@ class authorizenet
             $show_n = true;
             $checked = 'n';
             $cID = isset($data['fields']['contact_id_b']['attr']['value']) ? $data['fields']['contact_id_b']['attr']['value'] : 0;
-            if ($cID) { // find if stored values
-                $this->viewData['selCards']['values'] = [];
-                if (sizeof($this->viewData['selCards']['values']) == 0) {
+            if ($cID) { // pull stored wallet from Authorize.net keyed on getWalletID($cID)
+                $this->viewData['selCards']['values'] = $this->walletList(getWalletID((int)$cID));
+                if (empty($this->viewData['selCards']['values'])) {
                     $this->viewData['selCards']['hidden'] = true;
                     $show_s = false;
                 } else {
                     $checked = 's';
-                    $show_s = true;
-                    $first_prefix = $this->viewData['selCards']['values'][0]['text'];
-                    $invoice_num = substr($first_prefix, 0, 2)=='37' ? $invoice_amex : $invoice_num;
+                    $show_s  = true;
+                    $first   = $this->viewData['selCards']['values'][0];
+                    if (!empty($first['isAmex'])) { $invoice_num = $invoice_amex; }
                 }
             } else { $show_s = false; }
             if (isset($values['trans_code']) && $values['trans_code']) {
@@ -176,7 +180,8 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     html5($this->code.'_number',$this->viewData['number']).
     html5($this->code.'_month', $this->viewData['month']).
     html5($this->code.'_year',  $this->viewData['year']).
-    html5($this->code.'_cvv',   $this->viewData['cvv']).'
+    html5($this->code.'_cvv',   $this->viewData['cvv']).
+    html5($this->code.'_save',  $this->viewData['save']).'
 </div>';
         return $html;
     }
@@ -260,7 +265,9 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $txn->setOrder($this->buildOrder($ledger->main));
         $txn->setBillTo($this->buildBillTo($ledger->main));
         $txn->setCustomer($this->buildCustomerData($ledger->main));
-        return $this->runTransaction($txn);
+        $result = $this->runTransaction($txn);
+        $this->maybeSaveCardToWallet($result, $ledger);
+        return $result;
     }
 
     private function pmtAuthorize($data)
@@ -276,7 +283,23 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $txn->setOrder($this->buildOrder($ledger->main));
         $txn->setBillTo($this->buildBillTo($ledger->main));
         $txn->setCustomer($this->buildCustomerData($ledger->main));
-        return $this->runTransaction($txn);
+        $result = $this->runTransaction($txn);
+        $this->maybeSaveCardToWallet($result, $ledger);
+        return $result;
+    }
+
+    /**
+     * If the user checked "Save card to wallet" on a new-card transaction that succeeded,
+     * create (or attach to) an Authorize.net customer profile keyed by the Bizuno wallet ID
+     * (e.g. "C000000123" — same format PayFabric uses, see getWalletID()).
+     */
+    private function maybeSaveCardToWallet($result, $ledger)
+    {
+        if (empty($result['ok']) || empty($ledger) || empty($ledger->main['contact_id_b'])) { return; }
+        if (!clean("{$this->code}_save", 'boolean', 'post')) { return; }
+        $action = clean("{$this->code}_action", 'cmd', 'post');
+        if ($action !== 'n' && $action !== 'c') { return; } // only save when paying with a new card
+        $this->wallet('custCreate', ['ledger'=>$ledger]);
     }
 
     private function pmtCapAuth($data)
@@ -343,8 +366,10 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     {
         $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
         if (!$ledger) { return $this->failure('Ledger required for customer profile creation'); }
+        $cID = !empty($ledger->main['contact_id_b']) ? (int)$ledger->main['contact_id_b'] : 0;
+        if (!$cID) { return $this->failure('contact_id_b required to derive wallet ID'); }
         $profile = new AnetAPI\CustomerProfileType();
-        $profile->setMerchantCustomerId('M_' . (!empty($ledger->main['contact_id_b']) ? $ledger->main['contact_id_b'] : time()));
+        $profile->setMerchantCustomerId(getWalletID($cID));
         if (!empty($ledger->main['email_b']))       { $profile->setEmail($ledger->main['email_b']); }
         if (!empty($ledger->main['primary_name_b'])){ $profile->setDescription(substr($ledger->main['primary_name_b'], 0, 255)); }
         // Attach one payment profile if the form has a CC number
@@ -365,7 +390,21 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $controller = new AnetController\CreateCustomerProfileController($request);
         $response = $this->execute($controller);
         if (!$response) { return $this->failure('Gateway communication error'); }
-        if ($response->getMessages()->getResultCode() != 'Ok') { return $this->describeError($response); }
+        if ($response->getMessages()->getResultCode() != 'Ok') {
+            // E00039 = duplicate profile already exists for this MerchantCustomerId.
+            // Recover the existing profile ID and attach the new card to it instead of failing.
+            $msgs = $response->getMessages() ? $response->getMessages()->getMessage() : [];
+            $code = !empty($msgs[0]) ? (string)$msgs[0]->getCode() : '';
+            if ($code === 'E00039' && !empty($ccNum)) {
+                $existingID = $this->extractDuplicateProfileId(!empty($msgs[0]) ? (string)$msgs[0]->getText() : '');
+                if (!$existingID) { $existingID = $this->lookupCustomerProfileId(getWalletID($cID)); }
+                if ($existingID) {
+                    msgDebug("\nAuthorize.net profile already exists for ".getWalletID($cID).", attaching card to custID=$existingID");
+                    return $this->wallet('wltNew', ['custID'=>$existingID, 'ledger'=>$ledger]);
+                }
+            }
+            return $this->describeError($response);
+        }
         $payIDs = $response->getCustomerPaymentProfileIdList() ?: [];
         return $this->success(
             $response->getCustomerProfileId(),
@@ -374,6 +413,29 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             ['custID'=>$response->getCustomerProfileId(), 'payIDs'=>is_array($payIDs) ? $payIDs : []],
             $response
         );
+    }
+
+    /** E00039 message text is e.g. "A duplicate record with ID 12345678 already exists." */
+    private function extractDuplicateProfileId($text)
+    {
+        if (preg_match('/ID\s+(\d+)/', (string)$text, $m)) { return $m[1]; }
+        return '';
+    }
+
+    /** Fallback when the duplicate-message text doesn't include the existing profile ID. */
+    private function lookupCustomerProfileId($merchantCustomerId)
+    {
+        if ($this->cachedCustID) { return $this->cachedCustID; }
+        $request = new AnetAPI\GetCustomerProfileRequest();
+        $request->setMerchantAuthentication($this->merchantAuthentication());
+        $request->setMerchantCustomerId((string)$merchantCustomerId);
+        $controller = new AnetController\GetCustomerProfileController($request);
+        $response = $this->execute($controller);
+        if (!$response || !$response->getMessages() || $response->getMessages()->getResultCode() != 'Ok') { return ''; }
+        $profile = $response->getProfile();
+        if (!$profile) { return ''; }
+        $this->cachedCustID = (string)$profile->getCustomerProfileId();
+        return $this->cachedCustID;
     }
 
     private function walletCustGet($data)
@@ -485,6 +547,93 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             ['paymentProfile'=>$response->getPaymentProfile()],
             $response
         );
+    }
+
+    /**
+     * Build a dropdown-friendly list of stored cards for a Bizuno contact.
+     * Public wallet-provider entry point — same signature as PayFabric's walletList()
+     * so paymentWallet can dispatch to either gateway interchangeably.
+     *
+     * @param string $pfID - Bizuno wallet ID, e.g. "C000000123" (see getWalletID())
+     * @return array [['id'=>paymentProfileId, 'text'=>'Visa - 1234', 'hint'=>'1234', 'type'=>'credit', 'isAmex'=>bool, 'CardName'=>str, 'CardHolder'=>[...], 'Billto'=>[...]], ...]
+     *
+     * The Authorize.net customerProfileId is cached on the instance so subsequent
+     * walletDelete()/wallet-capture calls in the same request avoid a second round-trip.
+     */
+    public function walletList($pfID)
+    {
+        if (empty($pfID)) { return []; }
+        $request = new AnetAPI\GetCustomerProfileRequest();
+        $request->setMerchantAuthentication($this->merchantAuthentication());
+        $request->setMerchantCustomerId((string)$pfID);
+        $controller = new AnetController\GetCustomerProfileController($request);
+        $response = $this->execute($controller);
+        if (!$response || !$response->getMessages() || $response->getMessages()->getResultCode() != 'Ok') { return []; }
+        $profile = $response->getProfile();
+        if (!$profile) { return []; }
+        $this->cachedCustID = (string)$profile->getCustomerProfileId();
+        $cards = [];
+        foreach ($profile->getPaymentProfiles() ?: [] as $pp) {
+            $pay = $pp->getPayment();
+            $cc  = $pay ? $pay->getCreditCard() : null;
+            if (!$cc) { continue; } // skip eChecks for now
+            $masked = (string)$cc->getCardNumber(); // typically "XXXX1234"
+            $hint   = substr($masked, -4);
+            $type   = (string)$cc->getCardType();   // may be empty on some accounts
+            $label  = ($type !== '' ? $type : 'Card') . ' - ' . $hint;
+            $bill   = $pp->getBillTo();
+            $cards[] = [
+                'id'      => (string)$pp->getCustomerPaymentProfileId(),
+                'text'    => $label,
+                'hint'    => $hint,
+                'type'    => 'credit',
+                'isAmex'  => stripos($type, 'american') !== false,
+                'CardName'=> $type,
+                'CardHolder'=> [
+                    'FirstName' => $bill ? (string)$bill->getFirstName() : '',
+                    'LastName'  => $bill ? (string)$bill->getLastName()  : '',
+                ],
+                'Billto'  => [
+                    'Line1'   => $bill ? (string)$bill->getAddress() : '',
+                    'Line2'   => '',
+                    'Line3'   => '',
+                    'City'    => $bill ? (string)$bill->getCity()    : '',
+                    'State'   => $bill ? (string)$bill->getState()   : '',
+                    'Zip'     => $bill ? (string)$bill->getZip()     : '',
+                    'Phone'   => $bill ? (string)$bill->getPhoneNumber() : '',
+                    'Email'   => '',
+                ],
+            ];
+        }
+        return $cards;
+    }
+
+    /**
+     * Wallet-provider entry point, delete a stored card.
+     * Mirrors PayFabric's walletDelete($cardID) signature; the optional $pfID lets us
+     * recover the customerProfileId without a separate setter when the cache is cold.
+     */
+    public function walletDelete($cardID='', $pfID=null)
+    {
+        if (empty($cardID)) { return false; }
+        $custID = $this->cachedCustID;
+        if (empty($custID) && !empty($pfID)) { $custID = $this->lookupCustomerProfileId((string)$pfID); }
+        if (empty($custID)) { msgAdd('Could not locate Authorize.net customer profile for delete'); return false; }
+        $r = $this->wallet('wltDelete', ['custID'=>$custID, 'payID'=>$cardID]);
+        return !empty($r['ok']);
+    }
+
+    /**
+     * Wallet-provider entry point, called by paymentWallet::reload() after add/edit.
+     * Same shape as PayFabric's walletReload(): mutates $layout with a JS action
+     * that re-hydrates the gateway's stored-card dropdown on the cash-receipt form.
+     */
+    public function walletReload(&$layout=[], $pfID=0)
+    {
+        $output = [];
+        foreach ($this->walletList($pfID) as $card) { $output[] = ['id'=>$card['id'], 'text'=>$card['text']]; }
+        $action = "sel_{$this->code}selCards = ".json_encode($output)."; bizSelReload('{$this->code}selCards', sel_{$this->code}selCards);";
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>$action]]);
     }
 
     private function walletPayDelete($data)
@@ -728,10 +877,30 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return ['txID'=>$r['txID']];
     }
 
-    /** Legacy: called by paymentMain::sale(). Returns ['txID'=>X, 'txTime'=>Y] or false. */
+    /** Legacy: called by paymentMain::sale(). Returns ['txID'=>X, 'txTime'=>Y, 'code'=>Z] or false.
+     *  Dispatches based on the action radio: n=new card capture, s=stored card, c=capture prior auth, w=manual at gateway. */
     public function sale($fields, $ledger)
     {
-        $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
+        $action = clean("{$this->code}_action", 'cmd', 'post');
+        switch ($action) {
+            case 's': // charge a stored payment profile
+                $payID = clean("{$this->code}selCards", 'cmd', 'post');
+                if (empty($payID)) { msgAdd('Please select a stored card'); return false; }
+                $cID    = !empty($ledger->main['contact_id_b']) ? (int)$ledger->main['contact_id_b'] : 0;
+                $custID = $this->cachedCustID ?: $this->lookupCustomerProfileId(getWalletID($cID));
+                if (empty($custID)) { msgAdd('Could not locate Authorize.net customer profile'); return false; }
+                $r = $this->payment('wltCap', ['custID'=>$custID, 'payID'=>$payID, 'amount'=>$ledger->main['total_amount'], 'ledger'=>$ledger]);
+                break;
+            case 'c': // capture a previously-authorized transaction
+                $txID = clean("{$this->code}trans_code", 'cmd', 'post');
+                $r = $this->payment('capAuth', ['txID'=>$txID, 'amount'=>$ledger->main['total_amount']]);
+                break;
+            case 'w': // manual capture at the gateway website
+                msgAdd($this->lang['msg_capture_manual'], 'info');
+                return ['txID'=>'', 'txTime'=>biz_date('Y-m-d H:i:s'), 'code'=>'manual'];
+            default: // 'n' or unset — new-card capture
+                $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
+        }
         if (empty($r['ok'])) { return false; }
         return ['txID'=>$r['txID'], 'txTime'=>biz_date('Y-m-d H:i:s'), 'code'=>$r['code']];
     }
