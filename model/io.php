@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /model/io.php
  */
 
@@ -143,30 +143,42 @@ final class io
         if (!empty($opts['headers'])) { foreach ($opts['headers'] as $key => $value) { $headers[] = "$key: $value"; } }
         if (!empty($opts['cookies'])) { foreach ($opts['cookies'] as $key => $value) { $headers[] = "$key: $value"; } }
         unset($opts['headers'], $opts['cookies']);
-        $options = [];
         $ch = curl_init();
         msgDebug("\nSetting cURL Options, sending to url: $url");
-        if (!empty($options)) { foreach ($options as $opt => $value) {
-            switch ($opt) {
-                case 'useragent': curl_setopt($ch, CURLOPT_USERAGENT, $useragent); break;
-                default:          curl_setopt($ch, constant($opt), $value); break;
-            }
-        } }
-        curl_setopt($ch, CURLOPT_URL,           $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER,    $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($ch, CURLOPT_TIMEOUT,       30); // in seconds
-        curl_setopt($ch, CURLOPT_HEADER,        false);
-        curl_setopt($ch, CURLOPT_VERBOSE,       false);
-        curl_setopt($ch, CURLOPT_ENCODING,      ""); // Let cURL handle the response as some hosts mess up the return encoding, e.g. FedEx
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+        // Hardcoded defaults FIRST so caller-supplied $opts can override below.
+        curl_setopt($ch, CURLOPT_URL,            $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,     $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT,        30); // in seconds
+        curl_setopt($ch, CURLOPT_HEADER,         false);
+        curl_setopt($ch, CURLOPT_VERBOSE,        false);
+        curl_setopt($ch, CURLOPT_ENCODING,       ""); // Let cURL handle the response as some hosts mess up the return encoding, e.g. FedEx
+        // SSL verification ON by default — the original `false` made every outbound
+        // integration MITM-able. Operators with a legitimate self-signed endpoint can
+        // opt out per-call by passing 'CURLOPT_SSL_VERIFYPEER'=>false in $opts below.
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         if (strtolower($type) == 'post') {
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $rData);
         } elseif (strtolower($type) == 'put') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
             curl_setopt($ch, CURLOPT_POSTFIELDS, $rData);
+        }
+        // Apply caller-supplied $opts LAST so they can override the defaults above.
+        // Keys are CURLOPT_* constant names as strings, e.g. ['CURLOPT_SSL_VERIFYPEER'=>false].
+        // The original code initialized a separate `$options=[]` and looped over that empty
+        // array, so caller curl options have been silently dropped on the floor for years —
+        // only `$opts['headers']` and `$opts['cookies']` (handled above) ever took effect.
+        if (!empty($opts) && is_array($opts)) {
+            foreach ($opts as $opt => $value) {
+                if ($opt === 'useragent') { curl_setopt($ch, CURLOPT_USERAGENT, $useragent); continue; }
+                if (!is_string($opt) || !defined($opt)) {
+                    msgDebug("\ncURL: ignoring unknown option key '".(string)$opt."'");
+                    continue;
+                }
+                curl_setopt($ch, constant($opt), $value);
+            }
         }
 // for debugging cURL issues, uncomment below
 //$fp = fopen(BIZUNO_DATA."cURL_trace.txt", 'w');
@@ -344,11 +356,12 @@ final class io
             return $verbose ? msgAdd(sprintf(lang('err_io_file_open'), $fn)) : false;
         }
 //      if (false === @fwrite($handle, "\xEF\xBB\xBF".$data)) {
-        if (false === @fwrite($handle, $data)) {
+        $writeOk = (false !== @fwrite($handle, $data));
+        fclose($handle); // close on both success and failure to avoid handle leak on the error path
+        if (!$writeOk) {
             flush();
             return $verbose ? msgAdd(sprintf(lang('err_io_file_write'), $fn)) : false;
         }
-        fclose($handle);
         chmod($this->myFolder.$fn, 0664);
         msgDebug("\nSaved file to filename: BIZUNO_DATA/$fn");
         return true;
@@ -506,20 +519,27 @@ final class io
      * @return boolean
      */
     public function ftpUploadFile($con, $local_file, $remote_file='') {
-        $success = true;
         if (!$remote_file) { $remote_file = $local_file; }
         msgDebug("\nReady to open file $local_file and send to remote file name $remote_file");
         ftp_pasv($con, true);
-        $fp = fopen(BIZUNO_DATA.$local_file, 'r');
+        // Check the local fopen result before passing to ftp_fput — passing false
+        // there is undefined behavior, and the original code also leaked $fp / $con
+        // on the error path.
+        $fp = @fopen(BIZUNO_DATA.$local_file, 'r');
+        if (!$fp) {
+            ftp_close($con);
+            return msgAdd("Cannot open local file $local_file for FTP upload");
+        }
         if (!ftp_fput($con, $remote_file, $fp, FTP_ASCII)) {
-            // Troubleshooting FTP issues
             msgDebug("\nLast error: ".print_r(error_get_last(), true), 'trap');
+            fclose($fp);
+            ftp_close($con);
             return msgAdd("There was a problem while uploading $local_file through ftp to the remote server!");
         }
-        ftp_close($con);
         fclose($fp);
+        ftp_close($con);
         msgDebug("\nFile writtien successfully!");
-        return $success;
+        return true;
     }
 
     /**
@@ -657,7 +677,11 @@ final class io
             case 'zip':    return ['gz','zip'];
             default:
             case 'file' :  $extensions = array_merge($extensions, ['zip','gz','pdf','doc','docx','xls','xlsx','ods','txt','csv']); // add valid file extensions, fall through
-            case 'image':  $extensions = array_merge($extensions, ['jpg','jpeg','jpe','gif','png','svg','tif','tiff','webp']); // then add valid image extensions
+            // 'svg' deliberately excluded: SVG is XML and can carry inline <script>/<foreignObject>
+            // payloads. When served back same-origin via portal/api/fs, scripts execute in the
+            // bizuno security context. Operators who need SVG support should add it via a custom
+            // myExt cleaner override after sanitizing the upload server-side.
+            case 'image':  $extensions = array_merge($extensions, ['jpg','jpeg','jpe','gif','png','tif','tiff','webp']); // then add valid image extensions
         }
         return $extensions;
     }

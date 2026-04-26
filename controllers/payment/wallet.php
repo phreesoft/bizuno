@@ -23,36 +23,80 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/payment/wallet.php
  */
 
 namespace bizuno;
 
-if (!defined('PAYMENT_PAYFABRIC_WALLET'))     { define('PAYMENT_PAYFABRIC_WALLET',     'https://www.payfabric.com/Payment/'); }
-if (!defined('PAYMENT_PAYFABRIC_WALLET_TEST')){ define('PAYMENT_PAYFABRIC_WALLET_TEST','https://sandbox.payfabric.com/Payment/'); }
-
 class paymentWallet
 {
     public  $moduleID = 'payment';
-    private $mode     = 'prod'; // choices are 'test' (Test) or 'prod' (Production)
-    public $props;
-    public $cID;
-    public $type;
-    public $payfabric;
-    public $pfID;
+    public  $props;
+    public  $cID;
+    public  $type;
+    public  $gateway;     // first installed, active wallet-capable gateway instance
+    public  $gatewayCode; // e.g. 'payfabric', 'authorizenet'
+    public  $pfID;
 
     function __construct()
     {
-        $this->props= getMetaMethod('gateways', 'payfabric');
-        msgDebug("\nConstructing wallet with props = ".print_r($this->props, true));
-        if (!empty($this->props)) {
-            bizAutoLoad($this->props['path'].'payfabric.php');
-            $this->payfabric = new \bizuno\payfabric($this->props['settings']);
+        $this->cID         = clean('rID', 'integer','get');
+        $this->type        = clean('type','char',   'get');
+        $this->pfID        = getWalletID($this->cID);
+        $this->gateway     = $this->resolveGateway();
+        $this->gatewayCode = $this->gateway ? $this->gateway->code : '';
+        msgDebug("\nWallet manager bound to gateway: $this->gatewayCode");
+    }
+
+    /**
+     * Pick the first active payment gateway that exposes a walletList() method.
+     * Order is determined by the gateway's `order` setting (lowest first), matching
+     * the priority used by the payment-method dropdown elsewhere. Returns null when
+     * no installed gateway provides a wallet — callers must guard against that.
+     */
+    private function resolveGateway()
+    {
+        $methods = getMetaMethod('gateways');
+        if (empty($methods) || !is_array($methods)) { return null; }
+        $candidates = [];
+        foreach ($methods as $key => $row) {
+            if (empty($row['status']) || empty($row['path'])) { continue; }
+            $code = !empty($row['id']) ? $row['id'] : $key;
+            $candidates[] = ['code'=>$code, 'row'=>$row, 'order'=>!empty($row['settings']['order']) ? (int)$row['settings']['order'] : 99];
         }
-        $this->cID = clean('rID', 'integer','get');
-        $this->type= clean('type','char',   'get');
-        $this->pfID= getWalletID($this->cID);
+        // Honor the explicit setting from /controllers/payment/admin.php first, fall back to auto-pick.
+        $preferred = getModuleCache($this->moduleID, 'settings', 'general', 'wallet_provider', '');
+        if ($preferred) {
+            foreach ($candidates as $cand) {
+                if ($cand['code'] === $preferred) {
+                    if ($inst = $this->loadGatewayCandidate($cand)) { return $inst; }
+                    break; // preferred gateway is set but failed to load — fall through to auto-pick
+                }
+            }
+        }
+        $candidates = sortOrder($candidates);
+        foreach ($candidates as $cand) {
+            if ($inst = $this->loadGatewayCandidate($cand)) { return $inst; }
+        }
+        return null;
+    }
+
+    /**
+     * Try to instantiate a gateway candidate row and confirm it exposes walletList().
+     * Returns the instance on success, null on any failure (silent — caller iterates).
+     */
+    private function loadGatewayCandidate($cand)
+    {
+        $code = $cand['code'];
+        // bizAutoLoad resolves BIZUNO_FS_LIBRARY/BIZUNO_DATA placeholders inside $row['path'].
+        if (!bizAutoLoad($cand['row']['path']."$code.php")) { return null; }
+        $cls = "\\bizuno\\$code";
+        if (!class_exists($cls)) { return null; }
+        $inst = new $cls();
+        if (!method_exists($inst, 'walletList')) { return null; }
+        $this->props = $cand['row'];
+        return $inst;
     }
 
     /**
@@ -62,9 +106,9 @@ class paymentWallet
     public function manager(&$layout=[])
     {
         if (!$security = validateAccess('j12_mgr', 2)) { return; }
-        if (empty($this->payfabric)) { // not signed up, insert instructions to signup to PayFabric
-            $html  = "Sign up to PayFabric to save on e-check and credit card processing. Click Here.";
-//          $html  = $this->getPayFabricBanner();
+        if (empty($this->gateway)) { // no wallet-capable gateway is installed/active
+            $html  = "No payment gateway with wallet support is currently enabled. ";
+            $html .= "Activate a wallet-capable gateway (e.g. PayFabric or Authorize.net) under Payment Methods to manage stored cards here.";
             $layout= ['type'=>'divHTML','divs'=>['body'=>['order'=>50,'type'=>'html','html'=>$html]]];
             return;
         }
@@ -99,7 +143,7 @@ class paymentWallet
                 ],
             'panels' => $panels,
             'fields' => $fields,
-            'jsHead' => ['init'=>$this->payfabric->eventJS($this->cID)]];
+            'jsHead' => ['init'=>method_exists($this->gateway, 'eventJS') ? $this->gateway->eventJS($this->cID) : '']];
         if (empty($cards)) {
             $html = "The wallet is empty, let's add a credit card or e-check.";
             $layout['divs']['start'] = ['order'=> 5,'type'=>'html','html'=>$html];
@@ -130,21 +174,13 @@ class paymentWallet
      */
     public function add(&$layout)
     {
-        if (empty($this->payfabric) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        $token  = $this->payfabric->getToken();
-        $params = ["customer=$this->pfID", "token=$token", "tender=CreditCard"];
-        $address= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$this->cID");
-        if (!empty($address['address1']))   { $params[] = "Street1=".urlencode($address['address1']); }
-        if (!empty($address['address2']))   { $params[] = "Street2=".urlencode($address['address2']); }
-        if (!empty($address['city']))       { $params[] = "City="   .urlencode($address['city']); }
-        if (!empty($address['state']))      { $params[] = "State="  .urlencode($address['state']); }
-        if (!empty($address['postal_code'])){ $params[] = "Zip="    .urlencode($address['postal_code']); }
-        if (!empty($address['country']))    { $params[] = "Country=".urlencode($address['country']); }
-        if (!empty($address['email']))      { $params[] = "Email="  .urlencode($address['email']); }
-        if (!empty($address['telephone1'])) { $params[] = "Phone="  .urlencode($address['telephone1']); }
-        $url    = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
-        $url   .= "Web/Wallet/Create?".implode("&", $params); // ."&ReturnURI=%23" {TENDER} = CreditCard or ECheck
-        $layout= array_replace_recursive($layout, $this->viewIFrame($url));
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
+        if (!method_exists($this->gateway, 'walletAddURL')) {
+            return msgAdd("The {$this->gatewayCode} gateway does not support adding cards from this screen — cards are saved during a payment when the 'Save card to wallet' option is checked.", 'info');
+        }
+        $address = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$this->cID");
+        $url     = $this->gateway->walletAddURL($this->pfID, $address ?: []);
+        $layout  = array_replace_recursive($layout, $this->viewIFrame($url));
     }
     /**
      * Retrieve expired Credit Cards and delete them
@@ -158,9 +194,9 @@ class paymentWallet
      */
     public function delete(&$layout=[])
     {
-        if (empty($this->payfabric) || !$security = validateAccess('j12_mgr', 4)) { return; }
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 4)) { return; }
         $cardID  = clean('cardID', 'cmd', 'get');
-        $response= $this->payfabric->walletDelete($cardID);
+        $response= $this->gateway->walletDelete($cardID, $this->pfID);
         if (empty($response)) { return msgAdd("Error deleting the card!"); }
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizPanelRefresh('wallet');"]]);
     }
@@ -169,29 +205,30 @@ class paymentWallet
      */
     public function edit(&$layout)
     {
-        if (empty($this->payfabric) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        $cardID= clean('cardID', 'cmd', 'get');
-        $token = $this->payfabric->getToken();
-        $url   = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
-        $url  .= "Web/Wallet/Edit?card=$cardID&token=$token"; // &ReturnURI=%23
-        $layout= array_replace_recursive($layout, $this->viewIFrame($url));
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
+        if (!method_exists($this->gateway, 'walletEditURL')) {
+            return msgAdd("The {$this->gatewayCode} gateway does not support editing cards from this screen.", 'info');
+        }
+        $cardID = clean('cardID', 'cmd', 'get');
+        $url    = $this->gateway->walletEditURL($cardID);
+        $layout = array_replace_recursive($layout, $this->viewIFrame($url));
     }
     /**
      * Retrieve Credit Cards / eChecks
      */
     public function list()
     {
-        if (empty($this->payfabric) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        // Do this at the payment method as it is also performed while accepting payments
-        return $this->payfabric->walletList($this->pfID);
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return []; }
+        return $this->gateway->walletList($this->pfID);
     }
     /**
      * Reloads the credit cards in the combo after wallet add that was away from customer wallet tab
      */
     public function reload(&$layout=[])
     {
-        if (empty($this->payfabric) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        $this->payfabric->walletReload($layout, $this->pfID);
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
+        if (!method_exists($this->gateway, 'walletReload')) { return; }
+        $this->gateway->walletReload($layout, $this->pfID);
     }
 
     public function modifyID($srcID='', $destID='')
@@ -199,7 +236,8 @@ class paymentWallet
         msgDebug("\nEntering modifyID with srcID = $srcID AND destID = $destID");
         if (!$security = validateAccess('j12_mgr', 2)) { return; }
         if (empty($srcID) || empty($destID)) { return msgAdd(lang('illegal_access')); }
-        return $this->payfabric->walletRename($srcID, ['NewCustomerNumber'=>$destID]) ? true : false;
+        if (empty($this->gateway) || !method_exists($this->gateway, 'walletRename')) { return false; }
+        return $this->gateway->walletRename($srcID, ['NewCustomerNumber'=>$destID]) ? true : false;
     }
 
     // ***************************************************************************************************************
@@ -241,12 +279,19 @@ class paymentWallet
 
     private function viewAddress($card=[])
     {
-        $html  = "{$card['CardHolder']['FirstName']} {$card['CardHolder']['LastName']}<br />";
-        $html .= "{$card['Billto']['Line1']}<br />";
-        if (!empty($card['Billto']['Line2'])) { $html .= "{$card['Billto']['Line2']}<br />"; }
-        if (!empty($card['Billto']['Line3'])) { $html .= "{$card['Billto']['Line3']}<br />"; }
-        $html .= "{$card['Billto']['City']}, {$card['Billto']['State']}  {$card['Billto']['Zip']}<br />";
-        $html .= "{$card['Billto']['Phone']} | {$card['Billto']['Email']}<br />";
+        $holder = $card['CardHolder'] ?? [];
+        $bill   = $card['Billto']     ?? [];
+        $name   = trim(($holder['FirstName'] ?? '').' '.($holder['LastName'] ?? ''));
+        $cs     = trim(($bill['City'] ?? '').($bill['State'] ?? '') ? ($bill['City'] ?? '').', '.($bill['State'] ?? '').'  '.($bill['Zip'] ?? '') : '');
+        $contact= trim((!empty($bill['Phone']) ? $bill['Phone'] : '').(!empty($bill['Phone']) && !empty($bill['Email']) ? ' | ' : '').($bill['Email'] ?? ''));
+        $html   = '';
+        if ($name)               { $html .= "$name<br />"; }
+        if (!empty($bill['Line1'])) { $html .= "{$bill['Line1']}<br />"; }
+        if (!empty($bill['Line2'])) { $html .= "{$bill['Line2']}<br />"; }
+        if (!empty($bill['Line3'])) { $html .= "{$bill['Line3']}<br />"; }
+        if ($cs)                 { $html .= "$cs<br />"; }
+        if ($contact)            { $html .= "$contact<br />"; }
+        if ($html === '')        { $html = '<em>(no billing address on file)</em>'; }
         return $html;
     }
 }

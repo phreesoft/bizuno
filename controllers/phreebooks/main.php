@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-11
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1168,7 +1168,10 @@ function bizUnitDiscDisc(newValue) {
             'fields'=> $this->getStatusFields($contact, $aging)];
         $notes = dbMetaGet(0, 'notes', 'contacts', $cID);
         if (!empty($notes['value'])) {
-            $data['fields']['notes'] = ['order'=>15,'html'=>str_replace("\n", "<br />", $notes['value']),'attr'=>['type'=>'raw']];
+            // User-editable contact notes — escape HTML before re-applying the \n → <br/> substitution
+            // so that a customer record with `<script>...</script>` in notes can't fire on the genStat panel.
+            $safeNotes = str_replace("\n", "<br />", htmlspecialchars($notes['value'], ENT_QUOTES, 'UTF-8'));
+            $data['fields']['notes'] = ['order'=>15,'html'=>$safeNotes,'attr'=>['type'=>'raw']];
             $data['panels']['genStat']['keys'][] = 'notes';
         }
         $GLOBALS['aging'] = $aging;

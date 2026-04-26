@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /portal/api.php
  */
 
@@ -44,13 +44,20 @@ class portalApi
         msgDebug("\nBIZUNO_DATA = ".(defined('BIZUNO_DATA') ? BIZUNO_DATA : 'undefined')." and parts = ".print_r($parts, true));
         if (defined('BIZUNO_DATA') && !empty(BIZUNO_DATA)) {
             if (!empty($parts[1])) {
-                $io  = new io(); // needs BIZUNO_DATA
-                $fn  = (empty($parts[0]) ? BIZUNO_FS_LIBRARY : BIZUNO_DATA).$parts[1];
-                $ext = strtolower(pathinfo($parts[1], PATHINFO_EXTENSION));
+                $io   = new io(); // needs BIZUNO_DATA
+                $base = empty($parts[0]) ? BIZUNO_FS_LIBRARY : BIZUNO_DATA;
+                $fn   = $base.$parts[1];
+                $ext  = strtolower(pathinfo($parts[1], PATHINFO_EXTENSION));
                 msgDebug("\nLooking for fn = $fn");
-                $fBad= !file_exists($fn) ? true : false;
+                $fBad = !file_exists($fn) ? true : false;
                 $validExts = array_merge($io->getValidExt('image'), $io->getValidExt('script'));
-                $eBad= !in_array($ext, $validExts) ? true : false;
+                $eBad = !in_array($ext, $validExts) ? true : false;
+                // Path-traversal containment: resolve the requested file with realpath()
+                // and require it to live inside the chosen base directory. Without this,
+                // `path_rel` (which only normalizes slashes) would happily pass through
+                // `..` segments — letting any attacker with knowledge of the host fs read
+                // any .png/.css/.js file the web user can open.
+                if (!$fBad && !$this->fsPathContained($fn, $base)) { $fBad = true; }
             } else { $fBad = true; }
         } else { $fBad = true; }
         msgDebug("\neBad = $eBad and fBad = $fBad");
@@ -63,6 +70,26 @@ class portalApi
 //msgDebugWrite();
         readfile($fn);
         exit();
+    }
+
+    /**
+     * Returns true iff `realpath($fn)` lies inside `realpath($base)`. Trailing
+     * separator on the base prevents prefix-matching `/var/www/data` against
+     * `/var/www/data-other`. Mirrors the containment idiom in `model/io.php::validatePath()`,
+     * but parameterized by base so this method can guard both BIZUNO_DATA and
+     * BIZUNO_FS_LIBRARY (the two roots `fs()` legitimately serves from).
+     */
+    private function fsPathContained($fn, $base)
+    {
+        $real     = realpath($fn);
+        $baseReal = realpath($base);
+        if ($real === false || $baseReal === false) { return false; }
+        $baseReal = rtrim($baseReal, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (strncmp($real . DIRECTORY_SEPARATOR, $baseReal, strlen($baseReal)) !== 0) {
+            msgDebug("\nfs(): path-traversal attempt blocked — $real not inside $baseReal");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -242,67 +269,165 @@ class portalApi
 
     public function shipGetRates(&$layout=[])
     {
-        
-        
-        // @TODO - NEED TO VALIDATE CREDENTIALS FROM POST VARIABLES
-        
+        if (!$this->validateApiToken()) { return; }
         loadBusinessCache();
         compose('api', 'shipping', 'getRates', $layout);
     }
-    
+
     public function orderAdd(&$layout=[])
     {
-
-        // @TODO - Need a new way to authenticate since the users are now local.
-
-        $security = getUserCache('role', 'security');
-        $security['prices_c'] = 2;
-        $security['j10_mgr'] = 2; // Need both sales and sales order since user has an option.
-        $security['j12_mgr'] = 2;
-        setUserCache('role', 'security', $security);
+        if (!$this->validateApiToken()) { return; }
         loadBusinessCache();
+        if (!$this->loadApiUserContext()) { return; }
+        // Escalation kept for backward-compatibility with existing integrations: a
+        // verified token caller needs prices_c + j10_mgr + j12_mgr to add a sales
+        // order or cash receipt. Configure the API user with a role that already
+        // grants these to drop the explicit override.
+        $security = getUserCache('role', 'security');
+        $security['prices_c'] = max((int)($security['prices_c'] ?? 0), 2);
+        $security['j10_mgr']  = max((int)($security['j10_mgr']  ?? 0), 2);
+        $security['j12_mgr']  = max((int)($security['j12_mgr']  ?? 0), 2);
+        setUserCache('role', 'security', $security);
         compose('api', 'order', 'add', $layout);
     }
-// 
-    
+
     /**
      * Executes an EDI cron to poll ALL EDI sources for new orders.
-     * @param array $layout
-     * 
-     * command: https://biz.mydomain.com?bizRt=portal/api/ediCron
+     * Invocation: https://biz.mydomain.com?bizRt=portal/api/ediCron&token=<api_token>
      */
     public function ediCron(&$layout=[])
     {
+        if (!$this->validateApiToken()) { return; }
         loadBusinessCache();
-        $user   = getModuleCache('api', 'settings', 'phreesoft_api', 'api_user');
-        $userID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$user'");
-        $profile= getMetaContact($userID, 'user_profile');
-        msgDebug("\nEDI cron with user = $user and userID = $userID and profile = ".print_r($profile, true));
-        setUserCache('profile', '', $profile);
-        $role   = !empty($profile['role_id']) ? dbMetaGet($profile['role_id'], 'bizuno_role') : [];
-        setUserCache('role', '', $role);
+        if (!$this->loadApiUserContext()) { return; }
         msgDebug("\nUser has been set, ready to compose");
         compose('phreebooks', 'ediAPI', 'ediGet', $layout);
     }
     
     /**
-     * Handles customization calls for cron and unauthorized users where the response contains public data.
+     * Pass-through to a customer-supplied `myExt/controllers/api/myAPI.php` extension.
+     *
+     * **Unauthenticated by design.** This route exists so deployments can host their own
+     * cron/webhook endpoints (battery-store's `?bizRt=portal/api/myAPI&modID=mectronic`
+     * fetches inventory from a supplier; similar patterns exist for `digikey`,
+     * `netComponents`). The portal layer cannot know what auth the customer's extension
+     * needs, so it deliberately runs `goAction()` without a token check.
+     *
+     * **Contract for myExt authors:** the loaded `apiMyAPI::goAction()` MUST do its own
+     * authentication before performing any state change. Patterns we recommend:
+     *   - Match a shared secret in a header or query string (similar to `validateApiToken()`)
+     *   - Check `$_SERVER['REMOTE_ADDR']` against an allowlist of known cron sources
+     *   - For purely-public lookups (price feeds, status pings), document the public surface
+     *     and keep responses idempotent and rate-limited
+     *
+     * Without auth inside the extension, anything `goAction()` does is reachable by anyone
+     * on the internet. This route survives in `validateApiToken()` deliberately because
+     * `goAPI()` never calls `validateApiToken()` for it — see `portal/controller.php::goAPI()`.
+     *
      * @param type $layout
      */
     public function myAPI()
     {
         if (file_exists(BIZUNO_DATA.'myExt/controllers/api/myAPI.php')) {
             require(BIZUNO_DATA.'myExt/controllers/api/myAPI.php');
-            loadBusinessCache();           
+            loadBusinessCache();
             $ctl = new apiMyAPI();
             $ctl->goAction();
         }
     }
 
     /************************ Support Methods **************************/
+    /**
+     * IP-allowlist gate for the PhreeSoft mothership routes (`getBizRoles`, `getSalesTax`).
+     *
+     * Layered:
+     *   1. `REMOTE_ADDR === PHREESOFT_IP`        — primary check, original behavior.
+     *   2. (optional) `validateApiToken()` match — second factor when `api_token` is set.
+     *
+     * Step 2 hardens against the proxy-misconfiguration footgun the audit flagged: if a
+     * reverse proxy sets `REMOTE_ADDR` from `X-Forwarded-For`, an attacker forging that
+     * header bypasses step 1. With the token configured, they'd also need the secret to
+     * pass step 2. When `api_token` isn't configured, step 2 is skipped — preserves
+     * back-compat for installs that have always run with IP-only and don't have the
+     * mothership configured to send the token yet.
+     */
     private function validatePSrequest($bizID='')
     {
         msgDebug("\nEntering validatePSrequest with bizID = $bizID and remote address = ".$_SERVER['REMOTE_ADDR']." and PHREESOFT_IP = ".PHREESOFT_IP);
-        return (PHREESOFT_IP==$_SERVER['REMOTE_ADDR']) ? true : false;
+        if (PHREESOFT_IP != $_SERVER['REMOTE_ADDR']) { return false; }
+        loadBusinessCache();
+        $expected = (string)getModuleCache('api', 'settings', 'phreesoft_api', 'api_token', '');
+        if ($expected === '') { return true; } // back-compat: no token configured, IP-only
+        // Token configured — require it as a second factor. Reuses the same header/POST/GET
+        // sources as validateApiToken() but inlined to avoid the "fail if no token configured"
+        // path (step 1 already proves it's PhreeSoft, we just want extra assurance).
+        $supplied = isset($_SERVER['HTTP_X_BIZUNO_TOKEN']) ? trim((string)$_SERVER['HTTP_X_BIZUNO_TOKEN']) : '';
+        if ($supplied === '') { $tok = clean('token', 'cmd', 'post'); if (is_string($tok) && $tok !== '') { $supplied = $tok; } }
+        if ($supplied === '') { $tok = clean('token', 'cmd', 'get');  if (is_string($tok) && $tok !== '') { $supplied = $tok; } }
+        if ($supplied === '' || !hash_equals($expected, $supplied)) {
+            msgDebug("\nvalidatePSrequest: IP matched but api_token check failed (token configured, no/invalid value supplied)");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Constant-time check of the caller-supplied API token against api.settings.phreesoft_api.api_token.
+     * Token sources, in order: `X-Bizuno-Token` request header, then POST `token`, then GET `token`.
+     * Header is preferred — keeps the secret out of URL logs / Referer / shell history.
+     * Fails closed if the token is not configured — an unconfigured install cannot be exploited
+     * via these routes at all.
+     */
+    private function validateApiToken()
+    {
+        loadBusinessCache(); // settings live in business cache; safe to call multiple times
+        $expected = (string)getModuleCache('api', 'settings', 'phreesoft_api', 'api_token', '');
+        if ($expected === '') {
+            msgDebug("\napi_token not configured — refusing access to portal API endpoint.");
+            msgAdd('Illegal Access');
+            return false;
+        }
+        $supplied = isset($_SERVER['HTTP_X_BIZUNO_TOKEN']) ? trim((string)$_SERVER['HTTP_X_BIZUNO_TOKEN']) : '';
+        if ($supplied === '') {
+            $tok = clean('token', 'cmd', 'post');
+            if (is_string($tok) && $tok !== '') { $supplied = $tok; }
+        }
+        if ($supplied === '') {
+            $tok = clean('token', 'cmd', 'get');
+            if (is_string($tok) && $tok !== '') { $supplied = $tok; }
+        }
+        if ($supplied === '' || !hash_equals($expected, $supplied)) {
+            msgDebug("\nportal API token mismatch (supplied len=".strlen($supplied).")");
+            msgAdd('Illegal Access');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * After validateApiToken() passes, bind the request to the configured API user so
+     * downstream compose() calls operate as a real account (with that user's role/permissions)
+     * instead of the empty cache. Mirrors the original ediCron() bootstrap.
+     */
+    private function loadApiUserContext()
+    {
+        $email = (string)getModuleCache('api', 'settings', 'phreesoft_api', 'api_user', '');
+        if ($email === '') {
+            msgDebug("\nphreesoft_api.api_user is not configured.");
+            msgAdd('API user not configured');
+            return false;
+        }
+        $userID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='".addslashes($email)."'");
+        if (empty($userID)) {
+            msgDebug("\nphreesoft_api.api_user '$email' did not resolve to a contact row.");
+            msgAdd('API user not found');
+            return false;
+        }
+        $profile = getMetaContact($userID, 'user_profile');
+        setUserCache('profile', '', $profile);
+        $role = !empty($profile['role_id']) ? dbMetaGet($profile['role_id'], 'bizuno_role') : [];
+        setUserCache('role', '', $role);
+        msgDebug("\nportal API context loaded as user $email (id=$userID).");
+        return true;
     }
 }

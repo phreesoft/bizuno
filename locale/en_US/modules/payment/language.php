@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-11
+ * @version    7.x Last Update: 2026-04-26
  * @filesource locale/en_US/modules/payment/language.php
  */
 
@@ -42,6 +42,8 @@ $lang = [
     'gl_discount_v_tip' => 'Default GL account to use for payment discounts to vendors. Typically a Cost of Goods Sold type account.',
     'prefix_lbl' => 'Reference Prefix',
     'prefix_tip' => 'Default prefix for deposits. Deposits with the same ID are grouped together and simplify bank account reconciliation.',
+    'wallet_provider_lbl' => 'Wallet Provider',
+    'wallet_provider_tip' => 'Which active payment gateway is used to store and look up customer cards on the wallet tab. The dropdown lists every enabled gateway that supports a wallet. Leave on (auto) to use the first available.',
     // Messages
     'msg_approval_success' => '%s - Approval code: %s --> CVV2 results: %s',
     'err_payment_dup' => 'This payment has already been processed, resubmission to the payment gateway has been skipped!',

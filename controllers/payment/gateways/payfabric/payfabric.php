@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-05
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -39,10 +39,12 @@
 
 namespace bizuno;
 
-if (!defined('PAYMENT_PAYFABRIC_TOKEN'))     { define('PAYMENT_PAYFABRIC_TOKEN',     'https://www.payfabric.com/payment/api/token/create'); }
-if (!defined('PAYMENT_PAYFABRIC_TOKEN_TEST')){ define('PAYMENT_PAYFABRIC_TOKEN_TEST','https://sandbox.payfabric.com/payment/api/token/create'); }
-if (!defined('PAYMENT_PAYFABRIC_URL'))       { define('PAYMENT_PAYFABRIC_URL',       'https://www.payfabric.com/'); }
-if (!defined('PAYMENT_PAYFABRIC_URL_TEST'))  { define('PAYMENT_PAYFABRIC_URL_TEST',  'https://sandbox.payfabric.com/'); }
+if (!defined('PAYMENT_PAYFABRIC_TOKEN'))      { define('PAYMENT_PAYFABRIC_TOKEN',      'https://www.payfabric.com/payment/api/token/create'); }
+if (!defined('PAYMENT_PAYFABRIC_TOKEN_TEST')) { define('PAYMENT_PAYFABRIC_TOKEN_TEST', 'https://sandbox.payfabric.com/payment/api/token/create'); }
+if (!defined('PAYMENT_PAYFABRIC_URL'))        { define('PAYMENT_PAYFABRIC_URL',        'https://www.payfabric.com/'); }
+if (!defined('PAYMENT_PAYFABRIC_URL_TEST'))   { define('PAYMENT_PAYFABRIC_URL_TEST',   'https://sandbox.payfabric.com/'); }
+if (!defined('PAYMENT_PAYFABRIC_WALLET'))     { define('PAYMENT_PAYFABRIC_WALLET',     'https://www.payfabric.com/Payment/'); }
+if (!defined('PAYMENT_PAYFABRIC_WALLET_TEST')){ define('PAYMENT_PAYFABRIC_WALLET_TEST','https://sandbox.payfabric.com/Payment/'); }
 
 class payfabric
 {
@@ -533,11 +535,41 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
         return $cards; // array of e-checks and cards in wallet.
     }
 
-    public function walletDelete($cardID='')
+    public function walletDelete($cardID='', $pfID=null)
     {
         $httpUrl = "payment/api/wallet/delete/$cardID";
         $response= $this->queryAPI($httpUrl);
         return !empty($response['Result']) && strtolower($response['Result'])=='true' ? true : false;
+    }
+
+    /**
+     * Returns the URL for the iframe-hosted "add card" UI on PayFabric.
+     * Wallet-provider entry point — paymentWallet::add() invokes this when present.
+     * @param string $pfID    - Bizuno wallet ID (e.g. "C000000123")
+     * @param array  $address - billing address row from the contacts table; pre-fills the iframe
+     */
+    public function walletAddURL($pfID, $address=[])
+    {
+        $token  = $this->getToken();
+        $params = ["customer=$pfID", "token=$token", "tender=CreditCard"];
+        if (!empty($address['address1']))   { $params[] = "Street1=".urlencode($address['address1']); }
+        if (!empty($address['address2']))   { $params[] = "Street2=".urlencode($address['address2']); }
+        if (!empty($address['city']))       { $params[] = "City="   .urlencode($address['city']); }
+        if (!empty($address['state']))      { $params[] = "State="  .urlencode($address['state']); }
+        if (!empty($address['postal_code'])){ $params[] = "Zip="    .urlencode($address['postal_code']); }
+        if (!empty($address['country']))    { $params[] = "Country=".urlencode($address['country']); }
+        if (!empty($address['email']))      { $params[] = "Email="  .urlencode($address['email']); }
+        if (!empty($address['telephone1'])) { $params[] = "Phone="  .urlencode($address['telephone1']); }
+        $base = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
+        return $base."Web/Wallet/Create?".implode("&", $params);
+    }
+
+    /** Wallet-provider entry point: URL for the iframe-hosted "edit card" UI. */
+    public function walletEditURL($cardID)
+    {
+        $token = $this->getToken();
+        $base  = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
+        return $base."Web/Wallet/Edit?card=$cardID&token=$token";
     }
 
     /**

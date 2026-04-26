@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-10
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /view/easyUI/html5.php
  */
 
@@ -894,7 +894,10 @@ if ('state'==$key) { $data['fields'][$key]['attr']['type'] = 'state'; }
             }
         }
         $output .= '<table id="' . $prop['id'] . '"';
-        if (isset($prop['title'])) { $output .= ' title="' . addslashes($prop['title']) . '"'; }
+        // HTML attribute escape — was `addslashes()` which is a JS-string escape and lets through
+        // `<`/`"`/`'` unchanged. A panel title containing `<script>` (or `" onmouseover=…`) would
+        // break out of the title attribute and execute.
+        if (isset($prop['title'])) { $output .= ' title="' . htmlspecialchars((string)$prop['title'], ENT_QUOTES, 'UTF-8') . '"'; }
         $output .= "></table>";
         if (isset($prop['footnotes'])) {
             $output .= '<b>' . lang('notes') . ":</b><br />\n";

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-16
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -36,18 +36,24 @@ namespace bizuno;
  */
 function inventoryProcess($value, $format='')
 {
-    global $report;
+    global $report, $db;
+    // SKU values arriving as $value can contain quotes, multi-byte chars, NULs etc. — addslashes()
+    // is locale-dependent and not MySQL-charset-aware. PDO::quote() handles all of those correctly
+    // and includes the surrounding quotes in its output, so we drop the literal `'…'` wrapping.
+    $qSku = (is_object($db) && method_exists($db, 'quote')) ? $db->quote((string)$value) : "'".addslashes((string)$value)."'";
     switch ($format) {
-        case 'image_sku': return dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "sku='".addslashes($value)."'");
+        case 'image_sku': return dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "sku=$qSku");
         case 'inv_image': return dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "id='".intval($value)."'");
-        case 'inv_sku':   return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku',                 "id="  .intval($value))        ? $result : '');
-        case 'inv_shrt':  return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_short',   "id="  .intval($value))        ? $result : '');
-        case 'sku_name':  return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_short',   "sku='".addslashes($value)."'")? $result : '');
+        case 'inv_sku':   return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku',                 "id="  .intval($value))      ? $result : '');
+        case 'inv_shrt':  return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_short',   "id="  .intval($value))      ? $result : '');
+        case 'sku_name':  return empty($value) ? '' : ($result=dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_short',   "sku=$qSku")                 ? $result : '');
         case 'inv_assy':  return dbGetInvAssyCost($value);
-        case 'inv_j06_id':return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_purchase',"id='$value'")) ? $result : $value;
-        case 'inv_j06':   return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_purchase',"sku='".addslashes($value)."'"))? $result : $value;
-        case 'inv_j12_id':return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_sales',   "id='$value'")) ? $result : $value;
-        case 'inv_j12':   return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_sales',   "sku='".addslashes($value)."'"))? $result : $value;
+        // intval() on the id sites — was raw `$value` interpolation, relying entirely on upstream
+        // clean() which the row-level renderer doesn't always run. Now numeric coercion is local.
+        case 'inv_j06_id':return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_purchase',"id=".intval($value))) ? $result : $value;
+        case 'inv_j06':   return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_purchase',"sku=$qSku")) ? $result : $value;
+        case 'inv_j12_id':return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_sales',   "id=".intval($value))) ? $result : $value;
+        case 'inv_j12':   return ($result = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'description_sales',   "sku=$qSku")) ? $result : $value;
         case 'inv_mv0':   $range = 'm0';
         case 'inv_mv1':   if (empty($range)) { $range = 'm1'; }
         case 'inv_mv3':   if (empty($range)) { $range = 'm3'; }
@@ -56,15 +62,16 @@ function inventoryProcess($value, $format='')
                           return viewInvSales($value, $range); // value passed should be the SKU
         case 'inv_stk':   return viewInvMinStk($value); // value passed should be the SKU
         case 'storeStock':
-            $storeID  = !empty($GLOBALS['bizuno_store_id']) ? $GLOBALS['bizuno_store_id'] : 0;
-            $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku='".addslashes($value)."'", false);
+            $storeID  = !empty($GLOBALS['bizuno_store_id']) ? (int)$GLOBALS['bizuno_store_id'] : 0;
+            $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku=$qSku", false);
             if (!$thisStore) { $thisStore = 0;}
-            $thisOwed = dbGetValue(BIZUNO_DB_PREFIX.'journal_cogs_owed', 'SUM(qty) AS qty', "store_id=$storeID AND sku='".addslashes($value)."'", false);
+            $thisOwed = dbGetValue(BIZUNO_DB_PREFIX.'journal_cogs_owed', 'SUM(qty) AS qty', "store_id=$storeID AND sku=$qSku", false);
             if (!$thisOwed) { $thisOwed = 0;}
             return $thisStore - $thisOwed; // removed viewFormat(*, 'number')
         case 'sbBOM':
-            $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
-            $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
+            $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=".intval($value));
+            $qBOM  = (is_object($db) && method_exists($db, 'quote')) ? $db->quote((string)$sku['sku']) : "'".addslashes((string)$sku['sku'])."'";
+            $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku=$qBOM");
             $meta  = getMetaInventory($skuID, 'bill_of_materials');
             msgDebug("\nIn inventoryProcess with value = $value and sku = ".msgPrint($sku));
             $output= lang('qty').' - '.lang('sku').' - '.lang('description')."\n";
@@ -72,28 +79,30 @@ function inventoryProcess($value, $format='')
             return $output;
         case 'sbOnOrder':
             msgDebug("\nEntering sbOnOrder with value = ".msgPrint($value));
-            $sku    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$value");
-            $stmt   = dbGetResult("SELECT SUM(i.qty) AS 'qty' FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id 
-                WHERE m.journal_id=32 AND m.closed='0' AND sku='".addslashes($sku)."'");
+            $sku    = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=".intval($value));
+            $qOO    = (is_object($db) && method_exists($db, 'quote')) ? $db->quote((string)$sku) : "'".addslashes((string)$sku)."'";
+            $stmt   = dbGetResult("SELECT SUM(i.qty) AS 'qty' FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id
+                WHERE m.journal_id=32 AND m.closed='0' AND sku=$qOO");
             $row    = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : [];
             return !empty($row['qty']) ? $row['qty'] : 0;
         case 'sbSteps':
             msgDebug("\nEntering sbSteps with value = ".msgPrint($value));
 return '';
-            $data  = json_decode(dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'steps', "id='$value'"), true);
+            $data  = json_decode(dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'steps', "id=".intval($value)), true);
             $output= '';
-            foreach ($data as $step => $row) { $output .= "$step. ".dbGetValue(BIZUNO_DB_PREFIX."srvBuilder_tasks", 'description', "id='{$row['task_id']}'")."\n"; }
+            foreach ($data as $step => $row) { $output .= "$step. ".dbGetValue(BIZUNO_DB_PREFIX."srvBuilder_tasks", 'description', "id=".intval($row['task_id']))."\n"; }
             return $output;
             return 'needs work';
         case 'sbTask':
             msgDebug("\nEntering sbTask with value = ".msgPrint($value));
 return '';
-            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_tasks', 'description', "id='$value'");
+            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_tasks', 'description', "id=".intval($value));
             return $result ? $result : $value;
         case 'sbTaskList':
             msgDebug("\nEntering sbTaskList with value = ".msgPrint($value));
-            $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=$value");
-            $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku['sku'])."'");
+            $sku   = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['sku', 'qty'], "ref_id=".intval($value));
+            $qTL   = (is_object($db) && method_exists($db, 'quote')) ? $db->quote((string)$sku['sku']) : "'".addslashes((string)$sku['sku'])."'";
+            $skuID = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku=$qTL");
             $meta  = getMetaInventory($skuID, 'production_job');
             msgDebug("\nread meta = ".msgPrint($meta));
 //            $data  = json_decode(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'steps', "id='$value'"), true);
@@ -111,11 +120,11 @@ return '';
             return $result;
         case 'sbRefDraw':
 return '';
-            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'ref_spec', "id='$value'");
+            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'ref_spec', "id=".intval($value));
             return $result ? $result : ' ';
         case 'sbRefDocs':
 return '';
-            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'ref_doc', "id='$value'");
+            $result = dbGetValue(BIZUNO_DB_PREFIX.'srvBuilder_jobs', 'ref_doc', "id=".intval($value));
             return $result ? $result : ' ';
         default:
     }
@@ -123,7 +132,7 @@ return '';
         if (!$value) { return ''; }
         $fld   = explode(':', $format);
         if (empty($report->currentValues['id']) || empty($report->currentValues['unit_price']) || empty($report->currentValues['full_price'])) { // need to get the sku details
-            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id','item_cost','full_price'], "sku='".addslashes($value)."'");
+            $inv = dbGetValue(BIZUNO_DB_PREFIX.'inventory', ['id','item_cost','full_price'], "sku=$qSku");
         } else { $inv = $report->currentValues; }
         $values= ['iID'=>$inv['id'], 'iCost'=>$inv['item_cost'],'iList'=>$inv['full_price'],'iSheetc'=>$fld[1],'iSheetv'=>$fld[1],'cID'=>0,'cSheet'=>$fld[1],'cType'=>'c','qty'=>1];
         $prices= [];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-26
  * @filesource /model/db.php
  */
 
@@ -439,6 +439,37 @@ function dbCleanRoles($strRoles='') {
 }
 
 /**
+ * Writes a `--defaults-extra-file`-style credentials file (host/user/password)
+ * to a chmod-600 temp path under BIZUNO_DATA and returns its absolute path.
+ *
+ * Used by `dbDump()` and the saveRestore controller so that mysql/mysqldump
+ * shellouts can read credentials via `--defaults-extra-file=<path>` instead
+ * of `--password=$dbPass` on argv. Hides the password from both `ps` and
+ * `/proc/<pid>/environ`.
+ *
+ * Caller is responsible for `@unlink()` after the shell command returns —
+ * the file is short-lived but contains the live DB password.
+ *
+ * @return string|false absolute path on success, false on write failure
+ */
+function dbMysqlAuthFile()
+{
+    $dir = defined('BIZUNO_DATA') && BIZUNO_DATA ? rtrim(BIZUNO_DATA, '/\\') : sys_get_temp_dir();
+    if (!is_dir($dir) || !is_writable($dir)) { $dir = sys_get_temp_dir(); }
+    $path = $dir . DIRECTORY_SEPARATOR . 'bizmycli-' . bin2hex(random_bytes(8)) . '.cnf';
+    $body = "[client]\n"
+          . "host="     . BIZUNO_DB_CREDS['host'] . "\n"
+          . "user="     . BIZUNO_DB_CREDS['user'] . "\n"
+          . "password=" . BIZUNO_DB_CREDS['pass'] . "\n";
+    if (@file_put_contents($path, $body, LOCK_EX) === false) {
+        msgDebug("\ndbMysqlAuthFile: failed to write credentials file at $path");
+        return false;
+    }
+    @chmod($path, 0600);
+    return $path;
+}
+
+/**
  * Dumps the DB (or table) to a gzipped file into a specified folder
  * @param string $filename - Name of the file to create
  * @param string $dirWrite - Folder in the user root to write to, defaults to backups/
@@ -449,22 +480,28 @@ function dbDump($filename='bizuno_backup', $dirWrite='', $dbTable='')
     global $io;
     // set execution time limit to a large number to allow extra time
     set_time_limit(20000);
-    $dbHost = BIZUNO_DB_CREDS['host'];
     $dbName = BIZUNO_DB_CREDS['name'];
-    $dbUser = BIZUNO_DB_CREDS['user'];
-    $dbPass = BIZUNO_DB_CREDS['pass'];
     $dbPath = BIZUNO_DATA.$dirWrite;
     $dbFile = $filename.".sql.gz";
+    $tables = [];
     if (!$dbTable && BIZUNO_DB_PREFIX <> '') { // fetch table list (will be entire db if no prefix)
         if (!$stmt= dbGetResult("SHOW TABLES FROM $dbName LIKE '".BIZUNO_DB_PREFIX."%'")) { return; }
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        if ($rows) { foreach ($rows as $row) { $dbTable .= array_shift($row).' '; } }
+        if ($rows) { foreach ($rows as $row) { $tables[] = array_shift($row); } }
+    } elseif ($dbTable) { // single-table or pre-built list
+        foreach (preg_split('/\s+/', trim($dbTable)) as $t) { if ($t !== '') { $tables[] = $t; } }
     }
     if (!$io->validatePath($dirWrite.$dbFile, true, true)) { return; }
-    $cmd    = "mysqldump --opt -h $dbHost -u $dbUser -p$dbPass $dbName $dbTable | gzip > $dbPath$dbFile";
-    msgDebug("\n Executing command: $cmd");
-    if (!function_exists('exec')) { msgAdd("php exec is disabled, the backup cannot be achieved this way!"); }
+    if (!function_exists('exec')) { return msgAdd("php exec is disabled, the backup cannot be achieved this way!"); }
+    $authFile = dbMysqlAuthFile();
+    if (!$authFile) { return msgAdd('Could not create temporary MySQL credentials file'); }
+    $tableArgs = '';
+    foreach ($tables as $t) { $tableArgs .= ' '.escapeshellarg($t); }
+    $cmd = "mysqldump --defaults-extra-file=".escapeshellarg($authFile)." --opt ".escapeshellarg($dbName).$tableArgs
+         ." | gzip > ".escapeshellarg($dbPath.$dbFile);
+    msgDebug("\n Executing mysqldump (credentials hidden) for db=$dbName, tables=".count($tables));
     exec($cmd);
+    @unlink($authFile);
     if (!file_exists($dbPath.$dbFile)) { return; } // for some reason the dump failed, could be out of disk space
     chmod($dbPath.$dbFile, 0664);
     return true;
@@ -795,7 +832,8 @@ function dbTableReadCriteria($crit=[], $search=[])
         foreach ($crit as $key => $value) {
             if ($key=='search') {
                 if (isset($value['attr']) && !empty($value['attr']['value'])) {
-                    $criteria[] = dbGetSearch($value['attr']['value'], $search);
+                    $frag = dbGetSearch($value['attr']['value'], $search);
+                    if ($frag !== '') { $criteria[] = $frag; } // dbGetSearch may return '' for degenerate input
                 }
             } else {
                 if (!empty($value['sql'])) { $criteria[] = $value['sql']; }
@@ -846,10 +884,16 @@ function dbMetaGet($rID, $key, $table='common', $refID=0, $args=[])
             $val->_refID = isset($row['ref_id'])?$row['ref_id']:0;
             $val->_table = $table;
         } else {
-//            $val = json_decode($row['meta_value'], true); // This returned null when a string is in the meta_value field
-//            if (!is_array($val)) { $val = ['value'=>$val]; }
-            $val = json_validate($row['meta_value']) ? json_decode($row['meta_value'], true) : ['value'=>$row['meta_value']];
-            if (!is_array($val)) { $val = [$val]; }
+            // Three meta_value shapes can land here:
+            //   1. valid JSON object/array      → array, used as-is
+            //   2. valid JSON scalar (e.g. `42`) → scalar, wrap under 'value'
+            //   3. raw non-JSON string           → wrap under 'value'
+            // Older code wrapped (2) as `[$scalar]` (integer index 0), giving the meta a
+            // schizophrenic shape — callers reading `$meta['value']` (the (3) path) silently
+            // got nothing for scalar JSON rows. Always wrap scalar payloads as
+            // `['value' => $scalar]` so the consumer key is consistent.
+            $decoded = json_validate($row['meta_value']) ? json_decode($row['meta_value'], true) : $row['meta_value'];
+            $val = is_array($decoded) ? $decoded : ['value'=>$decoded];
             $val = array_merge($val, ['_rID'=>$row['id'], '_refID'=>isset($row['ref_id'])?$row['ref_id']:0, '_table'=>$table]);
         }
         $resp[]= $val;
@@ -1082,15 +1126,42 @@ function dbGetRoleMenu()
 }
 
 /**
+ * Builds the OR'd LIKE fragment used by every datagrid's search box.
+ * Returns SQL of the form `(f1 LIKE CONCAT('%', :v, '%') OR f2 LIKE …)` where
+ * the user-controlled value is escaped via `PDO::quote()` instead of
+ * `addslashes()`.
  *
- * @param type $search
- * @param type $fields
- * @return type
+ * Three reasons not to use `addslashes()` here:
+ *   1. it is locale-dependent and ignores the connection charset, so
+ *      multi-byte sequences can mask quote characters;
+ *   2. it doesn't escape MySQL's binary specials (`\0`, `\b`, `\Z`, `\n`, `\r`);
+ *   3. it leaves the LIKE wildcards (`%`, `_`) unescaped, so a search for
+ *      `100%` matches every row.
+ *
+ * `$fields` is supplied by the datagrid definition (module code, not user
+ * input) so it is concatenated directly.
+ *
+ * @param  string $search user-controlled search box value
+ * @param  array  $fields list of column expressions to OR-search across
+ * @return string         SQL fragment safe to splice into a WHERE clause; '' on empty input
  */
 function dbGetSearch($search, $fields)
 {
-    $search_text = addslashes($search);
-    return "(".implode(" LIKE '%$search_text%' OR ", $fields)." LIKE '%$search_text%')";
+    global $db;
+    $search = (string)$search;
+    if ($search === '' || empty($fields)) { return ''; }
+    // Escape LIKE wildcards in the user's value so '%' and '_' don't widen
+    // the search — backslash-escaped wildcards mean "literal %" / "literal _".
+    $escaped = strtr($search, ['\\' => '\\\\', '%' => '\\%', '_' => '\\_']);
+    // Prefer PDO::quote() (charset-aware) over the locale-broken addslashes().
+    if (is_object($db) && method_exists($db, 'quote')) {
+        $quoted = $db->quote($escaped);
+    } else { // very early bootstrap path — best-effort fallback
+        $quoted = "'".addslashes($escaped)."'";
+    }
+    $clauses = [];
+    foreach ($fields as $f) { $clauses[] = "$f LIKE CONCAT('%', $quoted, '%')"; }
+    return '('.implode(' OR ', $clauses).')';
 }
 
 /**

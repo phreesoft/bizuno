@@ -21,7 +21,7 @@
  * @author Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright 2008-2026, PhreeSoft, Inc.
  * @license https://www.gnu.org/licenses/agpl-3.0.txt
- * @version 7.x Last Update: 2026-04-24
+ * @version 7.x Last Update: 2026-04-26
  * @filesource /portal/viewAuth.php
  */
 namespace bizuno;
@@ -83,7 +83,7 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
 
             if ($this->verify2faCode($code, $email)) {
                 // Success → complete login
-                $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");
+                $user = $this->lookupUserByEmail($email, ['id', 'primary_name']);
                 if (!empty($user['id'])) {
                     $profile = getMetaContact($user['id'], 'user_profile');
                     $userData = [
@@ -118,7 +118,7 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
         } elseif ( isset($_POST['bizUser']) && !isset($_POST['bizPass'])) { // Step 2: User name has been entered
             msgDebug("\nUser email sent, make sure user exists in db, on to step 2.");
             $email = clean('bizUser', 'email', 'post');
-            $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");
+            $user = $this->lookupUserByEmail($email, ['id', 'primary_name']);
             if (empty($user['id'])) {
                 $this->errors = $this->lang['err_invalid_creds'];
                 $this->viewIntro($layout);
@@ -165,7 +165,7 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
      */
     public function viewAuth(&$layout=[], $email='')
     {
-        $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id'], "ctype_u='1' AND email='".clean('bizUser','email','post')."'");
+        $user = $this->lookupUserByEmail(clean('bizUser', 'email', 'post'), ['id']);
         $userID = $user['id'] ?? 0;
         $hasPasskeys = false;
         $jsAuth = "";
@@ -239,7 +239,7 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
     {
         msgDebug("\nEntering validateUser.");
         $email = clean('bizUser', 'email', 'post');
-        $user = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['id', 'primary_name'], "ctype_u='1' AND email='$email'");
+        $user = $this->lookupUserByEmail($email, ['id', 'primary_name']);
         if (empty($user['id'])) {
             $this->errors = $this->lang['err_invalid_creds'];
             return false;
@@ -375,6 +375,41 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
 
         msgDebug("\nIncorrect 2FA code attempt #{$session['attempts']} for $email");
         return false;
+    }
+
+    /**
+     * Parameterized contact lookup by email — replaces the inline
+     * `dbGetValue(... "email='$email'")` SQL concat used throughout the auth flow.
+     * Even though `clean(..., 'email')` already strips quotes, prepared statements
+     * are the canonical defense and remove any reliance on the cleaner's coverage.
+     *
+     * `dbGetValue()` doesn't accept bound parameters and refactoring it would
+     * touch hundreds of call sites across the codebase, so this helper drops down
+     * to the underlying PDO connection (`$db` is a `PDO` subclass — see
+     * [`model/db.php:30`](../model/db.php:30)) and runs a single prepared query.
+     *
+     * @param  string $email   value already passed through `clean(..., 'email')`
+     * @param  array  $fields  columns to project; whitelisted so caller-controlled
+     *                         strings can never reach the column list
+     * @return array           row keyed by field name, or [] if no match / error
+     */
+    private function lookupUserByEmail($email, $fields=['id'])
+    {
+        global $db;
+        if (empty($email) || !is_object($db) || empty($db->connected)) { return []; }
+        // Whitelist the field projection so $fields cannot inject SQL.
+        $allowed = ['id', 'primary_name', 'email', 'short_name', 'inactive'];
+        $cols    = [];
+        foreach ($fields as $f) { if (in_array($f, $allowed, true)) { $cols[] = '`'.$f.'`'; } }
+        if (empty($cols)) { $cols = ['`id`']; }
+        $sql  = "SELECT ".implode(', ', $cols)." FROM `".BIZUNO_DB_PREFIX."contacts` WHERE ctype_u = '1' AND email = :email LIMIT 1";
+        $stmt = $db->prepare($sql);
+        if (!$stmt || !$stmt->execute([':email' => $email])) {
+            msgDebug("\nlookupUserByEmail: prepare/execute failed for email lookup.");
+            return [];
+        }
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return is_array($row) ? $row : [];
     }
 
 }
