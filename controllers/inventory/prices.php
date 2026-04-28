@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -426,9 +426,8 @@ function preSubmitPrices() {
         if (!empty($args['full']))         { $inv['full_price']= $args['full']; }
         if ( empty($cont['gl_account']))   { $cont['gl_account'] = getModuleCache('phreebooks', 'settings', 'customers', 'gl_sales'); }
         if (!empty($cont['ctype_v']))      { $cont['gl_account'] = ''; } // they are also a vendor so use inventory gl acct
-        if (!empty($inv['block_discount'])){ $this->locked = true; }
         return ['iID'=>$inv['id'],           'qty'    =>abs($args['qty']), // to properly handle negative sales/purchases and still get pricing based on method
-            'cSheetc'=>$cont['price_sheet'], 'glAcct' =>$cont['gl_account'],
+            'cSheetc'=>$cont['price_sheet'], 'glAcct' =>$cont['gl_account'], 'noDisc'=>$inv['block_discount'],
             'iSheetc'=>$inv['price_sheet_c'],'iSheetv'=>$inv['price_sheet_v'],
             'cID'    =>$args['cID'],         'cType'  =>$this->type,
             'iCost'  =>$inv['item_cost'],    'iLand'  =>$inv['item_cost'], // landed cost
@@ -474,7 +473,7 @@ function preSubmitPrices() {
         }
         msgDebug("\nStart processing fixed discounts");
         foreach ($sheets as $sheet) { // Now process fixed discounts if criteria met
-            if ($this->locked || empty($sheet['postCalc']) || (!empty($sheet['postCalc']) && $args['cSheetc']<>$sheet['_rID'])) { continue; }
+            if ($this->locked || !empty($args['noDisc']) || empty($sheet['postCalc']) || (!empty($sheet['postCalc']) && $args['cSheetc']<>$sheet['_rID'])) { continue; }
             foreach ($sheet['levels']['rows'] as $idx => $level) {
                 if ($this->levelIdx == $idx) { $prices['price'] = $this->calcPrice($level, $args['iCost'], $prices['price']); msgDebug("\nSetting new price to ".$prices['price']); }
             }
