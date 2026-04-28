@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/payment/gateways/directdebit.php
  *
  * Direct debit / EFT: no external gateway. `payment('capture')` records the
@@ -108,16 +108,6 @@ function payment_".$this->code."() {
     public function report($action, $data=[])
     {
         return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: report/$action", 'data'=>[], 'raw'=>null];
-    }
-
-    // ========================================================================
-    // Legacy shims — remove once callers use the dispatchers directly.
-    // ========================================================================
-
-    public function sale($fields=[], $ledger=null)
-    {
-        $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
-        return ['txID'=>$r['txID'], 'txTime'=>biz_date('c')];
     }
 
     private function getDiscGL($rID=0)

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/payment/gateways/cod.php
  *
  * Cash-on-delivery: no external gateway. `payment('capture')` just records the
@@ -113,13 +113,4 @@ function payment_".$this->code."() {
         return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: report/$action", 'data'=>[], 'raw'=>null];
     }
 
-    // ========================================================================
-    // Legacy shims — remove once callers use the dispatchers directly.
-    // ========================================================================
-
-    /** Legacy: called by paymentMain::sale(). COD has nothing to charge; just acknowledge. */
-    public function sale($fields=[], $ledger=null)
-    {
-        return ['txID'=>'', 'txTime'=>biz_date('c'), 'code'=>''];
-    }
 }
