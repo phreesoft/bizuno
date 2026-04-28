@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -894,68 +894,4 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return $refs;
     }
 
-    // ========================================================================
-    // Legacy shims — delegate old-style callers to the generic dispatcher.
-    // Remove these once `paymentMain` + `phreebooks/main.php` + `j22.php` are
-    // updated to call $gateway->payment($action, $data) directly.
-    // ========================================================================
-
-    /** Legacy: called by paymentMain::authorize(). Returns ['txID'=>X] or false. */
-    public function paymentAuth($fields, $ledger)
-    {
-        $r = $this->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
-        if (empty($r['ok'])) { return false; }
-        return ['txID'=>$r['txID']];
-    }
-
-    /** Legacy: called by paymentMain::sale(). Returns ['txID'=>X, 'txTime'=>Y, 'code'=>Z] or false.
-     *  Dispatches based on the action radio: n=new card capture, s=stored card, c=capture prior auth, w=manual at gateway. */
-    public function sale($fields, $ledger)
-    {
-        $action = clean("{$this->code}_action", 'cmd', 'post');
-        switch ($action) {
-            case 's': // charge a stored payment profile
-                $payID = clean("{$this->code}selCards", 'cmd', 'post');
-                if (empty($payID)) { msgAdd('Please select a stored card'); return false; }
-                $cID    = !empty($ledger->main['contact_id_b']) ? (int)$ledger->main['contact_id_b'] : 0;
-                $custID = $this->cachedCustID ?: $this->lookupCustomerProfileId(getWalletID($cID));
-                if (empty($custID)) { msgAdd('Could not locate Authorize.net customer profile'); return false; }
-                $r = $this->payment('wltCap', ['custID'=>$custID, 'payID'=>$payID, 'amount'=>$ledger->main['total_amount'], 'ledger'=>$ledger]);
-                break;
-            case 'c': // capture a previously-authorized transaction
-                $txID = clean("{$this->code}trans_code", 'cmd', 'post');
-                $r = $this->payment('capAuth', ['txID'=>$txID, 'amount'=>$ledger->main['total_amount']]);
-                break;
-            case 'w': // manual capture at the gateway website
-                msgAdd($this->lang['msg_capture_manual'], 'info');
-                return ['txID'=>'', 'txTime'=>biz_date('Y-m-d H:i:s'), 'code'=>'manual'];
-            default: // 'n' or unset — new-card capture
-                $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
-        }
-        if (empty($r['ok'])) { return false; }
-        return ['txID'=>$r['txID'], 'txTime'=>biz_date('Y-m-d H:i:s'), 'code'=>$r['code']];
-    }
-
-    /** Legacy: called by phreebooks/main.php directly on same-day delete. Accepts journal_main.id. */
-    public function void($rID=0)
-    {
-        if (empty($rID)) { return msgAdd('Bad record ID passed to authorize.net void'); }
-        $txID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id=$rID AND gl_type='ttl'");
-        if (empty($txID) || empty($this->settings['allowRefund'])) {
-            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
-            return true; // non-fatal: let the journal delete proceed even if gateway void skipped
-        }
-        $r = $this->payment('void', ['txID'=>$txID, 'rID'=>$rID]);
-        return !empty($r['ok']);
-    }
-
-    /** Legacy: called by paymentMain::refund(). Note: old signature doesn't supply last-4,
-     *  so this will currently surface an error for authorize.net — refunds need the caller
-     *  layer updated to pass last4 before this path fully works. Returns ['txID'=>X,'code'=>Y] or false. */
-    public function refund($transCode='', $amount=0)
-    {
-        $r = $this->payment('refund', ['txID'=>$transCode, 'amount'=>$amount]);
-        if (empty($r['ok'])) { return false; }
-        return ['txID'=>$r['txID'], 'code'=>$r['code']];
-    }
 }

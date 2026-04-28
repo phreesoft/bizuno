@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /lib/controllers/payment/gateways/paypal.php
  *
  * Hosted PayPal redirect: there's no server-side API integration. `payment('capture')`
@@ -130,28 +130,6 @@ function payment_{$this->code}() {
     public function report($action, $data=[])
     {
         return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: report/$action", 'data'=>[], 'raw'=>null];
-    }
-
-    // ========================================================================
-    // Legacy shims — remove once callers use the dispatchers directly.
-    // ========================================================================
-
-    public function sale($fields=[], $ledger=null)
-    {
-        $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
-        return ['txID'=>$r['txID'], 'txTime'=>biz_date('c')];
-    }
-
-    public function paymentDelete()
-    {
-        $r = $this->payment('void');
-        return !empty($r['ok']);
-    }
-
-    public function refund()
-    {
-        $r = $this->payment('refund');
-        return !empty($r['ok']);
     }
 
     private function getDiscGL($data)

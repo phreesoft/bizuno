@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -318,8 +318,31 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
             msgAdd(lang('err_cc_no_transaction_id'), 'caution');
             return $this->success('', 'skipped', 'Missing txID/amount — non-fatal skip');
         }
-        $r = $this->refund($data['txID'], $data['amount']);
-        return $this->normalizeSaleReturn($r, 'Refund');
+        $transCode = $data['txID'];
+        $amount    = $data['amount'];
+        if (floatval($amount) <= 0) { return $this->failure(lang('err_cc_amount_negative')); }
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "trans_code='$transCode'", 'id');
+        msgDebug("\nIn refund with rows from trans code = ".print_r($rows, true));
+        $charged = $refunded = 0;
+        foreach ($rows as $row) {
+            if ($row['debit_amount']>0 || $row['credit_amount']<0) { $charged += $row['debit_amount'] - $row['credit_amount']; }
+            if ($row['debit_amount']<0 || $row['credit_amount']>0) { $refunded+= $row['credit_amount']- $row['debit_amount']; }
+        }
+        msgDebug("\nReady to refund amount $amount, charged = $charged and refunded already = $refunded");
+        $options = [];
+        if (empty($refunded) && $charged == $amount) { // full refund
+            $transURL = "payment/api/reference/$transCode?trxtype=Refund";
+        } else { // partial refund
+            $transURL = 'payment/api/transaction/process';
+            $transArgs= ['Amount'=>number_format($amount, 2, '.', ''), 'ReferenceKey'=>$transCode, 'Type'=>'Refund'];
+            $options  = [CURLOPT_POSTFIELDS=>json_encode($transArgs)];
+        }
+        msgDebug("\nReady to call API with url $transURL and options = ".print_r($options, true));
+        $refund = $this->queryAPI($transURL, $options);
+        if (empty($refund)) { return $this->failure('Refund failed at PayFabric — see trace'); }
+        msgLog(sprintf($this->lang['msg_refund_success'], $refund['Message'], $refund['AuthCode']));
+        msgAdd(sprintf($this->lang['msg_refund_success'], $refund['Message'], $refund['AuthCode']), 'success');
+        return $this->success((string)($refund['TrxKey'] ?? ''), (string)($refund['AuthCode'] ?? ''), (string)($refund['Message'] ?? ''), ['txTime'=>$refund['TrxDate'] ?? ''], $refund);
     }
 
     /**
@@ -480,25 +503,6 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
 //        return ['txID'=>$resp->ssl_txn_id, 'txTime'=>$resp->ssl_txn_time, 'code'=>$resp->ssl_approval_code];
     }
 
-    /**
-     * This method will capture payment, if payment was authorized in a prior transaction, a ccComplete is done
-     * @param integer $ledger
-     * @return array - On success, false (with messageStack message) on unsuccessful deletion
-     */
-    public function sale($fields, $ledger)
-    {
-        msgDebug("\nEntering $this->code:sale working with fields = ".print_r($fields, true));
-        $action = clean("{$this->code}_action", 'db_field', 'post');
-        switch ($action) { // figure out what type of sale it is
-            case 'c': return $this->saleAuth($ledger); // Capture a pre-authorized transaction, full or partial
-            case 's': return $this->saleNew($ledger); // Capture a new transaction
-            default:
-            case 'w': // website capture, just post it and let the user know
-                msgAdd($this->lang['msg_capture_at_payfabric'], 'info');
-                return true;
-        }
-    }
-
     /*
      * Handles pre-authorized captures, either partial or full
      */
@@ -647,62 +651,6 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
         // else $sale['Status'] => Failure
         msgLog(sprintf($this->lang['err_process_decline'], $sale['PayFabricErrorCode'], $sale['Message']));
         msgAdd(sprintf($this->lang['err_process_decline'], $sale['PayFabricErrorCode'], $sale['Message']));
-    }
-
-    /**
-     * @method void will delete/void a payment made BEFORE the processor commits the payment, typically must be run the same day as the sale
-     * @param integer $rID Record id from table journal_main to generate the void
-     * @return array merchant response On success, false (with messageStack message) on unsuccessful deletion
-     */
-    public function void($rID=0)
-    {
-        if (!$rID) { return msgAdd('Bad record ID passed'); }
-        $txID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id=$rID AND gl_type='ttl'");
-        if (!$txID || !$this->settings['allowRefund']) { msgAdd(lang('err_cc_no_transaction_id'), 'caution'); return true; }
-        // create the transaction
-        $voidUrl = "payment/api/reference/$txID?trxtype=Void";
-        $void    = $this->queryAPI($voidUrl);
-        if (empty($void)) { return; }
-        msgLog(sprintf($this->lang['msg_void_success'], $void['Message'], $void['AuthCode']));
-        msgAdd(sprintf($this->lang['msg_void_success'], $void['Message'], $void['AuthCode']), 'success');
-        return ['txID'=>$txID, 'txTime'=>$void['TrxDate'], 'code'=>$void['AuthCode']];
-    }
-
-    /**
-     * This method will refund a payment made AFTER the batch is processed, typically must be run any day after the sale
-     * @param integer $rID - record id from table journal_main to generate the refund
-     * @param float $amount - amount to be refunded (leave blank for full amount)
-     * @return array - On success, false (with messageStack message) on unsuccessful deletion
-     */
-    public function refund($transCode='', $amount=0)
-    {
-        // This should be working now. Once tested, the below lines can be removed.
-// @TODO - This may be an option to be performed during the credit memo refund in banking to save the user the hassle of refunding through the portal.
-//return msgAdd("Deleting a Payment after the batch has been processed has been disabled. To refund a customer after the batch has ben processed requires a Credit Memo and then payment applied against it. Then, the credit card refund needs to be completed throught the portal.");
-        if (floatval($amount) <= 0) { return msgAdd(lang('err_cc_amount_negative')); }
-        $options = [];
-        // using this trans code, get ref_id (mID) of the charge and all credits
-        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item', "trans_code='$transCode'", 'id');
-        msgDebug("\nIn refund with rows from trans code = ".print_r($rows, true));
-        $charged = $refunded = 0;
-        foreach ($rows as $row) {
-            if ($row['debit_amount']>0 || $row['credit_amount']<0) { $charged += $row['debit_amount'] - $row['credit_amount']; }
-            if ($row['debit_amount']<0 || $row['credit_amount']>0) { $refunded+= $row['credit_amount']- $row['debit_amount']; }
-        }
-        msgDebug("\nReady to refund amount $amount, charged = $charged and refunded already = $refunded");
-        if (empty($refunded) && $charged==$amount ) { // Full refund
-            $transURL = "payment/api/reference/$transCode?trxtype=Refund";
-        } else { // partial refund
-            $transURL = 'payment/api/transaction/process';
-            $transArgs= ['Amount'=>number_format($amount, 2, '.', ''), 'ReferenceKey'=>$transCode, 'Type'=>'Refund'];
-            $options  = [CURLOPT_POSTFIELDS=>json_encode($transArgs)]; // removed CURLOPT_VERBOSE=>true,
-        }
-        msgDebug("\nReady to call API with url $transURL and options = ".print_r($options, true));
-        $refund  = $this->queryAPI($transURL, $options);
-        if (empty($refund)) { return msgAdd("\nThere was an error processing the transaction, see trace.", 'trap'); }
-        msgLog(sprintf($this->lang['msg_refund_success'], $refund['Message'], $refund['AuthCode']));
-        msgAdd(sprintf($this->lang['msg_refund_success'], $refund['Message'], $refund['AuthCode']), 'success');
-        return ['txID'=>$refund['TrxKey'], 'txTime'=>$refund['TrxDate'], 'code'=>$refund['AuthCode']];
     }
 
     // ***************************************************************************************************************

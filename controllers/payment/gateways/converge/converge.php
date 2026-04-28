@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/payment/gateways/converge.php
  *
  * Source Information:
@@ -483,82 +483,4 @@ html5($this->code.'_action', ['label'=>$this->lang['at_converge'],              
         return $refs;
     }
 
-    // ========================================================================
-    // Legacy shims — delegate old-style callers to the generic dispatcher.
-    // Remove once `paymentMain` + `phreebooks/main.php` + `j22.php` are
-    // updated to call $gateway->payment($action, $data) directly.
-    // ========================================================================
-
-    /** Legacy: called by paymentMain::authorize(). Returns ['txID'=>X] or false. */
-    public function paymentAuth($fields, $ledger)
-    {
-        $r = $this->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
-        if (empty($r['ok'])) { return false; }
-        return ['txID'=>$r['txID']];
-    }
-
-    /**
-     * Legacy: called by paymentMain::sale(). The original `sale()` looked at the posted
-     * `<code>_action` radio (c=capture-prior-auth, s/n=new-sale, w=manual) and dispatched
-     * accordingly. Preserved here so the four UI buttons keep working.
-     */
-    public function sale($fields, $ledger)
-    {
-        $action = clean("{$this->code}_action", 'db_field', 'post');
-        switch ($action) {
-            case 'c':
-                $r = $this->payment('capAuth', ['fields'=>$fields, 'ledger'=>$ledger, 'txID'=>$fields['txID'] ?? '']);
-                break;
-            case 's':
-            case 'n':
-                $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
-                break;
-            case 'w':
-                msgAdd($this->lang['msg_capture_manual'].' '.$this->lang['msg_website'], 'caution');
-                return true; // legacy contract: truthy when nothing to send
-            default:
-                return true;
-        }
-        if (empty($r['ok'])) { return false; }
-        return ['txID'=>$r['txID'], 'txTime'=>$r['data']['txTime'] ?? biz_date('Y-m-d H:i:s'), 'code'=>$r['code']];
-    }
-
-    /** Legacy: called by phreebooks/main.php directly on same-day delete. Accepts journal_main.id. */
-    public function void($rID=0)
-    {
-        if (empty($rID)) { return msgAdd('Bad record ID passed to converge void'); }
-        $txID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id=$rID AND gl_type='ttl'");
-        if (empty($txID) || empty($this->settings['allowRefund'])) {
-            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
-            return true; // non-fatal: let the journal delete proceed even if gateway void skipped
-        }
-        $r = $this->payment('void', ['txID'=>$txID, 'rID'=>$rID]);
-        return !empty($r['ok']);
-    }
-
-    /**
-     * Legacy: called by paymentMain::refund(). The old signature here received the
-     * journal_main.id (not the transCode), so we look up the trans_code first to match
-     * the original behavior. Returns ['txID','code'] on success or false.
-     */
-    public function refund($rID=0, $amount=false)
-    {
-        if (empty($rID)) { return msgAdd('Bad record ID passed to converge refund'); }
-        $row = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['debit_amount','credit_amount','trans_code'], "ref_id=$rID AND gl_type='ttl'");
-        $maxAmount = floatval($row['debit_amount']) + floatval($row['credit_amount']);
-        if ($amount === false) { $amount = $maxAmount; }
-        if ($amount > $maxAmount) { return msgAdd(lang('err_cc_amount_too_big')); }
-        if (empty($row['trans_code']) || empty($this->settings['allowRefund'])) {
-            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
-            return true;
-        }
-        $r = $this->payment('refund', ['txID'=>$row['trans_code'], 'amount'=>$amount, 'rID'=>$rID]);
-        if (empty($r['ok'])) {
-            // Match original behavior: the original code emitted a friendly "refund failed at gateway" caution
-            // and still returned truthy so the journal delete could proceed.
-            msgAdd("The refund failed at Converge with the transaction reference: {$row['trans_code']}. The cash receipt was still deleted from Bizuno. Verify at the Converge Gateway that the charge was refunded.", 'caution');
-            return true;
-        }
-        return ['txID'=>$r['txID'], 'code'=>$r['code']];
-    }
 }
