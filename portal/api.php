@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /portal/api.php
  */
 
@@ -213,6 +213,9 @@ class portalApi
     public function logout(&$layout=[])
     {
         bizClrCookie('bizunoSession');
+        // CSRF Layer 2: rotate the synchronizer token so a token from this session can't
+        // be reused after the user signs back in (defense-in-depth against session-fixation).
+        if (function_exists("\\bizuno\\bizCsrfRotate")) { bizCsrfRotate(); }
         $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]]);
         if (function_exists("\\bizuno\\portalLogout")) { portalLogout($layout); }
     }

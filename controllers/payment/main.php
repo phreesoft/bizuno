@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/payment/main.php
  */
 
@@ -60,8 +60,10 @@ class paymentMain
     }
 
     /**
-     * This method accepts post variables from ALL methods, determines the method and submits all credit cards for authorization
-     * @return array - user message if failed, success contains the authorization_code for credit cards, ref field if supplied.
+     * Authorize a credit card. Calls $gateway->payment('authorize', ...) on the new
+     * generic dispatcher API. The legacy `paymentAuth()` shim on each gateway is
+     * retained for now and becomes dead code; remove in a follow-up after testing.
+     * @return string|false - txID on success, false on failure
      */
     public function authorize($ledger=[])
     {
@@ -69,19 +71,19 @@ class paymentMain
         $method = clean('method_code','text', 'post');
         if (!$gateway = $this->getGateway($method)) { return; }
         if (!$fields  = $this->process($method, $ledger)) { return; }
-        $txID = '1';
-        if (method_exists($gateway, 'paymentAuth')) {
-            if (!$response = $gateway->paymentAuth($fields, $ledger)) { return; }
-            $txID = $response['txID'];
-        }
-        return $txID;
+        $r = $gateway->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
+        if (empty($r['ok'])) { return; }
+        return !empty($r['txID']) ? $r['txID'] : '1';
     }
 
     /**
-     * This method is the parent to process a sale, both authorize and capture are supported
-     * @param array $method - typically $_POST variables to gather the payment details
-     * @param array $ledger - contains the current PhreeBooks ledger object with journal details
-     * @return false on failure and transaction information array on success
+     * Process a sale. Examines the posted `<method>_action` radio:
+     *   c = capture-prior-auth  → payment('capAuth', ...)
+     *   w = manual/website      → no gateway call, just record locally
+     *   s, n, '' = new sale     → payment('capture', ...)
+     * (The c/s/n/w convention is shared by every credit-card gateway's render(); record-only
+     * methods like cod/moneyorder/directdebit don't render the radio and fall through to capture.)
+     * @return array|false - normalized response on success, false on failure
      */
     public function sale($method='', $ledger=[])
     {
@@ -93,33 +95,50 @@ class paymentMain
         $iID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['id', 'description'], "ref_id={$ledger->main['id']} AND gl_type='ttl'");
         $fields = ['ref_1'=>clean($method.'_ref_1', 'text', 'post')];
         if (!$gateway= $this->getGateway($method)) { return; }
-        if (method_exists($gateway, 'sale')) {
-            msgDebug("\nProcessing sale with method = $method");
-            if (!$result = $gateway->sale($fields, $ledger)) { return; }
+        $radio = clean("{$method}_action", 'db_field', 'post');
+        if ($radio === 'w') {
+            // manual/web-side capture — nothing to send to the gateway, just record
+            $r = ['ok'=>true, 'txID'=>'', 'code'=>'', 'data'=>[]];
         } else {
-            $result['txID'] = '';
+            $action = ($radio === 'c') ? 'capAuth' : 'capture';
+            $payData = ['fields'=>$fields, 'ledger'=>$ledger];
+            if ($radio === 'c') {
+                $payData['txID'] = clean("{$method}trans_code", 'integer', 'post');
+            }
+            msgDebug("\nProcessing sale with method = $method action = $action");
+            $r = $gateway->payment($action, $payData);
+            if (empty($r['ok'])) { return; }
         }
         // add to the description
         $desc = bizDecode($iID['description']);
         $desc['method']= $method;
         $desc['status']= 'cap';
-        $fields = ['description'=>bizEncode($desc), 'trans_code'=>!empty($result['txID']) ? $result['txID'] : ''];
+        $fields = ['description'=>bizEncode($desc), 'trans_code'=>!empty($r['txID']) ? $r['txID'] : ''];
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $fields, 'update', "id={$iID['id']}");
-        return $result;
+        return $r;
     }
 
     /**
-     * Nothing to do here as this is for same day deletes and are handled at the post delete
-     * @TODO - probably should move that here for j17-j22 to handle deletes same day and after
+     * Void an unsettled transaction. Wraps the gateway dispatcher's `payment('void', ...)`
+     * action; the dispatcher itself does the journal_item trans_code lookup from rID and
+     * handles the "graceful skip" case (refunds disabled, no txID present).
+     * @return bool true on success or non-fatal skip; false only when the gateway call itself failed
      */
-    public function void() { }
+    public function void($method='', $rID=0)
+    {
+        msgDebug("\nEntering payment:void with method=$method rID=$rID");
+        if (empty($method) || empty($rID)) { return true; } // nothing to do
+        if (!$gateway = $this->getGateway($method)) { return true; } // getGateway already messaged
+        $r = $gateway->payment('void', ['rID'=>$rID]);
+        return !empty($r['ok']);
+    }
 
     /**
-     * Processes a customer refund from a given invoice if it is a credit card
-     * @param array $j22ttlRow - journal item row for the current post ttl line
-     * @param array $j22pmtRow - journal item row for the current post pmt line
-     * @param float $amount - amount to refund, cannot exceed the amount charged.
-     * @return boolean|string
+     * Process a customer refund. Calls $gateway->payment('refund', ...) with txID + amount,
+     * and pulls last4 from the original payment's description hint so SDK-based gateways
+     * (auth.net) that require a card number on refundTransaction can complete.
+     * @return boolean - always returns true so the credit memo proceeds even when the
+     *                   gateway-side refund fails or is skipped (matches legacy behavior)
      */
     public function refund(&$j22ttlRow, $j22pmtRow, $amount=0)
     {
@@ -129,13 +148,19 @@ class paymentMain
         if (empty($transCode)) { return true; } // had no transaction code so probably wasn't a credit card
         $method   = guessPaymentMethod(0, $j13ttlRow['description']);
         if (!$gateway = $this->getGateway($method)) { return; }
-        if (method_exists($gateway, 'refund')) {
-            msgDebug("\nProcessing refund with method = $method, amount = $amount");
-            if (!$result = $gateway->refund($transCode, $amount)) { return; }
-        } else { $result = ['txID'=>'', 'code'=>'']; }
-        $parts = ['method'=>$method, 'status'=>'rfnd', 'code'=>$result['code']];
+        // last4 lives in the original payment's description hint — required by SDK gateways (auth.net)
+        $origDesc = bizDecode($j13ttlRow['description']);
+        $last4    = !empty($origDesc['hint']) ? substr((string)$origDesc['hint'], -4) : '';
+        msgDebug("\nProcessing refund with method = $method, amount = $amount, last4 = $last4");
+        $r = $gateway->payment('refund', [
+            'txID'   => $transCode,
+            'amount' => $amount,
+            'last4'  => $last4,
+        ]);
+        if (empty($r['ok'])) { return; }
+        $parts = ['method'=>$method, 'status'=>'rfnd', 'code'=>$r['code']];
         $desc  = array_replace(bizDecode($j22ttlRow['description']), $parts);
-        $fields= ['description'=>bizEncode($desc), 'trans_code'=>$result['txID']];
+        $fields= ['description'=>bizEncode($desc), 'trans_code'=>$r['txID']];
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $fields, 'update', "id={$j22ttlRow['id']}");
         return true;
     }

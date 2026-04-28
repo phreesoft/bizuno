@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /view/main.php
  */
 
@@ -130,16 +130,19 @@ final class view
     private function setHeadKendoUI($data)
     {
         msgDebug("\nEntering setHeadKendoUI");
-        // Page head Meta 
+        $csrfToken = function_exists("\\bizuno\\bizCsrfGet") ? bizCsrfGet() : '';
+        // Page head Meta
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.'Bizuno'.'</title>'];
         $data['head']['metaTitle']   = ['order'=>22,'type'=>'html','html'=>'<meta name="robots" content="noindex">'];
         $data['head']['metaContent'] = ['order'=>24,'type'=>'html','html'=>'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'];
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];
+        $data['head']['metaCsrf']    = ['order'=>27,'type'=>'html','html'=>'<meta name="biz-csrf" content="'.htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8').'" />'];
         $data['head']['metaIcon']    = ['order'=>28,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.BIZUNO_ICON.'" />'];
         // Page head CSS
         $data['head']['cssBizuno']   = ['order'=>46,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_FS.'0/view/kendoUI/bizuno.css" />'];
-        // Page head JavaScript 
+        // Page head JavaScript
         $data['head']['jsjQuery']    = ['order'=>60,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'jQuery-3.7.1.js"></script>'];
+        $data['head']['jsCsrf']      = ['order'=>61,'type'=>'html','html'=>'<script type="text/javascript">const bizCSRF = "'.htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8').'";</script>'];
         $data['head']['jsBizuno']    = ['order'=>62,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_FS.'0/view/kendoUI/bizuno.js"></script>'];
         if (in_array($this->myDevice, ['mobile', 'tablet'])) { // add the mobile extensions
             $data['head']['metaMobile']= ['order'=>30,'type'=>'html','html'=>'<meta name="mobile-web-app-capable" content="yes" />'];
@@ -209,17 +212,20 @@ final class view
         if ($theme=='auto') { $theme = getuserCache('profile', 'mode')=='dark' ? 'bizuno-dark' : 'bizuno'; } // change to dark mode
         $logoPath= getModuleCache('bizuno', 'settings', 'company', 'logo');
         $favicon = $logoPath ? BIZUNO_URL_FS.getUserCache('business', 'bizID')."/images/$logoPath" : BIZUNO_ICON;
+        $csrfToken = function_exists("\\bizuno\\bizCsrfGet") ? bizCsrfGet() : '';
         $js  = "const bizVersion = '".MODULE_BIZUNO_VERSION."';\n";
         $js .= "const bizID = '".getUserCache('business','bizID', false, 0)."';\n";
         $js .= "const bizunoHome = '".BIZUNO_URL_PORTAL."';\n";
         $js .= "const bizunoAjax = '".BIZUNO_URL_AJAX."';\n";
         $js .= "const bizunoAjaxFS = '".BIZUNO_URL_FS."';\n";
+        $js .= "const bizCSRF = '".$csrfToken."';\n"; // CSRF Layer 2 — common.js attaches via X-Bizuno-Csrf header
         // Create page Head HTML
         $data['head']['metaTitle']   = ['order'=>20,'type'=>'html','html'=>'<title>'.(!empty($data['title']) ? $data['title'] : getModuleCache('bizuno', 'properties', 'title')).'</title>'];
         $data['head']['metaPath']    = ['order'=>22,'type'=>'html','html'=>'<!-- route:'.clean('bizRt',['format'=>'path_rel','default'=>''],'get').' -->'];
         $data['head']['metaContent'] = ['order'=>24,'type'=>'html','html'=>'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'];
         $data['head']['metaViewport']= ['order'=>26,'type'=>'html','html'=>'<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.9, maximum-scale=0.9" />'];
         $data['head']['metaRobots']  = ['order'=>28,'type'=>'html','html'=>'<meta name="robots" content="noindex" />'];
+        $data['head']['metaCsrf']    = ['order'=>29,'type'=>'html','html'=>'<meta name="biz-csrf" content="'.htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8').'" />'];
         $data['head']['metaIcon']    = ['order'=>30,'type'=>'html','html'=>'<link rel="icon" type="image/png" href="'.$favicon.'" />'];
         // CSS Links
         $data['head']['cssTheme']    = ['order'=>40,'type'=>'html','html'=>'<link rel="stylesheet" href="'.BIZUNO_URL_SCRIPTS .'jquery-easyui/themes/'.$theme.'/easyui.css" />'];

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/administrate/functions.php
  */
 
@@ -47,15 +47,6 @@ function administrateView($value, $format='') {
                 return $extRtn->lang['used'];
             }
             else { return $value; }
-        case 'storeStock': // @TODO - DEPRECATED - removed after 7/1/2025
-            global $db;
-            $storeID  = !empty($GLOBALS['bizuno_store_id']) ? (int)$GLOBALS['bizuno_store_id'] : 0;
-            $qSku     = (is_object($db) && method_exists($db, 'quote')) ? $db->quote((string)$value) : "'".addslashes((string)$value)."'";
-            $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku=$qSku", false);
-            if (!$thisStore) { $thisStore = 0;}
-            $thisOwed = dbGetValue(BIZUNO_DB_PREFIX.'journal_cogs_owed', 'SUM(qty) AS qty', "store_id=$storeID AND sku=$qSku", false);
-            if (!$thisOwed) { $thisOwed = 0;}
-            return $thisStore - $thisOwed; // removed viewFormat(*, 'number')
         default:
     }
     return $value;

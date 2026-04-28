@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /portal/controller.php
  */
 
@@ -147,7 +147,45 @@ class portalCtl
             $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
             return;
         }
+        // CSRF Layer 2: synchronizer-token check. Defaults to warn-only mode so existing
+        // browser tabs without the meta tag don't get logged out on deploy. Operators flip
+        // to enforce mode by setting `define('BIZUNO_CSRF_ENFORCE', true);` in portalCFG.php
+        // once the trace logs show no Layer-2 mismatches from legitimate traffic.
+        if (!$this->validateCsrf()) {
+            $enforce = defined('BIZUNO_CSRF_ENFORCE') && BIZUNO_CSRF_ENFORCE;
+            if ($enforce) {
+                msgDebug("\nCSRF Layer 2: rejecting bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} — token missing or mismatched");
+                msgAdd('Illegal Access');
+                $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
+                return;
+            }
+            msgDebug("\nCSRF Layer 2 (warn-only): bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} — token missing or mismatched; would reject under BIZUNO_CSRF_ENFORCE=true");
+        }
         if ($this->getCodex()) { compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout); }
+    }
+
+    /**
+     * CSRF Layer 2 — synchronizer-token check on every authenticated bizRt route.
+     *
+     * The token lives in `$_SESSION['biz_csrf']` (server-minted at sign-in, rotated on
+     * logout — see bizCsrfRotate(); read via bizCsrfGet()). The JS layer reads it from
+     * the `<meta name="biz-csrf">` injected by setHeadEasyUI/setHeadKendoUI and attaches
+     * it to every `jqBiz.ajax` call via the `beforeSend` hook in common.js.
+     *
+     * Token transport on the request side, in order of preference:
+     *   1. `X-Bizuno-Csrf` request header  — preferred; keeps token out of URL/Referer/logs
+     *   2. POST `_csrf` field              — for form submits
+     *   3. GET `_csrf` query param         — last-resort fallback
+     *
+     * @return bool true if the token matches OR there is none to compare yet (warn-only path)
+     */
+    private function validateCsrf()
+    {
+        $supplied = '';
+        if (!empty($_SERVER['HTTP_X_BIZUNO_CSRF'])) { $supplied = trim((string)$_SERVER['HTTP_X_BIZUNO_CSRF']); }
+        if ($supplied === '' && !empty($_POST['_csrf'])) { $supplied = trim((string)$_POST['_csrf']); }
+        if ($supplied === '' && !empty($_GET['_csrf']))  { $supplied = trim((string)$_GET['_csrf']);  }
+        return bizCsrfVerify($supplied);
     }
 
     /**

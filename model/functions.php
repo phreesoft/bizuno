@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /model/functions.php
  */
 
@@ -339,6 +339,10 @@ function setUserCookie($user)
     $cookie = base64_encode(json_encode($signed));
     bizSetCookie('bizunoUser',    $user['userEmail'], time()+(60*60*24*7)); // 7 days
     bizSetCookie('bizunoSession', $cookie, time()+(60*60*10)); // 10 hours
+    // CSRF Layer 2: rotate the synchronizer token on every successful login so a
+    // token captured pre-auth (or held by a dormant tab from a prior session) is
+    // invalidated. The next page render emits the new value into the meta tag.
+    bizCsrfRotate();
 }
 
 /**
@@ -373,6 +377,49 @@ function bizClrCookie($name)
     } else {
         setcookie($name, '', ['expires'=>time()-1,'path'=>'/','secure'=>true,'httponly'=>true,'samesite'=>'lax']);
     }
+}
+
+/**
+ * CSRF Layer 2 — synchronizer-token storage and verification.
+ *
+ * Layer 1 (Origin/Referer same-site check in `portalCtl::validateOrigin()`) blocks the
+ * common case. Layer 2 adds a per-session token that the JS layer attaches to every
+ * authenticated `bizRt` request — defense-in-depth when same-site protections are
+ * weakened by browser extensions, an enterprise proxy that rewrites `Origin`, or a
+ * future need to allow legitimate cross-origin embeds.
+ *
+ * Storage: `$_SESSION['biz_csrf']`. The PHP session cookie is HttpOnly + signed via
+ * `bizSessionMAC()` already, so the token can't be read or forged by an attacker.
+ *
+ * Token transport (server-side read order): `X-Bizuno-Csrf` request header, then
+ * POST `_csrf`, then GET `_csrf`. Header preferred — keeps the secret out of URL
+ * logs / Referer / shell history.
+ */
+function bizCsrfGet()
+{
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    if (empty($_SESSION['biz_csrf']) || !is_string($_SESSION['biz_csrf'])) {
+        $_SESSION['biz_csrf'] = bin2hex(random_bytes(16)); // 128-bit token
+    }
+    return $_SESSION['biz_csrf'];
+}
+
+/** Generate and install a fresh token, replacing any prior one. Call on auth-state changes
+ *  (login, logout, privilege change) to prevent session-fixation-style attacks. */
+function bizCsrfRotate()
+{
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    $_SESSION['biz_csrf'] = bin2hex(random_bytes(16));
+    return $_SESSION['biz_csrf'];
+}
+
+/** Constant-time compare a caller-supplied token against the session token. */
+function bizCsrfVerify($supplied)
+{
+    if (!is_string($supplied) || $supplied === '') { return false; }
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    if (empty($_SESSION['biz_csrf']) || !is_string($_SESSION['biz_csrf'])) { return false; }
+    return hash_equals($_SESSION['biz_csrf'], $supplied);
 }
 
 /**

@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-09
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /view/easyUI/common.js
  */
 
@@ -54,6 +54,13 @@ jqBiz.ajaxSetup({ // Set defaults for ajax requests
 //    contentType: "application/json; charset=utf-8", // this breaks easyUI, datagrid operations
 //    dataType: (jqBiz.browser.msie) ? "text" : "json", // not needed for jquery 2.x
     dataType: "json",
+    // CSRF Layer 2 — attach the per-session token to every ajax request. The server reads
+    // X-Bizuno-Csrf preferentially over POST/_csrf and GET/_csrf, so this single hook covers
+    // jsonAction(), jsonPortal(), datagrid loads, and every other jqBiz.ajax call automatically.
+    // The token comes from the bizCSRF JS constant emitted by setHeadEasyUI/setHeadKendoUI.
+    beforeSend: function(xhr) {
+        if (typeof bizCSRF !== 'undefined' && bizCSRF) { xhr.setRequestHeader('X-Bizuno-Csrf', bizCSRF); }
+    },
     error: function(XMLHttpRequest, textStatus, errorThrown) {
             if (textStatus==="timeout") { jqBiz('body').removeClass('loading'); }
             if (errorThrown) {

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-20
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/inventory/main.php
  */
 
@@ -1111,8 +1111,11 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         msgDebug("\nvalues from inventory table = ".print_r($values, true));
         $values['buy_uom'] = str_replace("'", "", $values['buy_uom']); // fixes bug in storing string
         $values['sell_uom']= str_replace("'", "", $values['sell_uom']); // fixes bug in storing string
-        $buyDesc = " (".lang('uom_'.$values['buy_uom'], $this->moduleID).")";
-        $sellDesc= " (".lang('uom_'.$values['sell_uom'], $this->moduleID).")";
+        // Escape: lang() falls through to its key when there's no translation, so an
+        // unknown buy_uom (e.g. user-supplied) would render as `(uom_<script>...)`. UOMs
+        // come from an enum in practice, but defense-in-depth before the type=>raw inject.
+        $buyDesc = " (".htmlspecialchars(lang('uom_'.$values['buy_uom'], $this->moduleID), ENT_QUOTES, 'UTF-8').")";
+        $sellDesc= " (".htmlspecialchars(lang('uom_'.$values['sell_uom'], $this->moduleID), ENT_QUOTES, 'UTF-8').")";
         msgDebug("\nbuyDesc = $buyDesc and sellDesc = $sellDesc");
         // convert qty_stock, qty_po and add (UOM) suffix to field value
         $layout['fields']['buy_uom']         = ['order'=>91,'break'=>false,'label'=>lang('buy_uom', $this->moduleID), 'lblStyle'=>['min-width'=>'60px'],'options'=>['width'=>100],'values'=>viewKeyDropdown($this->uom),'attr'=>['type'=>'select','value'=>$values['buy_uom']]];

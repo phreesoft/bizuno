@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -312,12 +312,28 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return $this->runTransaction($txn);
     }
 
+    /**
+     * Refund a settled transaction.
+     * Required: txID + amount + last4. The caller layer (paymentMain::refund) pulls
+     * last4 from the original payment's stored description hint.
+     * Returns ok=true with code='skipped' when refunds are disabled or the prior
+     * txID/last4 isn't recoverable — preserves the legacy "non-fatal skip" so a
+     * customer-refund credit memo can still post even if the gateway side fails.
+     */
     private function pmtRefund($data)
     {
-        if (empty($this->settings['allowRefund'])) { return $this->failure('Refunds are disabled for this gateway'); }
-        if (empty($data['txID']))  { return $this->failure('txID required for refund'); }
-        if (empty($data['last4'])) { return $this->failure('Last-4 of card required for refund'); }
-        if (empty($data['amount'])){ return $this->failure('Amount required for refund'); }
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Refunds disabled — non-fatal skip');
+        }
+        if (empty($data['txID']) || empty($data['amount'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Missing txID/amount — non-fatal skip');
+        }
+        if (empty($data['last4'])) {
+            msgAdd('Authorize.net refund requires the last 4 digits of the original card; the legacy stored description was missing the hint. Refund must be issued at the Authorize.net portal.', 'caution');
+            return $this->success('', 'skipped', 'Missing last4 — non-fatal skip');
+        }
         $cc = new AnetAPI\CreditCardType();
         $cc->setCardNumber(str_pad(substr((string)$data['last4'], -4), 4, '0', STR_PAD_LEFT));
         $cc->setExpirationDate('XXXX');
@@ -331,13 +347,28 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         return $this->runTransaction($txn);
     }
 
+    /**
+     * Void an unsettled transaction. Accepts either txID or rID (looks up trans_code
+     * from journal_item when only rID is provided — supports the phreebooks/main.php
+     * same-day-delete path that holds the journal_main record id).
+     */
     private function pmtVoid($data)
     {
-        if (empty($this->settings['allowRefund'])) { return $this->failure('Voids are disabled for this gateway'); }
-        if (empty($data['txID'])) { return $this->failure('txID required for void'); }
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Voids disabled — non-fatal skip');
+        }
+        $txID = !empty($data['txID']) ? (string)$data['txID'] : '';
+        if ($txID === '' && !empty($data['rID'])) {
+            $txID = (string)dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id={$data['rID']} AND gl_type='ttl'");
+        }
+        if ($txID === '') {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'No txID for void — non-fatal skip');
+        }
         $txn = new AnetAPI\TransactionRequestType();
         $txn->setTransactionType('voidTransaction');
-        $txn->setRefTransId((string)$data['txID']);
+        $txn->setRefTransId($txID);
         return $this->runTransaction($txn);
     }
 

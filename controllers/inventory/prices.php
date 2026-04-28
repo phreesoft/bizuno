@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-23
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -641,28 +641,4 @@ function preSubmitPrices() {
                 'margin'  => ['order'=>80,'label'=>lang('margin'),'attr'=>['width'=>60,'align'=>'right', 'size'=>10]]]];
     }
 
-    /**
-     * @TODO - DEPRECATED - Decodes the price sheet settings for quantity based pricing and returns array of values for datagrid display
-     * @param string $prices - encoded price value
-     * @return array - ready to display in datagrid
-     */
-    protected function getPrices($prices='')
-    {
-        msgDebug("\nWorking with price string: $prices");
-        $price_levels = explode(';', $prices);
-        $arrData = [];
-        for ($i=0; $i<sizeof($price_levels); $i++) {
-            $level_info = explode(':', $price_levels[$i]);
-            $arrData[] = [
-                'price'   => isset($level_info[0]) ? $level_info[0] : 0,
-                'qty'     => isset($level_info[1]) ? $level_info[1] : ($i+1),
-                'source'  => isset($level_info[2]) ? $level_info[2] : '1',
-                'adjType' => isset($level_info[3]) ? $level_info[3] : '',
-                'adjValue'=> isset($level_info[4]) ? $level_info[4] : 0,
-                'rndType' => isset($level_info[5]) ? $level_info[5] : '',
-                'rndValue'=> isset($level_info[6]) ? $level_info[6] : 0];
-        }
-        msgDebug("\nReturning from getPrices with value: ".print_r($arrData, true));
-        return ['total'=>sizeof($arrData), 'rows'=>$arrData];
-    }
 }

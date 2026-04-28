@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /model/registry.php
  */
 
@@ -343,10 +343,6 @@ unset($bizunoMod[$module]['dashboards']);
         foreach ($menu as $key => $props) {
             if (isset($props['child'])) {
                 $menu[$key]['security'] = $this->removeOrphanMenus($menu[$key]['child'], $userSecurity);
-// @TODO - Remove after Feb, 2026 - This case no longer happens.
-//            } elseif (!empty($menu[$key]['required'])) {
-//                $menu[$key]['security'] = 4;
-//                setUserCache('security', $key, $menu[$key]['security']); // this is wrong anyway!!!
             } else {
                 $menu[$key]['security'] = array_key_exists($key, $userSecurity) ? $userSecurity[$key] : 0;
             }
