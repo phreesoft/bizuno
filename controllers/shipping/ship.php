@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-13
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -505,7 +505,7 @@ function preSubmit() {
                         break;
                     case 'lpt': // accumulate the labels so only one button prints all thermal labels
                         $enTherm= true;
-                        $dataTherm[] = ['type'=>'raw','format'=>'base64','data'=>base64_encode(file_get_contents(BIZUNO_DATA.$file))];
+                        $dataTherm[] = file_get_contents(BIZUNO_DATA.$file); // raw ZPL/EPL string
                         break;
                 }
             }
@@ -514,27 +514,33 @@ function preSubmit() {
             $jsHead.= "var thermData = ".json_encode($dataTherm).";\n";
             $html  .= html5('', ['break'=>true,'events'=>['onClick'=>"labelThermal(thermData);"],'attr'=>['type'=>'button', 'value'=>'Print Thermal']]);
         }
-        $jsReady .= "if (typeof(qz)!=='undefined') {
-    if (typeof qzCertificate !== 'undefined') {
-        qz.security.setCertificatePromise(function(resolve, reject) { resolve(qzCertificate); });
-    } else {
-        qz.security.setCertificatePromise(function(resolve, reject) {
-            fetch('{$this->thermalTransport}digital-certificate.txt', {cache: 'no-store', headers: {'Content-Type': 'text/plain'}})
-                .then(function(data) { data.ok ? resolve(data.text()) : reject(data.text()); });
-        });
-    }
-} else {
-    alert('QZ-tray was not loaded from the Bizuno server, labels will not print! try reloading the page.');
-}";
+        // Zebra Browser Print: free local service that exposes localhost
+        // endpoints; no signing/certificates required (replaced QZ Tray, 2026-04-28).
+        // End user must install Browser Print from
+        // https://www.zebra.com/us/en/support-downloads/printer-software/printer-setup-utilities/browser-print.html
+        // and have a Zebra printer attached.
         $jsHead .= "
 function labelThermal(thermData) {
-    qz.websocket.connect().then(function() {
-        return qz.printers.find('zebra');
-    }).then(function(printer) {
-        var config = qz.configs.create(printer);
-        qz.print(config, thermData);
-    }).catch(function(e) { alert('Houston, we have a problem: '+e); });
-    setTimeout(function() { window.close(); }, 10000);
+    if (typeof BrowserPrint === 'undefined') {
+        alert('Zebra Browser Print is not loaded. Reload the page and try again.');
+        return;
+    }
+    BrowserPrint.getDefaultDevice('printer', function(device) {
+        if (!device || !device.name) {
+            alert('No Zebra printer found. Install Zebra Browser Print and connect a printer:\\nhttps://www.zebra.com/us/en/support-downloads/printer-software/printer-setup-utilities/browser-print.html');
+            return;
+        }
+        var i = 0;
+        function sendNext() {
+            if (i >= thermData.length) { setTimeout(function(){ window.close(); }, 2000); return; }
+            device.send(thermData[i], function() { i++; sendNext(); }, function(err) {
+                alert('Print failed: ' + err);
+            });
+        }
+        sendNext();
+    }, function(err) {
+        alert('Could not reach Zebra Browser Print on this machine. Is it running?\\n\\n' + err);
+    });
 }
 function labelPDF(rID, path) {
     jqBiz.fileDownload(bizunoAjax+'&bizRt=$this->moduleID/ship/labelDownload&rID='+rID+'&data='+path, {
@@ -550,12 +556,7 @@ function labelPDF(rID, path) {
             'toolbars'=> ['tbLabel'=>['icons'=>['close'=>['order'=>10,'events'=>['onClick'=>"window.close();"]]]]],
             'jsReady' => ['init'=>$jsReady]];
         if (!empty($enTherm)) {
-            $data['head']['qzTray']    = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'qz-tray/qz-tray.js"></script>'];
-//          $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script src="https://cdn.rawgit.com/kjur/jsrsasign/c057d3447b194fa0a3fdcea110579454898e093d/jsrsasign-all-min.js"></script>'];
-            $data['head']['qzJsrasign']= ['order'=>91,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'qz-tray/jsrsasign.js"></script>'];
-            $data['head']['qzSign']    = ['order'=>92,'type'=>'html','html'=>'<script type="text/javascript" src="'.$this->thermalTransport.'sign-message.js"></script>'];
-        } elseif (!file_exists(BIZUNO_URL_SCRIPTS.'assets/qz-tray/qz-tray.js')) {
-            msgAdd("Thermal labels are not available to print, proper transport is not installed!");
+            $data['head']['zebraBrowserPrint'] = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'zebra-browser-print/BrowserPrint-3.1.250.min.js"></script>'];
         }
         $data['jsHead']['init'] = $jsHead; // needs to be last
         $layout = array_replace_recursive($layout, $data);

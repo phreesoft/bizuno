@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/shipping/common.php
  */
 
@@ -45,7 +45,6 @@ class shippingCommon
     public $defaults; 
     public $options;
     public $settings;
-    public $thermalTransport;
     public $shipment;
     public $addrStruc;
     public $carriers;
@@ -61,7 +60,6 @@ class shippingCommon
             'resi_checked'  => 1, 'contact_req'  =>0, 'address1_req'=>1, 'address2_req'=>0, 'city_req'=>1, 'state_req'=>1, 'postal_code_req'=>1]];
         $this->options  = $this->getOptions();
         $this->settings = array_replace_recursive($this->defaults, getModuleCache($this->moduleID, 'settings'));
-        $this->thermalTransport = defined('BIZUNO_3P_QZ_TRAY') ? BIZUNO_3P_QZ_TRAY : BIZUNO_URL_SCRIPTS.'qz-tray/';
         $this->shipment = ['Qty'=>1, 'Wt'=>0, 'L'=>8, 'W'=>6, 'H'=>4, 'Ins'=>0];
         $this->addrStruc= dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
         unset($this->addrStruc['address_id'],$this->addrStruc['type']);

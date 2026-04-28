@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /view/easyUI/common.js
  */
 
@@ -2467,7 +2467,7 @@ function contactsDetail(rID, suffix, fill) {
             if (suffix=='_b') {
                 jqBiz('#terms').val(json.contact.terms);
                 bizTextSet('terms_text', json.contact.terms_text);
-                if (bizDefaults.phreebooks.journalID == 6) { bizDateSet('terminal_date', formatDate(json.contact.terminal_date)); }
+                bizDateSet('terminal_date', formatDate(json.contact.terminal_date)); // changed from only 6 to all sales/purchases
                 jqBiz('#spanContactProps'+suffix).show();
                 if (json.contact.rep_id != 0) { bizSelSet('rep_id', json.contact.rep_id); }
                 def_contact_gl_acct = json.contact.gl_account;

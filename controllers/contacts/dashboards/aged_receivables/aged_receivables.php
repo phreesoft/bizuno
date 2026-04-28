@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-11
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/contacts/dashboards/aged_receivables/aged_receivables.php
  */
 
@@ -83,7 +83,7 @@ class aged_receivables
         foreach ($rows as $row) {
             $agingAll= calculate_aging($row['contact_id_b']);
             $aging   = $agingAll[$this->type];
-            $output['balance_0']  += $aging['cust']['balance_0'];
+            $output['balance_0']  += $aging['balance_0'];
             $output['balance_30'] += $aging['balance_30'];
             $output['balance_60'] += $aging['balance_60'];
             $output['balance_90'] += $aging['balance_90'];
