@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-25
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /view/kendoUI/html5.php
  */
 
@@ -163,7 +163,6 @@ final class html5 {
             case 'hr':
             case 'img':         return $this->htmlElEmpty($id, $prop);
             case 'div':
-            case 'form':
             case 'section':
             case 'header':
             case 'li':
@@ -175,6 +174,7 @@ final class html5 {
             case 'tbody':
             case 'tfoot':
             case 'ul':          return $this->htmlElOpen($id, $prop);
+            case 'form':        return $this->htmlElOpen($id, $prop) . $this->csrfHidden();
             case 'badge':       return $this->inputBadge($id, $prop);
             case 'button':      return $this->inputButton($id, $prop);
 //          case 'iframe':      return $this->layoutIframe($output, $id, $prop);
@@ -350,8 +350,8 @@ final class html5 {
         $field .= '<' . $prop['attr']['type'];
         foreach ($prop['attr'] as $key => $value) {
             if ($key <> 'type') {
-                $field .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"';
-            } // was str_replace('"', '&quot;', $value)
+                $field .= ' ' . $key . '="' . $this->escAttr($value) . '"';
+            }
         }
         $field .= ">";
     }
@@ -1334,11 +1334,11 @@ columns:  [[
         $output .= '<ul id="' . $prop['id'] . '"></ul>' . "\n";
         if (isset($prop['menu'])) {
             $output .= "<div";
-            foreach ($prop['menu']['attr'] as $key => $value) { $output .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"'; }
+            foreach ($prop['menu']['attr'] as $key => $value) { $output .= ' ' . $key . '="' . $this->escAttr($value) . '"'; }
             $output .= ">\n";
             foreach ($prop['menu']['actions'] as $key => $value) {
                 $output .= '  <div id="' . $key . '"';
-                foreach ($value['attr'] as $key => $val) { $output .= ' ' . $key . '="' . str_replace('"', '\"', $val) . '"'; }
+                foreach ($value['attr'] as $key => $val) { $output .= ' ' . $key . '="' . $this->escAttr($val) . '"'; }
                 $output .= ">" . (isset($value['label']) ? $value['label'] : '') . "</div>\n";
             }
             $output .= "</div>\n";
@@ -1366,7 +1366,7 @@ columns:  [[
         if (isset($prop['attr']['value'])) {
             $value = isset($prop['format']) ? viewFormat($prop['attr']['value'], $prop['format']) : $prop['attr']['value'];
             if (is_array($value)) { $value = ''; } // This is not place for an array
-            $field .= ' value="' . str_replace('"', '&quot;', $value) . '"';
+            $field .= ' value="' . $this->escAttr($value) . '"';
             unset($prop['attr']['value']);
         }
         if (!empty($prop['js']))     { $this->jsBody[] = $prop['js']; } // old way
@@ -1719,7 +1719,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         foreach ($prop['attr'] as $key => $value) {
             if (in_array($key, ['type', 'maxlength'])) { continue; }
             if ($key == 'value') { $content = $value; continue; }
-            $field .= ' ' . $key . '="' . str_replace('"', '&quot;', $value) . '"';
+            $field .= ' ' . $key . '="' . $this->escAttr($value) . '"';
         }
         $field .= ">" . htmlspecialchars($content) . "</textarea>\n";
         $field .= $this->addLabelLast($id, $prop);
@@ -1831,12 +1831,37 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         }
         if (!empty($prop['attr'])) { foreach ($prop['attr'] as $key => $value) {
             if (empty($value)) { $value=''; } // fixes null being passed
-            $field .= ' '.$key.'="'.str_replace('"', '\"', $value).'"'; // was str_replace('"', '&quot;', $value)
+            $field .= ' '.$key.'="'.$this->escAttr($value).'"';
         } }
         if (!empty($prop['classes'])) { $field .= $this->addClasses($prop['classes']); }
         if (!empty($prop['styles']))  { $field .= $this->addStyles($prop['styles']); }
         if (!empty($prop['events']))  { $field .= $this->addEvents($prop['events']); }
         return $field;
+    }
+
+    /**
+     * CSRF Layer 2 — emits a hidden `_csrf` input. Called from the `<form>` render path so any
+     * non-ajax form POST automatically carries the synchronizer token. The server reads
+     * `$_POST['_csrf']` as one of the three accepted transports (header, POST, GET).
+     */
+    private function csrfHidden()
+    {
+        if (!function_exists("\\bizuno\\bizCsrfGet")) { return ''; }
+        return '<input type="hidden" name="_csrf" value="'.htmlspecialchars(bizCsrfGet(), ENT_QUOTES, 'UTF-8').'" />';
+    }
+
+    /**
+     * Single choke point for HTML attribute-value escaping.
+     * Replaces the prior `str_replace('"', '\"', $value)` pattern (which left `<`, `>`, `&`,
+     * and `'` unescaped — letting any `value` of `"><script>...` break out of the attribute).
+     *
+     * Safe for `data-options`, `onclick`, and other JS-bearing attributes: browsers decode
+     * HTML entity references in attribute values before the consuming parser sees the
+     * content, so `data-options="prompt:&quot;hi&quot;"` round-trips as expected.
+     */
+    private function escAttr($value)
+    {
+        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -1857,7 +1882,7 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
     private function addEvents($arrEvents = []) {
         if (!is_array($arrEvents)) { $arrEvents = [$arrEvents]; }
         $output = '';
-        foreach ($arrEvents as $key => $value) { $output .= ' ' . $key . '="' . str_replace('"', '\"', $value) . '"'; }
+        foreach ($arrEvents as $key => $value) { $output .= ' ' . $key . '="' . $this->escAttr($value) . '"'; }
         return $output;
     }
 

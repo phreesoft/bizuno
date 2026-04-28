@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -76,7 +76,6 @@ class bizunoSettings
 //          $bizunoMod[$module]['properties']['description']= $adm->lang['description'];
             $bizunoMod[$module]['properties']['status']     = 1;
             $bizunoMod[$module]['properties']['path']       = $relPath;
-            $this->adminInstDirs($adm);
             $this->adminAddRpts($path);
             if (method_exists($adm, 'install')) { $adm->install(); }
             if (isset($adm->notes)) { $this->notes = array_merge($this->notes, $adm->notes); }
@@ -308,21 +307,6 @@ class bizunoSettings
             if ($fn!='.' && $fn!='..' && is_dir($path.$fn)) {  $output[] = $fn; }
         }
         return $output;
-    }
-
-    /**
-     * Installs the file structure for a module, if any
-     * @param array $dirlist - list for folders to create
-     * @param string $path - folder path to start
-     * @return boolean, false on error, true on success
-     */
-    function adminInstDirs($adm)
-    {
-/* @TODO - DEPRECATED - Folders are now created on the fly as needed. 
-        global $io;
-        if (!isset($adm->dirlist)) { return; }
-        if (is_array($adm->dirlist)) { foreach ($adm->dirlist as $dir) { $io->validatePath($dir); } }
- */
     }
 
     /**

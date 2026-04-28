@@ -20,12 +20,20 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-01
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /view/themes/kendoUI/portal.js
  */
 
 var jqBiz = $.noConflict();
 var bizID = 0;
+
+// CSRF Layer 2 — match the easyUI ajaxSetup hook so any ajax call from a Kendo-UI module
+// also carries the X-Bizuno-Csrf header. The bizCSRF JS const is emitted by setHeadKendoUI.
+jqBiz.ajaxSetup({
+    beforeSend: function(xhr) {
+        if (typeof bizCSRF !== 'undefined' && bizCSRF) { xhr.setRequestHeader('X-Bizuno-Csrf', bizCSRF); }
+    }
+});
 
 const isDarkMode    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : '';
 const screenWidth   = screen.width; // screen dims

@@ -21,12 +21,26 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
  * © 2022 PayFabric from EVO Payments
  * @link https://github.com/PayFabric - Main Documentation Site
+ *
+ * Public entry points (generic gateway interface shared with other gateways):
+ *   payment($action, $data=[])  - card-transaction dispatch
+ *   wallet ($action, $data=[])  - stored customer/payment-profile dispatch
+ *   report ($action, $data=[])  - reporting dispatch (not implemented)
+ *
+ * Normalized return shape:
+ *   ['ok'=>bool, 'txID'=>'', 'code'=>'', 'msg'=>'', 'data'=>[], 'raw'=>$apiResponse|null]
+ *
+ * Note: the existing public methods (`walletList`, `walletDelete`, `walletAddURL`,
+ * `walletEditURL`, `walletReload`, `walletRename`, `walletValidate`) are still called
+ * directly by `controllers/payment/wallet.php`. They remain the gateway's wallet API
+ * surface; the new `wallet()` dispatcher delegates to them. Once the caller layer
+ * is updated to use `wallet($action, $data)`, those methods can be made private.
  *
  * instructions on where/how to get account and fill out settings
  * setting for types of cards/payment to accept
@@ -51,7 +65,6 @@ class payfabric
     public  $moduleID = 'payment';
     public  $methodDir= 'gateways';
     public  $code     = 'payfabric';
-    private $mode     = 'prod'; // choices are 'test' (Test) or 'prod' (Production)
     public  $defaults;
     public  $settings;
     public  $mains;
@@ -62,6 +75,7 @@ class payfabric
         'setup_id'    => 'Setup ID (provided by PhreeSoft)',
         'device_id'   => 'Device ID (provided by PhreeSoft)',
         'device_pw'   => 'Device Password (provided by PhreeSoft)',
+        'mode'        => 'Gateway Mode',
         'auth_type'   => 'Authorization Type',
         'prefix_amex' => 'Prefix to use for American Express credit cards. (These cards are processed and reconciled through American Express)',
         'allow_refund'=> 'Allow Void/Refunds? This must be enabled by PayFabric for your merchant account or refunds will not be allowed.',
@@ -81,13 +95,14 @@ class payfabric
     {
         $pmtDef        = getModuleCache($this->moduleID, 'settings', 'general', false, []);
         $this->defaults= ['cash_gl_acct'=>$pmtDef['gl_payment_c'],'disc_gl_acct'=>$pmtDef['gl_discount_c'],'order'=>10,
-            'setup_id'=>'','device_id'=>'','device_pw'=>'','prefix'=>'CC','allowRefund'=>'0']; // ,'prefixAX'=>'AX'
+            'setup_id'=>'','device_id'=>'','device_pw'=>'','mode'=>'test','prefix'=>'CC','allowRefund'=>'0']; // ,'prefixAX'=>'AX'
         $userMeta      = getMetaMethod($this->methodDir, $this->code);
         $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
     }
 
     public function settingsStructure()
     {
+        $modes = [['id'=>'test','text'=>'Test (Sandbox)'], ['id'=>'prod','text'=>'Production']];
         return [
             'cash_gl_acct'=> ['label'=>lang('gl_payment_c_lbl', $this->moduleID), 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
             'disc_gl_acct'=> ['label'=>lang('gl_discount_c_lbl', $this->moduleID),'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_disc_gl_acct",'value'=>$this->settings['disc_gl_acct']]],
@@ -95,6 +110,7 @@ class payfabric
             'setup_id'    => ['label'=>$this->lang['setup_id'],   'position'=>'after','attr'=>['size'=>'32','value'=>$this->settings['setup_id']]],
             'device_id'   => ['label'=>$this->lang['device_id'],  'position'=>'after','attr'=>['size'=>'48','value'=>$this->settings['device_id']]],
             'device_pw'   => ['label'=>$this->lang['device_pw'],  'position'=>'after','attr'=>['size'=>'24','value'=>$this->settings['device_pw']]],
+            'mode'        => ['label'=>$this->lang['mode'],       'values'=>$modes,   'attr'=>['type'=>'select','value'=>$this->settings['mode']]],
             'prefix'      => ['label'=>lang('prefix_lbl', $this->moduleID), 'position'=>'after','attr'=>['size'=> '5','value'=>$this->settings['prefix']]],
             'allowRefund' => ['label'=>$this->lang['allow_refund'],                   'attr'=>['type'=>'selNoYes','value'=>$this->settings['allowRefund']]]];
     }
@@ -163,7 +179,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_payfabric'],'attr'=>['typ
 
     public function eventJS($cID)
     {
-        $subDom = ($this->mode=='test' ? 'sandbox' : 'www');
+        $subDom = (($this->settings['mode'] ?? 'test')=='test' ? 'sandbox' : 'www');
         return "
 function payment_$this->code() {
     bizTextSet('invoice_num', arrPmtMethod['$this->code'].ref);
@@ -195,6 +211,185 @@ function {$this->code}WalletEvent(event) {
     }
 }
 window.addEventListener('message', {$this->code}WalletEvent, false);";
+    }
+
+    // ========================================================================
+    // Generic dispatchers — these three public methods are the gateway API
+    // shared with authorize.net + converge. The existing wallet methods
+    // (walletList/walletDelete/walletAddURL/etc) are still called directly by
+    // controllers/payment/wallet.php and stay public; the wallet() dispatcher
+    // here delegates to them.
+    // ========================================================================
+
+    /**
+     * Card-transaction dispatch.
+     * @param string $action - one of: capture, capAuth, refund, void, wltCap
+     *                         (`authorize` is not implemented for payfabric)
+     * @param array  $data   - context (see each private method for required keys)
+     * @return array normalized ['ok','txID','code','msg','data','raw']
+     */
+    public function payment($action, $data=[])
+    {
+        msgDebug("\nEntering payfabric::payment ($action)");
+        switch ($action) {
+            case 'capture':   return $this->pmtCapture($data);  // Sale via stored card (saleNew)
+            case 'wltCap':    return $this->pmtCapture($data);  // alias — payfabric only does stored-card sales
+            case 'capAuth':   return $this->pmtCapAuth($data);  // capture a prior authorize
+            case 'refund':    return $this->pmtRefund($data);
+            case 'void':      return $this->pmtVoid($data);
+        }
+        return $this->notImplemented("payment/$action");
+    }
+
+    /**
+     * Wallet/customer-profile dispatch. Delegates to the existing wallet methods
+     * and normalizes their heterogeneous return shapes.
+     */
+    public function wallet($action, $data=[])
+    {
+        msgDebug("\nEntering payfabric::wallet ($action)");
+        switch ($action) {
+            case 'wltGet':
+            case 'wltList':
+                if (empty($data['custID'])) { return $this->failure('custID required'); }
+                $cards = $this->walletList((string)$data['custID']);
+                return $this->success((string)$data['custID'], 'Ok', 'Wallet retrieved', ['cards'=>is_array($cards) ? $cards : []], $cards);
+            case 'wltNew':
+                if (empty($data['custID'])) { return $this->failure('custID required'); }
+                $url = $this->walletAddURL((string)$data['custID'], !empty($data['address']) ? $data['address'] : []);
+                if (!$url) { return $this->failure('Could not build PayFabric add-card URL'); }
+                return $this->success('', 'Ok', 'Add-card URL', ['url'=>$url], null);
+            case 'wltEdit':
+                if (empty($data['payID'])) { return $this->failure('payID required'); }
+                $url = $this->walletEditURL((string)$data['payID']);
+                if (!$url) { return $this->failure('Could not build PayFabric edit-card URL'); }
+                return $this->success((string)$data['payID'], 'Ok', 'Edit-card URL', ['url'=>$url], null);
+            case 'wltDelete':
+                if (empty($data['payID'])) { return $this->failure('payID required'); }
+                $ok = $this->walletDelete((string)$data['payID'], !empty($data['custID']) ? (string)$data['custID'] : null);
+                return $ok ? $this->success((string)$data['payID'], 'Ok', 'Card deleted') : $this->failure('Card delete failed');
+            case 'custUpdate':
+                if (empty($data['custID']))            { return $this->failure('custID required'); }
+                if (empty($data['merchantCustomerID'])){ return $this->failure('merchantCustomerID required for rename'); }
+                $ok = $this->walletRename((string)$data['custID'], ['NewCustomerNumber'=>(string)$data['merchantCustomerID']]);
+                return $ok ? $this->success((string)$data['custID'], 'Ok', 'Customer renamed') : $this->failure('Customer rename failed');
+        }
+        return $this->notImplemented("wallet/$action");
+    }
+
+    /** Reporting actions — payfabric reporting is not yet implemented in this gateway. */
+    public function report($action, $data=[])
+    {
+        msgDebug("\nEntering payfabric::report ($action)");
+        return $this->notImplemented("report/$action");
+    }
+
+    // ========================================================================
+    // payment() action implementations (delegate to existing internal logic)
+    // ========================================================================
+
+    private function pmtCapture($data)
+    {
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        if (!$ledger) { return $this->failure('Ledger not provided to payfabric capture'); }
+        $r = $this->saleNew($ledger);
+        return $this->normalizeSaleReturn($r, 'Capture');
+    }
+
+    private function pmtCapAuth($data)
+    {
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        if (!$ledger) { return $this->failure('Ledger not provided to payfabric capAuth'); }
+        $r = $this->saleAuth($ledger);
+        return $this->normalizeSaleReturn($r, 'CaptureAuth');
+    }
+
+    /**
+     * Refund a settled transaction. Returns ok=true with code='skipped' when
+     * refunds are disabled or the prior txID/amount isn't recoverable.
+     */
+    private function pmtRefund($data)
+    {
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Refunds disabled — non-fatal skip');
+        }
+        if (empty($data['txID']) || empty($data['amount'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Missing txID/amount — non-fatal skip');
+        }
+        $r = $this->refund($data['txID'], $data['amount']);
+        return $this->normalizeSaleReturn($r, 'Refund');
+    }
+
+    /**
+     * Void an unsettled transaction. Accepts either txID or rID; when only rID is
+     * given, looks up the trans_code from journal_item — supports the same-day
+     * delete path in phreebooks/main.php.
+     */
+    private function pmtVoid($data)
+    {
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Voids disabled — non-fatal skip');
+        }
+        $txID = !empty($data['txID']) ? (string)$data['txID'] : '';
+        if ($txID === '' && !empty($data['rID'])) {
+            $txID = (string)dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id={$data['rID']} AND gl_type='ttl'");
+        }
+        if ($txID === '') {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'No txID for void — non-fatal skip');
+        }
+        $voidUrl = "payment/api/reference/$txID?trxtype=Void";
+        $void = $this->queryAPI($voidUrl);
+        if (empty($void)) { return $this->failure('Void failed at PayFabric'); }
+        msgLog(sprintf($this->lang['msg_void_success'], $void['Message'], $void['AuthCode']));
+        msgAdd(sprintf($this->lang['msg_void_success'], $void['Message'], $void['AuthCode']), 'success');
+        return $this->success($txID, $void['AuthCode'] ?? '', $void['Message'] ?? '', ['txTime'=>$void['TrxDate'] ?? ''], $void);
+    }
+
+    // ========================================================================
+    // Helpers — normalize-return + env + status helpers
+    // ========================================================================
+
+    private function env() { return ($this->settings['mode'] ?? 'test') === 'prod' ? 'prod' : 'test'; }
+
+    /**
+     * The internal sale/void/refund methods all return either:
+     *   - ['txID','txTime','code'] on success
+     *   - false / void on transport failure
+     *   - true on "nothing to send" / success-without-txID
+     * Map all three into the normalized dispatcher shape.
+     */
+    private function normalizeSaleReturn($r, $label='Transaction')
+    {
+        if ($r === true)  { return $this->success('', 'Ok', "$label acknowledged"); }
+        if (empty($r) || !is_array($r)) { return ['ok'=>false, 'txID'=>'', 'code'=>'', 'msg'=>"$label failed", 'data'=>[], 'raw'=>$r]; }
+        return $this->success(
+            (string)($r['txID']  ?? ''),
+            (string)($r['code']  ?? ''),
+            "$label success",
+            ['txTime'=>$r['txTime'] ?? ''],
+            $r
+        );
+    }
+
+    private function success($txID='', $code='', $msg='', $data=[], $raw=null)
+    {
+        return ['ok'=>true, 'txID'=>$txID, 'code'=>$code, 'msg'=>$msg, 'data'=>$data, 'raw'=>$raw];
+    }
+
+    private function failure($msg='')
+    {
+        if ($msg) { msgAdd($msg); msgDebug("\nPayFabric failure: $msg"); }
+        return ['ok'=>false, 'txID'=>'', 'code'=>'', 'msg'=>$msg, 'data'=>[], 'raw'=>null];
+    }
+
+    private function notImplemented($action)
+    {
+        msgAdd("PayFabric action '$action' is not implemented.");
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: $action", 'data'=>[], 'raw'=>null];
     }
 
 /* methods to write
@@ -560,7 +755,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
         if (!empty($address['country']))    { $params[] = "Country=".urlencode($address['country']); }
         if (!empty($address['email']))      { $params[] = "Email="  .urlencode($address['email']); }
         if (!empty($address['telephone1'])) { $params[] = "Phone="  .urlencode($address['telephone1']); }
-        $base = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
+        $base = (($this->settings['mode'] ?? 'test')=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
         return $base."Web/Wallet/Create?".implode("&", $params);
     }
 
@@ -568,7 +763,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
     public function walletEditURL($cardID)
     {
         $token = $this->getToken();
-        $base  = ($this->mode=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
+        $base  = (($this->settings['mode'] ?? 'test')=='test' ? PAYMENT_PAYFABRIC_WALLET_TEST : PAYMENT_PAYFABRIC_WALLET);
         return $base."Web/Wallet/Edit?card=$cardID&token=$token";
     }
 
@@ -640,7 +835,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
     // ***************************************************************************************************************
     private function queryAPI($url, $opts=[])
     {
-        $destURL = ($this->mode=='test' ? PAYMENT_PAYFABRIC_URL_TEST : PAYMENT_PAYFABRIC_URL).$url;
+        $destURL = (($this->settings['mode'] ?? 'test')=='test' ? PAYMENT_PAYFABRIC_URL_TEST : PAYMENT_PAYFABRIC_URL).$url;
         $header  = ["Content-Type: application/json", "authorization: ".$this->settings['device_id']."|".$this->settings['device_pw']];
         $options = array_replace([CURLOPT_RETURNTRANSFER=>true, CURLOPT_HTTPHEADER=>$header], $opts);
         msgDebug("\nEntering PayFabric queryAPI with url: $destURL with options: ".print_r($options, true));
@@ -661,7 +856,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
 
     public function getToken()
     {
-        $httpUrl    = $this->mode=='test' ? PAYMENT_PAYFABRIC_TOKEN_TEST : PAYMENT_PAYFABRIC_TOKEN;
+        $httpUrl    = ($this->settings['mode'] ?? 'test')=='test' ? PAYMENT_PAYFABRIC_TOKEN_TEST : PAYMENT_PAYFABRIC_TOKEN;
         $header = ["Content-Type: application/json", "authorization: ".$this->settings['device_id']."|".$this->settings['device_pw']];
         $curlOptions= [CURLOPT_RETURNTRANSFER=>true, CURLOPT_HTTPHEADER=>$header];
         msgDebug("\nPayFabric url: $httpUrl with header: ".print_r($header, true));

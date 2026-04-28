@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1006,7 +1006,16 @@ function bizUnitDiscDisc(newValue) {
             bizAutoLoad("{$gateway['path']}$method.php", $fqcn);
             $processor = new $fqcn();
             if ($delOrd->main['post_date'] == biz_date()) {
-                if (method_exists($processor, 'void')) { if (!$processor->void($delOrd->main['id'])) { return; } }
+                // Use the new generic dispatcher when present; fall back to the legacy void() shim
+                // until every install has migrated. The dispatcher's pmtVoid does the journal_item
+                // trans_code lookup itself and returns ok=true with code='skipped' on graceful
+                // non-fatal cases (refunds disabled, no txID), matching legacy semantics.
+                if (method_exists($processor, 'payment')) {
+                    $r = $processor->payment('void', ['rID'=>$delOrd->main['id']]);
+                    if (empty($r['ok'])) { return; }
+                } elseif (method_exists($processor, 'void')) {
+                    if (!$processor->void($delOrd->main['id'])) { return; }
+                }
             }
         }
         if (isset($delOrd->recur_id) && $delOrd->recur_id > 0 && $delRecur) { // will contain recur_id

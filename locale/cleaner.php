@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /locale/cleaner.php
  */
 
@@ -380,15 +380,6 @@ function getMethLang($module, $method, $code)
     }
     return $output;
 }
-/**
- * @TODO - DEPRECATED - To be removed when code is fixed.
- * @return boolean false - But sets the session lang array with the admin language file
- */
-function getExtMethLang($modID, $folder, $code)
-{
-    return getMethLang($modID, $folder, $code);
-}
-
 /**
  * Returns the parsed array from the locale file to be used with settings drop downs and defaults
  * @return object - Locale information

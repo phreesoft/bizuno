@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /bizunoCFG.php
  */
 
@@ -38,6 +38,13 @@ define('BIZUNO_ICON',    'https://www.bizuno.com/bizuno_icon.png'); // URL to de
 define('PHREESOFT_LOGO', 'https://www.phreesoft.com/phreesoft.png'); // URL to default logo
 define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft RESTful API
 define('PHREESOFT_IP',   '71.78.123.232');
+
+// CSRF Layer 2 — synchronizer-token enforcement default.
+// `portalCFG.php` runs before this file (see index.php → portalCFG → bizunoCFG), so
+// any operator who needs to opt out for a specific install can `define('BIZUNO_CSRF_ENFORCE', false);`
+// in their portalCFG.php and PHP's first-wins behavior keeps that override in effect.
+// The shipped default is enforce-on; warn-only mode is reserved for explicit opt-out.
+if (!defined('BIZUNO_CSRF_ENFORCE')) { define('BIZUNO_CSRF_ENFORCE', true); }
 
 // set some sitewide constants
 //define('COG_ITEM_TYPES', 'ma,mi,ms,sa,si,sr'); // DEPRECATED

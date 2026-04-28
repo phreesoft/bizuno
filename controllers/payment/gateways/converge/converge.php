@@ -21,21 +21,21 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /controllers/payment/gateways/converge.php
  *
  * Source Information:
  * @copyright 2013 Converge, Incorporated, Two Concourse Parkway, Suite 800, Atlanta, GA 30328
  * @link https://www.myvirtualmerchant.com - Main Website
- * @link https://www.myvirtualmerchant.com/VirtualMerchant/download/developerGuide.pdf - Developer Guide (Document #VRM-0002-C - Copy in Documentation/Converge folder)
+ * @link https://www.myvirtualmerchant.com/VirtualMerchant/download/developerGuide.pdf - Developer Guide
  *
- * instructions on where/how to get account and fill out settings
- * setting for types of cards/payment to accept
- * setting to void or delete for same day journal deletions, returns for posted payments
- * setting to require AVS or no charge, notify/process anyway
- * settings for authorize only, sale, delete, void, return/credit, AVS (address verification)
- * accept credit cards, debit cards, EBT (Food Stamps), OPTIONAL, Gift Cards, electronic checks, PINless debit
- * OPTIONAL tip processing, EBT balance inquiry, Gift Card Balance inquiry, recurring payments, installments, attach signature
+ * Public entry points (generic gateway interface shared with other gateways):
+ *   payment($action, $data=[])  - card-transaction dispatch
+ *   wallet ($action, $data=[])  - stored customer/payment-profile dispatch (not implemented for converge)
+ *   report ($action, $data=[])  - reporting dispatch (not implemented for converge)
+ *
+ * Normalized return shape:
+ *   ['ok'=>bool, 'txID'=>'', 'code'=>'', 'msg'=>'', 'data'=>[], 'raw'=>$xmlResponse|null]
  */
 
 namespace bizuno;
@@ -48,7 +48,6 @@ class converge
     public  $moduleID = 'payment';
     public  $methodDir= 'gateways';
     public  $code     = 'converge';
-    private $mode     = 'prod'; // choices are 'test' (Test) or 'prod' (Production)
     public  $defaults;
     public  $settings;
     public  $lang     = ['title' => 'Converge',
@@ -57,6 +56,7 @@ class converge
         'merchant_id' => 'Merchant ID (provided by Converge)',
         'user_id'     => 'User ID (provided by Converge)',
         'pin'         => 'PIN (provided by Converge)',
+        'mode'        => 'Gateway Mode',
         'auth_type'   => 'Authorization Type',
         'prefix_amex' => 'Prefix to use for American Express credit cards. (These cards are processed and reconciled through American Express)',
         'allow_refund'=> 'Allow Void/Refunds? This must be enabled by Converge for your merchant account or refunds will not be allowed.',
@@ -70,7 +70,7 @@ class converge
     {
         $pmtDef        = getModuleCache($this->moduleID, 'settings', 'general', false, []);
         $this->defaults= ['cash_gl_acct'=>$pmtDef['gl_payment_c'],'disc_gl_acct'=>$pmtDef['gl_discount_c'],'order'=>10,'merchant_id'=>'','user_id'=>'',
-            'pin'=>'','auth_type'=>'Authorize/Capture','prefix'=>'CC','prefixAX'=>'AX','allowRefund'=>'0'];
+            'pin'=>'','mode'=>'test','auth_type'=>'Authorize/Capture','prefix'=>'CC','prefixAX'=>'AX','allowRefund'=>'0'];
         $userMeta      = getMetaMethod($this->methodDir, $this->code);
         $this->settings= array_replace($this->defaults, !empty($userMeta['settings']) ? $userMeta['settings'] : []);
     }
@@ -78,6 +78,7 @@ class converge
     public function settingsStructure()
     {
         $noYes = [['id'=>'0','text'=>lang('no')], ['id'=>'1','text'=>lang('yes')]];
+        $modes = [['id'=>'test','text'=>'Test (Demo)'], ['id'=>'prod','text'=>'Production']];
         $auths = [['id'=>'Authorize/Capture','text'=>lang('capture')], ['id'=>'Authorize','text'=>lang('authorize')]];
         return [
             'cash_gl_acct'=> ['label'=>lang('gl_payment_c_lbl', $this->moduleID), 'position'=>'after','attr'=>['type'=>'ledger','id'=>"{$this->code}_cash_gl_acct",'value'=>$this->settings['cash_gl_acct']]],
@@ -86,6 +87,7 @@ class converge
             'merchant_id' => ['label'=>$this->lang['merchant_id'],'position'=>'after','attr'=>['type'=>'text', 'size'=>'20','value'=>$this->settings['merchant_id']]],
             'user_id'     => ['label'=>$this->lang['user_id'],    'position'=>'after','attr'=>['type'=>'text', 'size'=>'20','value'=>$this->settings['user_id']]],
             'pin'         => ['label'=>$this->lang['pin'],        'position'=>'after','attr'=>['type'=>'text','value'=>$this->settings['pin']]],
+            'mode'        => ['label'=>$this->lang['mode'],       'values'=>$modes,   'attr'=>['type'=>'select','value'=>$this->settings['mode']]],
             'auth_type'   => ['label'=>$this->lang['auth_type'],  'values'=>$auths,   'attr'=>['type'=>'select','value'=>$this->settings['auth_type']]],
             'prefix'      => ['label'=>lang('prefix_lbl', $this->moduleID), 'position'=>'after','attr'=>['size'=>'5','value'=>$this->settings['prefix']]],
             'prefixAX'    => ['label'=>$this->lang['prefix_amex'],'position'=>'after','attr'=>['size'=>'5','value'=>$this->settings['prefixAX']]],
@@ -159,7 +161,7 @@ function convergeRefNum(type) {
         if ($this->code == $dispFirst) { htmlQueue("bizTextSet('invoice_num', '$invoice_num');", 'jsReady'); }
         $html  = html5($this->code.'_action', ['label'=>lang('capture'),'hidden'=>($show_c?false:true),'attr'=>['type'=>'radio','value'=>'c','checked'=>$checked=='c'?true:false],
     'events'=>  ['onChange'=>"jqBiz('#div{$this->code}s').hide(); jqBiz('#div{$this->code}n').hide(); jqBiz('#div{$this->code}c').show();"]]).
-html5($this->code.'_action', ['label'=>$this->lang['stored'], 'hidden'=>($show_s?false:true),'attr'=>['type'=>'radio','value'=>'s','checked'=>$checked=='s'?true:false],
+html5($this->code.'_action', ['label'=>$this->lang['stored'] ?? lang('stored'), 'hidden'=>($show_s?false:true),'attr'=>['type'=>'radio','value'=>'s','checked'=>$checked=='s'?true:false],
     'events'=>  ['onChange'=>"jqBiz('#div{$this->code}c').hide(); jqBiz('#div{$this->code}n').hide(); jqBiz('#div{$this->code}s').show();"]]).
 html5($this->code.'_action', ['label'=>lang('new'),    'hidden'=>($show_n?false:true),'attr'=>['type'=>'radio','value'=>'n','checked'=>$checked=='n'?true:false],
     'events'=>  ['onChange'=>"jqBiz('#div{$this->code}c').hide(); jqBiz('#div{$this->code}s').hide(); jqBiz('#div{$this->code}n').show();"]]).
@@ -183,202 +185,277 @@ html5($this->code.'_action', ['label'=>$this->lang['at_converge'],              
         return $html;
     }
 
-    public function paymentAuth($fields, $ledger)
-    {
-        $refs = $this->guessInv($ledger);
-        $submit_data = [
-            'ssl_transaction_type'  => 'CCAUTHONLY',
-            'ssl_merchant_id'       => $this->settings['merchant_id'],
-            'ssl_user_id'           => $this->settings['user_id'],
-            'ssl_pin'               => $this->settings['pin'],
-//?         'ssl_track_data'        => '', // The raw Track I or Track II data from the magnetic strip on the card
-//            'ssl_account_type'      => '', // Account Type (0 = checking, 1 = saving). Required for debit.
-//            'ssl_dukpt'             => '', // This is the value returned by the PIN pad device, which was used to encrypt the cardholder's Personal Identification Number (PIN) using the Derived Unique Key Per Transaction (DUKPT) method. This value cannot be stored. Required.
-//            'ssl_key_pointer'       => '', // Triple-DES DUKPT pointer that indicates to Converge which encryption key was used for US Debit transactions. Value must be set to T. Required.
-//            'ssl_pin_block'         => '', // The encrypted PIN block as returned from the PIN pad device. This value cannot be stored. Required.
-            'ssl_card_number'       => $fields['number'],
-            'ssl_exp_date'          => $fields['month'] . substr($fields['year'], -2), // requires 2 digit year
-            'ssl_amount'            => $ledger->main['total_amount'],
-            'ssl_cvv2cvc2'          => $fields['cvv'],
-            'ssl_invoice_number'    => $refs = ['inv'],
-//            'ssl_card_present'      => '', // recommended for POS
-//            'ssl_customer_code'     => '', // Customer code for purchasing card transactions
-            'ssl_salestax'          => isset($ledger->main['sales_tax']) ? $ledger->main['sales_tax'] : 0,
-            'ssl_cvv2cvc2_indicator'=> strlen($fields['cvv'])>0 ? '1' : '9', // if cvv2 exists, present else not present
-            'ssl_description'       => $ledger->main['description'],
-            'ssl_company'           => str_replace('&', '-', $fields['first_name'].' '.$fields['last_name']),
-//            'ssl_first_name'        => $request['bill_first_name'], // recommended for hand-keyed transactions, bizuno uses company
-//            'ssl_last_name'         => $request['bill_last_name'], // recommended for hand-keyed transactions, bizuno uses company
-            'ssl_avs_address'       => str_replace('&', '-', substr($ledger->main['address1_b'], 0, 20)), // maximum of 20 characters per spec
-            'ssl_address2'          => str_replace('&', '-', substr($ledger->main['address2_b'], 0, 20)),
-            'ssl_city'              => $ledger->main['city_b'],
-            'ssl_state'             => $ledger->main['state_b'],
-            'ssl_country'           => $ledger->main['country_b'],
-            'ssl_avs_zip'           => preg_replace("/[^A-Za-z0-9]/", "", $ledger->main['postal_code_b']),
-            'ssl_phone'             => substr(preg_replace("/[^0-9]/", "", $ledger->main['telephone1_b']), 0, 14),
-//            'ssl_email'             => isset($ledger->main['email_b']) ? $ledger->main['email_b'] : '', // getModuleCache('bizuno', 'settings', 'company', 'email'),
-            'ssl_show_form'         => 'FALSE',
-            'ssl_result_format'     => 'ASCII'];
-        msgDebug("\nConverge sale working with fields = ".print_r($fields, true));
-        if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
-        if (!$resp = $this->queryMerchant($submit_data)) { return; }
-        return $resp;
-    }
+    // ========================================================================
+    // Generic dispatchers — these three public methods are the gateway API
+    // ========================================================================
 
     /**
-     * @method sale - This method will capture payment, if payment was authorized in a prior transaction, a ccComplete is done
-     * @param integer $rID - record id from table journal_main to generate the capture, the transaction ID will be pulled from there.
-     * @return array - On success, false (with messageStack message) on unsuccessful deletion
+     * Card-transaction dispatch.
+     * @param string $action - one of: capture, authorize, capAuth, refund, void
+     * @param array  $data   - context (see each private method for required keys)
+     * @return array normalized ['ok','txID','code','msg','data','raw']
      */
-    public function sale($fields, $ledger)
+    public function payment($action, $data=[])
     {
-        $action = clean("{$this->code}_action", 'db_field', 'post');
-        msgDebug("\nConverge sale working with action = $action");
-        $submit_data = [];
+        msgDebug("\nEntering converge::payment ($action)");
         switch ($action) {
-            case 'c': // capture previously authorized transaction
-//                $code = dbGetValue(BIZUNO_DB_PREFIX."journal_item", ['trans_code', 'debit_amount'], "ref_id={$ledger->main['id']} AND gl_type='ttl'");
-                $submit_data = [
-                    'ssl_transaction_type'=> 'CCCOMPLETE',
-                    'ssl_merchant_id'     => $this->settings['merchant_id'],
-                    'ssl_user_id'         => $this->settings['user_id'],
-                    'ssl_pin'             => $this->settings['pin'],
-                    'ssl_txn_id'          => $fields['txID'], // Unique identifier returned on the original transaction
-                    'ssl_amount'          => $ledger->main['total_amount'], // amount of capture, must be less than or equal to auth amount
-                    ];
-                msgDebug("\nfields = ".print_r($submit_data, true));
-//                $desc['hint']  = isset($desc['hint']) ? $desc['hint'] : '****';
-                break;
-            case 's': // saved card, already decoded, just process like new card
-            case 'n': // new card
-                $submit_data = [
-                    'ssl_transaction_type'  => 'CCSALE',
-                    'ssl_merchant_id'       => $this->settings['merchant_id'],
-                    'ssl_user_id'           => $this->settings['user_id'],
-                    'ssl_pin'               => $this->settings['pin'],
-//?                    'ssl_track_data'        => '', // The raw Track I or Track II data from the magnetic strip on the card
-//                    'ssl_account_type'      => '', // Account Type (0 = checking, 1 = saving). Required for debit.
-//                    'ssl_dukpt'             => '', // This is the value returned by the PIN pad device, which was used to encrypt the cardholder's Personal Identification Number (PIN) using the Derived Unique Key Per Transaction (DUKPT) method. This value cannot be stored. Required.
-//                    'ssl_key_pointer'       => '', // Triple-DES DUKPT pointer that indicates to Converge which encryption key was used for US Debit transactions. Value must be set to T. Required.
-//                    'ssl_pin_block'         => '', // The encrypted PIN block as returned from the PIN pad device. This value cannot be stored. Required.
-                    'ssl_card_number'       => $fields['number'],
-                    'ssl_exp_date'          => $fields['month'] . substr($fields['year'], -2), // requires 2 digit year
-                    'ssl_amount'            => $ledger->main['total_amount'],
-                    'ssl_cvv2cvc2'          => $fields['cvv'],
-                    'ssl_invoice_number'    => $ledger->main['invoice_num'],
-//                    'ssl_card_present'      => '', // recommended for POS
-//                    'ssl_customer_code'     => '', // Customer code for purchasing card transactions
-                    'ssl_salestax'          => isset($ledger->main['sales_tax']) ? $ledger->main['sales_tax'] : 0,
-                    'ssl_cvv2cvc2_indicator'=> strlen($fields['cvv'])>0 ? '1' : '9', // if cvv2 exists, present else not present
-                    'ssl_description'       => $ledger->main['description'],
-                    'ssl_company'           => str_replace('&', '-', $fields['first_name'].' '.$fields['last_name']),
-//                    'ssl_first_name'        => $request['bill_first_name'], // recommended for hand-keyed transactions, bizuno uses company
-//                    'ssl_last_name'         => $request['bill_last_name'], // recommended for hand-keyed transactions, bizuno uses company
-                    'ssl_avs_address'       => str_replace('&', '-', substr($ledger->main['address1_b'], 0, 20)), // maximum of 20 characters per spec
-                    'ssl_address2'          => str_replace('&', '-', substr($ledger->main['address2_b'], 0, 20)),
-                    'ssl_city'              => $ledger->main['city_b'],
-                    'ssl_state'             => $ledger->main['state_b'],
-                    'ssl_country'           => $ledger->main['country_b'],
-                    'ssl_avs_zip'           => preg_replace("/[^A-Za-z0-9]/", "", $ledger->main['postal_code_b']),
-                    'ssl_phone'             => substr(preg_replace("/[^0-9]/", "", $ledger->main['telephone1_b']), 0, 14),
-//                    'ssl_email'             => isset($ledger->main['email_b']) ? $ledger->main['email_b'] : '', //getModuleCache('bizuno', 'settings', 'company', 'email'),
-                    'ssl_show_form'         => 'FALSE',
-                    'ssl_result_format'     => 'ASCII',
-                    ];
-                break;
-            case 'w': // website capture, just post it
-                msgAdd($this->lang['msg_capture_manual'].' '.$this->lang['msg_website'], 'caution');
-                break;
+            case 'capture':   return $this->pmtCapture($data);   // CCSALE
+            case 'authorize': return $this->pmtAuthorize($data); // CCAUTHONLY
+            case 'capAuth':   return $this->pmtCapAuth($data);   // CCCOMPLETE
+            case 'refund':    return $this->pmtRefund($data);    // CCRETURN
+            case 'void':      return $this->pmtVoid($data);      // CCVOID
         }
-        msgDebug("\nConverge sale working with fields = ".print_r($fields, true));
-        if (sizeof($submit_data) == 0) { return true; } // nothing to send to gateway
-        if (!$resp = $this->queryMerchant($submit_data)) { return; }
-        return $resp;
+        return $this->notImplemented("payment/$action");
+    }
+
+    /** Converge in this implementation has no stored-customer/wallet API surface. */
+    public function wallet($action, $data=[])
+    {
+        msgDebug("\nEntering converge::wallet ($action)");
+        return $this->notImplemented("wallet/$action");
+    }
+
+    /** Converge reporting not implemented in this gateway. */
+    public function report($action, $data=[])
+    {
+        msgDebug("\nEntering converge::report ($action)");
+        return $this->notImplemented("report/$action");
+    }
+
+    // ========================================================================
+    // payment() action implementations
+    // ========================================================================
+
+    private function pmtCapture($data)
+    {
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        $fields = !empty($data['fields']) ? $data['fields'] : [];
+        if (!$ledger) { return $this->failure('Ledger not provided to converge capture'); }
+        $req = array_merge(
+            $this->buildAuthFields(),
+            ['ssl_transaction_type'=>'CCSALE'],
+            $this->buildCardFields($fields),
+            $this->buildOrderFields($ledger->main, $ledger->main['invoice_num'] ?? ''),
+            $this->buildBillingFields($ledger->main, $fields)
+        );
+        return $this->runConverge($req);
+    }
+
+    private function pmtAuthorize($data)
+    {
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        $fields = !empty($data['fields']) ? $data['fields'] : [];
+        if (!$ledger) { return $this->failure('Ledger not provided to converge authorize'); }
+        $refs = $this->guessInv($ledger);
+        $req = array_merge(
+            $this->buildAuthFields(),
+            ['ssl_transaction_type'=>'CCAUTHONLY'],
+            $this->buildCardFields($fields),
+            $this->buildOrderFields($ledger->main, $refs['inv']),
+            $this->buildBillingFields($ledger->main, $fields)
+        );
+        return $this->runConverge($req);
+    }
+
+    private function pmtCapAuth($data)
+    {
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        if (empty($data['txID'])) { return $this->failure('txID required for priorAuthCapture'); }
+        if (!$ledger) { return $this->failure('Ledger required for capture amount'); }
+        $req = array_merge(
+            $this->buildAuthFields(),
+            ['ssl_transaction_type'=>'CCCOMPLETE',
+             'ssl_txn_id'          =>(string)$data['txID'],
+             'ssl_amount'          => $ledger->main['total_amount']]
+        );
+        return $this->runConverge($req);
     }
 
     /**
-     * @method void will delete/void a payment made BEFORE the processor commits the payment, typically must be run the same day as the sale
-     * @param integer $rID Record id from table journal_main to generate the void
-     * @return array merchant response On success, false (with messageStack message) on unsuccessful deletion
+     * Refund a settled transaction. Returns ok=true with code='skipped' when
+     * refunds are disabled or the prior txID/amount isn't recoverable.
      */
-    public function void($rID=0)
+    private function pmtRefund($data)
     {
-        if (!$rID) { return msgAdd('Bad record ID passed'); }
-        $txID = dbGetValue(BIZUNO_DB_PREFIX."journal_item", 'trans_code', "ref_id=$rID AND gl_type='ttl'");
-        if (!$txID || !$this->settings['allowRefund']) { msgAdd(lang('err_cc_no_transaction_id'), 'caution'); return true; }
-        $submit_data = [
-            'ssl_transaction_type'=> 'ccvoid',
-            'ssl_merchant_id'     => $this->settings['merchant_id'],
-            'ssl_user_id'         => $this->settings['user_id'],
-            'ssl_pin'             => $this->settings['pin'],
-            'ssl_txn_id'          => $txID]; // Unique identifier returned on the original transaction.
-        return $this->queryMerchant($submit_data);
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Refunds disabled — non-fatal skip');
+        }
+        if (empty($data['txID']) || empty($data['amount'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Missing txID/amount — non-fatal skip');
+        }
+        $amount = floatval($data['amount']);
+        if ($amount <= 0) { return $this->failure(lang('err_cc_amount_negative')); }
+        $req = array_merge(
+            $this->buildAuthFields(),
+            ['ssl_transaction_type'=>'ccreturn',
+             'ssl_txn_id'          =>(string)$data['txID'],
+             'ssl_amount'          => number_format($amount, 2, '.', '')]
+        );
+        return $this->runConverge($req);
     }
 
     /**
-     * @method refund This method will refund a payment made AFTER the batch is processed, typically must be run any day after the sale
-     * @param integer $rID - record id from table journal_main to generate the refund
-     * @param float $amount - amount to be refunded (leave blank for full amount)
-     * @return array - On success, false (with messageStack message) on unsuccessful deletion
+     * Void an unsettled transaction. Accepts either txID or rID (does the
+     * journal_item trans_code lookup itself when given only an rID).
      */
-    public function refund($rID=0, $amount=false)
+    private function pmtVoid($data)
     {
-        if (!$rID) { return msgAdd('Bad record ID passed'); }
-        $results = dbGetValue(BIZUNO_DB_PREFIX."journal_item", ['debit_amount', 'credit_amount', 'trans_code'], "ref_id=$rID AND gl_type='ttl'");
-        $max_amount = $results['debit_amount'] + $results['credit_amount'];
-        if ($amount === false) { $amount = $max_amount; }
-        if ($amount > $max_amount)  { return msgAdd(lang('err_cc_amount_too_big')); }
-        if (floatval($amount) <= 0) { return msgAdd(lang('err_cc_amount_negative')); }
-        if (!$results['trans_code'] || !$this->settings['allowRefund']) { msgAdd(lang('err_cc_no_transaction_id'), 'caution'); return true; }
-        $submit_data = [
-            'ssl_transaction_type'=> 'ccreturn',
-            'ssl_merchant_id'     => $this->settings['merchant_id'],
-            'ssl_user_id'         => $this->settings['user_id'],
-            'ssl_pin'             => $this->settings['pin'],
-            'ssl_txn_id'          => $results['trans_code'], // Unique identifier returned on the original transaction.
-            'ssl_amount'          => number_format($amount, 2, '.', '')]; // Amount to be refunded in full or partial. Must be less or equal to the original purchase, if not supplied original full amount is refunded.
-        $result = $this->queryMerchant($submit_data);
-        if (empty($result)) {
-            msgAdd("The refund failed at Converge with the transaction reference: {$results['trans_code']}. However, the cash receipt was still deleted from Bizuno. Please check at the Converge Gateway to make sure the charge was properly refunded.", 'caution');
-            return true;
+        if (empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'Voids disabled — non-fatal skip');
         }
-        return $result;
+        $txID = !empty($data['txID']) ? (string)$data['txID'] : '';
+        if ($txID === '' && !empty($data['rID'])) {
+            $txID = (string)dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id={$data['rID']} AND gl_type='ttl'");
+        }
+        if ($txID === '') {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return $this->success('', 'skipped', 'No txID for void — non-fatal skip');
+        }
+        $req = array_merge(
+            $this->buildAuthFields(),
+            ['ssl_transaction_type'=>'ccvoid',
+             'ssl_txn_id'          =>$txID]
+        );
+        return $this->runConverge($req);
     }
 
-    private function queryMerchant($request=[])
+    // ========================================================================
+    // Request-builder helpers
+    // ========================================================================
+
+    /** Merchant-credentials block, included on every request. */
+    private function buildAuthFields()
+    {
+        return [
+            'ssl_merchant_id' => $this->settings['merchant_id'],
+            'ssl_user_id'     => $this->settings['user_id'],
+            'ssl_pin'         => $this->settings['pin'],
+            'ssl_show_form'   => 'FALSE',
+            'ssl_result_format'=>'ASCII'];
+    }
+
+    /** Card data for sale/auth (number/exp/cvv/amount). */
+    private function buildCardFields($fields)
+    {
+        $cvv = $fields['cvv'] ?? '';
+        return [
+            'ssl_card_number'       => $fields['number'] ?? '',
+            'ssl_exp_date'          => ($fields['month'] ?? '').substr($fields['year'] ?? '', -2), // 2-digit year per spec
+            'ssl_cvv2cvc2'          => $cvv,
+            'ssl_cvv2cvc2_indicator'=> strlen((string)$cvv) > 0 ? '1' : '9'];
+    }
+
+    /** Order/amount/description block. */
+    private function buildOrderFields($main, $invoiceNum)
+    {
+        return [
+            'ssl_amount'         => $main['total_amount'],
+            'ssl_invoice_number' => (string)$invoiceNum,
+            'ssl_salestax'       => isset($main['sales_tax']) ? $main['sales_tax'] : 0,
+            'ssl_description'    => $main['description'] ?? ''];
+    }
+
+    /** Billing-address block built from ledger->main + posted card-holder name. */
+    private function buildBillingFields($main, $fields)
+    {
+        $first = $fields['first_name'] ?? '';
+        $last  = $fields['last_name']  ?? '';
+        return [
+            'ssl_company'    => str_replace('&', '-', trim("$first $last")),
+            'ssl_avs_address'=> str_replace('&', '-', substr($main['address1_b'] ?? '', 0, 20)),
+            'ssl_address2'   => str_replace('&', '-', substr($main['address2_b'] ?? '', 0, 20)),
+            'ssl_city'       => $main['city_b']    ?? '',
+            'ssl_state'      => $main['state_b']   ?? '',
+            'ssl_country'    => $main['country_b'] ?? '',
+            'ssl_avs_zip'    => preg_replace('/[^A-Za-z0-9]/','', $main['postal_code_b'] ?? ''),
+            'ssl_phone'      => substr(preg_replace('/[^0-9]/','', $main['telephone1_b'] ?? ''), 0, 14)];
+    }
+
+    // ========================================================================
+    // SDK plumbing — environment, runner, response parsing
+    // ========================================================================
+
+    private function env()
+    {
+        return ($this->settings['mode'] ?? 'test') === 'prod' ? PAYMENT_CONVERGE_URL : PAYMENT_CONVERGE_URL_TEST;
+    }
+
+    /**
+     * Posts the request to the configured Converge endpoint, parses the XML response,
+     * and returns the normalized shape. Used by every payment() action.
+     */
+    private function runConverge($request=[])
     {
         global $io;
         $tags = '';
-        foreach ($request as $key => $value) { if ($value <> '') { $tags .= "<$key>".urlencode(str_replace('&', '+', $value))."</$key>"; } }
+        foreach ($request as $key => $value) {
+            if ($value === '' || $value === null) { continue; }
+            if (is_array($value)) { msgDebug("\nconverge: skipping array value for $key"); continue; }
+            $tags .= "<$key>".urlencode(str_replace('&', '+', (string)$value))."</$key>";
+        }
         $data = "xmldata=<txn>$tags</txn>";
         msgDebug("\nRequest to send to Converge: $data");
-        $url = $this->mode=='test' ? PAYMENT_CONVERGE_URL_TEST : PAYMENT_CONVERGE_URL;
-        if (!$strXML = $io->cURL($url, $data, 'post')) { return; }
+        $url = $this->env();
+        $strXML = $io->cURL($url, $data, 'post');
+        if (!$strXML) { return $this->failure('Gateway communication error'); }
         msgDebug("\nReceived raw data back from Converge: ".print_r($strXML, true));
         $resp = parseXMLstring($strXML);
         msgDebug("\nReceived back from Converge: ".print_r($resp, true));
         if (isset($resp->errorCode)) {
-            msgLog(sprintf($this->lang['err_process_decline'], $resp->errorCode, $resp->errorMessage));
-            return msgAdd(sprintf($this->lang['err_process_decline'], $resp->errorCode, $resp->errorMessage));
-        } elseif (isset($resp->ssl_result) && $resp->ssl_result == '0') { // update the db with the transaction ID
-            if (!empty($resp->ssl_cvv2_response) && $resp->ssl_cvv2_response != 'M') {
-                msgAdd(sprintf($this->lang['err_cvv_mismatch'], $this->lang['CVV_'.$resp->ssl_cvv2_response]));
-            }
-            if (!empty($resp->ssl_avs_response) && !in_array($resp->ssl_avs_response, ['X','Y'])) {
-                msgAdd(sprintf($this->lang['err_avs_mismatch'], $this->lang['AVS_'.$resp->ssl_avs_response]));
-            }
-            $cvv = !empty($resp->ssl_cvv2_response) ? $this->lang['CVV_'.$resp->ssl_cvv2_response] : 'n/a';
-            msgAdd(sprintf($this->lang['msg_approval_success'], $resp->ssl_result_message, $resp->ssl_approval_code, $cvv), 'success');
-            return ['txID'=>$resp->ssl_txn_id, 'txTime'=>$resp->ssl_txn_time, 'code'=>$resp->ssl_approval_code];
+            $msg = sprintf($this->lang['err_process_decline'], (string)$resp->errorCode, (string)$resp->errorMessage);
+            msgLog($msg);
+            msgAdd($msg);
+            return ['ok'=>false, 'txID'=>'', 'code'=>(string)$resp->errorCode, 'msg'=>(string)$resp->errorMessage, 'data'=>[], 'raw'=>$resp];
         }
-        msgAdd($this->lang['err_process_failed'].' - '.$resp->ssl_result_message);
+        if (!isset($resp->ssl_result) || (string)$resp->ssl_result !== '0') {
+            $msg = $this->lang['err_process_failed'].' - '.(string)($resp->ssl_result_message ?? '');
+            msgAdd($msg);
+            return ['ok'=>false, 'txID'=>'', 'code'=>(string)($resp->ssl_result ?? ''), 'msg'=>$msg, 'data'=>[], 'raw'=>$resp];
+        }
+        // Success path — surface CVV/AVS warnings as cautions but don't fail
+        if (!empty($resp->ssl_cvv2_response) && (string)$resp->ssl_cvv2_response !== 'M') {
+            $key = 'CVV_'.(string)$resp->ssl_cvv2_response;
+            msgAdd(sprintf($this->lang['err_cvv_mismatch'] ?? 'CVV mismatch: %s', $this->lang[$key] ?? (string)$resp->ssl_cvv2_response), 'caution');
+        }
+        if (!empty($resp->ssl_avs_response) && !in_array((string)$resp->ssl_avs_response, ['X','Y'])) {
+            $key = 'AVS_'.(string)$resp->ssl_avs_response;
+            msgAdd(sprintf($this->lang['err_avs_mismatch'] ?? 'AVS mismatch: %s', $this->lang[$key] ?? (string)$resp->ssl_avs_response), 'caution');
+        }
+        $cvvLabel = !empty($resp->ssl_cvv2_response) ? ($this->lang['CVV_'.(string)$resp->ssl_cvv2_response] ?? 'n/a') : 'n/a';
+        msgAdd(sprintf($this->lang['msg_approval_success'] ?? '%s — auth: %s — CVV: %s', (string)$resp->ssl_result_message, (string)$resp->ssl_approval_code, $cvvLabel), 'success');
+        return $this->success(
+            (string)$resp->ssl_txn_id,
+            (string)$resp->ssl_approval_code,
+            (string)$resp->ssl_result_message,
+            ['txTime'=>(string)$resp->ssl_txn_time],
+            $resp
+        );
     }
 
-    /**
-     *
-     * @param type $data
-     * @return type
-     */
+    private function success($txID='', $code='', $msg='', $data=[], $raw=null)
+    {
+        return ['ok'=>true, 'txID'=>$txID, 'code'=>$code, 'msg'=>$msg, 'data'=>$data, 'raw'=>$raw];
+    }
+
+    private function failure($msg='')
+    {
+        if ($msg) { msgAdd($msg); msgDebug("\nConverge failure: $msg"); }
+        return ['ok'=>false, 'txID'=>'', 'code'=>'', 'msg'=>$msg, 'data'=>[], 'raw'=>null];
+    }
+
+    private function notImplemented($action)
+    {
+        msgAdd("Converge action '$action' is not implemented.");
+        return ['ok'=>false, 'txID'=>'', 'code'=>'not_implemented', 'msg'=>"not implemented: $action", 'data'=>[], 'raw'=>null];
+    }
+
+    // ========================================================================
+    // Original helpers (preserved)
+    // ========================================================================
+
     private function getDiscGL($data)
     {
         if (isset($data['fields'])) {
@@ -391,20 +468,97 @@ html5($this->code.'_action', ['label'=>$this->lang['at_converge'],              
 
     /**
      * Tries to guess the invoice number and po number of the first pmt record of the item array
-     * @param type $ledger
-     * @return type
      */
     private function guessInv($ledger)
     {
         $refs = ['inv'=>$ledger->main['invoice_num'], 'po'=>$ledger->main['invoice_num']];
         if (empty($ledger->items)) { return $refs; }
         foreach ($ledger->items as $row) {
-            if ($row['gl_type'] <> 'pmt') { continue; } // just the first row
+            if ($row['gl_type'] <> 'pmt') { continue; }
             $vals = explode(' ', $row['description'], 4);
             if (!empty($vals[1])) { $refs['inv']= $vals[1]; }
             if (!empty($vals[3])) { $refs['po'] = $vals[3]; }
             break;
         }
         return $refs;
+    }
+
+    // ========================================================================
+    // Legacy shims — delegate old-style callers to the generic dispatcher.
+    // Remove once `paymentMain` + `phreebooks/main.php` + `j22.php` are
+    // updated to call $gateway->payment($action, $data) directly.
+    // ========================================================================
+
+    /** Legacy: called by paymentMain::authorize(). Returns ['txID'=>X] or false. */
+    public function paymentAuth($fields, $ledger)
+    {
+        $r = $this->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
+        if (empty($r['ok'])) { return false; }
+        return ['txID'=>$r['txID']];
+    }
+
+    /**
+     * Legacy: called by paymentMain::sale(). The original `sale()` looked at the posted
+     * `<code>_action` radio (c=capture-prior-auth, s/n=new-sale, w=manual) and dispatched
+     * accordingly. Preserved here so the four UI buttons keep working.
+     */
+    public function sale($fields, $ledger)
+    {
+        $action = clean("{$this->code}_action", 'db_field', 'post');
+        switch ($action) {
+            case 'c':
+                $r = $this->payment('capAuth', ['fields'=>$fields, 'ledger'=>$ledger, 'txID'=>$fields['txID'] ?? '']);
+                break;
+            case 's':
+            case 'n':
+                $r = $this->payment('capture', ['fields'=>$fields, 'ledger'=>$ledger]);
+                break;
+            case 'w':
+                msgAdd($this->lang['msg_capture_manual'].' '.$this->lang['msg_website'], 'caution');
+                return true; // legacy contract: truthy when nothing to send
+            default:
+                return true;
+        }
+        if (empty($r['ok'])) { return false; }
+        return ['txID'=>$r['txID'], 'txTime'=>$r['data']['txTime'] ?? biz_date('Y-m-d H:i:s'), 'code'=>$r['code']];
+    }
+
+    /** Legacy: called by phreebooks/main.php directly on same-day delete. Accepts journal_main.id. */
+    public function void($rID=0)
+    {
+        if (empty($rID)) { return msgAdd('Bad record ID passed to converge void'); }
+        $txID = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', 'trans_code', "ref_id=$rID AND gl_type='ttl'");
+        if (empty($txID) || empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return true; // non-fatal: let the journal delete proceed even if gateway void skipped
+        }
+        $r = $this->payment('void', ['txID'=>$txID, 'rID'=>$rID]);
+        return !empty($r['ok']);
+    }
+
+    /**
+     * Legacy: called by paymentMain::refund(). The old signature here received the
+     * journal_main.id (not the transCode), so we look up the trans_code first to match
+     * the original behavior. Returns ['txID','code'] on success or false.
+     */
+    public function refund($rID=0, $amount=false)
+    {
+        if (empty($rID)) { return msgAdd('Bad record ID passed to converge refund'); }
+        $row = dbGetValue(BIZUNO_DB_PREFIX.'journal_item', ['debit_amount','credit_amount','trans_code'], "ref_id=$rID AND gl_type='ttl'");
+        $maxAmount = floatval($row['debit_amount']) + floatval($row['credit_amount']);
+        if ($amount === false) { $amount = $maxAmount; }
+        if ($amount > $maxAmount) { return msgAdd(lang('err_cc_amount_too_big')); }
+        if (empty($row['trans_code']) || empty($this->settings['allowRefund'])) {
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return true;
+        }
+        $r = $this->payment('refund', ['txID'=>$row['trans_code'], 'amount'=>$amount, 'rID'=>$rID]);
+        if (empty($r['ok'])) {
+            // Match original behavior: the original code emitted a friendly "refund failed at gateway" caution
+            // and still returned truthy so the journal delete could proceed.
+            msgAdd("The refund failed at Converge with the transaction reference: {$row['trans_code']}. The cash receipt was still deleted from Bizuno. Verify at the Converge Gateway that the charge was refunded.", 'caution');
+            return true;
+        }
+        return ['txID'=>$r['txID'], 'code'=>$r['code']];
     }
 }

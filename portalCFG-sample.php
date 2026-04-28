@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-27
  * @filesource /index.php
  */
 
@@ -57,6 +57,13 @@ if ( !defined( 'BIZUNO_DB_CREDS' ) ) { define( 'BIZUNO_DB_CREDS', ['type'=>'mysq
 // If you want to allow users to send support tickets to your administrator, set email here
 //define('BIZUNO_SUPPORT_NAME', 'My Business Support');
 //define('BIZUNO_SUPPORT_EMAIL','webmaster@my_D_domain.com');
+
+// CSRF Layer 2 — synchronizer-token enforcement.
+// Defaults to ON (set in bizunoCFG.php). Uncomment the line below ONLY if you have a
+// specific reason to fall back to warn-only mode (e.g. mid-rollout testing on an
+// install with custom myExt extensions whose ajax paths don't yet attach the token).
+// Warn-only logs CSRF mismatches to trace.txt without rejecting the request.
+//define('BIZUNO_CSRF_ENFORCE', false);
 
 /******************** END - Site Specific Settings ***********************/
 
