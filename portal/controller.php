@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /portal/controller.php
  */
 
@@ -147,11 +147,16 @@ class portalCtl
             $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
             return;
         }
-        // CSRF Layer 2: synchronizer-token check. Defaults to warn-only mode so existing
-        // browser tabs without the meta tag don't get logged out on deploy. Operators flip
-        // to enforce mode by setting `define('BIZUNO_CSRF_ENFORCE', true);` in portalCFG.php
-        // once the trace logs show no Layer-2 mismatches from legitimate traffic.
-        if (!$this->validateCsrf()) {
+        // CSRF Layer 2: synchronizer-token check. Only enforced when Layer 1
+        // had something to compare against (Origin or Referer was present).
+        // Cold navigations — bookmarks, address-bar typing, login redirects,
+        // first page load after sign-in — arrive with neither header and have
+        // no CSRF token to supply because they're not driven by JS. For those
+        // the SameSite=lax session cookie is the defense (it blocks the cookie
+        // entirely on cross-site sub-resource requests), and Layer 2 would
+        // only ever produce a redirect loop on the home page.
+        $isColdNav = empty($_SERVER['HTTP_ORIGIN']) && empty($_SERVER['HTTP_REFERER']);
+        if (!$isColdNav && !$this->validateCsrf()) {
             $enforce = defined('BIZUNO_CSRF_ENFORCE') && BIZUNO_CSRF_ENFORCE;
             if ($enforce) {
                 msgDebug("\nCSRF Layer 2: rejecting bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} — token missing or mismatched");

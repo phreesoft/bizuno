@@ -109,26 +109,80 @@ class cash_flow
         }
 
         // FUTURE: open AR (j12) + AP (j06), partial-paid aware.
-        // Due date is always computed from post_date + terms via getTermsDate().
-        // We intentionally do NOT use journal_main.terminal_date — on this
-        // install it currently mirrors post_date instead of the actual due
-        // date, so it can't be trusted. Revisit (see TODO scheduled for ~Nov
-        // 2026) once the upstream terminal_date population is fixed.
+        // Due-date sourcing is split by journal:
+        //   - AP (j06): trust journal_main.terminal_date — populated correctly.
+        //   - AR (j12): compute from post_date + terms via getTermsDate(). The
+        //     sales-journal terminal_date currently mirrors post_date on at
+        //     least one production install (revisit ~Nov 2026 — see scheduled
+        //     routine — once the upstream sales-side population is fixed, then
+        //     switch j12 to terminal_date for symmetry and a bit of speed).
         $open = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main',
             "journal_id IN (6, 12) AND closed='0'",
             'post_date',
-            ['id', 'journal_id', 'total_amount', 'terms', 'post_date']);
+            ['id', 'journal_id', 'total_amount', 'terms', 'post_date', 'terminal_date']);
         foreach ($open as $row) {
             $balance = (float)$row['total_amount'] + (float)getPaymentInfo($row['id'], $row['journal_id']);
             if ($balance <= 0) { continue; } // fully (or over-) paid via partials
             $isAR    = ($row['journal_id'] == 12);
-            $dueDate = getTermsDate($row['terms'] ?? '', $isAR ? 'c' : 'v', $row['post_date'] ?? '');
+            if ($isAR) {
+                $dueDate = getTermsDate($row['terms'] ?? '', 'c', $row['post_date'] ?? '');
+            } else {
+                $dueDate = !empty($row['terminal_date'])
+                    ? $row['terminal_date']
+                    : getTermsDate($row['terms'] ?? '', 'v', $row['post_date'] ?? '');
+            }
             // Overdue (due date already past) lumps into the current week.
             $effDate = ($dueDate >= $today) ? $dueDate : $today;
             $bucket  = $this->bucketFor($effDate, $weekStarts);
             if ($bucket === null) { continue; } // beyond the chart window
             $key = $isAR ? 'futIn' : 'futOut';
             $weeks[$bucket][$key] += $balance;
+        }
+
+        // FUTURE: scheduled cleared-cash entries — j18 receipts and j20 payments
+        // with closed='0' AND post_date > today. Examples: post-dated checks,
+        // ACH transfers queued for a future date.
+        $futCash = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main',
+            "journal_id IN (18, 20) AND closed='0' AND post_date > '$today'",
+            'post_date',
+            ['journal_id', 'post_date', 'total_amount']);
+        foreach ($futCash as $row) {
+            $bucket = $this->bucketFor($row['post_date'], $weekStarts);
+            if ($bucket === null) { continue; }
+            $key = $row['journal_id'] == 18 ? 'futIn' : 'futOut';
+            $weeks[$bucket][$key] += (float)$row['total_amount'];
+        }
+
+        // FUTURE: open General Journal entries (j02) dated forward that touch a
+        // payables-type GL account (chart-of-accounts type=20). The cash-out
+        // amount is the net debit on the AP line(s) of the entry — when AP is
+        // debited the corresponding credit hits cash, so the AP debit equals
+        // the cash leaving the bank on post_date. Pure AP accruals (AP being
+        // credited without a cash leg) net to <= 0 here and are skipped.
+        $apAccts = [];
+        foreach (getModuleCache('phreebooks', 'chart') as $glAcct => $props) {
+            if (isset($props['type']) && (string)$props['type'] === '20' && empty($props['inactive'])) {
+                $apAccts[$glAcct] = true;
+            }
+        }
+        if (!empty($apAccts)) {
+            $futGJ = dbGetMulti(BIZUNO_DB_PREFIX.'journal_main',
+                "journal_id=2 AND closed='0' AND post_date > '$today'",
+                'post_date',
+                ['id', 'post_date']);
+            foreach ($futGJ as $row) {
+                $bucket = $this->bucketFor($row['post_date'], $weekStarts);
+                if ($bucket === null) { continue; }
+                $items = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item',
+                    "ref_id={$row['id']}", '', ['gl_account', 'debit_amount', 'credit_amount']);
+                $apOut = 0.0;
+                foreach ($items as $item) {
+                    if (!isset($apAccts[$item['gl_account']])) { continue; }
+                    $apOut += (float)$item['debit_amount'] - (float)$item['credit_amount'];
+                }
+                if ($apOut <= 0) { continue; } // pure accrual, no cash impact
+                $weeks[$bucket]['futOut'] += $apOut;
+            }
         }
 
         // Anchor at today's bucket = current cash + projected rest-of-this-week.
