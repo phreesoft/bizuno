@@ -514,33 +514,53 @@ function preSubmit() {
             $jsHead.= "var thermData = ".json_encode($dataTherm).";\n";
             $html  .= html5('', ['break'=>true,'events'=>['onClick'=>"labelThermal(thermData);"],'attr'=>['type'=>'button', 'value'=>'Print Thermal']]);
         }
-        // Zebra Browser Print: free local service that exposes localhost
-        // endpoints; no signing/certificates required (replaced QZ Tray, 2026-04-28).
-        // End user must install Browser Print from
-        // https://www.zebra.com/us/en/support-downloads/printer-software/printer-setup-utilities/browser-print.html
-        // and have a Zebra printer attached.
-        $jsHead .= "
+        $jsHead .= $this->thermalPrintJS();
+        $data = ['type'=>'page', 'title'=>lang('label_generator', $this->moduleID),
+            'divs'    => [
+                'toolbar' => ['order'=>20,'type'=>'toolbar','key' =>'tbLabel'],
+                'divLabel'=> ['order'=>60,'type'=>'html',   'html'=>$html]],
+            'toolbars'=> ['tbLabel'=>['icons'=>['close'=>['order'=>10,'events'=>['onClick'=>"window.close();"]]]]],
+            'jsReady' => ['init'=>$jsReady]];
+        if (!empty($enTherm)) { $data['head']['zebraBrowserPrint'] = $this->thermalPrintScriptTag(); }
+        $data['jsHead']['init'] = $jsHead; // needs to be last
+        $layout = array_replace_recursive($layout, $data);
+    }
+
+    /**
+     * Zebra Browser Print: free local service that exposes localhost
+     * endpoints; no signing/certificates required (replaced QZ Tray, 2026-04-28).
+     * End user must install the Browser Print desktop service (search Zebra
+     * support for "Browser Print Windows/macOS download") and have a Zebra
+     * printer attached. Uses getLocalDevices(...) so we can find ANY Zebra
+     * printer the service knows about — getDefaultDevice() only finds the OS
+     * default which is rarely the Zebra one.
+     */
+    private function thermalPrintJS()
+    {
+        return "
 function labelThermal(thermData) {
     if (typeof BrowserPrint === 'undefined') {
         alert('Zebra Browser Print is not loaded. Reload the page and try again.');
         return;
     }
-    BrowserPrint.getDefaultDevice('printer', function(device) {
-        if (!device || !device.name) {
-            alert('No Zebra printer found. Install Zebra Browser Print and connect a printer:\\nhttps://www.zebra.com/us/en/support-downloads/printer-software/printer-setup-utilities/browser-print.html');
+    BrowserPrint.getLocalDevices(function(devices) {
+        var printers = (devices && devices.printer) ? devices.printer : [];
+        if (!printers.length) {
+            alert('No Zebra printer found.\\n\\nChecks:\\n  • Zebra Browser Print desktop service is running\\n  • At least one Zebra printer is configured in Browser Print\\n  • The printer is powered on and connected (USB/network)');
             return;
         }
+        var device = printers[0]; // first Zebra printer reported by Browser Print
         var i = 0;
         function sendNext() {
             if (i >= thermData.length) { setTimeout(function(){ window.close(); }, 2000); return; }
             device.send(thermData[i], function() { i++; sendNext(); }, function(err) {
-                alert('Print failed: ' + err);
+                alert('Print failed on ' + device.name + ': ' + err);
             });
         }
         sendNext();
     }, function(err) {
-        alert('Could not reach Zebra Browser Print on this machine. Is it running?\\n\\n' + err);
-    });
+        alert('Could not reach Zebra Browser Print on this machine. Is the desktop service running?\\n\\n' + err);
+    }, 'printer');
 }
 function labelPDF(rID, path) {
     jqBiz.fileDownload(bizunoAjax+'&bizRt=$this->moduleID/ship/labelDownload&rID='+rID+'&data='+path, {
@@ -549,17 +569,11 @@ function labelPDF(rID, path) {
         data: ''
     });
 }";
-        $data = ['type'=>'page', 'title'=>lang('label_generator', $this->moduleID),
-            'divs'    => [
-                'toolbar' => ['order'=>20,'type'=>'toolbar','key' =>'tbLabel'],
-                'divLabel'=> ['order'=>60,'type'=>'html',   'html'=>$html]],
-            'toolbars'=> ['tbLabel'=>['icons'=>['close'=>['order'=>10,'events'=>['onClick'=>"window.close();"]]]]],
-            'jsReady' => ['init'=>$jsReady]];
-        if (!empty($enTherm)) {
-            $data['head']['zebraBrowserPrint'] = ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'zebra-browser-print/BrowserPrint-3.1.250.min.js"></script>'];
-        }
-        $data['jsHead']['init'] = $jsHead; // needs to be last
-        $layout = array_replace_recursive($layout, $data);
+    }
+
+    private function thermalPrintScriptTag()
+    {
+        return ['order'=>90,'type'=>'html','html'=>'<script type="text/javascript" src="'.BIZUNO_URL_SCRIPTS.'zebra-browser-print/BrowserPrint-3.1.250.min.js"></script>'];
     }
 
     /**

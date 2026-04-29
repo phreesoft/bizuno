@@ -147,16 +147,18 @@ class portalCtl
             $this->layout = ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]];
             return;
         }
-        // CSRF Layer 2: synchronizer-token check. Only enforced when Layer 1
-        // had something to compare against (Origin or Referer was present).
-        // Cold navigations — bookmarks, address-bar typing, login redirects,
-        // first page load after sign-in — arrive with neither header and have
-        // no CSRF token to supply because they're not driven by JS. For those
-        // the SameSite=lax session cookie is the defense (it blocks the cookie
-        // entirely on cross-site sub-resource requests), and Layer 2 would
-        // only ever produce a redirect loop on the home page.
-        $isColdNav = empty($_SERVER['HTTP_ORIGIN']) && empty($_SERVER['HTTP_REFERER']);
-        if (!$isColdNav && !$this->validateCsrf()) {
+        // CSRF Layer 2: synchronizer-token check. Only enforced for state-
+        // changing requests — AJAX (?ajax=1 / X-Requested-With) or any POST.
+        // Plain GET page navigations (cold load, bookmark, internal link, the
+        // 302-after-login redirect) are read-only renders and would never have
+        // a CSRF token attached because no JS has run yet to read the
+        // <meta name="biz-csrf"> token from the page. For those the
+        // SameSite=lax session cookie + Layer 1 (Origin/Referer host check
+        // when present) provide the defense; cross-site state-changing GETs
+        // either get blocked by Layer 1 or by SameSite cookie behavior.
+        $isAjax     = !empty($_GET['ajax']) || !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
+        $isFormPost = !empty($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST';
+        if (($isAjax || $isFormPost) && !$this->validateCsrf()) {
             $enforce = defined('BIZUNO_CSRF_ENFORCE') && BIZUNO_CSRF_ENFORCE;
             if ($enforce) {
                 msgDebug("\nCSRF Layer 2: rejecting bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} — token missing or mismatched");

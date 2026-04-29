@@ -8,13 +8,18 @@ is Zebra's free, sign-free replacement for the previously used QZ Tray.
 ## Required client-side install
 
 End users with a Zebra printer must install Zebra Browser Print on the same
-machine that has the printer attached:
+machine that has the printer attached.
 
-- Download: <https://www.zebra.com/us/en/support-downloads/printer-software/printer-setup-utilities/browser-print.html>
-- Available for Windows, macOS, Linux, ChromeOS.
+- Search Zebra support for "Browser Print" (the canonical download URL has
+  moved at least once; safest path is from <https://support.zebra.com/> →
+  search "Browser Print"). Available for Windows, macOS, Linux, ChromeOS.
 - After install, the local service exposes `https://localhost:9101` (and
   `http://localhost:9100` for older configurations). Bizuno's bundled JS
   picks the right transport automatically.
+- Open the Browser Print app and confirm at least one Zebra printer shows
+  up in its list. The Bizuno JS calls `getLocalDevices('printer', ...)` and
+  uses the first printer reported — if Browser Print sees no printer,
+  Bizuno will surface "No Zebra printer found" and won't retry.
 
 ## Required server-side files
 
