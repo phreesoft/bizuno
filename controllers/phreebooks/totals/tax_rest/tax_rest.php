@@ -1,6 +1,9 @@
 <?php
 /*
- * PhreeBooks Total method to calculate sales tax through the PhreeSoft RESTful API
+ * PhreeBooks Total method to calculate sales tax via the Zip-Tax + Geocodio APIs.
+ * Replaces the previous PhreeSoft REST proxy (rewritten 2026-04-28). The actual
+ * lookup happens in controllers/phreebooks/restfulTax.php::getTaxRate(); API
+ * keys are configured under API Settings → Sales Tax APIs.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +24,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -38,7 +41,7 @@ class tax_rest
     public $lang     = ['title'=>'Sales Tax (REST)',
 //      'label' => 'Sales Tax (REST)',
         'extra_title' => '(REST)',
-        'description' => 'This method uses the PhreeSoft RESTful API interface to calculate sales tax based on the postal code.'];
+        'description' => 'Looks up sales tax via the Zip-Tax API (and optionally Geocodio for ZIP+4 enhancement) based on the shipping address. Configure API keys under API Settings → Sales Tax APIs. Rates are cached locally and refreshed quarterly.'];
 
     public function __construct()
     {

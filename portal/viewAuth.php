@@ -21,7 +21,7 @@
  * @author Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright 2008-2026, PhreeSoft, Inc.
  * @license https://www.gnu.org/licenses/agpl-3.0.txt
- * @version 7.x Last Update: 2026-04-26
+ * @version 7.x Last Update: 2026-04-28
  * @filesource /portal/viewAuth.php
  */
 namespace bizuno;
@@ -131,6 +131,8 @@ msgDebug("\n2FA enabled manually for testing on user $userID");
             if ($this->validateUser($layout)) { // if validated, return to load home page
                 msgDebug("\nUser validated, reloading!");
                 $layout = ['type'=>'guest','jsReady'=>['reload'=>"location.reload();"]];
+            } elseif (empty($layout)) { // bad password — validateUser left layout untouched, re-render the auth form so $this->errors surfaces. (The 2FA path sets layout itself.)
+                $this->viewAuth($layout, clean('bizUser', 'email', 'post'));
             }
         } else {
             $this->viewIntro($layout);

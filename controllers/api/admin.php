@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-04-28
  * @filesource /controllers/api/admin.php
  */
 
@@ -76,7 +76,10 @@ class apiAdmin extends apiCommon
             'phreesoft_api' => ['order'=>60,'label'=>lang('phreesoft_api'),'fields'=>[
                 'api_user'      => ['attr'=>['value'=>'']],
                 'api_pass'      => ['attr'=>['type'=>'password','value'=>'']],
-                'api_token'     => ['attr'=>['type'=>'password','value'=>'']]]]];
+                'api_token'     => ['attr'=>['type'=>'password','value'=>'']]]],
+            'sales_tax_api' => ['order'=>70,'label'=>'Sales Tax APIs','fields'=>[
+                'geocodio_key'  => ['label'=>'Geocodio API Key (optional, for ZIP+4 enhancement)','attr'=>['type'=>'password','value'=>'']],
+                'ziptax_key'    => ['label'=>'Zip-Tax API Key (required for tax_rest totals)',   'attr'=>['type'=>'password','value'=>'']]]]];
         settingsFill($data, $this->moduleID);
         return $data;
     }
