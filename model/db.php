@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /model/db.php
  */
 
@@ -457,10 +457,15 @@ function dbMysqlAuthFile()
     $dir = defined('BIZUNO_DATA') && BIZUNO_DATA ? rtrim(BIZUNO_DATA, '/\\') : sys_get_temp_dir();
     if (!is_dir($dir) || !is_writable($dir)) { $dir = sys_get_temp_dir(); }
     $path = $dir . DIRECTORY_SEPARATOR . 'bizmycli-' . bin2hex(random_bytes(8)) . '.cnf';
+    // MySQL option files are INI-style: '#' and ';' start comments and leading
+    // whitespace is trimmed unless the value is wrapped in double quotes (with
+    // '\' and '"' escaped). Quote every value so passwords containing '#', ';',
+    // spaces, or quotes survive intact.
+    $iniQuote = function($v) { return '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], (string)$v) . '"'; };
     $body = "[client]\n"
-          . "host="     . BIZUNO_DB_CREDS['host'] . "\n"
-          . "user="     . BIZUNO_DB_CREDS['user'] . "\n"
-          . "password=" . BIZUNO_DB_CREDS['pass'] . "\n";
+          . "host="     . $iniQuote(BIZUNO_DB_CREDS['host']) . "\n"
+          . "user="     . $iniQuote(BIZUNO_DB_CREDS['user']) . "\n"
+          . "password=" . $iniQuote(BIZUNO_DB_CREDS['pass']) . "\n";
     if (@file_put_contents($path, $body, LOCK_EX) === false) {
         msgDebug("\ndbMysqlAuthFile: failed to write credentials file at $path");
         return false;
@@ -491,18 +496,37 @@ function dbDump($filename='bizuno_backup', $dirWrite='', $dbTable='')
     } elseif ($dbTable) { // single-table or pre-built list
         foreach (preg_split('/\s+/', trim($dbTable)) as $t) { if ($t !== '') { $tables[] = $t; } }
     }
-    if (!$io->validatePath($dirWrite.$dbFile, true, true)) { return; }
+    if (!$io->validatePath($dirWrite.$dbFile, true, true)) { msgDebug("\nvalidatePath Failed!"); return; }
     if (!function_exists('exec')) { return msgAdd("php exec is disabled, the backup cannot be achieved this way!"); }
     $authFile = dbMysqlAuthFile();
     if (!$authFile) { return msgAdd('Could not create temporary MySQL credentials file'); }
     $tableArgs = '';
     foreach ($tables as $t) { $tableArgs .= ' '.escapeshellarg($t); }
-    $cmd = "mysqldump --defaults-extra-file=".escapeshellarg($authFile)." --opt ".escapeshellarg($dbName).$tableArgs
-         ." | gzip > ".escapeshellarg($dbPath.$dbFile);
+    // Two-step: write SQL to a temp file, then gzip. Keeps mysqldump's exit code
+    // visible (a piped pipeline reports gzip's exit code, not mysqldump's) and
+    // captures stderr so failures surface to the user instead of producing a
+    // ~20-byte gzip-of-nothing file that looks "successful".
+    $sqlFile = $dbPath.$filename.'.sql';
+    $errFile = $sqlFile.'.err';
+    $dumpCmd = "mysqldump --defaults-extra-file=".escapeshellarg($authFile)." --opt --result-file=".escapeshellarg($sqlFile)
+        ." ".escapeshellarg($dbName).$tableArgs." 2>".escapeshellarg($errFile);
     msgDebug("\n Executing mysqldump (credentials hidden) for db=$dbName, tables=".count($tables));
-    exec($cmd);
+    exec($dumpCmd, $dumpOut, $dumpRc);
     @unlink($authFile);
-    if (!file_exists($dbPath.$dbFile)) { return; } // for some reason the dump failed, could be out of disk space
+    $stderr = is_file($errFile) ? trim((string)@file_get_contents($errFile)) : '';
+    @unlink($errFile);
+    if ($dumpRc !== 0 || !is_file($sqlFile) || filesize($sqlFile) === 0) {
+        @unlink($sqlFile);
+        msgDebug("\nmysqldump failed (exit $dumpRc): $stderr");
+        return msgAdd("Database backup failed (mysqldump exit $dumpRc): ".($stderr !== '' ? $stderr : 'no stderr captured'));
+    }
+    if ($stderr !== '') { msgDebug("\nmysqldump stderr (non-fatal): $stderr"); } // warnings still come through stderr
+    exec("gzip -f ".escapeshellarg($sqlFile), $gzOut, $gzRc);
+    if ($gzRc !== 0 || !is_file($dbPath.$dbFile)) {
+        @unlink($sqlFile);
+        @unlink($dbPath.$dbFile);
+        return msgAdd("Database backup gzip step failed (exit $gzRc).");
+    }
     chmod($dbPath.$dbFile, 0664);
     return true;
 }

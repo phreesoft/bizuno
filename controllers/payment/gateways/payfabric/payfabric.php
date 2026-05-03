@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/payment/gateways/payfabric.php
  *
  * Source Information:
@@ -539,7 +539,7 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
         $resp   = $this->queryAPI($saleUrl, $tOptions);
         if (empty($resp)) { return; }
         $txDate = !empty($resp['TrxDateUTC']) ? biz_date('Y-m-d H:i:s', strtotime($resp['TrxDateUTC'])) : biz_date('Y-m-d H:i:s');
-        msgAdd(sprintf($this->lang['msg_approval_success'], $resp['Message'], $resp['AuthCode'], 'N/A'), 'success');
+        msgAdd(sprintf(lang('msg_approval_success', $this->moduleID), $resp['Message'], $resp['AuthCode'], 'N/A'), 'success');
         return ['txID'=>$resp['TrxKey'], 'txTime'=>$txDate, 'code'=>$resp['AuthCode']];
     }
 
@@ -639,13 +639,13 @@ window.addEventListener('message', {$this->code}WalletEvent, false);";
 */
         if ($sale['Status']=='Approved') {
             if (!empty($sale['CVV2Response']) && $sale['CVV2Response'] != 'NotSet') {
-                msgAdd(sprintf($this->lang['err_cvv_mismatch'], $this->lang["CVV_{$sale['CVV2Response']}"]));
+                msgAdd(sprintf(lang('err_cvv_mismatch', $this->moduleID), $this->lang["CVV_{$sale['CVV2Response']}"] ?? $sale['CVV2Response']));
             }
             if (!empty($sale['AVSZipResponse']) && !in_array($sale['AVSZipResponse'], ['X','Y'])) {
-                msgAdd(sprintf($this->lang['err_avs_mismatch'], $this->lang["AVS_{$sale['AVSZipResponse']}"]));
+                msgAdd(sprintf(lang('err_avs_mismatch', $this->moduleID), $this->lang["AVS_{$sale['AVSZipResponse']}"] ?? $sale['AVSZipResponse']));
             }
-            $cvv = !empty($sale['CVV2Response']) ? $this->lang["CVV_{$sale['CVV2Response']}"] : 'n/a';
-            msgAdd(sprintf($this->lang['msg_approval_success'], $sale['Message'], $sale['AuthCode'], $cvv), 'success');
+            $cvv = !empty($sale['CVV2Response']) ? ($this->lang["CVV_{$sale['CVV2Response']}"] ?? $sale['CVV2Response']) : 'n/a';
+            msgAdd(sprintf(lang('msg_approval_success', $this->moduleID), $sale['Message'], $sale['AuthCode'], $cvv), 'success');
             return ['txID'=>$trans['Key'], 'txTime'=>$sale['TrxDate'], 'code'=>$sale['AuthCode']];
         }
         // else $sale['Status'] => Failure

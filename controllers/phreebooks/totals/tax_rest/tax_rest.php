@@ -24,7 +24,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/phreebooks/totals/tax_rest/tax_rest.php
  */
 
@@ -164,7 +164,11 @@ function totals_{$this->code}(begBalance) {
                 '&shipping='    + encodeURIComponent(ship || 0) +
                 '&total='       + encodeURIComponent(begBalance),
             async: false,
-            success: function(resp) { tax_rest = resp; },
+            dataType: 'json',
+            success: function(resp) {
+                tax_rest = resp && resp.tax ? resp.tax : 0;
+                if (resp && resp.message) displayMessage(resp.message);
+            },
             error: function() { tax_rest = 0; }
         });
     } else {

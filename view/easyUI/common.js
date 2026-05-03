@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /view/easyUI/common.js
  */
 
@@ -1158,16 +1158,19 @@ function processJson(json) {
 function displayMessage(message) {
     var msgText = '';
     var imgIcon = '';
-    // Process errors and warnings
+    // Process errors and warnings — skip entries with no text
     if (message.error) for (var i=0; i<message.error.length; i++) {
+        if (!message.error[i].text) continue;
         msgText += '<span>'+message.error[i].text+'</span><br />';
         imgIcon = 'error';
     }
     if (message.warning) for (var i=0; i<message.warning.length; i++) {
+        if (!message.warning[i].text) continue;
         msgText += '<span>'+message.warning[i].text+'</span><br />';
         if (!imgIcon) imgIcon = 'warning';
     }
     if (message.caution) for (var i=0; i<message.caution.length; i++) {
+        if (!message.caution[i].text) continue;
         msgText += '<span>'+message.caution[i].text+'</span><br />';
         if (!imgIcon) imgIcon = 'warning';
     }
@@ -1178,17 +1181,19 @@ function displayMessage(message) {
         msgTitle= bizLangJS('INFORMATION');
         msgID   = Math.floor((Math.random() * 1000000) + 1); // random ID to keep boxes from stacking and crashing easyui
         for (var i=0; i<message.info.length; i++) {
+            if (!message.info[i].text) continue;
             if (typeof message.info[i].title !== 'undefined') { msgTitle = message.info[i].title; }
             msgText += '<span>'+message.info[i].text+'</span><br />';
         }
-        processJson( { action:'window', id:msgID, title:msgTitle, html:msgText } );
+        if (msgText) processJson( { action:'window', id:msgID, title:msgTitle, html:msgText } );
     }
     if (message.success) {
         msgText = '';
         for (var i=0; i<message.success.length; i++) {
+            if (!message.success[i].text) continue;
             msgText += '<span>'+message.success[i].text+'</span><br />';
         }
-        jqBiz.messager.show({title:bizLangJS('MESSAGE'), msg:msgText, timeout:5000, width:400, height:200, style:{ right:'', top:'', bottom:-document.body.scrollTop-document.documentElement.scrollTop }});
+        if (msgText) jqBiz.messager.show({title:bizLangJS('MESSAGE'), msg:msgText, timeout:5000, width:400, height:200, style:{ right:'', top:'', bottom:-document.body.scrollTop-document.documentElement.scrollTop }});
     }
 }
 

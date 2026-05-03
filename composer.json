@@ -42,10 +42,10 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "@php -r \"$f=__DIR__.'/../bizuno-clients/phreesoft/biz.phreesoft.com (Private)/myExt/controllers/psTools/prune-vendor.php'; if(file_exists($f)){passthru('php '.escapeshellarg($f).' --vendor='.escapeshellarg(__DIR__.'/vendor'));}\""
+            "@php -r \"if(file_exists(__DIR__.'/myExt/controllers/psTools/prune-vendor.php')){passthru('php '.escapeshellarg(__DIR__.'/myExt/controllers/psTools/prune-vendor.php').' --vendor='.escapeshellarg(__DIR__.'/vendor'));}\""
         ],
         "post-update-cmd": [
-            "@php -r \"$f=__DIR__.'/../bizuno-clients/phreesoft/biz.phreesoft.com (Private)/myExt/controllers/psTools/prune-vendor.php'; if(file_exists($f)){passthru('php '.escapeshellarg($f).' --vendor='.escapeshellarg(__DIR__.'/vendor'));}\""
+            "@php -r \"if(file_exists(__DIR__.'/myExt/controllers/psTools/prune-vendor.php')){passthru('php '.escapeshellarg(__DIR__.'/myExt/controllers/psTools/prune-vendor.php').' --vendor='.escapeshellarg(__DIR__.'/vendor'));}\""
         ]
     }
 }

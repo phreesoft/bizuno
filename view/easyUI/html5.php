@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /view/easyUI/html5.php
  */
 
@@ -762,7 +762,7 @@ if ('state'==$key) { $data['fields'][$key]['attr']['type'] = 'state'; }
                 'action' => ['order'=>1,'label'=>lang('action'),'attr'=>['width'=>60],
                     'events' => ['formatter'=>"function(value,row,index) { return {$attr['dgName']}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt={$attr['getPath']}&pathID=$path&fileID=idTBD');"]],
+                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt={$attr['getPath']}&pathID=$path&fileID=idTBD&_csrf='+encodeURIComponent(bizCSRF));"]],
                         'trash'   =>['order'=>70,'icon'=>'trash',   'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('{$attr['delPath']}&secID={$attr['secID']}','{$attr['dgName']}','{$path}idTBD');"]]]],
                 'fn'   => ['order'=>10,'label'=>lang('filename'),'attr'=>['width'=>300,'resizable'=>true]],
                 'size' => ['order'=>20,'label'=>lang('size'),    'attr'=>['width'=>100,'resizable'=>true,'align'=>'center']],

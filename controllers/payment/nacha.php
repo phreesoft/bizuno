@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/payment/nacha.php
  *
  */
@@ -139,7 +139,7 @@ class paymentNacha
         msgDebug("\nNacha file generated = \n\n".print_r($data, true)."\n\n");
         $filename = biz_date('Ymd-his')."-{$this->map['id']}.txt";
         $io->fileWrite($data, "{$this->dirBackup}$filename");
-        $script = "jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=bizuno/main/fileDownload&pathID=$this->dirBackup&fileID=$filename');";
+        $script = "jqBiz('#attachIFrame').attr('src','".BIZUNO_URL_AJAX."&bizRt=bizuno/main/fileDownload&pathID=$this->dirBackup&fileID=$filename&_csrf='+encodeURIComponent(bizCSRF));";
         $button = '<button onclick="'.$script.'">Click here to download the NACHA file</button>';
         msgAdd("<p>A total of $this->rowCount ACH records were created.</p><p> $button </p>", 'info');
         msgLog("A total of $this->rowCount ACH records were created.");
