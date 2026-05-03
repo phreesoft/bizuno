@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/shipping/tools.php
  */
 
@@ -80,7 +80,7 @@ class shippingTools
             'columns' => [
                 'action' => ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index) { return {$name}Formatter(value,row,index); }"],
                     'actions'=> [
-                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src',bizunoAjax+'&bizRt=bizuno/main/fileDownload&pathID=&fileID=idTBD');"]],
+                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src',bizunoAjax+'&bizRt=bizuno/main/fileDownload&pathID=&fileID=idTBD&_csrf='+encodeURIComponent(bizCSRF));"]],
                         'trash'   =>['order'=>70,'icon'=>'trash',   'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('bizuno/main/fileDelete','$name','idTBD');"]]]],
                 'name' => ['order'=>10,'label'=>lang('filename'),'attr'=>['width'=>200,'align'=>'center','resizable'=>true]],
                 'size' => ['order'=>20,'label'=>lang('size'),    'attr'=>['width'=> 75,'align'=>'center','resizable'=>true]],

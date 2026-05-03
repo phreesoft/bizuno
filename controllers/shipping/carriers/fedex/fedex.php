@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -296,7 +296,7 @@ class fedex extends fedexCommon
             'columns'=> [
                 'action' => ['order'=>1,'label'=>lang('action'),'events'=>['formatter'=>"function(value,row,index) { return ".$name."Formatter(value,row,index); }"],
                     'actions'=> [
-                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src',bizunoAjax+'&bizRt=bizuno/main/fileDownload&pathID=$this->reconcile_path&fileID=idTBD');"]],
+                        'download'=>['order'=>30,'icon'=>'download','events'=>['onClick'=>"jqBiz('#attachIFrame').attr('src',bizunoAjax+'&bizRt=bizuno/main/fileDownload&pathID=$this->reconcile_path&fileID=idTBD&_csrf='+encodeURIComponent(bizCSRF));"]],
                         'trash'   =>['order'=>70,'icon'=>'trash',   'events'=>['onClick'=>"if (confirm('".jsLang('msg_confirm_delete')."')) jsonAction('bizuno/main/fileDelete','$name','{$this->reconcile_path}idTBD');"]]]],
                 'title'=> ['order'=>10,'label'=>lang('filename'),'attr'=>['align'=>'center','resizable'=>true]],
                 'size' => ['order'=>20,'label'=>lang('size'),    'attr'=>['align'=>'right', 'resizable'=>true]],

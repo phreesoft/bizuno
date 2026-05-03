@@ -25,7 +25,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-03
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -137,14 +137,24 @@ class phreebooksRestfulTax
      * Calculates the sales tax for a shipping address using the configured
      * Zip-Tax API (and optionally Geocodio for ZIP+4 enhancement). Results
      * are cached per (zip_key, state) in bizuno_tax_rate_cache and expire at
-     * the next quarter boundary. Pure GET endpoint that returns the dollar
-     * tax amount as a raw scalar (the totals widget reads it via $.ajax).
+     * the next quarter boundary. Returns a JSON envelope {tax, message} so
+     * msgStack errors (e.g. missing API key) reach the totals-widget JS,
+     * which feeds them through displayMessage() the same way standard
+     * Bizuno AJAX responses do.
      * @param array $layout - Structure
      */
     public function getTaxRate(&$layout=[])
     {
-        $layout = array_replace_recursive($layout, ['type'=>'raw','content'=>0]);
-        if (!validateAccess('j9_mgr', 1) && !validateAccess('j10_mgr', 1) && !validateAccess('j12_mgr', 1)) { return; }
+        global $msgStack;
+        $tax = $this->computeTaxRate();
+        $layout = array_replace_recursive($layout, [
+            'type'   => 'raw',
+            'content'=> json_encode(['tax'=>(float)$tax, 'message'=>$msgStack->error])]);
+    }
+
+    private function computeTaxRate()
+    {
+        if (!validateAccess('j9_mgr', 1) && !validateAccess('j10_mgr', 1) && !validateAccess('j12_mgr', 1)) { return 0; }
         $args = [
             'total'      => clean('total',      'float',    'get'),
             'shipping'   => clean('shipping',   'float',    'get'),
@@ -155,16 +165,16 @@ class phreebooksRestfulTax
             'country'    => strtoupper(clean('country','alpha_num','get')) ?: 'USA',
             'zipCode'    => clean('postal_code','chars',    'get')];
         msgDebug("\nEntering getTaxRate with args = ".print_r($args, true));
-        if (!in_array($args['state'], $this->nexusMeta['states'])) { return; } // outside nexus, no tax owed
-        if (in_array($args['state'], $this->statesNoTax))          { return; } // state has no sales tax at all
-        if (empty($args['zipCode']))                                { return msgAdd("Missing or invalid postal code provided."); }
-        $rate    = $this->lookupTaxRate($args);
-        if ($rate === null) { return; } // lookup error already messaged
+        if (!in_array($args['state'], $this->nexusMeta['states'])) { return 0; } // outside nexus, no tax owed
+        if (in_array($args['state'], $this->statesNoTax))          { return 0; } // state has no sales tax at all
+        if (empty($args['zipCode'])) { msgAdd("Missing or invalid postal code provided."); return 0; }
+        $rate = $this->lookupTaxRate($args);
+        if ($rate === null) { return 0; } // lookup error already messaged
         $taxShip = in_array($args['state'], $this->stateTaxShip);
         $taxable = $taxShip ? floatval($args['total']) : (floatval($args['total']) - floatval($args['shipping']));
         $tax     = round($taxable * $rate, 2);
         msgDebug("\nExiting getTaxRate with rate=$rate, taxable=$taxable, tax=$tax");
-        $layout['content'] = $tax;
+        return $tax;
     }
 
     /**
