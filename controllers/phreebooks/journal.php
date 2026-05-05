@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -560,9 +560,9 @@ class journal
         } else { // generate a new order/invoice value
             switch ($this->main['journal_id']) { // select the field to fetch the next number
                 case  6: if (!$this->main['waiting']) { return msgAdd(lang('err_gl_invoice_num_empty')); }
-                case 14: // Allow dups. Otherwise it increments WO-### and other extensions ref's and will cause dups
-                case 15:
-                case 16: return true;
+                case 14: $str_field = 'next_ref_j14'; break;
+                case 15: $str_field = 'next_ref_j15'; break;
+                case 16: $str_field = 'next_ref_j16'; break;
                 case 17: $str_field = 'next_ref_j18'; break;
                 case 18: return 'DP'.biz_date('Ymd'); // reference field was left blank, generate a default value of today
                 case 19: $str_field = 'next_ref_j12'; break;

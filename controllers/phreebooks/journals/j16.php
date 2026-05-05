@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-27
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/phreebooks/journals/j16.php
  */
 
@@ -77,7 +77,6 @@ class j16 extends jCommon
     public function customizeView(&$data)
     {
         $fldKeys = ['id','journal_id','recur_id','recur_frequency','item_array','store_id','invoice_num','rep_id','post_date'];
-        $data['fields']['invoice_num']['required'] = true;
         $data['jsHead']['datagridData'] = $this->dgDataItem;
         $data['datagrid']['item'] = $this->dgAdjust('dgJournalItem');
         unset($data['toolbars']['tbPhreeBooks']['icons']['print'],  $data['toolbars']['tbPhreeBooks']['icons']['recur']);

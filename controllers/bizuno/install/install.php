@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-03
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/bizuno/install/install.php
  */
 
@@ -47,6 +47,9 @@ class bizInstall // Checking users:
             'next_ref_j10'     => ['label'=>'journal_id_10', 'value'=>'SO00001'],
             'next_ref_j12'     => ['label'=>'journal_id_12', 'value'=>'INV00001'],
             'next_ref_j13'     => ['label'=>'journal_id_13', 'value'=>'CM00001'],
+            'next_ref_j14'     => ['label'=>'journal_id_14', 'value'=>'ASY00001'],
+            'next_ref_j15'     => ['label'=>'journal_id_15', 'value'=>'XFR00001'],
+            'next_ref_j16'     => ['label'=>'journal_id_16', 'value'=>'ADJ00001'],
             'next_ref_j18'     => ['label'=>'journal_id_18', 'value'=>'RCT00001'],
             'next_ref_j20'     => ['label'=>'journal_id_20', 'value'=>'CK00001'],
             'next_return_num'  => ['label'=>'returns',       'value'=>'RMA00001'],
