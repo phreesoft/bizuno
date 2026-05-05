@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/administrate/tools.php
  */
 
@@ -189,7 +189,13 @@ class administrateTools {
     }
 
     /**
-     * Updates the references in the Bizuno cache with a modified values set by user in Settings
+     * Updates the references in the Bizuno cache with a modified values set by user in Settings.
+     *
+     * `bizuno_refs` rows ship in two shapes — fresh installs (post-7.x) store each entry as an
+     * associative array `['value'=>'R1000','label'=>'...']`; pre-7.x installs store the raw scalar
+     * `'R1000'`. `getNextReference()` and `setNextReference()` both branch on `is_array($entry)` to
+     * handle both — this method must too. Without the branch, PHP 8 fatals with "Cannot access
+     * offset of type string on string" the moment the foreach hits a legacy scalar entry.
      */
     public function statusSave()
     {
@@ -198,7 +204,9 @@ class administrateTools {
         $rID = metaIdxClean($meta);
         foreach ($meta as $key => $row) {
             $value = clean('stat_'.$key, 'alpha_num', 'post');
-            if (!empty($value)) { $meta[$key]['value'] = $value; }
+            if (empty($value)) { continue; }
+            if (is_array($row)) { $meta[$key]['value'] = $value; }    // new dict-shaped entry
+            else                { $meta[$key]          = $value; }   // legacy scalar entry
         }
         dbMetaSet($rID, 'bizuno_refs', $meta);
         msgAdd(lang('msg_settings_saved'), 'success');

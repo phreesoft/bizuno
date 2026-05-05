@@ -25,7 +25,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-03
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/phreebooks/restfulTax.php
  */
 
@@ -183,10 +183,16 @@ class phreebooksRestfulTax
      * 5-digit ZIP up to ZIP+4 when the API key is present — this gives
      * cache hits at finer geographic resolution. When no Geocodio key is
      * set, we cache by 5-digit ZIP and accept the coarser hit rate.
+     *
+     * Cache lifecycle: rows are NEVER deleted. A fresh fetch UPDATES the
+     * existing row in place, preserving history (so quarterly sales-tax
+     * reports can still resolve jurisdiction names for periods that ended
+     * months ago). `expires_at` is set to the next calendar-quarter start
+     * — so a row stays "fresh" for the rest of the quarter, then the next
+     * lookup that touches it triggers a refresh-update.
      */
     private function lookupTaxRate($args)
     {
-        global $io;
         $this->ensureCacheTable();
         $zipClean    = preg_replace('/[^0-9]/', '', $args['zipCode']);
         $zipLen      = strlen($zipClean);
@@ -197,22 +203,38 @@ class phreebooksRestfulTax
         elseif ($zipLen === 5 && $args['country'] === 'USA' && $args['state'] && $args['city'] && $args['address1']) {
             $zipPlus4 = $this->resolveZipPlus4($zip5, $args); // null when key is missing or no match
         }
-        $cacheKey    = $zipPlus4 ?: $zip5;
-        $today       = biz_date('Y-m-d');
-        $cached      = dbGetRow(BIZUNO_DB_PREFIX.'tax_rate_cache', "zip_key='$cacheKey' AND state='{$args['state']}'");
-        if ($cached && $cached['expires_at'] <= $today) {
-            dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."tax_rate_cache WHERE id={$cached['id']}");
-            $cached = [];
-        }
-        if ($cached) {
+        $cacheKey = $zipPlus4 ?: $zip5;
+        $today    = biz_date('Y-m-d');
+        $cached   = dbGetRow(BIZUNO_DB_PREFIX.'tax_rate_cache', "zip_key='$cacheKey' AND state='{$args['state']}'");
+        if ($cached && $cached['expires_at'] > $today) {
             msgDebug("\ntax_rate_cache hit: zip_key=$cacheKey state={$args['state']} rate={$cached['combined_rate']}");
             return (float)$cached['combined_rate'];
         }
+        // Stale (existing row, expired) or missing — fetch from API and write/update.
+        $existingId = !empty($cached['id']) ? (int)$cached['id'] : 0;
+        return $this->fetchAndCacheRate($args, $cacheKey, $existingId);
+    }
+
+    /**
+     * Calls the Zip-Tax API for the given address and writes the result to
+     * tax_rate_cache. If `$existingId` is non-zero, UPDATEs that row (preserves
+     * the row's identity and any references to it); otherwise INSERTs a new
+     * row. Returns the decimal rate, or null when the API key isn't configured.
+     *
+     * Used both by lookupTaxRate (fresh-tax math at the order-edit screen)
+     * and by the calcTaxCollected report path, which calls it on cache miss
+     * to backfill jurisdiction names for historical invoices.
+     */
+    private function fetchAndCacheRate($args, $cacheKey, $existingId = 0)
+    {
+        global $io;
         $apiKey = (string)getModuleCache('api', 'settings', 'sales_tax_api', 'ziptax_key');
         if ($apiKey === '') {
             msgAdd("Zip-Tax API key not configured. Set it under API Settings → Sales Tax APIs.");
             return null;
         }
+        $zipClean = preg_replace('/[^0-9]/', '', $args['zipCode']);
+        $zip5     = strlen($zipClean) >= 5 ? substr($zipClean, 0, 5) : $zipClean;
         $fullAddr = trim("{$args['address1']} {$args['address2']}, {$args['city']}, {$args['state']} $zip5");
         $opts = ['headers' => ['X-API-KEY' => $apiKey, 'Content-Type' => 'application/json']];
         $body = ['format' => 'json', 'countryCode' => $args['country'], 'address' => $fullAddr];
@@ -237,15 +259,22 @@ class phreebooksRestfulTax
                 if ($type === 'US_CITY_SALES_TAX')   { $jurCity   = $jur['jurName'] ?? ''; }
             }
         }
-        dbWrite(BIZUNO_DB_PREFIX.'tax_rate_cache', [
+        $row = [
             'zip_key'      => $cacheKey,
             'state'        => $args['state'],
             'combined_rate'=> $rate,
             'state_name'   => $jurState,
             'county'       => $jurCounty,
             'city'         => $jurCity,
-            'fetched_at'   => $today,
-            'expires_at'   => $this->getNextQuarterStart()]);
+            'fetched_at'   => biz_date('Y-m-d'),
+            'expires_at'   => $this->getNextQuarterStart()];
+        if ($existingId > 0) {
+            dbWrite(BIZUNO_DB_PREFIX.'tax_rate_cache', $row, 'update', "id=$existingId");
+            msgDebug("\ntax_rate_cache refreshed in place: id=$existingId, zip_key=$cacheKey state={$args['state']} rate=$rate");
+        } else {
+            dbWrite(BIZUNO_DB_PREFIX.'tax_rate_cache', $row);
+            msgDebug("\ntax_rate_cache new row: zip_key=$cacheKey state={$args['state']} rate=$rate");
+        }
         return $rate;
     }
 
@@ -344,6 +373,8 @@ class phreebooksRestfulTax
      */
     private function generateTaxReport($data)
     {
+        msgTrap();
+        msgDebug("\nEntering generateTaxReport with data = ".msgPrint($data));
         $output    = [];
         $mktplaces = !empty($data['marketplaces']) ? $data['marketplaces'] : [];
         $nexusSt   = !empty($data['nexus']) ? $data['nexus'] : [];
@@ -356,7 +387,7 @@ class phreebooksRestfulTax
             $nexus = in_array($row['state'], $nexusSt) ? 1 : '';
             $exempt= in_array($row['state'], $this->statesNoTax) || empty($row['tax']) ? 1 : '';
             $info  = in_array($state, $this->statesDetail)
-                ? $this->getJurisdictionFromCache($row['postal_code'], $row['state'])
+                ? $this->getOrFetchJurisdiction($row)
                 : ['county'=>'_all', 'state_rate'=>0, 'county_rate'=>0, 'city_rate'=>0];
             $cnty  = !empty($row['tax']) ? ($info['county'] ?: '_unknown') : '_exempt';
             $city  = !empty($row['tax']) && (!$this->skipCity || substr($cnty, -1) === '*') ? ucwords(strtolower($row['city'])) : '_all';
@@ -384,12 +415,49 @@ class phreebooksRestfulTax
         if (empty($zip)) { return $default; }
         $zip5 = substr(preg_replace('/[^0-9]/', '', $zip), 0, 5);
         if ($zip5 === '') { return $default; }
-        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'tax_rate_cache',
-            "zip_key LIKE '$zip5%' AND state='".strtoupper($state)."'");
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'tax_rate_cache', "zip_key LIKE '$zip5%' AND state='".strtoupper($state)."'");
         if (empty($rows)) { return $default; }
         $county = $rows[0]['county'] ?? '';
         if (count($rows) > 1) { $county .= '*'; } // ambiguity — multiple ZIP+4 buckets for this ZIP5
         return ['county'=>$county, 'state_rate'=>0, 'county_rate'=>0, 'city_rate'=>0]; // Zip-Tax returns combined rate only; sub-rates left at 0
+    }
+
+    /**
+     * Same-shape return as `getJurisdictionFromCache()`, but on cache miss
+     * for an invoice's (zip, state), reaches out to Zip-Tax and inserts a
+     * cache row for that pair. Lets `calcTaxCollected` fill in jurisdiction
+     * names for historical invoices whose cache rows were never created
+     * (or were deleted under the previous lifecycle behavior).
+     *
+     * Cost: one Zip-Tax API call per unique (zip, state) the report touches
+     * that isn't already cached. Subsequent runs of the same report (or any
+     * downstream lookup for the same address) hit the cache.
+     *
+     * Address fields come from the invoice row: `address1`, `address2`,
+     * `city`, `state`, `postal_code`, `country` (already populated by
+     * `calcTaxCollected` from `journal_main.*_s` fields).
+     */
+    private function getOrFetchJurisdiction($row)
+    {
+        $info = $this->getJurisdictionFromCache($row['postal_code'] ?? '', $row['state'] ?? '');
+        if (!empty($info['county'])) { return $info; }
+        // Cache miss for a detail-state. Backfill via the Zip-Tax API so the report
+        // has a county name for this (zip, state). Skip if we don't have enough
+        // address bits to query — the report just shows '_unknown' in that case.
+        $zip = $row['postal_code'] ?? '';
+        if (empty($zip) || empty($row['state'])) { return $info; }
+        msgDebug("\nReport jurisdiction backfill: zip=$zip state={$row['state']}");
+        $args = [
+            'address1' => $row['address1'] ?? '',
+            'address2' => $row['address2'] ?? '',
+            'city'     => $row['city']     ?? '',
+            'state'    => strtoupper($row['state']),
+            'country'  => strtoupper($row['country'] ?? 'USA') ?: 'USA',
+            'zipCode'  => $zip,
+        ];
+        $rate = $this->lookupTaxRate($args);
+        if ($rate === null) { return $info; } // API key missing / hard error — already messaged
+        return $this->getJurisdictionFromCache($zip, $row['state']);
     }
 
     private function generateFile($data=[])
