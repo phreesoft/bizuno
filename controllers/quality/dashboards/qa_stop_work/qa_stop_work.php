@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/quality/dashboards/qa_stop_work/qa_stop_work.php
  */
 
@@ -83,7 +83,7 @@ class qa_stop_work
             $rows[] = viewDashLink($left, $right, $action);
         }
         if (empty($rows)) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }
-        $html = !empty($result) ? '<form id="form'.$this->code.'" action="'.$action.'">'.html5('', $iconExp).'</form>' : '';
+        $html = !empty($result) ? '<form id="form'.$this->code.'" action="'.$action.'">'.bizCsrfHiddenInput().html5('', $iconExp).'</form>' : '';
         return ['lists'=>$rows, 'html'=>$html, 'jsHead'=>"ajaxDownload('form{$this->code}');"];
       }
 }

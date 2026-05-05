@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-05-04
  * @filesource /model/msg.php
  */
 
@@ -54,18 +54,12 @@ final class messageStack
     /**
      * Returns a copy of $data with values redacted when the key matches a sensitive-field pattern
      * (passwords, card numbers, CVV, API keys, auth tokens, 2FA codes). Recurses into nested arrays.
+     * Thin wrapper around the standalone bizScrubSensitive() helper so both the trace.txt
+     * boot-time dump (here) and msgPrint() (which any plugin can call) share one regex.
      */
     private function scrubSensitive($data)
     {
-        if (!is_array($data)) { return $data; }
-        $pattern = '/pass|pwd|userpw|secret|token|api[_-]?key|txn[_-]?key|card|pan|cvv|cvc|card[_-]?code|otp|2fa|tfa|twofa/i';
-        $output = [];
-        foreach ($data as $key => $val) {
-            if (is_array($val)) { $output[$key] = $this->scrubSensitive($val); }
-            elseif (is_string($key) && preg_match($pattern, $key)) { $output[$key] = '***'; }
-            else { $output[$key] = $val; }
-        }
-        return $output;
+        return bizScrubSensitive($data);
     }
 
     /**
@@ -222,12 +216,40 @@ function msgDebugWrite($filename=false, $append=false, $force=false)
     if (is_object($msgStack)) { $msgStack->debugWrite($filename, $append, $force); }
 }
 
+/**
+ * Recursively redacts values whose key matches a sensitive-field pattern. Single source of
+ * truth shared by `messageStack::scrubSensitive()` (the trace.txt $_GET / $_POST boot dump)
+ * and `msgPrint()` (every print_r-into-log-from-anywhere call). Adding a key category here
+ * propagates to every debug surface in one edit.
+ *
+ * Pattern hits: passwords (pass/pwd/userpw), API/auth tokens (token/secret/api[_-]?key/
+ * txn[_-]?key), card data (card/pan/cvv/cvc/card[_-]?code), and 2FA codes (otp/2fa/tfa/twofa).
+ * Match is case-insensitive on the array key. Non-array inputs are returned untouched so
+ * callers can pass scalars freely.
+ */
+function bizScrubSensitive($data)
+{
+    if (!is_array($data)) { return $data; }
+    $pattern = '/pass|pwd|userpw|secret|token|api[_-]?key|txn[_-]?key|card|pan|cvv|cvc|card[_-]?code|otp|2fa|tfa|twofa/i';
+    $output = [];
+    foreach ($data as $key => $val) {
+        if (is_array($val))                                          { $output[$key] = bizScrubSensitive($val); }
+        elseif (is_string($key) && preg_match($pattern, (string)$key)) { $output[$key] = '***'; }
+        else                                                         { $output[$key] = $val; }
+    }
+    return $output;
+}
+
 /*
- * Wrapper for print_r function which WordPress plugin checker doesn't like
+ * Wrapper for print_r function which WordPress plugin checker doesn't like.
+ * Auto-redacts sensitive keys (api_token, password, etc.) before stringifying so debug
+ * traces from anywhere in the codebase — bizuno core or any WP plugin that loads the
+ * shared msg helpers — never leak credentials. The bizuno-api plugin's earlier trace
+ * leak of `api_token` and `rest_user_pass` via `msgPrint($options)` is closed by this.
  */
 function msgPrint($value)
 {
-   return print_r($value, true);
+   return print_r(bizScrubSensitive($value), true);
 }
 
 /**

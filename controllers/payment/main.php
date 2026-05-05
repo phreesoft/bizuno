@@ -60,9 +60,10 @@ class paymentMain
     }
 
     /**
-     * Authorize a credit card. Calls $gateway->payment('authorize', ...) on the new
-     * generic dispatcher API. The legacy `paymentAuth()` shim on each gateway is
-     * retained for now and becomes dead code; remove in a follow-up after testing.
+     * Authorize a credit card. Prefers the generic `$gateway->payment('authorize', …)`
+     * dispatcher; falls back to the legacy `paymentAuth($fields, $ledger)` shim on
+     * gateways that haven't yet been ported (e.g. a client myExt that lags the core
+     * deploy). Without the fallback this would fatal on any gateway missing `payment()`.
      * @return string|false - txID on success, false on failure
      */
     public function authorize($ledger=[])
@@ -71,16 +72,26 @@ class paymentMain
         $method = clean('method_code','text', 'post');
         if (!$gateway = $this->getGateway($method)) { return; }
         if (!$fields  = $this->process($method, $ledger)) { return; }
-        $r = $gateway->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
-        if (empty($r['ok'])) { return; }
-        return !empty($r['txID']) ? $r['txID'] : '1';
+        if (method_exists($gateway, 'payment')) {
+            $r = $gateway->payment('authorize', ['fields'=>$fields, 'ledger'=>$ledger]);
+            if (empty($r['ok'])) { return; }
+            return !empty($r['txID']) ? $r['txID'] : '1';
+        }
+        if (method_exists($gateway, 'paymentAuth')) {
+            if (!$response = $gateway->paymentAuth($fields, $ledger)) { return; }
+            return !empty($response['txID']) ? $response['txID'] : '1';
+        }
+        return '1'; // no auth path on this gateway — historic behavior
     }
 
     /**
-     * Process a sale. Examines the posted `<method>_action` radio:
-     *   c = capture-prior-auth  → payment('capAuth', ...)
+     * Process a sale. Prefers the generic `$gateway->payment($action, …)` dispatcher;
+     * falls back to the legacy `sale($fields, $ledger)` shim on gateways that haven't
+     * yet been ported (e.g. a client myExt that lags the core deploy). The dispatcher
+     * path examines the posted `<method>_action` radio:
+     *   c = capture-prior-auth  → payment('capAuth', …)
      *   w = manual/website      → no gateway call, just record locally
-     *   s, n, '' = new sale     → payment('capture', ...)
+     *   s, n, '' = new sale     → payment('capture', …)
      * (The c/s/n/w convention is shared by every credit-card gateway's render(); record-only
      * methods like cod/moneyorder/directdebit don't render the radio and fall through to capture.)
      * @return array|false - normalized response on success, false on failure
@@ -99,7 +110,7 @@ class paymentMain
         if ($radio === 'w') {
             // manual/web-side capture — nothing to send to the gateway, just record
             $r = ['ok'=>true, 'txID'=>'', 'code'=>'', 'data'=>[]];
-        } else {
+        } elseif (method_exists($gateway, 'payment')) {
             $action = ($radio === 'c') ? 'capAuth' : 'capture';
             $payData = ['fields'=>$fields, 'ledger'=>$ledger];
             if ($radio === 'c') {
@@ -108,6 +119,16 @@ class paymentMain
             msgDebug("\nProcessing sale with method = $method action = $action");
             $r = $gateway->payment($action, $payData);
             if (empty($r['ok'])) { return; }
+        } elseif (method_exists($gateway, 'sale')) {
+            // Legacy fallback for un-ported gateways (typically client myExt). Translate the
+            // historic ['txID'=>X,'txTime'=>Y,'code'=>Z] return shape into the dispatcher's
+            // normalized form so the rest of this method can stay on one code path.
+            msgDebug("\nProcessing sale via legacy gateway->sale() — gateway has not been ported to payment() dispatcher");
+            if (!$result = $gateway->sale($fields, $ledger)) { return; }
+            $r = ['ok'=>true, 'txID'=>$result['txID'] ?? '', 'code'=>$result['code'] ?? '', 'data'=>['txTime'=>$result['txTime'] ?? '']];
+        } else {
+            // Gateway has neither the dispatcher nor the legacy shim — record-only with nothing to call.
+            $r = ['ok'=>true, 'txID'=>'', 'code'=>'', 'data'=>[]];
         }
         // add to the description
         $desc = bizDecode($iID['description']);
@@ -119,9 +140,10 @@ class paymentMain
     }
 
     /**
-     * Void an unsettled transaction. Wraps the gateway dispatcher's `payment('void', ...)`
-     * action; the dispatcher itself does the journal_item trans_code lookup from rID and
-     * handles the "graceful skip" case (refunds disabled, no txID present).
+     * Void an unsettled transaction. Prefers the generic `$gateway->payment('void', …)`
+     * dispatcher (which does the journal_item trans_code lookup and handles graceful
+     * skip when refunds are disabled); falls back to legacy `void($rID)` for gateways
+     * that haven't been ported.
      * @return bool true on success or non-fatal skip; false only when the gateway call itself failed
      */
     public function void($method='', $rID=0)
@@ -129,14 +151,22 @@ class paymentMain
         msgDebug("\nEntering payment:void with method=$method rID=$rID");
         if (empty($method) || empty($rID)) { return true; } // nothing to do
         if (!$gateway = $this->getGateway($method)) { return true; } // getGateway already messaged
-        $r = $gateway->payment('void', ['rID'=>$rID]);
-        return !empty($r['ok']);
+        if (method_exists($gateway, 'payment')) {
+            $r = $gateway->payment('void', ['rID'=>$rID]);
+            return !empty($r['ok']);
+        }
+        if (method_exists($gateway, 'void')) {
+            return !empty($gateway->void($rID));
+        }
+        return true; // no void path — non-fatal, let the journal delete proceed
     }
 
     /**
-     * Process a customer refund. Calls $gateway->payment('refund', ...) with txID + amount,
-     * and pulls last4 from the original payment's description hint so SDK-based gateways
-     * (auth.net) that require a card number on refundTransaction can complete.
+     * Process a customer refund. Prefers the generic `$gateway->payment('refund', …)`
+     * dispatcher; falls back to legacy `refund($transCode, $amount)` for gateways
+     * that haven't been ported. Pulls `last4` from the original payment's description
+     * hint so SDK-based gateways (auth.net) that require a card number on
+     * refundTransaction can complete.
      * @return boolean - always returns true so the credit memo proceeds even when the
      *                   gateway-side refund fails or is skipped (matches legacy behavior)
      */
@@ -148,16 +178,25 @@ class paymentMain
         if (empty($transCode)) { return true; } // had no transaction code so probably wasn't a credit card
         $method   = guessPaymentMethod(0, $j13ttlRow['description']);
         if (!$gateway = $this->getGateway($method)) { return; }
-        // last4 lives in the original payment's description hint — required by SDK gateways (auth.net)
-        $origDesc = bizDecode($j13ttlRow['description']);
-        $last4    = !empty($origDesc['hint']) ? substr((string)$origDesc['hint'], -4) : '';
-        msgDebug("\nProcessing refund with method = $method, amount = $amount, last4 = $last4");
-        $r = $gateway->payment('refund', [
-            'txID'   => $transCode,
-            'amount' => $amount,
-            'last4'  => $last4,
-        ]);
-        if (empty($r['ok'])) { return; }
+        if (method_exists($gateway, 'payment')) {
+            // last4 lives in the original payment's description hint — required by SDK gateways (auth.net)
+            $origDesc = bizDecode($j13ttlRow['description']);
+            $last4    = !empty($origDesc['hint']) ? substr((string)$origDesc['hint'], -4) : '';
+            msgDebug("\nProcessing refund with method = $method, amount = $amount, last4 = $last4");
+            $r = $gateway->payment('refund', [
+                'txID'   => $transCode,
+                'amount' => $amount,
+                'last4'  => $last4,
+            ]);
+            if (empty($r['ok'])) { return; }
+        } elseif (method_exists($gateway, 'refund')) {
+            msgDebug("\nProcessing refund via legacy gateway->refund() — gateway has not been ported to payment() dispatcher");
+            if (!$result = $gateway->refund($transCode, $amount)) { return; }
+            $r = ['ok'=>true, 'txID'=>$result['txID'] ?? '', 'code'=>$result['code'] ?? ''];
+        } else {
+            // Gateway has no refund path — record locally and proceed.
+            $r = ['ok'=>true, 'txID'=>'', 'code'=>''];
+        }
         $parts = ['method'=>$method, 'status'=>'rfnd', 'code'=>$r['code']];
         $desc  = array_replace(bizDecode($j22ttlRow['description']), $parts);
         $fields= ['description'=>bizEncode($desc), 'trans_code'=>$r['txID']];
