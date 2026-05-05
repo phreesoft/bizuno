@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-05 (CSRF token on labelPDF download URL)
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -534,6 +534,13 @@ function preSubmit() {
      * printer attached. Uses getLocalDevices(...) so we can find ANY Zebra
      * printer the service knows about — getDefaultDevice() only finds the OS
      * default which is rarely the Zebra one.
+     *
+     * The function is intentionally chatty on failure: when the 'printer'
+     * filter returns nothing it falls back to an unfiltered probe, then alerts
+     * everything Browser Print *did* report so a remote operator can read the
+     * categories and counts off the screen and back to support. This makes
+     * "No Zebra printer found" diagnostics possible without a Mac/PC remote
+     * desktop session and without DevTools access on the shipping PC.
      */
     private function thermalPrintJS()
     {
@@ -543,27 +550,77 @@ function labelThermal(thermData) {
         alert('Zebra Browser Print is not loaded. Reload the page and try again.');
         return;
     }
+    function summarize(devices) {
+        if (!devices || typeof devices !== 'object') { return '(no devices object)'; }
+        var keys = Object.keys(devices);
+        if (!keys.length) { return '(empty — no categories reported)'; }
+        var lines = [];
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            var arr = devices[k];
+            var n = (arr && arr.length) ? arr.length : 0;
+            var names = [];
+            if (n) {
+                for (var j = 0; j < arr.length; j++) {
+                    names.push((arr[j] && arr[j].name) ? arr[j].name : '?');
+                }
+            }
+            lines.push('  ' + k + ': ' + n + (n ? ' [' + names.join(', ') + ']' : ''));
+        }
+        return lines.join('\\n');
+    }
+    // Don't pass a deviceType filter — some Browser Print 3.x service builds don't
+    // match the 'printer' filter string even though they return devices under the
+    // `printer` category in the response. Empirical: ZP 500 + Browser Print 3.x on
+    // Windows reports ZERO results with filter='printer' but ONE result without filter.
+    // We read devices.printer from the unfiltered response instead.
     BrowserPrint.getLocalDevices(function(devices) {
         var printers = (devices && devices.printer) ? devices.printer : [];
-        if (!printers.length) {
-            alert('No Zebra printer found.\\n\\nChecks:\\n  • Zebra Browser Print desktop service is running\\n  • At least one Zebra printer is configured in Browser Print\\n  • The printer is powered on and connected (USB/network)');
+        if (printers.length) {
+            var device = printers[0]; // first Zebra printer reported by Browser Print
+            var i = 0;
+            function sendNext() {
+                if (i >= thermData.length) { setTimeout(function(){ window.close(); }, 2000); return; }
+                device.send(thermData[i], function() { i++; sendNext(); }, function(err) {
+                    alert('Print failed on ' + device.name + ': ' + err);
+                });
+            }
+            sendNext();
             return;
         }
-        var device = printers[0]; // first Zebra printer reported by Browser Print
-        var i = 0;
-        function sendNext() {
-            if (i >= thermData.length) { setTimeout(function(){ window.close(); }, 2000); return; }
-            device.send(thermData[i], function() { i++; sendNext(); }, function(err) {
-                alert('Print failed on ' + device.name + ': ' + err);
-            });
-        }
-        sendNext();
+        // No printer found in the unfiltered response either — surface what BP did report
+        // so the operator can spot the issue (wrong category, registration, etc.).
+        alert(
+            'No Zebra printer found.\\n\\n' +
+            'Browser Print returned the following on this PC:\\n' +
+            summarize(devices) + '\\n\\n' +
+            'If a printer is listed but under a category other than \"printer\",\\n' +
+            'open the Zebra Browser Print app and change the device type to Printer.\\n\\n' +
+            'If nothing is listed:\\n' +
+            '  • the desktop service is running (system tray icon)\\n' +
+            '  • the printer is registered there (Settings → Available Devices)\\n' +
+            '  • the printer is powered on and connected (USB / network)\\n' +
+            '  • only one Browser Print version is installed (services.msc)'
+        );
     }, function(err) {
-        alert('Could not reach Zebra Browser Print on this machine. Is the desktop service running?\\n\\n' + err);
-    }, 'printer');
+        alert(
+            'Could not reach Zebra Browser Print on this PC.\\n\\n' +
+            'Error: ' + (err && err.message ? err.message : err) + '\\n\\n' +
+            'Checks:\\n' +
+            '  • Browser Print desktop service is running\\n' +
+            '  • https://127.0.0.1:9101/available loads in this browser\\n' +
+            '    (accept the self-signed certificate if prompted)\\n' +
+            '  • no firewall is blocking localhost'
+        );
+    }); // no deviceType filter — see comment above
 }
 function labelPDF(rID, path) {
-    jqBiz.fileDownload(bizunoAjax+'&bizRt=$this->moduleID/ship/labelDownload&rID='+rID+'&data='+path, {
+    // CSRF Layer 2: this is a direct fileDownload (no form to host a hidden _csrf input)
+    // and uses an iframe-based POST that bypasses the jqBiz.ajaxSetup beforeSend hook,
+    // so neither the form transport nor the header transport delivers the token.
+    // Splicing the token into the URL takes the third-tier validateCsrf() GET fallback.
+    var url = bizunoAjax+'&bizRt=$this->moduleID/ship/labelDownload&rID='+rID+'&data='+path+'&_csrf=".addslashes(bizCsrfGet())."';
+    jqBiz.fileDownload(url, {
         failCallback: function (response, url) { processJson(JSON.parse(response)); },
         httpMethod: 'POST',
         data: ''

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    http://opensource.org/licenses/OSL-3.0  Open Software License (OSL 3.0)
- * @version    1.x Last Update: 2026-02-28
+ * @version    1.x Last Update: 2026-05-05
  * @filesource /controllers/files/admin.php
  */
 
@@ -984,7 +984,7 @@ class bizFiles
      */
     private function viewShareForm($userList=[])
     {
-        $html  = '<form id="bizShareForm" action="'.BIZOFFICE_AJAX.'&bizRt=bizStorage/setShareUsers&rID='.$this->postID.'">';
+        $html  = '<form id="bizShareForm" action="'.BIZOFFICE_AJAX.'&bizRt=bizStorage/setShareUsers&rID='.$this->postID.'">'.bizCsrfHiddenInput();
         $html .= '<p>'.lang('share_intro').'</p>';
         $html .= '<label for="shareUsers">'.lang('share_with').'</label>';
         $html .= '<input type="select" id="shareUsers" name="shareUsers">';

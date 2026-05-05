@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -724,7 +724,7 @@ class inventoryTools
         $layout = array_merge_recursive($layout, ['type'=>'divHTML',
             'divs'  => [
                 'body'  =>['order'=>50,'type'=>'html',  'html'=>'<div style="width:100%" id="chartForecastChart"></div>'],
-                'divExp'=>['order'=>70,'type'=>'html',  'html'=>'<form id="frmForecastChart" action="'.$action.'"></form>'],
+                'divExp'=>['order'=>70,'type'=>'html',  'html'=>'<form id="frmForecastChart" action="'.$action.'">'.bizCsrfHiddenInput().'</form>'],
                 'btnExp'=>['order'=>90,'type'=>'fields','keys'=>['icnExp']]],
             'fields'=> ['icnExp'=>['attr'=>['type'=>'button','value'=>lang('download_data')],'events'=>['onClick'=>"jqBiz('#frmForecastChart').submit();"]]],
             'jsHead'=> ['init'=>$js]]);

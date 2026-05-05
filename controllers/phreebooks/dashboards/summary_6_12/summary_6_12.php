@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/phreebooks/dashboards/summary_6_12/summary_6_12.php
  */
 
@@ -71,7 +71,7 @@ class summary_6_12
         $data   = $this->dataSales($opts['range']);
         $action = BIZUNO_URL_AJAX."&bizRt=phreebooks/tools/jrnlData&code=6_12&range={$opts['range']}";
         $html   = '<div style="width:100%" id="'.$this->code.'_chart"></div>';
-        $html  .= '<form id="sum_6_12" action="'.$action.'">'.html5('', $iconExp).'</form>';
+        $html  .= '<form id="sum_6_12" action="'.$action.'">'.bizCsrfHiddenInput().html5('', $iconExp).'</form>';
         $js     = "ajaxDownload('sum_6_12');
 function chart{$this->code}() {
     var data = new google.visualization.DataTable();

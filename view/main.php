@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /view/main.php
  */
 
@@ -1600,6 +1600,26 @@ function formatDatagrid($dbData, $name, $structure=[], $override=[])
 }
 
 /**
+ * Emits a hidden `_csrf` input for hand-built `<form>` strings — i.e. forms that don't go
+ * through the html5 builder's `<form>` renderer (which auto-injects via `csrfHidden()` in the
+ * html5 classes). Includes dashboard download buttons (googleChart / googleColumn / googleTable),
+ * the `summary_6_12` and `qa_stop_work` dashboard download forms, the office share dialogs,
+ * the inventory forecast download, and similar one-off `<form id="...">` HTML strings.
+ *
+ * These submit via `jqBiz.fileDownload` (iframe-based POST) which also bypasses the
+ * `jqBiz.ajaxSetup` `beforeSend` hook that attaches `X-Bizuno-Csrf` to xhr requests, so
+ * neither the header path nor the form-builder path delivers the token. Without this helper,
+ * every hand-built download/share button is rejected by `validateCsrf()` under
+ * `BIZUNO_CSRF_ENFORCE=true`. The field rides along when the form serializes;
+ * `validateCsrf()` reads it from `$_POST['_csrf']`.
+ */
+function bizCsrfHiddenInput()
+{
+    if (!function_exists("\\bizuno\\bizCsrfGet")) { return ''; }
+    return '<input type="hidden" name="_csrf" value="'.htmlspecialchars(bizCsrfGet(), ENT_QUOTES, 'UTF-8').'" />';
+}
+
+/**
  * Generates the HTML to create a Google pie chart
  * @param array $layout - structure coming in
  * @param type $dashID - div ID
@@ -1628,7 +1648,7 @@ function chart{$dashID}() {
     $html   = '<style>#{$dashID}_chart { width: 100% !important; height: 100% !important; }</style><div id="'.$dashID.'_chart"></div>';
     if (!empty($data['callback'])) {
         $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
-        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
+        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.bizCsrfHiddenInput().html5('', $iconExp).'</form>';
         $jsReady.= "\najaxDownload('dl_{$dashID}');";
     }
     if (!empty($data['click'])) {
@@ -1675,7 +1695,7 @@ function draw_{$dashID}_column() {
 }";
     if (!empty($data['callback'])) {
         $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
-        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
+        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.bizCsrfHiddenInput().html5('', $iconExp).'</form>';
         $jsReady.= "\najaxDownload('dl_$dashID')";
     }
     $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
@@ -1800,7 +1820,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', dra
 new MutationObserver(draw_{$dashID}_table).observe(document.body, { attributes: true, attributeFilter: ['class'] });";
     if (!empty($data['callback'])) {
         $iconExp = ['attr'=>['type'=>'button','value'=>lang('download')],'events'=>['onClick'=>"jqBiz('#dl_{$dashID}').submit();"]];
-        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.html5('', $iconExp).'</form>';
+        $html   .= "\n".'<form id="dl_'.$dashID.'" action="'.$data['callback'].'">'.bizCsrfHiddenInput().html5('', $iconExp).'</form>';
         $jsReady.= "\najaxDownload('dl_$dashID')";
     }
     $layout['divs']['body']   = ['order'=>50, 'type'=>'html', 'html'=>$html];
