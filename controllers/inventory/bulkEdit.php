@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-08
  * @filesource /controllers/inventory/bulkEdit.php
  */
 
@@ -152,10 +152,47 @@ jqBiz.extend(jqBiz.fn.datagrid.methods, { columnMenu: function(jq) { return buil
         // clean out values that are restricted or not in db, i.e. added by easyUI
         foreach (array_keys($values) as $field) { if (!isset($this->invTable[$field])) { unset($values[$field]); } }
         $values['last_update'] = biz_date('Y-m-d h:i:s');
+        // Defensive: clip oversize strings before they reach MySQL. Older installs (pre-7.3.x)
+        // can have narrower VARCHAR columns than the current canonical schema in tables.php
+        // (description_short was historically VARCHAR(20)/(32) on some legacy migrations
+        // before it was widened to VARCHAR(64)). Without this, a single oversized cell — for
+        // instance a 33-char `description_short` on a column still at VARCHAR(20) — fatals
+        // the entire save with SQLSTATE[22001] and the operator only sees the cryptic
+        // "Data too long for column" message. We clip per-field instead and surface a
+        // caution naming the SKU + field + actual length so the operator can fix the
+        // source data on their next pass; the row still lands and bulk-edit stays usable.
+        $this->clipToColumnLengths($values, $sku);
         msgDebug("\nSaving values = ".print_r($values, true));
         dbWrite(BIZUNO_DB_PREFIX."inventory", $values, 'update', "id=$rID");
         msgAdd(lang('msg_database_write'), 'success');
         msgLog(lang('inventory').'-'.lang('save')." - $sku (rID=$rID)");
+    }
+
+    /**
+     * Walks $values against $this->invTable and clips any string field whose value
+     * exceeds the column's declared (CHAR|VARCHAR) length. Mutates $values by reference.
+     * Adds one caution to the messageStack per clipped field, naming the SKU so a bulk
+     * save touching multiple rows is still debuggable. Multi-byte safe (mb_strlen/substr).
+     * Non-string columns and types we can't parse a length out of are left alone.
+     */
+    private function clipToColumnLengths(&$values, $sku)
+    {
+        foreach ($values as $field => $value) {
+            if (!is_string($value) || $value === '')   { continue; }
+            if (empty($this->invTable[$field]['dbType'])) { continue; }
+            $dbType = $this->invTable[$field]['dbType'];
+            // Match VARCHAR(N) / CHAR(N) — the only types where MySQL enforces a char-count limit
+            // we can know up-front. TEXT/MEDIUMTEXT have byte limits we won't ever hit from a UI
+            // grid edit, so don't bother. Length capture is char count; matches MySQL semantics
+            // for utf8mb4 (the default after the 7.3.6 charset migration in upgrade.php).
+            if (!preg_match('/^(varchar|char)\((\d+)\)/i', $dbType, $m)) { continue; }
+            $maxLen = (int)$m[2];
+            if ($maxLen <= 0)                          { continue; }
+            $actualLen = function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
+            if ($actualLen <= $maxLen)                 { continue; }
+            $values[$field] = function_exists('mb_substr') ? mb_substr($value, 0, $maxLen, 'UTF-8') : substr($value, 0, $maxLen);
+            msgAdd("SKU $sku: field <b>$field</b> was $actualLen chars but the column is limited to $maxLen — value clipped before save. Edit the source data to keep the full text.", 'caution');
+        }
     }
 
     /**
