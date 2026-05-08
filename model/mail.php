@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-17
+ * @version    7.x Last Update: 2026-05-08
  * @filesource /model/mail.php
  */
 
@@ -216,22 +216,31 @@ class bizunoMailer
     
     private function validateGoogleAppPW($creds)
     {
-        // Set default to users creds
-        $output  = ['email'=>$creds['email'], 'appPW'=>!empty($creds['gmail_app_pw']) ? trim($creds['gmail_app_pw']) : '']; 
-        // Take the mail from and strip everything except the email address
-        $mailFrom= clean('msgFrom', 'text', 'post');
-        $sender  = strpos($mailFrom, '<')!==false ? preg_replace('/.*?<([^>]+)>.*/', '$1', $mailFrom) : clean('msgFrom', 'email', 'post');
+        // Set default to users creds. Note: for *business* mail creds (when the user's
+        // own mail_mode is 'host'/blank, getMailCreds() falls back to bizuno.settings.mail)
+        // there is no `email` key — that path expects the per-sender lookup below to fill it in.
+        $output  = ['email'=>$creds['email'] ?? '', 'appPW'=>!empty($creds['gmail_app_pw']) ? trim($creds['gmail_app_pw']) : ''];
+        // Take the mail from and strip everything except the email address. Programmatic
+        // mailers (dashboards, crons, the autodownload notify path) don't post `msgFrom` —
+        // fall back to whatever the bizunoMailer instance was constructed with so the
+        // sender→app-password mapping below still has something to match. Without this,
+        // every non-form caller hits the empty-creds early-return and Gmail rejects the
+        // authentication with an empty Username.
+        $mailFrom = clean('msgFrom', 'text', 'post');
+        if (empty($mailFrom) && !empty($this->FromEmail)) { $mailFrom = $this->FromEmail; }
+        $sender   = strpos($mailFrom, '<')!==false ? preg_replace('/.*?<([^>]+)>.*/', '$1', $mailFrom) : trim((string)$mailFrom);
         msgDebug("\nGenerated filtered sender = $sender and output = ".msgPrint($output));
-        if (empty($mailFrom) || strtolower($sender)==strtolower($creds['email'])) { return $output; } // normal operation, email uses sender Google account
+        if (empty($mailFrom) || (!empty($creds['email']) && strtolower($sender)==strtolower($creds['email']))) { return $output; } // normal operation, email uses sender Google account
         // Retrieve business settings
         $myBiz   = getModuleCache('bizuno', 'settings', 'company');
         msgDebug("\nRead biz settings = ".msgPrint($myBiz));
         // Retrieve Google app passwords
         $myMail  = getModuleCache('bizuno', 'settings', 'mail');
-        if     ($myBiz['email']    ==$sender) { msgDebug("\n Hit email");    $output = ['email'=>$myBiz['email'],    'appPW'=>!empty($myMail['gmail_app_pw']) ? trim($myMail['gmail_app_pw']) : '']; }
-        elseif ($myBiz['email_ap'] ==$sender) { msgDebug("\n Hit email_ap"); $output = ['email'=>$myBiz['email_ap'], 'appPW'=>!empty($myMail['gmail_app_pw2'])? trim($myMail['gmail_app_pw2']): '']; }
-        elseif ($myBiz['email_ar'] ==$sender) { msgDebug("\n Hit email_ar"); $output = ['email'=>$myBiz['email_ar'], 'appPW'=>!empty($myMail['gmail_app_pw3'])? trim($myMail['gmail_app_pw3']): '']; }
-        elseif ($myBiz['email_mgr']==$sender) { msgDebug("\n Hit email_mgr");$output = ['email'=>$myBiz['email_mgr'],'appPW'=>!empty($myMail['gmail_app_pw4'])? trim($myMail['gmail_app_pw4']): '']; }
+        if     (!empty($myBiz['email'])     && $myBiz['email']    ==$sender) { msgDebug("\n Hit email");    $output = ['email'=>$myBiz['email'],    'appPW'=>!empty($myMail['gmail_app_pw']) ? trim($myMail['gmail_app_pw']) : '']; }
+        elseif (!empty($myBiz['email_ap'])  && $myBiz['email_ap'] ==$sender) { msgDebug("\n Hit email_ap"); $output = ['email'=>$myBiz['email_ap'], 'appPW'=>!empty($myMail['gmail_app_pw2'])? trim($myMail['gmail_app_pw2']): '']; }
+        elseif (!empty($myBiz['email_ar'])  && $myBiz['email_ar'] ==$sender) { msgDebug("\n Hit email_ar"); $output = ['email'=>$myBiz['email_ar'], 'appPW'=>!empty($myMail['gmail_app_pw3'])? trim($myMail['gmail_app_pw3']): '']; }
+        elseif (!empty($myBiz['email_mgr']) && $myBiz['email_mgr']==$sender) { msgDebug("\n Hit email_mgr");$output = ['email'=>$myBiz['email_mgr'],'appPW'=>!empty($myMail['gmail_app_pw4'])? trim($myMail['gmail_app_pw4']): '']; }
+        else { msgDebug("\n No business email mapping matched sender '$sender' — Gmail auth will fail with the empty default."); }
         msgDebug("\nReturning with adjusted email settings: ".msgPrint($output));
         return $output;
     }

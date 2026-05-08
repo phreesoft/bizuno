@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-05-08
  * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
  */
 
@@ -471,7 +471,7 @@ class ifAmazon {
                 validateData($strucMain, $ledger->main);
                 for ($i=0; $i<sizeof($items); $i++) { validateData($strucItem, $items[$i]); }
                 $ledger->items = $items;
-                if (!$ledger->Post()) { return; }
+                if (!$ledger->Post()) { return msgAdd("\nPost Error working on order ID = {$data['order-id']}"); }
                 $orderCnt++;
             }
             // prepare for next order.

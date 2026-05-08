@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-05-08
  * @filesource /controllers/phreebooks/dashboards/ship_j10/ship_j10.php
  */
 
@@ -154,9 +154,14 @@ class ship_j10
         $html = '';
         msgDebug("\nEmail list before email: ".print_r($this->emailList, true));
         foreach ($this->emailList as $row) { $html .= "SO #{$row['invNum']}: {$row['name']}<br />"; }
-        $fromEmail = 'support@phreesoft.com';
         $toEmail   = getModuleCache('bizuno', 'settings', 'company', 'email');
         $toName    = getModuleCache('bizuno', 'settings', 'company', 'contact');
+        // Send From the company's own primary email rather than a hardcoded support@phreesoft.com
+        // address. This is an internal "orders shipping today" reminder — the company is
+        // emailing itself. Using the company email also lets validateGoogleAppPW resolve to
+        // the matching gmail_app_pw entry when mail_mode='gmail'; the old PhreeSoft From
+        // never matched any business mapping and got rejected as "Could not authenticate".
+        $fromEmail = !empty($toEmail) ? $toEmail : 'support@phreesoft.com';
         $msgSubject= sprintf($this->lang['email_subject'], viewFormat($this->today, 'date'));
         $msgBody   = sprintf($this->lang['email_body'], $html);
         $mail      = new bizunoMailer($toEmail, $toName, $msgSubject, $msgBody, $fromEmail);
