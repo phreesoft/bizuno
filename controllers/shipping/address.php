@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-12
+ * @version    7.x Last Update: 2026-05-11
  * @filesource /controllers/shipping/address.php
  */
 
@@ -49,7 +49,14 @@ class shippingAddress extends shippingCommon
         $suffix    = clean('suffix',    ['format'=>'cmd', 'default' =>'_s'],'get');
         $methodCode= clean('methodCode',['format'=>'cmd', 'default;'=>''],  'get');
         if (!$ship || !isset($ship['address1'])) { return msgAdd("Cannot validate address, not enough address information sent!"); }
+        // common.js::shippingValidate() ships state and country as separate query params
+        // (line 2114 deliberately commented `state` out of the JSON blob — state lives in
+        // an easyUI combobox whose value isn't readable via the plain input[name] iterator).
+        // Merge both back into $ship here so carrier validators have a complete address.
+        // Without this, USPS rejects with "requires state" — Endicia happened to tolerate the
+        // missing state by silently dropping it from its payload, but that just hid the bug.
         $ship['country']= clean('country', ['format'=>'cmd', 'default;'=>'USA'], 'get');
+        $ship['state']  = clean('state',   ['format'=>'cmd', 'default'=>''],     'get');
         // first try shipper code validator, else try from registry in sort order
         $carrier   = explode(":", (string)$methodCode)[0];
         $output    = [];

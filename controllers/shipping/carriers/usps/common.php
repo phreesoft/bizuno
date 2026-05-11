@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-08
+ * @version    7.x Last Update: 2026-05-11
  * @filesource /controllers/shipping/carriers/usps/common.php
  *
  * Docs: https://developer.usps.com/  (specs in /Documents/USPS RESTFul API)
@@ -221,11 +221,10 @@ class uspsCommon
     {
         global $io;
         $url = $this->host() . $path;
-        if (!empty($opts['query']) && is_array($opts['query'])) {
-            // Drop empties — USPS's address validator 400s on empty params.
-            $q   = array_filter($opts['query'], function($v){ return $v !== '' && $v !== null; });
-            $url .= (strpos($url, '?')===false ? '?' : '&') . http_build_query($q);
-        }
+        // Drop empties — USPS's address validator 400s on empty params.
+        $query = !empty($opts['query']) && is_array($opts['query'])
+            ? array_filter($opts['query'], function($v){ return $v !== '' && $v !== null; })
+            : [];
         $headers = [
             'Authorization'=> 'Bearer ' . $token,
             'Accept'       => 'application/json',
@@ -239,13 +238,26 @@ class uspsCommon
             $headers['Content-Type'] = 'application/json';
         }
         if (!empty($opts['headers'])) { $headers = array_replace($headers, $opts['headers']); }
-        msgDebug("\nUSPS: $method $url");
+        // io->cURL convention: for GET the $data arg IS the query string to append (it
+        // unconditionally does `$url . '?' . $rData`); for POST/PUT it's the body. If we
+        // pre-bake the query into $url and pass $body=null to cURL, the GET path appends a
+        // bare `?` to the already-built URL — that trailing `?` becomes part of the LAST
+        // query parameter value on the server side. USPS's `^\d{5}$` ZIPCode pattern then
+        // rejected "76092?" with "regex does not match input string". Pass the query as
+        // $data for GETs instead, and only bake query into URL for non-GET (the rare case
+        // where a POST also carries URL params).
+        $isGet   = strtolower($method) === 'get';
+        $payload = $isGet ? $query : $body;
+        if (!$isGet && !empty($query)) {
+            $url .= (strpos($url, '?')===false ? '?' : '&') . http_build_query($query);
+        }
+        msgDebug("\nUSPS: $method $url" . ($isGet && !empty($query) ? '?' . http_build_query($query) : ''));
         $callOpts = ['headers'=>$headers];
         // Need the HTTP status to detect 401-and-retry. CURLOPT_HEADER is too
         // intrusive (mixes headers into the body); use a request_done capture
         // via curlinfo by going one level deeper.
         $callOpts['CURLOPT_FAILONERROR']  = false;
-        $raw = $io->cURL($url, $body, strtolower($method), $callOpts);
+        $raw = $io->cURL($url, $payload, strtolower($method), $callOpts);
         $decoded = is_string($raw) ? json_decode($raw, true) : null;
         if (!is_array($decoded)) {
             $hint = is_string($raw) && $raw !== '' ? substr($raw, 0, 200) : 'empty response';
