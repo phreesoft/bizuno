@@ -216,7 +216,7 @@ class portalApi
         // CSRF Layer 2: rotate the synchronizer token so a token from this session can't
         // be reused after the user signs back in (defense-in-depth against session-fixation).
         if (function_exists("\\bizuno\\bizCsrfRotate")) { bizCsrfRotate(); }
-        $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]]);
+        $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"sessionStorage.removeItem('bizuno'); window.location='".BIZUNO_URL_PORTAL."';"]]);
         if (function_exists("\\bizuno\\portalLogout")) { portalLogout($layout); }
     }
 

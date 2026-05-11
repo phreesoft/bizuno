@@ -184,11 +184,30 @@ function preSubmit() {
         $rID = clean('_rID', 'integer', 'post');
         if (!$security = validateAccess($this->secID, empty($rID)?2:3)) { return; }
         parent::saveMeta($layout, $args=['_rID'=>$rID]);
+        $this->rebuildCache();
+        $layout['content']['actionData'] .= " reloadSessionStorage();";
     }
     public function delete(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
         parent::deleteMeta($layout, ['_table'=>'common']);
+        $this->rebuildCache();
+        $layout['content']['actionData'] .= " reloadSessionStorage();";
+    }
+    private function rebuildCache()
+    {
+        $cache = [];
+        $rows  = dbMetaGet('%', $this->metaPrefix);
+        foreach ((array)$rows as $row) {
+            $cache[] = [
+                'id'      => $row['_rID'],
+                'title'   => $row['title'],
+                'rate'    => $row['tax_rate'],
+                'status'  => $row['inactive'],
+                'settings'=> !empty($row['taxAuths']['rows']) ? $row['taxAuths']['rows'] : [],
+            ];
+        }
+        setModuleCache('phreebooks', 'sales_tax', $this->type, $cache);
     }
 
     private function cleanAuths($auths=[])
