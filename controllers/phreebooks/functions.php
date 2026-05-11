@@ -579,20 +579,10 @@ function getTaxRate($taxID=0)
 function loadTaxes($type, $date=false)
 {
     if (!$date) { $date = biz_date('Y-m-d'); }
-    $output   = [];
-    $taxRates = getModuleCache('phreebooks', 'sales_tax', $type, false, []);
-    if (empty($taxRates)) { // cache not yet populated — build it from common_meta
-        $rows = dbMetaGet('%', "tax_rate_$type");
-        foreach ((array)$rows as $row) {
-            $auths = !empty($row['taxAuths']['rows']) ? $row['taxAuths']['rows'] : [];
-            $taxRates[] = ['id'=>$row['_rID'],'title'=>$row['title'],'rate'=>$row['tax_rate'],'status'=>$row['inactive'],'settings'=>$auths];
-        }
-        if (!empty($taxRates)) { setModuleCache('phreebooks', 'sales_tax', $type, $taxRates); }
-    }
+    $output  = [];
+    $taxRates= getModuleCache('phreebooks', 'sales_tax', $type, false, []);
     foreach ($taxRates as $row) {
-        // 'settings' may be stored as rows array (new) or full datagrid structure (old) — always extract the rows
-        $auths = isset($row['settings']['rows']) ? $row['settings']['rows'] : (array)($row['settings'] ?? []);
-        $output[] = ['id'=>$row['id'],'text'=>$row['title'],'tax_rate'=>$row['rate']." %",'status'=>$row['status'],'auths'=>$auths];
+        $output[] = ['id'=>$row['id'],'text'=>$row['title'],'tax_rate'=>$row['rate']." %",'status'=>$row['status'],'auths'=>$row['settings']];
     }
     array_unshift($output, ['id'=>'0', 'text'=>lang('none'), 'status'=>0, 'tax_rate'=>"0 %", 'auths'=>[]]);
     return $output;

@@ -1306,15 +1306,7 @@ function viewSalesTaxDropdown($type='c', $opts='')
     if ($opts=='contacts')  { $output[] = ['id'=>'-1', 'text'=>lang('per_contact'),  'status'=>0, 'tax_rate'=>'-']; }
     if ($opts=='inventory') { $output[] = ['id'=>'-1', 'text'=>lang('per_inventory'),'status'=>0, 'tax_rate'=>'-']; }
     $output[] = ['id'=>'0', 'text'=>lang('none'), 'status'=>0, 'tax_rate'=>0];
-    $taxRates = getModuleCache('phreebooks', 'sales_tax', $type, false, []);
-    if (empty($taxRates)) { // cache not yet populated — read from common_meta directly
-        $rows = dbMetaGet('%', "tax_rate_$type");
-        foreach ((array)$rows as $row) {
-            $taxRates[] = ['id'=>$row['_rID'],'title'=>$row['title'],'rate'=>$row['tax_rate'],'status'=>$row['inactive'],'settings'=>!empty($row['taxAuths']['rows'])?$row['taxAuths']['rows']:[]];
-        }
-        if (!empty($taxRates)) { setModuleCache('phreebooks', 'sales_tax', $type, $taxRates); }
-    }
-    foreach ($taxRates as $row) {
+    foreach (getModuleCache('phreebooks', 'sales_tax', $type, false, []) as $row) {
         if ($row['status'] == 0) { $output[] = ['id'=>$row['id'], 'text'=>$row['title'], 'status'=>$row['status'], 'tax_rate'=>$row['rate']]; }
     }
     return $output;
