@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-08
+ * @version    7.x Last Update: 2026-05-11
  * @filesource /controllers/shipping/carriers/usps/rate.php
  *
  * USPS Domestic Prices v3 — POST /prices/v3/base-rates/search
@@ -63,12 +63,36 @@ class uspsRate extends uspsCommon
         $bizCodes = array_filter(explode(':', (string)$this->settings['service_types']));
         if (empty($bizCodes)) { $bizCodes = array_values($this->options['rateCodes']); }
         $arrRates = [];
+        $errCntBefore = msgErrors();
         foreach ($bizCodes as $bizCode) {
             if (empty($this->options['mailClass'][$bizCode])) { continue; }
             $rate = $this->getRate($pkg, $bizCode);
-            if (!empty($rate)) { $arrRates[$bizCode] = $rate; }
+            if (!empty($rate)) { $arrRates[$bizCode] = $rate; continue; }
+            // A failure here is per-service (no rate for this mailClass at this weight/dim,
+            // or USPS doesn't price it for that lane). But auth/scope/token problems are
+            // global — every subsequent iteration will fail the same way and just stack
+            // duplicate "Insufficient OAuth scope" / "Unauthorized" messages in the popup.
+            // If the stack picked up a new error this iteration AND it's one of those
+            // global signals, bail the loop early so the operator sees the cause once.
+            $errCntAfter = msgErrors();
+            if ($errCntAfter > $errCntBefore && $this->lastErrorIsGlobal()) { break; }
+            $errCntBefore = $errCntAfter;
         }
         return sortOrder($arrRates, 'cost');
+    }
+
+    /**
+     * True when the most recent error on the message stack is a token/scope failure
+     * (i.e. won't change between rate requests). Used to short-circuit the per-service
+     * loop in rateQuote() so the operator doesn't see N copies of the same root cause.
+     */
+    private function lastErrorIsGlobal()
+    {
+        global $msgStack;
+        if (empty($msgStack->error['error'])) { return false; }
+        $last = end($msgStack->error['error']);
+        $text = is_array($last) ? ($last['text'] ?? '') : (string)$last;
+        return (bool) preg_match('/(insufficient.*scope|unauthorized|invalid.*token|forbidden|access.*denied)/i', $text);
     }
 
     /**

@@ -1,0 +1,5 @@
+# GitHub Sponsor button for the Bizuno repo.
+# Adds a ❤ Sponsor button at the top of github.com/phreesoft/bizuno that
+# links to the PayPal.me page. Add more URLs to `custom` (up to four) to
+# offer alternative donation channels.
+custom: ["https://paypal.me/DavePremo"]

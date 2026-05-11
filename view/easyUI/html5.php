@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-03
+ * @version    7.x Last Update: 2026-05-11
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1665,7 +1665,16 @@ for (i=0; i<bizDefaults.glAccounts.rows.length; i++) {
         if (!is_array($prop['attr']['value'])) {
             $prop['options']['value'] = "'".str_replace("'", "\\'", $prop['attr']['value'])."'"; // handle single quote in value variable
         } else {
-            $prop['options']['value'] = htmlspecialchars(json_encode($prop['attr']['value']));
+            // Hand raw JSON to addAttrs — escAttr() at the attribute boundary does the single
+            // htmlspecialchars pass. Previously this line pre-escaped with htmlspecialchars,
+            // which was fine when addAttrs used a plain str_replace('"', '\"', ...) but
+            // broke after escAttr() was upgraded to a proper htmlspecialchars: the pre-escaped
+            // `&quot;` got re-escaped to `&amp;quot;`, the browser decoded the attribute back
+            // to `&quot;`, and EasyUI's parseOptions choked on `&` with "Unexpected token '&'".
+            // Symptom on the page: every multi-select on shipping carrier settings panels
+            // (Endicia, FedEx, UPS, USPS, ODFL service_types/package_types) bailed parsing,
+            // cascading into the trailing numberbox/combobox widgets failing to initialize.
+            $prop['options']['value'] = json_encode($prop['attr']['value']);
         }
         if ( empty($prop['options']['editable']))  { $prop['options']['editable']  = 'false'; }
         if ( empty($prop['options']['width']))     { $prop['options']['width']     = 200; }
