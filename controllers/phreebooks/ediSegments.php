@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-09-09
+ * @version    7.x Last Update: 2026-05-15 (added N9() + MSG() handlers for 850 — capture reference info (e.g. PartsSource "PO POLICIES" + URL) as a $0 description line on the SO)
  * @filesource /controllers/phreebooks/ediSegments.php
  */
 
@@ -207,6 +207,35 @@ class phreebooksEdiSegments
     }
     protected function NTE() { // Process NTE tag (Note/Special Instruction)
     }
+    protected function N9() { // Process N9 tag (Reference Identification) for incoming 850
+        // X12 layout: N9*<qual>*<refID>*<description>. PartsSource sends N9*ZZ**PO POLICIES
+        // followed by MSG*<url>, so the human-readable label sits in element 03 (PHP index 3
+        // after the segment-ID at [0]). Other senders sometimes put the label in element 02
+        // (index 2) when the qualifier alone is enough context — fall back to that.
+        $n9    = $this->ediLines['N9']  ?? [];
+        $msg   = $this->ediLines['MSG'] ?? [];
+        $label = !empty($n9[3]) ? $n9[3] : ($n9[2] ?? '');
+        $text  = $msg[1] ?? '';
+        if ($label === '' && $text === '') { return; } // nothing useful to surface
+        $desc  = trim($label.(($label !== '' && $text !== '') ? ': ' : '').$text);
+        // Surface as a $0 descriptive item line on the SO so operators see the reference
+        // (e.g. policy URL) without it affecting totals. Matches the shape of the
+        // PID-derived "Vendor Description: …" line in PO1() below — empty SKU, qty 1,
+        // gl_type 'itm', default inventory GL, zero credit_amount.
+        $defInv = getModuleCache('inventory', 'settings', 'phreebooks', 'inv_ns');
+        $this->items[] = [
+            'sku'           => '',
+            'qty'           => 1,
+            'gl_type'       => 'itm',
+            'gl_account'    => $defInv,
+            'post_date'     => $this->main['post_date'],
+            'credit_amount' => 0,
+            'description'   => $desc];
+        // Note: the parser stores N9/MSG as flat single-occurrence arrays (see $isMulti in
+        // ediAPI.php). If a sender starts emitting multiple N9 loops per 850, add 'N9' and
+        // 'MSG' to $isMulti and iterate here.
+    }
+    protected function MSG() { } // text captured alongside N9() above; explicit no-op so dispatcher doesn't trap
     protected function PER() {
         $this->main['telephone1_b']= $this->main['telephone1_s']= $this->ediLines['PER'][6];
         $this->main['email_b']     = $this->main['email_s']     = $this->ediLines['PER'][4];

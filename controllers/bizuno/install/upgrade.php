@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-05-15 (added 7.3.9 gate to repair journal_main.period values that drifted off the post_date period for quality tickets)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -182,9 +182,19 @@ function bizunoUpgrade()
     if (version_compare($dbVer, '7.3.8') < 0) {
         UpgradeNextRefs(); // Upgrade next refs meta to new structure
         // Repair mal-formed common options, then rebuild upon cache reload
-        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key IN ('options_return_status', 
+        dbGetResult("DELETE FROM `".BIZUNO_DB_PREFIX."common_meta` WHERE meta_key IN ('options_return_status',
             'options_return_codes', 'options_qa_status', 'options_lead_times', 'options_contact_status',
             'options_frequencies', 'options_lead_times', 'options_fxdast_types', 'options_crm_actions');");
+    }
+
+    if (version_compare($dbVer, '7.3.9') < 0) {
+        // Repair journal_main.period values that drifted off the fiscal period implied by post_date.
+        // Symptom: rows with negative or zero `period` even though post_date is a valid in-range
+        // date. First seen on quality tickets (journal_id=30) where ticket save did not stamp
+        // `period` correctly. Fix is generic — match every row's post_date against journal_periods
+        // and set period to the matching fiscal period number. dbMetaSet/getValue helpers aren't
+        // used here because this is a bulk single-statement repair.
+        repairJournalMainPeriod();
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
@@ -228,4 +238,30 @@ function UpgradeNextRefs($default='R1000')
             'next_vend_id_num' => ['label'=>'ctype_v',       'value'=>$meta['next_vend_id_num'] ?? $default],
             'next_wo_num'      => ['label'=>'work_orders',   'value'=>$meta['next_wo_num']      ?? $default]];
     dbMetaSet($rID, 'bizuno_refs', $newMeta);
+}
+
+/**
+ * Realign journal_main.period so every row's stored period matches the fiscal period that
+ * contains its post_date (looked up against journal_periods).
+ *
+ * Historical bug: certain custom save paths (notably the quality ticket save under journal_id=30)
+ * did not stamp `period` from `post_date` and left it at -72 / 0 / other invalid values. The
+ * reports + grid date filters rely on `period`, so those rows fall out of any periodic view.
+ *
+ * Safe to run unconditionally: only rewrites rows where the *current* stored period differs
+ * from the correct period implied by post_date. No-op if the data is already clean. Post_date
+ * outside any defined fiscal period (legitimately rare — only pre-FY-creation rows) is left
+ * untouched because the JOIN finds no matching jp row.
+ */
+function repairJournalMainPeriod()
+{
+    msgDebug("\nEntering repairJournalMainPeriod");
+    $sql = "UPDATE ".BIZUNO_DB_PREFIX."journal_main jm
+            JOIN ".BIZUNO_DB_PREFIX."journal_periods jp
+              ON jm.post_date >= jp.start_date AND jm.post_date <= jp.end_date
+            SET jm.period = jp.period
+            WHERE jm.period <> jp.period";
+    $stmt = dbGetResult($sql);
+    $rows = $stmt ? $stmt->rowCount() : 0;
+    msgDebug("\nrepairJournalMainPeriod: realigned $rows journal_main rows to their post_date period.");
 }

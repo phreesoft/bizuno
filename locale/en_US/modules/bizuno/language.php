@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-21
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /locale/en_US/modules/bizuno/language.php
  */
 
@@ -182,7 +182,10 @@ $lang = [
     'admin_fix_comments' => 'Check/Repair Database Comments',
     'desc_update_comments' => '<p>This tool iterrates through your database tables to update the comments used to set positioning, styling and formatting the database fields. Generally this tool does not need to be run more than once or only after recommended by PhreeSoft after an update. If no changes are necessary, this tool will not touch your database.</p><p>Remember to backup your database before running this tool.</p>',
     'admin_fix_tables' => 'Synchronize Database Tables',
-    'desc_update_tables' => '<p>This tool verfies that the datbase table structure matches the latest release structure. Generally this tool does not need to be run more than once or only after recommended by PhreeSoft after an update. If no changes are necessary, this tool will not touch your database.</p><p>Remember to backup your database before running this tool.</p>',
+    'desc_update_tables' => '<p>This tool verfies that the database table structure matches the latest release structure. Generally this tool does not need to be run more than once or only after recommended by PhreeSoft after an update. If no changes are necessary, this tool will not touch your database.</p><p>Remember to backup your database before running this tool.</p>',
+    'admin_cache_clear_title' => 'Clear Business Cache',
+    'admin_cache_clear_desc'  => '<p>Forces a full rebuild of the cached business configuration (modules, roles, menus, dashboards, status/options dictionaries, PhreeForm reports). Use this after manually editing the database, recovering from a corrupt cache, or whenever a dropdown shows raw values like <code>qa_status_1</code> instead of the translated label.</p><p>The next page request after clicking this button rebuilds the cache from scratch — that one request will be slower than usual; subsequent requests are normal.</p>',
+    'admin_cache_clear_done'  => 'Business cache cleared. The next request will rebuild it from scratch — reload the page to see the change.',
     'fa_recalc_title' => 'Update Depreciated Value in Bulk',
     'fa_recalc_desc' => 'This tool updates the current value of ALL of your active assets. Calculations are based off of the acquisition date and current calendar year. The database values are updated.',
     'db_engine' => 'DB Engine',

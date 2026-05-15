@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-15 (lang(): added cross-module fallback search so module-owned keys translate when callers don't know the module — e.g. options_qa_status values rendered via viewKeyDropdown)
  * @filesource /locale/cleaner.php
  */
 
@@ -307,7 +307,20 @@ function lang($idx, $module='core')
 {
     global $bizunoLang;
     if ($module !== 'core' && isset($bizunoLang['modules'][$module][$idx])) { return $bizunoLang['modules'][$module][$idx]; }
-    return $bizunoLang['core'][$idx] ?? $idx;
+    if (isset($bizunoLang['core'][$idx])) { return $bizunoLang['core'][$idx]; }
+    // Fallback: search across all module dictionaries. Triggered when a generic helper
+    // (e.g. viewKeyDropdown, the fa_type processor, etc.) is given a lang KEY without
+    // knowing which module owns it. The options_* meta values now driving every status /
+    // type / frequency dropdown live in module-scoped dictionaries — qa_status_* in
+    // quality, rtn_status_* in phreebooks, fa_type_* in administrate. Conventional
+    // prefixes (qa_, rtn_, fa_, fxdast_) prevent cross-module key collisions. Only runs
+    // on the cold-miss path so it's free for the common case.
+    if (!empty($bizunoLang['modules']) && is_array($bizunoLang['modules'])) {
+        foreach ($bizunoLang['modules'] as $modStrings) {
+            if (isset($modStrings[$idx])) { return $modStrings[$idx]; }
+        }
+    }
+    return $idx;
 }
 
 /**

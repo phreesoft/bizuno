@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-05-15 (setNewFiscalYear: replaced misleading postfix-decrement return with explicit "return next_period - 1")
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -612,7 +612,13 @@ function setNewFiscalYear($next_fy, $next_period, $next_start_date, $num_periods
         $next_start_date = localeCalculateDate($next_start_date, $day_offset = 0, $month_offset = 1);
     }
     dbGetResult("INSERT INTO ".BIZUNO_DB_PREFIX."journal_periods VALUES ".implode(",\n",$periods));
-    return $next_period--;
+    // Previously: `return $next_period--;` — that's a postfix decrement on a local variable
+    // whose value gets returned BEFORE the decrement and then discarded, so the function
+    // returned `$next_period` (one past the last inserted period). Intent is to return the
+    // LAST period number actually inserted, so callers can chain. No core caller currently
+    // consumes the return value (admin.php builds successive years from $start_period in a
+    // for-loop), so this fix is non-breaking — just makes the contract explicit.
+    return $next_period - 1;
 }
 
 function setRetainedEarningsDefault()

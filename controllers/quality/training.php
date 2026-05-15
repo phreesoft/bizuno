@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-05-15 (migrated options reads off getModuleCache → getMetaCommon('options_*'))
  * @filesource /controllers/quality/training.php
  */
 
@@ -41,8 +41,12 @@ class qualityTraining extends mgrJournal
     {
         parent::__construct();
         $this->stores    = getModuleCache('bizuno', 'stores');
-        $this->freqs     = getModuleCache('bizuno', 'options', 'frequencies');
-        $this->leadTime  = getModuleCache('bizuno', 'options', 'lead_times');
+        // Migration step away from getModuleCache() for options: canonical home for these
+        // dropdown dicts is `common_meta.meta_key = options_*` (written by each module's
+        // *Admin::initialize() on every cache rebuild). Reading direct removes the dependency
+        // on the registry's bizuno.options.* mirror staying in sync.
+        $this->freqs     = getMetaCommon('options_frequencies') ?: [];
+        $this->leadTime  = getMetaCommon('options_lead_times')  ?: [];
         $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', 'training');
         $this->managerSettings();
         $this->fieldStructure();
@@ -105,7 +109,13 @@ class qualityTraining extends mgrJournal
         parent::managerMain($layout, $security, ['type'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('training'))]);
         unset($layout['datagrid']["dg{$this->domSuffix}"]['source']['actions']['new']); // remove the work icon since this is meta only
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']); // Don't allow copy here
-        $layout['jsHead']['init'] = "var fmtFreqs = ".json_encode($this->freqs).";\nvar fmtLeadTime = ".json_encode($this->leadTime).";";
+        // $this->freqs / leadTime hold raw lang KEYS so the same meta row can render in any
+        // locale. Translate before emitting to JS — the grid formatters do `fmtFreqs[value]`
+        // and `fmtLeadTime[value]` to render cells.
+        $freqsL10n=[]; foreach ($this->freqs    as $k=>$v) { $freqsL10n[$k] = is_string($v) ? lang($v) : $v; }
+        $ltL10n   =[]; foreach ($this->leadTime as $k=>$v) { $ltL10n[$k]    = is_string($v) ? lang($v) : $v; }
+        $layout['jsHead']['init'] = "var fmtFreqs = ".json_encode($freqsL10n, JSON_UNESCAPED_UNICODE)
+            .";\nvar fmtLeadTime = ".json_encode($ltL10n, JSON_UNESCAPED_UNICODE).";";
     }
     public function managerRows(&$layout=[])
     {

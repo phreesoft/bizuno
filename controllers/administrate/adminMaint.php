@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-05-15 (migrated options reads off getModuleCache → getMetaCommon('options_*'))
  * @filesource /controllers/administrate/adminMaint.php
  */
 
@@ -48,8 +48,12 @@ class administrateAdminMaint extends mgrJournal
         parent::__construct();
         $this->stores    = getModuleCache('bizuno', 'stores');
         $this->roles     = listRoles();
-        $this->freqs     = getModuleCache('bizuno', 'options', 'frequencies');
-        $this->leadTimes = getModuleCache('bizuno', 'options', 'lead_times');
+        // Migration step away from getModuleCache() for options: canonical home for these
+        // dropdown dicts is `common_meta.meta_key = options_*` (written by each module's
+        // *Admin::initialize() on every cache rebuild). Reading direct removes the dependency
+        // on the registry's bizuno.options.* mirror staying in sync.
+        $this->freqs     = getMetaCommon('options_frequencies') ?: [];
+        $this->leadTimes = getMetaCommon('options_lead_times')  ?: [];
         $this->attachPath= getModuleCache($this->moduleID, 'properties', 'attachPath', $this->pageID);
         $this->managerSettings();
         $this->fieldStructure();
@@ -102,7 +106,14 @@ class administrateAdminMaint extends mgrJournal
         parent::managerMain($layout, $security, $args);
         $roles = [];
         foreach ($this->roles as $role) { $roles[$role['id']] = $role['text']; }
-        $layout['jsHead']['init'] = "var fmtFreqs = ".json_encode($this->freqs).";\nvar fmtLeadTime = ".json_encode($this->leadTimes).";\nvar fmtRoles = ".json_encode($roles).";";
+        // $this->freqs / leadTimes hold raw lang KEYS so the same meta row can render in any
+        // locale. Translate before emitting to JS — grid formatters do `fmtFreqs[value]` and
+        // `fmtLeadTime[value]` to render cells.
+        $freqsL10n=[]; foreach ($this->freqs     as $k=>$v) { $freqsL10n[$k] = is_string($v) ? lang($v) : $v; }
+        $ltL10n   =[]; foreach ($this->leadTimes as $k=>$v) { $ltL10n[$k]    = is_string($v) ? lang($v) : $v; }
+        $layout['jsHead']['init'] = "var fmtFreqs = ".json_encode($freqsL10n, JSON_UNESCAPED_UNICODE)
+            .";\nvar fmtLeadTime = ".json_encode($ltL10n, JSON_UNESCAPED_UNICODE)
+            .";\nvar fmtRoles = ".json_encode($roles, JSON_UNESCAPED_UNICODE).";";
     }
     public function managerRows(&$layout=[])
     {

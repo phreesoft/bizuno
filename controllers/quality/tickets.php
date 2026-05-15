@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-15 (managerSettings: restore period default; managerGrid: added creation_date column; fixed closed/status filter wiring — were reading phantom f0/f1 POST fields)
  * @filesource /controllers/quality/tickets.php
  */
 
@@ -42,7 +42,15 @@ class qualityTickets extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');
+        // Read raw lang-key map (e.g. [1=>'qa_status_1', 2=>'qa_status_2', …]) straight from
+        // common_meta rather than the bizuno.options.qa_status cache slot. Migration step away
+        // from getModuleCache() for options: the canonical home for these dropdown dictionaries
+        // is `common_meta.meta_key = options_qa_status` (written by qualityAdmin::initialize()
+        // on every cache rebuild), and reading directly from there means a single source of
+        // truth and no dependency on the registry's bizuno.options.* mirror staying in sync.
+        // Lang keys are translated at render time (viewKeyDropdown applies lang(); the JS
+        // formatter side translates below before json_encode'ing for the grid).
+        $this->qual_status= getMetaCommon('options_qa_status') ?: [];
         $this->mapPanel   = ['title0'=>lang('stop_work'), 'title1'=>lang('work_around'), 'title2'=>lang('root_cause'), 'title3'=>lang('action_corr')];
         $this->attachPath = getModuleCache($this->moduleID, 'properties', 'attachPath', 'correctives');
         $this->managerSettings();
@@ -100,17 +108,25 @@ class qualityTickets extends mgrJournal
         $rIDList  = clean('rIDList',  'integer','get');
         $range    = clean('range',    'integer','get');
         $menu     = clean('menu',     'cmd',    'get');
-        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status')));
+        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getMetaCommon('options_qa_status') ?: []));
         $selClosed= [['id'=>'a','text'=>lang('all')], ['id'=>'1','text'=>lang('yes')], ['id'=>'0','text'=>lang('no')]];
-        // clean up the filter sqls
-        switch ($this->defaults['status']) {
-            default:
-            case 'a': $f0_value = "";           break;
-            case 'y': $f0_value = "closed='1'"; break;
-            case 'n': $f0_value = "closed='0'"; break;
-        }
-        $f1 = clean('f1', 'integer', 'post');
-        $f1_value = $f1 ? "printed='$f1'" : "";
+        // Filter SQL composition.
+        //
+        // Previous code read `clean('f1','integer','post')` and switched on $defaults['status']
+        // for the closed-filter SQL. Neither matched what the form actually posts: filter
+        // dropdowns submit their values keyed by the *filter name* in the grid structure
+        // (here: 'closed' and 'status'), not by the legacy 'f0'/'f1' shortcuts that were
+        // never threaded through. Result: both filters were no-ops — the user's "Stop Work"
+        // selection in the Status dropdown was being silently dropped. Also: the switch
+        // checked 'a'/'y'/'n' but $selClosed offers 'a'/'1'/'0', so two of the three cases
+        // were dead even if the wiring had been correct.
+        //
+        // Now: read directly from $this->defaults['closed'] and ['status'] (which already
+        // get populated from the right POST fields in managerSettings) and build SQL.
+        $cFilter  = $this->defaults['closed'];
+        $f0_value = in_array($cFilter, ['0','1'], true) ? "closed='$cFilter'" : "";
+        $sFilter  = $this->defaults['status'];
+        $f1_value = ($sFilter !== '' && $sFilter !== 'a') ? "printed=".intval($sFilter) : "";
         $data = array_replace_recursive(parent::gridBase($security, $args), [
             'attr'   => ['url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRows&menu=$menu&mgrAction=$action&rIDList=$rIDList&range=$range"],
             'source' => [
@@ -118,14 +134,20 @@ class qualityTickets extends mgrJournal
                 'filters'=> [
                     'store_id'=>['order'=>15,'break'=>true,'label'=>lang('ctype_b'),'sql'=>($this->defaults['store_id']<>-1 ? BIZUNO_DB_PREFIX."journal_main.store_id={$this->defaults['store_id']}" : ''),
                         'values'=>viewStores(),'attr'=>['type'=>sizeof($stores)>1?'select':'hidden','value'=>$this->defaults['store_id']]],
-                    'closed' => ['order'=>20,'break'=>true,'label' =>lang('cust_feedback', $this->moduleID),'sql'=>$f0_value,'attr'=>['type'=>'select','value'=>$this->defaults['f0']],'values'=>$selClosed],
-                    'status' => ['order'=>30,'break'=>true,'label' =>lang('status'),'sql'=>$f1_value,'attr'=>['type'=>'select','value'=>$this->defaults['f1']],'values'=>$statuses]]],
+                    'closed' => ['order'=>20,'break'=>true,'label' =>lang('cust_feedback', $this->moduleID),'sql'=>$f0_value,'attr'=>['type'=>'select','value'=>$cFilter],'values'=>$selClosed],
+                    'status' => ['order'=>30,'break'=>true,'label' =>lang('status'),'sql'=>$f1_value,'attr'=>['type'=>'select','value'=>$sFilter],'values'=>$statuses]]],
             'columns'=> [
                 'invoice_num'  => ['order'=>10, 'label'=>lang('ca_num', $this->moduleID),'attr'=>['width'=> 75, 'sortable'=>true, 'resizable'=>true]],
                 'store_id'     => ['order'=>20, 'label'=>lang('store_id'),     'attr'=>['width'=> 75, 'sortable'=>true, 'resizable'=>true], 'format'=> 'storeID'],
                 'description'  => ['order'=>30, 'label'=>lang('description'),  'attr'=>['width'=>250, 'sortable'=>true, 'resizable'=>true]],
                 'printed'      => ['order'=>40, 'label'=>lang('status'),       'attr'=>['width'=>100, 'sortable'=>true, 'resizable'=>true],
                     'events' => ['formatter'=>"function(value,row) { return bizQualStatuses[value]; }"]],
+                // creation_date — column key matches the field structure entry above (line 71)
+                // which dbFields to `post_date`. Setting 'field'=>'post_date' here makes
+                // mapMetaGridToDB() rekey the column for SQL selection while the struc-side
+                // key 'creation_date' is what the edit form binds to. 'format'=>'date' tells
+                // the row formatter to render via viewDate() in the user's locale.
+                'creation_date'=> ['order'=>45, 'field'=>'post_date', 'label'=>lang('date_created'), 'attr'=>['width'=> 80, 'type'=>'date', 'sortable'=>true, 'resizable'=>true], 'format'=>'date'],
                 'terminal_date'=> ['order'=>50, 'label'=>lang('date_found'),   'attr'=>['width'=> 80, 'type'=>'date', 'sortable'=>true, 'resizable'=>true], 'format'=>'date'],
                 'closed_date'  => ['order'=>60, 'label'=>lang('date_closed'),  'attr'=>['width'=> 80, 'type'=>'date', 'sortable'=>true, 'resizable'=>true], 'format'=>'date']]]);
             switch($action) {
@@ -165,12 +187,19 @@ class qualityTickets extends mgrJournal
     private function managerSettings()
     {
         parent::managerDefaults();
-//      $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>getUserCache('profile', 'def_periods', '', 'l')], 'post');
+        // Tickets aren't period-bound: a CA/PA opened in one fiscal period is routinely
+        // worked over multiple subsequent periods, so showing "All" by default matches
+        // user expectation. Without this line $this->defaults['period'] is unset, which
+        // makes dbSqlDates() fall through to its `default` case at db.php:1532 and emit
+        // `WHERE period=<current FY period>` — silently narrowing the grid to a handful
+        // of rows even when the UI dropdown shows "All". Honor POST so the dropdown
+        // works; if no POST (first load), default to 'a' for all-periods.
+        $this->defaults['period']  = clean('period',  ['format'=>'cmd',     'default'=>'a'], 'post');
         $this->defaults['store_id']= clean('store_id',['format'=>'integer', 'default'=>-1], 'post');
         $this->defaults['closed']  = clean('closed',  ['format'=>'char',    'default'=>'a'],'post');
         $this->defaults['status']  = clean('status',  ['format'=>'db_field','default'=>'a'],'post');
-        $this->defaults['f0']      = clean('f0',      ['format'=>'char',    'default'=>'a'],'post');
-        $this->defaults['f1']      = clean('f1',      ['format'=>'integer', 'default'=> 0], 'post');
+        // Note: 'f0'/'f1' shortcuts removed — the filter grid posts under the actual filter
+        // names ('closed', 'status') and managerGrid now reads those directly.
     }
 
     /******************************** Journal Manager ********************************/
@@ -178,7 +207,13 @@ class qualityTickets extends mgrJournal
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::managerMain($layout, $security, ['type'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('ticket'))]);
-        $layout['jsHead']['vars'] = "var bizQualStatuses = ".json_encode($this->qual_status).";";
+        // $this->qual_status holds raw lang KEYS (e.g. 'qa_status_1') so the same row in
+        // common_meta serves every locale. Translate each value before emitting to JS so the
+        // grid's `bizQualStatuses[value]` formatter renders the user's locale text — not the
+        // raw key. Per-request translation; trivial cost vs the readability gain.
+        $qualStatusL10n = [];
+        foreach ($this->qual_status as $k => $v) { $qualStatusL10n[$k] = is_string($v) ? lang($v) : $v; }
+        $layout['jsHead']['vars'] = "var bizQualStatuses = ".json_encode($qualStatusL10n, JSON_UNESCAPED_UNICODE).";";
         $qSettings = getModuleCache($this->moduleID, 'settings');
         if (!empty($qSettings['general']['proc_inv_mgr'])) {
             $layout['datagrid']['dgTickets']['source']['actions']['qaProc']= ['order'=>95,'icon'=>'steps',  'label'=>lang('qa_processes'),   'events'=>['onClick'=>"windowEdit('$this->moduleID/admin/renderQA&qaIdx=proc_qa_ticket', 'qaDoc', '".lang('processes')."', 1000, 500);"]];

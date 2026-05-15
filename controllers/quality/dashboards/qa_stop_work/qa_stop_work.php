@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05
+ * @version    7.x Last Update: 2026-05-15 (migrated qa_status read off getModuleCache → getMetaCommon('options_qa_status'))
  * @filesource /controllers/quality/dashboards/qa_stop_work/qa_stop_work.php
  */
 
@@ -56,7 +56,7 @@ class qa_stop_work
             'users'   => ['order'=>10,'label'=>lang('users'),        'clean'=>'array',   'attr'=>['type'=>'users',   'value'=>[0],],  'admin'=>true],
             'roles'   => ['order'=>20,'label'=>lang('groups'),       'clean'=>'array',   'attr'=>['type'=>'roles',   'value'=>[-1]],  'admin'=>true],
             // User fields
-            'range'   => ['order'=>40,'label'=>lang('disp_due'),     'clean'=>'boolean', 'attr'=>['type'=>'select',  'value'=>8],     'values'=>viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status'), true)],
+            'range'   => ['order'=>40,'label'=>lang('disp_due'),     'clean'=>'boolean', 'attr'=>['type'=>'select',  'value'=>8],     'values'=>viewKeyDropdown(getMetaCommon('options_qa_status') ?: [], true)],
             'trim'    => ['order'=>70,'label'=>lang('truncate_fit'), 'clean'=>'integer', 'attr'=>['type'=>'spinner', 'value'=>20],    'options'=>['min'=>10,'max'=>80,'width'=>100]],
             'order'   => ['order'=>80,'label'=>lang('sort_order'),   'clean'=>'db_field','attr'=>['type'=>'select',  'value'=>'desc'],'values'=>$order]];
         metaPopulate($this->struc, getMetaDashboard($this->code)); // override with user global settings

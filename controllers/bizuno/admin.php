@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-05-05
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -272,6 +272,7 @@ class bizunoAdmin
                 'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager'"]],
                 'tools'   => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'recalc' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'recalc'],
+                    'cacheClr'=>['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'cacheClr'],
                     'fixTbl' => ['order'=>30,'type'=>'panel','classes'=>['block33'],'key'=>'fixTbl'],
                     'stsSet' => ['order'=>40,'type'=>'panel','classes'=>['block66'],'key'=>'stsSet']]],
                 'stats'   => ['order'=>90,'label'=>lang('statistics'),'styles'=>['width'=>'700px;','height'=>'250px'],'type'=>'datagrid','key'=>'bizStats']]]],
@@ -280,8 +281,9 @@ class bizunoAdmin
                     'formBOF'=> ['order'=>10,'type'=>'form',  'key' =>'frmStatus'],
                     'body'   => ['order'=>20,'type'=>'fields','keys'=>$output['keys']['keys0']],
                     'formEOF'=> ['order'=>30,'type'=>'html',  'html'=>"</form>"]]],
-                'recalc' => ['label'=>lang('fa_recalc_title', $this->moduleID),   'type'=>'fields','keys'=>$output['keys']['keys1']],
-                'fixTbl' => ['label'=>lang('admin_fix_tables', $this->moduleID),  'type'=>'fields','keys'=>$output['keys']['keys2']]],
+                'recalc'  => ['label'=>lang('fa_recalc_title', $this->moduleID),  'type'=>'fields','keys'=>$output['keys']['keys1']],
+                'fixTbl'  => ['label'=>lang('admin_fix_tables', $this->moduleID), 'type'=>'fields','keys'=>$output['keys']['keys2']],
+                'cacheClr'=> ['label'=>lang('admin_cache_clear_title', $this->moduleID),'type'=>'fields','keys'=>$output['keys']['keys3']]],
             'datagrid'=> ['bizStats'=>$this->dgStats('bizStats')],
             'forms'   => ['frmStatus'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=administrate/tools/statusSave"]]],
             'fields'  => $output['fields'],
@@ -305,13 +307,16 @@ class bizunoAdmin
             'keys'  =>[
                 'keys0' => ['btnStatus'],
                 'keys1' => ['recalcDesc','btnRecalc'],
-                'keys2' => ['descFixTables','fix_tbl_btn']],
+                'keys2' => ['descFixTables','fix_tbl_btn'],
+                'keys3' => ['descCacheClear','cache_clr_btn']],
             'fields'=>[
                 'recalcDesc'    => ['order'=>10,'html'=>lang('fa_recalc_desc', $this->moduleID),'attr'=>['type'=>'raw']],
                 'btnRecalc'     => ['order'=>80,'attr'=>['type'=>'button','value'=>lang('start')],'events'=>['onClick'=>"jsonAction('administrate/fixedAssets/depValueBulk');"]],
                 'btnStatus'     => ['order'=>99,'icon'=>'save','label'=>'save','events'=>['onClick'=>"jqBiz('#frmStatus').submit();"]],
                 'descFixTables' => ['order'=>10,'html'=>lang('desc_update_tables', $this->moduleID),'attr'=>['type'=>'raw']],
-                'fix_tbl_btn'   => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/tools/repairTables');"],'attr'=>['type'=>'button','value'=>lang('go')]]]];
+                'fix_tbl_btn'   => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/tools/repairTables');"],'attr'=>['type'=>'button','value'=>lang('go')]],
+                'descCacheClear'=> ['order'=>10,'html'=>lang('admin_cache_clear_desc', $this->moduleID),'attr'=>['type'=>'raw']],
+                'cache_clr_btn' => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jsonAction('administrate/tools/cacheClear');"],'attr'=>['type'=>'button','value'=>lang('go')]]]];
         foreach ($status as $key => $settings) {
             if ($key == 'id') { continue; }
             $output['fields']["stat_$key"] = $settings;
