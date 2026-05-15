@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-25
+ * @version    7.x Last Update: 2026-05-15 (migrated faTypes read off getModuleCache → getMetaCommon('options_fxdast_types'); fixes pre-existing null read caused by subkey mismatch)
  * @filesource /controllers/administrate/fixedAssets.php
  */
 
@@ -39,7 +39,14 @@ class administrateFixedAssets extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->faTypes   = getModuleCache('bizuno', 'options', 'faTypes');
+        // Migration step away from getModuleCache() for options: canonical home for this
+        // dropdown dict is `common_meta.meta_key = options_fxdast_types` (written by
+        // bizunoAdmin::initialize() on every cache rebuild). The legacy
+        // getModuleCache('bizuno','options','faTypes') call was reading a non-existent
+        // subkey — the mirror in registry.php::initBizuno() maps options_fxdast_types →
+        // bizuno.options.fxdast_types (note: suffix, not 'faTypes'), so this swap also
+        // fixes a pre-existing silent null read.
+        $this->faTypes   = getMetaCommon('options_fxdast_types') ?: [];
         $this->schedules = getMetaCommon('fixed_assets_schedules');
         msgDebug("\nRead schedules = ".print_r($this->schedules, true));
         $this->condition = ['n'=>lang('new'),   'u'=>lang('used')];
@@ -110,8 +117,13 @@ class administrateFixedAssets extends mgrJournal
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::managerMain($layout, $security, ['dom'=>'div','title'=>sprintf(lang('tbd_manager'), lang('gl_acct_type_8'))]);
+        // $this->faTypes holds raw lang KEYS so the same meta row can render in any
+        // locale. Translate before emitting to JS — the grid `fa_type` formatter looks
+        // up `extFixedAssetsType[value]` to render the cell.
+        $faTypesL10n = [];
+        foreach ($this->faTypes as $k => $v) { $faTypesL10n[$k] = is_string($v) ? lang($v, $this->moduleID) : $v; }
         $layout['jsHead'] = [
-            'faType' => "var extFixedAssetsType = ".json_encode($this->faTypes,  JSON_UNESCAPED_UNICODE).";\n",
+            'faType' => "var extFixedAssetsType = ".json_encode($faTypesL10n,    JSON_UNESCAPED_UNICODE).";\n",
             'faCond' => "var extFixedAssetsCond = ".json_encode($this->condition,JSON_UNESCAPED_UNICODE).";\n"];
         // Stores
         if (sizeof(getModuleCache('bizuno', 'stores')) == 1) { return; }

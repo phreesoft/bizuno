@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-05-15 (migrated return_status read off getModuleCache → getMetaCommon('options_return_status'); translate legend label)
  * @filesource /controllers/contacts/dashboards/rtn_by_status/rtn_by_status.php
  */
 
@@ -43,7 +43,11 @@ class rtn_by_status
 
     function __construct()
     {
-        $this->status= getModuleCache('bizuno', 'options', 'return_status');
+        // Migration step away from getModuleCache() for options: canonical home for this
+        // dropdown dict is `common_meta.meta_key = options_return_status` (written by
+        // phreebooksAdmin::initialize() on every cache rebuild). Reading direct removes the
+        // dependency on the registry's bizuno.options.* mirror staying in sync.
+        $this->status= getMetaCommon('options_return_status') ?: [];
         $this->dates = localeDates(true, true, true);
         $this->fieldStructure();
     }
@@ -85,7 +89,11 @@ class rtn_by_status
         $rows[]= '<div><b>'.$this->lang['total_open']." ".sizeof($rows).'</b></div>';
         if (empty($rows)) { $rows[] = "<span>".lang('no_results')."</span>"; }
         if (empty($opts['status'])) { $opts['status'] = 1; }
-        $legend = !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? ucfirst(lang('filter')).": {$this->status[$opts['status']]}; {$this->dates[$opts['range']]}" : '';
+        // $this->status holds raw lang KEYS so translate before rendering the legend.
+        $statusLbl = isset($this->status[$opts['status']])
+            ? (is_string($this->status[$opts['status']]) ? lang($this->status[$opts['status']], 'phreebooks') : $this->status[$opts['status']])
+            : '';
+        $legend = !empty(getModuleCache('bizuno','settings','general','hide_filters',0)) ? ucfirst(lang('filter')).": {$statusLbl}; {$this->dates[$opts['range']]}" : '';
         return ['lists'=>$rows, 'legend'=>$legend];
     }
 }

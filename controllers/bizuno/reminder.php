@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-26
+ * @version    7.x Last Update: 2026-05-15 (migrated frequencies read off getModuleCache → getMetaCommon('options_frequencies'))
  * @filesource /controllers/bizuno/reminder.php
  */
 
@@ -39,7 +39,11 @@ class bizunoReminder extends mgrJournal
     {
         parent::__construct();
         $this->mgrTitle= lang('my_reminders');
-        $this->freqs   = getModuleCache('bizuno', 'options', 'frequencies');
+        // Migration step away from getModuleCache() for options: canonical home for these
+        // dropdown dicts is `common_meta.meta_key = options_frequencies` (written by
+        // bizunoAdmin::initialize() on every cache rebuild). Reading direct removes the
+        // dependency on the registry's bizuno.options.* mirror staying in sync.
+        $this->freqs   = getMetaCommon('options_frequencies') ?: [];
         $this->args    = ['type'=>'div', '_table'=>'contacts', '_refID'=>getuserCache('profile', 'userID')];
         $this->managerSettings();
         $this->fieldStructure();

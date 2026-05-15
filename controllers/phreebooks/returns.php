@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-05-15 (migrated return_status JS var off getModuleCache → getMetaCommon('options_return_status'))
  * @filesource /controllers/phreebooks/returns.php
  */
 
@@ -176,7 +176,15 @@ class phreebooksReturns extends mgrJournal
         $args = ['dom'=>$dom, 'type'=>'journal', '_table'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('returns'))];
         parent::managerMain($layout, $security, $args);
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']); // Don't allow copy here
-        $layout['jsHead']['vars'] = "var returnsStatus = ".json_encode(getModuleCache('bizuno', 'options', 'return_status'), JSON_UNESCAPED_UNICODE).";";
+        // Migration step away from getModuleCache() for options: pull the canonical dropdown
+        // dict straight from common_meta (`options_return_status`, written by phreebooksAdmin::initialize())
+        // and translate values via lang() before emitting to JS — the grid's status column
+        // formatter looks up `returnsStatus[value]` to render the cell, so JS needs display text,
+        // not the raw lang keys (e.g. 'rtn_status_1') that live in the meta row.
+        $statusMeta = getMetaCommon('options_return_status') ?: [];
+        $statusL10n = [];
+        foreach ($statusMeta as $k => $v) { $statusL10n[$k] = is_string($v) ? lang($v, $this->moduleID) : $v; }
+        $layout['jsHead']['vars'] = "var returnsStatus = ".json_encode($statusL10n, JSON_UNESCAPED_UNICODE).";";
     }
     public function managerRows(&$layout=[])
     {

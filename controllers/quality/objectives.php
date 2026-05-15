@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-14
+ * @version    7.x Last Update: 2026-05-15 (migrated qa_status reads off getModuleCache → getMetaCommon('options_qa_status'))
  * @filesource /controllers/quality/objectives.php
  */
 
@@ -39,7 +39,11 @@ class qualityObjectives extends mgrJournal
     function __construct()
     {
         parent::__construct();
-        $this->status= getModuleCache('bizuno', 'options', 'qa_status');
+        // Migration step away from getModuleCache() for options: canonical home for this
+        // dropdown dict is `common_meta.meta_key = options_qa_status` (written by
+        // qualityAdmin::initialize() on every cache rebuild). Reading direct removes the
+        // dependency on the registry's bizuno.options.* mirror staying in sync.
+        $this->status= getMetaCommon('options_qa_status') ?: [];
         $this->reps  = listUsers();
         $this->managerSettings();
         $this->fieldStructure();
@@ -76,7 +80,7 @@ class qualityObjectives extends mgrJournal
     */
     protected function managerGrid($security=0, $args=[])
     {
-        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status')));
+        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getMetaCommon('options_qa_status') ?: []));
         $selClosed= [['id'=>'a','text'=>lang('all')], ['id'=>'1','text'=>lang('yes')], ['id'=>'0','text'=>lang('no')]];
         $data     = array_replace_recursive(parent::gridBase($security, $args), [
             'source' => [
@@ -115,6 +119,10 @@ class qualityObjectives extends mgrJournal
         unset($layout['datagrid']["dg{$this->domSuffix}"]['columns']['action']['actions']['copy']);
         $keyedReps = [];
         foreach ($this->reps as $row) { $keyedReps[$row['id']] = $row['text']; }
+        // $this->status holds raw lang KEYS so the same meta row can render in any locale.
+        // Translate before emitting to JS — the grid formatter does `bizQualStatuses[value]`.
+        $qsL10n = [];
+        foreach ($this->status as $k => $v) { $qsL10n[$k] = is_string($v) ? lang($v) : $v; }
         $layout['jsHead'][$this->moduleID] = "
 function preSubmit() {
     jqBiz('#dgDetails').edatagrid('saveRow');
@@ -122,8 +130,8 @@ function preSubmit() {
     jqBiz('#dgObjData').val(JSON.stringify(actNotes));
     return true;
 }
-var bizQualStatuses = ".json_encode($this->status).";
-var {$this->moduleID}Reps = ".json_encode($keyedReps).";";
+var bizQualStatuses = ".json_encode($qsL10n, JSON_UNESCAPED_UNICODE).";
+var {$this->moduleID}Reps = ".json_encode($keyedReps, JSON_UNESCAPED_UNICODE).";";
     }
     public function managerRows(&$layout=[])
     {

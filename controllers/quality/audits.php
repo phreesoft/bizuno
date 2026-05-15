@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-15 (migrated options reads off getModuleCache → getMetaCommon('options_*'))
  * @filesource /controllers/quality/audits.php
  */
 
@@ -42,9 +42,13 @@ class qualityAudits extends mgrJournal
         parent::__construct();
         $this->mgrTitle   = sprintf(lang('tbd_manager'), lang('audit', $this->moduleID));
         $this->stores     = getModuleCache('bizuno', 'stores');
-        $this->freqs      = getModuleCache('bizuno', 'options', 'frequencies');
-        $this->qual_status= getModuleCache('bizuno', 'options', 'qa_status');
-        $this->leadTimes  = getModuleCache('bizuno', 'options', 'lead_times');
+        // Migration step away from getModuleCache() for options: canonical home for these
+        // dropdown dicts is `common_meta.meta_key = options_*` (written by each module's
+        // *Admin::initialize() on every cache rebuild). Reading direct removes the dependency
+        // on the registry's bizuno.options.* mirror staying in sync.
+        $this->freqs      = getMetaCommon('options_frequencies') ?: [];
+        $this->qual_status= getMetaCommon('options_qa_status')   ?: [];
+        $this->leadTimes  = getMetaCommon('options_lead_times')  ?: [];
         $this->attachPath = getModuleCache($this->moduleID, 'properties', 'attachPath', 'audits');
         $this->managerSettings();
         $this->fieldStructure();
@@ -80,7 +84,7 @@ class qualityAudits extends mgrJournal
     */
     protected function managerGrid($security=0, $args=[], $admin=false)
     {
-        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getModuleCache('bizuno', 'options', 'qa_status')));
+        $statuses = array_merge([['id'=>'a','text'=>lang('all')]], viewKeyDropdown(getMetaCommon('options_qa_status') ?: []));
         $dateRange= dbSqlDates($this->defaults['period']);
         $sqlPeriod= $dateRange['sql'];
         $selClosed= [['id'=>'a','text'=>lang('all')], ['id'=>'1','text'=>lang('yes')], ['id'=>'0','text'=>lang('no')]];
@@ -137,7 +141,15 @@ class qualityAudits extends mgrJournal
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
         parent::managerMain($layout, $security, ['type'=>'journal', 'title'=>sprintf(lang('tbd_manager'), lang('audit'))]);
-        $layout['jsHead'][$this->pageID] = "var fmtFreqs = ".json_encode($this->freqs)."; var fmtLeadTime = ".json_encode($this->leadTimes)."; var bizQualStatuses = ".json_encode($this->qual_status).";";
+        // $this->freqs / leadTimes / qual_status hold raw lang KEYS so the same meta row can
+        // render in any locale. Translate before emitting to JS — the grid formatters do
+        // `fmtFreqs[value]` / `fmtLeadTime[value]` / `bizQualStatuses[value]` to render cells.
+        $freqsL10n=[]; foreach ($this->freqs       as $k=>$v) { $freqsL10n[$k] = is_string($v) ? lang($v) : $v; }
+        $ltL10n   =[]; foreach ($this->leadTimes   as $k=>$v) { $ltL10n[$k]    = is_string($v) ? lang($v) : $v; }
+        $qsL10n   =[]; foreach ($this->qual_status as $k=>$v) { $qsL10n[$k]    = is_string($v) ? lang($v) : $v; }
+        $layout['jsHead'][$this->pageID] = "var fmtFreqs = ".json_encode($freqsL10n, JSON_UNESCAPED_UNICODE)
+            ."; var fmtLeadTime = ".json_encode($ltL10n, JSON_UNESCAPED_UNICODE)
+            ."; var bizQualStatuses = ".json_encode($qsL10n, JSON_UNESCAPED_UNICODE).";";
     }
     public function managerRows(&$layout=[])
     {

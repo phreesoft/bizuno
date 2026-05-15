@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-15 (calculatePeriod: auto-extends journal_periods forward to cover future post_dates via new ensureFiscalYearCovers helper — fixes recurring entries stamping period=0)
  * @filesource /model/functions.php
  */
 
@@ -1442,11 +1442,62 @@ function calculatePeriod($post_date, $verbose=true)
     }
     $period = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', 'period', "start_date<='$post_date' AND end_date>='$post_date'");
     msgDebug("\nHad to get period from db, retrieved period = $period");
-    if (!$period) { // post_date is out of range of defined accounting periods
+    if (!$period) {
+        // post_date is past the last defined fiscal period (or before the first). For
+        // post-FY dates this is legitimate — e.g. a recurring journal projected several
+        // years into the future, or a pre-dated entry made just past year-end. Auto-extend
+        // the fiscal calendar forward (capped) so we can stamp a real period instead of
+        // returning null and storing 0. Pre-FY dates (post_date < min start_date) are still
+        // rejected — there's no safe "auto-extend backward" since FY 1 is the anchor.
+        if (ensureFiscalYearCovers($post_date)) {
+            $period = dbGetValue(BIZUNO_DB_PREFIX.'journal_periods', 'period', "start_date<='$post_date' AND end_date>='$post_date'");
+            msgDebug("\nensureFiscalYearCovers extended the calendar; retrieved period = $period");
+        }
+    }
+    if (!$period) { // post_date is out of range of defined accounting periods (and we couldn't auto-extend)
         return msgAdd(sprintf(lang('err_gl_post_date_invalid'), $post_date));
     }
     if ($verbose) { msgAdd(lang('msg_gl_post_date_out_of_period'), 'caution'); }
     return $period;
+}
+
+/**
+ * Extends the fiscal calendar forward (auto-adds fiscal years via phreebooksTools::fyAdd)
+ * until $post_date falls within a defined period in `journal_periods`. Capped at $maxYears
+ * to prevent a runaway on typo'd far-future dates (e.g. 2099-01-01).
+ *
+ * Used by calculatePeriod() to self-heal future-projected entries — most notably the
+ * recurring journal projector in controllers/phreebooks/main.php which iterates monthly
+ * post_dates several years out. Previously those calls returned null because the target
+ * fiscal year hadn't been added yet, and the resulting journal_main row stamped period=0.
+ *
+ * @param string  $post_date - target date in Y-m-d format
+ * @param integer $maxYears  - safety cap on consecutive auto-adds [default 10]
+ * @return boolean - true if the calendar now covers $post_date, false if cap hit or call failed
+ */
+function ensureFiscalYearCovers($post_date, $maxYears=10)
+{
+    if (empty($post_date) || !defined('BIZUNO_DB_PREFIX')) { return false; }
+    $maxDate = dbGetValue(BIZUNO_DB_PREFIX."journal_periods", "MAX(end_date)", '', false);
+    if ($maxDate && $maxDate >= $post_date) { return true; } // already covered, no-op
+    msgDebug("\nensureFiscalYearCovers: post_date=$post_date past last FY end ($maxDate); auto-extending up to $maxYears years");
+    bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/tools.php', 'phreebooksTools');
+    // fyAdd is gated by validateAccess('admin', 3). For background callers (recur projector,
+    // import, API ingestion) elevate `role.administrate` temporarily — same pattern
+    // periodAutoUpdate has used since 7.0. Restore after the loop so we don't leave the
+    // user's session silently elevated.
+    $savedAdmin = getUserCache('role', 'administrate');
+    setUserCache('role', 'administrate', 1);
+    $tools    = new phreebooksTools();
+    $attempts = 0;
+    while ($attempts++ < $maxYears) {
+        $tools->fyAdd();
+        $maxDate = dbGetValue(BIZUNO_DB_PREFIX."journal_periods", "MAX(end_date)", '', false);
+        if ($maxDate && $maxDate >= $post_date) { break; }
+    }
+    setUserCache('role', 'administrate', $savedAdmin);
+    msgDebug("\nensureFiscalYearCovers: $attempts fyAdd attempts; max FY end_date now = $maxDate");
+    return ($maxDate && $maxDate >= $post_date);
 }
 
 /**

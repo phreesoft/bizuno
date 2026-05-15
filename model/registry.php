@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-15 (removeOrphanMenus: bridge max-child security back into $userSecurity for routable parents so validateAccess succeeds for a parent that has its own screen — e.g. inventory/build/manager under woProd)
  * @filesource /model/registry.php
  */
 
@@ -143,7 +143,7 @@ final class bizRegistry
         $fqcn  = "\\bizuno\\{$module}Admin";
         if (!bizAutoLoad("{$path}admin.php", $fqcn)) { return msgAdd("Cannot find module: $module at path: $path"); }
         $admin = new $fqcn();
-// Temporary for now but doesn't slow things down
+// @TODO - Temporary for now but doesn't slow things down
 unset($bizunoMod[$module]['dashboards']);
         $bizunoMod[$module]['settings'] = isset($admin->settings) ? $admin->settings : [];
         // set some system properties
@@ -265,8 +265,38 @@ unset($bizunoMod[$module]['dashboards']);
      */
     private function initBizuno()
     {
+        global $bizunoMod;
         msgDebug("\nEntering initBizuno.");
         setModuleCache('bizuno', 'stores', '', dbGetStores());
+        // Re-seed each module's common-meta options (options_qa_status, options_frequencies,
+        // options_lead_times, options_fxdast_types, options_crm_actions, options_return_codes,
+        // options_return_status, options_contact_status, …). Each module's *Admin::initialize()
+        // writes its options_* row(s) on first install — but the 7.3.8 upgrade at
+        // controllers/bizuno/install/upgrade.php:185 wipes those rows expecting them to rebuild
+        // on next cache reload. There was no rebuild step; this loop is it. initialize() does
+        // dbMetaGet→dbMetaSet so it's idempotent: cheap on a normal cache reload and self-heals
+        // any wiped or operator-tampered options_* row.
+        foreach (array_keys((array)$bizunoMod) as $modID) {
+            $fqcn = "\\bizuno\\{$modID}Admin";
+            if (!class_exists($fqcn)) { continue; }
+            $admin = new $fqcn();
+            if (method_exists($admin, 'initialize')) {
+                msgDebug("\ninitBizuno: re-running {$modID}Admin::initialize() to seed options_* rows");
+                $admin->initialize();
+            }
+        }
+        // Now mirror common_meta `options_*` rows into the bizuno.options.<suffix> cache so
+        // every getModuleCache('bizuno','options','<suffix>') call (tickets, audits, training,
+        // adminMaint, etc.) finds the values. Without this, the rows can exist in common_meta
+        // but the cached business config — which is what getModuleCache reads — has no
+        // `options` key under `bizuno`, and downstream code sees null.
+        $rows = dbGetMulti(BIZUNO_DB_PREFIX.'common_meta', "meta_key LIKE 'options\\_%' ESCAPE '\\\\'");
+        foreach ($rows as $row) {
+            $suffix = substr($row['meta_key'], strlen('options_'));
+            if ($suffix === '') { continue; }
+            $decoded = json_validate($row['meta_value']) ? json_decode($row['meta_value'], true) : $row['meta_value'];
+            setModuleCache('bizuno', 'options', $suffix, $decoded);
+        }
     }
 
     private function initPayment()
@@ -318,9 +348,15 @@ unset($bizunoMod[$module]['dashboards']);
         $this->userInfo = [];
         foreach ($roles as $role) {
             unset($role['_refID'], $role['_table']); // don't need these
-            $tmpMenu = $this->menuBar['child'];
-            $this->removeOrphanMenus($tmpMenu, !empty($role['security']) ? $role['security'] : []);
-            $role['menuBar'] = sortOrder($tmpMenu);
+            $tmpMenu  = $this->menuBar['child'];
+            // Pass security map by reference so removeOrphanMenus can write back inherited
+            // parent-level entries (a parent that is itself a route — e.g. inventory/build/manager
+            // — gets max(children's security) so validateAccess($parentKey) succeeds even though
+            // the role editor only offered checkboxes for the leaf children).
+            $userSec  = !empty($role['security']) ? $role['security'] : [];
+            $this->removeOrphanMenus($tmpMenu, $userSec);
+            $role['security'] = $userSec; // persist inherited parent entries
+            $role['menuBar']  = sortOrder($tmpMenu);
             dbMetaSet($role['_rID'], 'bizuno_role', $role);
             $this->userInfo['r'.$role['_rID']] = [
                 'title'   => $role['title'],
@@ -333,16 +369,32 @@ unset($bizunoMod[$module]['dashboards']);
     }
 
     /**
-     * Removes main menu heading if there are no sub menus underneath
-     * @param array $menu - working menu
+     * Removes main menu heading if there are no sub menus underneath.
+     * Also bridges inherited security values back into $userSecurity for *routable* parents
+     * (items that have both a `route` and a `child` list): the parent inherits the highest
+     * child's security level, which is then written back to the security map so
+     * validateAccess($parentKey) succeeds. Without this bridge, the role editor — which only
+     * exposes checkboxes for leaf items — has no way to grant access to a parent that is
+     * itself a standalone screen (e.g. inventory/build/manager under woProd → woDesign,woTasks).
+     *
+     * @param array $menu         - working menu (modified in place)
+     * @param array $userSecurity - role security map (modified in place; receives inherited entries)
      * @return integer - maximum security value found during the removal process
      */
-    private function removeOrphanMenus(&$menu, $userSecurity=[])
+    private function removeOrphanMenus(&$menu, &$userSecurity=[])
     {
         $security = 0;
         foreach ($menu as $key => $props) {
             if (isset($props['child'])) {
-                $menu[$key]['security'] = $this->removeOrphanMenus($menu[$key]['child'], $userSecurity);
+                $childMax = $this->removeOrphanMenus($menu[$key]['child'], $userSecurity);
+                // Inherit only when (a) the role editor didn't already write an explicit
+                // entry for this parent (so any future 'manager'-flagged checkbox wins),
+                // and (b) the parent is itself a reachable screen — otherwise there's no
+                // validateAccess() call to satisfy and we'd just be polluting the map.
+                if (!array_key_exists($key, $userSecurity) && !empty($menu[$key]['route'])) {
+                    $userSecurity[$key] = $childMax;
+                }
+                $menu[$key]['security'] = $childMax;
             } else {
                 $menu[$key]['security'] = array_key_exists($key, $userSecurity) ? $userSecurity[$key] : 0;
             }

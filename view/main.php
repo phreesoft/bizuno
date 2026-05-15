@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05
+ * @version    7.x Last Update: 2026-05-15 (fa_type processor migrated off getModuleCache → getMetaCommon('options_fxdast_types') + lang() translation)
  * @filesource /view/main.php
  */
 
@@ -486,8 +486,12 @@ function viewFormat($value, $format = '')
         case 'glTypeLbl': return is_numeric($value) ? lang("gl_acct_type_{$value}") : $value;
         case 'glTitle':   return getModuleCache('phreebooks', 'chart', $value, 'title');
         case 'fa_condition': return $value=='u' ? lang('used') : lang('new');
-        case 'fa_type':   $types = getModuleCache('bizuno', 'options', 'faTypes');
-                          return isset($types[$value]) ? $types[$value] : $value;
+        case 'fa_type':   // Migrated off getModuleCache; canonical home is common_meta.options_fxdast_types
+                          // (note: legacy cache subkey was 'faTypes' but the mirror used 'fxdast_types',
+                          // so this swap also fixes a pre-existing silent null read). Values are lang
+                          // keys (e.g. 'fa_type_bd') so translate before rendering.
+                          $types = getMetaCommon('options_fxdast_types') ?: [];
+                          return isset($types[$value]) ? (is_string($types[$value]) ? lang($types[$value], 'administrate') : $types[$value]) : $value;
         case 'lc':        return mb_strtolower($value);
         case 'j_desc':    return lang("journal_id_$value");
         case 'json':      return json_decode($value, true);
@@ -948,12 +952,26 @@ function viewInvMinStk($sku)
  * @param boolean $addAll - inserts at the beginning a choice of All and returns a value of a if selected
  * @return array $output - contains array compatible with function HTML5 to render a drop down input element
  */
+/**
+ * Builds a `[['id'=>k,'text'=>translated],…]` array for select dropdowns.
+ *
+ * Values are passed through `lang()` so the `options_*` rows stored in `common_meta`
+ * (which intentionally hold lang KEYS like `qa_status_1`, `daily`, `lead07` rather than
+ * pre-translated text — so the same row works across all user locales) render their
+ * translated label at display time. `lang()` returns the input key unchanged when not
+ * found in the dictionary, so non-key values (date labels from `localeDates()`, ISO
+ * currency codes, store names, etc.) pass through untouched. Safe to apply globally.
+ */
 function viewKeyDropdown($source, $addNone=false, $addAll=false)
 {
     $output = [];
     if (!empty($addNone)) { $output[] = ['id'=>'0', 'text'=>lang('none')]; }
     if (!empty($addAll))  { $output[] = ['id'=>'a', 'text'=>lang('all')]; }
-    if (is_array($source)) { foreach ($source as $key => $value) { $output[] = ['id'=>$key, 'text'=>$value]; } }
+    if (is_array($source)) {
+        foreach ($source as $key => $value) {
+            $output[] = ['id'=>$key, 'text'=>is_string($value) ? lang($value) : $value];
+        }
+    }
     return $output;
 }
 

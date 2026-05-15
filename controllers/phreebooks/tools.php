@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-05-15 (fyCloseReindexGenJournal: added self-heal re-stamp of journal_main.period from journal_periods to repair drift on FY close)
  * @filesource /controllers/phreebooks/tools.php
  */
 
@@ -433,6 +433,13 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
 
         // Let's go
         dbTransactionStart();
+        // Note: the cntM query above (line 424) excludes journal_id IN (6,7,12,13) — recurring
+        // templates and returns — under the assumption those need to survive the close. The
+        // DELETE below does NOT replicate that exclusion, so any 6/7/12/13 row with
+        // post_date <= fyEndDate is still deleted. That's the correct call for HISTORICAL rows
+        // of those journal types (a once-posted SO from 2022 should be culled when 2022 closes
+        // just like any other journal_id), but it means the cntM tally undercounts and the
+        // progress percentage drifts. The exclusion in the count is effectively dead.
         $cron['msg'][] = "Read $cntM records to delete from table: $tableM";
         $cron['msg'][] = "Executing SQL: DELETE FROM $tableM WHERE post_date <='{$cron['fyEndDate']}'"; // This should delete all journal main entries remaining
         dbGetResult("DELETE FROM $tableM WHERE post_date <='{$cron['fyEndDate']}'");
@@ -518,6 +525,33 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
         $cron['msg'][] = "Reindexing table $tableP to align with new periods.";
         $cron['msg'][] = "    Executing SQL: $sqlP";
         dbGetResult($sqlP);
+        // ----------------------------------------------------------------------------------
+        // Self-heal pass for journal_main.period
+        //
+        // The blind `UPDATE journal_main SET period = period - periodEnd` in Step 3 only
+        // produces correct results when every pre-close row already had a stored period
+        // that matched the fiscal period implied by its post_date. In practice we see drift:
+        //   - quality tickets (jID=30) and work orders (jID=32) saved without stamping period
+        //     (left at 0 / NULL — see repairJournalMainPeriod() in install/upgrade.php)
+        //   - future-dated recurring entries (jID=6,7,12,13) inserted before later fiscal years
+        //     existed in journal_periods — calculatePeriod() returned null so they stored 0
+        //   - prior buggy code paths that stamped period off-by-one
+        // The Step 3 decrement just shifts those wrong values further off. Now that
+        // journal_periods has been renumbered above, re-stamp every journal_main row whose
+        // stored period doesn't match the period implied by post_date. Idempotent — no-op on
+        // clean data, self-heals everything else. Rows with post_date outside any fiscal
+        // period (rare) are left untouched (the JOIN finds no match).
+        $sqlReheal = "UPDATE ".BIZUNO_DB_PREFIX."journal_main jm
+            JOIN ".BIZUNO_DB_PREFIX."journal_periods jp
+              ON jm.post_date >= jp.start_date AND jm.post_date <= jp.end_date
+            SET jm.period = jp.period
+            WHERE jm.period <> jp.period";
+        $cron['msg'][] = "Self-healing journal_main.period from journal_periods (post-renumber).";
+        $cron['msg'][] = "    Executing SQL: $sqlReheal";
+        $stmtHeal = dbGetResult($sqlReheal);
+        $healCnt  = $stmtHeal ? $stmtHeal->rowCount() : 0;
+        $cron['msg'][] = "    Re-stamped $healCnt journal_main rows.";
+        // ----------------------------------------------------------------------------------
         $props = dbGetPeriodInfo(getModuleCache('phreebooks', 'fy', 'period') - $cron['periodEnd']);
         setModuleCache('phreebooks', 'fy', false, $props);
         $cron['curStep']++;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-05-12
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1172,9 +1172,13 @@ function bizUnitDiscDisc(newValue) {
             'fields'=> $this->getStatusFields($contact, $aging)];
         $notes = dbMetaGet(0, 'notes', 'contacts', $cID);
         if (!empty($notes['value'])) {
-            // User-editable contact notes — escape HTML before re-applying the \n → <br/> substitution
-            // so that a customer record with `<script>...</script>` in notes can't fire on the genStat panel.
-            $safeNotes = str_replace("\n", "<br />", htmlspecialchars($notes['value'], ENT_QUOTES, 'UTF-8'));
+            // Notes are authored in the contact-edit WYSIWYG editor and stored as HTML.
+            // Allow basic formatting tags, then strip event handlers and inline styles to block XSS.
+            $safeNotes = strip_tags($notes['value'], '<br><p><div><span><strong><b><em><i><u><ul><ol><li><a>');
+            $safeNotes = preg_replace('/\s+on\w+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $safeNotes);
+            $safeNotes = preg_replace('/\s+style\s*=\s*("[^"]*"|\'[^\']*\')/i', '', $safeNotes);
+            $safeNotes = preg_replace('/href\s*=\s*(["\'])\s*(?:javascript|data|vbscript):[^"\']*\1/i', 'href=$1#$1', $safeNotes);
+            $safeNotes = str_replace("\n", "<br />", $safeNotes);
             $data['fields']['notes'] = ['order'=>15,'html'=>$safeNotes,'attr'=>['type'=>'raw']];
             $data['panels']['genStat']['keys'][] = 'notes';
         }

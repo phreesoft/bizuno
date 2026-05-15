@@ -211,4 +211,21 @@ class administrateTools {
         dbMetaSet($rID, 'bizuno_refs', $meta);
         msgAdd(lang('msg_settings_saved'), 'success');
     }
+
+    /**
+     * Clear the business config cache by zeroing `common_meta.bizuno_cache_expires`. The next
+     * authenticated request sees an expired timestamp in `portalCtl::cacheValidate()` and triggers
+     * a full `bizRegistry::initRegistry()` reload — re-running each module's `*Admin::initialize()`,
+     * re-seeding `options_*` rows, rebuilding role menus, dashboards, phreeform, etc.
+     *
+     * Wired to the Settings → Bizuno → Tools → "Clear Cache" button. Equivalent to manually setting
+     * `bizuno_cache_expires` to 0 in `common_meta`; faster path when the operator can reach the UI.
+     */
+    public function cacheClear()
+    {
+        if (!$security = validateAccess('admin', 3)) { return; }
+        bizCacheExpClear();
+        msgLog(lang('admin_cache_clear_title'));
+        msgAdd(lang('admin_cache_clear_done'), 'success');
+    }
 }
