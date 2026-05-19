@@ -1,1 +1,28 @@
+# Bizuno .gitignore
+#
+# Goal: keep the repo as the source of truth, with all generated and
+# install-specific artifacts excluded. Composer manages /vendor; the
+# installer creates /portalCFG.php and /BIZUNO_DATA; CI populates /dist
+# during release builds.
+
+# OS / editor noise
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Composer-managed dependencies — never tracked; restored by `composer install`
+/vendor/
+
+# Install-specific config — created by the installer, contains DB credentials
+/portalCFG.php
+
+# User data — uploads, attachments, cache, logs — never the repo's concern
+/BIZUNO_DATA/
+
+# CI release-build outputs (Phase 3+, when bin/release.php starts producing artifacts)
+/dist/
+/build/output/
+
+# Logs
+*.log
