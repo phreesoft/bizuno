@@ -21,8 +21,8 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
- * @filesource /index.php
+ * @version    7.x Last Update: 2026-05-19 (Phase 2: BIZUNO_FS_LIBRARY now points at src/; portal/controller.php load shifted to BIZUNO_FS_LIBRARY)
+ * @filesource /portalCFG-sample.php
  */
 
 namespace bizuno;
@@ -67,9 +67,27 @@ if ( !defined( 'BIZUNO_DB_CREDS' ) ) { define( 'BIZUNO_DB_CREDS', ['type'=>'mysq
 
 /******************** END - Site Specific Settings ***********************/
 
-// Platform Specific - File System Paths
+// Platform-specific file-system paths.
+//
+//   BIZUNO_FS_PORTAL  — directory containing index.php (web-served root)
+//   BIZUNO_FS_LIBRARY — directory containing the Bizuno PHP source. Defaults
+//                       to BIZUNO_FS_PORTAL.'src/' (shipped layout) but may
+//                       be set to an absolute path OUTSIDE the webroot for a
+//                       hardened install — keeps the PHP source out of any
+//                       directory Apache can serve. Common pattern on
+//                       ISPConfig and similar managed-hosting setups:
+//                         define('BIZUNO_FS_LIBRARY', '/var/www/biz.example.com/private/bizuno/src/');
+//                         define('BIZUNO_FS_ASSETS',  '/var/www/biz.example.com/private/bizuno/vendor/');
+//                         define('BIZUNO_DATA',       '/var/www/biz.example.com/private/bizuno/data/');
+//   BIZUNO_FS_ASSETS  — directory containing composer's vendor/. Same pattern
+//                       — defaults under the webroot but can be moved out.
+//
+// All three are `if (!defined())` guarded so a user-supplied value in
+// portalCFG.php takes precedence over these computed defaults. The Bizuno
+// installer rewrites BIZUNO_BIZID / BIZUNO_KEY / BIZUNO_DB_CREDS but leaves
+// any custom path defines you've added untouched.
 if ( !defined( 'BIZUNO_FS_PORTAL' ) )   { define( 'BIZUNO_FS_PORTAL',   $_SERVER['DOCUMENT_ROOT'].'/'); }
-if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  BIZUNO_FS_PORTAL ); }
+if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  BIZUNO_FS_PORTAL . 'src/' ); }
 if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_FS_PORTAL . 'vendor/' ); }
 
 // Platform Specific - URL's
@@ -82,5 +100,6 @@ if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', BIZUNO_U
 // Initialize Bizuno Library
 require ( BIZUNO_FS_LIBRARY . 'bizunoCFG.php' );
 
-// Initialize Portal
-require ( BIZUNO_FS_PORTAL  . 'portal/controller.php' );
+// Initialize Portal — sits under src/portal/ post-Phase 2, so loaded via
+// BIZUNO_FS_LIBRARY (which now points at src/) rather than BIZUNO_FS_PORTAL.
+require ( BIZUNO_FS_LIBRARY . 'portal/controller.php' );
