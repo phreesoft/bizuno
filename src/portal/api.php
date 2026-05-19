@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-19 (easyuiJS / easyuiCSS: scripts/ lives at the webroot, not under src/, so resolve via BIZUNO_FS_PORTAL not BIZUNO_FS_LIBRARY)
  * @filesource /portal/api.php
  */
 
@@ -148,7 +148,12 @@ class portalApi
      */
     public function easyuiJS()
     {
-        $basePath = BIZUNO_FS_LIBRARY.'/scripts/jquery-easyui-ext';
+        // scripts/ lives at the webroot (web-served directly), NOT under src/ —
+        // resolve via BIZUNO_FS_PORTAL. Pre-Phase 2 these two constants were the
+        // same value so the difference didn't matter; post-Phase 2 BIZUNO_FS_LIBRARY
+        // points at src/ and using it here produced an empty `file_get_contents()`
+        // result → empty JS response → "dashContainer.portal is not a function".
+        $basePath = BIZUNO_FS_PORTAL.'scripts/jquery-easyui-ext';
         $output  = '';
         $output .= file_get_contents("$basePath/portal/jquery.portal.js")           ."\n"; // Portal
         $output .= file_get_contents("$basePath/color/jquery.color.js")             ."\n"; // Color
@@ -167,7 +172,8 @@ class portalApi
      */
     public function easyuiCSS()
     {
-        $basePath= BIZUNO_FS_LIBRARY.'scripts/jquery-easyui-ext';
+        // Same scripts/-is-at-webroot reasoning as easyuiJS above.
+        $basePath= BIZUNO_FS_PORTAL.'scripts/jquery-easyui-ext';
         $icons   = [];
         $output  = '';
         $output .= file_get_contents("$basePath/texteditor/texteditor.css")   ."\n"; // Text Editor
