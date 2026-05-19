@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-03
+ * @version    7.x Last Update: 2026-05-19 (constructor: skip connect attempt + error toast when creds match the portalCFG-sample.php placeholders — that's the fresh-install signal, not a credential failure)
  * @filesource /model/db.php
  */
 
@@ -41,7 +41,22 @@ class db extends \PDO
      */
     function __construct($dbData)
     {
+        // No creds provided at all → silent bail. Caller (portalCtl::getScope)
+        // sees $connected = false and routes to the installer.
         if (empty($dbData['host']) || empty($dbData['name']) || empty($dbData['user']) || empty($dbData['pass'])) { return; }
+        // Fresh-install signal: the creds are still the literal placeholders
+        // shipped in portalCFG-sample.php (dbName / dbUser / dbPassword).
+        // Trying to connect with those would always fail and queue a
+        // misleading "Database connection failed" toast on what should be
+        // a clean install screen. Match all three slots together so a real
+        // DB user that happens to be named "dbUser" doesn't accidentally
+        // trigger this branch.
+        if ($dbData['name'] === 'dbName'
+            && $dbData['user'] === 'dbUser'
+            && $dbData['pass'] === 'dbPassword') {
+            msgDebug("\nDB creds are the portalCFG-sample.php placeholders — skipping connect attempt; this is a fresh install.");
+            return;
+        }
         $this->driver = !empty($dbData['type']) ? $dbData['type'] : 'mysql';
         $dns  = "{$dbData['type']}:host={$dbData['host']};dbname={$dbData['name']}";
         $user = $dbData['user'];
