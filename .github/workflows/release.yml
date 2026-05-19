@@ -31,6 +31,7 @@ on:
 
 permissions:
   contents: write   # needed for the GitHub Release create/upload
+  packages: write   # needed to push container images to ghcr.io
 
 concurrency:
   group: release-${{ github.ref }}
@@ -254,3 +255,87 @@ jobs:
             --username "$WP_SVN_USER" \
             --password "$WP_SVN_PASS" \
             -m "Release ${VERSION}"
+
+  # ─── Build and push the Docker image to ghcr.io ─────────────────────────
+  #
+  # Runs in parallel with the zip + wordpress builds (no `needs: build`).
+  # Docker buildx builds for both amd64 and arm64 so the same image works
+  # on Apple Silicon / Raspberry Pi servers and on standard x86 hosts.
+  # Pushes to ghcr.io/<owner>/bizuno with three tags:
+  #   :<version>  — pinned semver (e.g. 7.4.0)
+  #   :<major.minor> — auto-updating minor stream (e.g. 7.4)
+  #   :<major>    — auto-updating major stream (e.g. 7)
+  #   :latest     — current release; convenient for dev, NOT recommended in prod
+  #
+  # ghcr.io auth uses the workflow's built-in GITHUB_TOKEN via the
+  # `packages: write` permission declared at the top of this file — no
+  # separate secret needed.
+  docker:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: meta
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - name: Set up QEMU (for multi-arch builds)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image tags
+        id: tags
+        env:
+          REPO: ${{ github.repository }}
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          set -e
+          # Convert org name to lowercase — ghcr.io requires lowercase
+          IMAGE="ghcr.io/$(echo "$REPO" | tr '[:upper:]' '[:lower:]')"
+          # Split semver components for the rolling tags
+          MAJOR="$(echo "$VERSION" | cut -d. -f1)"
+          MINOR="$(echo "$VERSION" | cut -d. -f1-2)"
+          TAGS="${IMAGE}:${VERSION}"$'\n'
+          TAGS+="${IMAGE}:${MINOR}"$'\n'
+          TAGS+="${IMAGE}:${MAJOR}"$'\n'
+          TAGS+="${IMAGE}:latest"
+          {
+            echo "image=${IMAGE}"
+            echo "tags<<EOF"
+            echo "${TAGS}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Will tag as:"
+          echo "${TAGS}"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: build/docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.meta.outputs.version }}
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp || github.event.created_at }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Image digest
+        run: |
+          echo "Image pushed to: ${{ steps.tags.outputs.image }}"
+          echo "Tags published: ${{ steps.tags.outputs.tags }}"
