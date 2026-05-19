@@ -82,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false   # produce as many artifacts as possible even if one breaks
       matrix:
-        variant: [zip, wordpress]
+        variant: [zip, wordpress, nextcloud]
     steps:
       - name: Checkout tag
         uses: actions/checkout@v4
@@ -176,6 +176,9 @@ jobs:
             echo ""
             echo "- **bizuno-wp-${VERSION}.zip** — WordPress plugin. Upload via WP admin → Plugins → Add New → Upload Plugin."
             echo "- **bizuno-${VERSION}-zip.zip** — LAMP/WAMP drop-in. Composer-free; unzip into your webroot."
+            echo "- **bizuno-${VERSION}.tar.gz** — NextCloud launcher app. Upload via NextCloud Apps, or extract into \`<nextcloud>/apps/\`."
+            echo ""
+            echo "Container image: \`ghcr.io/phreesoft/bizuno:${VERSION}\` (also tagged \`:latest\`, \`:\$(echo "$VERSION" | cut -d. -f1-2)\`, \`:\$(echo "$VERSION" | cut -d. -f1)\`)."
             echo ""
             echo "For composer-create-project install: \`composer create-project phreesoft/bizuno --no-dev\` (pulls automatically from Packagist)."
             echo ""
