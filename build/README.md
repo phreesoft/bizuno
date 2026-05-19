@@ -25,19 +25,52 @@ described per-subdirectory below.
 
 ## Variant directories
 
-| Path | Purpose |
-|---|---|
-| [`wordpress/`](./wordpress/) | WordPress plugin glue. Plugin header file, WordPress.org readme, banner/icon assets, build script (TBD Phase 3). |
-| `composer/` (TBD) | Composer-create-project artifact builder. Phase 3. |
-| `zip/` (TBD) | LAMP/WAMP zip builder. Bundles vendor/. Phase 3. |
-| `docker/` (TBD) | Dockerfile, docker-compose, entrypoint. Phase 4. |
-| `nextcloud/` (TBD) | NextCloud app manifest + glue. Phase 5. |
+| Path | Status | Distribution channel |
+|---|---|---|
+| [`wordpress/`](./wordpress/) | **active** | GitHub Releases + WordPress.org SVN (auto-mirrored) |
+| [`zip/`](./zip/) | **active** | GitHub Releases |
+| composer | n/a | Packagist — `composer create-project phreesoft/bizuno`. No build script needed; the git repo itself IS the artifact. Tag a release and packagist picks it up. |
+| `docker/` (TBD) | Phase 4 | Docker Hub / ghcr.io |
+| `nextcloud/` (TBD) | Phase 5 | NextCloud app store |
 
 ## Build outputs
 
-Future per-variant `build.sh` scripts write to `build/output/<variant>/`
-which is `.gitignore`d. Release builds run via CI on tag push (see
-[`../.github/workflows/`](../.github/workflows/) — release workflow TBD).
+Per-variant `build.sh` scripts write to `build/output/<variant>/` which is
+in `.gitignore`. Each script is self-contained — run from anywhere:
+
+```bash
+bash build/zip/build.sh        # → build/output/bizuno-VERSION-zip.zip
+bash build/wordpress/build.sh  # → build/output/wordpress/bizuno-wp-VERSION.zip
+```
+
+Both scripts run `composer install --no-dev --optimize-autoloader` against
+a fresh staging directory; nothing in your working tree is modified.
+
+## Release workflow
+
+CI builds happen automatically on `git tag v*` push via
+[`../.github/workflows/release.yml`](../.github/workflows/release.yml).
+The workflow:
+
+1. Resolves the version from the pushed tag (strips the leading `v`)
+2. Verifies `src/VERSION` matches the tag (fails fast otherwise)
+3. Builds zip and wordpress variants in parallel
+4. Creates a GitHub Release with generated changelog notes, attaches both artifacts
+5. (Optional) Pushes the WordPress plugin to wordpress.org SVN if `WP_SVN_USER` / `WP_SVN_PASS` secrets are configured
+
+To release:
+
+```bash
+# bump src/VERSION first
+echo "7.4.0" > src/VERSION
+git commit -am "Release 7.4.0"
+git push origin main
+
+# tag and push
+git tag v7.4.0
+git push origin v7.4.0
+# … CI runs, ~3 minutes to artifacts, ~5 minutes to wordpress.org if SVN push enabled
+```
 
 ## Adding a new variant
 

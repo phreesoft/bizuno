@@ -1,0 +1,256 @@
+name: Release Bizuno
+
+# Triggered when a `v*` tag is pushed (e.g. v7.4.0). Builds every release
+# variant in parallel, attaches artifacts to a GitHub Release, and pushes
+# the WordPress plugin to wordpress.org SVN.
+#
+# To release:
+#   git tag v7.4.0
+#   git push origin v7.4.0
+#
+# Secrets required:
+#   WP_SVN_USER  — WordPress.org account username (Plugin Author)
+#   WP_SVN_PASS  — WordPress.org account password (or app password)
+# Optional:
+#   (none — GITHUB_TOKEN is provided automatically by Actions for the release upload)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to (re-)release, e.g. v7.4.0. Must already exist as a git tag.'
+        required: true
+        type: string
+      skip_svn:
+        description: 'Skip the WordPress.org SVN push?'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write   # needed for the GitHub Release create/upload
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false  # don't cancel mid-release; let the running one finish
+
+jobs:
+
+  # ─── Resolve the version once ────────────────────────────────────────────
+  #
+  # Either from the pushed tag (push event) or from the manual input.
+  # Strips the leading 'v' so VERSION is bare semver (7.4.0).
+  meta:
+    name: Resolve version metadata
+    runs-on: ubuntu-latest
+    outputs:
+      version:   ${{ steps.resolve.outputs.version }}
+      tag:       ${{ steps.resolve.outputs.tag }}
+      skip_svn:  ${{ steps.resolve.outputs.skip_svn }}
+    steps:
+      - name: Resolve
+        id: resolve
+        env:
+          GH_REF: ${{ github.ref }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          INPUT_SKIP_SVN: ${{ github.event.inputs.skip_svn }}
+        run: |
+          set -e
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG="${GH_REF#refs/tags/}"
+          fi
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "::error::Tag '$TAG' doesn't match v<semver>" && exit 1
+          fi
+          VERSION="${TAG#v}"
+          SKIP_SVN="${INPUT_SKIP_SVN:-false}"
+          echo "tag=$TAG"           >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION"   >> "$GITHUB_OUTPUT"
+          echo "skip_svn=$SKIP_SVN" >> "$GITHUB_OUTPUT"
+          echo "Resolved: tag=$TAG version=$VERSION skip_svn=$SKIP_SVN"
+
+  # ─── Build each variant ──────────────────────────────────────────────────
+  build:
+    name: Build ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+    needs: meta
+    strategy:
+      fail-fast: false   # produce as many artifacts as possible even if one breaks
+      matrix:
+        variant: [zip, wordpress]
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Verify src/VERSION matches the tag
+        env:
+          EXPECTED: ${{ needs.meta.outputs.version }}
+        run: |
+          set -e
+          ACTUAL=$(cat src/VERSION)
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::src/VERSION ($ACTUAL) doesn't match release tag ($EXPECTED)"
+            echo "::error::Bump src/VERSION before tagging, or retag after."
+            exit 1
+          fi
+
+      - name: Make build script executable
+        run: chmod +x build/${{ matrix.variant }}/build.sh
+
+      - name: Run the build
+        run: bash build/${{ matrix.variant }}/build.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bizuno-${{ matrix.variant }}-${{ needs.meta.outputs.version }}
+          path: build/output/${{ matrix.variant }}/*
+          retention-days: 30
+          if-no-files-found: error
+
+  # ─── Aggregate artifacts and create the GitHub Release ───────────────────
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [meta, build]
+    steps:
+      - name: Checkout (for release notes)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.meta.outputs.tag }}
+          fetch-depth: 50  # enough for changelog inspection
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts to attach
+        run: ls -la dist/
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.meta.outputs.tag }}
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          set -e
+          # Generate release notes — commits since the previous tag, if any
+          PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            NOTES_RANGE="${PREV_TAG}..${TAG}"
+            NOTES_HEADER="## Changes since $PREV_TAG"
+          else
+            NOTES_RANGE="${TAG}"
+            NOTES_HEADER="## Changes"
+          fi
+          {
+            echo "$NOTES_HEADER"
+            echo ""
+            git log --pretty=format:"- %s (%h)" "$NOTES_RANGE" || true
+            echo ""
+            echo ""
+            echo "## Artifacts"
+            echo ""
+            echo "- **bizuno-wp-${VERSION}.zip** — WordPress plugin. Upload via WP admin → Plugins → Add New → Upload Plugin."
+            echo "- **bizuno-${VERSION}-zip.zip** — LAMP/WAMP drop-in. Composer-free; unzip into your webroot."
+            echo ""
+            echo "For composer-create-project install: \`composer create-project phreesoft/bizuno --no-dev\` (pulls automatically from Packagist)."
+            echo ""
+            echo "See [docs](https://bizuno.com/docs/) for full install instructions."
+          } > release-notes.md
+          gh release create "$TAG" \
+            --title "Bizuno $VERSION" \
+            --notes-file release-notes.md \
+            dist/*
+
+  # ─── Mirror the WordPress plugin to wordpress.org SVN ────────────────────
+  wp-svn:
+    name: Push to WordPress.org SVN
+    runs-on: ubuntu-latest
+    needs: [meta, release]
+    if: needs.meta.outputs.skip_svn != 'true'
+    env:
+      WP_SVN_REPO: https://plugins.svn.wordpress.org/bizuno-wp
+      WP_SVN_USER: ${{ secrets.WP_SVN_USER }}
+      WP_SVN_PASS: ${{ secrets.WP_SVN_PASS }}
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - name: Validate SVN secrets
+        run: |
+          if [ -z "${WP_SVN_USER}" ] || [ -z "${WP_SVN_PASS}" ]; then
+            echo "::warning::WP_SVN_USER / WP_SVN_PASS not set — skipping wordpress.org push"
+            echo "WP_SVN_SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Install subversion
+        if: env.WP_SVN_SKIP != 'true'
+        run: sudo apt-get update && sudo apt-get install -y subversion
+
+      - name: Download WordPress plugin artifact
+        if: env.WP_SVN_SKIP != 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: bizuno-wordpress-${{ needs.meta.outputs.version }}
+          path: artifact
+
+      - name: Unzip plugin
+        if: env.WP_SVN_SKIP != 'true'
+        run: |
+          mkdir -p plugin
+          unzip -q artifact/bizuno-wp-${VERSION}.zip -d plugin
+          ls plugin/bizuno-wp/ | head
+
+      - name: SVN checkout WordPress.org repo
+        if: env.WP_SVN_SKIP != 'true'
+        run: |
+          svn checkout --depth immediates "$WP_SVN_REPO" svn-repo
+          svn update --set-depth infinity svn-repo/trunk svn-repo/assets svn-repo/tags
+
+      - name: Sync plugin → trunk + new tag
+        if: env.WP_SVN_SKIP != 'true'
+        run: |
+          set -e
+          # Replace trunk contents with the new build
+          rm -rf svn-repo/trunk/*
+          cp -a plugin/bizuno-wp/. svn-repo/trunk/
+          # Copy to tags/<version>
+          mkdir -p svn-repo/tags/${VERSION}
+          cp -a plugin/bizuno-wp/. svn-repo/tags/${VERSION}/
+          # Stage adds/deletes for svn
+          cd svn-repo
+          svn add --force --quiet .
+          # Delete files that SVN tracks but no longer exist locally
+          svn status | grep '^!' | sed -e 's/^! *//' | xargs -r svn delete --keep-local || true
+
+      - name: SVN commit
+        if: env.WP_SVN_SKIP != 'true'
+        run: |
+          cd svn-repo
+          svn commit \
+            --no-auth-cache \
+            --non-interactive \
+            --username "$WP_SVN_USER" \
+            --password "$WP_SVN_PASS" \
+            -m "Release ${VERSION}"
