@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-01
+ * @version    7.x Last Update: 2026-05-19 (added preflightCheck() so a missing vendor/ shows a friendly setup-required page instead of a misleading DB-error screen)
  * @filesource /index.php
  */
 
@@ -30,5 +30,14 @@ namespace bizuno;
 if (file_exists('portalCFG.php')) { require( 'portalCFG.php' ); }
 elseif (file_exists('portalCFG-sample.php')) { require( 'portalCFG-sample.php' ); }
 else { die( 'Mayday! There seems to be a critical file missing, you may want to re-install Bizuno from the GitHub source!' ); }
+
+// Pre-flight: verify PHP version, required extensions, and that composer
+// dependencies are installed BEFORE the autoloader is touched. If anything
+// is missing, this renders a friendly setup-required page and exits. On a
+// healthy install it's a fast file-exists + extension_loaded sweep and
+// returns silently. Loaded from portal/ because portalCFG.php has just
+// defined the path constants this check uses (BIZUNO_FS_LIBRARY, BIZUNO_FS_ASSETS).
+require( BIZUNO_FS_LIBRARY . 'portal/installCheck.php' );
+preflightCheck();
 
 new portalCtl();
