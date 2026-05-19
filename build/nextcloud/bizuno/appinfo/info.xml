@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+    Bizuno NextCloud app — manifest.
+
+    This is the metadata read by NextCloud at install time and by the
+    apps.nextcloud.com store at publish time. Element ORDER matters: the
+    info.xsd schema (linked below) validates ordering strictly. Don't
+    reshuffle without checking the XSD.
+
+    Schema reference:
+        https://apps.nextcloud.com/schema/apps/info.xsd
+
+    The <version> element is overwritten by build/nextcloud/build.sh
+    to match src/VERSION at build time — the hardcoded value here is a
+    safe default for hand-installs, but the canonical version source is
+    src/VERSION at the repo root.
+-->
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>bizuno</id>
+    <name>Bizuno ERP</name>
+    <summary>Launcher for the Bizuno ERP / accounting system inside NextCloud.</summary>
+    <description><![CDATA[
+Embed your Bizuno installation inside NextCloud. Adds a "Bizuno" entry
+to NextCloud's top navigation that opens your Bizuno system in a
+sandboxed iframe so users have a single launching point for daily work.
+
+**Prerequisites:** a running Bizuno installation (the official Docker
+image at `ghcr.io/phreesoft/bizuno` is the simplest path). After
+enabling this app, go to Settings → Administration → Bizuno ERP and
+set the externally-reachable URL of your Bizuno server.
+
+Bizuno is open-source ERP for small business: full double-entry
+accounting, CRM, inventory, sales, purchasing, payroll, shipping, and
+custom reporting. Visit [bizuno.com](https://bizuno.com) for more.
+
+**Note:** This launcher does *not* include Bizuno itself — Bizuno is
+a separate web service that NextCloud frames. Single sign-on between
+NextCloud and Bizuno is on the roadmap; users currently authenticate
+to each separately.
+    ]]></description>
+    <version>7.4.0</version>
+    <licence>agpl</licence>
+    <author mail="info@phreesoft.com" homepage="https://phreesoft.com">PhreeSoft, Inc.</author>
+    <namespace>Bizuno</namespace>
+    <category>integration</category>
+    <category>office</category>
+    <website>https://bizuno.com</website>
+    <bugs>https://github.com/phreesoft/bizuno/issues</bugs>
+    <repository type="git">https://github.com/phreesoft/bizuno</repository>
+    <dependencies>
+        <php min-version="8.0"/>
+        <nextcloud min-version="28" max-version="30"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Bizuno</name>
+            <route>bizuno.page.index</route>
+        </navigation>
+    </navigations>
+    <settings>
+        <admin>OCA\Bizuno\Settings\Admin</admin>
+        <admin-section>OCA\Bizuno\Settings\AdminSection</admin-section>
+    </settings>
+</info>

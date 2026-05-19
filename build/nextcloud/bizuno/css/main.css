@@ -1,0 +1,46 @@
+/*
+ * Bizuno NextCloud app — iframe styling.
+ *
+ * NextCloud renders an app's content inside #app-content. Bizuno has its
+ * own complete UI inside the iframe (top nav, side nav, dashboard) so we
+ * make the iframe fill the entire available area below NC's top bar.
+ *
+ * Loaded by templates/main.php via style('bizuno', 'main').
+ */
+
+/* Hide NC's per-app navigation sidebar — Bizuno provides its own. */
+#app-navigation {
+    display: none !important;
+}
+
+/* Stretch the content region all the way across now that #app-navigation
+   is gone (NC's default leaves a left gutter). */
+#app-content,
+#content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+}
+
+/* Full-window iframe.
+
+   The 50px offset accounts for NextCloud's fixed top header bar; this
+   matches the var(--header-height) value but using a literal keeps the
+   styling working on older NC versions that didn't expose that variable.
+*/
+#bizuno-frame {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: calc(100vh - 50px);
+    border: 0;
+    background: #ffffff;
+    display: block;
+}
+
+/* Friendlier centering on the unconfigured-state placeholder. */
+#emptycontent {
+    margin-top: 15vh;
+}

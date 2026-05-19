@@ -1,0 +1,119 @@
+# Bizuno NextCloud app — end-to-end test stack.
+#
+# Brings up NextCloud + MariaDB + Bizuno + MariaDB (separate) on a single
+# Docker network so you can iterate on the launcher app without a real
+# NextCloud server. Each service has its own DB to mirror production —
+# you wouldn't share databases across NC and Bizuno in real life.
+#
+# From the repo root:
+#   docker compose -f build/nextcloud/docker-compose.test.yml up -d
+#
+# Then:
+#   NextCloud → http://localhost:8090   (admin / bizuno-nc-admin-pw)
+#   Bizuno    → http://localhost:8080   (installer wizard on first hit)
+#
+# After both come up healthy, build + install the launcher app:
+#   bash build/nextcloud/build.sh
+#   docker cp build/output/nextcloud/bizuno-*.tar.gz nc-test:/tmp/
+#   docker exec nc-test bash -c 'tar -xzf /tmp/bizuno-*.tar.gz -C /var/www/html/apps/'
+#   docker exec -u www-data nc-test php occ app:enable bizuno
+#   docker exec -u www-data nc-test php occ config:app:set \
+#       bizuno bizuno_url --value="http://localhost:8080/"
+#
+# Log into NextCloud → click "Bizuno" in the top nav → Bizuno loads in
+# an iframe. (Note: from inside NC the iframe needs an externally-
+# reachable URL so the user's browser can load it. We use the host
+# port-mapped URL `http://localhost:8080/`, not the container hostname.)
+#
+# Quick reset (wipes everything):
+#   docker compose -f build/nextcloud/docker-compose.test.yml down -v
+
+name: bizuno-nc-test
+
+services:
+
+  nextcloud:
+    image: nextcloud:30-apache
+    container_name: nc-test
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    environment:
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: bizuno-nc-admin-pw
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost
+      MYSQL_HOST: nc-mariadb
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: nc-test-db-pw
+    volumes:
+      - nc-data:/var/www/html
+    depends_on:
+      nc-mariadb:
+        condition: service_healthy
+
+  nc-mariadb:
+    image: mariadb:11
+    container_name: nc-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: nc-test-root-pw
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: nc-test-db-pw
+    volumes:
+      - nc-mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  # Bizuno — uses the official image built in Phase 4. To test against
+  # a local source change, swap the `image:` line for:
+  #   build:
+  #     context: ../..
+  #     dockerfile: build/docker/Dockerfile
+  bizuno:
+    image: ghcr.io/phreesoft/bizuno:latest
+    container_name: bizuno-test
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      BIZUNO_DB_HOST: biz-mariadb
+      BIZUNO_DB_NAME: bizuno
+      BIZUNO_DB_USER: bizuno
+      BIZUNO_DB_PASS: bizuno-test-db-pw
+    volumes:
+      - bizuno-data:/var/www/html/data
+      - bizuno-config:/var/www/html/portalCFG-config
+    depends_on:
+      biz-mariadb:
+        condition: service_healthy
+
+  biz-mariadb:
+    image: mariadb:11
+    container_name: biz-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: biz-test-root-pw
+      MARIADB_DATABASE: bizuno
+      MARIADB_USER: bizuno
+      MARIADB_PASSWORD: bizuno-test-db-pw
+    volumes:
+      - biz-mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+volumes:
+  nc-data:
+  nc-mariadb-data:
+  bizuno-data:
+  bizuno-config:
+  biz-mariadb-data:
