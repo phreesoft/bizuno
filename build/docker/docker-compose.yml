@@ -1,0 +1,113 @@
+# Bizuno ERP — development / single-host docker-compose stack
+#
+# Brings up Bizuno + MariaDB + (optional) phpMyAdmin for local development
+# or single-host production deployments. Run from the repo root:
+#
+#   docker compose -f build/docker/docker-compose.yml up -d
+#
+# Bizuno comes up at http://localhost:8080. Default DB credentials below
+# are dev-friendly; OVERRIDE THEM for any internet-reachable deployment.
+#
+# Quick reset (wipes all data, including the DB):
+#   docker compose -f build/docker/docker-compose.yml down -v
+#
+# Upgrade Bizuno without losing data:
+#   docker compose -f build/docker/docker-compose.yml pull
+#   docker compose -f build/docker/docker-compose.yml up -d
+#
+# See build/docker/README.md for the full env-var reference + production
+# hardening guidance (TLS termination, separate DB, secrets management).
+
+name: bizuno
+
+services:
+
+  bizuno:
+    image: ghcr.io/phreesoft/bizuno:latest
+    # For local hacking against an unreleased version, comment the image line
+    # above and uncomment the build block below — runs the Dockerfile against
+    # the local source tree on every `docker compose up --build`.
+    # build:
+    #   context: ../..
+    #   dockerfile: build/docker/Dockerfile
+    container_name: bizuno
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      # Database — must match the mariadb service below
+      BIZUNO_DB_HOST: mariadb
+      BIZUNO_DB_NAME: bizuno
+      BIZUNO_DB_USER: bizuno
+      BIZUNO_DB_PASS: ${BIZUNO_DB_PASS:-bizuno-dev-password}
+
+      # Per-install secrets. ALWAYS set BIZUNO_KEY explicitly in prod so
+      # encrypted PII/passwords survive container replacement; the entrypoint
+      # generates a fresh key if you leave it empty (fine for dev).
+      BIZUNO_KEY:   ${BIZUNO_KEY:-}
+      BIZUNO_BIZID: ${BIZUNO_BIZID:-}
+
+      # Optional: data dir override. Default is /var/www/html/data inside the
+      # container; below maps that to a named volume.
+      # BIZUNO_DATA_DIR: /var/lib/bizuno/data
+    volumes:
+      # Persists uploads, attachments, cache, biz-instance-key.php, backups.
+      # Surviving container replacement is the whole point — never let this
+      # volume disappear without a deliberate `down -v`.
+      - bizuno-data:/var/www/html/data
+      # Persists the generated portalCFG.php so BIZUNO_KEY and DB creds
+      # don't regenerate on every container restart.
+      - bizuno-config:/var/www/html/portalCFG-config
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "--max-time", "4", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  mariadb:
+    image: mariadb:11
+    container_name: bizuno-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-bizuno-dev-root-password}
+      MARIADB_DATABASE: bizuno
+      MARIADB_USER: bizuno
+      MARIADB_PASSWORD: ${BIZUNO_DB_PASS:-bizuno-dev-password}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    # No host port published — bizuno reaches the DB via the docker network.
+    # Uncomment if you need DB access from the host (e.g. for a GUI client).
+    # ports:
+    #   - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  # ─── Optional: phpMyAdmin for DB inspection ─────────────────────────────
+  # Uncomment for dev. NEVER expose phpMyAdmin on a production install
+  # without TLS + strong auth + IP allowlisting.
+  #
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: bizuno-phpmyadmin
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mariadb
+  #   ports:
+  #     - "8081:80"
+  #   environment:
+  #     PMA_HOST: mariadb
+  #     PMA_USER: bizuno
+  #     PMA_PASSWORD: ${BIZUNO_DB_PASS:-bizuno-dev-password}
+
+volumes:
+  bizuno-data:
+  bizuno-config:
+  mariadb-data:

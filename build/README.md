@@ -13,7 +13,7 @@ point* and the *delivery format*:
 | **Composer** | `../index.php` | `composer create-project phreesoft/bizuno` |
 | **Zip** (LAMP/WAMP drop-in) | `../index.php` | release zip with vendor/ baked in |
 | **WordPress plugin** | `wordpress/bizuno-wp.php` | upload via WP admin, or wordpress.org |
-| **Docker** (future) | container `ENTRYPOINT` | Docker Hub / ghcr.io image |
+| **Docker** | container `ENTRYPOINT` | `ghcr.io/phreesoft/bizuno:VERSION` |
 | **NextCloud app** (future) | NextCloud's app loader | NextCloud app zip |
 
 The standalone install is the **default** — it's what the repo at HEAD
@@ -29,8 +29,8 @@ described per-subdirectory below.
 |---|---|---|
 | [`wordpress/`](./wordpress/) | **active** | GitHub Releases + WordPress.org SVN (auto-mirrored) |
 | [`zip/`](./zip/) | **active** | GitHub Releases |
+| [`docker/`](./docker/) | **active** | ghcr.io — multi-arch (linux/amd64, linux/arm64) |
 | composer | n/a | Packagist — `composer create-project phreesoft/bizuno`. No build script needed; the git repo itself IS the artifact. Tag a release and packagist picks it up. |
-| `docker/` (TBD) | Phase 4 | Docker Hub / ghcr.io |
 | `nextcloud/` (TBD) | Phase 5 | NextCloud app store |
 
 ## Build outputs
@@ -41,10 +41,14 @@ in `.gitignore`. Each script is self-contained — run from anywhere:
 ```bash
 bash build/zip/build.sh        # → build/output/bizuno-VERSION-zip.zip
 bash build/wordpress/build.sh  # → build/output/wordpress/bizuno-wp-VERSION.zip
+bash build/docker/build.sh     # → local image ghcr.io/phreesoft/bizuno:VERSION + :latest
 ```
 
-Both scripts run `composer install --no-dev --optimize-autoloader` against
-a fresh staging directory; nothing in your working tree is modified.
+The zip / wordpress scripts run `composer install --no-dev
+--optimize-autoloader` against a fresh staging directory; nothing in your
+working tree is modified. The docker build runs entirely inside the
+Docker build context — the local working tree is the build context but
+isn't written to.
 
 ## Release workflow
 
@@ -55,8 +59,9 @@ The workflow:
 1. Resolves the version from the pushed tag (strips the leading `v`)
 2. Verifies `src/VERSION` matches the tag (fails fast otherwise)
 3. Builds zip and wordpress variants in parallel
-4. Creates a GitHub Release with generated changelog notes, attaches both artifacts
-5. (Optional) Pushes the WordPress plugin to wordpress.org SVN if `WP_SVN_USER` / `WP_SVN_PASS` secrets are configured
+4. Builds and pushes the multi-arch Docker image to `ghcr.io/phreesoft/bizuno` (tags: `VERSION`, `MAJOR.MINOR`, `MAJOR`, `latest`)
+5. Creates a GitHub Release with generated changelog notes, attaches both zip artifacts
+6. (Optional) Pushes the WordPress plugin to wordpress.org SVN if `WP_SVN_USER` / `WP_SVN_PASS` secrets are configured
 
 To release:
 
@@ -69,7 +74,8 @@ git push origin main
 # tag and push
 git tag v7.4.0
 git push origin v7.4.0
-# … CI runs, ~3 minutes to artifacts, ~5 minutes to wordpress.org if SVN push enabled
+# … CI runs, ~3 minutes to zip artifacts, ~8 minutes to Docker image
+# (multi-arch builds are slower), ~5 minutes to wordpress.org if SVN push enabled
 ```
 
 ## Adding a new variant
