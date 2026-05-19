@@ -1,0 +1,17 @@
+# 4.1 PhreeBooks (the accounting core)
+
+The largest and most important module. Double-entry general ledger, chart of
+accounts, journal entries, register, reconciliation, payroll, fiscal-year
+management, EDI.
+
+If you're managing the books, this is where 80% of your time lives.
+
+## Pages
+
+| #  | Page                                                                  | Status | Audience       |
+|----|-----------------------------------------------------------------------|--------|----------------|
+| 01 | [Chart of Accounts](./01-chart-of-accounts.md)                        | stub   | bookkeeper, admin |
+| 02 | [Journals (the journal_id reference)](./02-journals.md)               | stub   | bookkeeper, admin, developer |
+| 03 | [Register & Reconcile](./03-register-and-reconcile.md)                | stub   | bookkeeper     |
+| 04 | [Payroll](./04-payroll.md)                                            | stub   | bookkeeper, admin |
+| 05 | [Fiscal-year management](./05-fiscal-year-management.md)              | stub   | admin          |

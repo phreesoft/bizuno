@@ -21,13 +21,23 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2026-05-15 (migrated PDF base class TCPDF → tFPDF; new bizHTMLCell shim + bizBarcode picqer-driven helper to replace TCPDF-only writeHTMLCell / write1DBarcode)
  * @filesource /controllers/phreeform/renderForm.php
  */
 
 namespace bizuno;
 
-class PDF extends \TCPDF
+use Picqer\Barcode\BarcodeGeneratorPNG;
+
+/**
+ * PhreeForm form-render PDF class.
+ *
+ * Extends tFPDF directly (not the FPDI/Tfpdf adapter) — form rendering doesn't need
+ * page-import capability; that's only used by phreeformOutput in render.php for stitching
+ * attachments. Keeping the base class shallow avoids pulling FPDI traits into every page
+ * draw operation.
+ */
+class PDF extends \tFPDF
 {
     public $moduleID  = 'phreeform';
     var $defaultSize  = "10";
@@ -51,16 +61,24 @@ class PDF extends \TCPDF
         global $report;
         $this->defaultFont = getModuleCache('phreeform','settings','general','default_font','helvetica');
         $PaperSize = explode(':', $report->pagesize);
-        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]), true, 'UTF-8', false);
-        $this->SetCellPadding(0);
+        // tFPDF constructor: (orientation, unit, format) — 3 args, not 6 like TCPDF.
+        // UTF-8 is intrinsic to tFPDF (that's the whole point of the fork) so no
+        // encoding parameter is needed. The defunct disk-cache flag (TCPDF's 6th arg)
+        // is dropped — tFPDF has no equivalent.
+        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]));
         if ($report->pageorient == 'P') { // Portrait - calculate max page height
             $this->pageY = $PaperSize[2] - $report->marginbottom;
         } else { // Landscape
             $this->pageY = $PaperSize[1] - $report->marginbottom;
         }
-        $this->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+        // Replaced PDF_MARGIN_LEFT/TOP/RIGHT (TCPDF-defined constants) with literal 10mm —
+        // matches TCPDF's defaults. Immediately overridden below with the report's own margins.
+        $this->SetMargins(10, 10, 10);
         $this->SetMargins($report->marginleft, $report->margintop, $report->marginright);
-        $this->SetCellPaddings(1, 0, 1); // added to move text away from border in forms
+        // SetCellPadding/SetCellPaddings were TCPDF-only (control over per-side cell padding).
+        // tFPDF has SetCellPadding(value) for symmetric padding, and that's also the FPDF
+        // default of 1mm. Honoring the original intent ("move text away from border") by
+        // keeping FPDF's default 1mm padding — no SetCellPadding call needed.
         $this->SetAutoPageBreak(0, $report->marginbottom);
         $this->SetFont($this->defaultFont);
         $this->SetDrawColor(128, 0, 0);
@@ -184,13 +202,21 @@ class PDF extends \TCPDF
     }
 
     /**
-     * Starts rending a page, static first then dynamic
-     * @param char $orientation - page orientation
-     * @param string $format - page size
+     * Override of tFPDF/FPDF's protected `_beginpage` hook — starts rendering a page,
+     * static content first then dynamic. We tap in here to maintain per-page-group
+     * counters used by the multi-form page-numbering aliases (`{nb1}`, `{nb2}`, …).
+     *
+     * Signature matches tFPDF 1.33 / FPDF 1.85 (3 args: orientation, size, rotation).
+     * Older Bizuno code had a 2-arg override which silently dropped `$rotation` and
+     * tripped PHP 8 LSP warnings. Now LSP-clean and forwards `$rotation` to parent.
+     *
+     * @param string $orientation page orientation
+     * @param string $size        page size
+     * @param int    $rotation    page rotation in degrees (0/90/180/270)
      */
-    public function _beginpage($orientation='', $format='')
+    public function _beginpage($orientation='', $size='', $rotation=0)
     {
-        parent::_beginpage($orientation, $format);
+        parent::_beginpage($orientation, $size, $rotation);
         if ($this->NewPageGroup) { // start a new group
             $n = sizeof((array)$this->PageGroups)+1;
             $alias = "{nb$n}";
@@ -203,7 +229,9 @@ class PDF extends \TCPDF
     }
 
     /**
-     * Wrapper for the TCPDF method with the same name
+     * Override of FPDF/tFPDF's internal _putpages() — performs page-group placeholder
+     * substitution (replaces our `{nbN}` aliases with the per-group page count) before
+     * delegating to the parent implementation. Signature matches tFPDF.
      */
     function _putpages() {
         $nb = $this->page;
@@ -357,7 +385,77 @@ class PDF extends \TCPDF
         if (isset($Params->settings->processing)) { $data = viewProcess($data, $Params->settings->processing); }
         if (isset($Params->settings->formatting)) { $data = viewFormat ($data, $Params->settings->formatting); }
         $data1 = clean($data, 'alpha_num'); // need to remove all special characters
-        $this->write1DBarcode($data1, $Params->settings->barcode, $Params->abscissa, $Params->ordinate, $Params->width, $Params->height, 0.4, $style, 'N');
+        // Was TCPDF's write1DBarcode(...). Now using picqer/php-barcode-generator which
+        // renders to PNG and embeds via Image(). The `$style` array (border, fgcolor,
+        // text-below, etc.) that TCPDF supported is largely gone — picqer is intentionally
+        // minimal. We honor the foreground color; the rest defaults to picqer's clean look.
+        // Text below the barcode is appended manually via Cell() in bizBarcode below.
+        $this->bizBarcode($data1, $Params->settings->barcode, $Params->abscissa, $Params->ordinate, $Params->width, $Params->height, $style);
+    }
+
+    /**
+     * Renders a 1D barcode on the current page using picqer/php-barcode-generator.
+     *
+     * Replaces TCPDF's write1DBarcode. Maps the legacy `type` argument (TCPDF symbology
+     * codes like 'C128', 'C39', 'EAN13') onto picqer's TYPE_* constants. Renders to PNG
+     * in memory, embeds via FPDF::Image() using a `data://` stream URI to avoid temp
+     * files, then optionally writes the human-readable text underneath.
+     *
+     * @param string $data    cleaned barcode payload
+     * @param string $type    TCPDF-style symbology code (defaults to C128 if unknown)
+     * @param float  $x       page X in mm
+     * @param float  $y       page Y in mm
+     * @param float  $w       width in mm
+     * @param float  $h       total height in mm (text label, if drawn, eats ~3mm of this)
+     * @param array  $style   legacy style hash — only `text`, `fgcolor`, `font`, `fontsize` used
+     */
+    protected function bizBarcode($data, $type, $x, $y, $w, $h, $style=[])
+    {
+        if (empty($data) || empty($w) || empty($h)) { return; }
+        // Map TCPDF symbology codes (the form designer still uses them) to picqer types.
+        // Unknown types fall back to Code 128 which handles arbitrary alphanumeric payloads.
+        $typeMap = [
+            'C128'  => BarcodeGeneratorPNG::TYPE_CODE_128,
+            'C128A' => BarcodeGeneratorPNG::TYPE_CODE_128,
+            'C128B' => BarcodeGeneratorPNG::TYPE_CODE_128,
+            'C128C' => BarcodeGeneratorPNG::TYPE_CODE_128,
+            'C39'   => BarcodeGeneratorPNG::TYPE_CODE_39,
+            'C39E'  => BarcodeGeneratorPNG::TYPE_CODE_39_CHECKSUM,
+            'EAN13' => BarcodeGeneratorPNG::TYPE_EAN_13,
+            'EAN8'  => BarcodeGeneratorPNG::TYPE_EAN_8,
+            'UPCA'  => BarcodeGeneratorPNG::TYPE_UPC_A,
+            'UPCE'  => BarcodeGeneratorPNG::TYPE_UPC_E,
+            'I25'   => BarcodeGeneratorPNG::TYPE_INTERLEAVED_2_5,
+            'POSTNET'=> BarcodeGeneratorPNG::TYPE_POSTNET,
+        ];
+        $picqerType = $typeMap[strtoupper($type)] ?? BarcodeGeneratorPNG::TYPE_CODE_128;
+        $showText   = !empty($style['text']);
+        $barH       = $showText ? max(1, $h - 3) : $h;   // reserve 3mm for human-readable line if requested
+        $fgcolor    = (!empty($style['fgcolor']) && is_array($style['fgcolor'])) ? $style['fgcolor'] : [0, 0, 0];
+        try {
+            $gen = new BarcodeGeneratorPNG();
+            // picqer width is per-bar (pixels). Use a rough conversion: target ~ (w mm * 4) px wide.
+            $widthFactor = max(1, (int)round(($w * 4) / max(1, strlen($data))));
+            $heightPx    = max(20, (int)round($barH * 8)); // 8 px/mm gives crisp print
+            $png = $gen->getBarcode($data, $picqerType, $widthFactor, $heightPx, $fgcolor);
+        } catch (\Exception $e) {
+            msgDebug("\nbizBarcode failed for data='$data' type='$type': ".$e->getMessage(), 'trap');
+            // Draw a labelled placeholder so the user sees something went wrong on the form.
+            $this->SetXY($x, $y);
+            $this->SetFont($this->defaultFont, '', 8);
+            $this->Cell($w, $h, "[barcode err: $data]", 1, 0, 'C');
+            return;
+        }
+        // FPDF::Image() accepts a data:// stream URI — no temp file needed.
+        $this->Image('data://text/plain;base64,'.base64_encode($png), $x, $y, $w, $barH, 'PNG');
+        if ($showText) {
+            $font = ($style['font'] ?? 'default') === 'default' ? $this->defaultFont : $style['font'];
+            $size = $style['fontsize'] ?? 8;
+            $this->SetXY($x, $y + $barH);
+            $this->SetFont($font, '', $size);
+            $this->SetTextColor($fgcolor[0], $fgcolor[1], $fgcolor[2]);
+            $this->Cell($w, 3, $data, 0, 0, 'C');
+        }
     }
 
     /**
@@ -494,9 +592,8 @@ class PDF extends \TCPDF
                 $props = (object)['abscissa'=>$this->GetX(), 'ordinate'=>$this->GetY(), 'width'=>$width, 'height'=>$width*3/4, 'hideNone'=>true];
                 $this->FormImgLink($props, $value);
                 $maxImgHt = $width * 3 / 4;
-            } else { // fixed to support basic HTML
-                $this->writeHTMLCell($Params->settings->boxfield->rows[$key]->width, $CellHeight, $x = '', $y = '', $value, 0, $ln = 1, $fillReq?true:false, $reseth = true, $align, $autopadding = true );
-//              $this->MultiCell($Params->settings->boxfield->rows[$key]->width, $CellHeight, $value, 0, $align, $fillReq?true:false);
+            } else { // basic HTML support via the inline shim — see bizHTMLCell() below
+                $this->bizHTMLCell($Params->settings->boxfield->rows[$key]->width, $CellHeight, $value, 0, $align, $fillReq ? true : false);
             }
             if ($this->GetY() > $maxY) { $maxY = $this->GetY(); }
             $NextXPos += $Params->settings->boxfield->rows[$key]->width;
@@ -574,6 +671,98 @@ class PDF extends \TCPDF
             $strData = $this->TruncData(substr($strData, 0, ($ColWidth / $CurWidth) * $NumChars * $percent), $ColWidth);
         }
         return $strData;
+    }
+
+    /**
+     * Minimal inline-HTML cell renderer — drop-in replacement for TCPDF's writeHTMLCell
+     * used by ShowTableRow above.
+     *
+     * Supported tags (anything else is stripped via strip_tags fallback):
+     *   <b>, <strong>            — bold
+     *   <i>, <em>                — italic
+     *   <u>                      — underline
+     *   <br>, <br/>, <br />      — line break
+     *   <font color="#rrggbb">   — text color (closing </font> resets to current color)
+     *
+     * Renders runs in sequence on the current line using FPDF::Write(), with line breaks
+     * handled by Ln(). For cells that need fixed width + wrap (the table row use case),
+     * the caller passes a width and the FPDF::Write() word-wrap engine breaks naturally.
+     *
+     * No support for nested complex layouts, block-level elements, tables, lists, or CSS.
+     * If the form designer expected those (it shouldn't — the form-builder UI doesn't emit
+     * them), the content will degrade to plain text without crashing.
+     *
+     * @param float   $w        cell width in mm
+     * @param float   $h        single-line height in mm (also used as line spacing)
+     * @param string  $html     cell content; may contain the tags above
+     * @param int     $border   0/1 — draw cell border around the bounding box
+     * @param string  $align    'L'|'C'|'R' — alignment hint (used only for plain-text fallback)
+     * @param bool    $fill     fill background with current fill color
+     */
+    protected function bizHTMLCell($w, $h, $html, $border=0, $align='L', $fill=false)
+    {
+        $startX = $this->GetX();
+        $startY = $this->GetY();
+        // Quick path: no tag-like content → MultiCell handles wrap + alignment + fill natively.
+        if (strpos($html, '<') === false) {
+            $this->MultiCell($w, $h, (string)$html, $border, $align, $fill);
+            return;
+        }
+        // Normalize <br variants, then split into tokens: literal text and the supported tags.
+        $html = preg_replace('#<br\s*/?>#i', "\n", $html);
+        $tokens = preg_split('#(</?(?:b|strong|i|em|u|font)[^>]*>)#i', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+        // Capture state to restore at end so we don't leak style into the next cell.
+        $savedFont    = $this->FontFamily;
+        $savedStyle   = $this->FontStyle;
+        $savedSize    = $this->FontSizePt;
+        $savedColorR  = $this->TextColor;   // FPDF stores the pdf color command string; we restore via SetTextColor below
+        $bold = $italic = $underline = false;
+        $colorStack = []; // each push is [r,g,b]
+        if ($fill) { // paint the bounding box first; runs draw on top
+            $this->Cell($w, $h, '', $border, 0, $align, true);
+            $this->SetXY($startX, $startY);
+        } elseif ($border) {
+            $this->Cell($w, $h, '', $border, 0);
+            $this->SetXY($startX, $startY);
+        }
+        foreach ($tokens as $tok) {
+            if ($tok === '') { continue; }
+            if ($tok[0] === '<') {
+                $lower = strtolower($tok);
+                if     (preg_match('#^<(b|strong)\b#', $lower))      { $bold = true; }
+                elseif (preg_match('#^</(b|strong)\b#', $lower))     { $bold = false; }
+                elseif (preg_match('#^<(i|em)\b#', $lower))          { $italic = true; }
+                elseif (preg_match('#^</(i|em)\b#', $lower))         { $italic = false; }
+                elseif (preg_match('#^<u\b#', $lower))               { $underline = true; }
+                elseif (preg_match('#^</u\b#', $lower))              { $underline = false; }
+                elseif (preg_match('#^<font[^>]*color\s*=\s*["\']?(#[0-9a-f]{6}|\d+:\d+:\d+)["\']?#i', $tok, $m)) {
+                    $colorStack[] = $this->convertRGB($m[1]);
+                    $rgb = end($colorStack);
+                    $this->SetTextColor($rgb[0], $rgb[1], $rgb[2]);
+                }
+                elseif (preg_match('#^</font\b#', $lower)) {
+                    array_pop($colorStack);
+                    if (empty($colorStack)) { $this->SetTextColor(0, 0, 0); }
+                    else { $rgb = end($colorStack); $this->SetTextColor($rgb[0], $rgb[1], $rgb[2]); }
+                }
+                // Apply font style change (bold/italic/underline) to the current font.
+                $st = ($bold?'B':'').($italic?'I':'').($underline?'U':'');
+                $this->SetFont($savedFont, $st, $savedSize);
+            } else {
+                // Decode entities, honor explicit \n breaks via the <br> normalization above.
+                $text  = html_entity_decode($tok, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $lines = explode("\n", $text);
+                foreach ($lines as $i => $line) {
+                    if ($line !== '') { $this->Write($h, $line); }
+                    if ($i < count($lines) - 1) { $this->Ln($h); }
+                }
+            }
+        }
+        // Restore font + color so the next cell isn't bleeding our state.
+        $this->SetFont($savedFont, $savedStyle, $savedSize);
+        $this->TextColor = $savedColorR;
+        // Advance to the next row position — caller expects we consumed one cell row.
+        $this->SetXY($startX + $w, $startY);
     }
 
     /**

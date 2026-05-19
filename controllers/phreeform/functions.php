@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-14
+ * @version    7.x Last Update: 2026-05-15 (font-picker glob path updated to tFPDF layout: `font/` singular, not TCPDF's `fonts/` plural)
  * @filesource /controllers/phreeform/functions.php
  */
 
@@ -550,7 +550,10 @@ function phreeformOrientation()
  */
 function phreeformFonts($show_default=true)
 {
-    $choices = glob(BIZUNO_3P_PDF."fonts/*.php");
+    // tFPDF stores FPDF-compatible font metric files under `font/` (singular) — distinct
+    // from TCPDF's `fonts/` (plural). BIZUNO_3P_PDF now points at the vendored tFPDF
+    // directory; this glob finds courier.php, helvetica.php, times.php, etc.
+    $choices = glob(BIZUNO_3P_PDF."font/*.php");
     $output = $show_default ? [['id'=>'default', 'text'=>lang('default')]] : [];
     foreach ($choices as $choice) {
         $name = false;

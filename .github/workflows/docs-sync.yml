@@ -1,0 +1,136 @@
+name: Sync docs to bizuno.com
+
+# Pushes Markdown under docs/ to BetterDocs on bizuno.com via the WP REST API.
+# See bin/README.md for the full how-it-works.
+#
+# Triggers:
+#   - Push to main that touches docs/ or the sync script
+#   - Manual run from the Actions tab (workflow_dispatch) with optional
+#     --status / --dry-run overrides
+#
+# Secrets required (Settings → Secrets and variables → Actions):
+#   WP_DOCS_USER  — WordPress user with rights to manage `docs` CPT
+#   WP_DOCS_PASS  — Application Password (NOT the user's login password)
+#   WP_DOCS_SITE  — WP site URL, e.g. https://bizuno.com
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'bin/docs-sync.php'
+      - '.github/workflows/docs-sync.yml'
+  workflow_dispatch:
+    inputs:
+      status:
+        description: 'Status floor (stub | draft | review | published | all)'
+        required: false
+        default: 'published'
+        type: choice
+        options:
+          - published
+          - review
+          - draft
+          - stub
+          - all
+      dry_run:
+        description: 'Dry run? (no API calls)'
+        required: false
+        default: false
+        type: boolean
+      only:
+        description: 'Optional path substring filter (e.g. 02-core-concepts)'
+        required: false
+        default: ''
+
+# Allow only one concurrent sync per branch; cancel any in-flight on a new push.
+concurrency:
+  group: docs-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Push to BetterDocs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Get composer cache dir
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Validate secrets
+        env:
+          USER_PRESENT: ${{ secrets.WP_DOCS_USER != '' }}
+          PASS_PRESENT: ${{ secrets.WP_DOCS_PASS != '' }}
+          SITE_PRESENT: ${{ secrets.WP_DOCS_SITE != '' }}
+        run: |
+          set -e
+          if [ "$USER_PRESENT" != "true" ] || [ "$PASS_PRESENT" != "true" ] || [ "$SITE_PRESENT" != "true" ]; then
+            echo "::error::Missing one or more secrets (WP_DOCS_USER / WP_DOCS_PASS / WP_DOCS_SITE)."
+            echo "Set them at Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Sync to BetterDocs
+        env:
+          BIZUNO_DOCS_USER: ${{ secrets.WP_DOCS_USER }}
+          BIZUNO_DOCS_PASS: ${{ secrets.WP_DOCS_PASS }}
+          BIZUNO_DOCS_SITE: ${{ secrets.WP_DOCS_SITE }}
+          INPUT_STATUS:  ${{ github.event.inputs.status || 'published' }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          INPUT_ONLY:    ${{ github.event.inputs.only || '' }}
+        run: |
+          set -e
+          ARGS=( --status="$INPUT_STATUS" )
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS+=( --dry-run )
+          fi
+          if [ -n "$INPUT_ONLY" ]; then
+            ARGS+=( --only="$INPUT_ONLY" )
+          fi
+          echo "Running: php bin/docs-sync.php ${ARGS[*]}"
+          php bin/docs-sync.php "${ARGS[@]}"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Bizuno docs sync"
+            echo ""
+            echo "- **Trigger:** ${{ github.event_name }}"
+            echo "- **Ref:** \`${{ github.ref }}\`"
+            echo "- **Status floor:** \`${{ github.event.inputs.status || 'published' }}\`"
+            if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+              echo "- **Dry-run:** yes"
+            fi
+            if [ -n "${{ github.event.inputs.only }}" ]; then
+              echo "- **Filter:** \`${{ github.event.inputs.only }}\`"
+            fi
+            echo ""
+            echo "Result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,6 @@
 <?php
 /*
- * Renders a report in PDF format using the TCPDF application
+ * Renders a report in PDF format using tFPDF (UTF-8 fork of FPDF)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-15 (TCPDF → tFPDF; Header() show-guards tightened: !empty() instead of isset(), plus skip-when-empty-or-"0" because FPDF renders the literal string "0" where TCPDF suppressed it)
  * @filesource /controllers/phreeform/renderReport.php
  */
 
 namespace bizuno;
 
-class PDF extends \TCPDF
+class PDF extends \tFPDF
 {
     public $moduleID = 'phreeform';
     public $defaultFont;
@@ -50,8 +50,14 @@ class PDF extends \TCPDF
         global $report;
         $this->defaultFont= getModuleCache('phreeform','settings','general','default_font','helvetica');
         $PaperSize        = explode(':', $report->pagesize);
-        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]), true, 'UTF-8', false);
-        $this->SetCellPadding(0);
+        // tFPDF takes (orientation, unit, format) — TCPDF's UTF-8 + disk-cache extra args
+        // are not needed (UTF-8 is intrinsic to tFPDF). SetCellPadding(0) was TCPDF-only;
+        // tFPDF's default 1mm cell padding is fine for report rows.
+        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]));
+        // Register {nb} → total-pages substitution. TCPDF auto-handled this; tFPDF (like
+        // FPDF) requires an explicit alias declaration. Footer() now emits the alias and
+        // tFPDF substitutes the real count at document close.
+        $this->AliasNbPages();
         $this->fontHeading= $report->headingfont== 'default' ? $this->defaultFont : $report->headingfont;
         $this->fontTitle1 = $report->title1font == 'default' ? $this->defaultFont : $report->title1font;
         $this->fontTitle2 = $report->title2font == 'default' ? $this->defaultFont : $report->title2font;
@@ -100,26 +106,49 @@ class PDF extends \TCPDF
         $this->SetX($report->marginleft);
         $this->SetY($report->margintop);
         $this->SetFillColor(255);
-        if (isset($report->headingshow)) { // Show the company name
-            $this->SetFont($this->fontHeading, 'B', $report->headingsize);
-            $Colors = $this->convertRGB($report->headingcolor);
-            $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
-            $CellHeight = ($report->headingsize) * 0.35;
-            $this->Cell(0, $CellHeight, getModuleCache('bizuno', 'settings', 'company', 'primary_name'), 0, 1, $report->headingalign);
+        // Heading / Title 1 / Title 2 guards
+        //
+        // Original code used `isset($report->title1show)` which returns true even when
+        // the value is 0 (the explicit "don't display" state in PhreeForm's designer).
+        // That alone forced a Cell() emission for every report — TCPDF then suppressed
+        // the output silently when title text resolved to '0', null, or empty. tFPDF
+        // (via FPDF Cell line 626) only suppresses when (string)$txt === '' — so the
+        // string "0" prints verbatim. Result: reports with title*show=0 or null/zero
+        // title*text now show stray "0" lines where TCPDF showed nothing.
+        //
+        // Two-stage guard now:
+        //   1. !empty($report->X_show) — skip the block entirely when display is off
+        //   2. trim((string)$txt) !== '' && $txt !== '0' — skip Cell when text is empty
+        //      or the literal "0" placeholder
+        if (!empty($report->headingshow)) { // Show the company name
+            $txt = (string)getModuleCache('bizuno', 'settings', 'company', 'primary_name');
+            if (trim($txt) !== '' && $txt !== '0') {
+                $this->SetFont($this->fontHeading, 'B', $report->headingsize);
+                $Colors = $this->convertRGB($report->headingcolor);
+                $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
+                $CellHeight = ($report->headingsize) * 0.35;
+                $this->Cell(0, $CellHeight, $txt, 0, 1, $report->headingalign);
+            }
         }
-        if (isset($report->title1show)) { // Set title 1 heading
-            $this->SetFont($this->fontTitle1, '', $report->title1size);
-            $Colors = $this->convertRGB($report->title1color);
-            $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
-            $CellHeight = ($report->title1size) * 0.35;
-            $this->Cell(0, $CellHeight, TextReplace($report->title1text), 0, 1, $report->title1align);
+        if (!empty($report->title1show)) { // Set title 1 heading
+            $txt = (string)TextReplace($report->title1text ?? '');
+            if (trim($txt) !== '' && $txt !== '0') {
+                $this->SetFont($this->fontTitle1, '', $report->title1size);
+                $Colors = $this->convertRGB($report->title1color);
+                $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
+                $CellHeight = ($report->title1size) * 0.35;
+                $this->Cell(0, $CellHeight, $txt, 0, 1, $report->title1align);
+            }
         }
-        if (isset($report->title2show)) { // Set Title 2 heading
-            $this->SetFont($this->fontTitle2, '', $report->title2size);
-            $Colors = $this->convertRGB($report->title2color);
-            $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
-            $CellHeight = ($report->title2size) * 0.35;
-            $this->Cell(0, $CellHeight, TextReplace($report->title2text), 0, 1, $report->title2align);
+        if (!empty($report->title2show)) { // Set Title 2 heading
+            $txt = (string)TextReplace($report->title2text ?? '');
+            if (trim($txt) !== '' && $txt !== '0') {
+                $this->SetFont($this->fontTitle2, '', $report->title2size);
+                $Colors = $this->convertRGB($report->title2color);
+                $this->SetTextColor($Colors[0], $Colors[1], $Colors[2]);
+                $CellHeight = ($report->title2size) * 0.35;
+                $this->Cell(0, $CellHeight, $txt, 0, 1, $report->title2align);
+            }
         }
         // Set the filter heading
         $this->SetFont($this->fontFilter, '', $report->filtersize);
@@ -174,12 +203,15 @@ class PDF extends \TCPDF
         $this->SetY(-12); //Position at 1.5 cm from bottom
         $this->SetFont($this->fontData, '', '8');
         $this->SetTextColor(0);
-        $total_pages = \TCPDF::getAliasNbPages();
-        $this->Cell(0, 10, lang('page').' '.$this->PageNo().' / '.$total_pages, 0, 0, 'C');
+        // tFPDF/FPDF page-count substitution: emit the literal '{nb}' alias declared by
+        // AliasNbPages() in the constructor. tFPDF rewrites '{nb}' to the actual page
+        // count when the document is closed. Replaces TCPDF's \TCPDF::getAliasNbPages()
+        // which returned a different alias string at runtime.
+        $this->Cell(0, 10, lang('page').' '.$this->PageNo().' / {nb}', 0, 0, 'C');
     }
 
     /**
-     * Generates and draws the report table to the TCPDF structure
+     * Generates and draws the report table to the tFPDF structure
      * @global object $report - Report structure
      * @param arary $Data - data to place in the report
      * @return null - Page data is added to the PDF file on the fly

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-15 (docblock cleanup after TCPDF removal — this file renders HTML not PDF, the old TCPDF reference was inaccurate)
  * @filesource /controllers/phreeform/renderHTML.php
  */
 
@@ -130,7 +130,7 @@ class HTML
      * Fill in all the data lines and add pages as needed
      * @param array $data - report data from the SQL
      * @param object $report - Report structure
-     * @return null - data is added to TCPDF output file
+     * @return null - data is appended to the HTML output buffer
      */
     private function addTable($data, $report)
     {

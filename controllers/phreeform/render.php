@@ -21,13 +21,15 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-05-15 (FPDI namespace swap: Tcpdf\Fpdi → Tfpdf\Fpdi after TCPDF removal)
  * @filesource /controllers/phreeform/render.php
  */
 
 namespace bizuno;
 
-use setasign\Fpdi\Tcpdf\Fpdi;
+// FPDI's tFPDF adapter — extends \tFPDF and adds page-import capability for stitching
+// existing PDFs (used by phreeformOutput at line ~558 to concatenate attachments).
+use setasign\Fpdi\Tfpdf\Fpdi;
 
 bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreeform/functions.php', 'phreeformImport', 'function');
 
@@ -573,7 +575,7 @@ class phreeformRender
 
     /**
      * Renders the database SQL statement, executes it and merges result with the report structure
-     * @global object $report - Report structure after merge ready for TCPDF render
+     * @global object $report - Report structure after merge ready for PDF render
      * @param object $report - Report structure void of result data, typically the raw report from the db
      * @return type
      */
@@ -700,7 +702,7 @@ class phreeformRender
     }
 
     /**
-     * For forms only - PDF style using TCPDF
+     * For forms only - PDF style using tFPDF
      * @global object $report - report structure after database has been run and data has been added
      * @global array $currencies - will be extracted from the data to determine ISO code for formatting
      * @param object $report - report with modified data
@@ -828,7 +830,7 @@ class phreeformRender
                 $pdf->FormTable($StoredTable);
             }
             foreach ($report->fieldlist->rows as $key => $field) {
-                // Set the totals (need to be on last printed page) - Handled in the Footer function in TCPDF
+                // Set the totals (need to be on last printed page) - Handled in the Footer function in renderForm::PDF
                 if ($field->type == 'Ttl') {
                     if (!isset($field->settings->boxfield->rows)) { return msgAdd(lang('err_pf_field_empty', $this->moduleID).' '.$field->title); }
                     $report->fieldlist->rows[$key]->settings->processing = isset($field->settings->processing) ? $field->settings->processing : '';
