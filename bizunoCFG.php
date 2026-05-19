@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-05-15 (removed TCPDF; setasign/tfpdf is now the sole PDF engine, barcodes via picqer)
  * @filesource /bizunoCFG.php
  */
 
@@ -87,24 +87,24 @@ require_once ( BIZUNO_FS_LIBRARY . 'model/mail.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'view/main.php' );
 require_once ( BIZUNO_FS_LIBRARY . 'view/easyUI/html5.php' );
 
-// Set the PDF renderer application
-$pdfRenderer = 'TCPDF'; // Options are 'TCPDF' (Default) and 'tFPDF'
-if ('tFPDF'==$pdfRenderer) { // http://www.fpdf.org/
-    define('BIZUNO_PDF_ENGINE', 'FPDF');
-    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'FPDF/');
-} else { // Current: https://github.com/tecnickcom/tc-lib-pdf - was: https://tcpdf.org/
-    define('BIZUNO_PDF_ENGINE', 'TCPDF');
-    define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'TCPDF/');
-}
+// PDF engine — tFPDF only (TCPDF removed in 7.3.9). tFPDF is Setasign's packaging of
+// the canonical UTF-8 fork of FPDF (fpdf.org/en/script/script92.php). Setasign also
+// maintains FPDI, so the two stay in lockstep — FPDI's tFPDF adapter at
+// vendor/setasign/fpdi/src/Tfpdf/Fpdi.php expects `\tFPDF` in the global namespace and
+// setasign/tfpdf supplies it (composer classmap autoload on tfpdf.php). No explicit
+// require_once needed here; the require below pulls in the composer autoloader and
+// `\tFPDF` resolves on first reference. BIZUNO_3P_PDF below is read by
+// phreeform/functions.php to enumerate available font metric files for the form
+// designer's font picker (FPDF-style .php files live under font/, TTF unicode fonts
+// under font/unifont/).
+define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'setasign/tfpdf/');
 
 // Load the Bizuno third party libraries
 if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { // using composer
     require ( BIZUNO_FS_ASSETS  . 'autoload.php' );
 } else { // If not using composer, try to load each library used seperately
-    if (file_exists( BIZUNO_FS_ASSETS . 'tecnickcom/tcpdf/tcpdf.php' ) && 'TCPDF' == BIZUNO_PDF_ENGINE) {
-        require ( BIZUNO_FS_ASSETS . 'tecnickcom/tcpdf/tcpdf.php' );
-        require ( BIZUNO_FS_ASSETS . 'setasign/fpdi/src/autoload.php' );
-    } elseif (file_exists( BIZUNO_FS_ASSETS . 'setasign/fpdf/fpdf.php' ) && 'FPDF' == BIZUNO_PDF_ENGINE) {
+    if (file_exists( BIZUNO_FS_ASSETS . 'setasign/tfpdf/tfpdf.php' )) {
+        require ( BIZUNO_FS_ASSETS . 'setasign/tfpdf/tfpdf.php' );
         require ( BIZUNO_FS_ASSETS . 'setasign/fpdf/fpdf.php' );
         require ( BIZUNO_FS_ASSETS . 'setasign/fpdi/src/autoload.php' );
     }

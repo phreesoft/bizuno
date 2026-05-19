@@ -48,6 +48,32 @@ Bizuno can be installed as a standalone application, a WordPress plugin, or host
    - A pre-set ToDo list will be generated with applicable priorities. Some actions cannot be taken once journal entries have been made.
    - Please refer the the Bizuno help pages for operational tips and procedures.
 
+### Optional: Commercial PDF parser (setasign/fpdi_pdf-parser)
+
+Bizuno uses [FPDI](https://www.setasign.com/products/fpdi/about/) to stitch together PDF attachments (e.g. when batch-printing multiple forms or appending uploaded documents to an order). FPDI's free parser handles PDF documents up to version 1.4. Modern PDFs (1.5+, with object streams or cross-reference streams) require Setasign's commercial parser, **fpdi_pdf-parser**.
+
+The commercial parser is **not** listed in Bizuno's `require` block — keeping it there would cause `composer install` to prompt every user for Setasign credentials, even those who don't need it. Most installs work fine without it.
+
+**If you don't have a Setasign license:** do nothing. `composer install` runs silently and Bizuno's PDF features work for the common case (older PDFs, internally-generated forms). You may see one informational line during install along the lines of *"setasign/fpdi_pdf-parser suggests installing — Commercial PDF parser…"* — that's just a hint, not an error.
+
+**If you have a Setasign license** and want full modern-PDF support:
+
+1. (Recommended) Add your credentials to a per-user `auth.json` so composer never prompts interactively:
+   ```bash
+   composer config --global --auth http-basic.www.setasign.com YOUR-SETASIGN-EMAIL YOUR-SETASIGN-API-KEY
+   ```
+   This writes `~/.composer/auth.json` (mode `0600`) — keep it out of version control.
+
+2. Add the package to your install:
+   ```bash
+   cd /path/to/bizuno
+   composer require setasign/fpdi_pdf-parser
+   ```
+
+   That persists `setasign/fpdi_pdf-parser` to your local `composer.json` so it survives future updates. FPDI auto-detects the parser via `class_exists()` at runtime — no further configuration needed.
+
+**Upgrading from a prior Bizuno version that had fpdi_pdf-parser in core:** on your next `composer update`, composer may remove `vendor/setasign/fpdi_pdf-parser/` as a now-orphan package. Re-add it with the `composer require` line above if you still want it.
+
 **WordPress Plugin Installation**
 - From the Wordpres plugin page, click on upload and search for the bizuno-accounting (search: Bizuno) plugin. Click on Install to retrieve the plugin from the WordPress Repository.
 - Activate the plugin and log in to WordPress. The latest Bizuno library plugin (yes, it is a seperate plugin) will be retrieved from the PhreeSoft server if it is not present on your server server.
