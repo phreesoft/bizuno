@@ -91,10 +91,28 @@ if ( !defined( 'BIZUNO_FS_LIBRARY' ) )  { define( 'BIZUNO_FS_LIBRARY',  BIZUNO_F
 if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_FS_PORTAL . 'vendor/' ); }
 
 // Platform Specific - URL's
+//
+// BIZUNO_URL_VIEW is the URL base for view-layer assets that now live under
+// src/ post-Phase 2 (icons, CSS, JS templates). Default points at
+// `BIZUNO_URL_PORTAL.'/src'` — works for the standard "drop in webroot"
+// install where the browser fetches https://yoursite.com/src/view/icons/...
+// directly via Apache.
+//
+// Hardened-install override: when src/ is OUTSIDE the webroot (e.g.
+// /private/bizuno/src/), Apache can't serve from there directly. Route asset
+// requests through the fs API instead — it reads from BIZUNO_FS_LIBRARY
+// (your absolute private path) and streams the file back:
+//
+//   define('BIZUNO_URL_VIEW', BIZUNO_URL_FS);
+//
+// URLs then become https://yoursite.com/?bizRt=portal/api/fs&src=/view/icons/...
+// Slightly slower (PHP overhead per asset request) but works without src/ being
+// web-accessible.
 if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ); } // full url to Bizuno root folder
 if ( !defined( 'BIZUNO_URL_AJAX' ) )    { define( 'BIZUNO_URL_AJAX',    BIZUNO_URL_PORTAL.'?ajax=1' ); }
 if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     BIZUNO_URL_PORTAL.'?bizRt=' ); }
 if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src=' ); }
+if ( !defined( 'BIZUNO_URL_VIEW' ) )    { define( 'BIZUNO_URL_VIEW',    BIZUNO_URL_PORTAL.'/src' ); }
 if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', BIZUNO_URL_PORTAL.'/scripts/' );  }
 
 // Initialize Bizuno Library
