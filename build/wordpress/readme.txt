@@ -1,5 +1,5 @@
-=== Bizuno – Full ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.3.8
+=== Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
+Stable tag: 7.3.9
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, phreebooks, bizuno, invoicing, purchase-orders, sales-tax, shipping, iso-9001, multi-store
@@ -64,11 +64,11 @@ Yes – handle multiple warehouses, locations, or even separate businesses from 
 = US sales tax and shipping details? =  
 Accurate US tax calc via API; full integration with USPS, FedEx, UPS – real-time quotes, labels, tracking, and freight reconciliation to save time/money.
 
-= Difference from bizuno-accounting plugin? =  
-This is the **full self-hosted Bizuno portal** (complete ERP). The bizuno-accounting plugin is a lighter entry point focused on accounting basics (downloads core Bizuno during install too).
+= Where is the actual Bizuno code? =
+Bundled inside the plugin — no external download step. The full Bizuno PHP library ships in `bizuno-accounting/src/`, third-party UI assets in `bizuno-accounting/scripts/`, and composer-installed dependencies in `bizuno-accounting/vendor/`. Activating the plugin is enough; the installer wizard on first hit just sets up the database tables.
 
-= Where is the actual Bizuno code? =  
-This plugin is a secure portal/launcher. The comprehensive Bizuno application (large codebase) auto-downloads from PhreeSoft during first install/upgrade.
+= How do updates work? =
+WordPress's standard update channel. New versions are published to the WordPress.org plugin directory; your site sees them in WP admin → Updates like any other plugin.
 
 == Screenshots ==
 
@@ -83,6 +83,12 @@ This plugin is a secure portal/launcher. The comprehensive Bizuno application (l
 9. Dashboard Widget Gallery
 
 == Changelog ==
+
+= 7.3.9 =
+* Self-contained plugin — folds the former `bizuno-wp` library plugin into this one. Single install, no sibling plugin required.
+* Switched updates to the standard WordPress.org channel; the third-party update-checker library is gone.
+* Bizuno path layout: `src/`, `vendor/`, `scripts/` all live inside the plugin directory.
+* Library upgrades: tFPDF replaces TCPDF; picqer barcode generator; FPDI for PDF import.
 
 = 7.3.8 =
 * Preparation for 2FA via email/biometrics. Locale updates & simplification. And more minor bugs.

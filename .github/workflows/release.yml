@@ -174,7 +174,7 @@ jobs:
             echo ""
             echo "## Artifacts"
             echo ""
-            echo "- **bizuno-wp-${VERSION}.zip** — WordPress plugin. Upload via WP admin → Plugins → Add New → Upload Plugin."
+            echo "- **bizuno-accounting-${VERSION}.zip** — WordPress plugin. Upload via WP admin → Plugins → Add New → Upload Plugin, or wait for the automatic update from wordpress.org."
             echo "- **bizuno-${VERSION}-zip.zip** — LAMP/WAMP drop-in. Composer-free; unzip into your webroot."
             echo "- **bizuno-${VERSION}.tar.gz** — NextCloud launcher app. Upload via NextCloud Apps, or extract into \`<nextcloud>/apps/\`."
             echo ""
@@ -196,7 +196,7 @@ jobs:
     needs: [meta, release]
     if: needs.meta.outputs.skip_svn != 'true'
     env:
-      WP_SVN_REPO: https://plugins.svn.wordpress.org/bizuno-wp
+      WP_SVN_REPO: https://plugins.svn.wordpress.org/bizuno-accounting
       WP_SVN_USER: ${{ secrets.WP_SVN_USER }}
       WP_SVN_PASS: ${{ secrets.WP_SVN_PASS }}
       VERSION: ${{ needs.meta.outputs.version }}
@@ -223,8 +223,8 @@ jobs:
         if: env.WP_SVN_SKIP != 'true'
         run: |
           mkdir -p plugin
-          unzip -q artifact/bizuno-wp-${VERSION}.zip -d plugin
-          ls plugin/bizuno-wp/ | head
+          unzip -q artifact/bizuno-accounting-${VERSION}.zip -d plugin
+          ls plugin/bizuno-accounting/ | head
 
       - name: SVN checkout WordPress.org repo
         if: env.WP_SVN_SKIP != 'true'
@@ -238,10 +238,10 @@ jobs:
           set -e
           # Replace trunk contents with the new build
           rm -rf svn-repo/trunk/*
-          cp -a plugin/bizuno-wp/. svn-repo/trunk/
+          cp -a plugin/bizuno-accounting/. svn-repo/trunk/
           # Copy to tags/<version>
           mkdir -p svn-repo/tags/${VERSION}
-          cp -a plugin/bizuno-wp/. svn-repo/tags/${VERSION}/
+          cp -a plugin/bizuno-accounting/. svn-repo/tags/${VERSION}/
           # Stage adds/deletes for svn
           cd svn-repo
           svn add --force --quiet .
