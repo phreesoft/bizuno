@@ -42,6 +42,12 @@ class bizuno_accounting
         add_action ( 'wp_ajax_bizuno_ajax',        [ $this, 'bizunoAjax' ] );
         add_action ( 'wp_ajax_nopriv_bizuno_ajax', [ $this, 'bizunoAjax' ] );
         add_action ( 'bizuno_daily_event',         [ $this, 'daily_cron' ] );
+        // ─── Legacy bizuno-wp migration ────────────────────────────────────
+        // Pre-7.3.9 sites had two plugins: this one (admin glue) + bizuno-wp
+        // (library). The library now ships inside this plugin. Auto-deactivate
+        // bizuno-wp once on upgrade, then nag the admin to delete its files.
+        add_action ( 'admin_init',                 [ $this, 'maybeMigrateLegacyBizunoWp' ] );
+        add_action ( 'admin_notices',              [ $this, 'legacyBizunoWpNotice' ] );
         // ─── Filters ───────────────────────────────────────────────────────
         // Remove XML-RPC pingback to cut a noisy attack surface for users who
         // never explicitly enabled pingbacks.
@@ -173,6 +179,58 @@ class bizuno_accounting
     }
 
     /**
+     * One-time migration from the pre-7.3.9 two-plugin layout. If the
+     * legacy `bizuno-wp` library plugin is currently active, deactivate it
+     * — its code now ships inside this plugin and leaving it active causes
+     * its now-defunct GitHub auto-updater bootstrap to keep firing on
+     * every request for nothing.
+     *
+     * Gated by a one-shot option so we run it exactly once. If a future
+     * admin reactivates `bizuno-wp` deliberately, we won't fight them —
+     * the persistent admin notice (below) will still nag until they
+     * delete the legacy plugin's files.
+     */
+    public function maybeMigrateLegacyBizunoWp()
+    {
+        if ( get_option( 'bizuno_accounting_legacy_migrated', false ) ) { return; }
+        if ( !function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        if ( is_plugin_active( 'bizuno-wp/bizuno-wp.php' ) ) {
+            deactivate_plugins( 'bizuno-wp/bizuno-wp.php' );
+        }
+        update_option( 'bizuno_accounting_legacy_migrated', true );
+    }
+
+    /**
+     * Persistent (non-dismissible) admin notice that appears as long as
+     * the `bizuno-wp/` directory exists in wp-content/plugins/. Goes away
+     * automatically once the admin deletes the legacy plugin.
+     *
+     * Capability-gated so only users who can act on the recommendation
+     * (delete plugins) see the nag — no need to clutter the screen for
+     * editors / authors.
+     */
+    public function legacyBizunoWpNotice()
+    {
+        if ( !current_user_can( 'activate_plugins' ) ) { return; }
+        if ( !file_exists( WP_PLUGIN_DIR . '/bizuno-wp/bizuno-wp.php' ) ) { return; }
+
+        $plugins_search_url = admin_url( 'plugins.php?s=bizuno-wp' );
+        echo '<div class="notice notice-warning">';
+        echo '<p><strong>Bizuno: legacy <code>bizuno-wp</code> plugin still installed</strong></p>';
+        echo '<p>';
+        echo wp_kses_post( sprintf(
+            /* translators: 1: anchor open tag pointing at WP plugins list filtered for bizuno-wp, 2: anchor close tag */
+            __( 'As of Bizuno Accounting 7.3.9, the separate <code>bizuno-wp</code> library plugin is no longer needed — its code is now bundled inside this plugin. It has been automatically deactivated, but the files remain on disk. Please %1$sdelete the bizuno-wp plugin%2$s from your Plugins list to complete the migration.', 'bizuno' ),
+            '<a href="' . esc_url( $plugins_search_url ) . '">',
+            '</a>'
+        ) );
+        echo '</p>';
+        echo '</div>';
+    }
+
+    /**
      * Clean up the daily cron event on deactivation. Data and tables
      * survive deactivation — those only get cleared by uninstall.
      */
@@ -198,6 +256,11 @@ register_activation_hook( __FILE__, 'bizuno_accounting_activate' );
  *   2. Create the public /bizuno placeholder page. The Bizuno UI replaces
  *      this content on the fly for logged-in users; anonymous visitors see
  *      the placeholder explaining they need to log in.
+ *   3. If the legacy `bizuno-wp` library plugin is still active, deactivate
+ *      it (the code now ships inside this plugin). The admin_init handler
+ *      `maybeMigrateLegacyBizunoWp` does the same thing — duplicating it
+ *      here lets fresh-install users land in a clean state immediately,
+ *      without waiting for the next admin request to fire admin_init.
  */
 function bizuno_accounting_activate()
 {
@@ -218,6 +281,14 @@ function bizuno_accounting_activate()
               . "Edit the user and check the 'Allow access to: <My Business>' box along with a role and click Save.",
         ] );
     }
+    // Deactivate the legacy bizuno-wp library plugin if still present.
+    if ( !function_exists( 'is_plugin_active' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+    if ( is_plugin_active( 'bizuno-wp/bizuno-wp.php' ) ) {
+        deactivate_plugins( 'bizuno-wp/bizuno-wp.php' );
+    }
+    update_option( 'bizuno_accounting_legacy_migrated', true );
 }
 
 /**
@@ -250,6 +321,7 @@ function bizuno_accounting_uninstall()
     }
     $upload_dir = wp_upload_dir();
     bizuno_accounting_rmdir( $upload_dir['basedir'] . '/bizuno' );
+    delete_option( 'bizuno_accounting_legacy_migrated' );
 }
 
 /**
