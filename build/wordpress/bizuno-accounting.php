@@ -10,7 +10,7 @@
  * Author:            PhreeSoft, Inc.
  * Author URI:        https://www.phreesoft.com
  * Author Email:      support@phreesoft.com
- * Text Domain:       bizuno
+ * Text Domain:       bizuno-accounting
  * Domain Path:       /src/locale
  * License:           AGPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/agpl-3.0.txt
@@ -221,7 +221,7 @@ class bizuno_accounting
         echo '<p>';
         echo wp_kses_post( sprintf(
             /* translators: 1: anchor open tag pointing at WP plugins list filtered for bizuno-wp, 2: anchor close tag */
-            __( 'As of Bizuno Accounting 7.3.9, the separate <code>bizuno-wp</code> library plugin is no longer needed — its code is now bundled inside this plugin. It has been automatically deactivated, but the files remain on disk. Please %1$sdelete the bizuno-wp plugin%2$s from your Plugins list to complete the migration.', 'bizuno' ),
+            __( 'As of Bizuno Accounting 7.3.9, the separate <code>bizuno-wp</code> library plugin is no longer needed — its code is now bundled inside this plugin. It has been automatically deactivated, but the files remain on disk. Please %1$sdelete the bizuno-wp plugin%2$s from your Plugins list to complete the migration.', 'bizuno-accounting' ),
             '<a href="' . esc_url( $plugins_search_url ) . '">',
             '</a>'
         ) );

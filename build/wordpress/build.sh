@@ -51,11 +51,11 @@ cp -a "$REPO_ROOT/build/wordpress/hostModel.php"      "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/readme.txt"         "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/icon_16.png"        "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/bizuno.png"         "$STAGING/"
-# Plugin Check / wp.org SVN exclusion + PHPCS config. Tells PCP and the
-# review team's automation which files to skip (bundled library + vendor)
-# vs. which are this plugin's own code to review.
-cp -a "$REPO_ROOT/build/wordpress/.distignore"        "$STAGING/"
-cp -a "$REPO_ROOT/build/wordpress/phpcs.xml.dist"     "$STAGING/"
+# NOTE: .distignore and phpcs.xml.dist live in build/wordpress/ but DO NOT
+# get shipped in the user-facing zip. Plugin Check flags them as
+# "hidden_files" / "application_detected" — wp.org's review bot rejects
+# both. The files are still useful in the source tree for future
+# SVN-deploy automation, but the deployed zip stays clean.
 
 # Bizuno library + UI assets — both required at runtime, both come from the
 # repo root. scripts/ holds vendor-y UI bundles (jquery-easyui, jQuery UI,
@@ -93,13 +93,50 @@ echo "→ composer install (production, no dev deps)"
 
 # ─── Trim noise ───────────────────────────────────────────────────────────────
 # WordPress.org's plugin-directory review dislikes VCS metadata, editor
-# crumbs, and oversized test fixtures. Strip them before zipping.
-echo "→ trimming dev metadata from the plugin"
-find "$STAGING"        -name '.git*'    -prune -exec rm -rf {} + 2>/dev/null || true
-find "$STAGING"        -name '.DS_Store'        -delete           2>/dev/null || true
-find "$STAGING/vendor" -name 'tests'    -type d -prune -exec rm -rf {} + 2>/dev/null || true
-find "$STAGING/vendor" -name 'docs'     -type d -prune -exec rm -rf {} + 2>/dev/null || true
-find "$STAGING/vendor" -name 'examples' -type d -prune -exec rm -rf {} + 2>/dev/null || true
+# crumbs, oversized test fixtures, and filenames/paths Plugin Check would
+# reject (hidden files, spaces in names, .xml.dist "application" files).
+# Strip them before zipping.
+echo "→ trimming dev metadata + Plugin-Check-blocking files"
+
+# VCS + macOS metadata anywhere in the tree.
+find "$STAGING"        -name '.git*'     -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING"        -name '.DS_Store'         -delete            2>/dev/null || true
+find "$STAGING"        -name 'Thumbs.db'         -delete            2>/dev/null || true
+
+# Composer dependency noise that bloats the zip without adding runtime value.
+find "$STAGING/vendor" -name 'tests'     -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING/vendor" -name 'docs'      -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING/vendor" -name 'examples'  -type d -prune -exec rm -rf {} + 2>/dev/null || true
+
+# Hidden files inside vendor/ — composer packages ship their own .travis.yml,
+# .editorconfig, .scrutinizer.yml, .phpdoc/, .agents/, etc. PCP flags every
+# one of these. Vendor packages don't need any dotfiles to function at
+# runtime, so strip them recursively.
+find "$STAGING/vendor" -name '.*' -not -name '.' -not -name '..' -prune -exec rm -rf {} + 2>/dev/null || true
+
+# Plugin Check / wp.org review-bot blockers inside src/:
+#
+# 1. macOS-Finder "Foo copy.json" duplicates accidentally committed into
+#    locale/. Real source files are the un-suffixed versions.
+find "$STAGING/src" -type f -name '* copy.*' -delete 2>/dev/null || true
+
+# 2. Vendor-supplied reference XSD schemas with spaces in directory names.
+#    These ship as documentation for the Walmart + Amazon marketplace
+#    integrations but are NOT loaded at runtime — ifWalmart.php and
+#    ifAmazon.php construct XML directly, they don't validate against the
+#    bundled schemas. Strip the reference directories whose path contains
+#    spaces; the funnels keep working.
+rm -rf "$STAGING/src/controllers/api/funnels/ifWalmart/API-V2"      2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/ifAmazon/source"       2>/dev/null || true
+
+# 3. Defensive sweep: any file with spaces or special chars in the name
+#    still left in src/ (PCP's "badly_named_files" rule). Log them so we
+#    can decide whether to add a targeted strip rule next pass.
+BAD=$(find "$STAGING/src" -name '* *' 2>/dev/null || true)
+if [ -n "$BAD" ]; then
+    echo "  ⚠ residual badly-named files in src/ (Plugin Check will flag):" >&2
+    echo "$BAD" | sed 's|^|    |' >&2
+fi
 
 # Defensive — portalCFG.php inside src/ would only matter for the standalone
 # install, but belt and suspenders: never let a per-site config slip into
