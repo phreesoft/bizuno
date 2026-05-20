@@ -51,6 +51,11 @@ cp -a "$REPO_ROOT/build/wordpress/hostModel.php"      "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/readme.txt"         "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/icon_16.png"        "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/bizuno.png"         "$STAGING/"
+# Plugin Check / wp.org SVN exclusion + PHPCS config. Tells PCP and the
+# review team's automation which files to skip (bundled library + vendor)
+# vs. which are this plugin's own code to review.
+cp -a "$REPO_ROOT/build/wordpress/.distignore"        "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/phpcs.xml.dist"     "$STAGING/"
 
 # Bizuno library + UI assets — both required at runtime, both come from the
 # repo root. scripts/ holds vendor-y UI bundles (jquery-easyui, jQuery UI,

@@ -1,0 +1,39 @@
+# Bizuno Accounting — Plugin Check / wp.org-SVN exclusion list.
+#
+# Plugin Check (https://wordpress.org/plugins/plugin-check/) reads this file
+# at the plugin root and skips matching paths when enumerating files to
+# scan. The same convention is used by WordPress.org's SVN-deploy automation
+# to exclude files from the public plugin trunk.
+#
+# Excluded here:
+#   src/      — Bizuno's PHP library. Cross-platform (also runs standalone,
+#               in Docker, embedded in NextCloud) so it doesn't use WP
+#               idioms like esc_html()/wp_die()/sanitize_*. PCP rules like
+#               "use wp_remote_get instead of curl" don't apply.
+#   vendor/   — composer-installed third-party packages. wp.org allows
+#               bundled libraries; PCP doesn't expect us to fix nits in
+#               them (we don't own the code).
+#   scripts/  — third-party UI assets (jQuery EasyUI, jQuery UI, jstree, …).
+#               Same reasoning as vendor/.
+#
+# The WP-integration glue at the plugin root (bizuno-accounting.php,
+# portalCFG.php, portalAPI.php, hostModel.php) IS checked, which is what
+# wp.org reviewers actually need to look at.
+
+/src/
+/vendor/
+/scripts/
+
+# Build / dev metadata that survived the build (defensive — build.sh tries
+# to strip these but a missed .DS_Store etc. shouldn't trip PCP).
+.git
+.gitignore
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+
+# Composer files — useful for transparency in the SVN trunk but not code
+# PCP needs to lint.
+/composer.json
+/composer.lock
