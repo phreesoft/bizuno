@@ -67,9 +67,8 @@ class bizuno_accounting
     {
         global $msgStack, $cleaner, $db, $io;
         require_once ( plugin_dir_path( __FILE__ ) . 'portalCFG.php' );
-        if ( !defined( 'BIZUNO_URL_VIEW' ) ) {
-            define( 'BIZUNO_URL_VIEW', plugins_url( '', __FILE__ ) );
-        }
+        // portalCFG.php is the canonical source for path/URL constants
+        // including BIZUNO_URL_VIEW — no need to re-define here.
         if ( !isset( $msgStack ) || !( $msgStack instanceof \bizuno\messageStack ) ) { $msgStack = new \bizuno\messageStack(); }
         if ( !isset( $cleaner )  || !( $cleaner  instanceof \bizuno\cleaner ) )      { $cleaner  = new \bizuno\cleaner(); }
         if ( !isset( $io )       || !( $io       instanceof \bizuno\io ) )           { $io       = new \bizuno\io(); }
