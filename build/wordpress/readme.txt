@@ -2,7 +2,7 @@
 Stable tag: 7.3.9
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
-Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, phreebooks, bizuno, invoicing, purchase-orders, sales-tax, shipping, iso-9001, multi-store
+Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
 Requires at least: 6.5
 Tested up to: 6.9.4
 Requires PHP: 8.2
