@@ -34,7 +34,10 @@ namespace bizuno;
  * @return string
  */
 function portal_date($format='Y-m-d', $timestamp=null) {
-    return !is_null($timestamp) ? date( $format, $timestamp ) : \wp_date( $format );
+    // wp_date() understands a NULL timestamp as "now"; it also handles the
+    // timezone correctly when a timestamp is passed. Using it in both
+    // branches keeps WP's locale-aware formatting consistent.
+    return \wp_date( $format, $timestamp );
 }
 
 /**
@@ -71,6 +74,11 @@ class hostMail
             "Reply-To: ".$this->cleanAddress($this->FromName, $this->FromEmail)];
         foreach ($this->toEmail as $addr) { $to[]     = $this->cleanAddress($addr['name'], $addr['email']); }
         foreach ($this->toCC as $addr)    { $headers[]= 'Cc: '.$this->cleanAddress($addr['name'], $addr['email']); }
+        // msgDebug() is Bizuno's internal trace.txt logger (gated on Bizuno's
+        // own debug flag), not WP's error_log. print_r() output is the
+        // intended payload — suppress the wp.org rule that assumes any
+        // print_r is leaked debug output.
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
         msgDebug("\nReady to send CMS host email with headers = ".print_r($headers, true));
         foreach ($this->attach as $file) {
             if (!empty($file['name'])) { // it's in the $_FILES folder, move to where WordPress can get it
@@ -80,10 +88,11 @@ class hostMail
             }
             $attachments[]= $file['path'];
         }
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
         msgDebug("\nAttachments array = ".print_r($attachments, true));
         $success = \wp_mail( $to, $this->Subject, $body, $headers, $attachments );
         // remove the temp files
-        foreach ($attachments as $file) { unlink($file); }
+        foreach ($attachments as $file) { wp_delete_file($file); }
         return $success ? true : false;
     }
 

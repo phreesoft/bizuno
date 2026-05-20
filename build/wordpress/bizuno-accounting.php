@@ -172,7 +172,7 @@ class bizuno_accounting
         if ( \bizuno\dbTableExists( BIZUNO_DB_PREFIX . 'configuration' ) ) { return true; }
         echo '<div class="notice notice-info is-dismissible">';
         echo '<p>You\'re just about ready to get started managing your business! '
-           . 'Click <a href="' . home_url( "/$this->bizSlug" ) . '" target="_blank">HERE</a> to open a new page at your website to run the database installer script. '
+           . 'Click <a href="' . esc_url( home_url( "/$this->bizSlug" ) ) . '" target="_blank">HERE</a> to open a new page at your website to run the database installer script. '
            . 'Remember to bookmark the page so you can quickly access your Bizuno business in the future.</p>';
         echo '</div>';
     }
@@ -312,12 +312,19 @@ function bizuno_accounting_html()
 function bizuno_accounting_uninstall()
 {
     global $wpdb;
+    // Direct DB queries + DROP TABLE are intentional here — uninstall is the
+    // one place a plugin legitimately needs to wipe its own tables. Object
+    // caching also doesn't apply: by the time uninstall runs the plugin is
+    // already being torn down. Suppress phpcs warnings that would otherwise
+    // flag this as suspicious.
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $wpdb->query( "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'bizuno_%'" );
     $tables = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}bizuno_%'", ARRAY_A );
     foreach ( $tables as $row ) {
         $table = array_shift( $row );
         $wpdb->query( "DROP TABLE IF EXISTS $table" );
     }
+    // phpcs:enable
     $upload_dir = wp_upload_dir();
     bizuno_accounting_rmdir( $upload_dir['basedir'] . '/bizuno' );
     delete_option( 'bizuno_accounting_legacy_migrated' );
@@ -336,8 +343,9 @@ function bizuno_accounting_rmdir( $dir )
         if ( is_dir( $path ) ) {
             bizuno_accounting_rmdir( $path );
         } else {
-            unlink( $path );
+            wp_delete_file( $path );
         }
     }
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- WP has no rmdir replacement; needed to remove Bizuno's per-site upload dir during uninstall.
     rmdir( $dir );
 }
