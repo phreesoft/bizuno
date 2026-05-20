@@ -31,6 +31,7 @@
         }
     ],
     "require": {
+        "php": "^8.2",
         "authorizenet/authorizenet": "2.0.3",
         "phpmailer/phpmailer": "^6.9",
         "phpseclib/phpseclib": "~3.0",
@@ -39,6 +40,12 @@
         "setasign/fpdi": "^2.5",
         "setasign/tfpdf": "^1.33",
         "web-auth/webauthn-lib": "^5.2"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        },
+        "sort-packages": true
     },
     "suggest": {
         "setasign/fpdi_pdf-parser": "Commercial PDF parser from Setasign — enables FPDI to import modern PDFs (1.5+, object/xref streams). Without it, FPDI's free parser handles PDF up to 1.4. Install separately with valid Setasign credentials: `composer require setasign/fpdi_pdf-parser`. FPDI auto-detects via class_exists() at runtime; no code changes required."

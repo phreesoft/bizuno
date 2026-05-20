@@ -6,7 +6,7 @@
  * Version:           7.3.9
  * Requires at least: 6.5
  * Tested up to:      6.9.4
- * Requires PHP:      8.0
+ * Requires PHP:      8.2
  * Author:            PhreeSoft, Inc.
  * Author URI:        https://www.phreesoft.com
  * Author Email:      support@phreesoft.com
