@@ -51,11 +51,15 @@ cp -a "$REPO_ROOT/build/wordpress/hostModel.php"      "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/readme.txt"         "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/icon_16.png"        "$STAGING/"
 cp -a "$REPO_ROOT/build/wordpress/bizuno.png"         "$STAGING/"
-# NOTE: .distignore and phpcs.xml.dist live in build/wordpress/ but DO NOT
-# get shipped in the user-facing zip. Plugin Check flags them as
-# "hidden_files" / "application_detected" — wp.org's review bot rejects
-# both. The files are still useful in the source tree for future
-# SVN-deploy automation, but the deployed zip stays clean.
+# phpcs.xml at the plugin root — Plugin Check loads it for the PHPCS-based
+# rule families (Security, Code Quality, etc.) and respects its
+# exclude-pattern entries to skip src/, vendor/, scripts/. NOTE: must be
+# named "phpcs.xml" (not phpcs.xml.dist) — PCP's No_Application_Files_Check
+# flags *.dist files. PHPCS itself loads both names equivalently.
+cp -a "$REPO_ROOT/build/wordpress/phpcs.xml"          "$STAGING/"
+# .distignore is NOT shipped — PCP flags any file starting with a dot
+# (hidden_files rule). The file stays in build/wordpress/ for future
+# wp.org SVN-deploy automation but never lands in the user-facing zip.
 
 # Bizuno library + UI assets — both required at runtime, both come from the
 # repo root. scripts/ holds vendor-y UI bundles (jquery-easyui, jQuery UI,
