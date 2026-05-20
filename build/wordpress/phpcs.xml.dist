@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<ruleset name="Bizuno Accounting">
+    <description>
+        PHPCS configuration used by WordPress.org's Plugin Check tool when
+        it scans this plugin. Plugin Check honors phpcs.xml(.dist) at the
+        plugin root for its PHPCS-based rule families (Security, Code
+        Quality, Performance, Accessibility, Naming).
+
+        We scope checks to the WP-integration files at the plugin root.
+        The bundled Bizuno library (src/) and third-party assets (vendor/,
+        scripts/) are excluded — same pattern Plugin Check applies to any
+        vendored library.
+    </description>
+
+    <!-- Scan the plugin root (Plugin Check sets cwd to the plugin dir) -->
+    <file>.</file>
+
+    <!-- ─── Exclusions ───────────────────────────────────────────────────
+         These match Plugin Check's bundled-library convention. The wp.org
+         review team understands and accepts plugins that bundle libraries
+         this way; the expectation is that the plugin's own glue code is
+         reviewed, not every transitively-included file.
+    -->
+
+    <!-- Bizuno's PHP library — cross-platform, not WP-idiomatic by design -->
+    <exclude-pattern>*/src/*</exclude-pattern>
+
+    <!-- Composer-installed dependencies (we don't own the code) -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Third-party UI assets (jQuery EasyUI, jQuery UI, jstree) -->
+    <exclude-pattern>*/scripts/*</exclude-pattern>
+
+    <!-- Composer metadata — not code to lint -->
+    <exclude-pattern>*/composer.json</exclude-pattern>
+    <exclude-pattern>*/composer.lock</exclude-pattern>
+
+    <!-- ─── File-type scope ──────────────────────────────────────────────
+         Only PHP. Plugin Check runs other checks for JS/CSS but those use
+         different rule families that read this file separately.
+    -->
+    <arg name="extensions" value="php"/>
+
+    <!-- ─── PHP version target (matches composer.json platform pin) ──── -->
+    <config name="testVersion" value="8.2-"/>
+</ruleset>
