@@ -68,6 +68,10 @@ if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     plugin_d
 if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      plugin_dir_url( __FILE__ ) . 'portalAPI.php?bizRt=portal/api/fs&src=' ); }
 if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  home_url() . '/bizuno?' ); }
 if ( !defined( 'BIZUNO_URL_SCRIPTS' ) ) { define( 'BIZUNO_URL_SCRIPTS', plugin_dir_url( __FILE__ ) . 'scripts/' ); }
+// View assets (icons, theme images) live under src/ post-Phase-2. Match the
+// standalone install convention: no trailing slash, callers append paths
+// like '/view/icons/sales.png' themselves.
+if ( !defined( 'BIZUNO_URL_VIEW' ) )    { define( 'BIZUNO_URL_VIEW',    rtrim( plugin_dir_url( __FILE__ ), '/' ) . '/src' ); }
 
 // ─── WP-specific quirks ──────────────────────────────────────────────────────
 // WordPress historically adds magic-quote slashes to all input arrays. Bizuno's
