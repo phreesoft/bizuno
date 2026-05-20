@@ -12,7 +12,7 @@ point* and the *delivery format*:
 | **Standalone** (current repo root) | `../index.php` | `git clone` or composer create-project |
 | **Composer** | `../index.php` | `composer create-project phreesoft/bizuno` |
 | **Zip** (LAMP/WAMP drop-in) | `../index.php` | release zip with vendor/ baked in |
-| **WordPress plugin** | `wordpress/bizuno-wp.php` | upload via WP admin, or wordpress.org |
+| **WordPress plugin** | `wordpress/bizuno-accounting.php` | wordpress.org plugin directory (slug `bizuno-accounting`); WP-admin upload also works |
 | **Docker** | container `ENTRYPOINT` | `ghcr.io/phreesoft/bizuno:VERSION` |
 | **NextCloud app** | `nextcloud/bizuno/` launcher | NextCloud app store (frames a separate Bizuno install) |
 
@@ -40,7 +40,7 @@ in `.gitignore`. Each script is self-contained — run from anywhere:
 
 ```bash
 bash build/zip/build.sh        # → build/output/zip/bizuno-VERSION-zip.zip
-bash build/wordpress/build.sh  # → build/output/wordpress/bizuno-wp-VERSION.zip
+bash build/wordpress/build.sh  # → build/output/wordpress/bizuno-accounting-VERSION.zip
 bash build/docker/build.sh     # → local image ghcr.io/phreesoft/bizuno:VERSION + :latest
 bash build/nextcloud/build.sh  # → build/output/nextcloud/bizuno-VERSION.tar.gz
 ```

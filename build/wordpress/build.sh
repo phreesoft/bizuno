@@ -1,21 +1,28 @@
 #!/usr/bin/env bash
 #
-# Build the WordPress plugin artifact.
+# Build the Bizuno Accounting WordPress plugin artifact.
 #
-# Assembles bizuno-wp-VERSION.zip — a standalone WordPress plugin containing:
-#   - bizuno-wp.php at the plugin root (WP plugin header + auto-update wiring)
-#   - readme.txt at the plugin root (WordPress.org plugin-directory format)
-#   - src/ — full Bizuno PHP source (controllers, model, view, locale, portal, …)
-#   - vendor/ — composer-installed dependencies, including the WP-only
-#     yahniselsts/plugin-update-checker for auto-updates from GitHub Releases
+# Produces a single, fully self-contained zip:
+#   build/output/wordpress/bizuno-accounting-VERSION.zip
 #
-# The resulting zip is what users install via WP admin → Plugins → Upload, and
-# what gets attached to GitHub Releases for the auto-updater to discover.
+# Contents:
+#   bizuno-accounting/bizuno-accounting.php  — main plugin file (WP-admin hooks)
+#   bizuno-accounting/portalCFG.php          — Bizuno path/URL constants
+#   bizuno-accounting/portalAPI.php          — direct file-serving entry point
+#   bizuno-accounting/hostModel.php          — WP-specific host overrides
+#   bizuno-accounting/readme.txt             — wordpress.org plugin readme
+#   bizuno-accounting/icon_16.png, bizuno.png — admin menu icons
+#   bizuno-accounting/src/                   — Bizuno PHP library (copied verbatim)
+#   bizuno-accounting/scripts/               — third-party UI assets (jQuery EasyUI, …)
+#   bizuno-accounting/vendor/                — composer install --no-dev result
+#
+# Distribution: WordPress.org plugin directory (slug bizuno-accounting). The
+# release workflow pushes the unpacked plugin to plugins.svn.wordpress.org
+# automatically on each `v*` tag; wordpress.org handles user updates from
+# there. No third-party update-checker library is bundled.
 #
 # Run from the repo root:
 #   bash build/wordpress/build.sh
-#
-# Output: build/output/wordpress/bizuno-wp-VERSION.zip
 
 set -euo pipefail
 
@@ -23,35 +30,52 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 VERSION="$(cat src/VERSION)"
+PLUGIN_SLUG="bizuno-accounting"
 STAGING_PARENT="$REPO_ROOT/build/output/wordpress-staging"
-STAGING="$STAGING_PARENT/bizuno-wp"  # MUST be named bizuno-wp — WP slug
+STAGING="$STAGING_PARENT/$PLUGIN_SLUG"        # MUST match the WP slug exactly
 OUTPUT_DIR="$REPO_ROOT/build/output/wordpress"
-ZIP_NAME="bizuno-wp-${VERSION}.zip"
+ZIP_NAME="${PLUGIN_SLUG}-${VERSION}.zip"
 
 echo "→ Building $ZIP_NAME from $REPO_ROOT (VERSION=$VERSION)"
 
-# Clean staging
+# Clean staging — never reuse a previous attempt's tree.
 rm -rf "$STAGING_PARENT"
 mkdir -p "$STAGING" "$OUTPUT_DIR"
 
-# Plugin entry + readme
-# These come from build/wordpress/ and land at the plugin root
-cp -a "$REPO_ROOT/build/wordpress/bizuno-wp.php" "$STAGING/"
-cp -a "$REPO_ROOT/build/wordpress/readme.txt"    "$STAGING/"
+# ─── Plugin-root files ────────────────────────────────────────────────────────
+# These come from build/wordpress/ and sit at the plugin root inside the zip.
+cp -a "$REPO_ROOT/build/wordpress/${PLUGIN_SLUG}.php" "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/portalCFG.php"      "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/portalAPI.php"      "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/hostModel.php"      "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/readme.txt"         "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/icon_16.png"        "$STAGING/"
+cp -a "$REPO_ROOT/build/wordpress/bizuno.png"         "$STAGING/"
 
-# Sync the plugin's Version: header line to src/VERSION so WP's update check
-# compares against the right number. The release workflow tags the repo
-# with v$VERSION; here we ensure the plugin file agrees.
-sed -i.bak -E "s/^( \* Version:[[:space:]]+).*$/\\1${VERSION}/" "$STAGING/bizuno-wp.php"
-rm -f "$STAGING/bizuno-wp.php.bak"
+# Bizuno library + UI assets — both required at runtime, both come from the
+# repo root. scripts/ holds vendor-y UI bundles (jquery-easyui, jQuery UI,
+# zebra-browser-print, …) that are too big / nested to ship via composer.
+cp -a "$REPO_ROOT/src"     "$STAGING/"
+cp -a "$REPO_ROOT/scripts" "$STAGING/"
 
-# Mirror src/ into the plugin
-cp -a "$REPO_ROOT/src" "$STAGING/"
+# AGPL licence — wordpress.org wants this present in the plugin tree.
+[ -f "$REPO_ROOT/LICENSE" ] && cp -a "$REPO_ROOT/LICENSE" "$STAGING/"
 
-# Composer install at the plugin root so vendor/ lands at bizuno-wp/vendor/.
-# The build needs composer.json + composer.lock present in $STAGING to do this;
-# copy them, install, then leave them in place (they're harmless for users
-# and useful for anyone who wants to re-run composer install themselves).
+# ─── Stamp the version into the plugin header ────────────────────────────────
+# WP reads the `Version:` line from the plugin file to drive the update UI;
+# keep it locked to whatever src/VERSION says at build time so the release
+# tag, src/VERSION, and the plugin header all agree.
+sed -i.bak -E "s/^( \* Version:[[:space:]]+).*$/\\1${VERSION}/" "$STAGING/${PLUGIN_SLUG}.php"
+rm -f "$STAGING/${PLUGIN_SLUG}.php.bak"
+
+# Same for readme.txt's "Stable tag:" line, which WP uses to pick the
+# version users actually receive from the wp.org SVN trunk.
+sed -i.bak -E "s/^(Stable tag:[[:space:]]+).*$/\\1${VERSION}/" "$STAGING/readme.txt"
+rm -f "$STAGING/readme.txt.bak"
+
+# ─── Composer install ─────────────────────────────────────────────────────────
+# Run composer at the staging root so vendor/ lands at <plugin>/vendor/.
+# --no-dev keeps Parsedown and friends out of the user-facing release.
 cp -a "$REPO_ROOT/composer.json" "$STAGING/"
 cp -a "$REPO_ROOT/composer.lock" "$STAGING/"
 echo "→ composer install (production, no dev deps)"
@@ -62,35 +86,25 @@ echo "→ composer install (production, no dev deps)"
     --no-interaction \
     --prefer-dist )
 
-# The auto-updater package (yahniselsts/plugin-update-checker) isn't in
-# composer.json — it's WordPress-only and was historically vendored manually.
-# Pull it from the repo's vendor/ if present (Phase 1+ kept it there) into
-# the plugin's vendor/yahniselsts/ so the require_once in bizuno-wp.php
-# resolves at runtime.
-if [ -d "$REPO_ROOT/vendor/yahniselsts" ]; then
-    echo "→ copying yahniselsts/plugin-update-checker into plugin vendor/"
-    cp -a "$REPO_ROOT/vendor/yahniselsts" "$STAGING/vendor/"
-else
-    echo "  ⚠ vendor/yahniselsts not found in repo — auto-updates will be inert" >&2
-    echo "    fetch from https://github.com/YahnisElsts/plugin-update-checker and drop into vendor/" >&2
-fi
-
-# Trim things WP plugin users don't need (and that WordPress.org's plugin-
-# directory review actively dislikes — *.md files, hidden dirs, .gitignore, etc.)
+# ─── Trim noise ───────────────────────────────────────────────────────────────
+# WordPress.org's plugin-directory review dislikes VCS metadata, editor
+# crumbs, and oversized test fixtures. Strip them before zipping.
 echo "→ trimming dev metadata from the plugin"
-find "$STAGING" -name '.git*' -prune -exec rm -rf {} +    2>/dev/null || true
-find "$STAGING" -name '.DS_Store' -delete                  2>/dev/null || true
-find "$STAGING/vendor" -name 'tests' -type d -prune -exec rm -rf {} + 2>/dev/null || true
-find "$STAGING/vendor" -name 'docs'  -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING"        -name '.git*'    -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING"        -name '.DS_Store'        -delete           2>/dev/null || true
+find "$STAGING/vendor" -name 'tests'    -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING/vendor" -name 'docs'     -type d -prune -exec rm -rf {} + 2>/dev/null || true
 find "$STAGING/vendor" -name 'examples' -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
-# WP plugins must NOT carry the per-install config — that's site-specific.
-# (Defensive — these wouldn't normally be in src/ but belt-and-suspenders.)
-rm -f "$STAGING/portalCFG.php"
+# Defensive — portalCFG.php inside src/ would only matter for the standalone
+# install, but belt and suspenders: never let a per-site config slip into
+# a user-facing zip.
+rm -f "$STAGING/portalCFG-sample.php"
+# (Plugin's own portalCFG.php at the staging root is intentional and stays.)
 
-# Zip — name the contained directory bizuno-wp so it unzips correctly into wp-content/plugins/
+# ─── Zip ──────────────────────────────────────────────────────────────────────
 echo "→ zipping → $OUTPUT_DIR/$ZIP_NAME"
-( cd "$STAGING_PARENT" && zip -rq "$OUTPUT_DIR/$ZIP_NAME" bizuno-wp -x '*.DS_Store' )
+( cd "$STAGING_PARENT" && zip -rq "$OUTPUT_DIR/$ZIP_NAME" "$PLUGIN_SLUG" -x '*.DS_Store' )
 
 SIZE_BYTES=$(stat -f%z "$OUTPUT_DIR/$ZIP_NAME" 2>/dev/null || stat -c%s "$OUTPUT_DIR/$ZIP_NAME")
 SIZE_MB=$(awk "BEGIN {printf \"%.1f\", $SIZE_BYTES / 1048576}")
