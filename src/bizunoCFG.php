@@ -31,9 +31,19 @@ if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)
 
 define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.4'); // Pull from file 
 
-// URLs to PhreeSoft Images
-define('BIZUNO_LOGO',    'https://www.bizuno.com/bizuno.png'); // URL to default logo
-define('BIZUNO_ICON',    'https://www.bizuno.com/bizuno_icon.png'); // URL to default Bizuno icon on the bizuno.com site
+// Default logo + favicon URLs. Both point at bundled images in
+// src/view/images/ via BIZUNO_URL_VIEW, which auto-adapts to the install
+// layout:
+//   - Standard install:  BIZUNO_URL_VIEW = BIZUNO_URL_PORTAL.'/src'
+//                        → '<host>/src/view/images/bizuno_icon.png' (Apache direct)
+//   - Hardened install:  BIZUNO_URL_VIEW = BIZUNO_URL_FS
+//                        → '<host>?bizRt=portal/api/fs&src=/view/images/bizuno_icon.png'
+//                          (served through the fs API from BIZUNO_FS_LIBRARY)
+//   - WordPress plugin:  BIZUNO_URL_VIEW = plugin_url . '/src'
+//                        → '/wp-content/plugins/bizuno-accounting/src/view/images/…'
+// No external network dependency: bizuno.com isn't pinged for site assets.
+define('BIZUNO_LOGO', BIZUNO_URL_VIEW.'/view/images/bizuno.png');
+define('BIZUNO_ICON', BIZUNO_URL_VIEW.'/view/images/bizuno_icon.png');
 
 define('PHREESOFT_LOGO', 'https://www.phreesoft.com/phreesoft.png'); // URL to default logo
 define('PHREESOFT_URL',  'https://www.phreesoft.com/wp-json/phreesoft-custom/v1'); // URL to PhreeSoft RESTful API

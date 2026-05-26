@@ -45,8 +45,29 @@ class portalApi
         if (defined('BIZUNO_DATA') && !empty(BIZUNO_DATA)) {
             if (!empty($parts[1])) {
                 $io   = new io(); // needs BIZUNO_DATA
-                $base = empty($parts[0]) ? BIZUNO_FS_LIBRARY : BIZUNO_DATA;
-                $fn   = $base.$parts[1];
+                // Dispatch by path prefix:
+                //   'view/…'         → BIZUNO_FS_LIBRARY/view/…   (Bizuno-shipped UI assets:
+                //                                                  icons, css, js, fonts)
+                //   '' (empty[0])    → BIZUNO_FS_LIBRARY/…        (legacy — the cleaner
+                //                                                  strips leading slashes
+                //                                                  so this path is rarely
+                //                                                  reached via URL, kept
+                //                                                  for back-compat)
+                //   anything else    → BIZUNO_DATA/parts[1]       (business-uploaded files,
+                //                                                  with parts[0] as the
+                //                                                  bizID prefix dropped from
+                //                                                  the path — DATA is
+                //                                                  already business-scoped)
+                if ($parts[0] === 'view') {
+                    $base = BIZUNO_FS_LIBRARY;
+                    $fn   = $base.'view/'.$parts[1];
+                } elseif (empty($parts[0])) {
+                    $base = BIZUNO_FS_LIBRARY;
+                    $fn   = $base.$parts[1];
+                } else {
+                    $base = BIZUNO_DATA;
+                    $fn   = $base.$parts[1];
+                }
                 $ext  = strtolower(pathinfo($parts[1], PATHINFO_EXTENSION));
                 msgDebug("\nLooking for fn = $fn");
                 $fBad = !file_exists($fn) ? true : false;
