@@ -86,19 +86,57 @@ class portalViewMaint
         if (!empty($userID) && $db->connected) { // if connected to the db, then find user
             $cID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$userID'");
             if (!empty($cID)) {
-                // generate email and send it. Return with check email message
+                // Always generate and store the token. Whether we email it or
+                // display it inline depends on the site's mail config.
                 $code  = format_uuidv4();
                 $exp   = strtotime('+15 minutes', time());
                 $exists= dbMetaGet(0, 'user_reset', 'contacts', $cID);
                 msgDebug("\nExists = ".print_r($exists, true));
                 $rID = metaIdxClean($exists);
                 dbMetaSet($rID, 'user_reset', "$exp:$code", 'contacts', $cID);
+                // No mail configured? Render the link inline so the admin
+                // can recover on a fresh install or after a cross-server
+                // restore that left the encrypted SMTP creds unreadable.
+                // On a configured install we ALWAYS show "check your email"
+                // regardless of send outcome — never expose the link as a
+                // side channel an attacker could exploit during transient
+                // SMTP outages.
+                if (!$this->isMailConfigured()) {
+                    $resetUrl = BIZUNO_URL_PORTAL."?bizRt=portal/api/lostVal&userID=$cID&userCode=$code";
+                    $safeUrl  = htmlspecialchars($resetUrl, ENT_QUOTES);
+                    $this->errors = '<strong>'.$this->lang['msg_reset_link_inline_title'].'</strong><br>'
+                                  . $this->lang['msg_reset_link_inline_body'].'<br><br>'
+                                  . '<a href="'.$safeUrl.'">'.$safeUrl.'</a>';
+                    return;
+                }
                 $this->sendResetEmail($cID, $code);
                 $this->errors = $this->lang['msg_reset_email_sent'];
                 return;
             }
         }
         $this->errors = $this->lang['err_invalid_creds'];
+    }
+
+    /**
+     * Detect whether the site has its mail transport configured.
+     *
+     * "Configured" means an administrator has explicitly chosen a mail
+     * mode (smtp / gmail / postfix) — not the fresh-install default of
+     * "no mode set". When unconfigured, getMailCreds() either returns
+     * an empty array (no module-cache entry) or — in the BIZUNO_KEY-
+     * mismatch case post-restore — returns null because the encrypted
+     * SMTP creds can't be decrypted.
+     *
+     * Either way: no mode set ⇒ we know mail will fail ⇒ fall back to
+     * an inline reset link. If a mode IS set we always commit to the
+     * email path, even if send fails, to avoid leaking reset links as
+     * a side channel during transient SMTP outages on real installs.
+     */
+    private function isMailConfigured()
+    {
+        $creds = getMailCreds();
+        if (empty($creds) || !is_array($creds)) { return false; }
+        return !empty($creds['mail_mode'] ?? '');
     }
 
     private function sendResetEmail($cID, $code)
