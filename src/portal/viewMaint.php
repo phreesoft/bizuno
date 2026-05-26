@@ -95,22 +95,38 @@ class portalViewMaint
                 msgDebug("\nExists = ".print_r($exists, true));
                 $rID = metaIdxClean($exists);
                 dbMetaSet($rID, 'user_reset', "$exp:$code", 'contacts', $cID);
-                // No mail configured? Render the link inline so the admin
-                // can recover on a fresh install or after a cross-server
-                // restore that left the encrypted SMTP creds unreadable.
-                // On a configured install we ALWAYS show "check your email"
-                // regardless of send outcome — never expose the link as a
-                // side channel an attacker could exploit during transient
-                // SMTP outages.
-                if (!$this->isMailConfigured()) {
-                    $resetUrl = BIZUNO_URL_PORTAL."?bizRt=portal/api/lostVal&userID=$cID&userCode=$code";
-                    $safeUrl  = htmlspecialchars($resetUrl, ENT_QUOTES);
-                    $this->errors = '<strong>'.$this->lang['msg_reset_link_inline_title'].'</strong><br>'
+                // Decide between three paths:
+                //   1. Mail not configured at all → render link inline
+                //      (fresh install, no SMTP set up yet).
+                //   2. Mail configured but send fails → render link
+                //      inline (post-restore BIZUNO_KEY mismatch garbles
+                //      the encrypted SMTP creds; postfix not installed;
+                //      etc.). Trade-off: this re-opens a side channel
+                //      where an attacker could trigger SMTP failures to
+                //      harvest reset links. The alternative is admins
+                //      permanently locked out after a cross-server
+                //      restore, which is strictly worse. Mitigated by
+                //      the existing 15-minute token TTL + single-use
+                //      semantics in validateAuth().
+                //   3. Mail configured and send returns truthy → show
+                //      the standard "check your email" message; never
+                //      reveal the link.
+                $resetUrl = BIZUNO_URL_PORTAL."?bizRt=portal/api/lostVal&userID=$cID&userCode=$code";
+                $safeUrl  = htmlspecialchars($resetUrl, ENT_QUOTES);
+                $renderInline = function ($titleKey) use ($safeUrl) {
+                    $this->errors = '<strong>'.$this->lang[$titleKey].'</strong><br>'
                                   . $this->lang['msg_reset_link_inline_body'].'<br><br>'
                                   . '<a href="'.$safeUrl.'">'.$safeUrl.'</a>';
+                };
+                if (!$this->isMailConfigured()) {
+                    $renderInline('msg_reset_link_inline_title');
                     return;
                 }
-                $this->sendResetEmail($cID, $code);
+                if (!$this->sendResetEmail($cID, $code)) {
+                    msgLog("Lost-password mail send returned falsy for user $cID — falling back to inline link.");
+                    $renderInline('msg_reset_link_failed_title');
+                    return;
+                }
                 $this->errors = $this->lang['msg_reset_email_sent'];
                 return;
             }
@@ -154,7 +170,12 @@ class portalViewMaint
         $msgBody  .= '<p>If you did not request this reset, please see your administrator.</p>';
         msgDebug("\nready to send the email");
         $bizMail = new bizunoMailer($contact['email'], $contact['primary_name'], $msgSubject, $msgBody, $fromEmail, $fromName);
-        $bizMail->sendMail();
+        // Return value bubbles up to validateReset(): bizunoMailerSendMail()
+        // returns `true` on success, falls through to a falsy value on SMTP
+        // failure / phpmailerException / postfix mail() returning false.
+        // validateReset uses this to decide between the "check your email"
+        // message vs. the inline-link fallback.
+        return $bizMail->sendMail();
     }
 
     public function lostNewPW(&$layout=[])
