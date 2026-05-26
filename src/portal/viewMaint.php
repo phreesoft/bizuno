@@ -35,6 +35,7 @@ class portalViewMaint
     public  $lang;
     public  $locale  = '';
     private $bizKey;
+    private $bizKeyGenerated = false; // memoization flag: ensures setConstant('BIZUNO_KEY') generates ONE random value per request even if the caller invokes it multiple times (e.g., the install loop iterating over multiple lines that mention the constant)
     private $dbCreds = [];
 
     function __construct()
@@ -291,10 +292,23 @@ class portalViewMaint
             $lines = file('portalCFG.php');
         } elseif (!file_exists('portalCFG-sample.php')) { $this->errors .= $this->lang['err_missing_cfg']; return;
         } else { $lines = file('portalCFG-sample.php'); }
+        // Match ONLY the actual define() line, not comments that also
+        // mention the constant. The pre-Phase-2 portalCFG-sample.php had
+        // one occurrence per constant so the loose strpos(...) worked;
+        // post-Phase-2 the file has explanatory comments referencing
+        // BIZUNO_KEY by name, which the loose match would rewrite into
+        // duplicate (and for BIZUNO_KEY, *conflicting* random) define
+        // lines. The duplicates aren't honored by PHP (!defined guards)
+        // but the in-memory $this->bizKey reflects the LAST generated
+        // value, while the WRITTEN portalCFG.php uses the FIRST — so
+        // the password hashed at install time was peppered with a
+        // different key than the login validator subsequently uses.
+        // Using `=== false` explicitly so a strpos at position 0 (line
+        // starts with the define) still counts as a match.
         foreach ($lines as $idx => $line) {
-            if (strpos($line, 'BIZUNO_BIZID'))   { $lines[$idx] = $this->setConstant('BIZUNO_BIZID'); }
-            if (strpos($line, 'BIZUNO_KEY'))     { $lines[$idx] = $this->setConstant('BIZUNO_KEY'); }
-            if (strpos($line, 'BIZUNO_DB_CREDS')){ $lines[$idx] = $this->setConstant('BIZUNO_DB_CREDS'); }
+            if (strpos($line, "define( 'BIZUNO_BIZID'")    !== false) { $lines[$idx] = $this->setConstant('BIZUNO_BIZID'); }
+            if (strpos($line, "define( 'BIZUNO_KEY'")      !== false) { $lines[$idx] = $this->setConstant('BIZUNO_KEY'); }
+            if (strpos($line, "define( 'BIZUNO_DB_CREDS'") !== false) { $lines[$idx] = $this->setConstant('BIZUNO_DB_CREDS'); }
         }
         if (!$this->installTestDB()) { $this->errors .= $this->lang['err_invalid_db_creds']; return; }
         // all tests passed write the new file
@@ -307,7 +321,17 @@ class portalViewMaint
         switch ($const) {
             case 'BIZUNO_BIZID': return "if ( !defined( 'BIZUNO_BIZID' ) ) { define( 'BIZUNO_BIZID', '".randomValue(6)."' ); }";
             case 'BIZUNO_KEY':
-                $this->bizKey = randomValue(16); // need this to encrypt the cookie
+                // Generate the per-install key exactly once. The flag guard
+                // matters because (a) randomValue() returns a different
+                // string on each call, and (b) the install flow later uses
+                // $this->bizKey to compute the admin's password hash. If a
+                // second call to setConstant('BIZUNO_KEY') overwrites
+                // $this->bizKey, the hash no longer pairs with the key
+                // actually written into portalCFG.php → login fails.
+                if (!$this->bizKeyGenerated) {
+                    $this->bizKey = randomValue(16);
+                    $this->bizKeyGenerated = true;
+                }
                 return "if ( !defined( 'BIZUNO_KEY' ) ) { define( 'BIZUNO_KEY', '$this->bizKey' ); }";
             case 'BIZUNO_DB_CREDS':
                 $name = clean('biz_db_name', 'db_field','post');
