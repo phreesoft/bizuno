@@ -74,6 +74,40 @@ echo "→ composer install (production)"
     --no-interaction \
     --prefer-dist )
 
+# ─── Strip junk before zipping ───────────────────────────────────────────────
+# These files don't break a LAMP install (Linux handles spaces + dotfiles
+# fine) but they bloat the archive, look unprofessional, and would block
+# wp.org publication of the same source — keep all variant outputs clean.
+echo "→ trimming dev metadata + macOS leftovers"
+
+# macOS / Windows / VCS metadata anywhere in the tree.
+find "$STAGING"        -name '.DS_Store' -delete                       2>/dev/null || true
+find "$STAGING"        -name 'Thumbs.db' -delete                       2>/dev/null || true
+find "$STAGING"        -name '.git*'     -prune -exec rm -rf {} +      2>/dev/null || true
+
+# Composer dep noise that bloats vendor/ without runtime value.
+find "$STAGING/vendor" -name 'tests'     -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING/vendor" -name 'docs'      -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find "$STAGING/vendor" -name 'examples'  -type d -prune -exec rm -rf {} + 2>/dev/null || true
+
+# macOS-Finder "Foo copy.json" duplicates accidentally committed in
+# src/locale/en_US/reports/. The real files are the un-suffixed versions.
+find "$STAGING/src" -type f -name '* copy.*' -delete                   2>/dev/null || true
+
+# Vendor-supplied reference docs whose directory/file names contain
+# spaces — XSD schemas for Walmart marketplace, spec docs for Amazon.
+# Not loaded at runtime (the funnels construct XML directly), purely
+# documentation that came with the SDK distributions.
+rm -rf "$STAGING/src/controllers/api/funnels/ifWalmart/API-V2"         2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/ifAmazon/source"          2>/dev/null || true
+
+# Defensive: warn if any residual badly-named file survives in src/.
+BAD=$(find "$STAGING/src" -name '* *' 2>/dev/null || true)
+if [ -n "$BAD" ]; then
+    echo "  ⚠ residual badly-named files in src/ (will still unzip fine but worth cleaning up):" >&2
+    echo "$BAD" | sed 's|^|    |' >&2
+fi
+
 # Drop a user-facing install note at the staging root
 cat > "$STAGING/INSTALL.txt" <<'INSTALL'
 Bizuno ERP — LAMP/WAMP drop-in install
