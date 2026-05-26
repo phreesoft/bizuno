@@ -134,15 +134,24 @@ class bizunoProfile extends mgrJournal
     {
         // Always strip the password fields from $this->struc so they don't
         // leak into the user_profile blob.
-        $cur = clean('bizPassCur', 'text', 'post');
-        $new = clean('bizPass0',   'text', 'post');
-        $cnf = clean('bizPass1',   'text', 'post');
+        //
+        // Cleaner type 'password' — verbatim string (no trim, no slash-strip
+        // — significant whitespace in a password should not be silently
+        // mangled) AND returns '' for missing/empty POST values, not null.
+        // The text cleaner returns null for empty input, which broke an
+        // earlier `=== ''` check and surfaced as a spurious "too short"
+        // error on profile saves where the user didn't touch the password.
+        $cur = (string) clean('bizPassCur', 'password', 'post');
+        $new = (string) clean('bizPass0',   'password', 'post');
+        $cnf = (string) clean('bizPass1',   'password', 'post');
         unset($this->struc['bizPassCur'], $this->struc['bizPass0'], $this->struc['bizPass1']);
-        // Nothing submitted → nothing to do.
-        if ($cur === '' && $new === '' && $cnf === '') { return; }
+        // Nothing submitted → nothing to do. empty() handles both '' and
+        // null defensively in case a future cleaner change shifts the
+        // representation again.
+        if (empty($cur) && empty($new) && empty($cnf)) { return; }
         // Partial submission → tell the user, abort password update but let
         // the rest of the profile save continue.
-        if ($cur === '' || $new === '' || $cnf === '') {
+        if (empty($cur) || empty($new) || empty($cnf)) {
             return msgAdd(lang('err_password_fields_required'));
         }
         if ($new !== $cnf)        { return msgAdd(lang('err_password_mismatch')); }
