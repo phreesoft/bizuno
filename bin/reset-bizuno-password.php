@@ -66,7 +66,7 @@ $candidates = [
 ];
 $cfg = null;
 foreach ($candidates as $path) {
-    if (file_exists($path)) { $cfg = $path; break; }
+    if (file_exists($path)) { $cfg = realpath($path); break; }
 }
 if (!$cfg) {
     fwrite(STDERR, "ERROR: portalCFG.php not found in any of:\n  - " . implode("\n  - ", $candidates) . "\n");
@@ -74,7 +74,25 @@ if (!$cfg) {
     exit(1);
 }
 
+// ─── synthesize web-request $_SERVER context for CLI use ──────────────────
+// Bizuno's portalCFG.php derives filesystem paths from $_SERVER['DOCUMENT_ROOT']
+// (e.g. BIZUNO_FS_PORTAL = $_SERVER['DOCUMENT_ROOT'].'/') and URL constants
+// from $_SERVER['HTTP_HOST']. From CLI those are unset, so the require chain
+// fails on "/src/bizunoCFG.php" not found. Synthesize them from the install
+// directory before requiring portalCFG.php — Bizuno's `if(!defined())`
+// guards then produce sensible filesystem paths.
+$installDir = dirname($cfg);
+$_SERVER['DOCUMENT_ROOT'] = $installDir;
+$_SERVER['HTTP_HOST']     = 'localhost';
+$_SERVER['HTTPS']         = '';
+$_SERVER['REQUEST_URI']   = '/';
+$_SERVER['REQUEST_METHOD'] = 'GET';
+
+// Suppress NOTICE/WARNING from CLI-context idiosyncrasies during the require.
+// We only care about FATAL — anything less is web-oriented bootstrap noise.
+$prevErrorReporting = error_reporting(E_ERROR | E_PARSE);
 require $cfg;
+error_reporting($prevErrorReporting);
 
 if (!defined('BIZUNO_KEY') || !defined('BIZUNO_DB_CREDS') || !defined('BIZUNO_DB_PREFIX')) {
     fwrite(STDERR, "ERROR: portalCFG.php loaded but expected constants (BIZUNO_KEY / BIZUNO_DB_CREDS / BIZUNO_DB_PREFIX) aren't defined.\n");
