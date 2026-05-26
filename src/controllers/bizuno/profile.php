@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-05-26 (in-app password change in profile editor)
  * @filesource /controllers/bizuno/profile.php
  */
 
@@ -45,7 +45,7 @@ class bizunoProfile extends mgrJournal
         $values = [10,20,30,40,50]; // This must match the values set in the UI (EasyUI for now), [10,20,30,40,50] is the default
         foreach ($values as $value) {$rows[] = ['id'=>$value, 'text'=>$value]; }
         $mail = new bizunoMailer();
-        $this->struc = [ 
+        $this->struc = [
             'title'      => ['tab'=>'options','panel'=>'general','order'=>10, 'clean'=>'text',     'attr'=>['value'=>getUserCache('profile', 'userName'),'readonly'=>true]],
             'email'      => ['tab'=>'options','panel'=>'general','order'=>15, 'clean'=>'email',    'attr'=>['value'=>getUserCache('profile', 'email'),   'readonly'=>true]],
             'user_pin'   => ['tab'=>'options','panel'=>'general','order'=>20, 'clean'=>'integer',  'attr'=>['type'=>'password','value'=>'']],
@@ -53,7 +53,21 @@ class bizunoProfile extends mgrJournal
             'def_periods'=> ['tab'=>'options','panel'=>'general','order'=>30, 'clean'=>'db_field', 'attr'=>['type'=>'select',  'value'=>'l'],      'values'=>$periods],
             'grid_rows'  => ['tab'=>'options','panel'=>'general','order'=>35, 'clean'=>'integer',  'attr'=>['type'=>'select',  'value'=>20],       'values'=>$rows],
             'icons'      => ['tab'=>'options','panel'=>'general','order'=>40, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'default'],'values'=>portalIcons()],
-            'theme'      => ['tab'=>'options','panel'=>'general','order'=>45, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'auto'],   'values'=>portalSkins()]];
+            'theme'      => ['tab'=>'options','panel'=>'general','order'=>45, 'clean'=>'alpha_num','attr'=>['type'=>'select',  'value'=>'auto'],   'values'=>portalSkins()],
+            // ─── Change password ─────────────────────────────────────────
+            // These three fields live in their own "password" panel under
+            // the same "options" tab. They are NEVER persisted to the
+            // user_profile meta — save() handles them separately, hashing
+            // the new value into user_auth meta (the same place login
+            // verification reads from), then unsets them before the rest
+            // of the profile fields get written. metaUpdate() in turn
+            // already refuses to refill values into password-typed inputs
+            // (functions.php ~line 687), so the new-password fields render
+            // empty on every page load — write-only behaviour by default.
+            'bizPassCur' => ['tab'=>'options','panel'=>'password','order'=>10, 'clean'=>'text', 'label'=>lang('password_current'),  'attr'=>['type'=>'password','value'=>'','autocomplete'=>'current-password','placeholder'=>lang('password_current')]],
+            'bizPass0'   => ['tab'=>'options','panel'=>'password','order'=>20, 'clean'=>'text', 'label'=>lang('password_new'),      'attr'=>['type'=>'password','value'=>'','autocomplete'=>'new-password',    'placeholder'=>lang('password_new')]],
+            'bizPass1'   => ['tab'=>'options','panel'=>'password','order'=>30, 'clean'=>'text', 'label'=>lang('password_retype'),   'attr'=>['type'=>'password','value'=>'','autocomplete'=>'new-password',    'placeholder'=>lang('password_retype')]],
+        ];
         langFillLabels($this->struc);
         $this->struc = array_replace($this->struc, $mail->struc); // bring in the mail settings
     }
@@ -78,6 +92,12 @@ class bizunoProfile extends mgrJournal
     {
         if (empty(getUserCache('profile', 'userID'))) { return; }
         if (empty(clean('user_pin', 'text', 'post'))) { unset($this->struc['user_pin']); } // only update password if it there is a value, otherwise keep the value
+        // Process password change (if any) BEFORE persisting profile meta.
+        // The password fields are unset from $this->struc after this so they
+        // never get written into the user_profile blob — they belong in
+        // user_auth meta instead, written via the same encryptPassword()
+        // helper viewMaint.php and the recovery script both use.
+        $this->savePasswordChange();
         $metaVal= dbMetaGet(0, $this->metaPrefix, 'contacts', getUserCache('profile', 'userID'));
 //if (!isset($metaVal['title']) && isset($metaVal[0])) { msgDebug("\nMeta profile is malformed, fixing it."); $metaVal = array_shift($metaVal); }
         $rID    = metaIdxClean($metaVal);
@@ -88,6 +108,59 @@ class bizunoProfile extends mgrJournal
         dbSetBizunoUsers();
         msgAdd(lang('msg_record_saved'), 'success');
         msgLog("$this->mgrTitle - ".lang('save').": {$output['title']}");
+    }
+
+    /**
+     * Handle the password-change fields on profile save.
+     *
+     * The three fields (bizPassCur / bizPass0 / bizPass1) are transient —
+     * they exist for the form but never persist into user_profile meta.
+     * This method:
+     *
+     *   1. Removes bizPass* from $this->struc unconditionally so the caller's
+     *      metaUpdate() doesn't try to round-trip them into user_profile.
+     *   2. If the user didn't fill any of them, return early — they're
+     *      just saving other profile settings.
+     *   3. Otherwise, validate: current must match the stored hash, new
+     *      must equal confirm, new must be ≥ 8 chars. Any failure adds a
+     *      message to $msgStack and returns without writing — the rest
+     *      of the profile save still completes (the user's typo
+     *      shouldn't lose their theme change).
+     *   4. On success, write the new hash into user_auth meta — same
+     *      shape Bizuno's login validator + the lost-password reset both
+     *      use, so the next login picks it up cleanly.
+     */
+    protected function savePasswordChange()
+    {
+        // Always strip the password fields from $this->struc so they don't
+        // leak into the user_profile blob.
+        $cur = clean('bizPassCur', 'text', 'post');
+        $new = clean('bizPass0',   'text', 'post');
+        $cnf = clean('bizPass1',   'text', 'post');
+        unset($this->struc['bizPassCur'], $this->struc['bizPass0'], $this->struc['bizPass1']);
+        // Nothing submitted → nothing to do.
+        if ($cur === '' && $new === '' && $cnf === '') { return; }
+        // Partial submission → tell the user, abort password update but let
+        // the rest of the profile save continue.
+        if ($cur === '' || $new === '' || $cnf === '') {
+            return msgAdd(lang('err_password_fields_required'));
+        }
+        if ($new !== $cnf)        { return msgAdd(lang('err_password_mismatch')); }
+        if (strlen($new) < 8)     { return msgAdd(lang('err_password_short')); }
+        // Verify the current password against the stored hash. Same shape
+        // as src/portal/viewAuth.php validateUser(): pepper with BIZUNO_KEY,
+        // then password_verify against the user_auth meta value.
+        $uID    = getUserCache('profile', 'userID');
+        $stored = dbMetaGet(0, 'user_auth', 'contacts', $uID);
+        $rID    = metaIdxClean($stored);
+        $peppered = hash_hmac('sha256', $cur, BIZUNO_KEY);
+        if (!password_verify($peppered, $stored['value'] ?? '')) {
+            return msgAdd(lang('err_password_current_wrong'));
+        }
+        // All checks passed → write the new hash.
+        dbMetaSet($rID, 'user_auth', encryptPassword($new), 'contacts', $uID);
+        msgAdd(lang('msg_password_changed'), 'success');
+        msgLog("$this->mgrTitle - ".lang('msg_password_changed'));
     }
     public function update()
     {
