@@ -80,7 +80,19 @@ define('BIZUNO_DATA', '${DATA_DIR}/');
 if (!defined('BIZUNO_FS_PORTAL'))   { define('BIZUNO_FS_PORTAL',   '${BIZUNO_ROOT}/'); }
 if (!defined('BIZUNO_FS_LIBRARY'))  { define('BIZUNO_FS_LIBRARY',  BIZUNO_FS_PORTAL . 'src/'); }
 if (!defined('BIZUNO_FS_ASSETS'))   { define('BIZUNO_FS_ASSETS',   BIZUNO_FS_PORTAL . 'vendor/'); }
-if (!defined('BIZUNO_URL_PORTAL'))  { define('BIZUNO_URL_PORTAL',  (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . \$_SERVER['HTTP_HOST']); }
+// HTTPS detection: honor X-Forwarded-Proto when the container is behind a
+// reverse proxy (Caddy, nginx, Traefik, etc.). Falls back to the standard
+// \$_SERVER['HTTPS']='on' check for direct/non-proxied installs. Without the
+// X-Forwarded-Proto branch, every URL Bizuno generates would be http://
+// even when the user's browser is on https — breaking link redirects,
+// CSRF token domains, and the iframe sandbox in the NextCloud variant.
+if (!defined('BIZUNO_URL_PORTAL')) {
+    \$proto = (
+        (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] === 'on') ||
+        (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    ) ? 'https' : 'http';
+    define('BIZUNO_URL_PORTAL', \$proto . '://' . \$_SERVER['HTTP_HOST']);
+}
 if (!defined('BIZUNO_URL_AJAX'))    { define('BIZUNO_URL_AJAX',    BIZUNO_URL_PORTAL . '?ajax=1'); }
 if (!defined('BIZUNO_URL_API'))     { define('BIZUNO_URL_API',     BIZUNO_URL_PORTAL . '?bizRt='); }
 if (!defined('BIZUNO_URL_FS'))      { define('BIZUNO_URL_FS',      BIZUNO_URL_PORTAL . '?bizRt=portal/api/fs&src=' ); }

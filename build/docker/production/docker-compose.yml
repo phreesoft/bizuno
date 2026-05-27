@@ -1,0 +1,146 @@
+# Bizuno ERP — production Docker stack with Caddy reverse-proxy + TLS termination.
+#
+# Use this when running Bizuno on a dedicated Docker host (no ISPConfig /
+# Plesk / shared web server). Three containers:
+#
+#   bizuno    — the Bizuno application (image from ghcr.io or built locally)
+#   mariadb   — Bizuno's database
+#   caddy     — TLS termination, reverse proxies port 443 → bizuno:80
+#
+# Bring up:
+#   cp .env.example .env
+#   $EDITOR .env                            # fill in hostname, secrets, cert paths
+#   docker compose pull                     # if using the prebuilt ghcr.io image
+#   docker compose up -d
+#
+# Verify:
+#   docker compose ps                       # all three should be "running (healthy)"
+#   curl -I https://your.host/              # 200 OK from the bizuno installer
+#
+# Update Bizuno (when a new image is published):
+#   docker compose pull
+#   docker compose up -d
+#
+# See build/docker/production/README.md for full setup notes including TLS
+# cert provisioning, DNS, and the local-build option for dev.
+
+name: bizuno
+
+services:
+
+  bizuno:
+    # Pinned to a specific version is safest in production; bump on purpose.
+    # `latest` is convenient for ongoing test environments.
+    image: ghcr.io/phreesoft/bizuno:${BIZUNO_VERSION:-latest}
+    # For local development against an unreleased version, comment the image
+    # line above and uncomment the build block below. Compose will rebuild
+    # on every `docker compose up --build` instead of pulling.
+    # build:
+    #   context: ../../..
+    #   dockerfile: build/docker/Dockerfile
+    container_name: bizuno
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    # No port mapping — only Caddy speaks to the outside world. bizuno is
+    # reachable inside the docker network at hostname `bizuno:80`.
+    expose:
+      - "80"
+    environment:
+      # ─── Database ────────────────────────────────────────────────
+      BIZUNO_DB_HOST: mariadb
+      BIZUNO_DB_NAME: ${BIZUNO_DB_NAME:?BIZUNO_DB_NAME must be set in .env}
+      BIZUNO_DB_USER: ${BIZUNO_DB_USER:?BIZUNO_DB_USER must be set in .env}
+      BIZUNO_DB_PASS: ${BIZUNO_DB_PASS:?BIZUNO_DB_PASS must be set in .env}
+      # ─── Per-install secrets ─────────────────────────────────────
+      # BIZUNO_KEY: 16-char alphanumeric. Encrypts stored PII (passwords,
+      # SMTP creds, etc.). NEVER change it after first install or all
+      # existing encrypted data becomes unreadable. Record in your
+      # password manager + back up portalCFG.php.
+      BIZUNO_KEY:   ${BIZUNO_KEY:?BIZUNO_KEY must be set in .env (16 alphanumeric chars)}
+      BIZUNO_BIZID: ${BIZUNO_BIZID:?BIZUNO_BIZID must be set in .env (6 alphanumeric chars)}
+    volumes:
+      # Bizuno's BIZUNO_DATA — uploads, attachments, cache, backups, biz-
+      # instance-key.php. CRITICAL TO BACK UP. Loss = data loss.
+      - bizuno-data:/var/www/html/data
+      # Persists portalCFG.php across container replacement so the
+      # entrypoint doesn't regenerate (and regenerate BIZUNO_KEY) on
+      # every restart.
+      - bizuno-config:/var/www/html/portalCFG-config
+    networks:
+      - bizuno-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "--max-time", "4", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  mariadb:
+    image: mariadb:11
+    container_name: bizuno-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?MARIADB_ROOT_PASSWORD must be set in .env}
+      MARIADB_DATABASE: ${BIZUNO_DB_NAME:?}
+      MARIADB_USER: ${BIZUNO_DB_USER:?}
+      MARIADB_PASSWORD: ${BIZUNO_DB_PASS:?}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - bizuno-net
+    # No host port exposed — bizuno reaches the DB via the docker network.
+    # Uncomment if you need DB access from the host (GUI client, etc.).
+    # ports:
+    #   - "127.0.0.1:3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  caddy:
+    # Pinned to v2 alpine — small (~50MB), fast restart, predictable.
+    image: caddy:2-alpine
+    container_name: bizuno-caddy
+    restart: unless-stopped
+    depends_on:
+      - bizuno
+    ports:
+      # The only ports exposed to the public internet. Caddy auto-redirects
+      # 80 → 443 inside the Caddyfile config.
+      - "80:80"
+      - "443:443"
+    environment:
+      # Substituted into the Caddyfile via {$VAR} syntax at start time.
+      BIZUNO_HOSTNAME: ${BIZUNO_HOSTNAME:?BIZUNO_HOSTNAME must be set in .env}
+      CADDY_CERT_FILE: ${CADDY_CERT_FILE:?CADDY_CERT_FILE must be set in .env}
+      CADDY_KEY_FILE:  ${CADDY_KEY_FILE:?CADDY_KEY_FILE must be set in .env}
+    volumes:
+      # Caddyfile lives in the same dir as docker-compose.yml; mount read-only.
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Mount the host's cert directory read-only. Paths inside the container
+      # mirror the host paths so Caddyfile values work the same.
+      - /etc/ssl/docker:/etc/ssl/docker:ro
+      # Caddy's own state (ACME data, etc.). Volumes so config edits don't
+      # nuke cached state on restart.
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - bizuno-net
+
+networks:
+  # Named so it's deterministic — bizuno containers can reach each other by
+  # service name (bizuno → mariadb, caddy → bizuno) regardless of container
+  # restart order.
+  bizuno-net:
+    name: bizuno-net
+
+volumes:
+  bizuno-data:
+  bizuno-config:
+  mariadb-data:
+  caddy-data:
+  caddy-config:
