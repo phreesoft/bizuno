@@ -226,38 +226,76 @@ jobs:
           unzip -q artifact/bizuno-accounting-${VERSION}.zip -d plugin
           ls plugin/bizuno-accounting/ | head
 
-      - name: SVN checkout WordPress.org repo
+      - name: SVN checkout WordPress.org trunk
         if: env.WP_SVN_SKIP != 'true'
         run: |
-          svn checkout --depth immediates "$WP_SVN_REPO" svn-repo
-          svn update --set-depth infinity svn-repo/trunk svn-repo/assets svn-repo/tags
+          # Only check out trunk — we don't need assets/, branches/, or
+          # the existing tags/ for our commit pattern. Smaller checkout =
+          # faster, fewer files for SVN to track.
+          svn checkout --depth empty "$WP_SVN_REPO" svn-repo
+          svn update --set-depth infinity svn-repo/trunk
 
-      - name: Sync plugin → trunk + new tag
+      - name: Sync plugin → trunk
         if: env.WP_SVN_SKIP != 'true'
         run: |
           set -e
           # Replace trunk contents with the new build
           rm -rf svn-repo/trunk/*
           cp -a plugin/bizuno-accounting/. svn-repo/trunk/
-          # Copy to tags/<version>
-          mkdir -p svn-repo/tags/${VERSION}
-          cp -a plugin/bizuno-accounting/. svn-repo/tags/${VERSION}/
-          # Stage adds/deletes for svn
+          # Stage adds + deletes for svn
           cd svn-repo
-          svn add --force --quiet .
+          svn add --force --quiet trunk
           # Delete files that SVN tracks but no longer exist locally
-          svn status | grep '^!' | sed -e 's/^! *//' | xargs -r svn delete --keep-local || true
+          svn status trunk | grep '^!' | sed -e 's/^! *//' | xargs -r svn delete --keep-local || true
 
-      - name: SVN commit
+      - name: SVN commit trunk (with retry)
         if: env.WP_SVN_SKIP != 'true'
         run: |
+          # wp.org SVN is notoriously flaky for big commits — connection
+          # resets ("E000104: Connection reset by peer") happen mid-upload
+          # roughly 1 in 4 attempts for large plugins. Retry up to 3 times
+          # before giving up; each retry uses a fresh connection.
           cd svn-repo
-          svn commit \
-            --no-auth-cache \
-            --non-interactive \
-            --username "$WP_SVN_USER" \
-            --password "$WP_SVN_PASS" \
-            -m "Release ${VERSION}"
+          for attempt in 1 2 3; do
+              echo "→ trunk commit attempt $attempt of 3"
+              if svn commit trunk \
+                    --no-auth-cache \
+                    --non-interactive \
+                    --username "$WP_SVN_USER" \
+                    --password "$WP_SVN_PASS" \
+                    -m "Release ${VERSION}"; then
+                  echo "✓ trunk commit succeeded on attempt $attempt"
+                  exit 0
+              fi
+              echo "✗ attempt $attempt failed; sleeping 30s before retry"
+              sleep 30
+          done
+          echo "✗ All 3 attempts failed — wp.org SVN is having a bad day"
+          exit 1
+
+      - name: Tag the release (server-side svn copy)
+        if: env.WP_SVN_SKIP != 'true'
+        run: |
+          # URL-to-URL svn copy creates the tag as a cheap server-side
+          # reference rather than re-uploading every file. Completes in
+          # seconds even for a 14 MB plugin. This is how the wp.org
+          # plugin maintainers handbook recommends tagging.
+          for attempt in 1 2 3; do
+              echo "→ tag commit attempt $attempt of 3"
+              if svn copy "${WP_SVN_REPO}/trunk" "${WP_SVN_REPO}/tags/${VERSION}" \
+                    --no-auth-cache \
+                    --non-interactive \
+                    --username "$WP_SVN_USER" \
+                    --password "$WP_SVN_PASS" \
+                    -m "Tag ${VERSION}"; then
+                  echo "✓ tag commit succeeded on attempt $attempt"
+                  exit 0
+              fi
+              echo "✗ attempt $attempt failed; sleeping 30s before retry"
+              sleep 30
+          done
+          echo "✗ All 3 tag-commit attempts failed"
+          exit 1
 
   # ─── Build and push the Docker image to ghcr.io ─────────────────────────
   #
