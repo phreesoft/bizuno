@@ -1,0 +1,77 @@
+# Bizuno Caddy reverse-proxy config.
+#
+# Variables come from env (see docker-compose.yml's caddy.environment):
+#   {$BIZUNO_HOSTNAME}    Public FQDN this site serves at
+#   {$CADDY_CERT_FILE}    Path to TLS cert (fullchain.pem)
+#   {$CADDY_KEY_FILE}     Path to TLS private key
+#
+# Caddy auto-redirects http://hostname → https://hostname via the standard
+# implicit-redirect behavior; no explicit :80 block needed.
+
+{$BIZUNO_HOSTNAME} {
+
+    # ─── TLS ─────────────────────────────────────────────────────────
+    # Manual cert files (wildcard from an external CA). For Let's Encrypt
+    # via Caddy's built-in ACME client, omit this directive entirely and
+    # Caddy will provision + renew certs automatically — but that requires
+    # ports 80/443 reachable from the public internet AND the domain's
+    # A-record already pointing at this server.
+    tls {$CADDY_CERT_FILE} {$CADDY_KEY_FILE}
+
+    # ─── Reverse proxy to Bizuno container ───────────────────────────
+    # bizuno:80 = the bizuno container's internal Apache port, resolved
+    # via Docker's embedded DNS on the bizuno-net network.
+    reverse_proxy bizuno:80 {
+
+        # Tell Bizuno (inside the container) that the original client
+        # request was HTTPS. The entrypoint-generated portalCFG.php
+        # honors HTTP_X_FORWARDED_PROTO when constructing
+        # BIZUNO_URL_PORTAL, so this header is what makes Bizuno emit
+        # https:// in links, redirects, AJAX URLs, etc.
+        header_up X-Forwarded-Proto https
+
+        # Preserve the original Host header so $_SERVER['HTTP_HOST']
+        # inside Bizuno matches the user's URL (not the docker hostname
+        # "bizuno"). Caddy preserves Host by default; this is explicit
+        # documentation rather than override.
+        header_up X-Forwarded-Host {host}
+
+        # Client IP for audit logs (msgLog etc.). Without this every
+        # log entry would record the caddy container's docker IP.
+        header_up X-Real-IP {remote_host}
+    }
+
+    # ─── Large uploads ───────────────────────────────────────────────
+    # Bizuno's PHP config allows 32MB uploads; let Caddy's request_body
+    # limiter agree so attachment uploads, CSV imports, and statement
+    # exports don't bounce at the proxy layer.
+    request_body {
+        max_size 32MB
+    }
+
+    # ─── Compression ─────────────────────────────────────────────────
+    # gzip is enough — Bizuno's UI is mostly small JSON + form HTML.
+    # zstd would be slightly better but takes a tiny CPU hit and the
+    # gain is invisible at Bizuno's traffic levels.
+    encode gzip
+
+    # ─── Sensible security headers ───────────────────────────────────
+    # HSTS — once a browser sees this, it refuses to fall back to http
+    # for the next year. Only set this when you're CERTAIN the site
+    # works over https; otherwise users get a hard lockout.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options    "nosniff"
+        Referrer-Policy           "strict-origin-when-cross-origin"
+        # X-Frame-Options is set by Bizuno itself per-page where needed
+        # (CSRF protection). Don't override here.
+    }
+
+    # ─── Access logs ─────────────────────────────────────────────────
+    # JSON-formatted, written inside the caddy container at
+    # /var/log/caddy.log — tail with: docker compose logs caddy
+    log {
+        output stderr
+        format json
+    }
+}
