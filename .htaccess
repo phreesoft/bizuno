@@ -1,3 +1,25 @@
+# Force HTTPS for the Bizuno install.
+#
+# Two RewriteCond lines because Bizuno can run in two environments:
+#
+#   1. Direct-to-Apache (standalone LAMP install, ISPConfig, etc.) —
+#      Apache sees the TLS handshake itself, %{HTTPS} reflects the
+#      real connection state.
+#
+#   2. Behind a TLS-terminating reverse proxy (Caddy, nginx, Traefik,
+#      cloud LB, the Docker production stack, etc.) — Apache only
+#      sees plain HTTP from the proxy; %{HTTPS} is always "off" even
+#      when the client connection IS https. The proxy signals the
+#      original protocol via the X-Forwarded-Proto header.
+#
+# Redirect to https only when BOTH conditions hold:
+#   - Apache's own TLS isn't on, AND
+#   - the request didn't arrive over https via a forwarding proxy.
+#
+# Without the second check, every request behind a proxy redirect-
+# loops forever: client → proxy → Apache (sees http) → 301 to https
+# → proxy → Apache (still sees http) → ad infinitum.
 RewriteEngine On
 RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

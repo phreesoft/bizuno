@@ -108,7 +108,20 @@ if ( !defined( 'BIZUNO_FS_ASSETS' ) )   { define( 'BIZUNO_FS_ASSETS',   BIZUNO_F
 // URLs then become https://yoursite.com/?bizRt=portal/api/fs&src=/view/icons/...
 // Slightly slower (PHP overhead per asset request) but works without src/ being
 // web-accessible.
-if ( !defined( 'BIZUNO_URL_PORTAL' ) )  { define( 'BIZUNO_URL_PORTAL',  (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ); } // full url to Bizuno root folder
+// BIZUNO_URL_PORTAL detects the request protocol from two signals:
+//   1. $_SERVER['HTTPS'] === 'on'        — direct Apache TLS handshake
+//   2. X-Forwarded-Proto === 'https'     — TLS terminated at a reverse proxy
+//                                          (Caddy, nginx, Traefik, cloud LB)
+// Without (2), an install behind a reverse proxy emits http:// in every URL
+// even when the user's browser is on https — breaks redirects, CSRF token
+// domains, and any cross-origin sandbox.
+if ( !defined( 'BIZUNO_URL_PORTAL' ) ) {
+    $bizProto = (
+        (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ||
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    ) ? 'https' : 'http';
+    define( 'BIZUNO_URL_PORTAL', $bizProto . '://' . $_SERVER['HTTP_HOST'] );
+}
 if ( !defined( 'BIZUNO_URL_AJAX' ) )    { define( 'BIZUNO_URL_AJAX',    BIZUNO_URL_PORTAL.'?ajax=1' ); }
 if ( !defined( 'BIZUNO_URL_API' ) )     { define( 'BIZUNO_URL_API',     BIZUNO_URL_PORTAL.'?bizRt=' ); }
 if ( !defined( 'BIZUNO_URL_FS' ) )      { define( 'BIZUNO_URL_FS',      BIZUNO_URL_PORTAL.'?bizRt=portal/api/fs&src=' ); }
