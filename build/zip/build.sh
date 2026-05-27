@@ -26,7 +26,11 @@ cd "$REPO_ROOT"
 
 VERSION="$(cat src/VERSION)"
 STAGING="$REPO_ROOT/build/output/zip-staging"
-OUTPUT_DIR="$REPO_ROOT/build/output"
+# Per-variant output dir (matches the pattern used by build/wordpress/build.sh
+# and build/nextcloud/build.sh). The release.yml workflow's upload-artifact
+# step expects each variant's artifacts under build/output/<variant>/* —
+# putting the zip directly in build/output/ made it invisible to upload.
+OUTPUT_DIR="$REPO_ROOT/build/output/zip"
 ZIP_NAME="bizuno-${VERSION}-zip.zip"
 
 echo "→ Building $ZIP_NAME from $REPO_ROOT (VERSION=$VERSION)"
