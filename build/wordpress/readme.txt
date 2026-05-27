@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.3.9
+Stable tag: 7.4.0
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -84,6 +84,15 @@ WordPress's standard update channel. New versions are published to the WordPress
 
 == Changelog ==
 
+= 7.4.0 =
+* First public release of the consolidated single-plugin architecture (the former `bizuno-wp` library plugin is now bundled inside this one — see the migration notice that appears in admin if `bizuno-wp` is still installed).
+* In-app password change in the user profile editor, with current-password verification.
+* Lost-password flow gains an inline-reset-link fallback when the site's mail transport isn't configured or send fails — survives cross-server DB restores where encrypted SMTP credentials become unreadable.
+* Installer fix: admin passwords set during the first-run wizard now verify correctly on the next login (a key-drift bug in the installer's portalCFG.php generation made the first set password unusable in some cases).
+* Favicon + login-screen logo now serve from the plugin's bundled `src/view/images/` instead of pinging `bizuno.com` at every page load — better for air-gapped installs and reduces external dependencies.
+* Plugin Check (WordPress.org review tool) compliance: scoped via `phpcs.xml`, security findings cleared, text domain corrected to match slug.
+* `bin/reset-bizuno-password.php` — CLI emergency password reset for cases where the web UI can't load.
+
 = 7.3.9 =
 * Self-contained plugin — folds the former `bizuno-wp` library plugin into this one. Single install, no sibling plugin required.
 * Switched updates to the standard WordPress.org channel; the third-party update-checker library is gone.
@@ -112,8 +121,11 @@ See GitHub commits for full history – ongoing modernization since 7.0+ archite
 
 == Upgrade Notice ==
 
+= 7.4.0 =
+First single-plugin release. If you have the legacy `bizuno-wp` plugin alongside, it is auto-deactivated and an admin notice will prompt you to delete its files. Data and settings preserved.
+
 = 7.3.x =
-Auto-update downloads latest core Bizuno library. No manual data migration needed – your settings and data remain intact. Re-save any API/shipping configs if prompted.
+Auto-update via WordPress. No manual data migration needed – your settings and data remain intact. Re-save any API/shipping configs if prompted.
 
 == About PhreeSoft ==
 
