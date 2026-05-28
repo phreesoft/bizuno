@@ -15,3 +15,5 @@ If you're moving from PhreeBooks 5 or QuickBooks, skim this, then jump to
 | 02 | [Three ways to run it](./02-three-ways-to-run-it.md)            | stub       | admin                 |
 | 03 | [First-hour walkthrough](./03-first-hour-walkthrough.md)        | stub       | bookkeeper, admin     |
 | 04 | [Docker install walkthrough](./04-docker-install-walkthrough.md)| published  | admin                 |
+| 05 | [LAMP / LEMP install walkthrough](./05-lamp-install-walkthrough.md)| published | admin                 |
+| 06 | [WordPress install walkthrough](./06-wordpress-install-walkthrough.md)| published | admin                |
