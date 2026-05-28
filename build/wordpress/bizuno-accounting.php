@@ -3,7 +3,7 @@
  * Plugin Name:       Bizuno Accounting – ERP/Accounting/CRM for WordPress
  * Plugin URI:        https://wordpress.org/plugins/bizuno-accounting/
  * Description:       Powerful open-source ERP, double-entry accounting, inventory, CRM & business management. Runs as a secure portal in WP admin. Activate, click the Bizuno menu and follow the install wizard.
- * Version:           7.4.1
+ * Version:           7.4.2
  * Requires at least: 6.5
  * Tested up to:      6.9.4
  * Requires PHP:      8.2
@@ -18,7 +18,6 @@
 
 // This file is the standalone WordPress plugin entry. As of 7.3.9 it absorbed
 // the WP-admin integration that used to live in the separate bizuno-accounting
-// repo. 7.4.0 is the first release on this single-plugin model.
 // repo — there is no longer a sibling library plugin (`bizuno-wp` is gone) and
 // no GitHub-Releases auto-updater (wordpress.org's normal update channel does
 // the job). The plugin is fully self-contained: src/ ships at <plugin>/src/,
