@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.4.1
+Stable tag: 7.4.2
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -84,6 +84,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 
 == Changelog ==
 
+= 7.4.2 =
+* Fix: install/connection failed on locked-down managed MySQL hosts (GoDaddy and similar) with "1227 Access denied; you need ... SESSION_VARIABLES_ADMIN". The DB layer set server-global charset variables on connect, which shared hosts forbid. Now negotiates charset via the PDO DSN (no privileges needed) and uses a guarded `SET NAMES`. Fixes activation on restricted hosting.
+
 = 7.4.1 =
 * Fix: dashboard JavaScript broke on fresh 7.4.0 installs — the version string emitted into an inline script carried a trailing newline, producing an unterminated JS string literal that halted page scripts (`bizID is not defined`). Version is now trimmed before use. Upgrade strongly recommended for anyone on 7.4.0.
 
@@ -123,6 +126,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 See GitHub commits for full history – ongoing modernization since 7.0+ architecture shift.
 
 == Upgrade Notice ==
+
+= 7.4.2 =
+Fixes plugin activation on locked-down managed MySQL hosts (GoDaddy etc.) that previously failed with a SESSION_VARIABLES_ADMIN privilege error.
 
 = 7.4.1 =
 Critical fix for a 7.4.0 JavaScript regression that broke the dashboard on fresh installs. Anyone on 7.4.0 should update immediately.

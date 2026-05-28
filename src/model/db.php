@@ -58,7 +58,11 @@ class db extends \PDO
             return;
         }
         $this->driver = !empty($dbData['type']) ? $dbData['type'] : 'mysql';
-        $dns  = "{$dbData['type']}:host={$dbData['host']};dbname={$dbData['name']}";
+        // charset=utf8 in the DSN negotiates client/connection/results encoding
+        // during the connection handshake — no SET statement, no privileges
+        // needed. This is the privilege-free, modern way to set the connection
+        // charset and works on locked-down shared hosts.
+        $dns  = "{$dbData['type']}:host={$dbData['host']};dbname={$dbData['name']};charset=utf8";
         $user = $dbData['user'];
         $pass = $dbData['pass'];
         switch($this->driver) {
@@ -70,7 +74,18 @@ class db extends \PDO
                     return msgAdd("Database connection failed. Please contact your administrator.");
                 }
                 $this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
-                $this->exec("SET character_set_results='utf8', character_set_client='utf8', character_set_connection='utf8', character_set_database='utf8', character_set_server='utf8'");
+                // Belt-and-suspenders charset enforcement for older MySQL that
+                // didn't honor the DSN charset. SET NAMES touches only the three
+                // CONNECTION-level variables (client/connection/results) — never
+                // character_set_database or character_set_server, which are
+                // server-global and require SESSION_VARIABLES_ADMIN to set. The
+                // old code set all five, which hard-failed on locked-down managed
+                // hosts (GoDaddy, etc.) with "1227 Access denied; you need ...
+                // SESSION_VARIABLES_ADMIN". Wrapped in try/catch so even a host
+                // that restricts SET NAMES degrades gracefully (the DSN charset
+                // already handled it).
+                try { $this->exec("SET NAMES 'utf8'"); }
+                catch (\PDOException $e) { msgDebug("\nSET NAMES skipped (non-fatal): ".$e->getMessage()); }
                 break;
         }
         $this->connected = true;
