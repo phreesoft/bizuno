@@ -29,7 +29,14 @@ namespace bizuno;
 
 if (!defined('SCRIPT_START_TIME')) { define('SCRIPT_START_TIME', microtime(true)); }
 
-define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? file_get_contents(__DIR__.'/VERSION') : '7.3.4'); // Pull from file 
+// trim() is essential: the VERSION file conventionally ends with a trailing
+// newline (POSIX text-file convention). Without trim(), that newline rides
+// along into MODULE_BIZUNO_VERSION and then into the inline JS emitted by
+// view/main.php — `const bizVersion = '7.4.0<newline>';` — which is an
+// unterminated string literal that halts the whole inline <script> block
+// (and every JS global defined after it, like bizID). Pre-7.4.0 the VERSION
+// file happened to have no trailing newline so the bug stayed latent.
+define('MODULE_BIZUNO_VERSION', file_exists(__DIR__.'/VERSION') ? trim(file_get_contents(__DIR__.'/VERSION')) : '7.3.4'); // Pull from file 
 
 // Default logo + favicon URLs. Both point at bundled images in
 // src/view/images/ via BIZUNO_URL_VIEW, which auto-adapts to the install

@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.4.0
+Stable tag: 7.4.1
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -84,6 +84,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 
 == Changelog ==
 
+= 7.4.1 =
+* Fix: dashboard JavaScript broke on fresh 7.4.0 installs — the version string emitted into an inline script carried a trailing newline, producing an unterminated JS string literal that halted page scripts (`bizID is not defined`). Version is now trimmed before use. Upgrade strongly recommended for anyone on 7.4.0.
+
 = 7.4.0 =
 * First public release of the consolidated single-plugin architecture (the former `bizuno-wp` library plugin is now bundled inside this one — see the migration notice that appears in admin if `bizuno-wp` is still installed).
 * In-app password change in the user profile editor, with current-password verification.
@@ -120,6 +123,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 See GitHub commits for full history – ongoing modernization since 7.0+ architecture shift.
 
 == Upgrade Notice ==
+
+= 7.4.1 =
+Critical fix for a 7.4.0 JavaScript regression that broke the dashboard on fresh installs. Anyone on 7.4.0 should update immediately.
 
 = 7.4.0 =
 First single-plugin release. If you have the legacy `bizuno-wp` plugin alongside, it is auto-deactivated and an admin notice will prompt you to delete its files. Data and settings preserved.
