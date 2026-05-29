@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-05-29
  * @filesource /controllers/inventory/images.php
  */
 
@@ -41,6 +41,7 @@ class inventoryImages
      */
     public function imagesLoad(&$layout=[])
     {
+        if (!$security = validateAccess('inv_mgr', 1)) { return; }
         $rID      = clean('rID', 'integer', 'get');
         $data     = ['fields'=>['invImageAdd'=>['icon'=>'add','label'=>lang('add_image', $this->moduleID),'events'=>['onClick'=>"invImagesAdd();"]]]];
         $imgCnt   = $needsUpdate = 0;

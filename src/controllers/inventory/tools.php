@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05
+ * @version    7.x Last Update: 2026-05-29
  * @filesource /controllers/inventory/tools.php
  */
 
@@ -481,6 +481,7 @@ class inventoryTools
      */
     public function qtyAllocRepair()
     {
+        if (!$security = validateAccess('admin', 3)) { return; }
         dbWrite(BIZUNO_DB_PREFIX.'inventory', ['qty_alloc'=>0], 'update', "qty_alloc<>0");
         msgAdd(lang('msg_database_write'), 'success');
         $stmt = dbGetResult("SELECT journal_main.description, journal_item.sku, journal_item.qty FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_item 
@@ -605,6 +606,7 @@ class inventoryTools
      */
     public function priceAssy(&$layout=[])
     {
+        if (!$security = validateAccess('admin', 3)) { return; }
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('ma','sa') AND inactive='0'", 'sku', ['id', 'sku']);
         if (sizeof($result) == 0) { return msgAdd("No assemblies found to process!"); }
         foreach ($result as $row) { $rows[] = ['id'=>$row['id']]; }
@@ -619,6 +621,7 @@ class inventoryTools
      */
     public function priceAssyNext(&$layout=[])
     {
+        if (!$security = validateAccess('admin', 3)) { return; }
         $blockCnt = 100;
         $cron = getUserCron('priceAssy');
         while ($blockCnt > 0) {
