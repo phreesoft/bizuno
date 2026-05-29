@@ -861,7 +861,7 @@ class contactsMain
      */
     public function deleteLog(&$layout=[])
     {
-        if (!$security = validateAccess($this->secID, 3)) { return; }
+        if (!$security = validateAccess($this->secID, 4)) { return; }
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd("Bad ID submitted!"); }
         msgLog(lang('log').' - '.lang('delete')." - ($rID)");
