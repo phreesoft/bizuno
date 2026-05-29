@@ -12,10 +12,10 @@ and error signals**, and a **source pointer** back to the code it was derived
 from. An agent should be able to plan and execute a business process from these
 files without reading the PHP.
 
-> **Status:** pilot. Only the [`contacts`](./contacts.md) module is complete.
-> It exists to validate the *format* before the remaining modules are
-> generated. Files here are `status: draft` so they are **not** published to
-> the human docs site by the BetterDocs sync.
+> **Status:** draft — all modules catalogued. The [`contacts`](./contacts.md)
+> module was the pilot that validated the *format*; the remaining modules were
+> generated against it. Files here are `status: draft` so they are **not**
+> published to the human docs site by the BetterDocs sync until reviewed.
 
 ## How Bizuno actions are addressed
 
@@ -133,16 +133,17 @@ source:        # file:line the action was derived from
 
 | Module | Status | File |
 |--------|--------|------|
-| Contacts | pilot — complete | [contacts.md](./contacts.md) |
-| PhreeBooks (GL/journals) | planned | — |
-| Inventory | planned | — |
-| Payment | planned | — |
-| Shipping | planned | — |
-| PhreeForm (reports) | planned | — |
-| Quality | planned | — |
-| Office | planned | — |
-| Administration | planned | — |
-| API / integration | planned | — |
+| Bizuno (core/portal) | draft | [bizuno.md](./bizuno.md) |
+| Contacts | draft (pilot) | [contacts.md](./contacts.md) |
+| PhreeBooks (GL/journals) | draft | [phreebooks.md](./phreebooks.md) |
+| Inventory | draft | [inventory.md](./inventory.md) |
+| Payment | draft | [payment.md](./payment.md) |
+| Shipping | draft | [shipping.md](./shipping.md) |
+| PhreeForm (reports) | draft | [phreeform.md](./phreeform.md) |
+| Quality | draft | [quality.md](./quality.md) |
+| Office | draft | [office.md](./office.md) |
+| Administration | draft | [administrate.md](./administrate.md) |
+| API / integration | draft | [api.md](./api.md) |
 
 ## Generation method (for maintainers)
 
