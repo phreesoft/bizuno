@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-05-29 (security: add validateAccess guards to saveNotes/saveLog/managerRowsLog/deleteLog routes)
  * @filesource /controllers/contacts/main.php
  */
 
@@ -452,6 +452,7 @@ class contactsMain
      */
     public function saveNotes()
     {
+        if (!$security = validateAccess($this->secID, 2)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         if (!$rID) { return; }
         $meta  = dbMetaGet(0, 'notes', 'contacts', $rID);
@@ -466,6 +467,7 @@ class contactsMain
      */
     public function saveLog(&$layout, $id=0)
     {
+        if (!$id && !validateAccess($this->secID, 2)) { return; } // guard direct route calls; internal calls from save() are pre-validated
         $rID = $id ? $id : clean('rID', 'integer', 'get');
         $action= clean('crm_action','text', 'post');
         $note  = clean('crm_note',  'text', 'post');
@@ -847,6 +849,7 @@ class contactsMain
      */
     public function managerRowsLog(&$layout=[])
     {
+        if (!$security = validateAccess($this->secID, 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $layout= array_replace_recursive($layout, ['type'=>'datagrid','key'=>'log','datagrid'=>['log'=>$this->dgLog('dgLog', $rID)]]);
     }
@@ -858,6 +861,7 @@ class contactsMain
      */
     public function deleteLog(&$layout=[])
     {
+        if (!$security = validateAccess($this->secID, 3)) { return; }
         $rID = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd("Bad ID submitted!"); }
         msgLog(lang('log').' - '.lang('delete')." - ($rID)");

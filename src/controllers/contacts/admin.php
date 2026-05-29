@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-06
+ * @version    7.x Last Update: 2026-05-29 (security: add validateAccess guard to adminSave route)
  * @filesource /controllers/contacts/admin.php
  */
 
@@ -154,6 +154,7 @@ class contactsAdmin
      */
     public function adminSave()
     {
+        if (!$security = validateAccess('admin', 2)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
 }
