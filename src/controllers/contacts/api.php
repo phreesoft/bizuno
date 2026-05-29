@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-05-29 (security: add validateAccess guard to apiTemplate route)
  * @filesource /controllers/contacts/api.php
  */
 
@@ -61,6 +61,7 @@ class contactsApi
      */
     public function apiTemplate()
     {
+        if (!$security = validateAccess('admin', 1)) { return; }
         global $io;
         $tables = [];
         require(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php');
