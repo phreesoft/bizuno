@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
+ * @version    7.x Last Update: 2026-05-31
  * @filesource /controllers/administrate/admin.php
  */
 
@@ -88,6 +88,16 @@ class administrateAdmin
         $layout['tabs']['tabContacts']['divs']['general']['divs']['genPB'] = ['order'=>75,'type'=>'panel','key'=>'genPB','classes'=>['block33']];
         $layout['panels']['genPB'] = ['label'=>lang('phreebooks'), 'type'=>'fields', 'keys'=>array_keys($pbFields)];
         $layout['fields'] = array_merge($layout['fields'], $pbFields, $rFields);
+        // Administrator-only (admin security level 5): reset this user's login password.
+        // No current-password field — an administrator override doesn't need the user's old password.
+        if (validateAccess('admin', 5, false)) {
+            $pwFields = [
+                'bizPass0' => ['order'=>10,'label'=>lang('password_new'),    'tip'=>'Administrator reset: set a new login password for this user (min 8 characters). Leave blank to keep the current password.', 'attr'=>['type'=>'password','value'=>'','autocomplete'=>'new-password']],
+                'bizPass1' => ['order'=>20,'label'=>lang('password_retype'), 'attr'=>['type'=>'password','value'=>'','autocomplete'=>'new-password']]];
+            $layout['tabs']['tabContacts']['divs']['general']['divs']['genPW'] = ['order'=>78,'type'=>'panel','key'=>'genPW','classes'=>['block33']];
+            $layout['panels']['genPW'] = ['label'=>lang('password'), 'type'=>'fields', 'keys'=>array_keys($pwFields)];
+            $layout['fields'] = array_merge($layout['fields'], $pwFields);
+        }
     }
 
     /**
@@ -113,5 +123,29 @@ class administrateAdmin
             'ap_acct'        => clean('ap_acct',        'cmd',    'post')];
         $output = array_replace(!empty($meta)?$meta:[], $data);
         dbMetaSet($rID, 'user_profile', $output, 'contacts', $cID);
+        $this->contactsSavePassword($cID);
+    }
+
+    /**
+     * Administrator password reset for the edited user. Mirrors the storage used by
+     * bizuno/profile.php (user_auth meta on the contact, encryptPassword()), but with no
+     * current-password check — it is an administrator override. Gated on admin security
+     * level 5; a level-4 admin can edit users but cannot reset passwords.
+     * @param integer $cID - contact id of the user being edited
+     */
+    private function contactsSavePassword($cID)
+    {
+        if (!validateAccess('admin', 5, false)) { return; }
+        $new = (string)clean('bizPass0', 'password', 'post');
+        $cnf = (string)clean('bizPass1', 'password', 'post');
+        if (empty($new) && empty($cnf)) { return; } // nothing entered → leave password unchanged
+        if (empty($new) || empty($cnf)) { return msgAdd(lang('err_password_fields_required')); }
+        if ($new !== $cnf)              { return msgAdd(lang('err_password_mismatch')); }
+        if (strlen($new) < 8)           { return msgAdd(lang('err_password_short')); }
+        $stored = dbMetaGet(0, 'user_auth', 'contacts', $cID);
+        $aID    = metaIdxClean($stored);
+        dbMetaSet($aID, 'user_auth', encryptPassword($new), 'contacts', $cID);
+        msgAdd(lang('msg_password_changed'), 'success');
+        msgLog(lang('users').' (cID '.$cID.') - '.lang('msg_password_changed'));
     }
 }
