@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (migrated PDF base class TCPDF → tFPDF; new bizHTMLCell shim + bizBarcode picqer-driven helper to replace TCPDF-only writeHTMLCell / write1DBarcode)
+ * @version    7.x Last Update: 2026-06-01 (coerce form image width/height to float before Image()/Cell() — blank/non-numeric dims threw "Unsupported operand types" in tFPDF under PHP 8)
  * @filesource /controllers/phreeform/renderForm.php
  */
 
@@ -253,8 +253,13 @@ class PDF extends \tFPDF
         if (!isset($Params->ordinate)) { $Params->ordinate = 10; }
         if (!isset($Params->width))    { $Params->width    = 0; }
         if (!isset($Params->height))   { $Params->height   = 0; }
+        // tFPDF::Image() does integer math on w/h; an empty or non-numeric string (which the form
+        // definition can supply) throws "Unsupported operand types" under PHP 8. Coerce to float so
+        // a blank dimension becomes 0 — FPDF's auto-size sentinel — matching the old TCPDF behavior.
+        $width  = (float)$Params->width;
+        $height = (float)$Params->height;
         if (is_file(BIZUNO_DATA.'images/'.$Params->settings->img_file)) {
-            $this->Image(BIZUNO_DATA.'images/'.$Params->settings->img_file, $Params->abscissa, $Params->ordinate, $Params->width, $Params->height);
+            $this->Image(BIZUNO_DATA.'images/'.$Params->settings->img_file, $Params->abscissa, $Params->ordinate, $width, $height);
         } else { // no image was found at the specified path, draw a box
             $this->SetXY($Params->abscissa, $Params->ordinate);
             $this->SetFont($this->defaultFont, '', '10');
@@ -262,7 +267,7 @@ class PDF extends \tFPDF
             $this->SetDrawColor(255, 0, 0);
             $this->SetLineWidth(0.35);
             $this->SetFillColor(255);
-            $this->Cell($Params->width, $Params->height, lang('no_image'), 1, 0, 'C');
+            $this->Cell($width, $height, lang('no_image'), 1, 0, 'C');
         }
     }
 
@@ -279,13 +284,17 @@ class PDF extends \tFPDF
         if (!isset($Params->ordinate)){ $Params->ordinate = '8'; }
         if (!isset($Params->width))   { $Params->width    = ''; }
         if (!isset($Params->height))  { $Params->height   = ''; }
+        // Coerce to float so a blank/non-numeric dimension becomes 0 (FPDF auto-size) rather than
+        // tripping tFPDF's "Unsupported operand types" under PHP 8. See FormImage() above.
+        $width  = (float)$Params->width;
+        $height = (float)$Params->height;
         if ( isset($Params->settings->processing)) { $path = viewProcess($path, $Params->settings->processing); }
         $ext = pathinfo(BIZUNO_DATA."images/$path", PATHINFO_EXTENSION);
         msgDebug("\nLooking for image at BIZUNO_DATA/images/$path");
         if (is_file(BIZUNO_DATA."images/$path") && (in_array(strtolower($ext), ['jpg', 'jpeg', 'png']))) {
-            $this->Image(BIZUNO_DATA."images/$path", $Params->abscissa, $Params->ordinate, $Params->width, $Params->height);
+            $this->Image(BIZUNO_DATA."images/$path", $Params->abscissa, $Params->ordinate, $width, $height);
         } elseif (!empty($Params->hideNone)) {
-            $this->Cell($Params->width, 5, lang('none'), 1, 0, 'C');
+            $this->Cell($width, 5, lang('none'), 1, 0, 'C');
         } else { // no image was found at the specified path, draw a box
             $this->SetXY($Params->abscissa, $Params->ordinate);
             $this->SetFont($this->defaultFont, '', '10');
