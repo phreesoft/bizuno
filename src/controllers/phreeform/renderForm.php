@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-01 (coerce form image width/height to float before Image()/Cell() — blank/non-numeric dims threw "Unsupported operand types" in tFPDF under PHP 8)
+ * @version    7.x Last Update: 2026-06-03 (bizHTMLCell: normalize <p>/<div> to line breaks + strip unsupported tags so "<p>..." descriptions aren't dropped; constrain Write() word-wrap to the cell column via a temp right margin and leave the cursor at content bottom so wrapped/multi-line cells wrap correctly and expand the row)
  * @filesource /controllers/phreeform/renderForm.php
  */
 
@@ -717,8 +717,19 @@ class PDF extends \tFPDF
             $this->MultiCell($w, $h, (string)$html, $border, $align, $fill);
             return;
         }
-        // Normalize <br variants, then split into tokens: literal text and the supported tags.
+        // Normalize line breaks: <br>, plus block-level <p>/<div> boundaries → newlines.
         $html = preg_replace('#<br\s*/?>#i', "\n", $html);
+        $html = preg_replace('#</(?:p|div)\s*>#i', "\n", $html);   // closing block tag ends the line
+        $html = preg_replace('#<(?:p|div)\b[^>]*>#i', '', $html);  // opening block tag (its newline came from the close)
+        // Strip every remaining tag EXCEPT the supported inline ones, so unsupported markup
+        // (e.g. <p>, <span>, lists) degrades to plain text instead of being swallowed whole or
+        // mis-parsed as an inline tag. This is the "strip_tags fallback" the header describes.
+        // Without it, a value that merely STARTS with an unsupported tag (e.g. "<p>DLC: ___")
+        // splits into a single token beginning with "<", which the loop below treats as a tag
+        // and never prints — dropping the entire cell.
+        $html = strip_tags($html, '<b><strong><i><em><u><font>');
+        // Collapse the blank line that consecutive </p><p> boundaries would otherwise leave.
+        $html = preg_replace("/\n[ \t]*\n+/", "\n", $html);
         $tokens = preg_split('#(</?(?:b|strong|i|em|u|font)[^>]*>)#i', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
         // Capture state to restore at end so we don't leak style into the next cell.
         $savedFont    = $this->FontFamily;
@@ -727,6 +738,13 @@ class PDF extends \tFPDF
         $savedColorR  = $this->TextColor;   // FPDF stores the pdf color command string; we restore via SetTextColor below
         $bold = $italic = $underline = false;
         $colorStack = []; // each push is [r,g,b]
+        // Constrain FPDF::Write() word-wrap to THIS cell's column. The caller already set the
+        // left margin to the column's left edge; we add a matching right margin so wrapped lines
+        // break at the cell's right edge instead of flowing to the page edge / into the next column.
+        $savedLMargin = $this->lMargin;
+        $savedRMargin = $this->rMargin;
+        $this->SetLeftMargin($startX);
+        $this->SetRightMargin(max(0, $this->w - ($startX + $w)));
         if ($fill) { // paint the bounding box first; runs draw on top
             $this->Cell($w, $h, '', $border, 0, $align, true);
             $this->SetXY($startX, $startY);
@@ -734,6 +752,7 @@ class PDF extends \tFPDF
             $this->Cell($w, $h, '', $border, 0);
             $this->SetXY($startX, $startY);
         }
+        $this->SetXY($startX, $startY); // start text at the cell's top-left
         foreach ($tokens as $tok) {
             if ($tok === '') { continue; }
             if ($tok[0] === '<') {
@@ -770,8 +789,12 @@ class PDF extends \tFPDF
         // Restore font + color so the next cell isn't bleeding our state.
         $this->SetFont($savedFont, $savedStyle, $savedSize);
         $this->TextColor = $savedColorR;
-        // Advance to the next row position — caller expects we consumed one cell row.
-        $this->SetXY($startX + $w, $startY);
+        // Restore the page margins we narrowed for wrapping.
+        $this->SetLeftMargin($savedLMargin);
+        $this->SetRightMargin($savedRMargin);
+        // Leave the cursor at the bottom of the rendered content (mirrors the MultiCell quick
+        // path) so the caller's row-height tracking grows the row to fit wrapped/multi-line cells.
+        $this->SetXY($startX, $this->GetY() + $h);
     }
 
     /**
