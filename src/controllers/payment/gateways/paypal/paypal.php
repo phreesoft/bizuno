@@ -110,6 +110,12 @@ function payment_{$this->code}() {
         switch ($action) {
             case 'capture':
             case 'authorize':
+            case 'wltCap':           // record-only — stored-card vs new-card distinction has no
+                                     // meaning to PayPal's manual-record flow, so route to the
+                                     // same "record and acknowledge" path. Without this case,
+                                     // the upstream dispatcher (payment/main.php) sending wltCap
+                                     // for an 's' radio selection would fall through to the
+                                     // notImplemented branch below.
                 $ref = !empty($data['fields']['ref_1']) ? $data['fields']['ref_1'] : '';
                 return ['ok'=>true, 'txID'=>$ref, 'code'=>'', 'msg'=>'PayPal payment recorded', 'data'=>[], 'raw'=>null];
             case 'void':

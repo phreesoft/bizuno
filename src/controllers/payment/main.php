@@ -89,11 +89,17 @@ class paymentMain
      * falls back to the legacy `sale($fields, $ledger)` shim on gateways that haven't
      * yet been ported (e.g. a client myExt that lags the core deploy). The dispatcher
      * path examines the posted `<method>_action` radio:
-     *   c = capture-prior-auth  → payment('capAuth', …)
-     *   w = manual/website      → no gateway call, just record locally
-     *   s, n, '' = new sale     → payment('capture', …)
+     *   c       = capture-prior-auth     → payment('capAuth', …)
+     *   w       = manual/website         → no gateway call, just record locally
+     *   s       = stored-card sale       → payment('wltCap', …)   (gateway resolves
+     *                                       custID/payID from ledger + POSTed selCards
+     *                                       inside its own pmtWalletCapture())
+     *   n, ''   = new-card sale          → payment('capture', …)
      * (The c/s/n/w convention is shared by every credit-card gateway's render(); record-only
-     * methods like cod/moneyorder/directdebit don't render the radio and fall through to capture.)
+     * methods like cod/moneyorder/directdebit don't render the radio and fall through to capture.
+     *  Gateways without stored-card support — e.g. converge — return notImplemented on wltCap,
+     *  which surfaces as a clear error rather than the historical "card number missing" cryptic
+     *  failure from sending `capture` with no POSTed PAN.)
      * @return array|false - normalized response on success, false on failure
      */
     public function sale($method='', $ledger=[])
@@ -111,7 +117,16 @@ class paymentMain
             // manual/web-side capture — nothing to send to the gateway, just record
             $r = ['ok'=>true, 'txID'=>'', 'code'=>'', 'data'=>[]];
         } elseif (method_exists($gateway, 'payment')) {
-            $action = ($radio === 'c') ? 'capAuth' : 'capture';
+            // Radio → gateway action:
+            //   's' → wltCap (stored card)   — previously misrouted to 'capture' which
+            //                                  called buildCreditCardFromPost() with no PAN
+            //                                  available and broke with an opaque gateway
+            //                                  "card number invalid" error
+            //   'c' → capAuth (prior auth)
+            //   anything else → capture (new card / record-only)
+            $action = 'capture';
+            if     ($radio === 'c') { $action = 'capAuth'; }
+            elseif ($radio === 's') { $action = 'wltCap'; }
             $payData = ['fields'=>$fields, 'ledger'=>$ledger];
             if ($radio === 'c') {
                 $payData['txID'] = clean("{$method}trans_code", 'integer', 'post');

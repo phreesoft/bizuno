@@ -374,6 +374,31 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     private function pmtWalletCapture($data)
     {
+        // Auto-resolve the three required fields from the ledger + POST when
+        // they're not pre-supplied. This is what lets payment/main.php:sale()
+        // route stored-card sales here just by passing the ledger handle —
+        // the gateway-specific lookups (Authorize.net customer profile ID,
+        // payment profile ID) live inside the gateway where they belong,
+        // not in the generic dispatcher.
+        //
+        // Pre-supplied calls (programmatic use, tests) still work — the
+        // !empty() guards mean we only fill in what's missing.
+        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
+        if (empty($data['payID'])) {
+            // The selCards dropdown POSTs the gateway's stored payment-profile ID.
+            // Convention matches the rest of this file: <code>selCards (no underscore).
+            $data['payID'] = clean("{$this->code}selCards", 'numeric', 'post');
+        }
+        if (empty($data['custID']) && $ledger && !empty($ledger->main['contact_id_b'])) {
+            $cID = (int)$ledger->main['contact_id_b'];
+            // cachedCustID short-circuits a duplicate lookup if walletCustCreate
+            // or an earlier wallet() call already resolved this profile in the
+            // same request.
+            $data['custID'] = $this->cachedCustID ?: $this->lookupCustomerProfileId(getWalletID($cID));
+        }
+        if (empty($data['amount']) && $ledger && isset($ledger->main['total_amount'])) {
+            $data['amount'] = $ledger->main['total_amount'];
+        }
         if (empty($data['custID']) || empty($data['payID'])) { return $this->failure('custID and payID required for wallet capture'); }
         if (empty($data['amount'])) { return $this->failure('Amount required for wallet capture'); }
         $profile = new AnetAPI\CustomerProfilePaymentType();
