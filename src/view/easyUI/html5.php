@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-11
+ * @version    7.x Last Update: 2026-06-02
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1234,6 +1234,7 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
         global $io;
         $grav040= $io->getGravatarURL(getUserCache('profile', 'email'), 40);
         $grav150= $io->getGravatarURL(getUserCache('profile', 'email'), 150);
+        $onErr  = ' onerror="this.onerror=null;this.src=\''.BIZUNO_ICON.'\';"'; // fall back to local Bizuno icon if Gravatar is unreachable
         $output = '';
         $output.= '<div class="easyui-panel" style="padding:5px;">';
 //      $output.= '    <a href="#" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-solid fa-list-check\'"></a>';
@@ -1241,10 +1242,10 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
             $output.= '    <a href="javascript:hrefClick(\'administrate/main/manager\');" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-regular fa-gear\'"></a>'; // 
         }
         $output.= '    <a href="javascript:winHref(bizunoHome);" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-solid fa-plus\'"></a>'; // 
-        $output.= '    <a href="#" class="easyui-menubutton" data-options="menu:\'#menuProfile\'"><img src="'.$grav040.'" style="height:40px;border-radius:20px;"></a>';
+        $output.= '    <a href="#" class="easyui-menubutton" data-options="menu:\'#menuProfile\'"><img src="'.$grav040.'"'.$onErr.' style="height:40px;border-radius:20px;"></a>';
         $output.= '</div>';
         $output.= '<div id="menuProfile" class="menu-content" style="background:#f0f0f0;padding:10px;text-align:left">';
-        $output.= '    <img src="'.$grav150.'" style="width:75px;height:75px;border-radius:75px;">';
+        $output.= '    <img src="'.$grav150.'"'.$onErr.' style="width:75px;height:75px;border-radius:75px;">';
         $output.= '    <p style="font-size:14px;color:#444;"><a href="javascript:hrefClick(\'bizuno/profile/edit\');">'.lang('bizuno_profile').'</a></p>';
         if ('bizuno'==$GLOBALS['bizunoModule'] && 'main'==$GLOBALS['bizunoPage'] && 'bizunoHome'==$GLOBALS['bizunoMethod']) { // only for dashboard pages
             $menuID = clean('menuID', 'cmd', 'get');
