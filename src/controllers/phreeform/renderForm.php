@@ -498,7 +498,53 @@ class PDF extends \tFPDF
         $GLOBALS['pfFieldSettings'] = $Params;
         if (isset($Params->settings->processing)) { $TextField = viewProcess($TextField, $Params->settings->processing); }
         if (isset($Params->settings->formatting)) { $TextField = viewFormat ($TextField, $Params->settings->formatting); }
-        if ($TextField) {  $this->MultiCell($Params->width, $Params->height, $TextField, $Border, $Params->settings->align, $Fill); }
+        if ($TextField) {
+            // ─── Line-height calculation ──────────────────────────────
+            // tFPDF's MultiCell takes a PER-LINE height, not the total
+            // height of the box. Font size is in points; coordinates are
+            // mm. 1pt = 0.3528mm, with ~1.2× leading typical for body
+            // text. This gives a sensible per-line height regardless of
+            // what $Params->height happens to be.
+            $lineHeight = $Params->settings->size * 0.3528 * 1.2;
+
+            if ($Params->height < $lineHeight * 1.5) {
+                // ─── Single-line cell ─────────────────────────────────
+                // Legacy path: the field is sized as a ONE-line label
+                // (e.g. a "NOTES" header, customer name, page-number).
+                // Passing $Params->height as MultiCell's line height
+                // works fine here because the text always fits in one
+                // line within $w, so no wrapping ever happens — the
+                // height parameter simply controls the cell's box
+                // dimensions. Preserve existing behavior so we don't
+                // perturb hundreds of well-tuned label cells.
+                $this->MultiCell($Params->width, $Params->height,
+                    $TextField, $Border, $Params->settings->align, $Fill);
+            } else {
+                // ─── Multi-line "box" cell — fixes the truncation bug ─
+                // Tall fields (Notes, long descriptions, address blocks)
+                // are containers, not single lines. The old code passed
+                // $Params->height (e.g. 35mm) as the per-line height,
+                // which made tFPDF treat the whole box as one giant
+                // line — no wrapping, text overflowing the right edge
+                // and visually clipping at the page margin.
+                //
+                // Fix: draw the bounding rectangle (border + fill) as a
+                // separate operation, then render the text inside with
+                // the font-derived line height so MultiCell wraps
+                // properly at word boundaries within $w.
+                if ($Border === '1' || $Fill === '1') {
+                    $rectStyle = ($Fill === '1' ? 'F' : '')
+                               . ($Border === '1' ? 'D' : '');
+                    $this->Rect($Params->abscissa, $Params->ordinate,
+                        $Params->width, $Params->height, $rectStyle);
+                    // Rect() moves the cursor; put it back at the box
+                    // origin so MultiCell starts at the top-left.
+                    $this->SetXY($Params->abscissa, $Params->ordinate);
+                }
+                $this->MultiCell($Params->width, $lineHeight,
+                    $TextField, '0', $Params->settings->align, '0');
+            }
+        }
     }
 
     /**
