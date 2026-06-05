@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-08
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/shipping/carriers/usps/ship.php
  *
  * Endpoints:
@@ -85,11 +85,21 @@ class uspsShip extends uspsCommon
         // Build the shipping log row. Field names must match what
         // controllers/shipping/main.php::shipManagerWrite() expects so the
         // log table populates correctly.
-        $extraServiceCost = 0;
-        if (!empty($resp['extraServices']) && is_array($resp['extraServices'])) {
-            foreach ($resp['extraServices'] as $svc) { $extraServiceCost += (float)($svc['price'] ?? 0); }
+        // Total cost = postage + extra-service fees + per-package fees. USPS
+        // splits surcharges across two arrays (extraServices and fees, e.g. a
+        // fuel surcharge lands in fees); both must be summed or the booked cost
+        // understates and won't reconcile against the rate quote.
+        $addOns = 0;
+        foreach (['extraServices', 'fees'] as $bucket) {
+            if (!empty($resp[$bucket]) && is_array($resp[$bucket])) {
+                foreach ($resp[$bucket] as $svc) { $addOns += (float)($svc['price'] ?? 0); }
+            }
         }
-        $totalCost = (float)($resp['postage'] ?? 0) + $extraServiceCost;
+        $totalCost = (float)($resp['postage'] ?? 0) + $addOns;
+        // Delivery commitment: expectedDeliveryDate is the current field;
+        // scheduleDeliveryDate (note: no "d") is the deprecated fallback.
+        $commit = $resp['commitment'] ?? [];
+        $deliveryDate = $commit['expectedDeliveryDate'] ?? ($commit['scheduleDeliveryDate'] ?? '');
         $this->usps_results[] = [
             'ref_id'       => $request['ship_ref_1'] ?? '',
             'method'       => $request['ship_method'] ?? '',
@@ -99,7 +109,7 @@ class uspsShip extends uspsCommon
             'book_cost'    => (float)($resp['postage'] ?? 0),
             'net_cost'     => $totalCost,
             'total_cost'   => $totalCost + (float)$this->settings['handling_fee'],
-            'delivery_date'=> $resp['commitment']['scheduledDeliveryDate'] ?? '',
+            'delivery_date'=> $deliveryDate,
             'notes'        => $resp['SKU'] ?? ''];
 
         // Persist the label binary. The vendor-JSON response carries the
@@ -121,6 +131,49 @@ class uspsShip extends uspsCommon
     }
 
     /**
+     * Void a label / request a refund: DELETE /labels/v3/label/{trackingNumber}.
+     *
+     * USPS decides cancel-vs-refund by whether a Shipping Services File (SSF)
+     * exists yet:
+     *   - No SSF (label just created) → status CANCELED, no charge ever posts.
+     *   - SSF created → status DISPUTED + disputeId, refund queued to the EPS
+     *     account once USPS approves it.
+     * Either outcome means the operator is done with this label, so we return
+     * true and let the shipping manager drop the local label file + log row.
+     *
+     * Requires the same X-Payment-Authorization-Token as label creation. USPS
+     * allows only one refund dispute per CRID per label per day — a duplicate
+     * same-day void returns a 400, which we surface so the operator knows.
+     *
+     * @param string $trckNum  USPS tracking number of the label to void
+     * @return bool true on CANCELED or DISPUTED, false (with a message) otherwise
+     */
+    public function labelDelete($trckNum='', $method='GND', $store_id=0)
+    {
+        msgDebug("\nUSPS labelDelete with tracking number = ".print_r($trckNum, true));
+        if (empty($trckNum)) { msgAdd('USPS: no tracking number supplied to void.'); return false; }
+        $paymentToken = $this->getPaymentAuthToken();
+        if (empty($paymentToken)) { return false; } // already messaged
+        $opts = ['headers' => ['X-Payment-Authorization-Token' => $paymentToken]];
+        $resp = $this->queryREST('delete', '/labels/v3/label/'.rawurlencode($trckNum), null, $opts);
+        if (empty($resp)) { return false; } // queryREST surfaced the error
+        // CancelResponse: {trackingNumber, status: CANCELED|DISPUTED, disputeId}
+        $status = strtoupper($resp['status'] ?? '');
+        if ($status === 'CANCELED') {
+            msgAdd("USPS label $trckNum canceled — no postage charge will post.", 'success');
+            return true;
+        }
+        if ($status === 'DISPUTED') {
+            $dispute = !empty($resp['disputeId']) ? " (refund request #{$resp['disputeId']})" : '';
+            msgAdd("USPS label $trckNum refund requested$dispute. The credit posts to your EPS account once USPS approves it.", 'success');
+            return true;
+        }
+        msgAdd("USPS: unexpected response voiding label $trckNum.");
+        msgDebug("\nUSPS labelDelete unexpected response: ".print_r($resp, true));
+        return false;
+    }
+
+    /**
      * Build the LabelRequest body for /labels/v3/label.
      *
      * USPS requires every label to carry a mailingDate in the future-or-today
@@ -139,7 +192,10 @@ class uspsShip extends uspsCommon
         $mailClass = $this->options['mailClass'][$bizCode];
 
         $shipPkg = clean('ship_pkg', ['format'=>'cmd','default'=>'package'], 'post');
-        $rateIndicator = $this->options['rateIndicator'][$shipPkg] ?? 'SP';
+        // Same mail-class-aware mapping the rate query uses — Priority Mail
+        // Express needs PA (not SP), or USPS fails the label SKU lookup exactly
+        // like the rate call did. Sharing the helper keeps quote and label in sync.
+        $rateIndicator = $this->rateIndicatorFor($shipPkg, $mailClass);
 
         // Clamp ship_date to today if it's in the past (USPS won't accept
         // backdated mailingDate). Cap at +7 days so an operator who types a
@@ -206,8 +262,14 @@ class uspsShip extends uspsCommon
     private function extensionForImageType($imageType)
     {
         switch ($imageType) {
+            // Thermal (Zebra) formats are saved as .lpt — that is the extension
+            // the shipping module's labelView() recognizes to render the "Print
+            // Thermal" button (raw bytes streamed to the printer via Zebra
+            // Browser Print). Writing .zpl produced a file the viewer didn't
+            // recognize, so the popup showed only a Close button.
             case 'ZPL203DPI':
-            case 'ZPL300DPI': return 'zpl';
+            case 'ZPL300DPI':
+            case 'EPL300DPI': return 'lpt';
             case 'PNG':       return 'png';
             case 'TIFF':      return 'tif';
             case 'JPG':       return 'jpg';

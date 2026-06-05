@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-08
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/shipping/carriers/usps/usps.php
  *
  * Docs: https://developer.usps.com/  (specs in /Documents/USPS RESTFul API)
@@ -174,14 +174,13 @@ class usps extends uspsCommon
     }
 
     /**
-     * USPS labels can't be voided/refunded synchronously over REST — refunds
-     * go through the EPS portal or through Business Customer Gateway. Keep the
-     * method present so the shipping manager's "void label" UI doesn't error,
-     * but surface a clear message instead of silently no-opping.
+     * Void a label / request a refund via the Labels API (DELETE label by
+     * tracking number). Delegates to uspsShip like labelGet().
      */
     public function labelDelete($tracking_number='', $method='GND', $store_id=0) {
-        msgAdd("USPS labels cannot be voided through the API. Submit a refund through the Business Customer Gateway or EPS portal for tracking #$tracking_number.", 'caution');
-        return false;
+        bizAutoLoad(dirname(__FILE__).'/ship.php', 'uspsShip');
+        $api = new uspsShip($this->settings, $this->options, $this->lang);
+        return $api->labelDelete($tracking_number, $method, $store_id);
     }
 
     public function trackBulk($track_date, $log_id) {
