@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-11
+ * @version    7.x Last Update: 2026-06-04
  * @filesource /controllers/shipping/carriers/usps/rate.php
  *
  * USPS Domestic Prices v3 — POST /prices/v3/base-rates/search
@@ -104,7 +104,9 @@ class uspsRate extends uspsCommon
     {
         $mailClass = $this->options['mailClass'][$bizCode];
         $payload = $this->getPayload($pkg, $mailClass);
-        $resp = $this->queryREST('post', '/prices/v3/base-rates/search', $payload);
+        // soft=true: a single unpriceable service (USPS "no working sku") is a
+        // skip, not a popup — other services still rate-shop normally.
+        $resp = $this->queryREST('post', '/prices/v3/base-rates/search', $payload, ['soft'=>true]);
         if (empty($resp) || empty($resp['rates'])) { return []; }
 
         // /base-rates/search response shape: {totalBasePrice, rates:[{price, weight, mailClass, productName, fees:[...], ...}]}
@@ -120,7 +122,9 @@ class uspsRate extends uspsCommon
         if (!empty($cheapest['fees']) && is_array($cheapest['fees'])) {
             foreach ($cheapest['fees'] as $fee) { $cost += (float)($fee['price'] ?? 0); }
         }
-        $note = !empty($cheapest['productDefinition']) ? $cheapest['productDefinition'] : $mailClass;
+        // Notes column shows the delivery commitment (published USPS estimate)
+        // rather than the raw mailClass, which already reads in the title.
+        $note = $this->lang[$bizCode.'_eta'] ?? (!empty($cheapest['productDefinition']) ? $cheapest['productDefinition'] : $mailClass);
         return [
             'title'  => $this->lang[$bizCode] . (!empty($cheapest['productName']) ? ' — '.$cheapest['productName'] : ''),
             'gl_acct'=> $this->settings['gl_acct'] ?? '',
@@ -134,7 +138,8 @@ class uspsRate extends uspsCommon
      * Builds the BaseRatesQuery payload. USPS's required fields are exhaustive
      * (every dimension + processing category + rateIndicator) but we infer
      * sensible defaults for typical parcels:
-     *   - rateIndicator SP (Single Piece) for non-flat-rate package types
+     *   - rateIndicator SP (Single Piece) for non-flat-rate package types,
+     *     remapped to PA for Priority Mail Express (its own single-piece code)
      *   - destinationEntryFacilityType NONE (sender drops at any post office)
      *   - processingCategory MACHINABLE (the common case for parcels)
      */
@@ -142,7 +147,9 @@ class uspsRate extends uspsCommon
     {
         $shipPkg = clean('ship_pkg', ['format'=>'cmd','default'=>'package'], 'post');
         if (empty($shipPkg) && !empty($pkg['settings']['ship_pkg'])) { $shipPkg = $pkg['settings']['ship_pkg']; }
-        $rateIndicator = $this->options['rateIndicator'][$shipPkg] ?? 'SP';
+        // Mail-class-aware indicator (PME remaps SP->PA etc.); shared with the
+        // label builder so the quote and its label resolve to the same SKU.
+        $rateIndicator = $this->rateIndicatorFor($shipPkg, $mailClass);
 
         // USPS takes weight in *pounds* (decimal allowed) for the prices API.
         // Bizuno's package envelope can carry weight in lb already; just cast.

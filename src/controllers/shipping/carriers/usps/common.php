@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-11
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/shipping/carriers/usps/common.php
  *
  * Docs: https://developer.usps.com/  (specs in /Documents/USPS RESTFul API)
@@ -47,6 +47,18 @@ class uspsCommon
     public    $ship_pickup;
     public    $confirm_type;
     public    $contact_type;
+    // Scope string USPS actually granted on the last token (fresh or cached).
+    // Surfaced in scope-error messages so the operator can see what the app is
+    // really provisioned for without enabling the msgTrap() debug trace.
+    protected $lastGrantedScope = null;
+    // Per-request token memo, keyed by cacheKey. The persisted cache is written
+    // via dbMetaSet but read back via getModuleCache, which only reflects the
+    // snapshot loaded at request start — so within a single rateQuote() loop the
+    // persisted token written this request is invisible and every service would
+    // re-mint a token (proven in trace: 4 OAuth calls for a 4-service quote).
+    // That burns the SS0 50-calls/day quota fast. This in-object memo collapses
+    // it to one token fetch per request.
+    protected $tokenMemo = [];
 
     // Production / test hostnames per the v3 specs. The same root serves all
     // resource APIs (oauth2, addresses, prices, labels, payments, tracking),
@@ -88,11 +100,21 @@ class uspsCommon
         // Bizuno carrier service codes (kept identical to Endicia so the rest
         // of the shipping manager / EDI 856 confirms / rate-shopping keep
         // working unchanged when an operator switches carriers).
-        '1DP' => 'USPS Priority Mail Express',
-        '2DP' => 'USPS Priority Mail',
-        'GND' => 'USPS Ground Advantage',
-        '3DP' => 'USPS Parcel Select',
-        '4DP' => 'USPS Media / Library / Bound Printed Matter',
+        '1DP' => 'Priority Mail Express',
+        '2DP' => 'Priority Mail',
+        'GND' => 'Ground Advantage',
+        '3DP' => 'Parcel Select',
+        '4DP' => 'Media / Library / Bound Printed Matter',
+        // Published USPS service commitments shown in the rate "Notes" column.
+        // These are standard nationwide estimates (actual days vary by zone).
+        // The base-rates API returns no delivery date — that needs the separate
+        // Service Standards API, which we skip here to conserve the daily call
+        // quota; static text is accurate enough for a rate-shopping estimate.
+        '1DP_eta' => 'Overnight to 2 days (money-back guarantee)',
+        '2DP_eta' => '1–3 business days',
+        'GND_eta' => '2–5 business days',
+        '3DP_eta' => '2–8 business days',
+        '4DP_eta' => '2–8 business days',
         // Package types displayed in the rate dropdown. Match Endicia's MPS_*
         // labels so the carrier-switcher UI reads consistently.
         'MPS_01' => 'Package',
@@ -153,9 +175,18 @@ class uspsCommon
         global $io;
         $cacheKey = 'token_' . md5($this->settings['client_id'] . '|' . ($this->settings['test_mode'] ? 't' : 'p'));
         if (!$force) {
+            // In-request memo first — survives the per-service rateQuote() loop,
+            // which getModuleCache cannot (see $tokenMemo note above).
+            if (!empty($this->tokenMemo[$cacheKey]['token']) && $this->tokenMemo[$cacheKey]['expires'] > time()) {
+                msgDebug("\nUSPS: reusing in-request bearer token, expires in ".($this->tokenMemo[$cacheKey]['expires']-time())." seconds");
+                $this->lastGrantedScope = $this->tokenMemo[$cacheKey]['scope'] ?? null;
+                return $this->tokenMemo[$cacheKey]['token'];
+            }
             $cached = getModuleCache($this->moduleID, $this->methodDir, $this->code, [])['settings'][$cacheKey] ?? [];
             if (!empty($cached['token']) && !empty($cached['expires']) && $cached['expires'] > time()) {
                 msgDebug("\nUSPS: using cached bearer token, expires in ".($cached['expires']-time())." seconds");
+                $this->lastGrantedScope     = $cached['scope'] ?? null;
+                $this->tokenMemo[$cacheKey] = $cached;
                 return $cached['token'];
             }
         }
@@ -168,11 +199,19 @@ class uspsCommon
         // body; the form-encoded form is standard OAuth2 and what the spec
         // example uses, so prefer that for compat with libraries that scrub
         // unknown JSON keys.
+        //
+        // Deliberately DO NOT send a `scope` param. Per USPS, the scopes a token
+        // carries are governed by which API *products* the app is subscribed to
+        // in the Developer Portal — not by what we ask for here. Worse, naming a
+        // scope the app is not provisioned for (e.g. `payments`, which needs a
+        // separate EPS/CRID/MID enrollment) can come back with an empty/reduced
+        // scope set, silently stripping `prices` too — which surfaces downstream
+        // as "Insufficient OAuth scope" on /prices/v3/base-rates/search. Omitting
+        // scope makes USPS grant the full set the app actually has provisioned.
         $body = http_build_query([
             'grant_type'   => 'client_credentials',
             'client_id'    => $this->settings['client_id'],
-            'client_secret'=> $this->settings['client_secret'],
-            'scope'        => 'addresses prices labels payments tracking']);
+            'client_secret'=> $this->settings['client_secret']]);
         $opts = ['headers'=>['Content-Type'=>'application/x-www-form-urlencoded', 'Accept'=>'application/json']];
         msgDebug("\nUSPS: requesting OAuth token from $url");
         $raw = $io->cURL($url, $body, 'post', $opts);
@@ -182,8 +221,19 @@ class uspsCommon
             msgDebug("\nUSPS OAuth raw response: ".msgPrint($raw));
             return false;
         }
+        // Record what USPS actually granted. If `prices` is absent from this
+        // list, the app is not subscribed to the Prices (Domestic Pricing) API
+        // product in the Developer Portal — that is the cause of "Insufficient
+        // OAuth scope" on rate requests, and no amount of retrying fixes it until
+        // the operator subscribes the app to that product. Held on the instance
+        // (and cached below) so a later scope error can echo it on screen.
+        $this->lastGrantedScope = $resp['scope'] ?? null;
+        msgDebug("\nUSPS: OAuth granted scope='".($resp['scope'] ?? '(none returned)')."' api_products='".($resp['api_products'] ?? '(none returned)')."'");
+        msgDebug("\nUSPS OAuth full response (access_token redacted): ".msgPrint($resp));
         $expiresIn = isset($resp['expires_in']) ? (int)$resp['expires_in'] : 3600;
-        $payload   = ['token'=>$resp['access_token'], 'expires'=>time() + max(60, $expiresIn - 30)];
+        $payload   = ['token'=>$resp['access_token'], 'expires'=>time() + max(60, $expiresIn - 30), 'scope'=>$resp['scope'] ?? ''];
+        // Memo for the rest of this request so the per-service loop reuses it.
+        $this->tokenMemo[$cacheKey] = $payload;
         // Persist alongside settings so the cache survives request boundaries.
         // Stored in the same meta blob the settings panel writes to, so a
         // settingSave() that rewrites that blob without preserving cached
@@ -207,7 +257,9 @@ class uspsCommon
      * @param string $method  HTTP method (get/post/put/delete)
      * @param string $path    Path under host(), e.g. "/prices/v3/base-rates/search"
      * @param mixed  $body    Array — sent as JSON; string — sent verbatim; null — no body
-     * @param array  $opts    Extra options: 'headers' (assoc), 'query' (assoc, appended to URL)
+     * @param array  $opts    Extra options: 'headers' (assoc), 'query' (assoc, appended to URL),
+     *                        'soft' (bool) — for rate-shopping: a per-service "no priceable SKU"
+     *                        is logged to the trace and returns false instead of raising a popup.
      */
     protected function queryREST($method, $path, $body=null, $opts=[])
     {
@@ -257,23 +309,40 @@ class uspsCommon
         // intrusive (mixes headers into the body); use a request_done capture
         // via curlinfo by going one level deeper.
         $callOpts['CURLOPT_FAILONERROR']  = false;
-        $raw = $io->cURL($url, $payload, strtolower($method), $callOpts);
+        // io->cURL only natively maps get/post/put. For anything else (DELETE on
+        // the label-void endpoint, future PATCH) it would silently fall through to
+        // a GET, so force the real verb via CURLOPT_CUSTOMREQUEST (applied last by
+        // io->cURL, so it wins). Keeps the fix inside the carrier — no core change.
+        $verb = strtolower($method);
+        if (!in_array($verb, ['get','post','put'])) { $callOpts['CURLOPT_CUSTOMREQUEST'] = strtoupper($method); }
+        $raw = $io->cURL($url, $payload, $verb, $callOpts);
         $decoded = is_string($raw) ? json_decode($raw, true) : null;
+        // Full response body to the trace (token-bearing requests only carry the
+        // response, not credentials; msgPrint still redacts any token-like keys).
+        // Needed to see USPS's complete error envelope — the one-line message it
+        // surfaces ("Could not find working sku…") often omits which field it
+        // rejected, but the full body names it.
+        msgDebug("\nUSPS $method $path raw response: ".msgPrint($decoded !== null ? $decoded : $raw));
         if (!is_array($decoded)) {
             $hint = is_string($raw) && $raw !== '' ? substr($raw, 0, 200) : 'empty response';
             msgAdd("USPS $method $path failed: $hint");
-            msgDebug("\nUSPS raw response: ".msgPrint($raw));
             return false;
         }
         // USPS error envelope: {"error":{"code":"...","message":"...","errors":[{"detail":...}]}}
         if (!empty($decoded['error'])) {
             $err = $decoded['error'];
-            // 401 once → force-refresh the token and retry one time.
-            $is401 = (isset($err['code']) && (string)$err['code'] === '401') ||
-                     (isset($err['status']) && (string)$err['status'] === '401') ||
-                     (stripos((string)($err['message'] ?? ''), 'unauthorized') !== false);
-            if ($is401 && !$retried) {
-                msgDebug("\nUSPS: 401 received — refreshing token and retrying once");
+            $errText = strtolower((string)($err['message'] ?? '') . ' ' . json_encode($err['errors'] ?? []));
+            // 401 once → force-refresh the token and retry one time. An
+            // "insufficient OAuth scope" error gets the same treatment: if the
+            // operator has just subscribed the app to a new API product, the
+            // ~8-hour cached token still lacks the scope, so a force-refresh
+            // picks up the newly-granted scopes without waiting for expiry.
+            $is401  = (isset($err['code']) && (string)$err['code'] === '401') ||
+                      (isset($err['status']) && (string)$err['status'] === '401') ||
+                      (stripos((string)($err['message'] ?? ''), 'unauthorized') !== false);
+            $isScope = strpos($errText, 'insufficient') !== false && strpos($errText, 'scope') !== false;
+            if (($is401 || $isScope) && !$retried) {
+                msgDebug("\nUSPS: ".($isScope ? 'insufficient scope' : '401')." received — refreshing token and retrying once");
                 $newToken = $this->getAccessToken(true);
                 if (empty($newToken)) { return false; }
                 return $this->doRequest($method, $path, is_string($body) ? json_decode($body, true) : $body, $opts, $newToken, true);
@@ -283,6 +352,30 @@ class uspsCommon
                 foreach ($err['errors'] as $e) {
                     if (!empty($e['detail'])) { $msg .= " — " . $e['detail']; }
                 }
+            }
+            // A scope error that survives the retry is a provisioning problem,
+            // not a transient one. Keep the on-screen message to the bare USPS
+            // error (the shipping operator who triggered the quote needs to know
+            // it failed) and push the diagnostic detail — what scope USPS
+            // actually granted — to the debug trace only, so it never pops up for
+            // other employees on a production box. Pull trace.txt to read it.
+            if ($isScope) {
+                $granted = $this->lastGrantedScope;
+                msgDebug("\nUSPS scope failure on $path. Token was granted scope: ".
+                    ($granted === null ? '(USPS returned no scope list — stale cached token, was force-refreshed)'
+                    : ($granted === '' ? '(empty — app has no provisioned scopes, or claims not refreshed)'
+                    : "'$granted'")).
+                    ". Rates require the Domestic Pricing API product on the Developer Portal app.");
+            }
+            // Best-effort callers (rate-shopping per service; the post-label EPS
+            // balance check) tolerate failures: a per-service pricing gap ("Could
+            // not find working sku…") or a flaky balance lookup shouldn't pop an
+            // error when the surrounding operation succeeded. Downgrade any
+            // non-auth failure to a trace line and return empty. Auth/scope still
+            // surface (handled above) since those are global and actionable.
+            if (!empty($opts['soft']) && !$is401 && !$isScope) {
+                msgDebug("\nUSPS $path: soft failure, suppressed from UI — $msg");
+                return false;
             }
             msgAdd("USPS $path: $msg");
             return false;
@@ -317,6 +410,32 @@ class uspsCommon
     }
 
     /**
+     * Resolves the USPS rateIndicator for a Bizuno package type + mail class.
+     * SHARED by the rate query and the label build so a quote and its label can
+     * never diverge (which would make the charged postage differ from the quote).
+     *
+     * The base map is keyed by package type (SP for parcels, FE/FA/FS… for the
+     * flat-rate family). Priority Mail Express is the exception: it has its own
+     * indicator codes (PA = PME Single Piece, E4/E6 = PME flat-rate envelopes)
+     * per the Domestic Prices / Labels v3 specs. Sending the generic SP/FE/FA
+     * for PME makes USPS fail the SKU lookup ("Could not find working sku from
+     * SSF ingredients").
+     *
+     * @param string $shipPkg   Bizuno package id (package, usps_flat_rate_envelope, …)
+     * @param string $mailClass USPS mail class (PRIORITY_MAIL_EXPRESS, …)
+     * @return string USPS rateIndicator code
+     */
+    protected function rateIndicatorFor($shipPkg, $mailClass)
+    {
+        $ri = $this->options['rateIndicator'][$shipPkg] ?? 'SP';
+        if ($mailClass === 'PRIORITY_MAIL_EXPRESS') {
+            $pme = ['SP'=>'PA', 'FE'=>'E4', 'FA'=>'E6'];
+            if (isset($pme[$ri])) { $ri = $pme[$ri]; }
+        }
+        return $ri;
+    }
+
+    /**
      * Optional balance check after a label is printed. USPS does not return
      * the balance in the label response (unlike Endicia), so this is a separate
      * call. Surface a low-balance warning the same way the Endicia helper
@@ -325,7 +444,9 @@ class uspsCommon
     protected function chkNeedToBuy()
     {
         if (empty($this->settings['payment_account'])) { return; }
-        $resp = $this->queryREST('get', '/payments/v3/payment-account/' . urlencode($this->settings['payment_account']));
+        // soft: a failed balance lookup must never pop an error after a label
+        // printed successfully — it's an informational nicety, not part of the ship.
+        $resp = $this->queryREST('get', '/payments/v3/payment-account/' . urlencode($this->settings['payment_account']), null, ['soft'=>true]);
         if (empty($resp) || !isset($resp['balance'])) { return; } // best-effort; don't block on errors
         $balance = (float)$resp['balance'];
         if ($balance < (float)$this->settings['funds_min']) {
@@ -443,10 +564,15 @@ class uspsCommon
             // case) from non-standard for pricing. Default everyone to
             // MACHINABLE; envelopes/letters override at call sites if needed.
             'processingCategory' => 'MACHINABLE',
+            // Label Material. All options produce a 4x6 label; for thermal the
+            // DPI MUST match the printer head — a 300-dpi label on a 203-dpi
+            // printer prints ~1.5x oversized (a 4x6 balloons to a letter
+            // half-sheet). PNG/GIF are intentionally omitted: the shipping label
+            // viewer only builds a print path for PDF (Download) and ZPL/EPL
+            // (saved as .lpt -> Print Thermal).
             'paperTypes' => [
-                ['id'=>'PDF',       'text'=>'PDF (plain paper)'],
-                ['id'=>'ZPL203DPI', 'text'=>'Zebra ZPL 203 dpi'],
-                ['id'=>'ZPL300DPI', 'text'=>'Zebra ZPL 300 dpi'],
-                ['id'=>'PNG',       'text'=>'PNG image']]];
+                ['id'=>'PDF',       'text'=>'PDF — 4×6 on plain paper / laser'],
+                ['id'=>'ZPL203DPI', 'text'=>'Zebra thermal — 203 dpi (most desktop Zebras, incl. ZP505)'],
+                ['id'=>'ZPL300DPI', 'text'=>'Zebra thermal — 300 dpi (300-dpi printheads only)']]];
     }
 }
