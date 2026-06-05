@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (calculatePeriod: auto-extends journal_periods forward to cover future post_dates via new ensureFiscalYearCovers helper — fixes recurring entries stamping period=0)
+ * @version    7.x Last Update: 2026-06-02 (viewFavicon: multi-source icon fetch (page link, /favicon.ico, DuckDuckGo, Google) with browser User-Agent + image validation, jittered 14-28 day cache, short retry for failed lookups — fixes dashboard favicons defaulting to bizuno and re-fetching on every reload)
  * @filesource /model/functions.php
  */
 
@@ -1975,36 +1975,109 @@ function viewFavicon($url, $title='', $event=false)
     $target= $event ? "style=\"cursor:pointer\" onClick=\"winHref('$url');\" " : '';
     $parts = parse_url($url);
     if (empty($parts['host'])) { return ''; }
-    if (file_exists(BIZUNO_DATA."cache/icons/{$parts['host']}.fav")) { // load the icon
-        $img = file_get_contents(BIZUNO_DATA."cache/icons/{$parts['host']}.fav");
-    } else {
-        $href = getFavIcon($url); // try full $url
-        msgDebug("\nReturned from getFavIcon with value = ".print_r($href, true));
-        if (empty($href)) { $href = getFavIcon($parts['host'], $parts['scheme']); } // if empty try domain
-        if (empty($href)) { // not found, use Google to guess
-            try { $result = @file_get_contents("http://www.google.com/s2/favicons?domain={$parts['host']}"); }
-            catch (Exception $ex) { return msgAdd("caught Google exception => ".print_r($ex, true)); }
-            msgDebug("\nGoogle approach with results = ".print_r($result, true));
-        } else {
-            if (strpos(strtolower($href), 'http') === false) { // it's relative, add url
-                $host  = "{$parts['scheme']}://{$parts['host']}";
-                msgDebug("\nFetching from host = $host/".$href);
-                $result= @file_get_contents($host.'/'.$href);
-                if (!$result && !empty($parts['path'])) { // might be in a sub-folder
-                    $host .= substr($parts['path'], 0, strrpos($parts['path'], '/'));
-                    msgDebug("\nFetching from sub host = $host/".$href);
-                    $result= @file_get_contents($host.'/'.$href);
-                }
-            } else {
-                $result= @file_get_contents($href);
-            }
-            msgDebug("\nElse approach with results = ".print_r($result, true));
-        }
-        $img = base64_encode($result);
-        if ($img) { $io->fileWrite($img, "cache/icons/{$parts['host']}.fav"); }
+    $host  = $parts['host'];
+    $scheme= !empty($parts['scheme']) ? $parts['scheme'] : 'https';
+    $cacheRel = "cache/icons/$host.fav";
+    $cachePath= BIZUNO_DATA.$cacheRel;
+    $maxAge   = 60*60*24*(14 + abs(crc32($host)) % 15); // re-fetch every 14-28 days, jittered per host (stable) so caches do not all expire together
+    if (file_exists($cachePath) && (time()-filemtime($cachePath)) < $maxAge) { // load the cached icon while it is still fresh
+        $img = file_get_contents($cachePath);
+        return '<img src="data:'.faviconMime(base64_decode(substr($img,0,24))).';base64,'.$img.'" width="32" height="32" alt="'.$title.'" '.$target.'/>';
     }
-    if (empty($img)) { $img = base64_encode(file_get_contents(BIZUNO_URL_FS.'0/view/images/favicon.ico')); }
-    return '<img src="data:image/png;base64,'.$img.'" width="32" height="32" alt="'.$title.'" '.$target.'/>';
+    // cache miss or expired - try sources cheapest-first, stopping at the first browser-safe image. Many sites (banks
+    // especially) block plain server fetches, so we end with dedicated favicon services that resolve the icon server side.
+    $result  = ''; // first browser-safe icon found (PNG/JPEG/GIF/WEBP/SVG)
+    $icoData = ''; // an ICO is kept only as a last resort - some browsers (e.g. Safari) will not render an .ico via <img>
+    $tryFetch = function($src) use (&$result, &$icoData, $host) { // short-circuits once a browser-safe icon is found
+        if (!empty($result) || empty($src)) { return; }
+        $data = faviconFetch($src);
+        if (!faviconIsImage($data)) { return; }
+        if (substr($data,0,4)==="\x00\x00\x01\x00" || substr($data,0,4)==="\x00\x00\x02\x00") { // ICO/CUR - stash, keep looking for a raster
+            if (empty($icoData)) { $icoData = $data; }
+            return;
+        }
+        $result = $data; msgDebug("\nfavicon for $host fetched from $src");
+    };
+    $tryFetch("$scheme://$host/favicon.ico");                      // 1. the well-known location - one small request, covers most sites
+    if (empty($result)) {                                          // 2. icon declared on the page - best quality but needs a full page download, so defer it
+        $href = getFavIcon($url);
+        if (!empty($href) && stripos($href, 'data:') !== 0) {      // ignore inline data: placeholders (e.g. href="data:,")
+            if      (stripos($href, 'http') === 0) { $src = $href; }                  // absolute URL
+            elseif  (strpos($href, '//')   === 0)  { $src = "$scheme:$href"; }         // protocol-relative
+            elseif  (strpos($href, '/')    === 0)  { $src = "$scheme://$host$href"; }  // root-relative
+            else                                   { $src = "$scheme://$host/$href"; } // document-relative
+            $tryFetch($src);
+        }
+    }
+    $tryFetch("https://icons.duckduckgo.com/ip3/$host.ico");          // 3. DuckDuckGo icon service (returns a PNG/JPEG raster)
+    $tryFetch("https://www.google.com/s2/favicons?domain=$host&sz=64"); // 4. Google icon service (returns a PNG/JPEG raster)
+    if (empty($result) && !empty($icoData)) { $result = $icoData; }   // no browser-safe raster anywhere, fall back to the site's ICO
+    $found = !empty($result);
+    if (!$found) { $result = file_get_contents(BIZUNO_URL_FS.'0/view/images/favicon.ico'); } // fall back to the default Bizuno icon
+    $mime= faviconMime($result); // emit the icon's actual format - a multi-image ICO declared as image/png will not decode in the browser
+    $img = base64_encode($result);
+    $io->fileWrite($img, $cacheRel); // cache the result so reloads do not re-hit the network until the cache expires
+    // a failed lookup is usually a transient block - expire it in ~2 days so the real icon can replace the default sooner
+    if (!$found) { @touch($cachePath, time() - $maxAge + (2*60*60*24)); }
+    return '<img src="data:'.$mime.';base64,'.$img.'" width="32" height="32" alt="'.$title.'" '.$target.'/>';
+}
+
+/**
+ * Fetches a URL with a short timeout and a browser User-Agent. The default PHP agent is rejected by many sites,
+ * which is the main reason favicons silently fall back to the default icon.
+ * @param string $url
+ * @return string - the raw response body, or '' on failure
+ */
+function faviconFetch($url)
+{
+    $ctx = stream_context_create(['http'=>[
+        'timeout'        => 4,
+        'follow_location'=> 1,
+        'max_redirects'  => 3,
+        'user_agent'     => 'Mozilla/5.0 (compatible; Bizuno/favicon)',
+        'header'         => "Accept: image/avif,image/webp,image/png,image/*,*/*;q=0.8\r\n"],
+        'ssl' =>['verify_peer'=>false, 'verify_peer_name'=>false]]); // some sites have incomplete chains, we only want the icon
+    // the context 'timeout' only bounds the transfer; default_socket_timeout also bounds DNS/TCP connect so a filtered host cannot hang ~60s
+    $old = ini_get('default_socket_timeout');
+    ini_set('default_socket_timeout', 4);
+    $data = (string)@file_get_contents($url, false, $ctx);
+    ini_set('default_socket_timeout', $old);
+    return $data;
+}
+
+/**
+ * Confirms a fetched payload is actually an image (not an HTML error page or empty body) by checking its magic bytes.
+ * @param string $data
+ * @return boolean
+ */
+function faviconIsImage($data)
+{
+    if (strlen($data) < 50) { return false; } // too small to be a usable icon
+    if (substr($data,0,4)==="\x00\x00\x01\x00" || substr($data,0,4)==="\x00\x00\x02\x00") { return true; } // ICO / CUR
+    if (substr($data,0,8)==="\x89PNG\r\n\x1a\n")                  { return true; } // PNG
+    if (substr($data,0,3)==="GIF")                                { return true; } // GIF
+    if (substr($data,0,3)==="\xFF\xD8\xFF")                       { return true; } // JPEG
+    if (substr($data,0,2)==="BM")                                 { return true; } // BMP
+    if (substr($data,0,4)==="RIFF" && substr($data,8,4)==="WEBP") { return true; } // WEBP
+    if (stripos(substr($data,0,512), '<svg') !== false)           { return true; } // SVG
+    return false;
+}
+
+/**
+ * Returns the data-URI MIME type for an image payload, read from its magic bytes. The data URI must declare the icon's
+ * real format - e.g. a multi-resolution ICO served as image/png will not decode in the browser.
+ * @param string $data - the raw (binary) image bytes
+ * @return string - MIME type, defaulting to image/x-icon (the most common favicon format)
+ */
+function faviconMime($data)
+{
+    if (substr($data,0,8)==="\x89PNG\r\n\x1a\n")                  { return 'image/png'; }
+    if (substr($data,0,3)==="GIF")                                { return 'image/gif'; }
+    if (substr($data,0,3)==="\xFF\xD8\xFF")                       { return 'image/jpeg'; }
+    if (substr($data,0,2)==="BM")                                 { return 'image/bmp'; }
+    if (substr($data,0,4)==="RIFF" && substr($data,8,4)==="WEBP") { return 'image/webp'; }
+    if (stripos(substr($data,0,512), '<svg') !== false)           { return 'image/svg+xml'; }
+    return 'image/x-icon'; // ICO/CUR and the safe default
 }
 
 function getFavIcon($host, $scheme=false)
@@ -2012,16 +2085,17 @@ function getFavIcon($host, $scheme=false)
     $output = '';
     if ($scheme) { $host = "$scheme://$host"; }
     msgDebug("\nTrying url: $host");
-    $site = @file_get_contents($host);
+    $site = faviconFetch($host); // use a browser User-Agent so the page is not served a bot block
+    if (empty($site)) { return; }
     $doc = new \DOMDocument('1.0', 'UTF-8');
     $internalErrors = libxml_use_internal_errors(true); // set error level
     $doc->strictErrorChecking = false;
-    if (empty($site)) { return; }
     $doc->loadHTML($site);
     libxml_use_internal_errors($internalErrors); // Restore error level
     $xml = simplexml_import_dom($doc);
     $arr = $xml->xpath('//link[@rel="icon"]');
-    if ( empty($arr)) { $arr = $xml->xpath('//link[@rel="shortcut icon"]'); } // try other option
+    if (empty($arr)) { $arr = $xml->xpath('//link[@rel="shortcut icon"]'); }  // legacy declaration
+    if (empty($arr)) { $arr = $xml->xpath('//link[@rel="apple-touch-icon"]'); } // usually a high-res PNG
     if (is_array($arr) && isset($arr[0])) { $output = getXmlAttribute($arr[0], 'href'); }
     return $output;
 }
