@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.4.2
+Stable tag: 7.4.3
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -84,6 +84,19 @@ WordPress's standard update channel. New versions are published to the WordPress
 
 == Changelog ==
 
+= 7.4.3 =
+* **USPS v3 REST API** — modernized USPS shipping integration: real-time rates, label generation, void/refund. The legacy v1 endpoints are deprecated by USPS; this brings Bizuno to the current API.
+* **Shipping manager** — added a "track all" link on the shipping dashboard and FedEx Freight (LTL) tracking URL handling.
+* **Sales / PO journals — context-aware Due Date** — the journal's date field now relabels per type: "Ship Date" for sales invoices (defaults to today), "Expiration Date" for sales/vendor quotes (today + 30), "Expected Ship" for sales/purchase orders. Stays editable; preserves saved values on edit.
+* **Users Manager — admin password reset** — administrators (security level 5) can now reset another user's password from the Users Manager. Useful for help-desk scenarios where the user can't reach the lost-password flow.
+* **Dashboard favicon** — robust multi-source fetch with a local fallback when Gravatar is unreachable. No more broken-image icons on offline / firewalled sites.
+* Fix: **Authorize.net (and every CC gateway) stored-card sale was broken** — charging a saved card silently failed because the dispatcher routed both "new card" and "stored card" radio selections to the same gateway action. Stored cards now dispatch to the wltCap action that uses the saved payment profile correctly.
+* Fix: **PhreeForm Notes/long-text box fields were clipping** — text in box-style container fields (Notes on picking tickets, long descriptions, address blocks) rendered as one giant line that cut off at the right edge of the box. Text now wraps at word boundaries inside the box.
+* Fix: **Work-order PDFs lost task description formatting** — HTML-wrapped task descriptions (`<p>...</p>` etc.) now render correctly in the PDF instead of as raw HTML.
+* Fix: **AJAX requests after session expiry returned the HTML login page** — JSON-expecting callers now receive a JSON `{auth: false}` response so the client can re-auth cleanly instead of trying to parse HTML.
+* Fix: **Contacts deleteLog required the wrong permission level** — was checking edit (3) but should require delete (4). Brings it in line with other delete operations.
+* Security: **Inventory + Contacts — closed five ungated public methods** that wrote/repaired data without checking the caller's ACL. Internal architecture: inventory and contacts now have model classes mirroring the journal class pattern for consistency.
+
 = 7.4.2 =
 * Fix: install/connection failed on locked-down managed MySQL hosts (GoDaddy and similar) with "1227 Access denied; you need ... SESSION_VARIABLES_ADMIN". The DB layer set server-global charset variables on connect, which shared hosts forbid. Now negotiates charset via the PDO DSN (no privileges needed) and uses a guarded `SET NAMES`. Fixes activation on restricted hosting.
 
@@ -126,6 +139,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 See GitHub commits for full history – ongoing modernization since 7.0+ architecture shift.
 
 == Upgrade Notice ==
+
+= 7.4.3 =
+USPS v3 REST integration, context-aware journal Due Date field, customer-reported fixes (stored-card sales, PhreeForm box-field text wrapping, AJAX session-expiry response), and tightened ACL gating on inventory + contacts. Recommended for all users.
 
 = 7.4.2 =
 Fixes plugin activation on locked-down managed MySQL hosts (GoDaddy etc.) that previously failed with a SESSION_VARIABLES_ADMIN privilege error.
