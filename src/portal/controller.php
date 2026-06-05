@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /portal/controller.php
  */
 
@@ -99,6 +99,25 @@ class portalCtl
      */
     private function goGuest()
     {
+        // A logged-out / expired session that receives an in-flight AJAX request
+        // would otherwise be handed the full login HTML page, and the browser's
+        // jqBiz.ajax handler throws "Expecting JSON, got HTML". Detect AJAX
+        // (excluding the login form's own full-page POST, which carries bizUser/
+        // step) and answer with a JSON redirect so the page navigates cleanly to
+        // the sign-in screen instead of erroring mid-action.
+        $isAjax      = !empty($_GET['ajax']) || !empty($_SERVER['HTTP_X_REQUESTED_WITH']);
+        $isLoginPost = isset($_POST['bizUser']) || isset($_POST['step']);
+        if ($isAjax && !$isLoginPost) {
+            msgDebug("\nGuest-scope AJAX request (session expired/logged out) — returning JSON redirect to login.");
+            $this->loadLanguage('en_US'); // pre-auth path: make sure lang() resolves
+            $txt = lang('msg_session_expired');
+            if ($txt === '' || $txt === 'msg_session_expired') { $txt = 'Your session has expired. Please sign in again.'; }
+            // Show a modal the operator must acknowledge, then send them to the
+            // sign-in screen — clearer than a silent jump mid-action.
+            $js = "jqBiz.messager.alert({title:'',msg:".json_encode($txt).",icon:'warning',fn:function(){ window.location='".BIZUNO_URL_PORTAL."'; }});";
+            $this->layout = ['type'=>'json', 'content'=>['action'=>'eval', 'actionData'=>$js]];
+            return;
+        }
         require(BIZUNO_FS_LIBRARY . 'portal/viewAuth.php');
         $view = new portalViewAuth();
         $view->login($this->layout);
