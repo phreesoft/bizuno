@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-13
+ * @version    7.x Last Update: 2026-06-02
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -453,25 +453,42 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
             $html .= lang('date_deliver')  .': '.viewFormat($meta['deliver_date'],'date')    .'<br /><br />';
             $temp  = explode(':', $meta['method_code']);
             $carrier = $temp[0];
+            $service = !empty($temp[1]) ? $temp[1] : '';
             $tracking_url = false;
+            $isFreight    = false;
             if (file_exists (dirname(__FILE__)."/carriers/$carrier/$carrier.php")) {
                 bizAutoLoad(dirname(__FILE__)."/carriers/$carrier/$carrier.php", $carrier);
-                if (defined(strtoupper($carrier)."_TRACKING_URL")) { $tracking_url = constant(strtoupper($carrier)."_TRACKING_URL"); }
+                $cUP = strtoupper($carrier);
+                // freight (LTL) services track on a different host than express/ground, see the carrier's *_FREIGHT_METHODS list
+                if (defined($cUP."_FREIGHT_TRACKING_URL") && defined($cUP."_FREIGHT_METHODS") && in_array($service, explode(',', constant($cUP."_FREIGHT_METHODS")))) {
+                    $tracking_url = constant($cUP."_FREIGHT_TRACKING_URL");
+                    $isFreight    = true;
+                } elseif (defined($cUP."_TRACKING_URL")) {
+                    $tracking_url = constant($cUP."_TRACKING_URL");
+                }
             }
             // build the table
             $html .= '<table style="border-collapse:collapse;width:100%">';
             $html .= ' <thead><tr class="panel-header"><td>'.lang('tracking_num')."</td><td>".lang('date_actual')."</td></tr></thead>";
             $html .= ' <tbody>';
+            $tracking_ids = [];
             foreach ($meta['packages']['rows'] as $pkg) {
                 if ($tracking_url) {
-                    $href = str_replace("TRACKINGNUM", $pkg['tracking_id'], $tracking_url);
+                    $href = str_replace("TRACKINGNUM", rawurlencode($pkg['tracking_id']), $tracking_url);
                     $html.= '  <tr><td><a href="'.$href.'" target="_blank">'.$pkg['tracking_id']."</a></td>";
                 } else { $html .= "  <tr><td>".$pkg['tracking_id']."</td>"; }
                 $html .= "  <td>".(!empty($pkg['actual_date'])?viewFormat($pkg['actual_date'], 'date'):'&nbsp;')."</td></tr>";
+                if (!empty($pkg['tracking_id'])) { $tracking_ids[] = $pkg['tracking_id']; }
                 if ($pkg['cost'])  { $cost += $pkg['cost']; }
             }
             $html .= " </tbody>";
-            $html .= "</table><br />";
+            $html .= "</table>";
+            // FedEx/UPS express accept several comma-separated numbers in one URL, track every shipment in this log at once (the freight portal qualifies a single PRO, so skip it there)
+            if ($tracking_url && !$isFreight && count($tracking_ids) > 1) {
+                $hrefAll = str_replace("TRACKINGNUM", rawurlencode(implode(',', $tracking_ids)), $tracking_url);
+                $html .= '<a href="'.$hrefAll.'" target="_blank">'.lang('tracking_all').'</a>';
+            }
+            $html .= "<br />";
             $html .= lang('notes').': '.implode('<br />', (array)$meta['notes']).'<br />';
             $html .= lang('cost').': ' .viewFormat($cost, 'currency').'<br />';
 
