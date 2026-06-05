@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-13
+ * @version    7.x Last Update: 2026-06-02
  * @filesource /local/en_US/language.php
  */
 
@@ -637,6 +637,7 @@ $langCore = [
     'totals' => 'Totals',
     'total_ach' => 'Total (ACH)',
     'tracking_num' => 'Tracking #',
+    'tracking_all' => 'Track all shipments',
     'trainer' => 'Trainer',
     'training' => 'QA Training',
     'trash' => 'Trash',
