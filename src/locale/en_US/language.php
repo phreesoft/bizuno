@@ -740,6 +740,7 @@ $langCore = [
     'err_phreeform_title_dup' => 'Report (%s) already exists in PhreeForm. Please enter a new title, check the Replace box or remove the original report before importing this one.',
     // Messages
     'msg_edit_new' => 'Press New on the manager or double click a row to edit a record.',
+    'msg_session_expired' => 'Your session has expired. Please sign in again.',
     'msg_settings_saved' => 'Settings Saved!',
     'msg_record_saved' => 'The entry was successfully saved!',
     'msg_password_changed' => 'Your password was changed. Use the new password on your next login.',
