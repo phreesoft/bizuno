@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-12
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -331,6 +331,11 @@ if (!formValidate()) return false;\n\treturn true;\n}";
         // complete the structure
         $structure['invoice_num']['tip']  = lang('msg_leave_null_to_assign_ref');
         $structure['invoice_num']['label']= lang("invoice_num_{$this->journalID}");
+        // The terminal_date field is repurposed by journal type, so relabel it:
+        //   sales invoice (12) = Ship Date; quotes (3,9) = Expiration Date;
+        //   sales/purchase orders (4,10) = Expected Ship. All others keep "Due Date".
+        $tdLabels = [3=>'expiration_date', 4=>'expected_ship', 9=>'expiration_date', 10=>'expected_ship', 12=>'ship_date'];
+        if (isset($tdLabels[$this->journalID])) { $structure['terminal_date']['label'] = lang($tdLabels[$this->journalID]); }
         $structure['rep_id']['values']    = viewRoleDropdown(in_array($this->journalID, [3, 4, 6, 7])?'purch':'sales');
         if (sizeof(getModuleCache('phreebooks', 'currency', 'iso')) > 1) {
             $structure['currency']['callback']    = 'totalsCurrency';

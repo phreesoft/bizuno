@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/phreebooks/journals/j03.php
  */
 
@@ -92,7 +92,9 @@ class j03 extends jCommon
         $data['jsHead']['datagridData'] = $this->dgDataItem;
         $data['datagrid']['item'] = $this->dgOrders('dgJournalItem', 'v');
         $data['fields']['gl_acct_id']['attr']['value']   = getModuleCache('phreebooks', 'settings', 'vendors', 'gl_payables');
-        $data['fields']['terminal_date']['attr']['value']= getTermsDate($data['fields']['terms']['attr']['value'], 'v');
+        // terminal_date here is the quote Expiration Date — left to the journal
+        // default (+30 days for new RFQs, saved value on edit), NOT recomputed from
+        // vendor terms.
         $isWaiting = isset($data['fields']['waiting']['attr']['checked']) && $data['fields']['waiting']['attr']['checked'] ? '1' : '0';
         $data['fields']['waiting'] = ['attr'=>  ['type'=>'hidden', 'value'=>$isWaiting]]; // field not used
         $data['divs']['divDetail'] = ['order'=>50,'type'=>'divs','classes'=>['areaView'],'divs'=>[

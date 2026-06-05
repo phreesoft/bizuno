@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-02
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /local/en_US/language.php
  */
 
@@ -559,6 +559,9 @@ $langCore = [
     'settings' => 'Settings',
     'ship' => 'Ship',
     'ship_date' => 'Ship Date',
+    // Per-journal labels for the repurposed terminal_date field (see phreebooks/main.php)
+    'expected_ship' => 'Expected Ship',
+    'expiration_date' => 'Expiration Date',
     'shipment_id' => 'Shipment ID',
     'shipment_cost' => 'Shipment Cost',
     'shipment_detail' => 'Shipment Detail',
