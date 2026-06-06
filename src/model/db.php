@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-19 (constructor: skip connect attempt + error toast when creds match the portalCFG-sample.php placeholders — that's the fresh-install signal, not a credential failure)
+ * @version    7.x Last Update: 2026-06-06 (constructor: strip ONLY_FULL_GROUP_BY from SESSION sql_mode so report queries with GROUP BY + non-aggregated columns run on GoDaddy/managed hosts that ship that mode enabled)
  * @filesource /model/db.php
  */
 
@@ -86,6 +86,19 @@ class db extends \PDO
                 // already handled it).
                 try { $this->exec("SET NAMES 'utf8'"); }
                 catch (\PDOException $e) { msgDebug("\nSET NAMES skipped (non-fatal): ".$e->getMessage()); }
+                // Relax ONLY_FULL_GROUP_BY for this session. Bizuno's report
+                // queries (Income Statement, Financial Summary, AR/AP aging,
+                // etc.) intentionally select non-aggregated columns alongside
+                // GROUP BY — valid under Bizuno's expected MySQL config but
+                // rejected with "1055 ... incompatible with sql_mode=
+                // only_full_group_by" on hosts that ship that mode enabled
+                // (GoDaddy, many managed/shared hosts). REPLACE() strips just
+                // that one flag from the SESSION sql_mode, leaving every other
+                // protection intact and requiring no special privilege. Wrapped
+                // in try/catch so a host that blocks even this degrades to the
+                // original behavior rather than failing the connection.
+                try { $this->exec("SET SESSION sql_mode=(SELECT REPLACE(@@SESSION.sql_mode,'ONLY_FULL_GROUP_BY',''))"); }
+                catch (\PDOException $e) { msgDebug("\nsql_mode adjust skipped (non-fatal): ".$e->getMessage()); }
                 break;
         }
         $this->connected = true;
