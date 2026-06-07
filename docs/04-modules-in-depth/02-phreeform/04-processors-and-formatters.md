@@ -2,7 +2,7 @@
 title: Processors and Formatters
 category: PhreeForm
 order: 4
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-07
 ---

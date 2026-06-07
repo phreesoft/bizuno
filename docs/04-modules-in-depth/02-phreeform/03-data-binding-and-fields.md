@@ -2,7 +2,7 @@
 title: Data Binding and Fields
 category: PhreeForm
 order: 3
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-07
 ---

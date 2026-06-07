@@ -2,7 +2,7 @@
 title: Form Designer
 category: PhreeForm
 order: 2
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-07
 ---
