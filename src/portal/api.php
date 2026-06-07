@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-19 (easyuiJS / easyuiCSS: scripts/ lives at the webroot, not under src/, so resolve via BIZUNO_FS_PORTAL not BIZUNO_FS_LIBRARY)
+ * @version    7.x Last Update: 2026-06-07 (logout: clear sessionStorage('bizuno') on redirect so the next login reloads a fresh browser session cache)
  * @filesource /portal/api.php
  */
 
@@ -243,7 +243,9 @@ class portalApi
         // CSRF Layer 2: rotate the synchronizer token so a token from this session can't
         // be reused after the user signs back in (defense-in-depth against session-fixation).
         if (function_exists("\\bizuno\\bizCsrfRotate")) { bizCsrfRotate(); }
-        $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"window.location='".BIZUNO_URL_PORTAL."';"]]);
+        // Clear the cached browser session so the next login forces a fresh loadBrowserSession
+        // (otherwise stale bizDefaults — e.g. an empty taxRates set — survive across re-login).
+        $layout = array_replace_recursive($layout, ['type'=>'page', 'jsHead'=>['redir'=>"sessionStorage.removeItem('bizuno'); window.location='".BIZUNO_URL_PORTAL."';"]]);
         if (function_exists("\\bizuno\\portalLogout")) { portalLogout($layout); }
     }
 

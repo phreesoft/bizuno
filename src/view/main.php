@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (fa_type processor migrated off getModuleCache → getMetaCommon('options_fxdast_types') + lang() translation)
+ * @version    7.x Last Update: 2026-06-07 (viewSalesTaxDropdown: use new getSalesTaxRates() helper that lazily rebuilds the empty sales_tax cache from common_meta so tax rates are selectable on fresh/imported installs)
  * @filesource /view/main.php
  */
 
@@ -1324,10 +1324,44 @@ function viewSalesTaxDropdown($type='c', $opts='')
     if ($opts=='contacts')  { $output[] = ['id'=>'-1', 'text'=>lang('per_contact'),  'status'=>0, 'tax_rate'=>'-']; }
     if ($opts=='inventory') { $output[] = ['id'=>'-1', 'text'=>lang('per_inventory'),'status'=>0, 'tax_rate'=>'-']; }
     $output[] = ['id'=>'0', 'text'=>lang('none'), 'status'=>0, 'tax_rate'=>0];
-    foreach (getModuleCache('phreebooks', 'sales_tax', $type, false, []) as $row) {
+    foreach (getSalesTaxRates($type) as $row) {
         if ($row['status'] == 0) { $output[] = ['id'=>$row['id'], 'text'=>$row['title'], 'status'=>$row['status'], 'tax_rate'=>$row['rate']]; }
     }
     return $output;
+}
+
+/**
+ * Returns the phreebooks.sales_tax module cache rows for a tax type, lazily rebuilding the
+ * cache from common_meta when it is empty (fresh install, or a session opened before the
+ * first tax-rate was saved). Centralizing the rebuild here keeps loadTaxes(),
+ * viewSalesTaxDropdown() and phreebooksTax::rebuildCache() from drifting apart.
+ *
+ * Each row is normalized to the cache shape id|title|rate|status|settings, where `settings`
+ * is the plain auths rows array. `taxAuths` is persisted as the EasyUI datagrid structure
+ * {rows,total,footer}; only `rows` is meaningful downstream, so it is extracted here.
+ *
+ * This helper lives in view/main.php because that file is require_once'd globally in
+ * bizunoCFG.php, so every caller (including view-layer callers that never load
+ * phreebooks/functions.php) can reach it.
+ * @param char $type - 'c' (customers) or 'v' (vendors)
+ * @param boolean $force - true to bypass the cache and rebuild from common_meta (used after save/delete)
+ * @return array - list of tax-rate rows (may be empty)
+ */
+function getSalesTaxRates($type, $force=false)
+{
+    if (!$force) {
+        $taxRates = getModuleCache('phreebooks', 'sales_tax', $type, false, []);
+        if (!empty($taxRates)) { return $taxRates; }
+    }
+    $taxRates = [];
+    foreach ((array)dbMetaGet('%', "tax_rate_$type") as $row) {
+        $taxRates[] = ['id'=>$row['_rID'], 'title'=>$row['title'], 'rate'=>$row['tax_rate'], 'status'=>$row['inactive'],
+            'settings'=>!empty($row['taxAuths']['rows']) ? $row['taxAuths']['rows'] : []];
+    }
+    // On a forced rebuild always write (so deleting the last rate clears the cache too); on the
+    // lazy path only cache a non-empty result to avoid pinning an empty array on fresh installs.
+    if ($force || !empty($taxRates)) { setModuleCache('phreebooks', 'sales_tax', $type, $taxRates); }
+    return $taxRates;
 }
 
 /**

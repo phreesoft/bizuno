@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (setNewFiscalYear: replaced misleading postfix-decrement return with explicit "return next_period - 1")
+ * @version    7.x Last Update: 2026-06-07 (loadTaxes: source rates via getSalesTaxRates() with lazy cache rebuild; extract auths rows for both new and stale-datagrid cache shapes)
  * @filesource /controllers/phreebooks/functions.php
  */
 
@@ -580,9 +580,13 @@ function loadTaxes($type, $date=false)
 {
     if (!$date) { $date = biz_date('Y-m-d'); }
     $output  = [];
-    $taxRates= getModuleCache('phreebooks', 'sales_tax', $type, false, []);
-    foreach ($taxRates as $row) {
-        $output[] = ['id'=>$row['id'],'text'=>$row['title'],'tax_rate'=>$row['rate']." %",'status'=>$row['status'],'auths'=>$row['settings']];
+    // getSalesTaxRates() (view/main.php, always loaded) returns the cache, rebuilding it from
+    // common_meta when empty so rates show up without a logout on fresh/imported installs.
+    foreach (getSalesTaxRates($type) as $row) {
+        // 'settings' is normally the plain auths rows array, but a stale cache from an older
+        // release may still hold the full datagrid {rows,total,footer} — extract rows either way.
+        $auths = isset($row['settings']['rows']) ? $row['settings']['rows'] : (array)($row['settings'] ?? []);
+        $output[] = ['id'=>$row['id'],'text'=>$row['title'],'tax_rate'=>$row['rate']." %",'status'=>$row['status'],'auths'=>$auths];
     }
     array_unshift($output, ['id'=>'0', 'text'=>lang('none'), 'status'=>0, 'tax_rate'=>"0 %", 'auths'=>[]]);
     return $output;
