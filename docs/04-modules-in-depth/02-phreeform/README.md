@@ -13,8 +13,8 @@ basic inline HTML in cells comes from an in-tree shim.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [Report engine overview](./01-report-engine-overview.md)              | stub   | bookkeeper, admin |
-| 02 | [Form designer](./02-form-designer.md)                                | stub   | admin          |
-| 03 | [Data binding and fields](./03-data-binding-and-fields.md)            | stub   | admin, developer |
-| 04 | [Processors and formatters](./04-processors-and-formatters.md)        | stub   | admin, developer |
-| 05 | [Custom forms](./05-custom-forms.md)                                  | stub   | admin          |
+| 01 | [Report engine overview](./01-report-engine-overview.md)              | draft  | bookkeeper, admin |
+| 02 | [Form designer](./02-form-designer.md)                                | draft  | admin          |
+| 03 | [Data binding and fields](./03-data-binding-and-fields.md)            | draft  | admin, developer |
+| 04 | [Processors and formatters](./04-processors-and-formatters.md)        | draft  | admin, developer |
+| 05 | [Custom forms](./05-custom-forms.md)                                  | draft  | admin          |
