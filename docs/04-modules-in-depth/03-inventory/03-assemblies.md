@@ -16,10 +16,10 @@ into the assembled SKU. This page covers the data model and the costing; the
 build workflow itself is in [Work orders / production](./04-work-orders-production.md).
 
 > **Scope check.** Bizuno's assembly model is solid for kitting and light
-> manufacturing, but it is **not** a full MRP. In particular: **labor and overhead
-> are not captured** — an assembly's cost is the sum of its components, nothing
-> more. If you need labor/burden in standard cost, you'll add it through the GL by
-> other means. See [Honest limits](#honest-limits).
+> manufacturing, but it is **not** a full MRP — no work centers, routings, or
+> capacity planning. You *can*, however, build **labor and overhead into the
+> assembly cost** by adding labor- or charge-type lines to the bill of materials
+> (see [Costing labor and overhead](#costing-labor-and-overhead)).
 
 ---
 
@@ -68,6 +68,32 @@ parent — otherwise the parent rolls up a stale sub-assembly cost.
 
 ---
 
+## Costing labor and overhead
+
+Labor and overhead don't need a separate cost field — model them as **inventory
+items** and drop them into the bill of materials like any other line:
+
+1. Create a labor- or charge-type item — e.g. a Labor (`lb`) item *"Assembly
+   labor"* with an `item_cost` of `$3.00` representing 0.1 hours of work (or
+   however you prefer to unitize it). Do the same for overhead/burden if you
+   track it.
+2. Add that item to the assembly's BOM with the **quantity** you need — e.g. 5 ×
+   *"Assembly labor"* for 0.5 hours of build time.
+
+Bizuno includes these lines when it rolls up the assembly's cost
+(`dbGetInvAssyCost` sums `qty × item_cost` across **every** BOM line, regardless of
+type), so the finished item's standing cost reflects materials **plus** the labor
+and overhead you've itemized.
+
+> **One nuance to know.** Labor/charge items are non-stock, so at *build-post*
+> time (jID 14) they aren't moved through inventory/COGS accounts the way stocked
+> components are — they contribute to the item's **computed cost**, not to a
+> separate GL inventory leg. For most shops the computed cost is exactly what you
+> want on margin reports; just be aware the labor isn't capitalized as its own
+> ledger entry during the build.
+
+---
+
 ## Building: what posts
 
 A build is recorded by the **Assembly journal (jID 14)**. Its `Post()`:
@@ -98,20 +124,22 @@ What the assembly model **does**:
 
 - Component bills of materials on `ma`/`sa` items
 - Build / un-build with correct stock movement and component-cost rollup
+- **Labor and overhead** in cost, via labor/charge items on the BOM (above)
 - Multi-level **availability** (recursive "can I build N?")
 - "How many can I build per store" capability view
 
 What it **does not** do (so you don't design around features that aren't there):
 
-- **No labor or overhead** in assembly cost — components only.
+- **No work centers, routings, or capacity planning** — the build is a recipe,
+  not a routed operation.
 - **No recursive cost rollup** — parent cost reflects direct components only;
-  build sub-assemblies first.
+  build sub-assemblies first so their cost is current.
 - **No phantom assemblies** — there's no "don't stock the assembly level" flag;
   every build moves real stock for both components and the finished item.
 
-For kitting and straightforward builds this is plenty. For routings, work centers,
-labor capture, and burden, you've crossed into territory a dedicated MRP handles
-better.
+For kitting and light builds — including itemized labor and overhead — this is
+plenty. For routed operations through work centers with capacity scheduling,
+you've crossed into territory a dedicated MRP handles better.
 
 ---
 
