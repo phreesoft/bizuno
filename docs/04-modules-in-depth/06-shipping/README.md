@@ -8,6 +8,6 @@ from a web app.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [Carriers](./01-carriers.md)                                          | draft  | admin          |
-| 02 | [Label printing](./02-label-printing.md)                              | draft  | bookkeeper, admin |
-| 03 | [Zebra Browser Print](./03-zebra-browser-print.md)                    | draft  | admin          |
+| 01 | [Carriers](./01-carriers.md)                                          | published | admin          |
+| 02 | [Label printing](./02-label-printing.md)                              | published | bookkeeper, admin |
+| 03 | [Zebra Browser Print](./03-zebra-browser-print.md)                    | published | admin          |

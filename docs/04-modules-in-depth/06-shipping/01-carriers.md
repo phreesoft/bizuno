@@ -2,7 +2,7 @@
 title: Carriers
 category: Shipping
 order: 1
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-07
 ---

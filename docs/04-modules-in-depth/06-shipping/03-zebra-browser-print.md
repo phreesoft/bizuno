@@ -2,7 +2,7 @@
 title: Zebra Browser Print
 category: Shipping
 order: 3
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-07
 ---
