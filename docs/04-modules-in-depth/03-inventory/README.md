@@ -10,7 +10,7 @@ transact.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [Inventory types](./01-inventory-types.md)                            | draft  | bookkeeper, admin |
-| 02 | [History and costing](./02-history-and-costing.md)                    | draft  | bookkeeper, admin |
-| 03 | [Assemblies](./03-assemblies.md)                                      | draft  | bookkeeper, admin |
-| 04 | [Work orders / production](./04-work-orders-production.md)            | draft  | bookkeeper, admin |
+| 01 | [Inventory types](./01-inventory-types.md)                            | published | bookkeeper, admin |
+| 02 | [History and costing](./02-history-and-costing.md)                    | published | bookkeeper, admin |
+| 03 | [Assemblies](./03-assemblies.md)                                      | published | bookkeeper, admin |
+| 04 | [Work orders / production](./04-work-orders-production.md)            | published | bookkeeper, admin |

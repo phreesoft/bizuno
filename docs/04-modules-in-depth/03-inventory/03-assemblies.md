@@ -2,7 +2,7 @@
 title: Assemblies
 category: Inventory
 order: 3
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-07
 ---

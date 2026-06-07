@@ -2,7 +2,7 @@
 title: Inventory Types
 category: Inventory
 order: 1
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-07
 ---
