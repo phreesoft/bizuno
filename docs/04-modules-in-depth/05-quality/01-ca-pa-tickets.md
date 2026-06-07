@@ -2,7 +2,7 @@
 title: CA/PA Tickets
 category: Quality
 order: 1
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-07
 ---
