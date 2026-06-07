@@ -16,9 +16,11 @@ posts the accounting automatically. This is where Bizuno crosses from "accountin
 app" into **light MRP**.
 
 > **Light** is the operative word. Work orders give you a stepped, signed-off
-> build process with stock allocation — not work centers, routings, capacity
-> planning, or labor capture. Read [Honest scope](#honest-scope) before you commit
-> a real manufacturing operation to it.
+> build process with stock allocation — not work centers, routings, or capacity
+> planning. (Labor *cost* you can capture, via labor items on the
+> [bill of materials](./03-assemblies.md#costing-labor-and-overhead).) Read
+> [Honest scope](#honest-scope) before you commit a real manufacturing operation
+> to it.
 
 ---
 
@@ -106,20 +108,40 @@ What work orders **do**:
 
 What they **don't** do — by design, so you can plan around it:
 
-- **No labor or overhead capture.** Steps record *who* and *when*, but no labor
-  hours or rates feed cost. Build cost is components only (see
-  [Assemblies → Honest limits](./03-assemblies.md#honest-limits)).
 - **No work centers, routings, or capacity/scheduling.** Steps are a checklist,
   not a routed operation through resources.
-- **No automated Quality "stop-work" link.** The [Quality module](../05-quality/01-ca-pa-tickets.md)
-  has its own stop-work tickets, but there is **no built-in tie** between a quality
-  ticket and a work order — holding a WO for a quality issue is a manual,
-  human-coordinated process, not an automated gate. (If you need that link,
-  it's a customization, not a setting.)
+- **Labor cost, but not labor *time*.** You can fold labor and overhead **cost**
+  into the build by putting labor items on the
+  [bill of materials](./03-assemblies.md#costing-labor-and-overhead); what steps
+  don't do is capture actual hours worked or feed a time clock.
 
-For batch builds, kit assembly, and a documented sign-off trail, this is a genuine
-asset. For full discrete or process manufacturing, treat it as a stepping stone,
-not a destination.
+For batch builds, kit assembly, itemized labor cost, and a documented sign-off
+trail, this is a genuine asset. For full discrete or process manufacturing with
+routed work centers, treat it as a stepping stone, not a destination.
+
+---
+
+## Quality stop-work and the dashboard
+
+A work order can be halted for a quality problem, and the place that surfaces is
+the **Quality module's stop-work tickets** ([CA/PA tickets](../05-quality/01-ca-pa-tickets.md)).
+There is **no automated data link** between a quality ticket and a specific work
+order — holding a build for a quality issue is a human-coordinated process, not a
+system gate. What gives management *visibility* into it is the **Stop-Work
+dashboard** (`qa_stop_work`), which lists open stop-work tickets at a glance, each
+linking through to the corrective-action record.
+
+> **About dashboards.** A Bizuno dashboard is a summary widget that gives you
+> at-a-glance data on the page where it's relevant. Each dashboard declares a
+> **category** matching a major menu heading (Customers, Vendors, Inventory,
+> Banking, General Ledger, Quality, …), and Bizuno shows it on that heading's
+> landing page; dashboards can also be placed on the **home page** so management
+> sees the most important numbers the moment they log in. A user adds the
+> dashboards they want from the available set for that page.
+>
+> The Stop-Work dashboard ships under the **Quality** category. To put critical
+> safety/quality status in front of management immediately, add it to the **home
+> page** dashboards — that's exactly the kind of summary the home dashboard is for.
 
 ---
 
