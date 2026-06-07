@@ -2,7 +2,7 @@
 title: Projects and CRM
 category: Contacts
 order: 5
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-06-07
 ---
