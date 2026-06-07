@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-06-07 (save/delete: rebuild the sales_tax module cache from common_meta and trigger reloadSessionStorage() so tax rates become selectable without a logout)
  * @filesource /controllers/phreebooks/tax.php
  */
 
@@ -184,11 +184,25 @@ function preSubmit() {
         $rID = clean('_rID', 'integer', 'post');
         if (!$security = validateAccess($this->secID, empty($rID)?2:3)) { return; }
         parent::saveMeta($layout, $args=['_rID'=>$rID]);
+        $this->rebuildCache();
+        $layout['content']['actionData'] .= " reloadSessionStorage();";
     }
     public function delete(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 4)) { return; }
         parent::deleteMeta($layout, ['_table'=>'common']);
+        $this->rebuildCache();
+        $layout['content']['actionData'] .= " reloadSessionStorage();";
+    }
+
+    /**
+     * Regenerates the phreebooks.sales_tax module cache from common_meta after a rate is
+     * saved or deleted, so dropdowns reflect the change immediately (paired with the
+     * reloadSessionStorage() client call that refreshes the browser's cached copy).
+     */
+    private function rebuildCache()
+    {
+        getSalesTaxRates($this->type, true); // force a rebuild from common_meta (view/main.php helper)
     }
 
     private function cleanAuths($auths=[])
