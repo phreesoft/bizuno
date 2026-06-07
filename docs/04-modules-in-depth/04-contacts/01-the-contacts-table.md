@@ -2,7 +2,7 @@
 title: The Contacts Table
 category: Contacts
 order: 1
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-07
 ---

@@ -2,7 +2,7 @@
 title: Employees
 category: Contacts
 order: 4
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-07
 ---
