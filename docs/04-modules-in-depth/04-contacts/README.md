@@ -14,8 +14,8 @@ for the conceptual reasoning before drilling into the per-role pages below.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [The contacts table](./01-the-contacts-table.md)                      | stub   | admin, developer |
-| 02 | [Customers](./02-customers.md)                                        | stub   | bookkeeper     |
-| 03 | [Vendors](./03-vendors.md)                                            | stub   | bookkeeper     |
-| 04 | [Employees](./04-employees.md)                                        | stub   | bookkeeper, admin |
-| 05 | [Projects and CRM](./05-projects-and-crm.md)                          | stub   | bookkeeper     |
+| 01 | [The contacts table](./01-the-contacts-table.md)                      | draft  | admin, developer |
+| 02 | [Customers](./02-customers.md)                                        | draft  | bookkeeper     |
+| 03 | [Vendors](./03-vendors.md)                                            | draft  | bookkeeper     |
+| 04 | [Employees](./04-employees.md)                                        | draft  | bookkeeper, admin |
+| 05 | [Projects and CRM](./05-projects-and-crm.md)                          | draft  | bookkeeper     |
