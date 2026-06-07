@@ -2,31 +2,135 @@
 title: Report Engine Overview
 category: PhreeForm
 order: 1
-status: stub
+status: draft
 audience: [bookkeeper, admin]
-last-updated: 2026-05-15
+last-updated: 2026-06-07
 ---
 
 # Report Engine Overview
 
-> **Status:** Stub — not yet drafted.
+PhreeForm is Bizuno's **only** reporting and document engine, and it's two tools
+sharing one foundation:
 
-## What this page will cover
+- a **report engine** — tabular output with grouping, totals, and filters, rendered
+  to PDF, HTML, or CSV; and
+- a **form engine** — pixel-positioned documents (invoices, packing slips,
+  statements, checks, labels) rendered to PDF.
 
-- PhreeForm = reports + forms, sharing a designer and data-binding system
-- The report lifecycle: SQL → result set → field merge → render (HTML | PDF | CSV | Excel)
-- Built-in reports vs. user-created reports
-- Per-field grouping, totaling, processing, formatting
-- Output channels: download, email, print
-- Where the report definition is stored (`phreeform` table) and what the JSON struct contains
-- The 7.3.9 tFPDF migration — what changed for end users (mostly nothing visible; barcodes now via picqer; HTML in cells via the in-tree shim)
+Both are built on the same data-binding, processing, and formatting system, so once
+you understand one you understand the other. Learn PhreeForm and you can produce
+almost any document or report your business needs; ignore it and you're stuck with
+the built-ins.
 
-## Why it matters
+---
 
-PhreeForm is the *only* report engine in Bizuno. Mastery here unlocks a lot
-of custom value; ignorance traps users in the built-in reports.
+## How a report runs
+
+```
+ definition (JSON)
+      │  load
+      ▼
+   build SQL  ──►  run query  ──►  per-cell: process → format  ──►  render  ──►  deliver
+ (tables, fields,    (result        (viewProcess then          (PDF │ HTML │   (inline │
+  filters, dates,     rows)          viewFormat)                CSV │ form-PDF)  download │
+  groups, sorts)                                                                 email)
+```
+
+1. **Load the definition.** The report/form is a JSON structure (see
+   [where definitions live](#where-definitions-live)).
+2. **Build the SQL.** PhreeForm assembles `SELECT`/`FROM`/`JOIN`/`WHERE`/`GROUP
+   BY`/`ORDER BY` from the definition's table list, visible fields, user-chosen
+   filters, the date range, and any grouping/sorting (`BuildSQL`).
+3. **Run and merge.** It executes the query and walks the result set, applying each
+   field's **processing** then **formatting** to every cell, and building group
+   subtotals and report totals (`BuildDataArray`). See
+   [Processors and formatters](./04-processors-and-formatters.md).
+4. **Render** to the chosen output.
+5. **Deliver** — display inline, download, or email.
+
+---
+
+## Output formats
+
+| Output | Reports | Forms | Notes                                   |
+|--------|:-------:|:-----:|-----------------------------------------|
+| PDF    | ✓       | ✓     | The default; forms are **PDF only**     |
+| HTML   | ✓       | —     | Tabular reports rendered as an HTML table |
+| CSV    | ✓       | —     | Comma-delimited export (the "xls" toolbar icon) |
+
+You pick the format from the toolbar when you open a report; forms always render to
+PDF.
+
+### Delivery channels
+
+The delivery selector offers:
+
+- **Inline** (`I`) — open in the browser (then print with the browser's print).
+- **Download** (`D`) — save the file.
+- **Email** (`S`) — send it as an attachment via Bizuno's mailer, with optional
+  logging to the contact's activity log.
+
+There is no separate "print" pipeline — printing is "inline, then print from the
+browser/PDF viewer."
+
+---
+
+## Where definitions live
+
+> **Not a `phreeform` table.** Despite the name, report and form definitions are
+> stored in the shared **`common_meta`** table under the `phreeform` key, as JSON.
+> A companion `phreeform_cache` meta entry holds a lightweight index (titles,
+> groups, IDs) so the report tree loads fast without parsing every definition.
+
+A definition's JSON carries everything the engine needs: the `title`, a `type`
+(`rpt` report, `frm` form, `lst` list, `dir` folder), the `group_id` (which folder/
+context it belongs to — see [Custom forms](./05-custom-forms.md#form-groups)), the
+source `tables` with their joins, the `fieldlist`, plus `grouplist`, `sortlist`,
+`filterlist`, page setup, fonts, and an email template.
+
+### Built-in vs. your own
+
+- **Built-in** reports and forms ship as JSON files under `locale/<lang>/reports/`
+  and are imported at install.
+- **Your own** are created in the designer (or by copying a built-in) and saved
+  into `common_meta`. They can be [exported and imported](./05-custom-forms.md#export--import)
+  as JSON to move between installs.
+
+---
+
+## Reports are offered by context
+
+A report or form belongs to a **group**, and groups map to journals/modules — so
+the right documents show up in the right place. When you print from a sales invoice
+(`jID 12`), Bizuno offers the forms in the `cust:j12` group; a check run offers
+`bnk:j20`. The mapping is `getDefaultFormID()`; the full group list is in
+[Custom forms](./05-custom-forms.md#form-groups).
+
+---
+
+## The 7.3.9 PDF migration
+
+As of 7.3.9, PDF generation uses **[tFPDF](https://www.fpdf.org/)** exclusively —
+TCPDF was removed. For end users this is **mostly invisible**, but three details
+matter if you maintain custom forms:
+
+- **Barcodes** are generated by `picqer/php-barcode-generator` (the `bizBarcode()`
+  helper). Supported symbologies include C128 (and A/B/C), C39, EAN-13/8, UPC-A/E,
+  Interleaved 2-of-5, and POSTNET.
+- **HTML inside cells** is handled by an in-tree shim (`bizHTMLCell()`) supporting a
+  small tag set — `<b>/<strong>`, `<i>/<em>`, `<u>`, `<font color>`, and
+  `<p>`/`<div>`/`<br>` as line breaks. Unsupported tags are stripped, not dropped
+  with their text.
+- **PDF page import** (e.g. appending attachments) uses the FPDI tFPDF adapter.
+
+If a custom form renders oddly after upgrading, these are the usual suspects — see
+[Custom forms → troubleshooting](./05-custom-forms.md#troubleshooting-after-739).
+
+---
 
 ## Related
 
 - [Form designer](./02-form-designer.md)
 - [Data binding and fields](./03-data-binding-and-fields.md)
+- [Processors and formatters](./04-processors-and-formatters.md)
+- [Custom forms](./05-custom-forms.md)

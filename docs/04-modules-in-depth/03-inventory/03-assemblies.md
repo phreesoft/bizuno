@@ -83,14 +83,32 @@ items** and drop them into the bill of materials like any other line:
 Bizuno includes these lines when it rolls up the assembly's cost
 (`dbGetInvAssyCost` sums `qty × item_cost` across **every** BOM line, regardless of
 type), so the finished item's standing cost reflects materials **plus** the labor
-and overhead you've itemized.
+and overhead you've itemized. The **build-post** capitalizes those same lines into
+the finished item's actual inventory value — so the posted cost (and the COGS when
+the assembly is later sold) matches the rolled-up estimate, not just the materials.
 
-> **One nuance to know.** Labor/charge items are non-stock, so at *build-post*
-> time (jID 14) they aren't moved through inventory/COGS accounts the way stocked
-> components are — they contribute to the item's **computed cost**, not to a
-> separate GL inventory leg. For most shops the computed cost is exactly what you
-> want on margin reports; just be aware the labor isn't capitalized as its own
-> ledger entry during the build.
+### GL treatment of labor/overhead lines
+
+Stocked components move value *between* asset accounts (component inventory → finished
+inventory), so they self-balance. A non-stock labor/charge line has no inventory layer
+to draw from, so the build needs an offsetting credit. Bizuno credits the **labor
+item's Inventory/Asset GL account** (`gl_inv`) for the line's `qty × item_cost` while
+debiting that amount into the finished-goods inventory value:
+
+| Leg | Account | Build (qty > 0) | Un-build (qty < 0) |
+|-----|---------|-----------------|--------------------|
+| Finished assembly | assembly `gl_inv` (finished inventory) | **Debit** materials + labor | **Credit** materials + labor |
+| Each stocked component | component `gl_inv` | **Credit** layer cost | **Debit** layer cost |
+| Each labor/charge line | labor `gl_inv` (clearing) | **Credit** `qty × item_cost` | **Debit** `qty × item_cost` |
+
+> **Configure the labor item's Inventory/Asset account deliberately.** Point it at a
+> **labor-applied / overhead-absorbed clearing account** (a contra to wherever the
+> actual labor/overhead expense lands), *not* a raw stock account. The build credits
+> this account to relieve the period's labor/overhead expense and rolls that cost into
+> the finished asset; it becomes COGS when the assembly sells. Labor lines are still
+> non-stock, so no `qty_stock`, inventory layer, or COGS-usage record is created for
+> them — only the balanced GL leg above. By default a labor/charge item's `gl_inv` is
+> the **non-stock** account, so set it explicitly if you want a dedicated clearing account.
 
 ---
 
@@ -98,23 +116,48 @@ and overhead you've itemized.
 
 A build is recorded by the **Assembly journal (jID 14)**. Its `Post()`:
 
-1. Reads the BOM, and for each component creates a consumption leg
+1. Reads the BOM, and for each **stocked** component creates a consumption leg
    (`gl_type='asi'`) — drawing the component's cost via its
    [costing method](./02-history-and-costing.md) (FIFO/LIFO/average) and
    **decrementing** its `qty_stock`.
-2. Creates the assembled-item leg (`gl_type='asy'`) — **incrementing** the
+2. For each **labor/charge** (non-stock) line, creates a balanced clearing leg
+   (also `gl_type='asi'`) at `qty × item_cost`, crediting the line's `gl_inv`
+   clearing account — no `qty_stock` or layer movement (see
+   [Costing labor and overhead](#costing-labor-and-overhead)).
+3. Creates the assembled-item leg (`gl_type='asy'`) — **incrementing** the
    assembly's `qty_stock` and adding a cost layer.
-3. Rolls the cost: **assembled cost = sum of the components' COGS**, and the
+4. Rolls the cost: **assembled cost = components' COGS + labor/overhead**, and the
    finished unit cost = that total ÷ quantity built.
-4. Marks the build closed.
+5. Marks the build closed.
 
-The GL effect nets within your inventory/COGS accounts — value simply moves from
-the component SKUs to the finished SKU. Reversing a build (un-post) puts the
-components back and removes the finished units.
+The GL effect nets to zero — stocked value moves from the component SKUs to the
+finished SKU, and labor/overhead moves from its clearing account into the finished
+SKU. Reversing a build (un-post) puts the components back, debits the clearing
+account back, and removes the finished units.
 
 > You don't usually post a jID 14 by hand — it's created for you when a
 > [work order](./04-work-orders-production.md) step completes. The jID 14 is the
 > accounting record; the work order is the shop-floor workflow that drives it.
+
+### Verifying labor is capitalized
+
+To confirm a labor line flows into actual cost and COGS (not just the estimate):
+
+1. Create a stocked component (e.g. `WIDGET-PART`, `item_cost` $5) and **receive 10**
+   so it has a cost layer. Create a Labor (`lb`) item *"Assembly labor"*, `item_cost`
+   $3, with its Inventory/Asset GL account set to a labor-applied clearing account.
+2. Create an assembly `ma` item *"Widget"* with BOM: 2 × `WIDGET-PART` + 5 × *Assembly
+   labor*. The cost roll-up should read **$25** (`2×5 + 5×3`).
+3. **Build 1** Widget (post the jID 14). Verify:
+   - `inventory_history` for `WIDGET`: one new layer, `unit_cost = 25` (not 10).
+   - `journal_item` rows for the build: a `gl_type='asy'` debit of $25 to the Widget's
+     `gl_inv`; an `asi` credit of $10 to the part's `gl_inv`; an `asi` credit of **$15**
+     to the labor clearing account. Debits = credits = $25.
+4. **Sell 1** Widget. The sale's COGS leg (`gl_type='cog'`) should be **$25**, including
+   the $15 labor — confirm via the GL or `dbGetCOGSj12()`.
+5. **Un-build** (post a jID 14 with qty −1, or un-post the build). Confirm the legs
+   reverse exactly: part `gl_inv` debited $10, labor clearing debited $15, Widget
+   `gl_inv` credited $25 — net zero, and the Widget layer/`qty_stock` is removed.
 
 ---
 
