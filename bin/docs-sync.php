@@ -522,7 +522,9 @@ final class WpRestClient
             $raw  = curl_exec($ch);
             $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             $err  = curl_error($ch);
-            curl_close($ch);
+            // curl_close() is a deprecated no-op since PHP 8.0 (removed effect)
+            // and emits a deprecation notice on PHP 8.5+; the handle frees itself
+            // when $ch goes out of scope.
             if ($this->verbose) {
                 fwrite(STDERR, sprintf("    %s %s → %d\n", $method, $url, $code));
             }
