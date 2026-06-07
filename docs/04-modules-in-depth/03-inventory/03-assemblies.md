@@ -17,9 +17,10 @@ build workflow itself is in [Work orders / production](./04-work-orders-producti
 
 > **Scope check.** Bizuno's assembly model is solid for kitting and light
 > manufacturing, but it is **not** a full MRP — no work centers, routings, or
-> capacity planning. You *can*, however, build **labor and overhead into the
-> assembly cost** by adding labor- or charge-type lines to the bill of materials
-> (see [Costing labor and overhead](#costing-labor-and-overhead)).
+> capacity planning. You *can* itemize **labor and overhead** on the bill of
+> materials to factor them into the assembly's *estimated* cost (for pricing) —
+> with one deliberate rule about how they hit the GL (see
+> [Costing labor and overhead](#costing-labor-and-overhead)).
 
 ---
 
@@ -80,17 +81,20 @@ items** and drop them into the bill of materials like any other line:
 2. Add that item to the assembly's BOM with the **quantity** you need — e.g. 5 ×
    *"Assembly labor"* for 0.5 hours of build time.
 
-Bizuno includes these lines when it rolls up the assembly's cost
-(`dbGetInvAssyCost` sums `qty × item_cost` across **every** BOM line, regardless of
-type), so the finished item's standing cost reflects materials **plus** the labor
-and overhead you've itemized.
+The assembly's **estimated/standing cost** picks these lines up: `dbGetInvAssyCost`
+sums `qty × item_cost` across **every** BOM line regardless of type, so the figure
+you see for pricing and margin reflects materials **plus** the labor and overhead
+you've itemized.
 
-> **One nuance to know.** Labor/charge items are non-stock, so at *build-post*
-> time (jID 14) they aren't moved through inventory/COGS accounts the way stocked
-> components are — they contribute to the item's **computed cost**, not to a
-> separate GL inventory leg. For most shops the computed cost is exactly what you
-> want on margin reports; just be aware the labor isn't capitalized as its own
-> ledger entry during the build.
+> **Important — labor is not capitalized into inventory value, by design.** At
+> *build-post* (jID 14), Bizuno deliberately rolls **only the stocked, COGS-tracked
+> components** into the finished item's GL inventory value; labor/charge lines are
+> intentionally **excluded** from that capitalized cost. This is correct, not a
+> gap: labor is expensed through its **own GL → COGS path**, so capitalizing it
+> into the assembly's inventory value as well would **double-count** it. The net
+> effect is what you want — labor shows in the *estimate* for pricing, while the
+> capitalized inventory cost (and therefore the COGS posted when the assembly
+> later sells) stays materials-only.
 
 ---
 
@@ -124,7 +128,8 @@ What the assembly model **does**:
 
 - Component bills of materials on `ma`/`sa` items
 - Build / un-build with correct stock movement and component-cost rollup
-- **Labor and overhead** in cost, via labor/charge items on the BOM (above)
+- **Labor and overhead** in the *estimated* cost, via labor/charge items on the
+  BOM — deliberately not capitalized into inventory GL value (above)
 - Multi-level **availability** (recursive "can I build N?")
 - "How many can I build per store" capability view
 
