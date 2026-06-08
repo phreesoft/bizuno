@@ -11,8 +11,8 @@ out of the box.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [CA/PA tickets](./01-ca-pa-tickets.md)                                | stub   | bookkeeper, admin |
-| 02 | [Audits](./02-audits.md)                                              | stub   | admin          |
-| 03 | [Training](./03-training.md)                                          | stub   | admin          |
-| 04 | [Maintenance](./04-maintenance.md)                                    | stub   | admin          |
-| 05 | [Objectives](./05-objectives.md)                                      | stub   | admin          |
+| 01 | [CA/PA tickets](./01-ca-pa-tickets.md)                                | published | bookkeeper, admin |
+| 02 | [Audits](./02-audits.md)                                              | published | admin          |
+| 03 | [Training](./03-training.md)                                          | published | admin          |
+| 04 | [Maintenance](./04-maintenance.md)                                    | published | admin          |
+| 05 | [Objectives](./05-objectives.md)                                      | published | admin          |

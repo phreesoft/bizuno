@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-06-06 (common_meta/contacts_meta/inventory_meta: TEXT meta_value uses DEFAULT NULL, not "NULL DEFAULT ''" — strict MySQL 8 rejects a literal default on TEXT/BLOB with error 1101)
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
