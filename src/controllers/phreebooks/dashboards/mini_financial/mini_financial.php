@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/phreebooks/dashboards/mini_financial/mini_financial.php
  */
 
@@ -197,7 +197,10 @@ class mini_financial
         if (!$stmt = dbGetResult($sql)) { return; }
         $ytd_period = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $sql = "SELECT beginning_balance FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$first_period AND gl_type=$type GROUP BY gl_account ORDER BY gl_account";
+        // GROUP BY dropped 2026-06-05: redundant under WHERE period=X (one row
+        // per gl_account already) and rejected by strict mode (only_full_group_by)
+        // because beginning_balance isn't aggregated or covered by the GROUP key.
+        $sql = "SELECT beginning_balance FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$first_period AND gl_type=$type ORDER BY gl_account";
         if (!$stmt = dbGetResult($sql)) {return; }
         $beg_balance  = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 

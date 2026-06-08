@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-06-05
  * @filesource /controllers/phreeform/extensions/income_statement.php
  */
 
@@ -132,9 +132,11 @@ class income_statement
                 'amount' => $negate ? -$row['balance'] : $row['balance'],
                 'budget' => $row['budget']];
         }
-        // get YTD begininng balances
+        // get YTD begininng balances. GROUP BY dropped 2026-06-05: redundant
+        // under WHERE period=X and rejected by strict mode (only_full_group_by)
+        // since beginning_balance is non-aggregated.
         $sql = "SELECT gl_account, beginning_balance
-            FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$this->period_first AND gl_type=$type GROUP BY gl_account ORDER BY gl_account";
+            FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$this->period_first AND gl_type=$type ORDER BY gl_account";
         if (!$stmt = dbGetResult($sql)) { return; }
         $result1 = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($result1 as $row) { // year to date
@@ -160,9 +162,10 @@ class income_statement
             $data[$row['gl_account']]['ly_amount'] = $negate ? -$row['balance'] : $row['balance'];
             $data[$row['gl_account']]['ly_budget'] = $row['budget'];
         }
-        // get Last YTD begininng balances
+        // get Last YTD begininng balances. GROUP BY dropped 2026-06-05: same
+        // strict-mode reason as the YTD beginning-balance query above.
         $sql = "SELECT gl_account, beginning_balance
-            FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$this->period_first AND gl_type=$type GROUP BY gl_account ORDER BY gl_account";
+            FROM ".BIZUNO_DB_PREFIX."journal_history WHERE period=$this->period_first AND gl_type=$type ORDER BY gl_account";
         if (!$stmt = dbGetResult($sql)) { return; }
         $result4 = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($result4 as $row) { // year to date
