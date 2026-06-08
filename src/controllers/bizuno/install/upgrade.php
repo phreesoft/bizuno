@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (added 7.3.9 gate to repair journal_main.period values that drifted off the post_date period for quality tickets)
+ * @version    7.x Last Update: 2026-06-06 (added 7.4.3 gate to MODIFY *_meta.meta_value to TEXT DEFAULT NULL — repairs the illegal "DEFAULT ''" on TEXT columns carried by pre-7.4.3 imports that fatal on strict MySQL 8 with error 1101)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -195,6 +195,31 @@ function bizunoUpgrade()
         // and set period to the matching fiscal period number. dbMetaSet/getValue helpers aren't
         // used here because this is a bulk single-statement repair.
         repairJournalMainPeriod();
+    }
+
+    if (version_compare($dbVer, '7.4.3') < 0) {
+        // Strict-mode MySQL 8 / MariaDB (GoDaddy and most managed hosts) reject a
+        // literal default on a TEXT/BLOB column with "1101 - BLOB, TEXT, GEOMETRY
+        // or JSON column 'meta_value' can't have a default value". Releases through
+        // 7.4.2 defined the *_meta.meta_value columns as "TEXT NULL DEFAULT ''", so
+        // any database created or imported at that level (e.g. a 7.3.8 import) still
+        // carries the illegal default. The moment Bizuno re-syncs the table
+        // structure (repairTables() issues CHANGE `meta_value` `meta_value` TEXT
+        // <attr> from tables.php), that bad attr was replayed and the statement
+        // fatally errored. 7.4.3 corrected the shipped spec to DEFAULT NULL; this
+        // gate realigns already-installed databases so the column matches. MODIFY is
+        // idempotent — safe to apply whether the column is currently NOT NULL,
+        // NULL DEFAULT '', or already DEFAULT NULL. Comments mirror tables.php.
+        $metaCols = [
+            'common_meta'    => 'tag:MetaValue;order:20',
+            'contacts_meta'  => 'tag:MetaValue;order:40',
+            'inventory_meta' => 'tag:MetaValue;order:40',
+            'journal_meta'   => 'tag:MetaValue;order:40'];
+        foreach ($metaCols as $mTbl => $mCmt) {
+            if (dbFieldExists(BIZUNO_DB_PREFIX.$mTbl, 'meta_value')) {
+                dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX.$mTbl."` MODIFY `meta_value` TEXT DEFAULT NULL COMMENT '$mCmt'");
+            }
+        }
     }
 
     // At every upgrade, run the comments repair tool to fix changes to the view structure and add any new phreeform categories
