@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-03 (bizHTMLCell: normalize <p>/<div> to line breaks + strip unsupported tags so "<p>..." descriptions aren't dropped; constrain Write() word-wrap to the cell column via a temp right margin and leave the cursor at content bottom so wrapped/multi-line cells wrap correctly and expand the row)
+ * @version    7.x Last Update: 2026-05-31 (bizHTMLCell: normalize <p>/<div> to line breaks + strip unsupported tags so "<p>..." descriptions aren't dropped; constrain Write() word-wrap to the cell column via a temp right margin and leave the cursor at content bottom so wrapped/multi-line cells wrap correctly and expand the row)
  * @filesource /controllers/phreeform/renderForm.php
  */
 
@@ -259,7 +259,7 @@ class PDF extends \tFPDF
         $width  = (float)$Params->width;
         $height = (float)$Params->height;
         if (is_file(BIZUNO_DATA.'images/'.$Params->settings->img_file)) {
-            $this->Image(BIZUNO_DATA.'images/'.$Params->settings->img_file, $Params->abscissa, $Params->ordinate, $width, $height);
+            $this->Image(BIZUNO_DATA.'images/'.$Params->settings->img_file, (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
         } else { // no image was found at the specified path, draw a box
             $this->SetXY($Params->abscissa, $Params->ordinate);
             $this->SetFont($this->defaultFont, '', '10');
@@ -292,7 +292,7 @@ class PDF extends \tFPDF
         $ext = pathinfo(BIZUNO_DATA."images/$path", PATHINFO_EXTENSION);
         msgDebug("\nLooking for image at BIZUNO_DATA/images/$path");
         if (is_file(BIZUNO_DATA."images/$path") && (in_array(strtolower($ext), ['jpg', 'jpeg', 'png']))) {
-            $this->Image(BIZUNO_DATA."images/$path", $Params->abscissa, $Params->ordinate, $width, $height);
+            $this->Image(BIZUNO_DATA."images/$path", (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
         } elseif (!empty($Params->hideNone)) {
             $this->Cell($width, 5, lang('none'), 1, 0, 'C');
         } else { // no image was found at the specified path, draw a box
