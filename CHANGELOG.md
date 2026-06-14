@@ -2,6 +2,8 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.5] — Unreleased
+
 ## [7.4.4] — 2026-06-14
 
 ### Fixed
