@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [7.4.4] — Unreleased
+## [7.4.4] — 2026-06-14
 
 ### Fixed
 - **Strict-MySQL (GoDaddy) compatibility** — resolved fatals on dashboard and report
