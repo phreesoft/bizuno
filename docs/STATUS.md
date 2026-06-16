@@ -5,7 +5,7 @@
 > `git log` shows what's been published. This file is the quick "where we left
 > off" summary. Not synced to BetterDocs.
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-06-16
 
 ---
 
@@ -32,7 +32,7 @@ fiscal-year-close.
 
 ## Remaining stubs (the next work)
 
-- **02-core-concepts:** fiscal-periods-vs-calendar-dates, contacts-as-universal-entity, inventory-types-and-cogs
+- **02-core-concepts:** ✅ now fully drafted (the last three — fiscal-periods-vs-calendar-dates, contacts-as-universal-entity, inventory-types-and-cogs — drafted on branch `docs/core-concepts-stubs`, **not yet published**: flip `status: draft → published` and sync to go live)
 - **03-daily-workflows:** po-receive-bill-pay, partial-backorder, returns-and-credit-memos, recurring-invoices-and-pos, multi-currency-and-gl-settlement
 - **05-administration:** roles-and-security, users-employees-contacts, backup-and-restore, override-hooks-and-myext, cache-mechanics
 - **06-customization:** the-myext-pattern, custom-payment-gateway, custom-journal-type, custom-phreeform-processor
@@ -79,3 +79,9 @@ php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' 
 - **Assembly labor cost:** labor/charge BOM lines are deliberately **not**
   capitalized into an assembly's GL inventory value (labor has its own GL→COGS path;
   capitalizing would double-count). See `03-inventory/03-assemblies.md`.
+- **Stubs say "7.3.9" for the period fixes — that's wrong.** `ensureFiscalYearCovers`
+  and the `fyClose` period self-heal both landed in commit `f40b8a1` (2026-05-15),
+  which is contained in `v7.4.0`+ — there is no 7.3.9 tag at all. The drafted
+  Core-Concepts page now cites `since: 7.4.0`. When you write the
+  `09-troubleshooting/03-period-drift-and-recurs` and `08-migration/release-notes`
+  pages, use **7.4.0**, not 7.3.9, for these.
