@@ -30,25 +30,34 @@ fiscal-year-close.
 
 ---
 
-## Remaining stubs (the next work)
+## Status: every chapter is drafted 🎉
 
-All drafted chapters below are **merged to `main` but still `status: draft`** —
-i.e. written and committed, but **not yet published** to bizuno.com/docs.
+**There are no stubs left in the manual.** Every page is now `draft` or
+`published`. The remaining work is editorial review and **publishing** (flip
+`draft → published` + sync), not drafting.
 
-- **02-core-concepts:** ✅ fully drafted (merged to `main`)
-- **03-daily-workflows:** ✅ fully drafted (merged to `main` — pages 02–06; 01 was already done)
-- **05-administration:** ✅ fully drafted (merged to `main`)
-- **06-customization:** ✅ fully drafted (merged to `main`)
-- **09-troubleshooting:** ✅ fully drafted (merged to `main`)
-- **07-integration:** ✅ fully drafted (merged to `main`)
-- **08-migration-and-upgrade:** ✅ fully drafted (branch `docs/migration` — from-phreebooks-v5, from-quickbooks, and the release-notes `7-3-9` stub **renamed to `7-4-0`** and drafted as the v7.4.0 notes)
-- **01-getting-started:** `what-is-bizuno` — the **only remaining stub in the manual**
+Chapters drafted in this push (all **merged to `main`**, all still `status:
+draft` — written and committed, but **not yet published** to bizuno.com/docs):
 
-To publish a drafted chapter live: flip its pages' `status: draft → published`
-(and the section README), then sync.
+- **01-getting-started:** ✅ `what-is-bizuno` drafted (the last stub); `03-first-hour-walkthrough` was already drafted
+- **02-core-concepts:** ✅ fully drafted
+- **03-daily-workflows:** ✅ fully drafted
+- **05-administration:** ✅ fully drafted
+- **06-customization:** ✅ fully drafted
+- **07-integration:** ✅ fully drafted
+- **08-migration-and-upgrade:** ✅ fully drafted (release-notes `7-3-9` stub **renamed to `7-4-0`**, drafted as the v7.4.0 notes)
+- **09-troubleshooting:** ✅ fully drafted
 
-Remaining: just **`01-getting-started/01-what-is-bizuno`** — the last stub in the
-whole manual.
+(Chapter **04 Modules in Depth** was already complete and **published live**.)
+
+### To publish the drafted chapters live
+Flip each page's frontmatter `status: draft → published` (and the section README
+status column), then sync — only `published` pages sync:
+```bash
+php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' --only=<section>
+```
+Suggested order: a voice/accuracy review pass per chapter, then publish
+chapter-by-chapter (Getting-Started → Core Concepts → Daily Workflows → … ).
 
 > **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
 > — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover
