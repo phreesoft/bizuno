@@ -12,9 +12,9 @@ common variations / gotchas.
 
 | #  | Page                                                                                                   | Status | Audience       |
 |----|--------------------------------------------------------------------------------------------------------|--------|----------------|
-| 01 | [Quote → SO → Invoice → Payment → Deposit](./01-quote-so-invoice-payment-deposit.md)                   | stub   | bookkeeper     |
-| 02 | [PO → Receive → Vendor Invoice → Pay Bill](./02-po-receive-bill-pay.md)                                | stub   | bookkeeper     |
-| 03 | [Sale with partial backorder](./03-sale-with-partial-backorder.md)                                     | stub   | bookkeeper     |
-| 04 | [Returns and credit memos](./04-returns-and-credit-memos.md)                                           | stub   | bookkeeper     |
-| 05 | [Recurring invoices and POs](./05-recurring-invoices-and-pos.md)                                       | stub   | bookkeeper, admin |
-| 06 | [Multi-currency invoice and GL settlement](./06-multi-currency-and-gl-settlement.md)                   | stub   | bookkeeper     |
+| 01 | [Quote → SO → Invoice → Payment → Deposit](./01-quote-so-invoice-payment-deposit.md)                   | draft  | bookkeeper     |
+| 02 | [PO → Receive → Vendor Invoice → Pay Bill](./02-po-receive-bill-pay.md)                                | draft  | bookkeeper     |
+| 03 | [Sale with partial backorder](./03-sale-with-partial-backorder.md)                                     | draft  | bookkeeper     |
+| 04 | [Returns and credit memos](./04-returns-and-credit-memos.md)                                           | draft  | bookkeeper     |
+| 05 | [Recurring invoices and POs](./05-recurring-invoices-and-pos.md)                                       | draft  | bookkeeper, admin |
+| 06 | [Multi-currency invoice and GL settlement](./06-multi-currency-and-gl-settlement.md)                   | draft  | bookkeeper     |
