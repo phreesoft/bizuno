@@ -12,7 +12,7 @@ can't do that in QuickBooks."
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [The myExt/ pattern](./01-the-myext-pattern.md)                       | stub   | developer, admin |
-| 02 | [Custom payment gateway](./02-custom-payment-gateway.md)              | stub   | developer      |
-| 03 | [Custom journal type](./03-custom-journal-type.md)                    | stub   | developer      |
-| 04 | [Custom PhreeForm processor](./04-custom-phreeform-processor.md)      | stub   | developer      |
+| 01 | [The myExt/ pattern](./01-the-myext-pattern.md)                       | draft  | developer, admin |
+| 02 | [Custom payment gateway](./02-custom-payment-gateway.md)              | draft  | developer      |
+| 03 | [Custom journal type](./03-custom-journal-type.md)                    | draft  | developer      |
+| 04 | [Custom PhreeForm processor](./04-custom-phreeform-processor.md)      | draft  | developer      |
