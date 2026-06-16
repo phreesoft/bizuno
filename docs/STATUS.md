@@ -5,7 +5,7 @@
 > `git log` shows what's been published. This file is the quick "where we left
 > off" summary. Not synced to BetterDocs.
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-06-16
 
 ---
 
@@ -32,17 +32,20 @@ fiscal-year-close.
 
 ## Remaining stubs (the next work)
 
-- **02-core-concepts:** fiscal-periods-vs-calendar-dates, contacts-as-universal-entity, inventory-types-and-cogs
+- **02-core-concepts:** ✅ now fully drafted (the last three — fiscal-periods-vs-calendar-dates, contacts-as-universal-entity, inventory-types-and-cogs — on branch `docs/core-concepts-stubs`, **not yet published**)
+- **05-administration:** ✅ now fully drafted (roles-and-security, users-employees-contacts, backup-and-restore, override-hooks-and-myext, cache-mechanics — on branch `docs/administration`, **not yet published**; fiscal-year-close was already drafted)
 - **03-daily-workflows:** po-receive-bill-pay, partial-backorder, returns-and-credit-memos, recurring-invoices-and-pos, multi-currency-and-gl-settlement
-- **05-administration:** roles-and-security, users-employees-contacts, backup-and-restore, override-hooks-and-myext, cache-mechanics
 - **06-customization:** the-myext-pattern, custom-payment-gateway, custom-journal-type, custom-phreeform-processor
 - **07-integration:** woocommerce-via-bizuno-api, edi-x12, rest-api-surface
 - **08-migration-and-upgrade:** from-phreebooks-v5, from-quickbooks, release-notes/7-3-9
 - **09-troubleshooting:** trap-and-trace-files, cache-out-of-sync, period-drift-and-recurs, pdf-rendering-issues
 - **01-getting-started:** what-is-bizuno
 
-Suggested next chapters: **Core Concepts** (underpins everything; several module
-pages already link to its stubs) or **Administration**.
+To publish the two drafted chapters live: flip their pages' `status: draft → published`
+(and the section READMEs), merge, then sync.
+
+Suggested next chapters: **Daily Workflows** (after the first), then
+**Customization** / **Integration** / **Migration** / **Troubleshooting**.
 
 ---
 
@@ -79,3 +82,17 @@ php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' 
 - **Assembly labor cost:** labor/charge BOM lines are deliberately **not**
   capitalized into an assembly's GL inventory value (labor has its own GL→COGS path;
   capitalizing would double-count). See `03-inventory/03-assemblies.md`.
+- **The stubs say "7.3.9" — there is no 7.3.9 tag** (tags jump `7.3.8 → v7.4.0`).
+  Verified actual releases for the features the stubs misattributed:
+  `ensureFiscalYearCovers` + `fyClose` period self-heal → **v7.4.0**;
+  parent-menu-from-child role access → **v7.4.0**; Clear Business Cache button →
+  **v7.4.0**; `options_*` rebuild into `common_meta` → **7.3.8**. The drafted pages
+  cite these correctly. Use the same when writing `08-migration/release-notes` and
+  `09-troubleshooting/03-period-drift-and-recurs` (rename the `release-notes/7-3-9`
+  stub — that release doesn't exist).
+- **Backup tool is database-only.** The built-in Administrate → Backup runs
+  `mysqldump` (`.sql.gz`) and does **not** capture the `BIZUNO_DATA` filesystem
+  (images, PDFs, `myExt/`) — that's a manual tar. The drafted backup page says so;
+  don't let later pages imply the tool backs up files.
+- **Passkeys/WebAuthn are vendored but NOT wired up.** Only emailed-code 2FA is live.
+  Don't document hardware passkeys as an available feature until the enrollment UI lands.
