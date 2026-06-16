@@ -39,16 +39,17 @@ i.e. written and committed, but **not yet published** to bizuno.com/docs.
 - **03-daily-workflows:** ✅ fully drafted (merged to `main` — pages 02–06; 01 was already done)
 - **05-administration:** ✅ fully drafted (merged to `main`)
 - **06-customization:** ✅ fully drafted (merged to `main`)
-- **09-troubleshooting:** ✅ fully drafted (branch `docs/troubleshooting` — trap-and-trace-files, cache-out-of-sync, period-drift-and-recurs, pdf-rendering-issues)
-- **07-integration:** woocommerce-via-bizuno-api, edi-x12, rest-api-surface
+- **09-troubleshooting:** ✅ fully drafted (merged to `main`)
+- **07-integration:** ✅ fully drafted (branch `docs/integration` — woocommerce-via-bizuno-api, edi-x12, rest-api-surface)
 - **08-migration-and-upgrade:** from-phreebooks-v5, from-quickbooks, release-notes/7-3-9
 - **01-getting-started:** what-is-bizuno
 
 To publish a drafted chapter live: flip its pages' `status: draft → published`
 (and the section README), then sync.
 
-Suggested next chapters: **Integration** or **Migration**
-(Getting-Started's lone `what-is-bizuno` stub is a quick win too).
+Remaining: **08-migration-and-upgrade** (from-phreebooks-v5, from-quickbooks,
+release-notes) and **01-getting-started** (`what-is-bizuno`, a quick win). Those
+two are the only stubs left in the whole manual.
 
 > **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
 > — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover
