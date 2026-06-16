@@ -69,11 +69,26 @@ class bizuno_accounting
         require_once ( plugin_dir_path( __FILE__ ) . 'portalCFG.php' );
         // portalCFG.php is the canonical source for path/URL constants
         // including BIZUNO_URL_VIEW — no need to re-define here.
+        // These three are cheap, allocation-only globals (no DB, no I/O on
+        // construction) so they're safe to set up on every request.
         if ( !isset( $msgStack ) || !( $msgStack instanceof \bizuno\messageStack ) ) { $msgStack = new \bizuno\messageStack(); }
         if ( !isset( $cleaner )  || !( $cleaner  instanceof \bizuno\cleaner ) )      { $cleaner  = new \bizuno\cleaner(); }
         if ( !isset( $io )       || !( $io       instanceof \bizuno\io ) )           { $io       = new \bizuno\io(); }
-        if ( !isset( $db )       || !( $db       instanceof \bizuno\db ) )           { $db       = new \bizuno\db( BIZUNO_DB_CREDS ); }
-        $this->verifyDbInstalled();
+        // DB connection is opened LAZILY. Previously this ran on every WP
+        // `init` — i.e. on every storefront page view and every unrelated
+        // AJAX call — holding a MySQL connection for the whole request even
+        // when Bizuno was never touched. On shared hosts with a low
+        // `max_user_connections` cap (Bizuno shares WordPress's DB user) that
+        // exhausts the pool and surfaces as MySQL error 1203. The only
+        // consumer of $db at init time is the admin install-status notice
+        // (verifyDbInstalled), which is meaningful only on real wp-admin page
+        // loads. Front-end /bizuno page views and bizuno_ajax calls let
+        // portalCtl open its own single connection, so we no longer
+        // double-connect there either.
+        if ( is_admin() && !wp_doing_ajax() ) {
+            if ( !isset( $db ) || !( $db instanceof \bizuno\db ) ) { $db = new \bizuno\db( BIZUNO_DB_CREDS ); }
+            $this->verifyDbInstalled();
+        }
     }
 
     /**
@@ -128,14 +143,17 @@ class bizuno_accounting
 
     /**
      * Intercept the front-end /bizuno page and hand control to Bizuno's own
-     * controller instead of rendering the WP theme. Anonymous users see the
-     * normal page content (a login-required message); authenticated users
-     * see the full Bizuno UI in place.
+     * controller instead of rendering the WP theme. Bizuno authenticates
+     * independently of WordPress (its own bizunoSession cookie + sign-in
+     * screen), so we do NOT gate on is_user_logged_in() here — that would
+     * force a redundant WordPress login first. portalCtl::getScope() returns
+     * 'guest' for an unauthenticated visitor and renders Bizuno's own login;
+     * a valid Bizuno session lands straight in the full UI.
      */
     public function bizunoPageRedirect()
     {
         global $post;
-        if ( is_user_logged_in() && !empty( $post->post_name ) && $this->bizSlug == $post->post_name ) {
+        if ( !empty( $post->post_name ) && $this->bizSlug == $post->post_name ) {
             new \bizuno\portalCtl();
             exit();
         }
