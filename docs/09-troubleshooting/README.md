@@ -7,7 +7,7 @@ and recover from them.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [Trap and trace files](./01-trap-and-trace-files.md)                  | stub   | admin, developer |
-| 02 | [Cache out of sync](./02-cache-out-of-sync.md)                        | stub   | admin          |
-| 03 | [Period drift and recurring entries](./03-period-drift-and-recurs.md) | stub   | admin          |
-| 04 | [PDF rendering issues](./04-pdf-rendering-issues.md)                  | stub   | admin, developer |
+| 01 | [Trap and trace files](./01-trap-and-trace-files.md)                  | draft  | admin, developer |
+| 02 | [Cache out of sync](./02-cache-out-of-sync.md)                        | draft  | admin          |
+| 03 | [Period drift and recurring entries](./03-period-drift-and-recurs.md) | draft  | admin          |
+| 04 | [PDF rendering issues](./04-pdf-rendering-issues.md)                  | draft  | admin, developer |
