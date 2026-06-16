@@ -11,9 +11,9 @@ If you're moving from PhreeBooks 5 or QuickBooks, skim this, then jump to
 
 | #  | Page                                                            | Status     | Audience              |
 |----|-----------------------------------------------------------------|------------|-----------------------|
-| 01 | [What is Bizuno](./01-what-is-bizuno.md)                        | stub       | all                   |
+| 01 | [What is Bizuno](./01-what-is-bizuno.md)                        | draft      | all                   |
 | 02 | [Four ways to run it](./02-three-ways-to-run-it.md)             | published  | admin                 |
-| 03 | [First-hour walkthrough](./03-first-hour-walkthrough.md)        | stub       | bookkeeper, admin     |
+| 03 | [First-hour walkthrough](./03-first-hour-walkthrough.md)        | draft      | bookkeeper, admin     |
 | 04 | [Docker install walkthrough](./04-docker-install-walkthrough.md)| published  | admin                 |
 | 05 | [LAMP / LEMP install walkthrough](./05-lamp-install-walkthrough.md)| published | admin                 |
 | 06 | [WordPress install walkthrough](./06-wordpress-install-walkthrough.md)| published | admin                |
