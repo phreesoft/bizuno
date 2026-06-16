@@ -5,7 +5,7 @@
 > `git log` shows what's been published. This file is the quick "where we left
 > off" summary. Not synced to BetterDocs.
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-06-16
 
 ---
 
@@ -32,17 +32,20 @@ fiscal-year-close.
 
 ## Remaining stubs (the next work)
 
-- **02-core-concepts:** fiscal-periods-vs-calendar-dates, contacts-as-universal-entity, inventory-types-and-cogs
-- **03-daily-workflows:** po-receive-bill-pay, partial-backorder, returns-and-credit-memos, recurring-invoices-and-pos, multi-currency-and-gl-settlement
-- **05-administration:** roles-and-security, users-employees-contacts, backup-and-restore, override-hooks-and-myext, cache-mechanics
+- **02-core-concepts:** ✅ fully drafted (branch `docs/core-concepts-stubs`, **not yet published**)
+- **03-daily-workflows:** ✅ fully drafted (branch `docs/daily-workflows`, **not yet published** — pages 02–06 drafted; 01 was already done)
+- **05-administration:** ✅ fully drafted (branch `docs/administration`, **not yet published**)
 - **06-customization:** the-myext-pattern, custom-payment-gateway, custom-journal-type, custom-phreeform-processor
 - **07-integration:** woocommerce-via-bizuno-api, edi-x12, rest-api-surface
 - **08-migration-and-upgrade:** from-phreebooks-v5, from-quickbooks, release-notes/7-3-9
 - **09-troubleshooting:** trap-and-trace-files, cache-out-of-sync, period-drift-and-recurs, pdf-rendering-issues
 - **01-getting-started:** what-is-bizuno
 
-Suggested next chapters: **Core Concepts** (underpins everything; several module
-pages already link to its stubs) or **Administration**.
+To publish a drafted chapter live: flip its pages' `status: draft → published`
+(and the section README), merge, then sync.
+
+Suggested next chapters: **Customization**, **Integration**, **Migration**, or
+**Troubleshooting** (Getting-Started's lone `what-is-bizuno` stub is a quick win too).
 
 ---
 
@@ -79,3 +82,30 @@ php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' 
 - **Assembly labor cost:** labor/charge BOM lines are deliberately **not**
   capitalized into an assembly's GL inventory value (labor has its own GL→COGS path;
   capitalizing would double-count). See `03-inventory/03-assemblies.md`.
+- **The stubs say "7.3.9" — there is no 7.3.9 tag** (tags jump `7.3.8 → v7.4.0`).
+  Verified real releases: period self-heal / `ensureFiscalYearCovers`, parent-menu-from-child
+  role access, and the Clear Business Cache button → **v7.4.0**; the `options_*`
+  rebuild into `common_meta` → **7.3.8**. Rename the `08-migration/release-notes/7-3-9`
+  stub — that release doesn't exist.
+- **Backup tool is database-only.** Built-in Administrate → Backup runs `mysqldump`
+  (`.sql.gz`); it does NOT capture the `BIZUNO_DATA` filesystem (images/PDFs/`myExt/`) —
+  that's a manual tar. (Drafted in `05-administration/03`.)
+- **Passkeys/WebAuthn are vendored but NOT wired up** — only emailed-code 2FA is live.
+- **Daily-workflow corrections found while drafting (all verified against the journal classes):**
+  - PO is **jID=4**, not jID=7 (jID=7 is Vendor Credit). The old stub had this wrong.
+  - **No GRNI / accrued-receipts step.** Bizuno receives stock *and* books AP in one
+    entry — the Purchase (jID=6) — there is no separate receive journal and no
+    goods-received-not-invoiced account. Three-way match is manual.
+  - **No auto-PO-from-backorder.** There's a read-only reorder/stock-status dashboard
+    and manual (or drop-ship) PO creation — nothing generates POs from short SO lines.
+  - **Returns:** the RMA-tracking module is real (status/codes/preventable, receive→close),
+    but the **Quality tie-in is NOT automatic** — return codes don't open CA/PA tickets.
+  - **Recurring:** occurrences are inserted **eagerly** (all up front, linked by `recur_id`);
+    edit is binary (this / all-future, no "all incl. past"); and **"delete all future" is
+    effectively unreachable in the UI** — stopping a chain means deleting future rows one
+    by one, so don't over-project. Frequencies are only weekly/bi-weekly/monthly/quarterly.
+  - **Multi-currency:** Bizuno records foreign-currency txns and posts the GL in the home
+    currency at a **manually-entered** rate (auto-feed is deprecated). It does **NOT** post
+    realized FX gain/loss at payment, and has **no** period-end unrealized revaluation —
+    both are manual General Journal entries. Reports are default-currency only. Don't let
+    later pages imply automatic FX accounting.
