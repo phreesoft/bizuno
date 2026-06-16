@@ -12,8 +12,8 @@ If a single page in the whole manual is mandatory reading, it's
 
 | #  | Page                                                                                                   | Status | Audience              |
 |----|--------------------------------------------------------------------------------------------------------|--------|-----------------------|
-| 01 | [Multi-store, multi-period, multi-currency](./01-multi-store-multi-period-multi-currency.md)           | stub   | admin, bookkeeper     |
-| 02 | [The journal_id taxonomy](./02-journal-id-taxonomy.md)                                                 | stub   | admin, developer      |
-| 03 | [Fiscal periods vs. calendar dates](./03-fiscal-periods-vs-calendar-dates.md)                          | stub   | bookkeeper, admin     |
-| 04 | [Contacts as the universal entity](./04-contacts-as-universal-entity.md)                               | stub   | bookkeeper, admin     |
-| 05 | [Inventory types and COGS](./05-inventory-types-and-cogs.md)                                           | stub   | bookkeeper, admin     |
+| 01 | [Multi-store, multi-period, multi-currency](./01-multi-store-multi-period-multi-currency.md)           | draft  | admin, bookkeeper     |
+| 02 | [The journal_id taxonomy](./02-journal-id-taxonomy.md)                                                 | draft  | admin, developer      |
+| 03 | [Fiscal periods vs. calendar dates](./03-fiscal-periods-vs-calendar-dates.md)                          | draft  | bookkeeper, admin     |
+| 04 | [Contacts as the universal entity](./04-contacts-as-universal-entity.md)                               | draft  | bookkeeper, admin     |
+| 05 | [Inventory types and COGS](./05-inventory-types-and-cogs.md)                                           | draft  | bookkeeper, admin     |
