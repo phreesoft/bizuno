@@ -40,16 +40,15 @@ i.e. written and committed, but **not yet published** to bizuno.com/docs.
 - **05-administration:** ✅ fully drafted (merged to `main`)
 - **06-customization:** ✅ fully drafted (merged to `main`)
 - **09-troubleshooting:** ✅ fully drafted (merged to `main`)
-- **07-integration:** ✅ fully drafted (branch `docs/integration` — woocommerce-via-bizuno-api, edi-x12, rest-api-surface)
-- **08-migration-and-upgrade:** from-phreebooks-v5, from-quickbooks, release-notes/7-3-9
-- **01-getting-started:** what-is-bizuno
+- **07-integration:** ✅ fully drafted (merged to `main`)
+- **08-migration-and-upgrade:** ✅ fully drafted (branch `docs/migration` — from-phreebooks-v5, from-quickbooks, and the release-notes `7-3-9` stub **renamed to `7-4-0`** and drafted as the v7.4.0 notes)
+- **01-getting-started:** `what-is-bizuno` — the **only remaining stub in the manual**
 
 To publish a drafted chapter live: flip its pages' `status: draft → published`
 (and the section README), then sync.
 
-Remaining: **08-migration-and-upgrade** (from-phreebooks-v5, from-quickbooks,
-release-notes) and **01-getting-started** (`what-is-bizuno`, a quick win). Those
-two are the only stubs left in the whole manual.
+Remaining: just **`01-getting-started/01-what-is-bizuno`** — the last stub in the
+whole manual.
 
 > **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
 > — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover
