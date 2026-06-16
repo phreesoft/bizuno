@@ -38,17 +38,24 @@ i.e. written and committed, but **not yet published** to bizuno.com/docs.
 - **02-core-concepts:** ✅ fully drafted (merged to `main`)
 - **03-daily-workflows:** ✅ fully drafted (merged to `main` — pages 02–06; 01 was already done)
 - **05-administration:** ✅ fully drafted (merged to `main`)
-- **06-customization:** ✅ fully drafted (branch `docs/customization` — all 4 pages: the-myext-pattern, custom-payment-gateway, custom-journal-type, custom-phreeform-processor)
+- **06-customization:** ✅ fully drafted (merged to `main`)
+- **09-troubleshooting:** ✅ fully drafted (branch `docs/troubleshooting` — trap-and-trace-files, cache-out-of-sync, period-drift-and-recurs, pdf-rendering-issues)
 - **07-integration:** woocommerce-via-bizuno-api, edi-x12, rest-api-surface
 - **08-migration-and-upgrade:** from-phreebooks-v5, from-quickbooks, release-notes/7-3-9
-- **09-troubleshooting:** trap-and-trace-files, cache-out-of-sync, period-drift-and-recurs, pdf-rendering-issues
 - **01-getting-started:** what-is-bizuno
 
 To publish a drafted chapter live: flip its pages' `status: draft → published`
 (and the section README), then sync.
 
-Suggested next chapters: **Integration**, **Migration**, or **Troubleshooting**
+Suggested next chapters: **Integration** or **Migration**
 (Getting-Started's lone `what-is-bizuno` stub is a quick win too).
+
+> **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
+> — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover
+> (period self-heal, parent-menu-from-child access, Clear Business Cache button,
+> the tFPDF migration, `bizScrubSensitive`, EDI N9/MSG no-op) all shipped in
+> **v7.4.0**. The `options_*` rebuild was 7.3.8; the PDF Image() x/y casts were
+> 7.4.3/7.4.4.
 
 ---
 
