@@ -2,7 +2,7 @@
 title: Fiscal-year Management
 category: PhreeBooks
 order: 5
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-07
 ---

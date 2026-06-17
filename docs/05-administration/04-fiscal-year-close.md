@@ -2,7 +2,7 @@
 title: Fiscal-Year Close
 category: Administration
 order: 4
-status: draft
+status: published
 audience: [admin, bookkeeper]
 last-updated: 2026-05-19
 ---

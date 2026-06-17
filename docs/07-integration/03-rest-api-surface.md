@@ -2,7 +2,7 @@
 title: REST API Surface
 category: Integration
 order: 3
-status: draft
+status: published
 audience: [developer]
 last-updated: 2026-06-16
 ---

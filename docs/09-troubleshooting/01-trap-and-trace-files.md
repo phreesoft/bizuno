@@ -2,7 +2,7 @@
 title: Trap and Trace Files
 category: Troubleshooting
 order: 1
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-16
 ---

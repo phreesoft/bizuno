@@ -2,7 +2,7 @@
 title: Custom Payment Gateway
 category: Customization
 order: 2
-status: draft
+status: published
 audience: [developer]
 last-updated: 2026-06-16
 ---

@@ -2,7 +2,7 @@
 title: Contacts as the Universal Entity
 category: Core Concepts
 order: 4
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-16
 ---

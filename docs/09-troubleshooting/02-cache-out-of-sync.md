@@ -2,7 +2,7 @@
 title: Cache Out of Sync
 category: Troubleshooting
 order: 2
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-16
 ---

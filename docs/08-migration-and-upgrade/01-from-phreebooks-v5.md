@@ -2,7 +2,7 @@
 title: From PhreeBooks v5
 category: Migration & Upgrade
 order: 1
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-16
 ---

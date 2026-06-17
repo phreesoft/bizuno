@@ -2,7 +2,7 @@
 title: Roles and Security
 category: Administration
 order: 1
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-16
 ---

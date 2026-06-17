@@ -2,7 +2,7 @@
 title: Quote → SO → Invoice → Payment → Deposit
 category: Daily Workflows
 order: 1
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-05-19
 ---

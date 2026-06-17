@@ -2,7 +2,7 @@
 title: Returns and Credit Memos
 category: Daily Workflows
 order: 4
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-06-16
 ---

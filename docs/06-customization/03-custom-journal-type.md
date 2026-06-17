@@ -2,7 +2,7 @@
 title: Custom Journal Type
 category: Customization
 order: 3
-status: draft
+status: published
 audience: [developer]
 last-updated: 2026-06-16
 ---
