@@ -2,7 +2,7 @@
 title: Custom PhreeForm Processor
 category: Customization
 order: 4
-status: draft
+status: published
 audience: [developer]
 last-updated: 2026-06-16
 ---

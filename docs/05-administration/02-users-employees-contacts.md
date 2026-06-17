@@ -2,7 +2,7 @@
 title: Users vs. Employees vs. Contacts
 category: Administration
 order: 2
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-16
 ---

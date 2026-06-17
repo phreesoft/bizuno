@@ -2,7 +2,7 @@
 title: Register & Reconcile
 category: PhreeBooks
 order: 3
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-06-07
 ---

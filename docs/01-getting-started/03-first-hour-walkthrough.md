@@ -2,7 +2,7 @@
 title: First-Hour Walkthrough
 category: Getting Started
 order: 3
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-05-19
 ---

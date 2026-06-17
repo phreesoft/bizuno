@@ -2,7 +2,7 @@
 title: The journal_id Taxonomy
 category: Core Concepts
 order: 2
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-05-19
 ---

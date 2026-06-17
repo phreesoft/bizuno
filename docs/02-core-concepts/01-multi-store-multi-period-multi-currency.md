@@ -2,7 +2,7 @@
 title: Multi-store, Multi-period, Multi-currency
 category: Core Concepts
 order: 1
-status: draft
+status: published
 audience: [admin, bookkeeper]
 last-updated: 2026-05-19
 ---

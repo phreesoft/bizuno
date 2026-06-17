@@ -2,7 +2,7 @@
 title: Backup and Restore
 category: Administration
 order: 3
-status: draft
+status: published
 audience: [admin]
 last-updated: 2026-06-16
 ---

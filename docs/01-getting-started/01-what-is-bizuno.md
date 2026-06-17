@@ -2,7 +2,7 @@
 title: What is Bizuno
 category: Getting Started
 order: 1
-status: draft
+status: published
 audience: [bookkeeper, admin, developer]
 last-updated: 2026-06-16
 ---

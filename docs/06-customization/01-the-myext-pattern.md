@@ -2,7 +2,7 @@
 title: The myExt/ Pattern
 category: Customization
 order: 1
-status: draft
+status: published
 audience: [developer, admin]
 last-updated: 2026-06-16
 ---

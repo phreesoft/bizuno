@@ -30,34 +30,39 @@ fiscal-year-close.
 
 ---
 
-## Status: every chapter is drafted 🎉
+## Status: whole manual drafted AND flipped to `published` 🎉
 
-**There are no stubs left in the manual.** Every page is now `draft` or
-`published`. The remaining work is editorial review and **publishing** (flip
-`draft → published` + sync), not drafting.
+**Every manual page is now `status: published`** (frontmatter + section README
+status columns), merged to `main`. There are no stubs and no drafts left in the
+manual chapters.
 
-Chapters drafted in this push (all **merged to `main`**, all still `status:
-draft` — written and committed, but **not yet published** to bizuno.com/docs):
+Chapters (all **merged to `main`**, all now `status: published`):
 
-- **01-getting-started:** ✅ `what-is-bizuno` drafted (the last stub); `03-first-hour-walkthrough` was already drafted
-- **02-core-concepts:** ✅ fully drafted
-- **03-daily-workflows:** ✅ fully drafted
-- **05-administration:** ✅ fully drafted
-- **06-customization:** ✅ fully drafted
-- **07-integration:** ✅ fully drafted
-- **08-migration-and-upgrade:** ✅ fully drafted (release-notes `7-3-9` stub **renamed to `7-4-0`**, drafted as the v7.4.0 notes)
-- **09-troubleshooting:** ✅ fully drafted
+- **01-getting-started** ✅ (incl. `what-is-bizuno`, the former last stub)
+- **02-core-concepts** ✅
+- **03-daily-workflows** ✅
+- **04-modules-in-depth** ✅ (was already largely live; the remaining PhreeBooks pages flipped too)
+- **05-administration** ✅
+- **06-customization** ✅
+- **07-integration** ✅
+- **08-migration-and-upgrade** ✅ (release-notes `7-3-9` → **`7-4-0`**)
+- **09-troubleshooting** ✅
 
-(Chapter **04 Modules in Depth** was already complete and **published live**.)
+**Deliberately left as `draft` (NOT for the public manual):** `agent-catalog/*`
+(internal machine-readable agent catalog) and `CONTRIBUTING-DOCS.md`. These are
+skipped by the sync on purpose — don't flip them.
 
-### To publish the drafted chapters live
-Flip each page's frontmatter `status: draft → published` (and the section README
-status column), then sync — only `published` pages sync:
+### The one remaining step: run the sync
+The `published` flag only gates *whether* a page syncs; it does **not** push
+anything live by itself. To publish to bizuno.com/docs, the site owner
+(`support@phreesoft.com`, who holds the WP app password) runs:
 ```bash
-php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' --only=<section>
+composer install            # first time on a machine (parsedown)
+php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>'
 ```
-Suggested order: a voice/accuracy review pass per chapter, then publish
-chapter-by-chapter (Getting-Started → Core Concepts → Daily Workflows → … ).
+A full `--dry-run` currently reports **79 candidate pages, 0 failed** (12 skipped
+= the agent-catalog + CONTRIBUTING files above). Commit `docs/.sync-map.json`
+after the first real sync.
 
 > **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
 > — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover

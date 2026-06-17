@@ -2,7 +2,7 @@
 title: PO → Receive → Vendor Invoice → Pay Bill
 category: Daily Workflows
 order: 2
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-06-16
 ---

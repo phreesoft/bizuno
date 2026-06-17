@@ -2,7 +2,7 @@
 title: PDF Rendering Issues
 category: Troubleshooting
 order: 4
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-16
 ---

@@ -2,7 +2,7 @@
 title: Recurring Invoices and POs
 category: Daily Workflows
 order: 5
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-16
 ---

@@ -2,7 +2,7 @@
 title: Cache Mechanics
 category: Administration
 order: 6
-status: draft
+status: published
 audience: [admin, developer]
 last-updated: 2026-06-16
 ---

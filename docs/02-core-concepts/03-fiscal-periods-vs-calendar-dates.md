@@ -2,7 +2,7 @@
 title: Fiscal Periods vs. Calendar Dates
 category: Core Concepts
 order: 3
-status: draft
+status: published
 audience: [bookkeeper, admin]
 last-updated: 2026-06-16
 ---

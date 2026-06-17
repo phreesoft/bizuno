@@ -2,7 +2,7 @@
 title: Sale with Partial Backorder
 category: Daily Workflows
 order: 3
-status: draft
+status: published
 audience: [bookkeeper]
 last-updated: 2026-06-16
 ---

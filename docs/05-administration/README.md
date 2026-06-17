@@ -12,9 +12,9 @@ should still know it exists.
 
 | #  | Page                                                                  | Status | Audience       |
 |----|-----------------------------------------------------------------------|--------|----------------|
-| 01 | [Roles and security](./01-roles-and-security.md)                      | draft  | admin          |
-| 02 | [Users vs. employees vs. contacts](./02-users-employees-contacts.md)  | draft  | admin          |
-| 03 | [Backup and restore](./03-backup-and-restore.md)                      | draft  | admin          |
-| 04 | [Fiscal-year close](./04-fiscal-year-close.md)                        | draft  | admin, bookkeeper |
-| 05 | [Override hooks and myExt/](./05-override-hooks-and-myext.md)         | draft  | admin, developer |
-| 06 | [Cache mechanics](./06-cache-mechanics.md)                            | draft  | admin, developer |
+| 01 | [Roles and security](./01-roles-and-security.md)                      | published  | admin          |
+| 02 | [Users vs. employees vs. contacts](./02-users-employees-contacts.md)  | published  | admin          |
+| 03 | [Backup and restore](./03-backup-and-restore.md)                      | published  | admin          |
+| 04 | [Fiscal-year close](./04-fiscal-year-close.md)                        | published  | admin, bookkeeper |
+| 05 | [Override hooks and myExt/](./05-override-hooks-and-myext.md)         | published  | admin, developer |
+| 06 | [Cache mechanics](./06-cache-mechanics.md)                            | published  | admin, developer |

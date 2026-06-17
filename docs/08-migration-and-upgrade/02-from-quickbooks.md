@@ -2,7 +2,7 @@
 title: From QuickBooks
 category: Migration & Upgrade
 order: 2
-status: draft
+status: published
 audience: [admin, bookkeeper]
 last-updated: 2026-06-16
 ---

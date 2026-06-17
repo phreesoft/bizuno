@@ -9,7 +9,7 @@ One file per release. Each file covers:
 
 | Version | Date       | File                  | Status |
 |---------|------------|-----------------------|--------|
-| 7.4.0   | 2026-05-19 | [7-4-0.md](./7-4-0.md) | draft  |
+| 7.4.0   | 2026-05-19 | [7-4-0.md](./7-4-0.md) | published  |
 
 > There is **no 7.3.9 release** (the line went 7.3.8 → 7.4.0). Point releases
 > 7.4.1–7.4.4 are small fixes — see the repo `CHANGELOG.md` rather than a page
