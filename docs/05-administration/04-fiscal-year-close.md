@@ -254,4 +254,4 @@ lost. Hence: **take the backup. Verify the backup. Trust the backup.**
 - [Fiscal periods vs. calendar dates](../02-core-concepts/03-fiscal-periods-vs-calendar-dates.md) — what period numbers mean
 - [Backup and restore](./03-backup-and-restore.md) — the prerequisite
 - [Cache mechanics](./06-cache-mechanics.md) — why you clear it after
-- [Release 7.3.9](../08-migration-and-upgrade/03-release-notes/7-3-9.md) — the self-heal pass added to close
+- [Release 7.4.0](../08-migration-and-upgrade/03-release-notes/7-4-0.md) — the self-heal pass added to close

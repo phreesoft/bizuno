@@ -15,7 +15,7 @@
  * @author     PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-19 (auth: switched from hand-built Authorization header to CURLOPT_USERPWD so the script behaves byte-for-byte like `curl --user`; survives 301 redirects + sidesteps Apache/mod_security auth-header munging)
+ * @version    7.x Last Update: 2026-06-18 (rewrite intra-doc relative links — `../section/NN-name.md#anchor` and `../section/` — to BetterDocs URLs `/docs/<slug>/` and `/docs-category/<slug>/` so cross-links resolve on the published site instead of 404ing)
  * @filesource /bin/docs-sync.php
  */
 
@@ -105,6 +105,7 @@ log_line(sprintf("Found %d candidate file(s). Status filter: %s. Site: %s. Dry-r
 
 $categoryCache = [];   // category-slug => term-id
 $stats = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0];
+$linkStats = ['rewritten' => 0, 'unresolved' => 0];   // intra-doc link rewriting
 
 foreach ($files as $file) {
     $rel = ltrim(substr($file, strlen(realpath(DOCS_DIR))), DIRECTORY_SEPARATOR);
@@ -130,8 +131,10 @@ foreach ($files as $file) {
     $catName = derive_category_name($file);
     $order   = (int)($doc['front']['order'] ?? 0);
 
-    // Render body to HTML; prepend a small metadata block (audience + last-updated)
+    // Render body to HTML; rewrite intra-doc links to live BetterDocs URLs;
+    // then prepend a small metadata block (audience + last-updated).
     $bodyHtml = $pdown->text($doc['body']);
+    $bodyHtml = rewrite_doc_links($bodyHtml, $file, $linkStats);
     $bodyHtml = wrap_with_meta($bodyHtml, $doc['front'], $rel);
 
     if ($dryRun) {
@@ -172,6 +175,8 @@ if (!$dryRun) { save_sync_map($syncMap); }
 
 log_line(sprintf("Done — created %d, updated %d, skipped %d, failed %d",
     $stats['created'], $stats['updated'], $stats['skipped'], $stats['failed']));
+log_line(sprintf("Links — rewrote %d intra-doc link(s) to BetterDocs URLs; %d relative link(s) unresolved, kept as-is (external/scheme links are left untouched and not counted)",
+    $linkStats['rewritten'], $linkStats['unresolved']));
 exit($stats['failed'] > 0 ? 2 : 0);
 
 
@@ -290,6 +295,72 @@ function derive_category_name(string $path): string
               'Ar' => 'AR', 'Ap' => 'AP', 'Gl' => 'GL'];
     $name = strtr($name, $known);
     return $name;
+}
+
+/**
+ * Rewrite intra-doc Markdown links (relative paths to other docs) into the
+ * BetterDocs URLs they map to on the live site:
+ *
+ *   ../02-core-concepts/01-multi-store-….md#anchor  →  /docs/multi-store-…/#anchor
+ *   ../03-daily-workflows/                          →  /docs-category/daily-workflows/
+ *
+ * Each link is resolved against the source file's directory with realpath(),
+ * which also confirms the target exists. External (http/https/mailto…),
+ * root-absolute (/…), and pure-anchor (#…) links are left untouched. URLs are
+ * emitted root-relative so they resolve regardless of host (bizuno.com vs www).
+ */
+function rewrite_doc_links(string $html, string $srcAbsPath, array &$stats): string
+{
+    $docsRoot = realpath(DOCS_DIR);
+    $srcDir   = dirname($srcAbsPath);
+    return preg_replace_callback('/href="([^"]*)"/', function ($m) use ($docsRoot, $srcDir, &$stats) {
+        $href = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5);
+        // Leave external, root-absolute, scheme (mailto:/https:/…), and pure-anchor links alone
+        if ($href === '' || $href[0] === '#' || $href[0] === '/'
+            || preg_match('#^[a-z][a-z0-9+.\-]*:#i', $href)) {
+            return $m[0];
+        }
+        // Peel off a #fragment — kept for page links, dropped for category links
+        $anchor = '';
+        if (($p = strpos($href, '#')) !== false) {
+            $anchor = substr($href, $p);
+            $href   = substr($href, 0, $p);
+        }
+        if ($href === '') { return $m[0]; }
+        $target = realpath($srcDir . DIRECTORY_SEPARATOR . $href);
+        if ($target === false || strncmp($target, $docsRoot, strlen($docsRoot)) !== 0) {
+            $stats['unresolved']++;
+            return $m[0];   // outside docs/, or the target doesn't exist — leave it
+        }
+        if (is_dir($target)) {
+            // The 04-modules-in-depth chapter root has no single category — skip it
+            if (preg_replace('/^\d+-/', '', basename($target)) === 'modules-in-depth') {
+                $stats['unresolved']++;
+                return $m[0];
+            }
+            $url = '/docs-category/' . category_slug_for_dir($target) . '/';
+        } elseif (str_ends_with($target, '.md')) {
+            $url = '/docs/' . derive_slug($target) . '/' . $anchor;
+        } else {
+            $stats['unresolved']++;
+            return $m[0];
+        }
+        $stats['rewritten']++;
+        return 'href="' . htmlspecialchars($url, ENT_QUOTES) . '"';
+    }, $html);
+}
+
+/**
+ * Category slug for a section directory — mirrors derive_category_slug() but
+ * takes the directory itself (not a file inside it) as input.
+ */
+function category_slug_for_dir(string $dirAbs): string
+{
+    $name = preg_replace('/^\d+-/', '', basename($dirAbs));
+    if (str_contains($dirAbs, '04-modules-in-depth')) {
+        $name = 'modules-' . $name;
+    }
+    return strtolower($name);
 }
 
 /**
