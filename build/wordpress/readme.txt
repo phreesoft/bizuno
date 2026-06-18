@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.4.3
+Stable tag: 7.4.5
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -83,6 +83,11 @@ WordPress's standard update channel. New versions are published to the WordPress
 9. Dashboard Widget Gallery
 
 == Changelog ==
+
+= 7.4.5 =
+* Fix: **Shared-host "Database connection failed" (MySQL error 1203)** — the plugin opened a MySQL connection on *every* WordPress request (storefront page views, unrelated AJAX) and double-connected on Bizuno AJAX. On hosts with a low `max_user_connections` cap this exhausted the pool and could take the whole site down. The connection is now opened lazily — only when Bizuno actually handles the request.
+* Fix: **/bizuno required a WordPress login first** — reaching /bizuno now goes straight to Bizuno's own sign-in screen (Bizuno authenticates independently of WordPress), instead of showing a "log into WordPress first" placeholder.
+* Fix: **/bizuno served a stale cached page** — page-cache layers (Bluehost Endurance Page Cache, WP Super Cache, W3TC, etc.) could serve a cached copy of the /bizuno page without running PHP, so it never booted Bizuno. The /bizuno page and Bizuno AJAX responses are now marked non-cacheable.
 
 = 7.4.3 =
 * **USPS v3 REST API** — modernized USPS shipping integration: real-time rates, label generation, void/refund. The legacy v1 endpoints are deprecated by USPS; this brings Bizuno to the current API.
