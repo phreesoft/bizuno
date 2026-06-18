@@ -154,6 +154,15 @@ class bizuno_accounting
     {
         global $post;
         if ( !empty( $post->post_name ) && $this->bizSlug == $post->post_name ) {
+            // /bizuno is a live application endpoint, never a cacheable static
+            // page. Tell page-cache layers (Bluehost Endurance Page Cache, WP
+            // Super Cache, W3TC, WP Rocket, Batcache, …) to skip it and send
+            // no-store headers for any CDN/proxy in front. Without this, a
+            // cached copy is served WITHOUT invoking PHP, so this hook never
+            // fires and the page won't boot Bizuno — and a logged-in render
+            // could be served to another visitor.
+            if ( !defined( 'DONOTCACHEPAGE' ) ) { define( 'DONOTCACHEPAGE', true ); }
+            nocache_headers();
             new \bizuno\portalCtl();
             exit();
         }
@@ -166,6 +175,11 @@ class bizuno_accounting
      */
     public function bizunoAjax()
     {
+        // AJAX responses are per-user, per-request application data — never
+        // cacheable. Same rationale as bizunoPageRedirect(): keep page-cache
+        // layers and any CDN/proxy from storing or replaying them.
+        if ( !defined( 'DONOTCACHEPAGE' ) ) { define( 'DONOTCACHEPAGE', true ); }
+        nocache_headers();
         new \bizuno\portalCtl();
         exit();
     }
