@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-31 (bizHTMLCell: normalize <p>/<div> to line breaks + strip unsupported tags so "<p>..." descriptions aren't dropped; constrain Write() word-wrap to the cell column via a temp right margin and leave the cursor at content bottom so wrapped/multi-line cells wrap correctly and expand the row)
+ * @version    7.x Last Update: 2026-06-05 (FormImage / FormImgLink: pre-validate image via getimagesize() before handing to tFPDF — corrupt or mistyped files (e.g. .png that isn't PNG) used to fatal the PDF stream from inside the vendor lib; now they fall back to the bundled default and surface a msgAdd warning, with a final "no_image" box if even the default is unreadable)
  * @filesource /controllers/phreeform/renderForm.php
  */
 
@@ -258,9 +258,10 @@ class PDF extends \tFPDF
         // a blank dimension becomes 0 — FPDF's auto-size sentinel — matching the old TCPDF behavior.
         $width  = (float)$Params->width;
         $height = (float)$Params->height;
-        if (is_file(BIZUNO_DATA.'images/'.$Params->settings->img_file)) {
-            $this->Image(BIZUNO_DATA.'images/'.$Params->settings->img_file, (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
-        } else { // no image was found at the specified path, draw a box
+        $path = $this->safeImagePath(BIZUNO_DATA.'images/'.$Params->settings->img_file);
+        if ($path !== null) {
+            $this->Image($path, (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
+        } else { // even the default fallback failed — draw the red "no image" box
             $this->SetXY($Params->abscissa, $Params->ordinate);
             $this->SetFont($this->defaultFont, '', '10');
             $this->SetTextColor(255, 0, 0);
@@ -289,13 +290,13 @@ class PDF extends \tFPDF
         $width  = (float)$Params->width;
         $height = (float)$Params->height;
         if ( isset($Params->settings->processing)) { $path = viewProcess($path, $Params->settings->processing); }
-        $ext = pathinfo(BIZUNO_DATA."images/$path", PATHINFO_EXTENSION);
         msgDebug("\nLooking for image at BIZUNO_DATA/images/$path");
-        if (is_file(BIZUNO_DATA."images/$path") && (in_array(strtolower($ext), ['jpg', 'jpeg', 'png']))) {
-            $this->Image(BIZUNO_DATA."images/$path", (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
+        $resolved = $this->safeImagePath(BIZUNO_DATA."images/$path");
+        if ($resolved !== null) {
+            $this->Image($resolved, (float)$Params->abscissa, (float)$Params->ordinate, $width, $height);
         } elseif (!empty($Params->hideNone)) {
             $this->Cell($width, 5, lang('none'), 1, 0, 'C');
-        } else { // no image was found at the specified path, draw a box
+        } else { // even the default fallback failed — draw the red "no image" box
             $this->SetXY($Params->abscissa, $Params->ordinate);
             $this->SetFont($this->defaultFont, '', '10');
             $this->SetTextColor(255, 0, 0);
@@ -304,6 +305,36 @@ class PDF extends \tFPDF
             $this->SetFillColor(255);
             $this->Cell('30', '20', lang('no_image'), 1, 0, 'C');
         }
+    }
+
+    /**
+     * Pre-validate an image path before handing it to tFPDF's Image(). tFPDF
+     * inspects file content (not just extension) and Error()s out the entire
+     * PDF stream on mismatch — e.g. a file named ".png" that is actually
+     * truncated, a JPG, or HTML. This helper does that content check up front
+     * via getimagesize() and returns:
+     *
+     *   - $path             when the file is a valid PNG/JPG/GIF tFPDF can handle.
+     *   - bundled bizuno_icon.png  when the requested file is missing or invalid
+     *     (operator sees a msgAdd 'caution' so the issue is visible).
+     *   - null              when even the bundled fallback can't be loaded — caller
+     *     should draw the red "no_image" box and skip the Image() call entirely.
+     */
+    private function safeImagePath($path)
+    {
+        if (is_file($path)) {
+            $info = @getimagesize($path);
+            if ($info !== false && in_array($info[2], [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF], true)) {
+                return $path;
+            }
+            msgAdd("Image '$path' is not a valid PNG/JPG/GIF (extension may not match content). Falling back to the default Bizuno image.", 'caution');
+        }
+        $fallback = BIZUNO_FS_LIBRARY . 'view/images/bizuno_icon.png';
+        if (is_file($fallback) && @getimagesize($fallback) !== false) {
+            return $fallback;
+        }
+        msgAdd("Default fallback image at $fallback is also missing or unreadable. Skipping this image element.", 'caution');
+        return null;
     }
 
     /**
