@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-10-24
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /locale/en_US/module/administrate/language.php
  */
 
@@ -129,4 +129,23 @@ $lang = [
     'stock_all' => 'In Stock-All',
     'store_stock' => 'Stock-Here',
     'transfer_picklist' => 'Transfer Forms',
+// Software Updates (administrate/updater)
+    'updates'                 => 'Software Updates',
+    'update_desc'             => 'Bizuno checks GitHub for the latest production release. Review the installed and available versions below, read the release notes, and apply the update when you are ready.',
+    'update_current_version'  => 'Installed version',
+    'update_latest_version'   => 'Latest production release',
+    'update_published'        => 'Published',
+    'update_release_notes'    => 'Release Notes',
+    'update_check_now'        => 'Check GitHub Now',
+    'update_now_btn'          => 'Update Now',
+    'update_available'        => 'A new production release (%s) is available to install.',
+    'update_up_to_date'       => 'You are running the latest production release.',
+    'update_none'             => 'No newer production release is available to install.',
+    'update_check_failed'     => 'Could not reach GitHub to check for updates. Please try again later.',
+    'update_confirm'          => 'This will place the site in maintenance mode, download release %s from GitHub, back up your current installation, and replace the program files. Continue?',
+    'update_failed'           => 'Update failed: %s',
+    'update_reload'           => 'Reload Bizuno',
+    'update_step_prep'        => 'Site placed in maintenance mode. Preparing update to %s …',
+    'update_step_download'    => 'Downloaded release %s. Installing program files …',
+    'update_complete'         => 'Update complete — Bizuno is now version %s. Click Reload to continue.',
 ];

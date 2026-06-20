@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-02
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1239,7 +1239,11 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
         $output.= '<div class="easyui-panel" style="padding:5px;">';
 //      $output.= '    <a href="#" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-solid fa-list-check\'"></a>';
         if (!empty(getUserCache('role', 'administrate'))) {
-            $output.= '    <a href="javascript:hrefClick(\'administrate/main/manager\');" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-regular fa-gear\'"></a>'; // 
+            // Gear/settings icon, with a hidden notification badge lit by an async update check after page load
+            $output.= '    <span style="position:relative;display:inline-block;">';
+            $output.= '        <a href="javascript:hrefClick(\'administrate/main/manager\');" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-regular fa-gear\'"></a>';
+            $output.= '        <span id="bizUpdateBadge" title="'.lang('updates', 'administrate').'" style="display:none;position:absolute;top:4px;right:4px;width:10px;height:10px;background:#e53935;border:1px solid #fff;border-radius:50%;"></span>';
+            $output.= '    </span>';
         }
         $output.= '    <a href="javascript:winHref(bizunoHome);" class="easyui-linkbutton" data-options="plain:true,size:\'large\',iconCls:\'fa-sharp-duotone fa-solid fa-plus\'"></a>'; // 
         $output.= '    <a href="#" class="easyui-menubutton" data-options="menu:\'#menuProfile\'"><img src="'.$grav040.'"'.$onErr.' style="height:40px;border-radius:20px;"></a>';
@@ -1251,9 +1255,15 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
             $menuID = clean('menuID', 'cmd', 'get');
             $output .= '    <p style="font-size:14px;color:#444;"><a href="javascript:hrefClick(\'bizuno/dashboard/manager&menuID='.$menuID.'\');">'.lang('add_dashboards').'</a></p>';
         }
+        if (!empty(getUserCache('role', 'administrate'))) { // hidden update notice, revealed by the async check below
+            $output.= '    <p id="menuUpdate" style="display:none;font-size:14px;color:#b71c1c;"><a href="javascript:hrefClick(\'bizuno/admin/adminHome\');">'.lang('updates', 'administrate').' &mdash; <span class="bizUpdVer"></span></a></p>';
+        }
         $output.= '    <p style="font-size:14px;color:#444;"><a href="javascript:hrefClick(\'administrate/tools/ticketMain\');">'.lang('support').'</a>';
         $output.= '    <p style="font-size:14px;color:#444;"><a href="javascript:hrefClick(\'portal/api/logout\');">'.lang('sign_out').'</a></p>';
         $output.= '</div>';
+        if (!empty(getUserCache('role', 'administrate'))) { // non-blocking GitHub update check; lights the gear badge + dropdown notice
+            $this->jsReady[] = "jqBiz.ajax({url:bizunoAjax+'&bizRt=administrate/updater/statusJson',dataType:'json',success:function(r){ if(r&&r.available){ jqBiz('#bizUpdateBadge').show(); jqBiz('#menuUpdate').show().find('.bizUpdVer').text(r.latest); } }});";
+        }
         return $output;
     }
 

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /controllers/bizuno/admin.php
  */
 
@@ -270,6 +270,7 @@ class bizunoAdmin
                 'sched'   => ['order'=>30,'label'=>lang('fa_schedules', $this->moduleID),'type'=>'html', 'html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fixedAssets/adminSchedLoad'"]],
                 'tabs'    => ['order'=>40,'label'=>lang('extra_tabs'),   'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/tabs/manager'"]],
                 'fields'  => ['order'=>50,'label'=>lang('extra_fields'), 'type'=>'html','html'=>'',       'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/fields/manager'"]],
+                'updates' => ['order'=>60,'label'=>lang('updates','administrate'),'type'=>'html','html'=>'','options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=administrate/updater/adminPanel'"]],
                 'tools'   => ['order'=>80,'label'=>lang('tools'),'type'=>'divs','classes'=>['areaView'],'divs'=>[
                     'recalc' => ['order'=>10,'type'=>'panel','classes'=>['block33'],'key'=>'recalc'],
                     'cacheClr'=>['order'=>20,'type'=>'panel','classes'=>['block33'],'key'=>'cacheClr'],
