@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-08-14
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /view/icons/default.php
  */
 
@@ -151,16 +151,16 @@ $icons = [
     'edi'           => ['dir'=>'default','path'=>'edi.png'],
     'fill'          => ['dir'=>'default','path'=>'fill.png'],
     'fixedAsset'    => ['dir'=>'default','path'=>'fixedasset.png'],
-    'ifAmazon'      => ['dir'=>'default','path'=>'amazon.jpg'],
-    'ifBigCom'      => ['dir'=>'default','path'=>'bigcommerce.png'],
-    'ifGoogle'      => ['dir'=>'default','path'=>'google.jpg'],
+    'amazon'        => ['dir'=>'default','path'=>'amazon.jpg'],
+    'bigCom'        => ['dir'=>'default','path'=>'bigcommerce.png'],
+    'google'        => ['dir'=>'default','path'=>'google.jpg'],
     'intuitpayroll' => ['dir'=>'default','path'=>'intuitpayroll.jpg'],
     'payrollcentric'=> ['dir'=>'default','path'=>'payrollcentric.png'],
     'opencart'      => ['dir'=>'default','path'=>'opencart.png'],
     'prestashop'    => ['dir'=>'default','path'=>'prestashop.png'],
-    'ifStripe'      => ['dir'=>'default','path'=>'stripe.png'],
-    'ifWalmart'     => ['dir'=>'default','path'=>'walmart.jpg'],
-    'ifWooCommerce' => ['dir'=>'default','path'=>'woocommerce.png'],
+    'stripe'        => ['dir'=>'default','path'=>'stripe.png'],
+    'walmart'       => ['dir'=>'default','path'=>'walmart.jpg'],
+    'wooCommerce'   => ['dir'=>'default','path'=>'woocommerce.png'],
     'invrec'        => ['dir'=>'default','path'=>'invrec.png'],
     'item_desc'     => ['dir'=>'default','path'=>'item_desc.png'],
     'maint'         => ['dir'=>'default','path'=>'maint.png'],

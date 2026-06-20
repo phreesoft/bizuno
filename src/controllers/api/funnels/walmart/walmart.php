@@ -21,19 +21,19 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
- * @filesource /controllers/api/funnels/ifWalmart/ifWalmart.php
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /controllers/api/funnels/walmart/walmart.php
  */
 
 namespace bizuno;
 
-class ifWalmart
+class walmart
 {
     public $devStatus= true; // this method is still in development status
 
     public $moduleID = 'api';
     public $methodDir= 'funnels';
-    public $code     = 'ifWalmart';
+    public $code     = 'walmart';
     public $defaults;
     public $settings;
     public $lang     = ['title' => 'Walmart Interface',
@@ -140,10 +140,10 @@ class ifWalmart
         $this->journalMainSaveDefaults();
         $title = $this->lang['title'];
         $maps = [];
-        $files = glob(BIZUNO_DATA."data/ifWalmart/*.map");
+        $files = glob(BIZUNO_DATA."data/walmart/*.map");
         if (is_array($files)) { foreach ($files as $value) {
             $tmp1 = str_replace(".map", "", $value);
-            $tmp2 = str_replace(BIZUNO_DATA."data/ifWalmart/", "", $tmp1);
+            $tmp2 = str_replace(BIZUNO_DATA."data/walmart/", "", $tmp1);
             $maps[] = ['id'=>$tmp2, 'text'=>$tmp2];
         } }
         $data = [
@@ -172,11 +172,11 @@ class ifWalmart
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['dateShip','btnConfirm']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
             'forms'   => [
-                'frmInventory'=> ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/inventoryGo"]],
-                'frmOrders'   => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/ordersGo"]],
-                'frmConfirm'  => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/confirmGo"]]],
+                'frmInventory'=> ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=$this->code"]],
+                'frmOrders'   => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/ordersGo&modID=$this->code"]],
+                'frmConfirm'  => ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/confirmGo&modID=$this->code"]]],
             'fields' => [
-                'imgWalmart'  => ['attr'   => ['type'=>'img', 'src'=>BIZUNO_FS_LIBRARY.'0/controllers/api/funnels/ifWalmart/logo.png']],
+                'imgWalmart'  => ['attr'   => ['type'=>'img', 'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.jpg"]],
                 'selMap'      => ['values' => $maps, 'attr'=> ['type'=>'select']],
                 'btnInventory'=> ['events' => ['onClick'=>"jqBiz('#frmInventory').submit();"], 'attr'=> ['type'=>'button', 'value'=>lang('go')]],
                 'fileOrders'  => ['attr'   => ['type'=>'file']],
@@ -200,7 +200,7 @@ class ifWalmart
                 'getMap' => ['order'=>20,'type'=>'panel','classes'=>['block66'],'key'=>$this->code]]]]];
         $layout['panels'][$channel] = ['type'=>'fields','keys'=>['tplDescWm','selTempWm','divMapWm']];
         $layout['fields']['tplDescWm'] = ['order'=>10,'html'=>$this->lang['walmart_template_desc'],  'attr'=>['type'=>'raw']];
-        $layout['fields']['selTempWm'] = ['order'=>20,'values'=>$templWm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifWalmart', 0, bizSelGet('selTempWm'));"],'attr'=>['type'=>'select']];
+        $layout['fields']['selTempWm'] = ['order'=>20,'values'=>$templWm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=walmart', 0, bizSelGet('selTempWm'));"],'attr'=>['type'=>'select']];
         $layout['fields']['divMapWm']  = ['order'=>90,'html'=>'<div id="divWalmartMap">&nbsp;</div>','attr'=>['type'=>'raw']];
         $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/$this->methodDir/$this->code/$this->code.js?ver=".MODULE_BIZUNO_VERSION."');";
         $layout['jsReady'][$channel]= "walmartContact();";
@@ -212,7 +212,7 @@ class ifWalmart
    */
     private function loadInvTemplate($tpl, $force=true)
     {
-        $tmp   = array_map('str_getcsv', file(BIZUNO_FS_LIBRARY."controllers/ifWalmart/source/$tpl/$tpl.csv")); // pull title, extract count and required/optional
+        $tmp   = array_map('str_getcsv', file(BIZUNO_FS_LIBRARY."controllers/api/funnels/walmart/source/$tpl/$tpl.csv")); // pull title, extract count and required/optional
         $titles= array_shift($tmp); // just need the first row
         msgDebug("\nWorking with titles = ".print_r($titles, true));
         $map   = [];
@@ -221,7 +221,7 @@ class ifWalmart
             $map[$values['title']] = $values;
         }
         // now the definitions file
-        if (($handle = fopen(BIZUNO_FS_LIBRARY."controllers/ifWalmart/source/$tpl/Definitions.csv", "r")) !== false) {
+        if (($handle = fopen(BIZUNO_FS_LIBRARY."controllers/api/funnels/walmart/source/$tpl/Definitions.csv", "r")) !== false) {
             while (($data = fgetcsv($handle, 0, "\t")) !== false) {
                 if (isset($data[1]) && isset($output['fields'][$data[1]])) {
                     $output['fields'][$data[1]]['tip']     = $data[3]."\n\nRange: ".$data[4]."\n\nExample: ".$data[5];
@@ -258,7 +258,7 @@ class ifWalmart
      */
     private function saveInvTemplate($tpl, $output) {
         global $io;
-        $io->fileWrite(json_encode($output), "data/ifWalmart/$tpl.map", true);
+        $io->fileWrite(json_encode($output), "data/walmart/$tpl.map", true);
         msgDebug("output = ".print_r($output, true));
         msgAdd($this->lang['msg_template_created'], 'success');
 
@@ -276,8 +276,8 @@ class ifWalmart
         if (!$tpl) { return msgAdd("No template file selected!"); }
         $structure = $this->loadInvTemplate($tpl, true);
         $temp = [];
-        if (file_exists(BIZUNO_DATA."data/ifWalmart/$tpl.map")) { // get current settings
-            $temp = json_decode(file_get_contents(BIZUNO_DATA."data/ifWalmart/$tpl.map"), true);
+        if (file_exists(BIZUNO_DATA."data/walmart/$tpl.map")) { // get current settings
+            $temp = json_decode(file_get_contents(BIZUNO_DATA."data/walmart/$tpl.map"), true);
             unset($temp['header']); // remove the header in case of new template
         }
         $fields = array_replace_recursive($structure, $temp);
@@ -285,7 +285,7 @@ class ifWalmart
         $data = [
             'content'=> ['action'=>'divHTML','divID'=>'divWalmartMap'],
             'divs'   => ['divTpl'=>['oreder'=>10,'type'=>'html','html'=>$this->viewTemplate]],
-            'forms'  => ['frmTemplate'=>['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/templateSave"]]],
+            'forms'  => ['frmTemplate'=>['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/templateSave&modID=$this->code"]]],
             'icnSave'=> ['icon'=>'save','events'=>  ['onClick'=>"jqBiz('#frmTemplate').submit();"]],
             'fldTpl' => ['attr'=>  ['type'=>'hidden', 'value'=>"$tpl"]],
             'lang'   => [
@@ -358,14 +358,14 @@ class ifWalmart
         if (!$security = validateAccess('walmart', 3)) { return; }
         $tpl = clean('template', 'text', 'post');
         if (!$tpl) { return msgAdd("No template found to save!"); }
-        if (!file_exists(BIZUNO_DATA."data/ifWalmart/$tpl.map")) { return msgAdd("Sorry, I cannot file the template file in your file space"); }
-        $fields = json_decode(file_get_contents(BIZUNO_DATA."data/ifWalmart/$tpl.map"), true);
+        if (!file_exists(BIZUNO_DATA."data/walmart/$tpl.map")) { return msgAdd("Sorry, I cannot file the template file in your file space"); }
+        $fields = json_decode(file_get_contents(BIZUNO_DATA."data/walmart/$tpl.map"), true);
         // clean the post variables
         foreach ($fields['fields'] as $key => $value) {
             $setting = clean($key, 'text', 'post');
             if ($setting) { $fields['fields'][$key]['value'] = $setting; }
         }
-        $io->fileWrite(json_encode($fields), "data/ifWalmart/$tpl.map", true, false, true);
+        $io->fileWrite(json_encode($fields), "data/walmart/$tpl.map", true, false, true);
         msgDebug("output = ".print_r($fields, true));
         msgAdd(lang('msg_record_saved'), 'success');
     }
@@ -382,11 +382,11 @@ class ifWalmart
         if (isset($layout['fields']['contact_id_b']['attr']['value']) && $layout['fields']['contact_id_b']['attr']['value']) {
             $cID = $layout['fields']['contact_id_b']['attr']['value'];
             if ($jID==18 && $cID==$this->settings['general']['contact_id']) {
-                $layout['toolbars']['tbPhreeBooks']['icons']['ifWalmart'] = [
+                $layout['toolbars']['tbPhreeBooks']['icons']['walmart'] = [
                     'label' =>$this->lang['import_payment'],
                     'order' =>80,
                     'events'=>  ['onClick'=>"reconcileWalmart();"]];
-                $layout['divs']['ifWalmart'] = ['order'=>0, 'type'=>'html', 'html'=>'<script type="text/javascript" src="'.BIZUNO_FS_LIBRARY.'controllers/ifWalmart/ifWalmart.js"></script>'];
+                $layout['jsBody']['walmart'] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
             }
         }
     }
@@ -397,7 +397,7 @@ class ifWalmart
      */
     private function journalMainSaveDefaults($jID=10)
     {
-        $data = ['path'=>'ifWalmart'.$jID,
+        $data = ['path'=>'walmart'.$jID,
             'values' => [
                 ['index'=>'rows',  'clean'=>'integer','default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')],
                 ['index'=>'page',  'clean'=>'integer','default'=>'1'],
@@ -423,8 +423,8 @@ class ifWalmart
         bizAutoLoad(BIZUNO_FS_LIBRARY."controllers/inventory/prices.php", 'inventoryPrices');
         $dbField = $this->settings['general']['catalog_field'];
         $map = clean('selMap', 'text', 'post');
-        if (!file_exists (BIZUNO_DATA."data/ifWalmart/$map.map")) { return msgAdd(sprintf($this->lang['err_no_inv_map'], $map)); }
-        $map    = json_decode(file_get_contents(BIZUNO_DATA."data/ifWalmart/$map.map"), true);
+        if (!file_exists (BIZUNO_DATA."data/walmart/$map.map")) { return msgAdd(sprintf($this->lang['err_no_inv_map'], $map)); }
+        $map    = json_decode(file_get_contents(BIZUNO_DATA."data/walmart/$map.map"), true);
         $rows   = [];
         $result = dbGetMulti(BIZUNO_DB_PREFIX."inventory", "inactive='0' AND `$dbField`='1'", 'sku');
         foreach ($result as $key => $item) {
@@ -700,7 +700,7 @@ return msgAdd("This feature has not been completed at this time!");
     {
         if (!$security = validateAccess('walmart', 3)) { return; }
         $html  = '<p>'.lang('desc_new_price_sheets')."</p>";
-        $html .= html5('frmNewPmt', ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifWalmart/admin/paymentProcess"]]);
+        $html .= html5('frmNewPmt', ['attr'=>  ['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/paymentProcess&modID=$this->code"]]);
         $html .= html5('walmart_pmt',  ['attr'=>  ['type'=>'file']]);
         $html .= html5('iconGO', ['icon'=>'next', 'events'=>  ['onClick'=>"jqBiz('#frmNewPmt').submit(); bizWindowClose('winNewPmt'); jqBiz('body').addClass('loading');"]]);
         $html .= "</form>";

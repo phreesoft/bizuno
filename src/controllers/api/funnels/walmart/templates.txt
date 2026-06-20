@@ -19,13 +19,13 @@
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
  * @version    7.x Last Update: 2020-09-05
- * @filesource /EXTENSION_PATH/ifWalmart/admin.php
+ * @filesource /EXTENSION_PATH/walmart/admin.php
  */
 
 1. Download the Walmart template
 2. Open with excel or Apple Numbers, save as .csv file. This will create several files. The two required files are:
    `Template.csv` and `Data Definitions.csv`
-3. Create folder in /ext/ifWalmart/source named after the template 'formal tag name', i.e. ConsumerElectronics
+3. Create folder in /ext/walmart/source named after the template 'formal tag name', i.e. ConsumerElectronics
 4. Copy csv files into created folder.
 5. Edit the Data Definitions.csv file with a spreadsheet program and duplicate grouped definitions so they can be 
    parsed properly. i.e bullet_point1 - bullet_point5 needs to become 5 identical lines with the field names:

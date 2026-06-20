@@ -53,12 +53,12 @@ settings_keys:              # api.settings.bizuno_api.* drive GL posting + auto-
   gl_tax:         ''
   tax_rate_id:    0
 channels:                   # funnel methods loaded dynamically by modID
-  ifAmazon: Amazon
-  ifBigCom: BigCommerce
-  ifGoogle: Google
-  ifStripe: Stripe
-  ifWooCommerce: WooCommerce
-  # ifWalmart present on disk, not enabled in $channels
+  amazon: Amazon
+  bigCom: BigCommerce
+  google: Google
+  stripe: Stripe
+  wooCommerce: WooCommerce
+  # walmart present on disk, not enabled in $channels
 gl_impact: SCOPED           # only api/order/add (via portal/api/orderAdd) posts a journal — see warning
 inventory_impact: SCOPED    # only jID 12 (Sales Invoice) relieves stock + COGS
 ```
@@ -661,7 +661,7 @@ auth:
   sec_id: admin
   min_level: 1
 preconditions:
-  - modID names an enabled funnel channel (ifAmazon | ifBigCom | ifGoogle | ifStripe | ifWooCommerce)
+  - modID names an enabled funnel channel (amazon | bigCom | google | stripe | wooCommerce)
 inputs:
   required:
     - name: modID
