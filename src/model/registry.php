@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (removeOrphanMenus: bridge max-child security back into $userSecurity for routable parents so validateAccess succeeds for a parent that has its own screen — e.g. inventory/build/manager under woProd)
+ * @version    7.x Last Update: 2026-06-20 (initRegistry: ride the daily Bizuno update check on the cache reload)
  * @filesource /model/registry.php
  */
 
@@ -63,9 +63,24 @@ final class bizRegistry
         $this->initPhreeBooks();
         $this->initPhreeForm($bizunoMod);
         $this->initDashboards();
+        $this->initUpdateCheck();
         dbWriteCache();
         $this->setLangCache();
         msgDebug("\nReturning from initRegistry");
+    }
+
+    /**
+     * Ride the once-per-day Bizuno software-update check on the (8-hourly) business
+     * cache reload instead of the per-page settings-icon badge poll. checkVersion()
+     * self-throttles to CHECK_TTL (24h) and stores the result in the bizuno config
+     * cache, so the badge endpoint reads a warm value without ever hitting GitHub on
+     * a normal page load. Best-effort — a failed check never breaks the cache rebuild.
+     */
+    private function initUpdateCheck()
+    {
+        if (!bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/administrate/updater.php', 'administrateUpdater')) { return; }
+        try { (new administrateUpdater())->checkVersion(); }
+        catch (\Throwable $e) { msgDebug("\nupdate check skipped during cache reload: ".$e->getMessage()); }
     }
 
     /**

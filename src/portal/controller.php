@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /portal/controller.php
  */
 
@@ -187,7 +187,38 @@ class portalCtl
             }
             msgDebug("\nCSRF Layer 2 (warn-only): bizRt={$this->route['module']}/{$this->route['page']}/{$this->route['method']} — token missing or mismatched; would reject under BIZUNO_CSRF_ENFORCE=true");
         }
-        if ($this->getCodex()) { compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout); }
+        if ($this->getCodex()) {
+            if ($this->maintenanceGate()) { return; } // a software update is in progress — block everyone but the initiator
+            compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout);
+        }
+    }
+
+    /**
+     * While administrate/updater is swapping the program files, a lock file
+     * (data/updates/maintenance.json) holds the site offline so no one writes to
+     * a half-replaced filesystem. The admin who started the update passes through
+     * (so the stepped update requests themselves run); everyone else gets a
+     * self-refreshing "being updated" page. Stale locks (a crashed update) auto-
+     * expire after 15 minutes so the site can never be permanently wedged.
+     * @return bool true if the request was blocked (and $this->layout was set)
+     */
+    private function maintenanceGate()
+    {
+        if (!defined('BIZUNO_DATA')) { return false; }
+        $lock = BIZUNO_DATA.'updates/maintenance.json';
+        if (!is_file($lock)) { return false; }
+        $info = json_decode((string)file_get_contents($lock), true);
+        if (empty($info['at']) || (time() - (int)$info['at']) > 900) { @unlink($lock); return false; }
+        if (!empty($info['by']) && (string)getUserCache('profile', 'userID') === (string)$info['by']) { return false; }
+        $tgt  = !empty($info['target']) ? ' to '.htmlspecialchars($info['target']) : '';
+        $html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="20">'
+              . '<title>Maintenance</title><style>body{font-family:Arial,Helvetica,sans-serif;text-align:center;'
+              . 'color:#444;background:#f7f7f7;padding-top:90px;}h2{color:#b71c1c;}</style></head><body>'
+              . '<h2>Bizuno is being updated'.$tgt.'</h2>'
+              . '<p>The system is briefly offline while a software update is applied.<br>This page refreshes automatically.</p>'
+              . '</body></html>';
+        $this->layout = ['type'=>'raw', 'content'=>$html];
+        return true;
     }
 
     /**
