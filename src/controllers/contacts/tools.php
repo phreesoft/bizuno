@@ -162,7 +162,7 @@ class contactsTools
         $this->mergeMetaTax('tax_rate_c', 'taxAuths');
         $this->mergeMetaTax('tax_rate_v', 'taxAuths');
         $metaT = dbMetaGet('%', 'training'); // common_meta:training
-        msgDebug("\nRead ".sizeof($metaT)." rows from key training.");
+        msgDebug("\nRead ".(is_array($metaT) ? sizeof($metaT) : 0)." rows from key training.");
         if (!empty($metaT)) {
             foreach($metaT as $meta) {
                 $found = false;
@@ -182,7 +182,7 @@ class contactsTools
     private function mergeMetaTax($key, $index)
     {
         $taxC = dbMetaGet('%', $key);
-        msgDebug("\nRead ".sizeof($taxC)." rows from key $key.");
+        msgDebug("\nRead ".(is_array($taxC) ? sizeof($taxC) : 0)." rows from key $key.");
         if (empty($taxC)) { return; }
         foreach($taxC as $rate) {
             if (isset($rate[$index]) && is_array($rate[$index]) && empty($rate[$index]['rows'])) { // make new format
