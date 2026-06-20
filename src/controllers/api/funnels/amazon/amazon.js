@@ -17,8 +17,8 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    PhreeSoft Proprietary
- * @version    7.x Last Update: 2025-04-22
- * @filesource /EXTENSION_PATH/ifAmazon/ifAmazon.js
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /EXTENSION_PATH/amazon/amazon.js
  */
 
 /**
@@ -26,7 +26,7 @@
  */
 function reconcileAmazon() {
     jqBiz.ajax({
-        url: bizunoAjax+'&bizRt=api/admin/paymentFileForm&modID=ifAmazon',
+        url: bizunoAjax+'&bizRt=api/admin/paymentFileForm&modID=amazon',
         success: function (data) { processJson(data); } // should pull up the upload form
     });
 }

@@ -21,19 +21,19 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-05
- * @filesource /controllers/api/funnels/ifWooCommerce/ifWooCommerce.php
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /controllers/api/funnels/wooCommerce/wooCommerce.php
  */
 
 namespace bizuno;
 
 bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
-class ifWooCommerce extends apiExport
+class wooCommerce extends apiExport
 {
     public    $moduleID   = 'api';
     public    $methodDir  = 'funnels';
-    public    $code       = 'ifWooCommerce';
+    public    $code       = 'wooCommerce';
     protected $domSuffix  = 'wpWoo';
     protected $metaPrefix = 'woocommerce';
     private   $refreshRows= 100; // number of inventory items to pass in a single cron call
@@ -81,7 +81,7 @@ class ifWooCommerce extends apiExport
     {
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
-            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
+            'imgLogo'   => ['styles' =>['cursor'=>'pointer'], 'attr'=>['type'=>'img','height'=>50,'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
             'radio1'    => ['order'=>20,'break' =>true,'label' =>$this->lang['upload_opt1'],'attr'=>['type'=>'radio','value'=>1,'id'=>'optUpload','name'=>'optUpload']],
             'radio2'    => ['order'=>21,'break' =>true,'label' =>$this->lang['upload_opt2'],'attr'=>['type'=>'radio','value'=>2,'id'=>'optUpload','name'=>'optUpload']],
             'radio3'    => ['order'=>22,'break' =>true,'label' =>$this->lang['upload_opt3'],'attr'=>['type'=>'radio','value'=>3,'id'=>'optUpload','name'=>'optUpload','checked'=>true]],

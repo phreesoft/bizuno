@@ -21,19 +21,19 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-24
- * @filesource /controllers/api/funnels/ifBigCom/ifBigCom.php
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /controllers/api/funnels/bigCom/bigCom.php
  */
 
 namespace bizuno;
 
 bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
-class ifBigCom extends apiExport
+class bigCom extends apiExport
 {
     public  $moduleID = 'api';
     public  $methodDir= 'funnels';
-    public  $code     = 'ifBigCom';
+    public  $code     = 'bigCom';
     private $inStock  = true; // Assume product is in stock, cleared during journal item creation
     public  $defaults;
     public  $settings;
@@ -130,7 +130,7 @@ class ifBigCom extends apiExport
         if (!$security = validateAccess($this->code, 1)) { return; }
         $fields = [
             'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://www.bigcommerce.com');"],
-                'attr'=>['type'=>'img','height'=>100,'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/$this->code.png"]],
+                'attr'=>['type'=>'img','height'=>100,'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
             'btnOrders'   => ['events' =>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmOrders').submit();"], 'attr'=>['type'=>'button','value'=>lang('go')]],

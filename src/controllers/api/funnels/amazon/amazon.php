@@ -21,17 +21,17 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-08
- * @filesource /controllers/api/funnels/ifAmazon/ifAmazon.php
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /controllers/api/funnels/amazon/amazon.php
  */
 
 namespace bizuno;
 
-class ifAmazon {
+class amazon {
     public  $moduleID = 'api';
     public  $methodDir= 'funnels';
-    public  $code     = 'ifAmazon';
-    private $mapPath = BIZUNO_FS_LIBRARY.'controllers/api/funnels/ifAmazon/maps/';
+    public  $code     = 'amazon';
+    private $mapPath = BIZUNO_FS_LIBRARY.'controllers/api/funnels/amazon/maps/';
     public  $defaults;
     public  $settings;
     public  $lang = ['title' => 'Amazon Interface',
@@ -151,7 +151,7 @@ class ifAmazon {
      */
     public function home(&$layout=[])
     {
-        if (!$security = validateAccess('ifAmazon', 1)) { return; }
+        if (!$security = validateAccess('amazon', 1)) { return; }
         $this->journalMainSaveDefaults();
         $maps = [];
         $files = glob($this->mapPath.'*.map');
@@ -161,7 +161,7 @@ class ifAmazon {
             $maps[] = ['id'=>$tmp2, 'text'=>$tmp2];
         } }
         $fields = [
-            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/logo.png"]],
+            'imgLogo'     => ['styles' =>['cursor'=>'pointer'], 'events' =>['onClick'=>"winHref('https://sellercentral.amazon.com');"],'attr'=>['type'=>'img','src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
             'selMap'      => ['values' =>$maps, 'attr'=> ['type'=>'select']],
             'btnInventory'=> ['events' =>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]],
             'fileOrders'  => ['attr'   =>['type'=>'file']],
@@ -211,12 +211,12 @@ class ifAmazon {
         if (empty($layout['fields']['journal_id'])) { return; }
         $jID = $layout['fields']['journal_id']['attr']['value'];
         $cID = $layout['fields']['contact_id_b']['attr']['value'];
-        msgDebug("\nEntering ifAmazon for customization with jID = $jID and contact ID = $cID");
+        msgDebug("\nEntering amazon for customization with jID = $jID and contact ID = $cID");
         if (empty($cID)) { return; }
         if ($jID==18 && $cID==$this->settings['contact_id']) {
             $layout['jsHead'][$this->moduleID] = "var AmazonGlAr = '{$this->settings['gl_acct_ar']}';\nvar AmazonGlTax = '{$this->settings['gl_acct_tax']}'";
-            $layout['toolbars']['tbPhreeBooks']['icons']['ifAmazon'] = ['order'=>80,'label'=>$this->lang['import_payment'],'events'=>['onClick'=>"reconcileAmazon();"]];
-            $layout['jsBody']['ifAmazon'] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
+            $layout['toolbars']['tbPhreeBooks']['icons']['amazon'] = ['order'=>80,'label'=>$this->lang['import_payment'],'events'=>['onClick'=>"reconcileAmazon();"]];
+            $layout['jsBody']['amazon'] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
         }
     }
 
@@ -226,7 +226,7 @@ class ifAmazon {
      */
     private function journalMainSaveDefaults($jID=10)
     {
-        $data = ['path'=>'ifAmazon'.$jID, 'values'=>[
+        $data = ['path'=>'amazon'.$jID, 'values'=>[
             ['index'=>'rows',  'clean'=>'integer','default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')],
             ['index'=>'page',  'clean'=>'integer','default'=>'1'],
             ['index'=>'sort',  'clean'=>'text',   'default'=>BIZUNO_DB_PREFIX.'journal_main.invoice_num'],
@@ -315,7 +315,7 @@ class ifAmazon {
     {
         global $io;
         msgDebug("\nWorking with settings = ".print_r($this->settings, true));
-        if (!$security = validateAccess('ifAmazon', 2)) { return; }
+        if (!$security = validateAccess('amazon', 2)) { return; }
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/journal.php',  'journal');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/functions.php','phreebooksProcess','function');
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'getStoreStock',    'function');
@@ -531,7 +531,7 @@ class ifAmazon {
     public function confirmGo()
     {
         global $io;
-        if (!$security = validateAccess('ifAmazon', 2)) { return; }
+        if (!$security = validateAccess('amazon', 2)) { return; }
         $cID   = isset($this->settings['contact_id']) ? $this->settings['contact_id'] : false;
         $shipDate= clean('dateShip', 'date', 'post');
         if (!$shipDate || !$cID) { return msgAdd($this->lang['err_confirm_no_contact'], 'error'); }
@@ -613,15 +613,15 @@ class ifAmazon {
      */
     public function paymentFileForm(&$layout=[])
     {
-        if (!$security = validateAccess('ifAmazon', 3)) { return; }
+        if (!$security = validateAccess('amazon', 3)) { return; }
         $html  = '<p>'.$this->lang['import_payment_desc']."</p>";
-        $html .= html5('frmNewPmt', ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/paymentProcess&modID=ifAmazon"]]);
+        $html .= html5('frmNewPmt', ['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/paymentProcess&modID=amazon"]]);
         $html .= html5('amazon_pmt',['attr'=>['type'=>'file']]);
         $html .= html5('iconGO', ['icon'=>'next', 'events'=>['onClick'=>"jqBiz('#frmNewPmt').submit(); bizWindowClose('winNewPmt'); jqBiz('body').addClass('loading');"]]);
         $html .= "</form>";
         $data = ['type'=>'popup','title'=>$this->lang['import_payment'],'attr'=>['id'=>'winNewPmt','width'=>400,'height'=>200],
             'divs'   => ['winNewPmt'=>['order'=>50,'type'=>'html','html'=>$html]],
-            'jsReady'=> ['ifAmazon' =>"ajaxForm('frmNewPmt');"]];
+            'jsReady'=> ['amazon' =>"ajaxForm('frmNewPmt');"]];
         $layout = array_replace_recursive($layout, $data);
     }
 
@@ -634,7 +634,7 @@ class ifAmazon {
     public function paymentProcess(&$layout=[])
     {
         global $io;
-        if (!$security = validateAccess('ifAmazon', 3)) { return; }
+        if (!$security = validateAccess('amazon', 3)) { return; }
         if (!$io->validateUpload('amazon_pmt')) { return; }
         $contents = file($_FILES['amazon_pmt']['tmp_name']);
         msgDebug("\nread ".sizeof($contents)." lines from the uploaded file.");
@@ -670,7 +670,7 @@ class ifAmazon {
                 'getMap' => ['order'=>20,'type'=>'panel','classes'=>['block66'],'key'=>$this->code]]]]];
         $layout['panels'][$channel] = ['type'=>'fields','keys'=>['tplDescAm','selTempAm','divMapAm']];
         $layout['fields']['tplDescAm'] = ['order'=>10,'html'=>$this->lang['amazon_template_desc'],   'attr'=>['type'=>'raw']];
-        $layout['fields']['selTempAm'] = ['order'=>20,'values'=>$templAm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=ifAmazon', 0, bizSelGet('selTempAm'));"], 'attr'=>['type'=>'select']];
+        $layout['fields']['selTempAm'] = ['order'=>20,'values'=>$templAm,'events'=>['onChange'=>"jsonAction('api/admin/templateStructure&modID=amazon', 0, bizSelGet('selTempAm'));"], 'attr'=>['type'=>'select']];
         $layout['fields']['divMapAm']  = ['order'=>90,'html'=>'<div id="divAmazonMap">&nbsp;</div>', 'attr'=>['type'=>'raw']];
         $layout['jsHead'][$channel] = "jqBiz.cachedScript('".BIZUNO_URL_FS."0/controllers/api/funnels/$this->code/$this->code.js&ver=".MODULE_BIZUNO_VERSION."');";
     }
@@ -681,7 +681,7 @@ class ifAmazon {
    */
     private function loadInvTemplate($tpl, $force=true)
     {
-        $rows = file(BIZUNO_FS_LIBRARY."controllers/ifAmazon/source/$tpl/Template.txt");
+        $rows = file(BIZUNO_FS_LIBRARY."controllers/api/funnels/amazon/source/$tpl/Template.txt");
         $line1 = explode("\t", trim($rows[0])); // header row contains titles
         $line2 = explode("\t", trim($rows[1])); // English titled indexes
         $line3 = explode("\t", trim($rows[2])); // amazon keyed fields
@@ -695,7 +695,7 @@ class ifAmazon {
             $output['fields'][$line3[$i]] = ['label'=>$line2[$i], 'group'=>$grpCnt];
         }
         // now the definitions file
-        if (($handle = fopen(BIZUNO_FS_LIBRARY."controllers/ifAmazon/source/$tpl/Data Definitions.txt", "r")) !== false) {
+        if (($handle = fopen(BIZUNO_FS_LIBRARY."controllers/api/funnels/amazon/source/$tpl/Data Definitions.txt", "r")) !== false) {
             while (($data = fgetcsv($handle, 0, "\t")) !== false) {
                 if (isset($data[6]) && isset($output['fields'][$data[6]])) {
                     $output['fields'][$data[1]]['tip']     = $data[3]."\n\nRange: ".$data[4]."\n\nExample: ".$data[5];
@@ -715,7 +715,7 @@ class ifAmazon {
      */
     private function saveInvTemplate($tpl, $output) {
         global $io;
-        $io->fileWrite(json_encode($output), "data/ifAmazon/$tpl.map", true);
+        $io->fileWrite(json_encode($output), "data/amazon/$tpl.map", true);
         msgDebug("output = ".print_r($output, true));
         msgAdd($this->lang['msg_template_created'], 'success');
 
@@ -728,13 +728,13 @@ class ifAmazon {
      */
     public function templateStructure(&$layout=[])
     {
-        if (!$security = validateAccess('ifAmazon', 3)) { return; }
+        if (!$security = validateAccess('amazon', 3)) { return; }
         $tpl = clean('data', 'text', 'get');
         if (!$tpl) { return msgAdd("No template file selected!"); }
         $structure = $this->loadInvTemplate($tpl, true);
         $temp = [];
-        if (file_exists(BIZUNO_DATA."data/ifAmazon/$tpl.map")) { // get current settings
-            $temp = json_decode(file_get_contents(BIZUNO_DATA."data/ifAmazon/$tpl.map"), true);
+        if (file_exists(BIZUNO_DATA."data/amazon/$tpl.map")) { // get current settings
+            $temp = json_decode(file_get_contents(BIZUNO_DATA."data/amazon/$tpl.map"), true);
             unset($temp['header']); // remove the header in case of new template
         }
         $fields = array_replace_recursive($temp, $structure);
@@ -742,7 +742,7 @@ class ifAmazon {
         $data = [
             'content'=> ['action'=>'divHTML','divID'=>'divAmazonMap'],
             'divs'   => ['divTpl'=>['order'=>10,'type'=>'html','html'=>$this->viewTemplate]],
-            'forms'  => ['frmTemplate'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=ifAmazon/admin/templateSave"]]],
+            'forms'  => ['frmTemplate'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/templateSave&modID=$this->code"]]],
             'icnSave'=> ['icon'=>'save','events'=>['onClick'=>"jqBiz('#frmTemplate').submit();"]],
             'fldTpl' => ['attr'=>['type'=>'hidden', 'value'=>"$tpl"]],
             'lang'   => [
@@ -818,17 +818,17 @@ class ifAmazon {
     public function templateSave()
     {
         global $io;
-        if (!$security = validateAccess('ifAmazon', 3)) { return; }
+        if (!$security = validateAccess('amazon', 3)) { return; }
         $tpl = clean('template', 'text', 'post');
         if (!$tpl) { return msgAdd("No template found to save!"); }
-        if (!file_exists(BIZUNO_DATA."data/ifAmazon/$tpl.map")) { return msgAdd("Sorry, I cannot file the template file in your file space"); }
-        $fields = json_decode(file_get_contents(BIZUNO_DATA."data/ifAmazon/$tpl.map"), true);
+        if (!file_exists(BIZUNO_DATA."data/amazon/$tpl.map")) { return msgAdd("Sorry, I cannot file the template file in your file space"); }
+        $fields = json_decode(file_get_contents(BIZUNO_DATA."data/amazon/$tpl.map"), true);
         // clean the post variables
         foreach (array_keys($fields['fields']) as $key) {
             $setting = clean($key, 'text', 'post');
             if ($setting) { $fields['fields'][$key]['value'] = $setting; }
         }
-        $io->fileWrite(json_encode($fields), "data/ifAmazon/$tpl.map", true, false, true);
+        $io->fileWrite(json_encode($fields), "data/amazon/$tpl.map", true, false, true);
         msgDebug("\nOutput = ".print_r($fields, true));
         msgAdd(lang('msg_record_saved'), 'success');
     }
