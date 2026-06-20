@@ -443,8 +443,12 @@ function productUpload(rID) {
         $resp = $io->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
         if (isset($resp['message'])) {
-            if (is_string($resp['message'])) { msgAdd($resp['message'], 'info'); } // probably an error
-            else                             { msgMerge($resp['message']); }
+            if (is_string($resp['message'])) {
+                // Skip empty/whitespace-only strings. The WC product/refresh endpoint can
+                // return a blank message per batch, which fired msgAdd('','info') => a blank
+                // info popup for every batch during a quick stock/price refresh.
+                if (trim($resp['message']) !== '') { msgAdd($resp['message'], 'info'); } // non-blank = probably an error worth surfacing
+            } else                               { msgMerge($resp['message']); }
         }
         return $resp;
     }
