@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-06-20
  * @filesource /controllers/api/admin.php
  */
 
@@ -35,7 +35,7 @@ class apiAdmin extends apiCommon
 {
     public $moduleID = 'api';
     public $methodDir= 'funnels';
-    public $channels = ['ifAmazon','ifBigCom','ifGoogle','ifStripe','ifWooCommerce']; // 'ifWalmart'
+    public $channels = ['amazon','bigCom','google','stripe','wooCommerce']; // 'walmart'
     public $settings = [];
     public $structure= [];
 
@@ -209,7 +209,7 @@ class apiAdmin extends apiCommon
     {
         msgDebug("\nEntering api/admin/pbEdit");
         // foreach enabled module, see if they have to add anything to the edit screen
-        $_GET['modID'] = 'ifAmazon';
+        $_GET['modID'] = 'amazon';
         $chan = $this->getMethod();
         $chan->pbEdit($layout);
     }
@@ -223,8 +223,8 @@ class apiAdmin extends apiCommon
 
         // foreach enabled module, see if they have to add anything to the edit screen
         $layout['datagrid']['manager']['columns']['woocommerce_sync'] = ['order'=>0,'field'=>'woocommerce_sync','attr'=>['hidden'=>true]];
-        $layout['datagrid']['manager']['columns']['action']['actions']['woocommerce'] = ['icon'=>'ifWooCommerce','label'=>'Upload to WooComerce','size'=>'small','order'=>90,
-            'display'=>"row.woocommerce_sync=='1'",'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/productToStore&modID=ifWooCommerce', idTBD);"]];
+        $layout['datagrid']['manager']['columns']['action']['actions']['woocommerce'] = ['icon'=>'wooCommerce','label'=>'Upload to WooComerce','size'=>'small','order'=>90,
+            'display'=>"row.woocommerce_sync=='1'",'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/productToStore&modID=wooCommerce', idTBD);"]];
     }
 
     /**

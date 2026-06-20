@@ -126,12 +126,12 @@ find "$STAGING/src" -type f -name '* copy.*' -delete 2>/dev/null || true
 
 # 2. Vendor-supplied reference XSD schemas with spaces in directory names.
 #    These ship as documentation for the Walmart + Amazon marketplace
-#    integrations but are NOT loaded at runtime — ifWalmart.php and
-#    ifAmazon.php construct XML directly, they don't validate against the
+#    integrations but are NOT loaded at runtime — walmart.php and
+#    amazon.php construct XML directly, they don't validate against the
 #    bundled schemas. Strip the reference directories whose path contains
 #    spaces; the funnels keep working.
-rm -rf "$STAGING/src/controllers/api/funnels/ifWalmart/API-V2"      2>/dev/null || true
-rm -rf "$STAGING/src/controllers/api/funnels/ifAmazon/source"       2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/walmart/API-V2"      2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/amazon/source"       2>/dev/null || true
 
 # 3. Defensive sweep: any file with spaces or special chars in the name
 #    still left in src/ (PCP's "badly_named_files" rule). Log them so we

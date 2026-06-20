@@ -102,8 +102,8 @@ find "$STAGING/src" -type f -name '* copy.*' -delete                   2>/dev/nu
 # spaces — XSD schemas for Walmart marketplace, spec docs for Amazon.
 # Not loaded at runtime (the funnels construct XML directly), purely
 # documentation that came with the SDK distributions.
-rm -rf "$STAGING/src/controllers/api/funnels/ifWalmart/API-V2"         2>/dev/null || true
-rm -rf "$STAGING/src/controllers/api/funnels/ifAmazon/source"          2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/walmart/API-V2"         2>/dev/null || true
+rm -rf "$STAGING/src/controllers/api/funnels/amazon/source"          2>/dev/null || true
 
 # Defensive: warn if any residual badly-named file survives in src/.
 BAD=$(find "$STAGING/src" -name '* *' 2>/dev/null || true)
