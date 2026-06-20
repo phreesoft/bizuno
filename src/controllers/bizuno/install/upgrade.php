@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-06 (added 7.4.3 gate to MODIFY *_meta.meta_value to TEXT DEFAULT NULL — repairs the illegal "DEFAULT ''" on TEXT columns carried by pre-7.4.3 imports that fatal on strict MySQL 8 with error 1101)
+ * @version    7.x Last Update: 2026-06-20 (added 7.4.6 gate to rekey methods_funnels meta and role security ACLs after the api funnels were renamed to drop the "if" prefix and use camelCase ids — ifAmazon->amazon, ifWooCommerce->wooCommerce, etc.)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -219,6 +219,51 @@ function bizunoUpgrade()
             if (dbFieldExists(BIZUNO_DB_PREFIX.$mTbl, 'meta_value')) {
                 dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX.$mTbl."` MODIFY `meta_value` TEXT DEFAULT NULL COMMENT '$mCmt'");
             }
+        }
+    }
+
+    if (version_compare($dbVer, '7.4.6') < 0) {
+        // API funnel folders/classes were renamed to drop the legacy "if" prefix
+        // and adopt camelCase ids: ifAmazon->amazon, ifBigCom->bigCom,
+        // ifGoogle->google, ifStripe->stripe, ifWalmart->walmart and
+        // ifWooCommerce->wooCommerce. Funnel state is keyed by that id in two
+        // metadata stores, so both must be rekeyed or the rename silently drops it:
+        //   1) methods_funnels — holds each channel's saved settings/credentials.
+        //      A cache reload rescans the new folders and refiles DEFAULT settings
+        //      under the new ids (initMethodList), orphaning anything stored under
+        //      the old ids. Rekeying first lets those settings carry forward.
+        //   2) every role's security map — funnel ACLs are keyed by the funnel id
+        //      (validateAccess('ifAmazon',...)); un-rekeyed roles lose access and
+        //      the menu entry disappears for existing users until re-granted.
+        $funnelMap = ['ifAmazon'=>'amazon', 'ifBigCom'=>'bigCom', 'ifGoogle'=>'google',
+            'ifStripe'=>'stripe', 'ifWalmart'=>'walmart', 'ifWooCommerce'=>'wooCommerce'];
+        $fMeta = dbMetaGet(0, 'methods_funnels');
+        if (!empty($fMeta)) {
+            $fIdx = metaIdxClean($fMeta);
+            $newF = [];
+            foreach ($fMeta as $oldID => $row) {
+                $newID = isset($funnelMap[$oldID]) ? $funnelMap[$oldID] : $oldID;
+                if (is_array($row)) {
+                    if (!empty($row['id']))   { $row['id']   = $newID; }
+                    if (!empty($row['path'])) { $row['path'] = str_replace("/$oldID/", "/$newID/", $row['path']); }
+                    if (!empty($row['url']))  { $row['url']  = str_replace("/$oldID/", "/$newID/", $row['url']); }
+                }
+                $newF[$newID] = $row;
+            }
+            dbMetaSet($fIdx, 'methods_funnels', $newF);
+        }
+        $roles = dbMetaGet('%', 'bizuno_role');
+        foreach ($roles as $role) {
+            if (empty($role['security']) || !is_array($role['security'])) { continue; }
+            $changed = false;
+            foreach ($funnelMap as $oldID => $newID) {
+                if (isset($role['security'][$oldID])) {
+                    $role['security'][$newID] = $role['security'][$oldID];
+                    unset($role['security'][$oldID]);
+                    $changed = true;
+                }
+            }
+            if ($changed) { dbMetaSet($role['_rID'], 'bizuno_role', $role); }
         }
     }
 

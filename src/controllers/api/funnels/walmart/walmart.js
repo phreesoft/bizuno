@@ -2,8 +2,8 @@
  * @name Bizuno ERP
  * @copyright 2008-2018, PhreeSoft, www.PhreeSoft.com
  * @author Dave Premo, PhreeSoft
- * @version 1.0 Last Update: 2020-11-23
- * @filesource /EXTENSION_PATH/ifWalmart/ifWalmart.js
+ * @version 1.0 Last Update: 2026-06-20
+ * @filesource /EXTENSION_PATH/walmart/walmart.js
  */
 
 function walmartContact() {
@@ -33,7 +33,7 @@ function walmartContact() {
  */
 function reconcileWalmart() {
 	jqBiz.ajax({
-        url: bizunoAjax+'&bizRt=proIF/admin/paymentFileForm&modID=ifWalmart',
+        url: bizunoAjax+'&bizRt=api/admin/paymentFileForm&modID=walmart',
 		success: function (data) { processJson(data); } // should pull up the upload form
 	});
 }

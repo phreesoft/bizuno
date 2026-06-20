@@ -21,19 +21,19 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
- * @filesource /controllers/api/funnels/ifGoogle/ifGoogle.php
+ * @version    7.x Last Update: 2026-06-20
+ * @filesource /controllers/api/funnels/google/google.php
  */
 
 namespace bizuno;
 
 bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/api/export.php', 'apiExport');
 
-class ifGoogle extends apiExport
+class google extends apiExport
 {
     public $moduleID = 'api';
     public $methodDir= 'funnels';
-    public $code     = 'ifGoogle';
+    public $code     = 'google';
     public $defaults;
     public $settings;
     public $map;
@@ -152,7 +152,7 @@ class ifGoogle extends apiExport
      */
     public function home(&$layout=[])
     {
-        if (!$security = validateAccess('ifGoogle', 1)) { return; }
+        if (!$security = validateAccess('google', 1)) { return; }
         $data = ['title'=> $this->lang['title'],
             'divs'=>[
                 'head'    => ['order'=> 1,'type'=>'fields','keys'=>['imgLogo']],
@@ -165,9 +165,9 @@ class ifGoogle extends apiExport
                     'desc'   => ['order'=>20,'type'=>'html',  'html'=>"<p>".$this->lang['build_inventory_desc']."</p>"],
                     'body'   => ['order'=>30,'type'=>'fields','keys'=>['btnInv']],
                     'formEOF'=> ['order'=>90,'type'=>'html',  'html'=>"</form>"]]]],
-            'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=ifGoogle&dl=1"]]],
+            'forms'  => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/admin/inventoryGo&modID=google&dl=1"]]],
             'fields' => [
-                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZUNO_URL_FS.'0/controllers/api/funnels/ifGoogle/google_large.png']],
+                'imgLogo'=> ['attr'  =>['type'=>'img','height'=>60,'src'=>BIZUNO_URL_FS."0/controllers/$this->moduleID/$this->methodDir/$this->code/logo.png"]],
                 'btnInv' => ['events'=>['onClick'=>"jqBiz('#frmInventory').submit();"],'attr'=>['type'=>'button','value'=>lang('go')]]],
             'jsReady'=> ['init'    =>"ajaxDownload('frmInventory');"]];
         $layout = array_replace_recursive($layout, viewMain(), $data);
@@ -180,8 +180,8 @@ class ifGoogle extends apiExport
      */
     public function invManager(&$layout=[])
     {
-        if (!validateAccess('ifGoogle', 3, false)) { return; }
-        $layout['datagrid']['manager']['source']['actions']['googleUpload'] = ['order'=>55,'icon'=>'ifGoogle','label'=>$this->lang['upload_to_google'],'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/inventoryGo&modID=ifGoogle');"]];
+        if (!validateAccess('google', 3, false)) { return; }
+        $layout['datagrid']['manager']['source']['actions']['googleUpload'] = ['order'=>55,'icon'=>'google','label'=>$this->lang['upload_to_google'],'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/inventoryGo&modID=google');"]];
     }
 
     /**
