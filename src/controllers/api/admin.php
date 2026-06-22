@@ -35,7 +35,7 @@ class apiAdmin extends apiCommon
 {
     public $moduleID = 'api';
     public $methodDir= 'funnels';
-    public $channels = ['amazon','bigCom','google','stripe','wooCommerce']; // 'walmart'
+    public $channels = ['amazon','bigCom','google','stripe','walmart','wooCommerce'];
     public $settings = [];
     public $structure= [];
 
@@ -198,6 +198,42 @@ class apiAdmin extends apiCommon
     {
         $chan = $this->getMethod();
         $chan->ordersGo($layout);
+    }
+
+    /**
+     * Unattended order pull, invoked by the secured cron route portal/api/funnelCron.
+     */
+    public function cronGet(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $chan->cronGet($layout);
+    }
+
+    /**
+     * Server-side datagrid data feed for a funnel's open sales orders.
+     */
+    public function ordersData(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $chan->ordersData($layout);
+    }
+
+    /**
+     * Submits a product (item setup) feed for a funnel.
+     */
+    public function itemFeed(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $chan->itemFeed($layout);
+    }
+
+    /**
+     * Polls the status of a previously submitted feed.
+     */
+    public function feedStatus(&$layout=[])
+    {
+        $chan = $this->getMethod();
+        $chan->feedStatus($layout);
     }
 
     /**

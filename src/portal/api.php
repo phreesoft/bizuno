@@ -335,7 +335,22 @@ class portalApi
         msgDebug("\nUser has been set, ready to compose");
         compose('phreebooks', 'ediAPI', 'ediGet', $layout);
     }
-    
+
+    /**
+     * Executes an unattended order pull for an API funnel (Walmart, etc.).
+     * Invocation: https://biz.mydomain.com?bizRt=portal/api/funnelCron&modID=walmart&token=<api_token>
+     * Mirrors ediCron(): validates the api token, loads business + API user context, then composes
+     * to api/admin/cronGet which dispatches to the named funnel's cronGet().
+     */
+    public function funnelCron(&$layout=[])
+    {
+        if (!$this->validateApiToken()) { return; }
+        loadBusinessCache();
+        if (!$this->loadApiUserContext()) { return; }
+        msgDebug("\nfunnelCron: user context set, composing api/admin/cronGet for modID = ".clean('modID', 'cmd', 'get'));
+        compose('api', 'admin', 'cronGet', $layout);
+    }
+
     /**
      * Pass-through to a customer-supplied `myExt/controllers/api/myAPI.php` extension.
      *

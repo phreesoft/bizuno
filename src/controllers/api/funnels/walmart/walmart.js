@@ -1,8 +1,8 @@
 /**
  * @name Bizuno ERP
- * @copyright 2008-2018, PhreeSoft, www.PhreeSoft.com
+ * @copyright 2008-2026, PhreeSoft, www.PhreeSoft.com
  * @author Dave Premo, PhreeSoft
- * @version 1.0 Last Update: 2026-06-20
+ * @version 7.x Last Update: 2026-06-20
  * @filesource /EXTENSION_PATH/walmart/walmart.js
  */
 
@@ -29,12 +29,29 @@ function walmartContact() {
 }
 
 /**
- * This function generates a form to upload the walmart payment file
+ * Lists the available Walmart settlement (recon) reports pulled live from the REST API.
+ * Picking a date downloads that report and runs it through processWalmart() to reconcile.
  */
 function reconcileWalmart() {
 	jqBiz.ajax({
-        url: bizunoAjax+'&bizRt=api/admin/paymentFileForm&modID=walmart',
-		success: function (data) { processJson(data); } // should pull up the upload form
+        url: bizunoAjax+'&bizRt=api/admin/reconcileList&modID=walmart',
+		success: function (data) { processJson(data); } // shows the settlement report picker
+	});
+}
+
+/**
+ * Polls a submitted Walmart item feed until it finishes ingesting.
+ */
+function walmartFeedStatus(feedId) {
+	if (!feedId) { return; }
+	jqBiz.ajax({
+		url: bizunoAjax+'&bizRt=api/admin/feedStatus&modID=walmart&feedId='+encodeURIComponent(feedId),
+		success: function (data) {
+			processJson(data);
+			if (data.content && data.content.status && data.content.status != 'PROCESSED' && data.content.status != 'ERROR') {
+				window.setTimeout(function(){ walmartFeedStatus(feedId); }, 5000);
+			}
+		}
 	});
 }
 
