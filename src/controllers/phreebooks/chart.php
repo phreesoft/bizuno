@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-08
+ * @version    7.x Last Update: 2026-07-14
  * @filesource /controllers/phreebooks/chart.php
  */
 
@@ -120,7 +120,22 @@ class phreebooksChart extends mgrJournal
             'upload_txt'  => ['order'=>30,'type'=>'html','html'=>lang('coa_upload_file', $this->moduleID),'attr'=>['type'=>'raw']],
             'file_coa'    => ['order'=>35,'label'=>'', 'attr'=>['type'=>'file']],
             'btn_coa_upl' => ['order'=>40,'attr'=>['type'=>'button', 'value'=>lang('btn_coa_upload', $this->moduleID)], 'events'=>['onClick'=>"if (confirm('".lang('msg_gl_replace_confirm', $this->moduleID)."')) jqBiz('#frmGlUpload').submit();"]]];
-        if (!$coa_blocked) { $fields['sel_coa']['values'] = localeLoadCharts(); }
+        // The import/upload panel may only be used before the first journal entry is posted. When blocked, it is not rendered.
+        if (!$coa_blocked) {
+            $fields['sel_coa']['values'] = localeLoadCharts();
+            $impDiv = ['order'=>30,'label'=>lang('coa_import_title', $this->moduleID),'type'=>'divs','divs'=>[
+                'desc'   => ['order'=>10,'type'=>'html',  'html'=>"<p>".lang('coa_import_desc', $this->moduleID)."</p>"],
+                'formBOF'=> ['order'=>15,'type'=>'form',  'key' =>'frmGlUpload'],
+                'body'   => ['order'=>50,'type'=>'fields','keys'=>array_keys($fields)],
+                'formEOF'=> ['order'=>95,'type'=>'html',  'html'=>"</form>"]]];
+            $data = [
+                'accordion'=> ["acc{$this->domSuffix}"=>['divs'=>["imp{$this->domSuffix}"=>$impDiv]]],
+                'forms'    => ['frmGlUpload'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=phreebooks/chart/upload"]]],
+                'fields'   => $fields,
+                'jsHead'   => ['chartRefresh'=>"function chartRefresh() { bizGridReload('dg{$this->domSuffix}'); }"],
+                'jsReady'  => ['selCOA'=>"ajaxForm('frmGlUpload');"]];
+            $layout = array_replace_recursive($layout, $data);
+        }
     }
 
     public function managerRows(&$layout=[])
@@ -406,11 +421,11 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
         global $io;
         msgDebug("\nupload file array = ".print_r($_FILES, true));
         if (!$security = validateAccess('admin', 4)){ return; }
-        if (!$io->validateUpload('file_coa', '', 'xml', true))  { return; }
-        $filename = $filename = clean($_FILES['file_coa']['name'], 'filename');
-        $io->uploadSave('file_coa', 'temp/', '', 'xml');
         if (dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))  { return msgAdd(lang('coa_import_blocked', $this->moduleID)); }
-        if (!$this->chartInstall("temp/$filename"))             { return; }
+        if (!$io->validateUpload('file_coa', '', 'csv', true))  { return; }
+        $filename = str_replace(' ', '_', clean($_FILES['file_coa']['name'], 'filename')); // uploadSave() converts spaces to underscores
+        if (!$io->uploadSave('file_coa', 'temp/', '', 'csv'))   { return; }
+        if (!$this->chartInstall("temp/$filename", true))       { return; }
         dbGetResult("TRUNCATE ".BIZUNO_DB_PREFIX.'journal_history');
         buildChartOfAccountsHistory();
         msgAdd(lang('msg_gl_replace_success', $this->moduleID), 'success');
@@ -441,10 +456,11 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
      * @param string $chart - relative path to chart to install
      * @return user message with status
      */
-    public function chartInstall($chart)
+    public function chartInstall($chart, $upload=false)
     {
         msgDebug("\nTrying to load chart: $chart");
-        if     (file_exists(BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart"; }
+        if      ($upload  && file_exists(BIZUNO_DATA.$chart)) { $path=BIZUNO_DATA.$chart; } // user uploaded chart in the data temp/ folder
+        elseif (!$upload && file_exists(BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart")) { $path=BIZUNO_FS_LIBRARY."locale/en_US/modules/phreebooks/charts/$chart"; }
         else { return msgAdd('Bad path to chart!', 'trap'); }
         unset($GLOBALS['BIZUNO_TABLES']); // need to reset this as most likely the tables were just added.
         if (!dbTableExists(BIZUNO_DB_PREFIX.'journal_main') || !empty(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id'))) { return msgAdd(lang('coa_import_blocked', $this->moduleID)); }
@@ -482,12 +498,27 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
     public function prepData($path)
     {
         $output= [];
-        $skip  = 2;
         $rows  = array_map('str_getcsv', file($path));
-        for ($i=0; $i<$skip; $i++) { array_shift($rows); }
-        $head  = array_shift($rows); // pull the header row
-        if ($head[0]<>'id') { return msgAdd('This doesn\'t look like the correct file. Please check your csv file and try again!'); }
-        foreach ($rows as $row) { $output[] = array_combine($head, $row); }
+        if (empty($rows)) { return msgAdd('The chart of accounts file is empty!'); }
+        if (strpos((string)$rows[0][0], 'Description:') === 0) { // library sample chart: description row, friendly header row, then machine header row
+            array_shift($rows); // description row
+            array_shift($rows); // friendly header row
+            $head = array_shift($rows); // machine header row: id,default,parent,inactive,description,code,
+            if (($head[0] ?? '') <> 'id') { return msgAdd('This doesn\'t look like the correct file. Please check your csv file and try again!'); }
+            foreach ($rows as $row) {
+                if (count($row) <> count($head)) { continue; } // skip blank/malformed lines
+                $output[] = array_combine($head, $row);
+            }
+        } else { // chart exported from chart:export - single header row of column labels, columns in struc order
+            array_shift($rows); // column label header row
+            $keys = array_keys($this->struc); // id, default, inactive, type, cur, title, parent, heading
+            foreach ($rows as $row) {
+                if (empty($row[0]) || count($row) < count($keys)) { continue; } // skip blank/short lines
+                $rec = array_combine($keys, array_slice($row, 0, count($keys)));
+                $output[] = ['id'=>$rec['id'], 'default'=>$rec['default'], 'inactive'=>$rec['inactive'],
+                    'code'=>$rec['type'], 'description'=>$rec['title'], 'parent'=>$rec['parent']];
+            }
+        }
         msgDebug("\nReturning from chart:prepData with number of accounts = ".sizeof((array)$output));
         return $output;
     }
