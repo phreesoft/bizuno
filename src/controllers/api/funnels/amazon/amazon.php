@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-07-16
  * @filesource /controllers/api/funnels/amazon/amazon.php
  */
 
@@ -636,7 +636,7 @@ class amazon {
         global $io;
         if (!$security = validateAccess('amazon', 3)) { return; }
         if (!$io->validateUpload('amazon_pmt')) { return; }
-        $contents = file($_FILES['amazon_pmt']['tmp_name']);
+        $contents = file($_FILES['amazon_pmt']['tmp_name'], FILE_IGNORE_NEW_LINES); // implode below re-adds them, else every other line is blank
         msgDebug("\nread ".sizeof($contents)." lines from the uploaded file.");
         $contents[0] = str_replace('-', '_', $contents[0]); // breaks javascript to use dashes
         $output = base64_encode(implode("\n", $contents)); // base64_encode file to preserve tabs and line feeds.
