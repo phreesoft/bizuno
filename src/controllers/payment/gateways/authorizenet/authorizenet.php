@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-07-20
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -420,20 +420,22 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     private function walletCustCreate($data)
     {
-        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
-        if (!$ledger) { return $this->failure('Ledger required for customer profile creation'); }
-        $cID = !empty($ledger->main['contact_id_b']) ? (int)$ledger->main['contact_id_b'] : 0;
+        // Accept either a ledger handle (payment flow) or a pre-built billing 'main' array
+        // (wallet-tab add flow, which has no journal ledger). Both use the same *_b keys.
+        $main = !empty($data['main']) ? $data['main'] : (!empty($data['ledger']) ? $data['ledger']->main : null);
+        if (!$main) { return $this->failure('Ledger required for customer profile creation'); }
+        $cID = !empty($main['contact_id_b']) ? (int)$main['contact_id_b'] : 0;
         if (!$cID) { return $this->failure('contact_id_b required to derive wallet ID'); }
         $profile = new AnetAPI\CustomerProfileType();
         $profile->setMerchantCustomerId(getWalletID($cID));
-        if (!empty($ledger->main['email_b']))       { $profile->setEmail($ledger->main['email_b']); }
-        if (!empty($ledger->main['primary_name_b'])){ $profile->setDescription(substr($ledger->main['primary_name_b'], 0, 255)); }
+        if (!empty($main['email_b']))        { $profile->setEmail($main['email_b']); }
+        if (!empty($main['primary_name_b'])) { $profile->setDescription(substr($main['primary_name_b'], 0, 255)); }
         // Attach one payment profile if the form has a CC number
         $ccNum = clean("{$this->code}_number", 'numeric', 'post');
         if (!empty($ccNum)) {
             $payProf = new AnetAPI\CustomerPaymentProfileType();
             $payProf->setCustomerType('individual');
-            $payProf->setBillTo($this->buildBillTo($ledger->main));
+            $payProf->setBillTo($this->buildBillTo($main));
             $pay = new AnetAPI\PaymentType();
             $pay->setCreditCard($this->buildCreditCardFromPost());
             $payProf->setPayment($pay);
@@ -456,7 +458,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
                 if (!$existingID) { $existingID = $this->lookupCustomerProfileId(getWalletID($cID)); }
                 if ($existingID) {
                     msgDebug("\nAuthorize.net profile already exists for ".getWalletID($cID).", attaching card to custID=$existingID");
-                    return $this->wallet('wltNew', ['custID'=>$existingID, 'ledger'=>$ledger]);
+                    return $this->wallet('wltNew', ['custID'=>$existingID, 'main'=>$main]);
                 }
             }
             return $this->describeError($response);
@@ -560,11 +562,11 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     private function walletPayNew($data)
     {
         if (empty($data['custID'])) { return $this->failure('custID required'); }
-        $ledger = !empty($data['ledger']) ? $data['ledger'] : null;
-        if (!$ledger) { return $this->failure('Ledger required for billing info'); }
+        $main = !empty($data['main']) ? $data['main'] : (!empty($data['ledger']) ? $data['ledger']->main : null);
+        if (!$main) { return $this->failure('Ledger required for billing info'); }
         $payProf = new AnetAPI\CustomerPaymentProfileType();
         $payProf->setCustomerType('individual');
-        $payProf->setBillTo($this->buildBillTo($ledger->main));
+        $payProf->setBillTo($this->buildBillTo($main));
         $pay = new AnetAPI\PaymentType();
         $pay->setCreditCard($this->buildCreditCardFromPost());
         $payProf->setPayment($pay);
@@ -690,6 +692,72 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         foreach ($this->walletList($pfID) as $card) { $output[] = ['id'=>$card['id'], 'text'=>$card['text']]; }
         $action = "sel_{$this->code}selCards = ".json_encode($output)."; bizSelReload('{$this->code}selCards', sel_{$this->code}selCards);";
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>$action]]);
+    }
+
+    /**
+     * Wallet-provider entry point: build the native "Add Credit Card" popup for the
+     * customer-manager wallet tab. Authorize.net has no gateway-hosted add-card iframe
+     * (unlike PayFabric), so paymentWallet::add() renders this Bizuno form when the
+     * gateway exposes walletAddForm() instead of walletAddURL(). The form POSTs back to
+     * payment/wallet/save (-> walletAddSave) via divSubmit().
+     *
+     * @param int   $cID     - Bizuno contact id (rID on the wallet tab)
+     * @param array $address - contacts row, used to prefill the cardholder name; the
+     *                         billing address on file is attached server-side in walletAddSave()
+     * @return array Bizuno popup layout
+     */
+    public function walletAddForm($cID, $address=[])
+    {
+        $cc_exp = pullExpDates();
+        $name   = trim(!empty($address['contact']) ? $address['contact'] : ($address['primary_name'] ?? ''));
+        $flds   = [
+            'name'  => ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_name'),      'attr'=>['value'=>$name]],
+            'number'=> ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_number')],
+            'month' => ['options'=>['width'=>130],'label'=>lang('payment_expiration'),'values'=>$cc_exp['months'],'attr'=>['type'=>'select','value'=>biz_date('m')]],
+            'year'  => ['options'=>['width'=> 80],'break'=>true,'values'=>$cc_exp['years'],'attr'=>['type'=>'select','value'=>biz_date('Y')]],
+            'cvv'   => ['options'=>['width'=> 60],'break'=>true,'label'=>lang('payment_cvv')]];
+        $html  = '<div id="divCardAdd" style="padding:10px;">';
+        $html .= html5($this->code.'_name',  $flds['name']);
+        $html .= html5($this->code.'_number',$flds['number']);
+        $html .= html5($this->code.'_month', $flds['month']);
+        $html .= html5($this->code.'_year',  $flds['year']);
+        $html .= html5($this->code.'_cvv',   $flds['cvv']);
+        $html .= '</div>';
+        $html .= '<div style="padding:0 10px 10px 10px;">'.html5($this->code.'_cardSave',
+            ['attr'=>['type'=>'button','value'=>lang('save')],
+             'events'=>['onClick'=>"jqBiz('body').addClass('loading'); divSubmit('payment/wallet/save&rID=$cID', 'divCardAdd');"]]).'</div>';
+        return ['type'=>'popup','title'=>lang('wallet'),'attr'=>['id'=>'winCardAdd','width'=>460,'height'=>320],
+            'divs' => ['body'=>['order'=>50,'type'=>'html','html'=>$html]]];
+    }
+
+    /**
+     * Wallet-provider entry point: save a card submitted from walletAddForm() into the
+     * customer's Authorize.net profile (creating the profile if it doesn't exist yet).
+     * Card fields are read from POST by the shared buildCreditCardFromPost(); the billing
+     * address comes from the contacts row so the stored payment profile carries an AVS address.
+     *
+     * @param int    $cID  - Bizuno contact id
+     * @param string $pfID - Bizuno wallet id, e.g. "C000000123" (unused here; the profile is
+     *                       keyed on getWalletID($cID) inside walletCustCreate)
+     * @return array normalized ['ok'=>bool, ...]
+     */
+    public function walletAddSave($cID, $pfID='')
+    {
+        $cID = (int)$cID;
+        if (empty($cID)) { return $this->failure('Contact ID required to save card'); }
+        if (empty(clean("{$this->code}_number", 'numeric', 'post'))) { return $this->failure('A credit card number is required.'); }
+        $addr = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID") ?: [];
+        $name = clean("{$this->code}_name", 'text', 'post');
+        $main = [
+            'contact_id_b'  => $cID,
+            'primary_name_b'=> $name ?: ($addr['primary_name'] ?? ''),
+            'address1_b'    => $addr['address1']    ?? '',
+            'city_b'        => $addr['city']        ?? '',
+            'state_b'       => $addr['state']       ?? '',
+            'postal_code_b' => $addr['postal_code'] ?? '',
+            'country_b'     => $addr['country']     ?? '',
+            'email_b'       => $addr['email']       ?? ''];
+        return $this->walletCustCreate(['main'=>$main]);
     }
 
     private function walletPayDelete($data)
