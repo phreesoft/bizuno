@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-04
+ * @version    7.x Last Update: 2026-07-20
  * @filesource /controllers/shipping/carriers/usps/rate.php
  *
  * USPS Domestic Prices v3 — POST /prices/v3/base-rates/search
@@ -156,6 +156,7 @@ class uspsRate extends uspsCommon
         $weight = (float)$pkg['settings']['weight'];
         if ($weight <= 0) { $weight = 0.1; } // minimum the API allows
 
+        $procCat = $this->processingCategoryFor($rateIndicator);
         $payload = [
             'originZIPCode'      => $this->extractZip($pkg['shipper']['postal_code']     ?? ''),
             'destinationZIPCode' => $this->extractZip($pkg['destination']['postal_code'] ?? ''),
@@ -164,7 +165,7 @@ class uspsRate extends uspsCommon
             'width'              => (float)($pkg['settings']['width']  ?? 0),
             'height'             => (float)($pkg['settings']['height'] ?? 0),
             'mailClass'          => $mailClass,
-            'processingCategory' => $this->options['processingCategory'],
+            'processingCategory' => $procCat,
             'rateIndicator'      => $rateIndicator,
             'destinationEntryFacilityType' => 'NONE',
             'priceType'          => $this->settings['price_type'] ?? 'RETAIL',
