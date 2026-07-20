@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-07-20
  * @filesource /controllers/payment/wallet.php
  */
 
@@ -175,12 +175,31 @@ class paymentWallet
     public function add(&$layout)
     {
         if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        if (!method_exists($this->gateway, 'walletAddURL')) {
+        $address = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$this->cID") ?: [];
+        if (method_exists($this->gateway, 'walletAddURL')) { // gateway-hosted iframe add (e.g. PayFabric)
+            $url    = $this->gateway->walletAddURL($this->pfID, $address);
+            $layout = array_replace_recursive($layout, $this->viewIFrame($url));
+        } elseif (method_exists($this->gateway, 'walletAddForm')) { // native Bizuno card-entry form (e.g. Authorize.net)
+            $layout = array_replace_recursive($layout, $this->gateway->walletAddForm($this->cID, $address));
+        } else {
             return msgAdd("The {$this->gatewayCode} gateway does not support adding cards from this screen — cards are saved during a payment when the 'Save card to wallet' option is checked.", 'info');
         }
-        $address = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$this->cID");
-        $url     = $this->gateway->walletAddURL($this->pfID, $address ?: []);
-        $layout  = array_replace_recursive($layout, $this->viewIFrame($url));
+    }
+    /**
+     * Persist a card submitted from a native (non-iframe) add-card form. Only gateways that
+     * collect the card on a Bizuno-rendered form (walletAddForm) reach this — iframe-hosted
+     * gateways (PayFabric) post the card back to the gateway directly and never call save().
+     */
+    public function save(&$layout=[])
+    {
+        if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
+        if (!method_exists($this->gateway, 'walletAddSave')) {
+            return msgAdd("The {$this->gatewayCode} gateway does not support saving cards from this screen.", 'info');
+        }
+        $result = $this->gateway->walletAddSave($this->cID, $this->pfID);
+        if (empty($result['ok'])) { return; } // the gateway already surfaced the reason via msgAdd()
+        msgAdd(lang('msg_database_write'), 'success');
+        $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizWindowClose('winCardAdd'); bizPanelRefresh('wallet');"]]);
     }
     /**
      * Retrieve expired Credit Cards and delete them
