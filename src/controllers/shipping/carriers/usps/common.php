@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-07-20
  * @filesource /controllers/shipping/carriers/usps/common.php
  *
  * Docs: https://developer.usps.com/  (specs in /Documents/USPS RESTFul API)
@@ -433,6 +433,23 @@ class uspsCommon
             if (isset($pme[$ri])) { $ri = $pme[$ri]; }
         }
         return $ri;
+    }
+
+    /**
+     * Resolves the USPS processingCategory for a given rateIndicator. Flat-rate
+     * ENVELOPE products (Flat Rate Envelope, Padded, Legal, and the PME envelope
+     * variants) are flat-size mail — USPS resolves their SSF SKU under FLATS, not
+     * MACHINABLE. Sending MACHINABLE for those yields "Could not find working sku
+     * from SSF ingredients". Flat-rate BOXES and regular parcels stay MACHINABLE.
+     * Flat-rate pricing is fixed, so this never changes the postage charged.
+     *
+     * @param string $rateIndicator resolved USPS rateIndicator (SP, FE, FS, PA, E4, …)
+     * @return string USPS processingCategory
+     */
+    protected function processingCategoryFor($rateIndicator)
+    {
+        $flatEnvelopes = ['FE', 'FP', 'FA', 'E4', 'E6', 'E7'];
+        return in_array($rateIndicator, $flatEnvelopes) ? 'FLATS' : $this->options['processingCategory'];
     }
 
     /**

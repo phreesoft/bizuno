@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-07-20
  * @filesource /controllers/shipping/carriers/usps/ship.php
  *
  * Endpoints:
@@ -218,6 +218,7 @@ class uspsShip extends uspsCommon
             $weight = (float)($pkg['settings']['weight'] ?? 0.1);
         }
 
+        $procCat = $this->processingCategoryFor($rateIndicator);
         $payload = [
             'imageInfo'   => [
                 // ZPL printers and PDF are the realistic options; default
@@ -230,11 +231,16 @@ class uspsShip extends uspsCommon
             'packageDescription' => [
                 'mailClass'                    => $mailClass,
                 'rateIndicator'                => $rateIndicator,
-                'processingCategory'           => $this->options['processingCategory'],
+                'processingCategory'           => $procCat,
                 'destinationEntryFacilityType' => 'NONE',
                 'mailingDate'                  => $mailingDate,
                 'weightUOM'                    => 'lb',
                 'weight'                       => round($weight, 2),
+                // USPS's packageDescription schema requires EITHER dimensions or a
+                // packagingType/shape pair. The latter is undocumented (no example
+                // or enum in the USPS spec/examples), so we always send dimensions
+                // like every USPS example. For flats they're pricing-irrelevant
+                // (flat rate is fixed by product), so they don't affect the charge.
                 'dimensionsUOM'                => 'in',
                 'length'                       => (float) clean('length', ['format'=>'float','default'=>0], 'post'),
                 'width'                        => (float) clean('width',  ['format'=>'float','default'=>0], 'post'),
