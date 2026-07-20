@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (lang(): added cross-module fallback search so module-owned keys translate when callers don't know the module — e.g. options_qa_status values rendered via viewKeyDropdown)
+ * @version    7.x Last Update: 2026-07-20 (localeCalculateDate(): cast day/month/year offsets to int to prevent PHP 8 "int + string" fatal when callers pass non-numeric terms values)
  * @filesource /locale/cleaner.php
  */
 
@@ -457,6 +457,9 @@ function localeGetDates($this_date = '')
  */
 function localeCalculateDate($start_date, $day_offset=0, $month_offset=0, $year_offset=0)
 {
+    $day_offset  = (int)$day_offset; // guard against non-numeric offsets (PHP 8 throws on int + string)
+    $month_offset= (int)$month_offset;
+    $year_offset = (int)$year_offset;
     $date_details= localeGetDates($start_date);
     msgDebug("\nin localeCalculateDate with start date = $start_date and day offset = $day_offset and month offsest = $month_offset and year offset = $year_offset ... ");
     if ($date_details['ThisYear'] > '1900' && $date_details['ThisYear'] < '2099') {

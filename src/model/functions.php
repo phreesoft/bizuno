@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-02 (viewFavicon: multi-source icon fetch (page link, /favicon.ico, DuckDuckGo, Google) with browser User-Agent + image validation, jittered 14-28 day cache, short retry for failed lookups — fixes dashboard favicons defaulting to bizuno and re-fetching on every reload)
+ * @version    7.x Last Update: 2026-07-20 (getTermsDate(): guard non-numeric net-days term so filling a multi-role contact no longer triggers a fatal in localeCalculateDate)
  * @filesource /model/functions.php
  */
 
@@ -1274,8 +1274,8 @@ function getTermsDate($terms_encoded='', $type='c', $post_date=false)
         default:
         case '0': // Default terms
         case '3': // Special terms
-            if (!isset($terms[3])) { $terms[3] = 30; }
-            return localeCalculateDate($post_date, $terms[3]);
+            if (!isset($terms[3]) || !is_numeric($terms[3])) { $terms[3] = 30; }
+            return localeCalculateDate($post_date, intval($terms[3]));
         case '1': // Cash on Delivery (COD)
         case '2': // Prepaid
         case '6': // Due upon receipt
