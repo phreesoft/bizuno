@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-07-20
+ * @version    7.x Last Update: 2026-07-22
  * @filesource /controllers/payment/wallet.php
  */
 
@@ -193,10 +193,18 @@ class paymentWallet
     public function save(&$layout=[])
     {
         if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        if (!method_exists($this->gateway, 'walletAddSave')) {
-            return msgAdd("The {$this->gatewayCode} gateway does not support saving cards from this screen.", 'info');
+        $cardID = clean('cardID', 'cmd', 'get'); // set only when editing an existing card
+        if (!empty($cardID)) {
+            if (!method_exists($this->gateway, 'walletEditSave')) {
+                return msgAdd("The {$this->gatewayCode} gateway does not support editing cards from this screen.", 'info');
+            }
+            $result = $this->gateway->walletEditSave($this->cID, $cardID, $this->pfID);
+        } else {
+            if (!method_exists($this->gateway, 'walletAddSave')) {
+                return msgAdd("The {$this->gatewayCode} gateway does not support saving cards from this screen.", 'info');
+            }
+            $result = $this->gateway->walletAddSave($this->cID, $this->pfID);
         }
-        $result = $this->gateway->walletAddSave($this->cID, $this->pfID);
         if (empty($result['ok'])) { return; } // the gateway already surfaced the reason via msgAdd()
         msgAdd(lang('msg_database_write'), 'success');
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizWindowClose('winCardAdd'); bizPanelRefresh('wallet');"]]);
@@ -225,12 +233,18 @@ class paymentWallet
     public function edit(&$layout)
     {
         if (empty($this->gateway) || !$security = validateAccess('j12_mgr', 2)) { return; }
-        if (!method_exists($this->gateway, 'walletEditURL')) {
+        $cardID = clean('cardID', 'cmd', 'get');
+        if (method_exists($this->gateway, 'walletEditURL')) { // gateway-hosted iframe edit (e.g. PayFabric)
+            $url    = $this->gateway->walletEditURL($cardID);
+            $layout = array_replace_recursive($layout, $this->viewIFrame($url));
+        } elseif (method_exists($this->gateway, 'walletEditForm')) { // native Bizuno card-entry form (e.g. Authorize.net)
+            $address= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$this->cID") ?: [];
+            $form   = $this->gateway->walletEditForm($this->cID, $cardID, $address);
+            if (empty($form)) { return; } // the gateway already surfaced the reason via msgAdd()
+            $layout = array_replace_recursive($layout, $form);
+        } else {
             return msgAdd("The {$this->gatewayCode} gateway does not support editing cards from this screen.", 'info');
         }
-        $cardID = clean('cardID', 'cmd', 'get');
-        $url    = $this->gateway->walletEditURL($cardID);
-        $layout = array_replace_recursive($layout, $this->viewIFrame($url));
     }
     /**
      * Retrieve Credit Cards / eChecks
