@@ -265,7 +265,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $pay = new AnetAPI\PaymentType();
         $pay->setCreditCard($this->buildCreditCardFromPost());
         $txn->setPayment($pay);
-        $txn->setOrder($this->buildOrder($ledger->main));
+        $this->applyOrderInfo($txn, $ledger);
         $txn->setBillTo($this->buildBillTo($ledger->main));
         $txn->setCustomer($this->buildCustomerData($ledger->main));
         $result = $this->runTransaction($txn);
@@ -283,7 +283,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $pay = new AnetAPI\PaymentType();
         $pay->setCreditCard($this->buildCreditCardFromPost());
         $txn->setPayment($pay);
-        $txn->setOrder($this->buildOrder($ledger->main));
+        $this->applyOrderInfo($txn, $ledger);
         $txn->setBillTo($this->buildBillTo($ledger->main));
         $txn->setCustomer($this->buildCustomerData($ledger->main));
         $result = $this->runTransaction($txn);
@@ -413,7 +413,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $txn->setTransactionType('authCaptureTransaction');
         $txn->setAmount(number_format($data['amount'], 2, '.', ''));
         $txn->setProfile($profile);
-        if (!empty($data['ledger'])) { $txn->setOrder($this->buildOrder($data['ledger']->main)); }
+        if (!empty($data['ledger'])) { $this->applyOrderInfo($txn, $data['ledger']); }
         return $this->runTransaction($txn);
     }
 
@@ -998,7 +998,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             (string)$tresponse->getTransId(),
             (string)$tresponse->getAuthCode(),
             (string)$tresponse->getMessages()[0]->getDescription(),
-            ['responseCode'=>$tresponse->getResponseCode(), 'accountNumber'=>$tresponse->getAccountNumber()],
+            ['responseCode'=>$tresponse->getResponseCode(), 'accountNumber'=>$tresponse->getAccountNumber(), 'accountType'=>$tresponse->getAccountType()],
             $response
         );
     }
@@ -1059,11 +1059,59 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     // Request-object builders (shared across actions)
     // ========================================================================
 
-    private function buildOrder($main)
+    /**
+     * Attaches everything order-related to a charge request: order (real invoice
+     * number + description), PO number, one line item per invoice being paid, and
+     * the duplicate-window guard. Shared by pmtCapture/pmtAuthorize/pmtWalletCapture.
+     */
+    private function applyOrderInfo($txn, $ledger)
     {
+        $refs = $this->collectRefs($ledger);
+        $txn->setOrder($this->buildOrder($ledger, $refs));
+        if (!empty($refs['pos'])) { $txn->setPoNumber(substr(implode(',', $refs['pos']), 0, 25)); }
+        foreach (array_slice($refs['rows'], 0, 30) as $row) { // API limit: 30 line items
+            $vals = explode(' ', $row['description'], 4);
+            $line = new AnetAPI\LineItemType();
+            $line->setItemId(substr(!empty($vals[1]) ? 'Inv '.$vals[1] : 'Payment', 0, 31));
+            $line->setName(substr($row['description'], 0, 31));
+            $line->setDescription(substr($row['description'], 0, 255));
+            $line->setQuantity(1);
+            $amount = !empty($row['credit_amount']) ? $row['credit_amount'] : (!empty($row['debit_amount']) ? $row['debit_amount'] : 0);
+            $line->setUnitPrice(number_format(abs($amount), 2, '.', ''));
+            $txn->addToLineItems($line);
+        }
+        // Widen Authorize.net's duplicate-transaction check from its 2-minute default so an
+        // accidental re-post of the same receipt is declined (E00027) instead of double-charged.
+        $dup = new AnetAPI\SettingType();
+        $dup->setSettingName('duplicateWindow');
+        $dup->setSettingValue('600');
+        $txn->addToTransactionSettings($dup);
+    }
+
+    /**
+     * The order sent to Authorize.net carries the customer's invoice number(s), not the
+     * internal deposit reference (CC/AX + date) which means nothing to the customer or
+     * the merchant portal. The deposit reference stays in journal_main.invoice_num for
+     * bank-rec grouping and is still noted in the order description. Falls back to the
+     * old behavior (deposit reference) when there are no pmt rows (e.g. pre-payments).
+     */
+    private function buildOrder($ledger, $refs=null)
+    {
+        if ($refs === null) { $refs = $this->collectRefs($ledger); }
+        $main = $ledger->main;
+        $inv  = implode(',', $refs['invs']);
+        if (strlen($inv) > 20) { $inv = (string)$refs['invs'][0]; } // multiple invoices that don't fit: first one, full list goes in description
+        if ($inv === '' && !empty($main['invoice_num'])) { $inv = (string)$main['invoice_num']; }
+        if (!empty($refs['invs'])) {
+            $desc = 'Payment for Inv# '.implode(', ', $refs['invs']);
+            if (!empty($refs['pos'])) { $desc .= ' PO# '.implode(', ', $refs['pos']); }
+            if (!empty($main['invoice_num'])) { $desc .= ' (Ref '.$main['invoice_num'].')'; }
+        } else {
+            $desc = !empty($main['description']) ? (string)$main['description'] : '';
+        }
         $order = new AnetAPI\OrderType();
-        if (!empty($main['invoice_num'])) { $order->setInvoiceNumber(substr((string)$main['invoice_num'], 0, 20)); }
-        if (!empty($main['description']))  { $order->setDescription(substr((string)$main['description'], 0, 255)); }
+        if ($inv  !== '') { $order->setInvoiceNumber(substr($inv, 0, 20)); }
+        if ($desc !== '') { $order->setDescription(substr($desc, 0, 255)); }
         return $order;
     }
 
@@ -1119,19 +1167,25 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
     }
 
     /**
-     * Tries to guess the invoice number and po number of the first pmt record of the item array
+     * Collects the invoice and PO numbers from every pmt row of the receipt.
+     * Row descriptions are formatted 'Inv# %s PO# %s' (lang key pmt_desc_short),
+     * with lang('none') as the PO placeholder — filtered out here.
+     * Replaces the old single-row guessInv() (same parse, converge parity).
+     * @return array ['invs'=>[invoice numbers], 'pos'=>[PO numbers], 'rows'=>[pmt rows]]
      */
-    private function guessInv($ledger)
+    private function collectRefs($ledger)
     {
-        $refs = ['inv'=>$ledger->main['invoice_num'], 'po'=>$ledger->main['invoice_num']];
+        $refs = ['invs'=>[], 'pos'=>[], 'rows'=>[]];
         if (empty($ledger->items)) { return $refs; }
         foreach ($ledger->items as $row) {
             if ($row['gl_type'] <> 'pmt') { continue; }
             $vals = explode(' ', $row['description'], 4);
-            if (!empty($vals[1])) { $refs['inv']= $vals[1]; }
-            if (!empty($vals[3])) { $refs['po'] = $vals[3]; }
-            break;
+            if (!empty($vals[1]) && $vals[1] <> lang('none')) { $refs['invs'][] = $vals[1]; }
+            if (!empty($vals[3]) && $vals[3] <> lang('none')) { $refs['pos'][]  = $vals[3]; }
+            $refs['rows'][] = $row;
         }
+        $refs['invs'] = array_values(array_unique($refs['invs']));
+        $refs['pos']  = array_values(array_unique($refs['pos']));
         return $refs;
     }
 
