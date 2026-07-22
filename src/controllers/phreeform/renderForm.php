@@ -65,7 +65,14 @@ class PDF extends \tFPDF
         // UTF-8 is intrinsic to tFPDF (that's the whole point of the fork) so no
         // encoding parameter is needed. The defunct disk-cache flag (TCPDF's 6th arg)
         // is dropped — tFPDF has no equivalent.
-        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]));
+        // tFPDF's built-in StdPageSizes only knows a3/a4/a5/letter/legal, so passing the
+        // name string (as TCPDF's much larger format table allowed) fails for every other
+        // entry in phreeformPages() (A0-A2, A6-A9, TABLOID, and any custom label size).
+        // Pass the numeric width/height already parsed above instead — tFPDF accepts an
+        // array directly and skips the name lookup entirely.
+        $pdfFormat = isset($PaperSize[1], $PaperSize[2]) && is_numeric($PaperSize[1]) && is_numeric($PaperSize[2])
+            ? [(float)$PaperSize[1], (float)$PaperSize[2]] : strtoupper($PaperSize[0]);
+        parent::__construct($report->pageorient, 'mm', $pdfFormat);
         if ($report->pageorient == 'P') { // Portrait - calculate max page height
             $this->pageY = $PaperSize[2] - $report->marginbottom;
         } else { // Landscape

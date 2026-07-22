@@ -53,7 +53,14 @@ class PDF extends \tFPDF
         // tFPDF takes (orientation, unit, format) — TCPDF's UTF-8 + disk-cache extra args
         // are not needed (UTF-8 is intrinsic to tFPDF). SetCellPadding(0) was TCPDF-only;
         // tFPDF's default 1mm cell padding is fine for report rows.
-        parent::__construct($report->pageorient, 'mm', strtoupper($PaperSize[0]));
+        // tFPDF's built-in StdPageSizes only knows a3/a4/a5/letter/legal, so passing the
+        // name string (as TCPDF's much larger format table allowed) fails for every other
+        // entry in phreeformPages() (A0-A2, A6-A9, TABLOID, and any custom label size).
+        // Pass the numeric width/height already parsed above instead — tFPDF accepts an
+        // array directly and skips the name lookup entirely.
+        $pdfFormat = isset($PaperSize[1], $PaperSize[2]) && is_numeric($PaperSize[1]) && is_numeric($PaperSize[2])
+            ? [(float)$PaperSize[1], (float)$PaperSize[2]] : strtoupper($PaperSize[0]);
+        parent::__construct($report->pageorient, 'mm', $pdfFormat);
         // Register {nb} → total-pages substitution. TCPDF auto-handled this; tFPDF (like
         // FPDF) requires an explicit alias declaration. Footer() now emits the alias and
         // tFPDF substitutes the real count at document close.
