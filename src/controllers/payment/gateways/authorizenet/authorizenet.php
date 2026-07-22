@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-07-20
+ * @version    7.x Last Update: 2026-07-22
  * @filesource /controllers/payment/gateways/authorizenet.php
  *
  * Source Information:
@@ -65,6 +65,9 @@ class authorizenet
         'msg_website'        => 'This must be done manually at the Authorize.net website.',
         'msg_capture_manual' => 'The payment was not processed through the Authorize.net gateway.',
         'save_to_wallet'     => 'Save card to wallet',
+        'card_details'       => 'Card Details',
+        'billing_address'    => 'Billing Address',
+        'no_change'          => '(no change)',
         'msg_address_result' => 'Address verification results: %s',
         'err_process_decline'=> 'Decline Code #%s: %s',
         'err_process_failed' => 'The credit card did not process, the response from Authorize.net:'];
@@ -708,33 +711,132 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
      */
     public function walletAddForm($cID, $address=[])
     {
+        return $this->cardForm($cID, [
+            'name'       => trim(!empty($address['contact']) ? $address['contact'] : ($address['primary_name'] ?? '')),
+            'company'    => $address['primary_name'] ?? '',
+            'address1'   => $address['address1']     ?? '',
+            'city'       => $address['city']         ?? '',
+            'state'      => $address['state']        ?? '',
+            'postal_code'=> $address['postal_code']  ?? '',
+            'country'    => $address['country']      ?? '',
+            'telephone1' => $address['telephone1']   ?? '']);
+    }
+
+    /**
+     * Wallet-provider entry point: build the "edit stored card" popup. Every field except
+     * the card number is editable. Authorize.net never returns a stored PAN (only the mask,
+     * e.g. XXXX1234) so the number is shown read-only; the expiration is masked in the API
+     * response too, hence the month/year selects default to "no change".
+     *
+     * @param int    $cID    - Bizuno contact id
+     * @param string $cardID - Authorize.net customerPaymentProfileId
+     * @return array Bizuno popup layout, or [] when the stored card can't be read
+     */
+    public function walletEditForm($cID, $cardID, $address=[])
+    {
+        $pp = $this->fetchPaymentProfile($cID, $cardID);
+        if (!$pp) { return []; }
+        $bill = $pp->getBillTo();
+        $cc   = $pp->getPayment() ? $pp->getPayment()->getCreditCard() : null;
+        return $this->cardForm($cID, [
+            'name'       => $bill ? trim($bill->getFirstName().' '.$bill->getLastName()) : '',
+            'company'    => $bill ? (string)$bill->getCompany()     : '',
+            'address1'   => $bill ? (string)$bill->getAddress()     : '',
+            'city'       => $bill ? (string)$bill->getCity()        : '',
+            'state'      => $bill ? (string)$bill->getState()       : '',
+            'postal_code'=> $bill ? (string)$bill->getZip()         : '',
+            'country'    => $bill ? (string)$bill->getCountry()     : '',
+            'telephone1' => $bill ? (string)$bill->getPhoneNumber() : '',
+            'masked'     => $cc   ? (string)$cc->getCardNumber()    : ''], $cardID);
+    }
+
+    /**
+     * Shared popup builder for the add- and edit-card forms. On edit the card number is
+     * read-only and the CVV field is dropped entirely — there is nothing to re-validate
+     * and the CVV is never retained (PCI DSS forbids storing it after authorization).
+     */
+    private function cardForm($cID, $values=[], $cardID='')
+    {
         $cc_exp = pullExpDates();
-        $name   = trim(!empty($address['contact']) ? $address['contact'] : ($address['primary_name'] ?? ''));
-        $flds   = [
-            'name'  => ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_name'),      'attr'=>['value'=>$name]],
-            'number'=> ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_number')],
-            'month' => ['options'=>['width'=>130],'label'=>lang('payment_expiration'),'values'=>$cc_exp['months'],'attr'=>['type'=>'select','value'=>biz_date('m')]],
-            'year'  => ['options'=>['width'=> 80],'break'=>true,'values'=>$cc_exp['years'],'attr'=>['type'=>'select','value'=>biz_date('Y')]],
-            'cvv'   => ['options'=>['width'=> 60],'break'=>true,'label'=>lang('payment_cvv')]];
+        $isEdit = !empty($cardID);
+        $months = $cc_exp['months'];
+        $years  = $cc_exp['years'];
+        if ($isEdit) { // index 0 is the placeholder entry from pullExpDates()
+            $months[0]['text'] = $this->lang['no_change'];
+            $years[0]['text']  = $this->lang['no_change'];
+        }
+        $number = ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_number')];
+        if ($isEdit) { $number['attr'] = ['value'=>$values['masked'] ?? '', 'readonly'=>true]; }
+        $flds = [
+            'name'       => ['options'=>['width'=>240],'break'=>true,'label'=>lang('payment_name'),'attr'=>['value'=>$values['name'] ?? '']],
+            'number'     => $number,
+            'month'      => ['options'=>['width'=>140],'label'=>lang('payment_expiration'),'values'=>$months,'attr'=>['type'=>'select','value'=>$isEdit?0:biz_date('m')]],
+            'year'       => ['options'=>['width'=>110],'break'=>true,'values'=>$years,'attr'=>['type'=>'select','value'=>$isEdit?0:biz_date('Y')]],
+            'cvv'        => ['options'=>['width'=> 60],'break'=>true,'label'=>lang('payment_cvv')],
+            'company'    => ['options'=>['width'=>240],'break'=>true,'label'=>lang('company'),    'attr'=>['value'=>$values['company'] ?? '']],
+            'address1'   => ['options'=>['width'=>240],'break'=>true,'label'=>lang('address1'),   'attr'=>['value'=>$values['address1'] ?? '']],
+            'city'       => ['options'=>['width'=>240],'break'=>true,'label'=>lang('city'),       'attr'=>['value'=>$values['city'] ?? '']],
+            'state'      => ['options'=>['width'=>240],'break'=>true,'label'=>lang('state'),      'attr'=>['type'=>'state',  'value'=>$values['state'] ?? '']],
+            'postal_code'=> ['options'=>['width'=>120],'break'=>true,'label'=>lang('postal_code'),'attr'=>['value'=>$values['postal_code'] ?? '']],
+            'country'    => ['options'=>['width'=>240],'break'=>true,'label'=>lang('country'),    'attr'=>['type'=>'country','value'=>$values['country'] ?? '']],
+            'telephone1' => ['options'=>['width'=>160],'break'=>true,'label'=>lang('telephone1'), 'attr'=>['value'=>$values['telephone1'] ?? '']]];
+        $route = "payment/wallet/save&rID=$cID".($isEdit ? "&cardID=$cardID" : '');
         $html  = '<div id="divCardAdd" style="padding:10px;">';
+        $html .= '<fieldset><legend>'.$this->lang['card_details'].'</legend>';
         $html .= html5($this->code.'_name',  $flds['name']);
         $html .= html5($this->code.'_number',$flds['number']);
         $html .= html5($this->code.'_month', $flds['month']);
         $html .= html5($this->code.'_year',  $flds['year']);
-        $html .= html5($this->code.'_cvv',   $flds['cvv']);
-        $html .= '</div>';
+        if (!$isEdit) { $html .= html5($this->code.'_cvv', $flds['cvv']); }
+        $html .= '</fieldset>';
+        $html .= '<fieldset><legend>'.$this->lang['billing_address'].'</legend>';
+        foreach (['company','address1','city','state','postal_code','country','telephone1'] as $key) {
+            $html .= html5($this->code."_$key", $flds[$key]);
+        }
+        $html .= '</fieldset></div>';
         $html .= '<div style="padding:0 10px 10px 10px;">'.html5($this->code.'_cardSave',
             ['attr'=>['type'=>'button','value'=>lang('save')],
-             'events'=>['onClick'=>"jqBiz('body').addClass('loading'); divSubmit('payment/wallet/save&rID=$cID', 'divCardAdd');"]]).'</div>';
-        return ['type'=>'popup','title'=>lang('wallet'),'attr'=>['id'=>'winCardAdd','width'=>460,'height'=>320],
+             'events'=>['onClick'=>"jqBiz('body').addClass('loading'); divSubmit('$route', 'divCardAdd');"]]).'</div>';
+        return ['type'=>'popup','title'=>lang('wallet'),'attr'=>['id'=>'winCardAdd','width'=>520,'height'=>640],
             'divs' => ['body'=>['order'=>50,'type'=>'html','html'=>$html]]];
+    }
+
+    /** Read one stored payment profile from Authorize.net, or null (reason already surfaced). */
+    private function fetchPaymentProfile($cID, $cardID)
+    {
+        $custID = $this->cachedCustID ?: $this->lookupCustomerProfileId(getWalletID((int)$cID));
+        if (empty($custID)) { msgAdd('Could not locate the Authorize.net customer profile for this contact.'); return null; }
+        $r = $this->wallet('wltGet', ['custID'=>$custID, 'payID'=>$cardID]);
+        if (empty($r['ok']) || empty($r['data']['paymentProfile'])) { return null; }
+        return $r['data']['paymentProfile'];
+    }
+
+    /**
+     * Map the POSTed wallet-form billing fields into the *_b keys buildBillTo() expects.
+     * 'cardholder_name' is a wallet-form-only key (no such journal_main column) that lets
+     * buildBillTo() set the cardholder first/last independently of the company name.
+     */
+    private function postToMain($cID)
+    {
+        $addr = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=".(int)$cID) ?: [];
+        return [
+            'contact_id_b'   => (int)$cID,
+            'cardholder_name'=> clean("{$this->code}_name",       'text', 'post'),
+            'primary_name_b' => clean("{$this->code}_company",    'text', 'post'),
+            'address1_b'     => clean("{$this->code}_address1",   'text', 'post'),
+            'city_b'         => clean("{$this->code}_city",       'text', 'post'),
+            'state_b'        => clean("{$this->code}_state",      'text', 'post'),
+            'postal_code_b'  => clean("{$this->code}_postal_code",'text', 'post'),
+            'country_b'      => clean("{$this->code}_country",    'text', 'post'),
+            'telephone1_b'   => clean("{$this->code}_telephone1", 'text', 'post'),
+            'email_b'        => $addr['email'] ?? ''];
     }
 
     /**
      * Wallet-provider entry point: save a card submitted from walletAddForm() into the
      * customer's Authorize.net profile (creating the profile if it doesn't exist yet).
-     * Card fields are read from POST by the shared buildCreditCardFromPost(); the billing
-     * address comes from the contacts row so the stored payment profile carries an AVS address.
+     * Card fields are read from POST by the shared buildCreditCardFromPost(); billing
+     * details come from the form so the stored profile carries an AVS address.
      *
      * @param int    $cID  - Bizuno contact id
      * @param string $pfID - Bizuno wallet id, e.g. "C000000123" (unused here; the profile is
@@ -746,18 +848,56 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $cID = (int)$cID;
         if (empty($cID)) { return $this->failure('Contact ID required to save card'); }
         if (empty(clean("{$this->code}_number", 'numeric', 'post'))) { return $this->failure('A credit card number is required.'); }
-        $addr = dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID") ?: [];
-        $name = clean("{$this->code}_name", 'text', 'post');
-        $main = [
-            'contact_id_b'  => $cID,
-            'primary_name_b'=> $name ?: ($addr['primary_name'] ?? ''),
-            'address1_b'    => $addr['address1']    ?? '',
-            'city_b'        => $addr['city']        ?? '',
-            'state_b'       => $addr['state']       ?? '',
-            'postal_code_b' => $addr['postal_code'] ?? '',
-            'country_b'     => $addr['country']     ?? '',
-            'email_b'       => $addr['email']       ?? ''];
-        return $this->walletCustCreate(['main'=>$main]);
+        return $this->walletCustCreate(['main'=>$this->postToMain($cID)]);
+    }
+
+    /**
+     * Wallet-provider entry point: update a stored card's billing details and/or expiration.
+     * The card number can never be changed here. Authorize.net accepts the masked number
+     * (XXXX1234) on update and retains the PAN on file when it sees one; the mask is re-read
+     * from the gateway rather than taken from the POST so a tampered form can't reach the API.
+     * Likewise the expiration is only replaced when both selects are set — otherwise 'XXXX'
+     * tells Authorize.net to keep the stored date. No CVV is sent: it is never stored.
+     *
+     * @param int    $cID    - Bizuno contact id
+     * @param string $cardID - Authorize.net customerPaymentProfileId
+     * @param string $pfID   - Bizuno wallet id, used to resolve the customer profile
+     * @return array normalized ['ok'=>bool, ...]
+     */
+    public function walletEditSave($cID, $cardID, $pfID='')
+    {
+        $cID = (int)$cID;
+        if (empty($cID) || empty($cardID)) { return $this->failure('Contact ID and card ID required to update the card'); }
+        $custID = $this->cachedCustID ?: $this->lookupCustomerProfileId($pfID ?: getWalletID($cID));
+        if (empty($custID)) { return $this->failure('Could not locate the Authorize.net customer profile for this contact.'); }
+        $pp = $this->fetchPaymentProfile($cID, $cardID);
+        if (!$pp) { return $this->failure('Could not read the stored card from Authorize.net.'); }
+        $ccOld  = $pp->getPayment() ? $pp->getPayment()->getCreditCard() : null;
+        $masked = $ccOld ? (string)$ccOld->getCardNumber() : '';
+        if (empty($masked)) { return $this->failure('The stored card number is unavailable, it cannot be updated.'); }
+        $month = clean("{$this->code}_month", 'numeric', 'post');
+        $year  = clean("{$this->code}_year",  'integer', 'post');
+        $cc = new AnetAPI\CreditCardType();
+        $cc->setCardNumber($masked);
+        $cc->setExpirationDate(!empty($month) && !empty($year) ? sprintf('%04d-%02d', (int)$year, (int)$month) : 'XXXX');
+        $pay = new AnetAPI\PaymentType();
+        $pay->setCreditCard($cc);
+        $payProf = new AnetAPI\CustomerPaymentProfileExType();
+        $payProf->setCustomerPaymentProfileId((string)$cardID);
+        $payProf->setCustomerType('individual');
+        $payProf->setBillTo($this->buildBillTo($this->postToMain($cID)));
+        $payProf->setPayment($pay);
+        $request = new AnetAPI\UpdateCustomerPaymentProfileRequest();
+        $request->setMerchantAuthentication($this->merchantAuthentication());
+        $request->setRefId('ref' . time());
+        $request->setCustomerProfileId((string)$custID);
+        $request->setPaymentProfile($payProf);
+        $request->setValidationMode('none'); // a masked card number cannot be test-authorized
+        $controller = new AnetController\UpdateCustomerPaymentProfileController($request);
+        $response = $this->execute($controller);
+        if (!$response) { return $this->failure('Gateway communication error'); }
+        if ($response->getMessages()->getResultCode() != 'Ok') { return $this->describeError($response); }
+        return $this->success((string)$cardID, 'Ok', 'Payment profile updated', [], $response);
     }
 
     private function walletPayDelete($data)
@@ -926,7 +1066,11 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     private function buildBillTo($main)
     {
-        $parts = explode(' ', $main['primary_name_b'] ?? '', 2);
+        // 'cardholder_name' is set only by the wallet-tab form (postToMain), which collects the
+        // cardholder separately from the company. The payment flow has no such key and keeps
+        // the original behavior of splitting the billing company name into first/last.
+        $person = !empty($main['cardholder_name']) ? $main['cardholder_name'] : ($main['primary_name_b'] ?? '');
+        $parts = explode(' ', $person, 2);
         $addr = new AnetAPI\CustomerAddressType();
         $addr->setFirstName(substr($parts[0] ?? '', 0, 50));
         $addr->setLastName(substr($parts[1] ?? '', 0, 50));
@@ -936,6 +1080,7 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         if (!empty($main['state_b']))       { $addr->setState(substr($main['state_b'], 0, 40)); }
         if (!empty($main['postal_code_b'])) { $addr->setZip(preg_replace('/[^A-Za-z0-9]/','',$main['postal_code_b'])); }
         if (!empty($main['country_b']))     { $addr->setCountry(substr($main['country_b'], 0, 60)); }
+        if (!empty($main['telephone1_b']))  { $addr->setPhoneNumber(substr($main['telephone1_b'], 0, 25)); }
         return $addr;
     }
 
