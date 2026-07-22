@@ -752,8 +752,13 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
 
     /**
      * Shared popup builder for the add- and edit-card forms. On edit the card number is
-     * read-only and the CVV field is dropped entirely — there is nothing to re-validate
-     * and the CVV is never retained (PCI DSS forbids storing it after authorization).
+     * read-only, since Authorize.net never returns a stored PAN.
+     *
+     * There is deliberately no CVV field here. A stored card is charged as a card-on-file
+     * credential, which neither requires nor expects a CVV, and PCI DSS forbids retaining
+     * the code after authorization — so a CVV collected at this point could never be used
+     * again. AVS (the billing address below) is the fraud control for stored cards. The
+     * CVV on the payment screen is unaffected: that one rides a real authorization.
      */
     private function cardForm($cID, $values=[], $cardID='')
     {
@@ -772,7 +777,6 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
             'number'     => $number,
             'month'      => ['options'=>['width'=>140],'label'=>lang('payment_expiration'),'values'=>$months,'attr'=>['type'=>'select','value'=>$isEdit?0:biz_date('m')]],
             'year'       => ['options'=>['width'=>110],'break'=>true,'values'=>$years,'attr'=>['type'=>'select','value'=>$isEdit?0:biz_date('Y')]],
-            'cvv'        => ['options'=>['width'=> 60],'break'=>true,'label'=>lang('payment_cvv')],
             'company'    => ['options'=>['width'=>240],'break'=>true,'label'=>lang('company'),    'attr'=>['value'=>$values['company'] ?? '']],
             'address1'   => ['options'=>['width'=>240],'break'=>true,'label'=>lang('address1'),   'attr'=>['value'=>$values['address1'] ?? '']],
             'city'       => ['options'=>['width'=>240],'break'=>true,'label'=>lang('city'),       'attr'=>['value'=>$values['city'] ?? '']],
@@ -787,7 +791,6 @@ html5($this->code.'_action', ['label'=>$this->lang['at_authorizenet'],          
         $html .= html5($this->code.'_number',$flds['number']);
         $html .= html5($this->code.'_month', $flds['month']);
         $html .= html5($this->code.'_year',  $flds['year']);
-        if (!$isEdit) { $html .= html5($this->code.'_cvv', $flds['cvv']); }
         $html .= '</fieldset>';
         $html .= '<fieldset><legend>'.$this->lang['billing_address'].'</legend>';
         foreach (['company','address1','city','state','postal_code','country','telephone1'] as $key) {
