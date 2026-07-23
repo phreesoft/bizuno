@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-07-23
  * @filesource /local/en_US/language.php
  */
 
@@ -267,6 +267,7 @@ $langCore = [
     'doc_link' => 'Document Link',
     'download' => 'Download',
     'download_data'=> 'Download Data',
+    'duplicate' => 'Duplicate',
     'due_date' => 'Due Date',
     'edit' => 'Edit',
     'edit_profile' => 'Edit Profile',
