@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-07-23
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -1718,6 +1718,10 @@ function bizUnitDiscDisc(newValue) {
                     'optFill'    => ['order'=>40,'icon'=>'fill','label'=>lang('save_fill'),'security'=>2,
                         'hidden' =>  in_array($this->journalID, [4,10]) && $security>1?false:true,
                         'events' => ['onClick'=>"jqBiz('#xAction').val('invoice'); jqBiz('#frmJournal').submit();"]],
+                    'optDuplicate' => ['order'=>45,'icon'=>'copy','label'=>lang('duplicate'),'security'=>3,
+                        'hidden'  => !in_array($this->journalID, [3, 9]),
+                        'disabled'=> $this->rID?false:true,
+                        'events'  => ['onClick'=>"saveAction('saveAs','$this->journalID');"]],
                     'optSaveAs'  => ['order'=>50,'label'=>lang('save_as'),'child'=>  [
                         'saveAsQuote'=> ['order'=>10,'icon'=>'quote','label'=>lang("journal_id_".($type=='v'?3: 9)),'security'=>3,
 //                            'disabled'=> !in_array($this->journalID, array(3,9)) ? false : true,
