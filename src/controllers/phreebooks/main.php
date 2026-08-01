@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-07-23
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/main.php
  */
 
@@ -319,7 +319,10 @@ jqBiz('#postDateMax').datebox({onChange:function (newDate) { jqBiz('#postDateMax
 var items = jqBiz('#dgJournalItem').datagrid('getData');\n\tjqBiz('#item_array').val(JSON.stringify(items));\n\t
 if (!formValidate()) return false;\n\treturn true;\n}";
         $jsHead     = $jsBody = '';
-        $jsReady    = "ajaxForm('frmJournal');\njqBiz('#dgJournalItem').edatagrid('addRow');\n";
+        // journalEdit() swaps journal forms in via AJAX without a full page reload, so the terminal_date
+        // dirty-tracking globals in common.js (contactsDetail/terminalDateFromPostDate) must be reset here
+        // on every edit load, or a manual edit on one record would suppress auto-sync on the next.
+        $jsReady    = "terminalDateDirty = false;\nterminalDateSyncing = false;\najaxForm('frmJournal');\njqBiz('#dgJournalItem').edatagrid('addRow');\n";
         if ($this->action=='inv' && !empty(getModuleCache('phreebooks', 'settings', $this->type=='v'?'vendors':'customers', 'show_status'))) {
             $jsReady .= "jsonAction('phreebooks/main/detailStatus', $cID);";
         }
@@ -336,6 +339,16 @@ if (!formValidate()) return false;\n\treturn true;\n}";
         //   sales/purchase orders (4,10) = Expected Ship. All others keep "Due Date".
         $tdLabels = [3=>'expiration_date', 4=>'expected_ship', 9=>'expiration_date', 10=>'expected_ship', 12=>'ship_date'];
         if (isset($tdLabels[$this->journalID])) { $structure['terminal_date']['label'] = lang($tdLabels[$this->journalID]); }
+        // Keep terminal_date in sync client-side (see common.js terminalDateFromPostDate/terminalDateMarkDirty):
+        //   - journals 3/9 (quotes) and 4/10/12 (orders/sale) recalc from post_date (offset or same date).
+        //   - journals 6/7/13 (purchase/vendor credit/customer credit) recalc from the currently known
+        //     vendor/customer terms (contactsDetail() on contact selection, terminalDateFromTerms() via
+        //     the termsDate ajax lookup on post_date change).
+        //   All of them stop following their source once the user manually edits terminal_date.
+        if (in_array($this->journalID, [3,4,6,7,9,10,12,13])) {
+            $structure['terminal_date']['events']['onChange'] = 'terminalDateMarkDirty();';
+            $structure['post_date']['events']['onChange']     = 'terminalDateFromPostDate(newVal);';
+        }
         $structure['rep_id']['values']    = viewRoleDropdown(in_array($this->journalID, [3, 4, 6, 7])?'purch':'sales');
         if (sizeof(getModuleCache('phreebooks', 'currency', 'iso')) > 1) {
             $structure['currency']['callback']    = 'totalsCurrency';
@@ -1953,6 +1966,22 @@ function bizUnitDiscDisc(newValue) {
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'0','invoice_num'=>$invNum], 'update', "id=$rID");
         $action = !empty($panel) ? "bizPanelRefresh('$panel');" : "bizGridReload('dgPhreeBooks');";
         $layout = array_replace_recursive($layout,['content'=>['action'=>'eval','actionData'=>$action]]);
+    }
+
+    /**
+     * Lightweight ajax lookup used by common.js terminalDateFromTerms() to recalculate the terminal_date
+     * (Due Date) for journals 6/7/13 when the user changes post_date, without a full contactsDetail()
+     * round trip (which would also re-fill address/gl/tax fields the user may have already edited).
+     * @param array $layout - structure
+     * @return modified $layout - content.date, the recalculated due date in db format (Y-m-d)
+     */
+    public function termsDate(&$layout=[])
+    {
+        if (!$security = validateAccess("j{$this->journalID}_mgr", 1)) { return; }
+        $terms     = clean('terms', 'text', 'get');
+        $post_date = !empty($_GET['post_date']) ? clean('post_date', 'date', 'get') : false;
+        $date = getTermsDate($terms, $this->type, $post_date);
+        $layout = array_replace_recursive($layout, ['content'=>['date'=>$date]]);
     }
 
     private function setQuote2Order($rID, $cID, $structure)

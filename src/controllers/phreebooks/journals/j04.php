@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-05
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/journals/j04.php
  */
 
@@ -90,7 +90,9 @@ class j04 extends jCommon
         $data['datagrid']['item']['columns']['action']['actions']['trash']['display'] = "typeof row.bal==='undefined' || row.bal==0 || row.bal==null"; // do not allow trash if line has received qty
         $data['fields']['gl_acct_id']['attr']['value']   = getModuleCache('phreebooks', 'settings', 'vendors', 'gl_payables');
         // terminal_date here is the Expected Ship date — left to the journal default
-        // (today for new POs, saved value on edit), NOT recomputed from vendor terms.
+        // (same as post date for new POs, saved value on edit; see journal::defaultTerminalDate()),
+        // NOT recomputed from vendor terms. common.js keeps it synced to post_date client-side
+        // until the user manually edits it.
         $data['fields']['waiting']['label'] = lang('confirmed');
 //      $isWaiting = isset($data['fields']['waiting']['attr']['checked']) && $data['fields']['waiting']['attr']['checked'] ? '1' : '0';
 //      $data['fields']['waiting'] = ['attr'=>  ['type'=>'hidden', 'value'=>$isWaiting]]; // field not used

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-12-27
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/journals/j06.php
  */
 
@@ -137,9 +137,11 @@ class j06 extends jCommon
         $data['jsHead']['datagridData'] = $this->dgDataItem;
         $data['datagrid']['item'] = $this->dgOrders('dgJournalItem', 'v');
         $data['fields']['gl_acct_id']['attr']['value'] = getModuleCache('phreebooks', 'settings', 'vendors', 'gl_payables');
+        // terminal_date here is the Due Date — defaults to the vendor's terms (or the default vendor
+        // terms setting if no vendor selected yet), computed by journal::defaultTerminalDate(); see
+        // common.js contactsDetail() for the recalculation when a vendor is selected/changed.
         if (!$rID) { // new order
             $data['fields']['closed'] = ['attr'=>['type'=>'hidden', 'value'=>'0']];
-            $data['fields']['terminal_date']['attr']['value'] = getTermsDate($data['fields']['terms']['attr']['value'], 'v');
         } elseif (isset($data['fields']['closed']['attr']['checked']) && $data['fields']['closed']['attr']['checked'] == 'checked') {
             $data['fields']['closed'] = ['attr'=>['type'=>'hidden', 'value'=>'1']];
             $data['fields']['journal_msg']['html'] .= '<span style="font-size:20px;color:red">'.lang('paid')."</span>";
