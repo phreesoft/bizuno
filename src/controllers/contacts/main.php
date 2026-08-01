@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-29 (security: add validateAccess guards to saveNotes/saveLog/managerRowsLog/deleteLog routes)
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/contacts/main.php
  */
 
@@ -525,10 +525,12 @@ class contactsMain
     public function details(&$layout=[])
     {
         if (!$security = validateAccess($this->secID, 1)) { return; }
-        $rID    = clean('rID', 'integer','get');
-        $prefix = clean('prefix','text', 'get');
-        $suffix = clean('suffix','text', 'get');
-        $fill   = clean('fill',  'char', 'get');
+        $rID      = clean('rID', 'integer','get');
+        $prefix   = clean('prefix','text', 'get');
+        $suffix   = clean('suffix','text', 'get');
+        $fill     = clean('fill',  'char', 'get');
+        // optional, used to calculate terminal_date (due date) relative to the order's post date instead of today; clean('date') returns the string 'null' when absent, so only clean when present
+        $post_date= !empty($_GET['post_date']) ? clean('post_date', 'date', 'get') : false;
         $address[] = addressLoad($rID);
         $address[0]['type'] = 'm';
         if (!$rID) { // biz_id=0, send company information
@@ -538,7 +540,7 @@ class contactsMain
             $type   = $contact['ctype_v']=='1' ? 'v' : 'c';
             // Fix a few things
             $contact['terms_text']   = viewTerms($contact['terms'], true, $type);
-            $contact['terminal_date']= getTermsDate($contact['terms'], $type);
+            $contact['terminal_date']= getTermsDate($contact['terms'], $type, $post_date);
             if (getModuleCache('shipping', 'properties', 'status') && getModuleCache('shipping', 'settings', 'general', 'gl_shipping_'.$type)) {
                 $contact['ship_gl_acct_id'] = getModuleCache('shipping', 'settings', 'general', 'gl_shipping_'.$type);
             }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /view/easyUI/html5.php
  */
 
@@ -1502,6 +1502,7 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
             $prop['options']['value'] = "'".viewDate($prop['attr']['value'])."'";
             unset($prop['attr']['value']);
         }
+        $this->mapEvents($prop); // was missing: 'events'=>['onChange'=>...] fell through to a raw onChange="" HTML attr instead of the easyUI onChange option, so it silently never fired
         return $this->input($id, $prop);
     }
 
@@ -1513,6 +1514,7 @@ msgDebug("\nbizuno properties = ".msgPrint(getModuleCache('bizuno', 'properties'
             $prop['options']['value'] = "'".viewDate($prop['attr']['value'], true)."'";
             unset($prop['attr']['value']);
         }
+        $this->mapEvents($prop); // see inputDate() above
         return $this->input($id, $prop);
     }
 

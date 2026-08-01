@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-09
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/journals/j07.php
  */
 
@@ -131,7 +131,10 @@ class j07 extends jCommon
         $data['jsHead']['datagridData'] = $this->dgDataItem;
         $data['datagrid']['item'] = $this->dgOrders('dgJournalItem', 'v');
         $data['fields']['gl_acct_id']['attr']['value']   = getModuleCache('phreebooks', 'settings', 'vendors', 'gl_payables');
-        $data['fields']['terminal_date']['attr']['value']= getTermsDate($data['fields']['terms']['attr']['value'], 'v');
+        // terminal_date here is the Due Date — defaults to the vendor's terms (or the default vendor
+        // terms setting if no vendor selected yet), computed by journal::defaultTerminalDate(); see
+        // common.js contactsDetail() for the recalculation when a vendor is selected/changed. Must NOT
+        // be unconditionally recomputed here or it would clobber the saved value when editing.
         if (!$rID) { // new order
             $data['fields']['closed'] = ['attr'=>['type'=>'hidden', 'value'=>'0']];
         } elseif (isset($data['fields']['closed']['attr']['checked']) && $data['fields']['closed']['attr']['checked'] == 'checked') {

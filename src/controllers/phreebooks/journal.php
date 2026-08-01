@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -213,7 +213,7 @@ class journal
                 $this->main['so_po_ref_id'] = $this->main['id'];
                 $this->main['id']           = 0;
                 $this->main['post_date']    = biz_date('Y-m-d');
-                $this->main['terminal_date']= biz_date('Y-m-d'); // get default based on type
+                $this->main['terminal_date']= $this->defaultTerminalDate($this->main['post_date'], $this->main['terms'] ?? '');
                 $this->main['invoice_num']  = '';
                 if (in_array($this->journalID, [12]) && getModuleCache('shipping', 'properties', 'status')) { $this->main['waiting'] = '1'; } // set waiting to ship flag
 // @todo this should be a setting as some want the rep to flow from the Sales Order for commissions while others just care about who fills the order.
@@ -249,6 +249,7 @@ class journal
         if (!$post_date) { $post_date = biz_date('Y-m-d'); }
         $termsType  = in_array($this->journalID, [3,4,6,7,17,20,21]) ? 'vendors' : 'customers';
         if (!empty($cID)) { $cData = dbGetValue(BIZUNO_DB_PREFIX.'contacts', ['store_id','terms'], "id=$cID"); }
+        $terms = !empty($cData['terms']) ? $cData['terms'] : getModuleCache('phreebooks', 'settings', $termsType, 'terms'); // default terms
         $this->main = [
             'id'           => 0,  // default to new order
             'journal_id'   => $jID ? $jID : 0,
@@ -259,12 +260,12 @@ class journal
             'sales_tax'    => 0,
             'tax_rate_id'  => 0,
             'total_amount' => 0,
-            'terms'        => !empty($cData['terms']) ? $cData['terms'] : getModuleCache('phreebooks', 'settings', $termsType, 'terms'), // default terms
+            'terms'        => $terms,
             'gl_acct_id'   => '',
             'currency'     => getDefaultCurrency(), 'currency_rate'=> 1,
             'closed'       => 0, 'waiting' => 0, 'printed' => 0,'attach' => '0',
             'post_date'    => $post_date,
-            'terminal_date'=> in_array($this->journalID, [3,9]) ? localeCalculateDate(biz_date(), 30) : biz_date(), // @TODO 30 days for quotes, needs to be setting
+            'terminal_date'=> $this->defaultTerminalDate($post_date, $terms),
             'period'       => calculatePeriod($post_date, false), // hold back not current period message for API
             'admin_id'     => getUserCache('profile', 'userID'),
             'rep_id'       => getUserCache('profile', 'userID', false, '0'),
@@ -273,6 +274,30 @@ class journal
             'drop_ship'    => 0];
         if (in_array($this->journalID, [3,4,6,13,15,21])) { $this->setShip2Biz(); } // pre-set the ship to address
         $this->items = [];
+    }
+
+    /**
+     * Calculates the default terminal_date value for a journal, since the field is repurposed per journal type:
+     *   3  (Vendor Quote/RFQ)    - Expiration Date, always post date + 7 days
+     *   9  (Customer Quote)      - Expiration Date, always post date + 30 days
+     *   6  (Vendor Purchase)     - Due Date, from vendor terms (contact terms if known, else the default vendor terms setting)
+     *   7  (Vendor Credit Memo)  - Due Date, same rule as journal 6
+     *   13 (Customer Credit Memo)- Due Date, same rule as journal 6 but against customer terms ($this->type=='c')
+     *   all others (4,10,12,...)- Expected Ship / Ship Date, same date as post date
+     * @param string $post_date - db format (Y-m-d) post date to calculate from
+     * @param string $terms - encoded payment terms, only used for journals 6, 7 and 13
+     * @return string - date in db format
+     */
+    private function defaultTerminalDate($post_date, $terms='')
+    {
+        switch ($this->journalID) {
+            case  3: return localeCalculateDate($post_date, 7);
+            case  9: return localeCalculateDate($post_date, 30);
+            case  6:
+            case  7:
+            case 13: return getTermsDate($terms, $this->type, $post_date);
+            default: return $post_date;
+        }
     }
 
     /**

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-16
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /controllers/phreebooks/journals/j13.php
  */
 
@@ -133,6 +133,9 @@ class j13 extends jCommon
         $data['jsHead']['datagridData'] = $this->dgDataItem;
         $data['datagrid']['item'] = $this->dgOrders('dgJournalItem', 'c');
         $data['fields']['gl_acct_id']['attr']['value'] = getModuleCache('phreebooks', 'settings', 'customers', 'gl_receivables');
+        // terminal_date here is the Due Date — defaults to the customer's terms (or the default customer
+        // terms setting if no customer selected yet), computed by journal::defaultTerminalDate(); see
+        // common.js contactsDetail() for the recalculation when a customer is selected/changed.
         if (!$rID) { // new order
             $data['fields']['closed'] = ['attr'=>['type'=>'hidden', 'value'=>'0']];
         } elseif (isset($data['fields']['closed']['attr']['checked']) && $data['fields']['closed']['attr']['checked'] == 'checked') {

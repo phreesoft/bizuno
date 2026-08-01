@@ -20,7 +20,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-03
+ * @version    7.x Last Update: 2026-08-01
  * @filesource /view/easyUI/common.js
  */
 
@@ -1622,6 +1622,19 @@ function dbDate(str) {
 }
 
 /**
+ * Adds/subtracts days from a users locale formatted date, used to keep terminal_date synced to post_date
+ * @param string localeDateStr - date in the user's locale format
+ * @param integer days - number of days to add (negative to subtract), 0 returns the same date
+ * @returns string - date in the user's locale format
+ */
+function localeDateAdd(localeDateStr, days) {
+    var parts = dbDate(localeDateStr).split('-');
+    var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    d.setDate(d.getDate() + days);
+    return formatDate(d);
+}
+
+/**
  *
  * @param {type} ref
  * @returns integer, -1 if less, 0 if equal, 1 if greater
@@ -2464,15 +2477,84 @@ function setFields(rowIndex) {
 }
 
 /**************************** orders ******************************************************/
-function contactsDetail(rID, suffix, fill) {
+/**
+ * The terminal_date field is repurposed per journal type (see phreebooks/main.php $tdLabels):
+ *   3 (RFQ)/9 (Sales Quote)          - Expiration Date, post_date + a fixed number of days
+ *   4 (PO)/10 (SO)/12 (Sale)         - Expected Ship/Ship Date, same date as post_date
+ *   6 (Purchase)/7 (Vendor Credit)/
+ *   13 (Customer Credit)             - Due Date, from the selected vendor's/customer's terms; see
+ *                                       contactsDetail (on contact selection) and terminalDateFromTerms
+ *                                       (on post_date change, via the termsDate ajax lookup)
+ * In every case it stays synced to its source (post_date and/or the contact's terms) only until the
+ * user manually edits it, tracked here with terminalDateDirty. terminalDateSyncing suppresses the
+ * dirty flag while we set the value ourselves via terminalDateAutoSet().
+ */
+var terminalDateDirty   = false;
+var terminalDateSyncing = false;
+
+function terminalDateMarkDirty() {
+    if (!terminalDateSyncing) { terminalDateDirty = true; }
+}
+
+function terminalDateAutoSet(val) {
+    terminalDateSyncing = true;
+    bizDateSet('terminal_date', val);
+    terminalDateSyncing = false;
+}
+
+// bound to post_date's onChange for journals 3, 4, 6, 7, 9, 10, 12, 13 (see phreebooks/main.php)
+function terminalDateFromPostDate(newVal) {
+    if (terminalDateDirty || !newVal) { return; }
+    switch (parseInt(bizDefaults.phreebooks.journalID, 10)) {
+        case  3: terminalDateAutoSet(localeDateAdd(newVal, 7));  break; // RFQ Expiration: +7 days
+        case  9: terminalDateAutoSet(localeDateAdd(newVal, 30)); break; // Sales Quote Expiration: +30 days
+        case  4:
+        case 10:
+        case 12: terminalDateAutoSet(newVal); break; // Expected Ship/Ship Date: same as post date
+        case  6:
+        case  7:
+        case 13: terminalDateFromTerms(newVal); break; // Due Date: recalc from the currently known vendor/customer terms
+        default: // not one of the journals terminal_date tracking applies to
+    }
+}
+
+/**
+ * Recalculates terminal_date (Due Date, journals 6/7/13) from the currently known vendor/customer terms
+ * (the #terms hidden field, set either by contactsDetail() on contact selection or the journal's default
+ * terms setting) against a new post_date. A small dedicated ajax lookup instead of a full contactsDetail()
+ * round trip, which would also re-fill address/gl/tax fields the user may have already edited.
+ */
+function terminalDateFromTerms(newVal) {
+    if (terminalDateDirty || !newVal) { return; }
+    var terms = jqBiz('#terms').val();
+    if (!terms) { return; }
+    var jID = bizDefaults.phreebooks.journalID;
     jqBiz.ajax({
-        url:     bizunoAjax+'&bizRt=contacts/main/details&rID='+rID+'&suffix='+suffix+'&fill='+fill,
+        url: bizunoAjax+'&bizRt=phreebooks/main/termsDate&jID='+jID+'&terms='+encodeURIComponent(terms)+'&post_date='+encodeURIComponent(newVal),
+        success: function(json) {
+            if (terminalDateDirty || !json || typeof json.date === 'undefined') { return; } // may have gone dirty while the request was in flight
+            terminalDateAutoSet(formatDate(json.date));
+        }
+    });
+}
+
+function contactsDetail(rID, suffix, fill) {
+    var url = bizunoAjax+'&bizRt=contacts/main/details&rID='+rID+'&suffix='+suffix+'&fill='+fill;
+    if (suffix=='_b' && jqBiz('#post_date').length) { url += '&post_date='+encodeURIComponent(bizDateGet('post_date')); }
+    jqBiz.ajax({
+        url:     url,
         success: function(json) {
             processJson(json);
             if (suffix=='_b') {
                 jqBiz('#terms').val(json.contact.terms);
                 bizTextSet('terms_text', json.contact.terms_text);
-                bizDateSet('terminal_date', formatDate(json.contact.terminal_date)); // changed from only 6 to all sales/purchases
+                // Due Date (journals 6/7/13 only) recalculates from the selected vendor's/customer's terms,
+                // unless the user has already manually changed it. Other journal types manage terminal_date
+                // via terminalDateFromPostDate() instead and must not be overwritten here.
+                var jID = bizDefaults.phreebooks ? parseInt(bizDefaults.phreebooks.journalID, 10) : 0;
+                if (!terminalDateDirty && (jID==6 || jID==7 || jID==13) && typeof json.contact.terminal_date !== 'undefined') {
+                    terminalDateAutoSet(formatDate(json.contact.terminal_date));
+                }
                 jqBiz('#spanContactProps'+suffix).show();
                 if (json.contact.rep_id != 0) { bizSelSet('rep_id', json.contact.rep_id); }
                 def_contact_gl_acct = json.contact.gl_account;
