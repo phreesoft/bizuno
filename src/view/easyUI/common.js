@@ -79,6 +79,54 @@ jqBiz.ajaxSetup({ // Set defaults for ajax requests
     }
 });
 
+// CSRF Layer 2 (forms + fetch) — the ajaxSetup hook above covers every jqBiz.ajax
+// call, but native <form> POSTs and raw fetch() bypass jQuery and never get the token.
+// Attach the same per-session bizCSRF token to those too — SAME-ORIGIN ONLY — so
+// hand-built forms and fetch() callers are covered automatically, with no per-form
+// _csrf field or per-call header needed. Without this, any non-ajax POST is rejected
+// by validateCsrf() under BIZUNO_CSRF_ENFORCE and bounced to the portal home.
+(function () {
+    function bizCsrfToken() { return (typeof bizCSRF !== 'undefined' && bizCSRF) ? bizCSRF : ''; }
+    function bizCsrfSameOrigin(url) {
+        try { return new URL(url, window.location.href).origin === window.location.origin; }
+        catch (e) { return true; } // relative URL resolves to same origin
+    }
+    function bizCsrfInjectForm(form) {
+        if (!form || form.tagName !== 'FORM') { return; }
+        if ((form.method || 'get').toLowerCase() !== 'post') { return; }
+        if (!bizCsrfSameOrigin(form.getAttribute('action') || window.location.href)) { return; }
+        if (form.querySelector('input[name="_csrf"]')) { return; }
+        var token = bizCsrfToken();
+        if (!token) { return; }
+        var input = document.createElement('input');
+        input.type = 'hidden'; input.name = '_csrf'; input.value = token;
+        form.appendChild(input);
+    }
+    // User-initiated submits (capture phase, before the form serializes)
+    document.addEventListener('submit', function (e) { bizCsrfInjectForm(e.target); }, true);
+    // Programmatic form.submit() does not fire the submit event — wrap it as well
+    try {
+        var nativeSubmit = HTMLFormElement.prototype.submit;
+        HTMLFormElement.prototype.submit = function () { bizCsrfInjectForm(this); return nativeSubmit.apply(this, arguments); };
+    } catch (e) { /* older browser: the submit-event listener still covers user submits */ }
+    // fetch() — add the header on same-origin, state-changing calls
+    if (window.fetch) {
+        var nativeFetch = window.fetch;
+        window.fetch = function (input, init) {
+            init = init || {};
+            var url = (typeof input === 'string') ? input : (input && input.url) || '';
+            var method = ((init.method || (typeof input === 'object' && input.method) || 'GET') + '').toUpperCase();
+            var token = bizCsrfToken();
+            if (token && bizCsrfSameOrigin(url) && method !== 'GET' && method !== 'HEAD') {
+                var headers = new Headers(init.headers || (typeof input === 'object' && input.headers) || {});
+                if (!headers.has('X-Bizuno-Csrf')) { headers.set('X-Bizuno-Csrf', token); }
+                init.headers = headers;
+            }
+            return nativeFetch.call(this, input, init);
+        };
+    }
+})();
+
 let stored = null;
 let storedVersion = null;
 if (sessionStorage.bizuno) {
