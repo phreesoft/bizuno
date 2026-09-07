@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-09-07
  * @filesource /controllers/payment/main.php
  */
 
@@ -191,8 +191,13 @@ class paymentMain
         $j13ttlRow= dbGetRow(BIZUNO_DB_PREFIX.'journal_item', "ref_id={$j22pmtRow['item_ref_id']} AND gl_type='ttl'");
         $transCode= $this->refundTrnsCode($j22ttlRow, $j13ttlRow);
         if (empty($transCode)) { return true; } // had no transaction code so probably wasn't a credit card
-        $method   = guessPaymentMethod(0, $j13ttlRow['description']);
-        if (!$gateway = $this->getGateway($method)) { return; }
+        $method   = $this->normalizeMethod(guessPaymentMethod(0, $j13ttlRow['description']));
+        if (!$gateway = $this->getGateway($method, false)) {
+            // Method stored on the original payment (e.g. a cart gateway ID from a web order) has no
+            // installed Bizuno gateway. Notify and let the credit memo post; refund must be done at the merchant.
+            msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+            return true;
+        }
         if (method_exists($gateway, 'payment')) {
             // last4 lives in the original payment's description hint — required by SDK gateways (auth.net)
             $origDesc = bizDecode($j13ttlRow['description']);
@@ -203,10 +208,16 @@ class paymentMain
                 'amount' => $amount,
                 'last4'  => $last4,
             ]);
-            if (empty($r['ok'])) { return; }
+            if (empty($r['ok'])) { // gateway already messaged the error, post the CM and refund at the merchant
+                msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+                return true;
+            }
         } elseif (method_exists($gateway, 'refund')) {
             msgDebug("\nProcessing refund via legacy gateway->refund() — gateway has not been ported to payment() dispatcher");
-            if (!$result = $gateway->refund($transCode, $amount)) { return; }
+            if (!$result = $gateway->refund($transCode, $amount)) {
+                msgAdd(lang('err_cc_no_transaction_id'), 'caution');
+                return true;
+            }
             $r = ['ok'=>true, 'txID'=>$result['txID'] ?? '', 'code'=>$result['code'] ?? ''];
         } else {
             // Gateway has no refund path — record locally and proceed.
@@ -264,11 +275,30 @@ class paymentMain
         if (!empty($desc2['status']) && $desc2['status']=='cap') { return $j18row['trans_code']; }
     }
 
-    private function getGateway($method='')
+    /**
+     * Maps legacy/cart gateway IDs stored on older payment records to the installed Bizuno gateway code.
+     * e.g. WooCommerce Authorize.net plugin posts method 'authnet' which Bizuno knows as 'authorizenet'.
+     */
+    private function normalizeMethod($method='')
     {
+        $aliases = ['authnet'=>'authorizenet', 'authorize'=>'authorizenet', 'authorize_net'=>'authorizenet', 'elevon'=>'converge', 'ppcp-gateway'=>'paypal'];
+        $key = strtolower(trim((string)$method));
+        return isset($aliases[$key]) ? $aliases[$key] : $method;
+    }
+
+    /**
+     * Instantiates the gateway class for a method
+     * @param string $method - gateway code
+     * @param boolean $verbose - true to raise an error message if the gateway is not installed, false to fail silently
+     * @return object|null - gateway instance or null if not installed
+     */
+    private function getGateway($method='', $verbose=true)
+    {
+        $method  = $this->normalizeMethod($method);
         $gateway = getMetaMethod('gateways', $method);
         if (empty($gateway['path'])) {
-            return msgAdd("Cannot apply payment to gateway: $method since the method is not installed!");
+            if ($verbose) { msgAdd("Cannot apply payment to gateway: $method since the method is not installed!"); }
+            return;
         }
         bizAutoLoad($gateway['path']."$method.php");
         $fqcn   = "\\bizuno\\$method";

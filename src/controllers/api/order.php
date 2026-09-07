@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-01-10
+ * @version    7.x Last Update: 2026-09-07
  * @filesource /controllers/api/order.php
  */
 
@@ -193,6 +193,8 @@ class apiOrder extends apiCommon
         if (strpos($test, 'ppcp-gateway')!==false) { return 'paypal'; } // returned from WordPress PayPal plugin
         if (strpos($test, 'elevon')      !==false) { return 'converge'; }
         if (strpos($test, 'converge')    !==false) { return 'converge'; }
+        if (strpos($test, 'authnet')     !==false) { return 'authorizenet'; } // WooCommerce Authorize.net plugin
+        if (strpos($test, 'authorize')   !==false) { return 'authorizenet'; }
         return $fromCart;
     }
     private function guessShipMethod($carrier)
