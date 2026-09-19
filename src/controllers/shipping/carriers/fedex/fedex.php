@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-02
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /controllers/shipping/carriers/fedex/manager.php
  *
  * FedEx Developer Site: https://www.fedex.com/us/developer/web-services/process.html?tab=tab1
@@ -31,7 +31,7 @@ namespace bizuno;
 
 define ('FEDEX_TRACKING_URL',         'https://www.fedex.com/fedextrack/?trknbr=TRACKINGNUM'); // FedEx Express/Ground
 define ('FEDEX_FREIGHT_TRACKING_URL', 'https://www.fedexfreight.com/fedextrack/?trknbr=TRACKINGNUM&trkqual=~TRACKINGNUM~FDFR'); // FedEx Freight (LTL) uses a separate host + tracking qualifier
-define ('FEDEX_FREIGHT_METHODS',      'GDF,ECF'); // LTL service codes (Freight Priority, Freight Economy) tracked via the FedEx Freight portal
+define ('FEDEX_FREIGHT_METHODS',      '1DF,2DF,3DF,GDF,ECF,IFE,IFP'); // every freight service (Express 1/2/3 Day, LTL Priority/Economy, Int. Priority/Economy) tracks via the FedEx Freight portal
 
 bizAutoLoad(dirname(__FILE__).'/common.php', 'fedexCommon');
 bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'viewCarrierServices', 'function');
@@ -328,7 +328,7 @@ class fedex extends fedexCommon
                 case 'Tracking ID Charge Description': // there are zero to 25 of these, same label!!!
                     $desc = $data[$idx];
                     break;
-                case 'Tracking ID Charge Amount';
+                case 'Tracking ID Charge Amount':
                     if (empty($data[$idx])) { break; }
                     $output['charges'][] = ['text'=>$desc, 'value'=>$data[$idx]];
                     break;
