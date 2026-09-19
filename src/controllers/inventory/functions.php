@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-09-19 (invQtyQuote process: open sales quote qty per SKU for the Inventory Manager)
  * @filesource /controllers/inventory/functions.php
  */
 
@@ -61,6 +61,15 @@ function inventoryProcess($value, $format='')
         case 'inv_mv12':  if (empty($range)) { $range = 'm12';}
                           return viewInvSales($value, $range); // value passed should be the SKU
         case 'inv_stk':   return viewInvMinStk($value); // value passed should be the SKU
+        case 'invQtyQuote': // open sales quote demand (journal 9, not closed) for the SKU passed, aggregated once per request for the whole grid
+            static $quoteMap = null;
+            if ($quoteMap === null) {
+                $quoteMap = [];
+                $rows = dbGetMulti(BIZUNO_DB_PREFIX.'journal_item ji JOIN '.BIZUNO_DB_PREFIX.'journal_main jm ON jm.id=ji.ref_id',
+                    "jm.journal_id=9 AND jm.closed='0' AND ji.gl_type='itm' AND ji.sku<>'' GROUP BY ji.sku", '', ['ji.sku AS sku', 'SUM(ji.qty) AS qty'], 0, false);
+                foreach ((array)$rows as $row) { $quoteMap[$row['sku']] = floatval($row['qty']); }
+            }
+            return $quoteMap[$value] ?? 0;
         case 'storeStock':
             $storeID  = !empty($GLOBALS['bizuno_store_id']) ? (int)$GLOBALS['bizuno_store_id'] : 0;
             $thisStore= dbGetValue(BIZUNO_DB_PREFIX.'inventory_history', 'SUM(remaining) AS remaining', "remaining>0 AND store_id=$storeID AND sku=$qSku", false);

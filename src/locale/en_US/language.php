@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-07-23
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /local/en_US/language.php
  */
 
@@ -1022,6 +1022,8 @@ $langCore = [
     'qty_store' => 'Qty this Store',
     'qty_po' => 'Qty on PO',
     'qty_so' => 'Qty on SO',
+    'qty_quote' => 'Qty on Quote',
+    'on_open_quotes' => 'On Open Quotes',
     'qty_alloc' => 'Qty Allocated',
     'qty_min' => 'Min Stock Level',
     'qty_restock' => 'Reorder Qty',
