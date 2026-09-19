@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-09-19 (manager: Qty on Quote column from open sales quotes, vendor and open-quote filters)
  * @filesource /controllers/inventory/main.php
  */
 
@@ -157,6 +157,8 @@ class inventoryMain
             ['index'=>'sort',  'clean'=>'text',   'default'=>BIZUNO_DB_PREFIX."inventory.sku"],
             ['index'=>'order', 'clean'=>'text',   'default'=>'ASC'],
             ['index'=>'f0',    'clean'=>'char',   'method'=>'request','default'=>'y'],
+            ['index'=>'f2',    'clean'=>'integer','method'=>'request','default'=>0],   // vendor
+            ['index'=>'f3',    'clean'=>'char',   'method'=>'request','default'=>'a'], // on open quotes
             ['index'=>'search','clean'=>'text',   'default'=>'']]];
         if ($clrSearch) { clearUserCache($data['path']); }
         $this->defaults = updateSelection($data);
@@ -841,6 +843,15 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             case 'y': $f0_value = "inactive='0'"; break;
             case 'n': $f0_value = "inactive='1'"; break;
         }
+        // Qty on Quote: open sales quote demand per SKU (journal 9, not closed) via the invQtyQuote process (one aggregate query per request,
+        // same alias+process pattern as the multi-store stock column so the single-table query path is unchanged). Used with the vendor and
+        // open-quote filters to find items to add to a vendor PO to reach the free-freight minimum.
+        $onQuote = BIZUNO_DB_PREFIX."inventory.sku IN (SELECT ji.sku FROM ".BIZUNO_DB_PREFIX."journal_item ji JOIN ".BIZUNO_DB_PREFIX."journal_main jm ON jm.id=ji.ref_id"
+                 . " WHERE jm.journal_id=9 AND jm.closed='0' AND ji.gl_type='itm' AND ji.sku<>'')";
+        $vendors = [['id'=>0, 'text'=>lang('all')]];
+        foreach ((array)dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_v='1' AND inactive<>'1'", 'short_name', ['id','short_name']) as $row) { $vendors[] = ['id'=>$row['id'], 'text'=>$row['short_name']]; }
+        $f2 = intval($this->defaults['f2']);
+        $f3 = $this->defaults['f3'];
         $data = ['id'=> $name, 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
             'attr'     => ['idField'=>'id', 'toolbar'=>"#{$name}Toolbar", 'url'=>BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows"],
             'events'   => [
@@ -855,9 +866,11 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                     'mergeInv'    =>['order'=>30,'icon'=>'merge',  'hidden'=>$security>4?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
                     'woDesign'    =>['order'=>50,'icon'=>'design', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/design/manager');"]],
                     'woTasks'     =>['order'=>55,'icon'=>'inv-adj','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/tasks/manager');"]],
-                    'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizTextSet('search', ''); ".$name."Reload();"]]],
+                    'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizSelSet('f2', 0); bizSelSet('f3', 'a'); bizTextSet('search', ''); ".$name."Reload();"]]],
                 'filters'=> [
                     'f0'     => ['order'=>10,'label'=>lang('status'),'break'=>true,'sql'=>$f0_value,'values'=> $yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['f0']]],
+                    'f2'     => ['order'=>20,'label'=>lang('vendors'),'sql'=>!empty($f2) ? BIZUNO_DB_PREFIX."inventory.vendor_id=$f2" : '','values'=>$vendors,'attr'=>['type'=>'select','value'=>$f2]],
+                    'f3'     => ['order'=>30,'label'=>lang('on_open_quotes'),'sql'=>$f3=='y' ? $onQuote : '','values'=>[['id'=>'a','text'=>lang('all')],['id'=>'y','text'=>lang('yes')]],'attr'=>['type'=>'select','value'=>$f3]],
                     'search' => ['order'=>90,'attr'=>['value'=>$this->defaults['search']]]],
                 'sort' => ['s0'=>  ['order'=>10, 'field'=>($this->defaults['sort'].' '.$this->defaults['order'])]]],
             'columns'  => [
@@ -881,6 +894,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                 'qty_stock'        => ['order'=>30,'field'=>'qty_stock','format'=>'number','label'=>lang('qty_stock'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
                 'qty_po'           => ['order'=>40,'field'=>'qty_po',   'format'=>'number','label'=>lang('qty_po'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right'],'format'=>'buySell'],
                 'qty_so'           => ['order'=>50,'field'=>'qty_so',   'format'=>'number','label'=>lang('qty_so'),   'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']],
+                'qty_quote'        => ['order'=>55,'field'=>BIZUNO_DB_PREFIX.'inventory.sku','alias'=>'sku','process'=>'invQtyQuote','format'=>'number','label'=>lang('qty_quote'),'attr'=>['width'=>150,'sortable'=>false,'resizable'=>true,'align'=>'right']],
                 'qty_alloc'        => ['order'=>60,'field'=>'qty_alloc','format'=>'number','label'=>lang('qty_alloc'),'attr'=>['width'=>150,'sortable'=>true,'resizable'=>true,'align'=>'right']]]];
         switch ($filter) {
             case 'stock': $data['source']['filters']['restrict'] = ['order'=>99, 'sql'=>"inventory_type in ('si','sr','ms','mi','ma')"]; break;

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-09-19 (register invQtyQuote process)
  * @filesource /controllers/inventory/admin.php
  */
 
@@ -81,6 +81,7 @@ class inventoryAdmin
             'inv_mv12'  => ['text'=>lang('annual_sales')     .' (sku)'],
             'inv_stk'   => ['text'=>lang('qty_min')          .' (sku)'],
             'storeStock'=> ['text'=>lang('store_stock'),         'group'=>lang('ctype_b')],
+            'invQtyQuote'=>['text'=>lang('qty_quote'),           'group'=>lang('inventory')],
             'sbBOM'     => ['text'=>lang('sb_proc_bom', $this->moduleID),  'group'=>lang('work_orders')],
             'sbOnOrder' => ['text'=>lang('sb_proc_order', $this->moduleID),'group'=>lang('work_orders')],
             'sbSteps'   => ['text'=>lang('sb_step_list', $this->moduleID), 'group'=>lang('work_orders')],
