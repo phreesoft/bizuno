@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (added N9() + MSG() handlers for 850 — capture reference info (e.g. PartsSource "PO POLICIES" + URL) as a $0 description line on the SO)
+ * @version    7.x Last Update: 2026-09-19 (TD5 map: FEDEX INTL P/E FRT now IFP/IFE instead of the LTL codes GDF/ECF)
  * @filesource /controllers/phreebooks/ediSegments.php
  */
 
@@ -410,10 +410,10 @@ class phreebooksEdiSegments
             case 'FEDEX 3DAY FREIGHT':          return 'fedex:3DF';
             case 'UPS FREIGHT':
             case 'FEDEX FREIGHT':
-            case 'FEDEX INTL P FRT':
             case 'FEDEX FREIGHT PRIORITY':      return 'fedex:GDF';
-            case 'FEDEX INTL E FRT':
             case 'FEDEX FREIGHT ECONOMY':       return 'fedex:ECF';
+            case 'FEDEX INTL P FRT':            return 'fedex:IFP'; // International Priority Freight (Express), not LTL
+            case 'FEDEX INTL E FRT':            return 'fedex:IFE'; // International Economy Freight (Express), not LTL
             case 'CUST PICKUP':                 return 'freeshipper:GDR';
             default: $this->errors[] = "Error in tag TD5 position 3, undefined shipping method: $value";
         }

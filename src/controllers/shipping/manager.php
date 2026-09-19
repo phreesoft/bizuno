@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-02
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /controllers/shipping/manager.php
  */
 
@@ -48,6 +48,7 @@ class shippingManager extends mgrJournal
     function __construct()
     {
         parent::__construct();
+        $this->mgrTitle = sprintf(lang('tbd_manager'), lang('shipping')); // pageID is 'manager', so the parent's default title reads "Manager Manager" in the audit log
         $this->managerSettings();
         $this->fieldStructure();
     }
@@ -373,9 +374,17 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
                 $table = 'journal';
             }
         }
-        $args = ['_rID'=>$rID, '_table'=>$table, '_refID'=>$refID, 'tabID'=>2];
+        $args = ['_rID'=>$rID, '_table'=>$table, '_refID'=>$refID, 'tabID'=>2, 'log'=>false];
         parent::saveMeta($layout, $args);
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['waiting'=>'0'], 'update', "id=$refID");
+        // shipment meta has no title, so write an audit line that identifies the shipment and what it now says
+        $meta  = dbMetaGet(clean('_rID', 'integer', 'post'), $this->metaPrefix, $table, $refID); // saveMeta sets _rID on inserts
+        $track = [];
+        foreach ((array)($meta['packages']['rows'] ?? []) as $pkg) { if (!empty($pkg['tracking_id'])) { $track[] = $pkg['tracking_id']; } }
+        msgLog("$this->mgrTitle - ".lang('save').": ".lang('reference').": ".($meta['ref_num'] ?? '')
+            ."; ".lang('invoice_num_12').": ".($meta['invoice_num'] ?? '')
+            ."; ".lang('method').": ".viewProcess($meta['method_code'] ?? '', 'shipInfo')." (".($meta['method_code'] ?? '').")"
+            ."; ".lang('tracking_num').": ".(!empty($track) ? implode(', ', $track) : lang('none')));
     }
 
     public function delete(&$layout=[])

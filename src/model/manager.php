@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-25
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /model/manager.php
  */
 
@@ -381,7 +381,9 @@ class mgrJournal
         if (empty($defs['_rID'])) { $defs['_rID'] = $_POST['_rID'] = $result; } // only for inserts
         $io->uploadSave("atch{$this->domSuffix}", "{$this->attachPath}{$output['ref_num']}_{$defs['_rID']}_");
         msgAdd(lang('msg_record_saved'), 'success');
-        msgLog("$this->mgrTitle - ".lang('save').": ".(!empty($output['title']) ? $output['title'] : ''));
+        if (!isset($defs['log']) || $defs['log']!==false) { // callers pass 'log'=>false when they write their own, more descriptive, audit line
+            msgLog("$this->mgrTitle - ".lang('save').": ".(!empty($output['title']) ? $output['title'] : ($output['ref_num'] ?? '')));
+        }
         $data  = ['content'=>['action'=>'eval','actionData'=>"jqBiz('#acc{$this->domSuffix}').accordion('select',{$defs['tabID']}); bizGridReload('dg{$this->domSuffix}'); jqBiz('#dtl{$this->domSuffix}').html('&nbsp;');"]];
         $layout= array_replace_recursive($layout, $data);
     }
