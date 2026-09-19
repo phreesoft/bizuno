@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-09-19 (price tiers carry the sell unit label and weight so the store can name them)
  * @filesource /controllers/api/funnels/wooCommerce/wooCommerce.php
  */
 
@@ -363,7 +363,8 @@ function productUpload(rID) {
             if (sizeof($sheet['sheets'])==1) { continue; } // probably a fixed price so move on to the next one
             foreach ($sheet['sheets'] as $level) {
                 if (empty($level['qty']) || empty($level['price'])) { continue; } // skip empty rows
-                $sellQtys[] = ['qty'=>$level['qty'], 'price'=>round($level['price'], 2)]; // this will use the last default sheet if multiple defaults are selected.
+                $sellQtys[] = ['qty'=>$level['qty'], 'price'=>round($level['price'], 2), // this will use the last default sheet if multiple defaults are selected.
+                    'label'=>!empty($level['label']) ? $level['label'] : '', 'weight'=>!empty($level['weight']) ? floatval($level['weight']) : 0]; // sell unit name/weight from the price sheet
             }
         }
         msgDebug("\nCleaning up priceTiers resulted in the number of rows: ".sizeof($sellQtys));

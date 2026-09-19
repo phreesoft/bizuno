@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-09-19 (price level editor shows/edits the sell unit label and weight already stored on each level)
  * @filesource /controllers/inventory/prices.php
  */
 
@@ -621,6 +621,8 @@ function preSubmitPrices() {
                 'action'  => ['order'=> 1,'label'=>lang('action'), 'attr'=>['width'=>60,],
                     'actions'=> ['trash'=>  ['icon'=>'trash','order'=>20,'events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]],
                     'events' => ['formatter'=>"function(value,row,index){ return ".$name."Formatter(value,row,index); }"]],
+                'label'   => ['order'=> 5,'label'=>lang('sell_unit'), 'attr'=>['width'=>170,'resizable'=>true],
+                    'events'=>  ['editor'=>"{type:'textbox'}"]], // sell unit name, e.g. Blister Card (5 pieces); set by the master sheet import, shown on quotes and the web store
                 'qty'     => ['order'=>10,'label'=>lang('qty'), 'attr'=>['width'=>60,'align'=>'right'],
                     'events'=>  ['editor'=>"{type:'numberbox',options:{formatter:function(value){ return formatPrecise(value); }}}"]],
                 'source'  => ['order'=>20,'label'=>lang('source'), 'attr'=>['width'=>120,'sortable'=>true, 'resizable'=>true, 'align'=>'center'],
@@ -637,6 +639,8 @@ function preSubmitPrices() {
                     'events' => ['editor'=>"{type:'numberbox'}",'formatter'=>"function(value,row){ return formatNumber(value); }"]],
                 'price'   => ['order'=>70,'label'=>lang('price'), 'attr'=>['width'=>120,'align'=>'right', 'size'=>10],
                     'events' => ['editor'=>"{type:'numberbox'}",'formatter'=>"function(value,row){ return formatNumber(value); }"]],
+                'weight'  => ['order'=>75,'label'=>lang('weight'),'attr'=>['width'=>70,'align'=>'right', 'size'=>10],
+                    'events' => ['editor'=>"{type:'numberbox',options:{precision:2}}",'formatter'=>"function(value,row){ return value ? formatNumber(value) : ''; }"]],
                 'margin'  => ['order'=>80,'label'=>lang('margin'),'attr'=>['width'=>60,'align'=>'right', 'size'=>10]]]];
     }
 

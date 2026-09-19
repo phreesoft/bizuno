@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (manager: Qty on Quote column from open sales quotes, vendor and open-quote filters)
+ * @version    7.x Last Update: 2026-09-19 (Sell Units panel on the General tab listing the SKU price sheet levels (unit, pieces, price, weight))
  * @filesource /controllers/inventory/main.php
  */
 
@@ -235,6 +235,33 @@ class inventoryMain
      * @param array $layout - structure coming in
      * @return modified structure
      */
+    /**
+     * Read-only summary of the SKU's own customer price sheet levels (sell unit, pieces, price, weight) for the General tab,
+     * so the packaging breakdown imported from the master data sheet is visible without opening the Prices tab.
+     * @param integer $rID - inventory record id
+     * @return string - html table, or a short note when the SKU has no sheet of its own
+     */
+    private function sellUnitsHTML($rID=0)
+    {
+        if (empty($rID)) { return ''; }
+        $sheets = getMetaInventory($rID, 'price_c%');
+        if (!empty($sheets) && !isset($sheets[0])) { $sheets = [$sheets]; } // a single hit comes back as one sheet, not a list
+        $use = [];
+        foreach ((array)$sheets as $sheet) { // the SKU sheet not tied to a customer, default one first
+            if (!empty($sheet['cID']) || empty($sheet['levels']['rows'])) { continue; }
+            if (empty($use) || !empty($sheet['default'])) { $use = $sheet; }
+        }
+        if (empty($use)) { return '<p>'.lang('none').'</p>'; }
+        $html = '<table style="border-collapse:collapse;width:100%"><thead><tr class="panel-header"><td>'.lang('sell_unit').'</td><td style="text-align:right">'.lang('qty').'</td><td style="text-align:right">'.lang('price').'</td><td style="text-align:right">'.lang('weight').'</td></tr></thead><tbody>';
+        foreach ($use['levels']['rows'] as $level) {
+            $unit = !empty($level['label']) ? $level['label'] : lang('qty').' '.$level['qty'];
+            $html.= '<tr><td>'.htmlspecialchars($unit, ENT_QUOTES, 'UTF-8').'</td><td style="text-align:right">'.viewFormat($level['qty'], 'number').'</td>'
+                  . '<td style="text-align:right">'.(isset($level['price']) && $level['price']!=='' ? viewFormat($level['price'], 'currency') : '').'</td>'
+                  . '<td style="text-align:right">'.(!empty($level['weight']) ? viewFormat($level['weight'], 'number') : '').'</td></tr>';
+        }
+        return $html.'</tbody></table>';
+    }
+
     public function edit(&$layout=[])
     {
         $security    = validateAccess('inv_mgr', 1);
@@ -345,6 +372,7 @@ class inventoryMain
                     'genCust' => ['order'=>40,'type'=>'panel','classes'=>['block33'],'key'=>'genCust'],
                     'genVend' => ['order'=>50,'type'=>'panel','classes'=>['block33'],'key'=>'genVend','hidden'=>$hideV],
                     'genGL'   => ['order'=>60,'type'=>'panel','classes'=>['block33'],'key'=>'genGL'],
+                    'genSell' => ['order'=>70,'type'=>'panel','classes'=>['block33'],'key'=>'genSell','hidden'=>$rID?false:true],
                     'genAtch' => ['order'=>80,'type'=>'panel','classes'=>['block66'],'key'=>'genAtch']]],
                 'movement' => ['order'=>30,'label'=>lang('movement'),'hidden'=>$rID?false:true,'type'=>'html','html'=>'',
                     'options'=> ['href'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/history/movement&rID=$rID'"]],
@@ -367,6 +395,7 @@ class inventoryMain
                 'genCust' => ['label'=>lang('details').' ('.lang('customers').')',      'type'=>'fields','keys'=>$fldCust],
                 'genVend' => ['label'=>lang('details').' ('.lang('vendors').')',        'type'=>'fields','keys'=>$fldVend],
                 'genGL'   => ['label'=>lang('details').' ('.lang('general_ledger').')', 'type'=>'fields','keys'=>$fldGL],
+                'genSell' => ['label'=>lang('sell_units'),                              'type'=>'html',  'html'=>$this->sellUnitsHTML($rID)],
                 'genAtch' => ['type'=>'attach','defaults'=>['path'=>getModuleCache($this->moduleID,'properties','attachPath', 'inventory'),'prefix'=>"rID_{$rID}_"]]],
             'forms'   => ['frmInventory'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=inventory/main/save"]]],
             'fields'  => $structure,
