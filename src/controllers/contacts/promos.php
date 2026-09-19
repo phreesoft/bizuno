@@ -46,6 +46,18 @@ class contactsPromos extends mgrJournal
     }
 
     /**
+     * Sets the manager grid defaults. Relies on the base defaults from
+     * mgrJournal::managerDefaults(), like the sibling contacts controllers.
+     * Without this method the constructor's $this->managerSettings() call
+     * fatals (Call to undefined method bizuno\contactsPromos::managerSettings()),
+     * breaking Contacts -> Promotions on every install.
+     */
+    protected function managerSettings()
+    {
+        parent::managerDefaults();
+    }
+
+    /**
      * Sets the page fields with their structure
      * @return array - page structure
      */
