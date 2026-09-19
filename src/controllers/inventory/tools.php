@@ -93,7 +93,7 @@ class inventoryTools
         msgDebug("\nDeleting meta from source SKU: $srcSKU");
         $jMeta  = dbMetaGet(0, '%', 'inventory', $srcID);
         dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."inventory_meta WHERE ref_id=$srcID");
-        msgAdd("Table inventory_meta number of source meta entries removed = ".sizeof($jMeta), 'info');
+        msgAdd("Table inventory_meta number of source meta entries removed = ".(is_array($jMeta) ? sizeof($jMeta) : 0), 'info');
         // Move the main image if not existing at dest
         $srcImg = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "id=$srcID");
         $destImg= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'image_with_path', "id=$destID");
@@ -135,6 +135,7 @@ class inventoryTools
     private function renameMetaReturn($srcSKU='', $destSKU='')
     {
         $rows= dbMetaGet(0, 'return', 'journal', '%');
+        if (!is_array($rows)) { $rows = []; }
         msgDebug("\nWorking on journal_meta:return key , read ".sizeof($rows)." rows to process.");
         $cnt = 0;
         foreach ($rows as $row) {
