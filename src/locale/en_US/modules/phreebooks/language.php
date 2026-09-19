@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /locale/en_US/modules/phreebooks/language.php
  */
 
@@ -63,6 +63,13 @@ $lang = [
     'show_status_tip' => 'This feature displays a contact status popup on the order screens when a customer/vendor is selected from the search popup. It displays balances, account aging as well as the active status of the contact.',
     'include_all_lbl' => 'Fill All SKUs',
     'include_all_tip'=> 'Include all lines that have SKUs when filling a Sales Order irregardless of whether they are being filled with this invoice. No - only line items that have a non-zero quantity will be added to the invoice. Yes - All line items with non-blank SKUs will be included in the invoice, handy for displaying shipped prior/balance due information on blanket purchase orders.',
+    'stmt_form_lbl' => 'Monthly Statement Form',
+    'stmt_form_tip' => 'Form emailed by the monthly statement cron (portal/api/stmtCron) to every active customer whose Monthly Statement property is set. Forms listed here live in the PhreeForm Customers -> Statements folder. Leave at Select to disable the cron.',
+    'stmt_dates_lbl' => 'Monthly Statement Dates',
+    'stmt_dates_tip' => 'Date range the statement covers when the cron runs. Last Month suits a run on the 1st. Customers set to "Email, always" fall back to all dates when the range has no activity, so they still receive their account status.',
+    'stmt_cc_lbl' => 'Monthly Statement CC',
+    'stmt_cc_tip' => 'Optional email address copied on every statement the cron sends, e.g. your A/R clerk. The run summary always goes to the Manager email in Company settings.',
+    'stmt_dates_lastmonth' => 'Last Month',
     'ck_dup_po_lbl' => 'Prevent Duplicate PO #s',
     'ck_dup_po_tip' => 'Check for duplicate PO numbers for the selected customer. Handy to prevent double shipments but requires a unique PO number for partial or split shipments.',
     'rm_item_ship_lbl' => 'Remove Zero Value Shipping',

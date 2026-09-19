@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /controllers/api/locale/en_US/language.php
  */
 
@@ -33,7 +33,7 @@ $lang = [
     'api_pass_lbl'  => 'API Password',
     'api_pass_tip'  => 'Optional password — used by integrations that authenticate against the legacy API user/pass scheme. Leave blank if you only use the API token.',
     'api_token_lbl' => 'API Token',
-    'api_token_tip' => 'Shared secret required by the unauthenticated portal endpoints (shipGetRates, orderAdd, ediCron). Pass it as `token=...` in the request POST or query string. Leave blank to disable those endpoints entirely.',
+    'api_token_tip' => 'Shared secret required by the unauthenticated portal endpoints (shipGetRates, orderAdd, ediCron, funnelCron, stmtCron). Pass it as `token=...` in the request POST or query string. Leave blank to disable those endpoints entirely.',
     // API Settings
     'cart_sync' => '%s Product',
     'cart_cat' => '%s Category Path',

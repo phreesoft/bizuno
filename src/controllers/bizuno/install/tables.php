@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-06 (common_meta/contacts_meta/inventory_meta: TEXT meta_value uses DEFAULT NULL, not "NULL DEFAULT ''" — strict MySQL 8 rejects a literal default on TEXT/BLOB with error 1101)
+ * @version    7.x Last Update: 2026-09-19 (contacts.stmt_email: monthly statement email preference, none / skip if no activity / always)
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -142,6 +142,8 @@ $tables = [
                 'import'=>true, 'export'=>false,'required'=>false,'desc'=>"ACH bank account number"],
             'marketplace'=> ['format'=>"ENUM('0','1')",   'attr'=>"DEFAULT '0'",            'comment'=> 'type:checkbox;order:20;tag:Marketplace',
                 'import'=>true, 'export'=>true, 'required'=>false,'desc'=>"Whether the customer is a marketplace and if sales tax is withheld and remitted by the customer."],
+            'stmt_email' => ['format'=>"ENUM('0','1','2')",'attr'=>"DEFAULT '0'",            'comment'=> 'type:select;order:22;tag:StatementEmail',
+                'import'=>true, 'export'=>true, 'required'=>false,'desc'=>"Monthly statement email sent by the statement cron: 0 - none, 1 - email but skip when there is no activity, 2 - always email."],
             'gov_id_number' => ['format'=>'VARCHAR(16)',  'attr'=>"DEFAULT NULL",           'comment'=> 'tag:GovID;order:66',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Government ID Number, i.e. SSN for US citizens"],
             'gl_account'    => ['format'=>'VARCHAR(15)',  'attr'=>"DEFAULT NULL",           'comment'=> 'type:ledger;tag:DefaultGLAccount;order:68',

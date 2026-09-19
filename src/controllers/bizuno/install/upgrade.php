@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20 (added 7.4.6 gate to rekey methods_funnels meta and role security ACLs after the api funnels were renamed to drop the "if" prefix and use camelCase ids — ifAmazon->amazon, ifWooCommerce->wooCommerce, etc.)
+ * @version    7.x Last Update: 2026-09-19 (added 7.4.7 gate: contacts.stmt_email for the monthly statement cron)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -272,6 +272,11 @@ function bizunoUpgrade()
     $ctl = new administrateTools();
     $ctl->repairTables(false);
 
+    if (version_compare($dbVer, '7.4.7') < 0) {
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'stmt_email')) { // monthly statement email preference, drives portal/api/stmtCron
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD `stmt_email` ENUM('0','1','2') NOT NULL DEFAULT '0' COMMENT 'type:select;order:22;tag:StatementEmail' AFTER `marketplace`");
+        }
+    }
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
     bizCacheExpClear(); // clear cache to force reload 

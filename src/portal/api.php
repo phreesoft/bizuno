@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-07 (logout: clear sessionStorage('bizuno') on redirect so the next login reloads a fresh browser session cache)
+ * @version    7.x Last Update: 2026-09-19 (stmtCron: token-secured monthly customer statement route -> phreeform/render/cronStatements)
  * @filesource /portal/api.php
  */
 
@@ -349,6 +349,21 @@ class portalApi
         if (!$this->loadApiUserContext()) { return; }
         msgDebug("\nfunnelCron: user context set, composing api/admin/cronGet for modID = ".clean('modID', 'cmd', 'get'));
         compose('api', 'admin', 'cronGet', $layout);
+    }
+
+    /**
+     * Emails the monthly customer statements, unattended. Schedule it on the server for the 1st of the month:
+     *   curl -s "https://biz.mydomain.com?bizRt=portal/api/stmtCron&token=<api_token>"
+     * Same bootstrap as funnelCron(): validates the api token, loads business + API user context, then composes
+     * to phreeform/render/cronStatements which loops the flagged customers (contacts.stmt_email) one at a time.
+     */
+    public function stmtCron(&$layout=[])
+    {
+        if (!$this->validateApiToken()) { return; }
+        loadBusinessCache();
+        if (!$this->loadApiUserContext()) { return; }
+        msgDebug("\nstmtCron: user context set, composing phreeform/render/cronStatements");
+        compose('phreeform', 'render', 'cronStatements', $layout);
     }
 
     /**

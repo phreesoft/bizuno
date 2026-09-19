@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-16
+ * @version    7.x Last Update: 2026-09-19 (customer settings for the monthly statement cron: form, date range, CC)
  * @filesource /controllers/phreebooks/admin.php
  */
 
@@ -171,6 +171,11 @@ class phreebooksAdmin {
             'payables'     => getChartDefault(20),
             'receivables'  => getChartDefault(2),
             'sales'        => getChartDefault(30)];
+        $stmtForms = [['id'=>'0', 'text'=>lang('select')]]; // PhreeForm forms in the customer statements folder, for the monthly statement cron
+        foreach ((array)dbMetaGet('%', 'phreeform') as $row) {
+            if (!empty($row['mime_type']) && $row['mime_type']=='frm' && !empty($row['group_id']) && $row['group_id']=='cust:stmt') { $stmtForms[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; }
+        }
+        $stmtDates = [['id'=>'lastmonth','text'=>lang('stmt_dates_lastmonth', $this->moduleID)], ['id'=>'period','text'=>lang('dates_this_period')], ['id'=>'all','text'=>lang('all')]];
         $data = [
             'general'  => ['order'=>10,'label'=>lang('general'),'fields'=>[
                 'round_tax_auth' => ['attr'=>['type'=>'selNoYes', 'value'=>0]],
@@ -192,7 +197,10 @@ class phreebooksAdmin {
                 'terms_edit'     => ['icon'=>'settings','label'=>lang('terms'),'attr'=>['type'=>'hidden'],'events'=>['onClick'=>"jsonAction('contacts/main/editTerms&type=c&prefix=customers_&default=1', 0, jqBiz('#customers_terms').val());"]],
                 'show_status'    => ['attr'=>['type'=>'selNoYes', 'value'=>1]],
                 'include_all'    => ['attr'=>['type'=>'selNoYes', 'value'=>0]],
-                'ck_dup_po'      => ['attr'=>['type'=>'selNoYes', 'value'=>0]]]],
+                'ck_dup_po'      => ['attr'=>['type'=>'selNoYes', 'value'=>0]],
+                'stmt_form'      => ['values'=>$stmtForms,'attr'=>['type'=>'select', 'value'=>0]],
+                'stmt_dates'     => ['values'=>$stmtDates,'attr'=>['type'=>'select', 'value'=>'lastmonth']],
+                'stmt_cc'        => ['attr'=>['size'=>48, 'value'=>'']]]],
             'vendors'  => ['order'=>30,'label'=>lang('vendors'),'fields'=>[
                 'gl_payables'    => ['attr'=>['type'=>'ledger','id'=>'vendors_gl_payables',    'value'=>$glDefaults['payables']]],
                 'gl_purchases'   => ['attr'=>['type'=>'ledger','id'=>'vendors_gl_purchases',   'value'=>$glDefaults['inventory']]],

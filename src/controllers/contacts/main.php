@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-08-01
+ * @version    7.x Last Update: 2026-09-19 (stmt_email monthly statement select in the customer Properties panel)
  * @filesource /controllers/contacts/main.php
  */
 
@@ -252,6 +252,7 @@ class contactsMain
         $structure['inactive']['label']      = lang('status');
         $structure['inactive']['values']     = getContactStatuses();
         $structure['rep_id']['values']       = viewRoleDropdown();
+        $structure['stmt_email']['values']   = [['id'=>'0','text'=>lang('none')], ['id'=>'1','text'=>lang('stmt_email_skip', $this->moduleID)], ['id'=>'2','text'=>lang('stmt_email_send', $this->moduleID)]];
         $structure['tax_rate_id']['defaults']= ['value'=>$structure['tax_rate_id']['attr']['value'],'type'=>$this->type,'target'=>'inventory','callback'=>"var foo=0;"];
         // set some new fields
         $structure['terms_text']= ['order'=>61,'label'=>lang('terms'),'break'=>false,
@@ -369,6 +370,7 @@ class contactsMain
                 $data['panels']['genProp']['keys'][] = 'terms';
                 break;
             case 'c': // Customers
+                $data['panels']['genProp']['keys'][] = 'stmt_email'; // monthly statement email preference, see portal/api/stmtCron
                 $data['tabs']['tabContacts']['divs']['payment'] = ['order'=>60,'label'=>lang('payment'),'hidden'=>$rID && getUserCache('profile', 'admin_encrypt')?false:true,'type'=>'html','html'=>'',
                     'options'=>['href'=>"'".BIZUNO_URL_AJAX."&bizRt=payment/main/manager&rID=$rID'"]];
                 break;

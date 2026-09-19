@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (FPDI namespace swap: Tcpdf\Fpdi → Tfpdf\Fpdi after TCPDF removal)
+ * @version    7.x Last Update: 2026-09-19 (cronStatements: unattended monthly customer statement emails for portal/api/stmtCron)
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -553,6 +553,127 @@ class phreeformRender
         }
         msgDebug("\nFinished sending email.");
         return $data; // which becomes layout
+    }
+
+    /**
+     * Unattended monthly customer statements, invoked by the token-secured route portal/api/stmtCron (runs as the API user).
+     * Emails the form chosen in PhreeBooks settings -> Customers to every active customer whose Monthly Statement property is set,
+     * one customer at a time, logs each send to the customer's CRM log, then emails a run summary to the company Manager address.
+     * contacts.stmt_email: 1 - skip the customer when the date range has no activity, 2 - always send (falls back to all dates).
+     * @param array $layout - response: content => ['sent'=>n, 'skipped'=>n, 'failed'=>n, 'log'=>[...]]
+     */
+    public function cronStatements(&$layout=[])
+    {
+        global $io, $report;
+        $settings= getModuleCache('phreebooks', 'settings', 'customers');
+        $formID  = intval($settings['stmt_form'] ?? 0);
+        $fromName= getModuleCache('bizuno', 'settings', 'company', 'primary_name');
+        $from    = getModuleCache('bizuno', 'settings', 'company', 'email_ar');
+        if (empty($from)) { $from = getModuleCache('bizuno', 'settings', 'company', 'email'); }
+        if (empty($formID)) { return $this->cronStmtDone($layout, [], 'The monthly statement form is not set (PhreeBooks Settings -> Customers), nothing sent.'); }
+        if (empty($from))   { return $this->cronStmtDone($layout, [], 'No company email address to send from (Settings -> Company), nothing sent.'); }
+        $dates    = $this->cronStmtDates($settings['stmt_dates'] ?? 'lastmonth');
+        $customers= dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_c='1' AND inactive='0' AND stmt_email IN ('1','2')", 'primary_name', ['id','short_name','primary_name','email','email2','stmt_email']);
+        msgDebug("\ncronStatements: form $formID, dates $dates, ".sizeof($customers)." flagged customers");
+        $log = [];
+        foreach ($customers as $cust) {
+            $entry = ['id'=>$cust['id'], 'customer'=>trim($cust['short_name'].' '.$cust['primary_name']), 'status'=>'failed', 'note'=>''];
+            $email = !empty($cust['email2']) ? $cust['email2'] : $cust['email']; // A/R address first, then the general address
+            if (empty($email)) { $entry['note'] = 'no email address on the customer record'; $log[] = $entry; continue; }
+            $report = $this->renderLoadReport($formID);
+            if (empty($report->title)) { $entry['note'] = "statement form $formID was not found"; $log[] = $entry; break; }
+            $strPDF = $this->cronStmtRender($report, $cust['id'], $dates);
+            if (empty($strPDF['data']) && $cust['stmt_email']=='2' && $dates<>'a') { // always send: fall back to the full history so the account status still goes out
+                $report = $this->renderLoadReport($formID);
+                $strPDF = $this->cronStmtRender($report, $cust['id'], 'a');
+            }
+            if (empty($strPDF['data'])) {
+                $entry['status'] = $cust['stmt_email']=='1' ? 'skipped' : 'failed';
+                $entry['note']   = $cust['stmt_email']=='1' ? 'no activity in the date range' : 'no transactions on file, the form produced no page';
+                $log[] = $entry; continue;
+            }
+            $output = $this->renderMerge([$strPDF]);
+            $file   = 'temp/'.preg_replace('/[^A-Za-z0-9_.-]/', '_', $output['filename']);
+            $io->fileWrite($output['data'], $file, true, false, true);
+            $subject= $report->title.' '.lang('from').' '.$fromName;
+            $body   = !empty($report->emailmessage) ? TextReplace(stripslashes($report->emailmessage)) : sprintf(lang('email_body'), $report->title, $fromName);
+            $mail   = new bizunoMailer($email, $cust['primary_name'], $subject, str_replace("\n", "<br />", $body), $from, $fromName);
+            if (!empty($settings['stmt_cc'])) { $mail->addToCC($settings['stmt_cc']); }
+            $mail->attach(BIZUNO_DATA.$file);
+            if ($mail->sendMail()) {
+                $entry['status'] = 'sent'; $entry['note'] = $email;
+                dbWrite(BIZUNO_DB_PREFIX.'contacts_log', ['contact_id'=>$cust['id'], 'entered_by'=>getUserCache('profile', 'userID', false, '0'), 'log_date'=>biz_date('Y-m-d H:i:s'),
+                    'action'=>lang('mail_out', $this->moduleID), 'notes'=>"Email: {$cust['primary_name']} ($email), $subject (statement cron)"]);
+            } else {
+                $entry['note'] = 'mail send failed: '.$this->cronStmtErrors();
+            }
+            @unlink(BIZUNO_DATA.$file);
+            $log[] = $entry;
+        }
+        return $this->cronStmtDone($layout, $log);
+    }
+
+    /**
+     * Renders the statement form for one customer over one date range, the same criteria the manual Email button passes
+     * @return array|false - ['data'=>pdf, 'filename'=>...] or empty when the form had no rows
+     */
+    private function cronStmtRender(&$report, $cID, $dates)
+    {
+        $report->datedefault = $dates;
+        $report->xfilterlist = (object)['fieldname'=>'contacts.id', 'default'=>'equal', 'min'=>$cID, 'max'=>''];
+        return $this->renderForm($report);
+    }
+
+    /**
+     * Maps the PhreeBooks statement date setting to a PhreeForm date default
+     */
+    private function cronStmtDates($mode='lastmonth')
+    {
+        switch ($mode) {
+            case 'all':    return 'a';
+            case 'period': return 'l';
+            default:
+            case 'lastmonth':
+                $first = biz_date('Y-m-01', strtotime('first day of last month'));
+                $last  = biz_date('Y-m-t',  strtotime('last day of last month'));
+                return "b:$first:$last";
+        }
+    }
+
+    /**
+     * Pulls any error text off the message stack for the run log, so a mail failure names the cause
+     */
+    private function cronStmtErrors()
+    {
+        global $msgStack;
+        $out = [];
+        foreach (['error', 'warning'] as $level) { // messageStack keeps ['error'=>[['text'=>..]], 'warning'=>[..], ...]
+            foreach ((array)($msgStack->error[$level] ?? []) as $msg) { $out[] = is_array($msg) ? ($msg['text'] ?? json_encode($msg)) : (string)$msg; }
+            unset($msgStack->error[$level]); // consumed, keep the next customer's entry clean
+        }
+        return !empty($out) ? implode('; ', $out) : 'see the debug trace';
+    }
+
+    /**
+     * Writes the run summary to the audit log, emails it to the company Manager address, and returns it as the response
+     */
+    private function cronStmtDone(&$layout, $log=[], $fatal='')
+    {
+        $counts = ['sent'=>0, 'skipped'=>0, 'failed'=>0];
+        $lines  = [];
+        foreach ($log as $entry) { $counts[$entry['status']]++; $lines[] = strtoupper($entry['status']).": {$entry['customer']}".(!empty($entry['note']) ? " - {$entry['note']}" : ''); }
+        $title  = 'Monthly statements '.biz_date('Y-m-d').": {$counts['sent']} sent, {$counts['skipped']} skipped, {$counts['failed']} failed".(!empty($fatal) ? " - $fatal" : '');
+        msgLog("PhreeForm - $title");
+        $mgr = getModuleCache('bizuno', 'settings', 'company', 'email_mgr');
+        if (!empty($mgr)) {
+            $from = getModuleCache('bizuno', 'settings', 'company', 'email_ar') ?: getModuleCache('bizuno', 'settings', 'company', 'email');
+            $body = $title."<br /><br />".(!empty($lines) ? implode("<br />", $lines) : 'No customers are set to receive a monthly statement.');
+            $mail = new bizunoMailer($mgr, lang('manager'), $title, $body, $from, getModuleCache('bizuno', 'settings', 'company', 'primary_name'));
+            if (!$mail->sendMail()) { msgDebug("\ncronStmtDone: summary email to $mgr failed"); }
+        }
+        if (!empty($fatal)) { msgAdd($fatal); }
+        $layout = array_replace_recursive($layout, ['content'=>$counts + ['title'=>$title, 'log'=>$log]]);
+        return true;
     }
 
     private function renderMerge($PDFs)
