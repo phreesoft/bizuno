@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-04
+ * @version    7.x Last Update: 2026-09-19
  * @filesource /locale/en_US/modules/contacts/language.php
  */
 
@@ -99,6 +99,9 @@ $lang = [
     'msg_email_complete' => 'Mailing Complete',
     'marketing' => 'Marketing',
     'newsletter' => 'Newsletter',
+    'stmt_email' => 'Monthly Statement',
+    'stmt_email_skip' => 'Email, skip if no activity',
+    'stmt_email_send' => 'Email, always',
     // CRM
     'restrict_user_lbl' => 'Restrict Reps',
     'restrict_user_tip' => 'Restricts reps to only see accounts that are assigned to them.',

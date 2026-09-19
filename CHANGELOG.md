@@ -2,6 +2,28 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.7] — Unreleased
+
+### Added
+- **Monthly customer statements by cron** — new customer property *Monthly Statement*
+  (None / Email, skip if no activity / Email, always) and PhreeBooks Settings → Customers
+  options for the statement form, date range and CC address. The token-secured route
+  `portal/api/stmtCron` (same pattern as `funnelCron`) renders the chosen PhreeForm
+  statement for each flagged customer, emails it, writes the CRM log entry and emails a
+  run summary to the Manager address. Schedule with one curl line on the 1st of the month.
+  DB: `contacts.stmt_email` added by the 7.4.7 upgrade gate.
+- **FedEx hazmat / dangerous goods** on REST labels (parcel + LTL): hazmat panel in the
+  label generator with battery/lead-acid/limited-quantity profiles, DG declaration or
+  OP-900 requested with the label, freight line items flagged for the BOL. Replaces the
+  FedEx Ship Manager workflow. Not yet verified against the FedEx sandbox.
+
+### Fixed
+- FedEx freight tracking links now go to fedexfreight.com for every freight service, not
+  only Ground Priority/Economy.
+- EDI TD5 map: FEDEX INTL P/E FRT now map to IFP/IFE instead of the LTL codes GDF/ECF.
+- Shipping Manager saves log the shipment reference, order, method and tracking numbers
+  under the title "Shipping Manager" (was a blank "Manager Manager - Save:" line).
+
 ## [7.4.5] — Unreleased
 
 ## [7.4.4] — 2026-06-14
