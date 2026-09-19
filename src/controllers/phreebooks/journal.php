@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-08-01
+ * @version    7.x Last Update: 2026-09-19 (updateContact: ship-to Add/Update attaches to the billing contact instead of creating a second contact)
  * @filesource /controllers/phreebooks/journal.php
  */
 
@@ -549,6 +549,10 @@ class journal
             $this->main['address_id_b'] = $billB['aID'];
         }
         if (!empty($updateS) && empty($dropShip)) { // Shipping address
+            // No ship-to contact was searched (new customer, or same customer as billing): the address belongs to the billing contact,
+            // which by now is either the record just created above or the one posted with the order. Without this, addressUpdate()
+            // sees cID=0 and creates a second, orphan contact holding only the shipping address.
+            if (empty($cIDs) && !empty($this->main['contact_id_b'])) { $cIDs = $this->main['contact_id_b']; }
             $billS = $contact->addressUpdate(['cID'=>$cIDs, 'aID'=>$aIDs, 'cType'=>$this->type, 'aType'=>'s', 'suffix'=>'_s']);
             $this->main['contact_id_s'] = $billS['cID'];
             $this->main['address_id_s'] = $billS['aID'];
