@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-06-19
+ * @version    7.x Last Update: 2026-09-19
  * @filesource locale/en_US/modules/shipping/language.php
  */
 
@@ -98,6 +98,29 @@ $lang = [
     'amt_insurance' => 'Ins. Value',
     'extras' => 'Extras',
     'hazardous' => 'Hazardous',
+    'hz_regulation' => 'Regulation', // hazmat panel in the label generator
+    'hz_option' => 'DG Type',
+    'hz_section2' => 'Excepted Lithium (Sec. II)',
+    'hz_bat_material' => 'Battery Material',
+    'hz_bat_packing' => 'Battery Packing',
+    'hz_accessible' => 'Accessible',
+    'hz_cargo_only' => 'Cargo Aircraft Only',
+    'hz_un_id' => 'UN/ID No.',
+    'hz_name' => 'Proper Shipping Name',
+    'hz_tech_name' => 'Technical Name',
+    'hz_class' => 'Hazard Class',
+    'hz_sub_class' => 'Subsidiary Class',
+    'hz_pack_group' => 'Packing Group',
+    'hz_pack_instr' => 'Packing Instr.',
+    'hz_qty' => 'Net Qty per Package',
+    'hz_qty_units' => 'Qty Units',
+    'hz_containers' => 'Containers',
+    'hz_container_type' => 'Container Type',
+    'hz_offeror' => 'Offeror',
+    'hz_phone' => 'Emergency Phone',
+    'hz_signatory' => 'Signatory',
+    'hz_sig_title' => 'Signatory Title',
+    'hz_sig_place' => 'Signed At',
     'GND' => 'Ground',
     'packages' => 'Packages',
     'my_packages' => 'My Packages',

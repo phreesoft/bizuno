@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-05 (CSRF token on labelPDF download URL)
+ * @version    7.x Last Update: 2026-09-19 (hazmat / dangerous goods panel in the label generator, profiles supplied by the carrier module)
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -67,7 +67,7 @@ class shippingShip extends shippingCommon
         msgDebug("\nfields = ".print_r($fields, true));
         $keys  = $this->setCarrierKeys($shipper);
         msgDebug("\nkeys = ".print_r($keys, true));
-        $js    = $this->labelJS();
+        $js    = $this->labelJS($shipper);
         $data  = ['type'=>'divHTML',
             'toolbars' => ['tbShipping'=>['icons'=>[
                 'print' => ['order'=>20,'events'=>['onClick'=>"jqBiz('body').addClass('loading'); jqBiz('#frmLabel').submit();"]],
@@ -89,7 +89,7 @@ class shippingShip extends shippingCommon
                 'shipTo'  => ['label'=>lang('ship_to'),'type'=>'address', 'keys'=>$keys['address_d'], 'attr'=>['id'=>'address'],
                     'settings'=>['suffix'=>'','search'=>false,'clear'=>false,'validate'=>true]],
                 'options' => ['label'=>lang('options'),               'type'=>'fields',  'keys'  =>$keys['options']],
-                'hazmat'  => ['label'=>lang('options'),               'type'=>'fields',  'keys'  =>$keys['hazmat']]],
+                'hazmat'  => ['label'=>lang('hazardous', $this->moduleID),'type'=>'fields','keys'  =>$keys['hazmat']]],
             'forms'   => ['frmLabel'=>['attr'=>['type'=>'form','action'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/labelGet"]]],
             'datagrid'=> ['dgPkg'=>$this->dgPkg('dgPkg', $dbData['pkg'])],
             'fields'  => $fields,
@@ -154,6 +154,16 @@ class shippingShip extends shippingCommon
             }
         }
         if (!isset($data['pkg'])) { $data['pkg'] = ['Qty'=>1, 'Wt'=>0, 'L'=>8, 'W'=>6, 'H'=>4, 'Ins'=>0]; } // package defaults
+        // Hazmat: the carrier module supplies the selectable profiles (options['HazmatProfiles']) and the offeror/emergency contact defaults (settings dg_*)
+        $hzProfiles = [];
+        if (!empty($shipper->options['HazmatProfiles'])) {
+            $hzProfiles[] = ['id'=>'', 'text'=>lang('none')];
+            foreach ($shipper->options['HazmatProfiles'] as $hzID => $profile) { $hzProfiles[] = ['id'=>$hzID, 'text'=>$profile['text']]; }
+        }
+        $hzLists = $this->hazmatLists();
+        $dg = ['offeror'=>'', 'phone'=>'', 'signatory'=>'', 'sig_title'=>'', 'sig_place'=>''];
+        foreach ($dg as $key => $val) { if (!empty($shipper->settings["dg_$key"])) { $dg[$key] = $shipper->settings["dg_$key"]; } }
+        if (empty($dg['offeror'])) { $dg['offeror'] = getModuleCache('bizuno', 'settings', 'company', 'primary_name'); }
         $fields = [ // Options
             'pkg_array'    => ['order'=> 1,'attr'=>['type'=>'hidden']], // for grids
             'frt_billed'   => ['order'=> 1,'attr'=>['type'=>'hidden','value'=>isset($data['freight']) ? $data['freight'] : 0]],
@@ -180,8 +190,32 @@ class shippingShip extends shippingCommon
             'ship_cod_cur' => ['order'=>47,'label'=>lang('ship_cod_cur', $this->moduleID), 'break'=>true,'values'=>$currencyUOMs, 'attr'=> ['type'=>'select', 'value'=>!empty($data['currency']) ? $data['currency'] : getDefaultCurrency()]],
             'ship_cod_type'=> ['order'=>48,'label'=>lang('ship_cod_type', $this->moduleID),'break'=>true,'values'=>viewKeyDropdown($shipper->options['CODMap']),'attr'=>['type'=>'select','value'=>$shipper->ship_cod_type]],
             'extra1'       => ['order'=>70,'label'=>lang('extras', $this->moduleID),'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
-            // Hazmat
-//          'hazmat'       => ['order'=>11,'label'=>lang('hazardous'],    'break'=>true,'attr'=>['type'=>'selNoYes','checked'=>false]],
+            // Hazmat - the select lives in the options panel, picking a profile reveals the hazmat panel and fills the defaults (see selHazmat in labelJS)
+            'ship_hazmat'    => ['order'=>11,'label'=>lang('hazardous', $this->moduleID),'break'=>true,'values'=>$hzProfiles,'attr'=>['type'=>empty($hzProfiles)?'hidden':'select','value'=>''],
+                'options' => ['onChange'=>"function (newVal, oldVal) { selHazmat(newVal); }"]],
+            'hz_regulation'  => ['order'=>10,'label'=>lang('hz_regulation', $this->moduleID),  'values'=>$hzLists['regulation'],  'attr'=>['type'=>'select','value'=>'IATA']],
+            'hz_option'      => ['order'=>12,'label'=>lang('hz_option', $this->moduleID),      'break'=>true,'values'=>$hzLists['option'],'attr'=>['type'=>'select','value'=>'BATTERY']],
+            'hz_section2'    => ['order'=>14,'label'=>lang('hz_section2', $this->moduleID),    'break'=>true,'attr'=>['type'=>'checkbox','checked'=>false]],
+            'hz_bat_material'=> ['order'=>16,'label'=>lang('hz_bat_material', $this->moduleID),'values'=>$hzLists['bat_material'],'attr'=>['type'=>'select','value'=>'']],
+            'hz_bat_packing' => ['order'=>18,'label'=>lang('hz_bat_packing', $this->moduleID), 'break'=>true,'values'=>$hzLists['bat_packing'],'attr'=>['type'=>'select','value'=>'']],
+            'hz_accessible'  => ['order'=>20,'label'=>lang('hz_accessible', $this->moduleID),  'attr'=>['type'=>'checkbox','checked'=>false]],
+            'hz_cargo_only'  => ['order'=>22,'label'=>lang('hz_cargo_only', $this->moduleID),  'break'=>true,'attr'=>['type'=>'checkbox','checked'=>false]],
+            'hz_un_id'       => ['order'=>24,'label'=>lang('hz_un_id', $this->moduleID),       'attr'=>['size'=>8]],
+            'hz_class'       => ['order'=>26,'label'=>lang('hz_class', $this->moduleID),       'attr'=>['size'=>4]],
+            'hz_sub_class'   => ['order'=>28,'label'=>lang('hz_sub_class', $this->moduleID),   'break'=>true,'attr'=>['size'=>4]],
+            'hz_name'        => ['order'=>30,'label'=>lang('hz_name', $this->moduleID),        'break'=>true,'attr'=>['size'=>48]],
+            'hz_tech_name'   => ['order'=>32,'label'=>lang('hz_tech_name', $this->moduleID),   'break'=>true,'attr'=>['size'=>48]],
+            'hz_pack_group'  => ['order'=>34,'label'=>lang('hz_pack_group', $this->moduleID),  'values'=>$hzLists['pack_group'],'attr'=>['type'=>'select','value'=>'DEFAULT']],
+            'hz_pack_instr'  => ['order'=>36,'label'=>lang('hz_pack_instr', $this->moduleID),  'break'=>true,'attr'=>['size'=>6]],
+            'hz_qty'         => ['order'=>38,'label'=>lang('hz_qty', $this->moduleID),         'attr'=>['type'=>'float','value'=>0,'size'=>8]],
+            'hz_qty_units'   => ['order'=>40,'label'=>lang('hz_qty_units', $this->moduleID),   'break'=>true,'values'=>$hzLists['qty_units'],'attr'=>['type'=>'select','value'=>'KG']],
+            'hz_containers'  => ['order'=>42,'label'=>lang('hz_containers', $this->moduleID),  'attr'=>['type'=>'integer','value'=>1,'size'=>4]],
+            'hz_container_type'=>['order'=>44,'label'=>lang('hz_container_type', $this->moduleID),'break'=>true,'attr'=>['value'=>'Fiberboard Box','size'=>24]],
+            'hz_offeror'     => ['order'=>46,'label'=>lang('hz_offeror', $this->moduleID),     'break'=>true,'attr'=>['value'=>$dg['offeror'],'size'=>32]],
+            'hz_phone'       => ['order'=>48,'label'=>lang('hz_phone', $this->moduleID),       'break'=>true,'attr'=>['value'=>$dg['phone'],'size'=>20]],
+            'hz_signatory'   => ['order'=>50,'label'=>lang('hz_signatory', $this->moduleID),   'attr'=>['value'=>$dg['signatory'],'size'=>24]],
+            'hz_sig_title'   => ['order'=>52,'label'=>lang('hz_sig_title', $this->moduleID),   'attr'=>['value'=>$dg['sig_title'],'size'=>16]],
+            'hz_sig_place'   => ['order'=>54,'label'=>lang('hz_sig_place', $this->moduleID),   'break'=>true,'attr'=>['value'=>$dg['sig_place'],'size'=>20]],
             // settings
             'ship_pkg'     => ['order'=>10,'label'=>lang('ship_pkg', $this->moduleID),     'break'=>true,'values'=>viewKeyDropdown($shipper->options['PackageMap']),'attr'=>['type'=>'select', 'value'=>$shipper->ship_pkg]],
             'ship_pickup'  => ['order'=>15,'label'=>lang('ship_pickup', $this->moduleID),  'break'=>true,'values'=>viewKeyDropdown($shipper->options['PickupMap']), 'attr'=>['type'=>'select', 'value'=>$shipper->ship_pickup]],
@@ -209,11 +243,34 @@ class shippingShip extends shippingCommon
     }
 
     /**
+     * Fixed choice lists for the hazmat panel, the values are the carrier API enumerations (FedEx REST Ship API, UPS uses the same DOT/IATA vocabulary)
+     * @return array - dropdown lists keyed by hz_ field suffix
+     */
+    private function hazmatLists()
+    {
+        return [
+            'regulation'  => [['id'=>'IATA','text'=>'IATA (Air/Express)'],['id'=>'DOT','text'=>'DOT 49 CFR (Ground)'],['id'=>'ADR','text'=>'ADR (Europe Road)'],['id'=>'ORMD','text'=>'ORM-D']],
+            'option'      => [['id'=>'BATTERY','text'=>'Lithium Battery'],['id'=>'HAZARDOUS_MATERIALS','text'=>'Hazardous Materials'],
+                ['id'=>'LIMITED_QUANTITIES_COMMODITIES','text'=>'Limited Quantity'],['id'=>'SMALL_QUANTITY_EXCEPTION','text'=>'Small Quantity Exception'],
+                ['id'=>'REPORTABLE_QUANTITIES','text'=>'Reportable Quantity'],['id'=>'ORM_D','text'=>'ORM-D']],
+            'bat_material'=> [['id'=>'','text'=>lang('none')],['id'=>'LITHIUM_ION','text'=>'Lithium Ion'],['id'=>'LITHIUM_METAL','text'=>'Lithium Metal']],
+            'bat_packing' => [['id'=>'','text'=>lang('none')],['id'=>'PACKED_WITH_EQUIPMENT','text'=>'Packed with Equipment'],['id'=>'CONTAINED_IN_EQUIPMENT','text'=>'Contained in Equipment']],
+            'pack_group'  => [['id'=>'DEFAULT','text'=>lang('none')],['id'=>'I','text'=>'I'],['id'=>'II','text'=>'II'],['id'=>'III','text'=>'III']],
+            'qty_units'   => [['id'=>'KG','text'=>'kg'],['id'=>'G','text'=>'g'],['id'=>'L','text'=>'L'],['id'=>'ML','text'=>'mL'],['id'=>'LB','text'=>'lb']]];
+    }
+
+    /**
      * Generates the JavaScript for package shipments
+     * @param object $shipper - carrier class, supplies the hazmat profile defaults
      * @return array - JavaScript jsBody and jsReady
      */
-    private function labelJS()
+    private function labelJS($shipper=null)
     {
+        $hzDefaults = [];
+        if (!empty($shipper->options['HazmatProfiles'])) {
+            foreach ($shipper->options['HazmatProfiles'] as $hzID => $profile) { $hzDefaults[$hzID] = !empty($profile['defaults']) ? $profile['defaults'] : []; }
+        }
+        $hzJSON = json_encode($hzDefaults, JSON_FORCE_OBJECT);
         $js = [];
         $js['jsBody']['init'] = "
 function pkgUpdate() {
@@ -282,9 +339,21 @@ function pkgEstimate() {
     var json = { action:'window', id:'shippingEst', title:bizLangJS('SHIPPING_ESTIMATOR'), width:1000, height:600, href:href };
     processJson(json);
 }
-function selHazmat() {
-    alert('Hazmat Toggled!');
-    bizDivToggle('divHazmat');
+var hzProfiles = $hzJSON;
+function selHazmat(profile) { // show the hazmat panel and load the profile defaults, blank profile hides it (nothing is sent to the carrier)
+    if (!profile) { jqBiz('#divHazmat').hide(); return; }
+    jqBiz('#divHazmat').show();
+    var p = hzProfiles[profile];
+    if (typeof p == 'undefined') { return; }
+    var sel = ['regulation','option','bat_material','bat_packing','pack_group','qty_units'];
+    var chk = ['section2','accessible','cargo_only'];
+    var num = ['qty','containers'];
+    for (var key in p) {
+        if      (sel.indexOf(key) >= 0) { bizSelSet('hz_'+key, p[key]); }
+        else if (chk.indexOf(key) >= 0) { bizCheckboxSet('hz_'+key, p[key] ? 1 : 0); }
+        else if (num.indexOf(key) >= 0) { bizNumSet('hz_'+key, p[key]); }
+        else                            { bizTextSet('hz_'+key, p[key]); }
+    }
 }
 function preSubmit() {
     if (bizGridExists('dgPkg')) {
@@ -356,9 +425,11 @@ function preSubmit() {
             'address_d'=> ['primary_name','contact','address1','address2','city','state','postal_code','country','telephone1','email'],
             'details'  => ['ship_bill_to','ship_bill_act','carrier','method_code','pkg_array','frt_billed',
                 'ship_method','ship_ref_1','ship_ref_2','ship_date','store_id_b','store_id_p'],
-            'options'  => ['residential','ship_handling','ship_saturday','ship_return','insurance', // 'ship_hazmat',
+            'options'  => ['residential','ship_handling','ship_saturday','ship_return','insurance','ship_hazmat',
                 'ship_cod','ship_cod_val','ship_cod_cur','ship_cod_type','extra1'],
-            'hazmat'   => [],
+            'hazmat'   => ['hz_regulation','hz_option','hz_section2','hz_bat_material','hz_bat_packing','hz_accessible','hz_cargo_only',
+                'hz_un_id','hz_class','hz_sub_class','hz_name','hz_tech_name','hz_pack_group','hz_pack_instr','hz_qty','hz_qty_units',
+                'hz_containers','hz_container_type','hz_offeror','hz_phone','hz_signatory','hz_sig_title','hz_sig_place'],
             'settings' => ['ship_pkg','ship_pickup','weightUOM','dimUOM','currencyUOM'],
             'notify'   => ['ship_confirm','confirm_type'],
             'ltl'      => ['ltl_desc','ltl_class']];
@@ -444,7 +515,7 @@ function preSubmit() {
             'ship_cod_type'=> clean('ship_cod_type','cmd',    'post'),
             'extra1'       => clean('extra1',       'array',  'post'),
             // Hazmat
-//          'hazmat'       => clean('hazmat',       'TND',    'post'),
+            'ship_hazmat'  => clean('ship_hazmat',  'cmd',    'post'),
             // settings
             'ship_pkg'     => clean('ship_pkg',     'cmd',    'post'),
             'ship_pickup'  => clean('ship_pickup',  'cmd',    'post'),
@@ -459,6 +530,17 @@ function preSubmit() {
             'ltl_class'    => clean('ltl_class',    'cmd',    'post')];
         $packages = clean('pkg_array', 'json', 'post');
         $fields['pkgs'] = !empty($packages['rows']) ? $packages['rows'] : [];
+        $fields['hazmat'] = []; // dangerous goods details, stays empty unless a hazmat profile was selected so carriers can test with empty()
+        if (!empty($fields['ship_hazmat'])) {
+            $fields['hazmat'] = ['profile'=>$fields['ship_hazmat']];
+            foreach (['regulation','option','bat_material','bat_packing','pack_group','qty_units'] as $key) { $fields['hazmat'][$key] = clean("hz_$key", 'cmd', 'post'); }
+            foreach (['un_id','class','sub_class','pack_instr','name','tech_name','container_type','offeror','phone','signatory','sig_title','sig_place'] as $key) {
+                $fields['hazmat'][$key] = clean("hz_$key", 'text', 'post');
+            }
+            foreach (['section2','accessible','cargo_only'] as $key) { $fields['hazmat'][$key] = clean("hz_$key", 'integer', 'post'); }
+            $fields['hazmat']['qty']       = clean('hz_qty',        'float',  'post');
+            $fields['hazmat']['containers']= max(1, clean('hz_containers', 'integer','post'));
+        }
         $this->fieldsAddress($fields, ['suffix'=>'_s','cID'=>clean('store_id_p', 'integer', 'post')]); // shipper
         $this->fieldsAddress($fields, ['suffix'=>'_o','cID'=>clean('store_id_p', 'integer', 'post')]); // origin
         $this->fieldsAddress($fields, ['suffix'=>'_p','cID'=>clean('store_id_b', 'integer', 'post')]); // payor

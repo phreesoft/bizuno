@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-20
+ * @version    7.x Last Update: 2026-09-19 (hazmat: DG/battery package services, DG paperwork, freight hazmat line items, hazmat profiles, dg_* settings)
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -108,6 +108,11 @@ Replace the test URL and test credentials with the production URL and production
         'max_sp_weight' => 'Maximum allowed box weight for Smart Post shipments, typically no larger than 7 pounds.',
         'def_ltl_class' => 'Default weight class to use for LTL shipments.',
         'def_ltl_desc'  => 'Default commodity description to use for LTL shipments.',
+        'dg_offeror'    => 'Dangerous goods: offeror name printed on the shipper\'s declaration / OP-900, usually your company name. Defaults to the company name if blank.',
+        'dg_phone'      => 'Dangerous goods: 24 hour emergency response telephone number, e.g. CHEMTREC 1-800-424-9300 with your contract number.',
+        'dg_signatory'  => 'Dangerous goods: name of the DG certified person signing the declaration.',
+        'dg_sig_title'  => 'Dangerous goods: title of the signatory.',
+        'dg_sig_place'  => 'Dangerous goods: city where the declaration is signed.',
         'def_exp_multi' => 'To bill your FedEx shipments from multiple stores, enter your credentials as follows for each aditional store: PostalCode;ExpressAcct#;MeterNumber:PostalCode;ExpressAcct#;MeterNumber, etc. Stores are set in My Business -> Settings -> Bizuno settings -> Stores tab.',
         'def_ltl_multi' => 'To bill your FedEx Freight shipments from multiple stores, enter your credentials as follows for each aditional store: PostalCode;FreightAcct#:PostalCode;FreightAcct#, etc. Stores are set in My Business -> Settings -> Bizuno settings -> Stores tab.',
         'label_thermal' => 'Label size for thermal printing.',
@@ -153,6 +158,7 @@ Replace the test URL and test credentials with the production URL and production
             'sp_hub'       => '',   'max_sp_weight'=>7,      'max_weight'=>150,
             'printer_type' => 'PDF','printer_name' =>'zebra','label_pdf' =>'PAPER_8.5X11_TOP_HALF_LABEL','label_thermal'=>'STOCK_4X6.75_LEADING_DOC_TAB',
             'ltl_acct_num' => '',   'ltl_class'    => '125', 'ltl_desc'  =>'',
+            'dg_offeror'   => '',   'dg_phone'     => '',    'dg_signatory'=>'', 'dg_sig_title'=>'', 'dg_sig_place'=>'', // dangerous goods defaults for the label generator
             'recon_fee'    => 3,    'recon_percent'=>0.1,    'bill_hq'   => 1,
             'gl_acct_c'    => getModuleCache('shipping','settings','general','gl_shipping_c'),
             'gl_acct_v'    => getModuleCache('shipping','settings','general','gl_shipping_v'),
@@ -521,9 +527,15 @@ return '';
 //              'hazardousMaterials' => 'BATTERY', // HAZARDOUS_MATERIALS
                 'dimensions'         => ['units'=>$dimUOM, 'length'=>$pallet['length'], 'width'=>$pallet['width'], 'height'=>$pallet['height']],
             ];
-            $this->pkgSpSrvcs($box, $pkg);
+            if (!empty($pkg['hazmat']['profile'])) { // FedEx Freight hazmat, the flag and description drive the hazmat section of the BOL
+                $hz  = $pkg['hazmat'];
+                $box['hazardousMaterials'] = !empty($hz['option']) ? $hz['option'] : 'HAZARDOUS_MATERIALS';
+                $dot = implode(', ', array_filter([$hz['un_id'], $hz['name'], $hz['class'], (!empty($hz['pack_group']) && $hz['pack_group']<>'DEFAULT') ? 'PG '.$hz['pack_group'] : '']));
+                if (!empty($dot)) { $box['description'] = $dot.' - '.$box['description']; }
+            }
             $arrPkgs['lineItem'][] = $box;
         }
+        if (!empty($pkg['hazmat']['offeror'])) { $arrPkgs['hazardousMaterialsOfferor'] = $pkg['hazmat']['offeror']; }
         return $arrPkgs;
     }
 
@@ -547,82 +559,100 @@ return '';
 //              'variableHandlingChargeDetail'=> ['rateType'=> 'ACCOUNT','percentValue'=>0,'rateLevelType'=>'BUNDLED_RATE','fixedValue'=>['amount'=>'100','currency'=> $this->currency)],'rateElementBasis'=> 'NET_CHARGE'],
             ];
 //          if (empty($pkg['settings']['insurance'] || empty($pkg['settings']['ship_ins_val'])) { unset($box['declaredValue']); }
+            if (!empty($pkg['hazmat']['profile'])) { // freight is always DOT regulated, the DG detail rides on the package line item
+                $pkg['hazmat']['regulation'] = 'DOT';
+                $this->pkgSpSrvcs($box, $pkg);
+            }
             $arrPkgs[] = $box;
         }
         return $arrPkgs;
 
     }
 
+    /**
+     * Package level special services, presently the dangerous goods entered in the label generator's hazmat panel ($pkg['hazmat']).
+     * Excepted lithium batteries (IATA Section II / 49 CFR 173.185(c)) ship as the BATTERY service with batteryDetails and need no declaration,
+     * everything else ships as DANGEROUS_GOODS with a full dangerousGoodsDetail and FedEx returns the declaration or OP-900 with the label.
+     * @param array $box - requestedPackageLineItems entry (parcel or freight), modified
+     * @param array $pkg - label request
+     */
     public function pkgSpSrvcs(&$box, $pkg)
     {
-        if (empty($pkg['settings']['hazmat'])) { return; }
+        if (empty($pkg['hazmat']['profile'])) { return; }
+        $hz = $pkg['hazmat'];
+        if (!empty($hz['section2'])) {
+            if (empty($hz['bat_material'])) { $hz['bat_material'] = 'LITHIUM_ION'; }
+            if (empty($hz['bat_packing'])) {
+                $hz['bat_packing'] = 'PACKED_WITH_EQUIPMENT';
+                msgAdd('Battery packing was not selected, PACKED_WITH_EQUIPMENT was sent to FedEx. Stand-alone lithium batteries are not excepted and must ship as fully regulated dangerous goods.', 'caution');
+            }
+            $box['packageSpecialServices'] = [
+                'specialServiceTypes'=> ['BATTERY'],
+                'batteryDetails'     => [['material'=>$hz['bat_material'], 'packing'=>$hz['bat_packing'], 'regulatorySubType'=>'IATA_SECTION_II']]];
+            return;
+        }
         $box['packageSpecialServices'] = [
-            'specialServiceTypes'=> ['BATTERY'], // DANGEROUS_GOODS, BATTERY
-//          'signatureOptionType'=> ['NO_SIGNATURE_REQUIRED'],
-//          'alcoholDetail'=> ['alcoholRecipientType'=> 'LICENSEE','shipperAgreementType'=> 'Retailer'],
-//          'packageCODDetail'=> ['codCollectionAmount'=> ['amount'=> 12.45,'currency'=>$curISO],'codCollectionType'=> 'ANY'],
-//              'pieceCountVerificationBoxCount'=> 0,
-            'batteryDetails'=> [
-                [
-                    'material'=> 'LITHIUM_METAL',
-                    'regulatorySubType'=> 'IATA_SECTION_II',
-                    'packing'=> 'CONTAINED_IN_EQUIPMENT',
-                ],
-            ],
-//                'dryIceWeight'=> ['value'=> 10,'units'=>$wtUOM],
-        ];
-        $this->pkgHazardous($box, $pkg);
+            'specialServiceTypes' => ['DANGEROUS_GOODS'],
+            'dangerousGoodsDetail'=> $this->dgDetail($hz)];
     }
 
-    public function pkgHazardous(&$box, $pkg)
+    /**
+     * Builds the FedEx dangerousGoodsDetail structure from the hazmat panel, blank values are dropped so FedEx only validates what was entered
+     * @param array $hz - $pkg['hazmat']
+     * @return array
+     */
+    private function dgDetail($hz)
     {
-        $wtUOM = getModuleCache('shipping', 'settings', 'general', 'weight_uom');
-        $box['packageSpecialServices']['dangerousGoodsDetail'] = [
-            'offeror'=> 'Battery Store',
-            'accessibility'=> 'INACCESSIBLE', // INACCESSIBLE, ACCESSIBLE
-            'emergencyContactNumber'=> '8175643243',
-            'options'=> ['BATTERY'],
-            'containers'=> [
-                [
-                    'offeror'=> 'Shipping Guy',
-                    'hazardousCommodities'=> [
-                        [
-                            'quantity'=> ['quantityType'=> 'GROSS','amount'=> 7,'units'=> 'LB'],
-                            'innerReceptacles'=> [['quantity'=> ['quantityType'=> 'GROSS','amount'=> 7,'units'=> 'LB']]],
-//                          'options'=> ['labelTextOption'=> 'Override','customerSuppliedLabelText'=> 'LabelText'],
-                            'description'=> [
-                                'sequenceNumber'=> 1,
-//                                'processingOptions'=> ['INCLUDE_SPECIAL_PROVISIONS'],
-//                                'subsidiaryClasses'=> 9,
-//                                'labelText'=> 'labelText',
-                                'technicalName'=> 'BATTERY STORE',
-//                                'packingDetails'=> ['packingInstructions'=> 'instruction','cargoAircraftOnly'=> false],
-//                                'authorization'=> 'Authorization Information',
-//                                'reportableQuantity'=> false,
-//                                'percentage'=> 10,
-//                                'id'=> 'ID',
-                                'packingGroup'=> 'DEFAULT',
-                                'properShippingName'=> 'LITHIUM METAL BATTERY',
-                                'hazardClass'=> 9,
-                            ],
-                        ],
-                    ],
-                    'numberOfContainers'=> 1,
-                    'containerType'=> 'Fiberboard Box',
-                    'emergencyContactNumber'=> [
-                        'areaCode'=> '817',
-                        'personalIdentificationNumber'=> '5643243',
-//                        'extension'=> '3245',
-                        'countryCode'=> 'US',
-//                        'localNumber'=> '23456',
-                        ],
-                    'packaging'=> ['count'=> 7,'units'=> $wtUOM],
-                    'packingType'=> 'ALL_PACKED_IN_ONE',
-//                    'radioactiveContainerClass'=> 'EXCEPTED_PACKAGE'
-                ],
-            ],
-//            'packaging'=> ['count'=>7,'units'=>$wtUOM], // Number of pieces per box???
-        ];
+        $notEmpty = function($v) { return $v !== '' && $v !== [] && $v !== null; };
+        $qty  = ['amount'=>floatval($hz['qty']), 'units'=>$hz['qty_units'], 'quantityType'=>'NET'];
+        $desc = array_filter([
+            'sequenceNumber'    => 1,
+            'id'                => $hz['un_id'],
+            'properShippingName'=> $hz['name'],
+            'technicalName'     => $hz['tech_name'],
+            'hazardClass'       => $hz['class'],
+            'subsidiaryClasses' => !empty($hz['sub_class']) ? array_map('trim', explode(',', $hz['sub_class'])) : [],
+            'packingGroup'      => !empty($hz['pack_group']) ? $hz['pack_group'] : 'DEFAULT',
+            'packingDetails'    => !empty($hz['pack_instr']) ? ['packingInstructions'=>$hz['pack_instr'], 'cargoAircraftOnly'=>!empty($hz['cargo_only'])] : []], $notEmpty);
+        $commodity = ['description'=>$desc];
+        if (!empty($qty['amount'])) { $commodity['quantity'] = $qty; $commodity['innerReceptacles'] = [['quantity'=>$qty]]; }
+        $detail = array_filter([
+            'regulation'            => $hz['regulation'],
+            'accessibility'         => !empty($hz['accessible']) ? 'ACCESSIBLE' : 'INACCESSIBLE',
+            'cargoAircraftOnly'     => !empty($hz['cargo_only']),
+            'options'               => [$hz['option']],
+            'offeror'               => $hz['offeror'],
+            'emergencyContactNumber'=> $hz['phone'],
+            'signatory'             => !empty($hz['signatory']) ? array_filter(['contactName'=>$hz['signatory'], 'title'=>$hz['sig_title'], 'place'=>$hz['sig_place']], $notEmpty) : [],
+            'packaging'             => ['count'=>intval($hz['containers']), 'units'=>$hz['container_type']],
+            'containers'            => [[
+                'packingType'         => 'ALL_PACKED_IN_ONE',
+                'containerType'       => $hz['container_type'],
+                'numberOfContainers'  => intval($hz['containers']),
+                'hazardousCommodities'=> [$commodity]]]], $notEmpty);
+        return $detail;
+    }
+
+    /**
+     * Requests the regulatory paperwork FedEx generates for dangerous goods, it comes back with the label as a PDF shipment document:
+     * OP-900 for FedEx Ground (DOT), the Shipper's Declaration for Express (IATA/ADR). Excepted lithium batteries and ORM-D need none.
+     * @param array $payload - parcel ship request, modified
+     * @param array $pkg - label request
+     */
+    public function addShipDocsDG(&$payload, $pkg)
+    {
+        if (empty($pkg['hazmat']['profile']) || !empty($pkg['hazmat']['section2'])) { return; }
+        $fmt = ['docType'=>'PDF', 'stockType'=>'PAPER_LETTER'];
+        switch ($pkg['hazmat']['regulation']) {
+            case 'ORMD': return;
+            case 'DOT':
+                $payload['requestedShipment']['shippingDocumentSpecification']['shippingDocumentTypes'][] = 'OP_900';
+                $payload['requestedShipment']['shippingDocumentSpecification']['op900Detail'] = ['format'=>$fmt, 'signatureName'=>$pkg['hazmat']['signatory']];
+                break;
+            default:
+                $payload['requestedShipment']['shippingDocumentSpecification']['shippingDocumentTypes'][] = 'DANGEROUS_GOODS_SHIPPERS_DECLARATION';
+                $payload['requestedShipment']['shippingDocumentSpecification']['dangerousGoodsShippersDeclarationDetail'] = ['documentFormat'=>$fmt];
+        }
     }
 
     public function addEmailNotifications(&$payload, $pkg)
@@ -780,6 +810,7 @@ return '';
                 'DIRECT'               => lang('sig_rqd', $this->moduleID)],
             'LTLClasses' => ['0'=>lang('select'),'050'=>'50','055'=>'55','060'=>'60','065'=>'65','070'=>'70','077'=>'77.5','085'=>'85',
                 '092'=>'92.5','100'=>'100','110'=>'110','125'=>'125','150'=>'150','175'=>'175','200'=>'200','250'=>'250','300'=>'300'],
+            'HazmatProfiles' => $this->hazmatProfiles(),
             'paperTypes' => [
                 ['id'=>'PAPER_4X6',                     'text'=>lang('label_01', $this->moduleID)],
                 ['id'=>'PAPER_4X8',                     'text'=>lang('label_02', $this->moduleID)],
@@ -794,5 +825,34 @@ return '';
                 ['id'=>'STOCK_4X9_LEADING_DOC_TAB',     'text'=>lang('label_11', $this->moduleID)],
                 ['id'=>'STOCK_4X9_TRAILING_DOC_TAB',    'text'=>lang('label_12', $this->moduleID)]]];
         return $options;
+    }
+
+    /**
+     * Hazmat profiles offered in the label generator. The defaults pre-fill the hazmat panel (keys are the hz_ field suffixes) and stay editable.
+     * Covers lithium batteries (UN3480/3481/3090/3091) excepted and fully regulated, lead acid (UN2800/2794), limited quantity, plus a blank form.
+     * @return array - profile id => ['text'=>label, 'defaults'=>[...]]
+     */
+    private function hazmatProfiles()
+    {
+        $base = ['regulation'=>'IATA','option'=>'BATTERY','section2'=>0,'bat_material'=>'','bat_packing'=>'','accessible'=>0,'cargo_only'=>0,
+            'un_id'=>'','class'=>'','sub_class'=>'','name'=>'','tech_name'=>'','pack_group'=>'DEFAULT','pack_instr'=>'','qty'=>0,'qty_units'=>'KG',
+            'containers'=>1,'container_type'=>'Fiberboard Box'];
+        $s2 = array_replace($base, ['section2'=>1, 'class'=>'9']); // excepted lithium, BATTERY service, no declaration
+        $dg = array_replace($base, ['section2'=>0, 'class'=>'9', 'pack_group'=>'II', 'accessible'=>1]); // fully regulated lithium, Express
+        $gd = array_replace($dg,   ['regulation'=>'DOT', 'option'=>'HAZARDOUS_MATERIALS', 'accessible'=>0]); // fully regulated lithium, Ground
+        $pb = array_replace($base, ['regulation'=>'DOT', 'option'=>'HAZARDOUS_MATERIALS', 'class'=>'8', 'pack_group'=>'III']); // lead acid, Ground
+        return [
+            'LI_ION_S2_PWE'=> ['text'=>'UN3481 Lithium ion batteries packed with equipment - Section II (excepted)',    'defaults'=>array_replace($s2, ['bat_material'=>'LITHIUM_ION',  'bat_packing'=>'PACKED_WITH_EQUIPMENT',  'un_id'=>'UN3481','name'=>'Lithium ion batteries packed with equipment',  'pack_instr'=>'966'])],
+            'LI_ION_S2_CIE'=> ['text'=>'UN3481 Lithium ion batteries contained in equipment - Section II (excepted)',  'defaults'=>array_replace($s2, ['bat_material'=>'LITHIUM_ION',  'bat_packing'=>'CONTAINED_IN_EQUIPMENT','un_id'=>'UN3481','name'=>'Lithium ion batteries contained in equipment','pack_instr'=>'967'])],
+            'LI_MET_S2_PWE'=> ['text'=>'UN3091 Lithium metal batteries packed with equipment - Section II (excepted)',  'defaults'=>array_replace($s2, ['bat_material'=>'LITHIUM_METAL','bat_packing'=>'PACKED_WITH_EQUIPMENT',  'un_id'=>'UN3091','name'=>'Lithium metal batteries packed with equipment','pack_instr'=>'969'])],
+            'LI_MET_S2_CIE'=> ['text'=>'UN3091 Lithium metal batteries contained in equipment - Section II (excepted)','defaults'=>array_replace($s2, ['bat_material'=>'LITHIUM_METAL','bat_packing'=>'CONTAINED_IN_EQUIPMENT','un_id'=>'UN3091','name'=>'Lithium metal batteries contained in equipment','pack_instr'=>'970'])],
+            'LI_ION_DG'    => ['text'=>'UN3480 Lithium ion batteries - fully regulated, Express (IATA)',   'defaults'=>array_replace($dg, ['bat_material'=>'LITHIUM_ION',  'un_id'=>'UN3480','name'=>'Lithium ion batteries',  'pack_instr'=>'965','cargo_only'=>1])],
+            'LI_MET_DG'    => ['text'=>'UN3090 Lithium metal batteries - fully regulated, Express (IATA)', 'defaults'=>array_replace($dg, ['bat_material'=>'LITHIUM_METAL','un_id'=>'UN3090','name'=>'Lithium metal batteries','pack_instr'=>'968','cargo_only'=>1])],
+            'LI_ION_GND'   => ['text'=>'UN3480 Lithium ion batteries - fully regulated, Ground (DOT)',     'defaults'=>array_replace($gd, ['bat_material'=>'LITHIUM_ION',  'un_id'=>'UN3480','name'=>'Lithium ion batteries'])],
+            'LI_MET_GND'   => ['text'=>'UN3090 Lithium metal batteries - fully regulated, Ground (DOT)',   'defaults'=>array_replace($gd, ['bat_material'=>'LITHIUM_METAL','un_id'=>'UN3090','name'=>'Lithium metal batteries'])],
+            'PB_2800'      => ['text'=>'UN2800 Batteries, wet, non-spillable - Class 8, Ground (DOT)',     'defaults'=>array_replace($pb, ['un_id'=>'UN2800','name'=>'Batteries, wet, non-spillable, electric storage'])],
+            'PB_2794'      => ['text'=>'UN2794 Batteries, wet, filled with acid - Class 8, Ground (DOT)',  'defaults'=>array_replace($pb, ['un_id'=>'UN2794','name'=>'Batteries, wet, filled with acid, electric storage'])],
+            'LTD_QTY'      => ['text'=>'Limited Quantity - Ground (DOT)', 'defaults'=>array_replace($base, ['regulation'=>'DOT','option'=>'LIMITED_QUANTITIES_COMMODITIES'])],
+            'CUSTOM'       => ['text'=>'Custom - enter details', 'defaults'=>$base]];
     }
 }

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-07
+ * @version    7.x Last Update: 2026-09-19 (hazmat: DG paperwork on parcel labels, declaration recorded in the shipping log notes)
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -50,6 +50,10 @@ class fedexShip extends fedexCommon
         $this->is_freight = (in_array($request['ship_method'], ['GDF','ECF'])) ? true : false;
         $this->prepShipment($request);
         $this->addCreds($request);
+        if (!empty($request['hazmat']['profile'])) { // record what was declared in the shipping log
+            $hz = $request['hazmat'];
+            $this->pkgNotes .= 'DG: '.trim($hz['un_id'].' '.$hz['name']).(!empty($hz['section2']) ? ' (excepted, Section II)' : ' ('.($this->is_freight ? 'DOT' : $hz['regulation']).')').'; ';
+        }
         if ($this->is_freight) { $this->getFreightRate($request); }
         $this->getLabelREST($request, false);
         if (!empty($request['ship_return'])) { // Return shipment, switch to-from and some other things and get return label
@@ -207,6 +211,7 @@ class fedexShip extends fedexCommon
         $this->addSpSrv($payload, $pkg, $is_return);
         $payload['requestedShipment']['requestedPackageLineItems'] = $this->addPkgs($pkg);
         $this->addCustoms($payload, $pkg);
+        if (!$is_return) { $this->addShipDocsDG($payload, $pkg); } // DG declaration / OP-900, the return leg is plain ground
         if ($is_return) { // make some changes to return label request
             $recip = $this->mapAddress($pkg['shipper']);
             array_unshift($recip['streetLines'], 'Return/Recycle Program'); // append return department
