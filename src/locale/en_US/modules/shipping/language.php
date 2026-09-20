@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19
+ * @version    7.x Last Update: 2026-09-20 (msg_hazmat_not_quoted for the rate estimator)
  * @filesource locale/en_US/modules/shipping/language.php
  */
 
@@ -98,6 +98,7 @@ $lang = [
     'amt_insurance' => 'Ins. Value',
     'extras' => 'Extras',
     'hazardous' => 'Hazardous',
+    'msg_hazmat_not_quoted' => '%s does not offer the selected hazmat profile, its rates were quoted without dangerous goods.',
     'hz_regulation' => 'Regulation', // hazmat panel in the label generator
     'hz_option' => 'DG Type',
     'hz_section2' => 'Excepted Lithium (Sec. II)',

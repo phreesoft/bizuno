@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-28
+ * @version    7.x Last Update: 2026-09-20 (hazmatFromProfile(): carrier hazmat array from a profile id + dg_* settings, used by the rate estimator)
  * @filesource /controllers/shipping/common.php
  */
 
@@ -282,6 +282,23 @@ class shippingCommon
      *
      * @param type $items
      */
+    /**
+     * Builds the $pkg['hazmat'] array a carrier expects from a hazmat profile id and the carrier's dangerous goods settings,
+     * i.e. what the label generator's hazmat panel would post if the user accepted the profile defaults untouched.
+     * @param object $shipper - loaded carrier
+     * @param string $profileID - key into $shipper->options['HazmatProfiles']
+     * @return array - hazmat array, or [] when the carrier does not offer that profile (caller decides whether to warn)
+     */
+    protected function hazmatFromProfile($shipper, $profileID='')
+    {
+        if (empty($profileID) || empty($shipper->options['HazmatProfiles'][$profileID]['defaults'])) { return []; }
+        $hz = array_replace($shipper->options['HazmatProfiles'][$profileID]['defaults'], ['profile'=>$profileID]);
+        foreach (['offeror','phone','signatory','sig_title','sig_place'] as $key) { $hz[$key] = !empty($shipper->settings["dg_$key"]) ? $shipper->settings["dg_$key"] : ''; }
+        if (empty($hz['offeror'])) { $hz['offeror'] = getModuleCache('bizuno', 'settings', 'company', 'primary_name'); }
+        $hz['containers'] = max(1, intval($hz['containers'] ?? 1));
+        return $hz;
+    }
+
     protected function guessShipment($items=[])
     {
         msgDebug("\nEntering guessShipment with items = ".print_r($items, true));

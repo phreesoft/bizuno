@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-09-20 (Hazardous profile select in the estimator, preset from the order SKUs, sent to the carriers so DG surcharges are quoted)
  * @filesource /controllers/shipping/rate.php
  */
 
@@ -91,9 +91,20 @@ class shippingRate extends shippingCommon
             $this->shipment['Ins'] = 0;
         }
         $guess = $this->shipment;
+        // Hazardous: same profile list as the label generator (merged from the carriers), preset from the first SKU on the order that carries one
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'shippingHazmatProfiles', 'function');
+        $hzProfiles = function_exists('\\bizuno\\shippingHazmatProfiles') ? shippingHazmatProfiles() : [];
+        $hzPreset   = '';
+        if (!empty($hzProfiles) && !empty($data['item'])) {
+            foreach ($data['item'] as $row) {
+                if (empty($row['sku'])) { continue; }
+                $hzSku = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'hazmat_profile', "sku='".addslashes($row['sku'])."'");
+                if (!empty($hzSku)) { $hzPreset = $hzSku; break; }
+            }
+        }
         $fields= [
             'keyAddr'=> ['city','state','postal_code','country'],
-            'keyOpt' => ['num_boxes','weight','residential','length','txtWidth','width','txtHeight','height','insurance','ins_amount','extra1'], // ,'hazmat'
+            'keyOpt' => ['num_boxes','weight','residential','hazmat','length','txtWidth','width','txtHeight','height','insurance','ins_amount','extra1'],
             'keyDtl' => ['ship_date','total_amount','ltl_class'],
             'fields' => [
                 'city'        => ['order'=>10,'label'=>lang('city'),       'attr'=>['value'=>!empty($data['ship']['city_s'])       ? $data['ship']['city_s']       : '']],
@@ -103,6 +114,8 @@ class shippingRate extends shippingCommon
                 'num_boxes'   => ['order'=>10,'label'=>lang('num_boxes'),'attr'=>['type'=>'integer','value'=>$guess['Qty'],'size'=>5]],
                 'weight'      => ['order'=>20,'label'=>lang('ship_weight', $this->moduleID),'attr'=>['type'=>'float','value'=>$guess['Wt'], 'size'=>10]],
                 'residential' => ['order'=>30,'label'=>lang('residential_address'),'attr'=>['type'=>'checkbox']],
+                'hazmat'      => ['order'=>35,'label'=>lang('hazardous', $this->moduleID),'values'=>array_merge([['id'=>'', 'text'=>lang('none')]], $hzProfiles),
+                    'attr'=>['type'=>empty($hzProfiles) ? 'hidden' : 'select', 'value'=>$hzPreset]],
                 'length'      => ['order'=>40,'label'=>lang('dimensions', $this->moduleID),'break'=>false,'attr' =>['type'=>'integer','value'=>$guess['L'],'size'=>3]],
                 'txtWidth'    => ['order'=>49,'html' =>'X','break'=>false,'attr'=>['type'=>'raw']],
                 'width'       => ['order'=>50,'break'=>false,'attr'=>['type'=>'integer','value'=>$guess['W'],'size'=>3]],
@@ -115,7 +128,6 @@ class shippingRate extends shippingCommon
                 'insurance'   => ['order'=>60,'label'=>lang('inc_insurance', $this->moduleID),'attr'=>['type'=>'checkbox','checked'=>false, 'size'=>8]],
                 'ins_amount'  => ['order'=>61,'label'=>lang('amt_insurance', $this->moduleID),'attr'=>['type'=>'currency','value'=>$guess['Ins']]],
                 'extra1'      => ['order'=>70,'label'=>lang('extras', $this->moduleID),'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
-//              'hazmat'      => ['order'=>80,'label'=>lang('hazardous'],'attr'=>['type'=>'checkbox','checked'=>false]],
                 ]];
 //        $addBook = dbLoadStructure(BIZUNO_DB_PREFIX.'contacts');
 //        foreach ($fields['keyAddr'] as $idx) {
@@ -153,7 +165,7 @@ class shippingRate extends shippingCommon
             'settings' => [
                 'ship_date'   => clean('ship_date',  'date',    'post'),
                 'insurance'   => clean('insurance',  'integer', 'post'),
-//              'hazmat'      => clean('hazmat',     'integer', 'post'),
+                'hazmat'      => clean('hazmat',     'cmd',     'post'), // hazmat profile id, carriers get the expanded array in $pkg['hazmat'] below
                 'ins_amount'  => clean('ins_amount', 'currency','post'),
                 'weight'      => clean('weight',     'float',   'post'),
                 'length'      => clean('length',     'float',   'post'),
@@ -174,7 +186,12 @@ class shippingRate extends shippingCommon
         $rates = [];
         foreach ($carriers as $carrier) {
             $est = $this->loadCarrier($carrier);
-            if (method_exists($est, 'rateQuote')) { $rates[$carrier] = $est->rateQuote($pkg); }
+            if (!method_exists($est, 'rateQuote')) { continue; }
+            $pkg['hazmat'] = $this->hazmatFromProfile($est, $pkg['settings']['hazmat']); // dangerous goods drive the carrier surcharges, empty when none
+            if (!empty($pkg['settings']['hazmat']) && empty($pkg['hazmat'])) {
+                msgAdd(sprintf(lang('msg_hazmat_not_quoted', $this->moduleID), !empty($this->myCarriers[$carrier]['title']) ? $this->myCarriers[$carrier]['title'] : $carrier), 'caution');
+            }
+            $rates[$carrier] = $est->rateQuote($pkg);
         }
         msgDebug("\nrate return array = ".print_r($rates, true));
         $data = [
