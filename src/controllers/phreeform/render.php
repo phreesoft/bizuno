@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (cronStatements: unattended monthly customer statement emails for portal/api/stmtCron)
+ * @version    7.x Last Update: 2026-09-20 (renderMerge: modern-PDF attachment failures report the file and the parser hint instead of a fatal)
  * @filesource /controllers/phreeform/render.php
  */
 
@@ -397,6 +397,7 @@ class phreeformRender
             } while (true);
             $allPDFs = array_merge($PDFs, $this->attachments);
             $output = $this->renderMerge($allPDFs);
+            if (empty($output)) { $layout = array_replace_recursive($layout, $data); return; } // an attachment could not be read, message is in the stack
         }
         msgDebug("\nReady to download file...");
         if     ($format == 'html')       { return; }
@@ -683,12 +684,23 @@ class phreeformRender
         foreach ($PDFs as $doc) {
             if (empty($fn))          { $fn = $doc['filename']; }
             if (empty($doc['data'])) { $doc['data'] = file_get_contents(BIZUNO_DATA.$doc['filename']); }
-            $pageCount = $pdf->setSourceFile(\setasign\Fpdi\PdfParser\StreamReader::createByString($doc['data']));
-            for ($pageNo=1; $pageNo<=$pageCount; $pageNo++) {
-                $templateId = $pdf->importPage($pageNo);
-                msgDebug("\nAdding page with orient = {$doc['orient']} and format = ".print_r($doc['format'], true));
-                $pdf->AddPage($doc['orient'], $doc['format']);
-                $pdf->useTemplate($templateId, ['adjustPageSize'=>true]);
+            try {
+                $pageCount = $pdf->setSourceFile(\setasign\Fpdi\PdfParser\StreamReader::createByString($doc['data']));
+                for ($pageNo=1; $pageNo<=$pageCount; $pageNo++) {
+                    $templateId = $pdf->importPage($pageNo);
+                    msgDebug("\nAdding page with orient = {$doc['orient']} and format = ".print_r($doc['format'], true));
+                    $pdf->AddPage($doc['orient'], $doc['format']);
+                    $pdf->useTemplate($templateId, ['adjustPageSize'=>true]);
+                }
+            } catch (\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException $e) {
+                $hint = $e->getCode()==\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException::COMPRESSED_XREF
+                    ? ' It is a modern PDF (1.5+) which needs the licensed Setasign FPDI PDF-Parser; see README "Commercial PDF parser" for how to connect it, or re-save the file as PDF 1.4.'
+                    : ' '.$e->getMessage();
+                msgDebug("\nrenderMerge failed on {$doc['filename']}: ".$e->getMessage(), 'trap');
+                return msgAdd(sprintf(lang('phreeform_pdf_attach_fail', $this->moduleID), basename($doc['filename'])).$hint);
+            } catch (\setasign\Fpdi\PdfParser\PdfParserException $e) {
+                msgDebug("\nrenderMerge failed on {$doc['filename']}: ".$e->getMessage(), 'trap');
+                return msgAdd(sprintf(lang('phreeform_pdf_attach_fail', $this->moduleID), basename($doc['filename'])).' '.$e->getMessage());
             }
         }
         return ['filename'=>$fn, 'data'=>$pdf->Output($fn, 'S')];

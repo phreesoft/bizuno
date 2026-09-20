@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-05-15 (removed TCPDF; setasign/tfpdf is now the sole PDF engine, barcodes via picqer)
+ * @version    7.x Last Update: 2026-09-20 (drop-in loader for the licensed setasign FPDI PDF-Parser at data/myExt/lib/fpdi_pdf-parser/)
  * @filesource /bizunoCFG.php
  */
 
@@ -119,6 +119,7 @@ define('BIZUNO_3P_PDF', BIZUNO_FS_ASSETS.'setasign/tfpdf/');
 // Load the Bizuno third party libraries
 if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { // using composer
     require ( BIZUNO_FS_ASSETS  . 'autoload.php' );
+    bizunoLoadFpdiParser(); // licensed FPDI PDF-Parser drop-in (see the function below), no-op when composer already provides it
 } else { // If not using composer, try to load each library used seperately
     if (file_exists( BIZUNO_FS_ASSETS . 'setasign/tfpdf/tfpdf.php' )) {
         require ( BIZUNO_FS_ASSETS . 'setasign/tfpdf/tfpdf.php' );
@@ -140,4 +141,26 @@ if (file_exists(BIZUNO_FS_ASSETS . 'autoload.php' ) ) { // using composer
         require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Math/BigInteger.php' );
         require ( BIZUNO_FS_ASSETS . 'phpseclib/phpseclib/phpseclib/Net/SSH2.php' );
     }
+}
+
+/**
+ * Connects Setasign's commercial FPDI PDF-Parser (modern PDF 1.5+ attachments: object and cross-reference streams) when it was
+ * unpacked by hand instead of installed through composer. FPDI itself checks class_exists(setasign\FpdiPdfParser\PdfParser\PdfParser)
+ * at run time, so all that is needed is an autoloader for that namespace. The package is licensed per site, which is why it lives
+ * under the site's private data folder and not in the code tree:
+ *     <BIZUNO_DATA>/myExt/lib/fpdi_pdf-parser/src/PdfParser/PdfParser.php   (unzip the Setasign download so src/ sits there)
+ * Composer installs (README: composer require setasign/fpdi_pdf-parser) take precedence and skip this.
+ */
+function bizunoLoadFpdiParser()
+{
+    if (!defined('BIZUNO_DATA') || class_exists('setasign\\FpdiPdfParser\\PdfParser\\PdfParser')) { return; }
+    $base = BIZUNO_DATA.'myExt/lib/fpdi_pdf-parser/';
+    if (!is_dir($base.'src')) { return; }
+    if (file_exists($base.'src/autoload.php')) { require_once $base.'src/autoload.php'; return; } // package ships its own loader
+    spl_autoload_register(function ($class) use ($base) { // fallback PSR-4 loader for the setasign\FpdiPdfParser namespace
+        $prefix = 'setasign\\FpdiPdfParser\\';
+        if (strncmp($class, $prefix, strlen($prefix)) !== 0) { return; }
+        $file = $base.'src/'.str_replace('\\', '/', substr($class, strlen($prefix))).'.php';
+        if (is_file($file)) { require $file; }
+    });
 }
