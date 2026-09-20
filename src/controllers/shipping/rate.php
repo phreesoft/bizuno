@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (Hazardous profile select in the estimator, preset from the order SKUs, sent to the carriers so DG surcharges are quoted)
+ * @version    7.x Last Update: 2026-09-20 (hazmat DG contacts default from the ship-from branch)
  * @filesource /controllers/shipping/rate.php
  */
 
@@ -187,7 +187,7 @@ class shippingRate extends shippingCommon
         foreach ($carriers as $carrier) {
             $est = $this->loadCarrier($carrier);
             if (!method_exists($est, 'rateQuote')) { continue; }
-            $pkg['hazmat'] = $this->hazmatFromProfile($est, $pkg['settings']['hazmat']); // dangerous goods drive the carrier surcharges, empty when none
+            $pkg['hazmat'] = $this->hazmatFromProfile($est, $pkg['settings']['hazmat'], $pkg['origin']); // dangerous goods drive the carrier surcharges, empty when none
             if (!empty($pkg['settings']['hazmat']) && empty($pkg['hazmat'])) {
                 msgAdd(sprintf(lang('msg_hazmat_not_quoted', $this->moduleID), !empty($this->myCarriers[$carrier]['title']) ? $this->myCarriers[$carrier]['title'] : $carrier), 'caution');
             }

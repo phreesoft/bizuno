@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (hazmat panel: hide after layout, not before, so easyUI sizes it; resize on show)
+ * @version    7.x Last Update: 2026-09-20 (hazmat panel contact defaults via dgDefaults(): carrier dg_* -> ship-from branch -> company)
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -163,9 +163,7 @@ class shippingShip extends shippingCommon
         $hzLists = $this->hazmatLists();
         $hzPreset= ''; // profile from the order's SKUs (inventory.hazmat_profile), only if this carrier offers it
         if (!empty($data['hazmat_profile']) && !empty($shipper->options['HazmatProfiles'][$data['hazmat_profile']])) { $hzPreset = $data['hazmat_profile']; }
-        $dg = ['offeror'=>'', 'phone'=>'', 'signatory'=>'', 'sig_title'=>'', 'sig_place'=>''];
-        foreach ($dg as $key => $val) { if (!empty($shipper->settings["dg_$key"])) { $dg[$key] = $shipper->settings["dg_$key"]; } }
-        if (empty($dg['offeror'])) { $dg['offeror'] = getModuleCache('bizuno', 'settings', 'company', 'primary_name'); }
+        $dg = $this->dgDefaults($shipper, !empty($data['store_id']) ? (array)dbGetContact($data['store_id']) : []); // ship-from branch, else company
         $fields = [ // Options
             'pkg_array'    => ['order'=> 1,'attr'=>['type'=>'hidden']], // for grids
             'frt_billed'   => ['order'=> 1,'attr'=>['type'=>'hidden','value'=>isset($data['freight']) ? $data['freight'] : 0]],
