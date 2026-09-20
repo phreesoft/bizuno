@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-07-23
+ * @version    7.x Last Update: 2026-09-20 (hazmat rate requests: drop Ground Economy and limit carrierCodes to the carriers that take the goods)
  * @filesource /controllers/shipping/carriers/fedex/rate.php
  *
  * FedEx Developer Rate:
@@ -147,8 +147,29 @@ class fedexRate extends fedexCommon
             'carrierCodes'=> ['FDXE', 'FDXG', 'FXSP']]; // Required to get Ground Economy rates (despite documentation)
         $this->addEmailNotifications($payload, $pkg);
         $this->addCustoms($payload, $pkg);
+        $this->limitCarriersDG($payload, $pkg);
         msgDebug("\nReturning from payloadREST with payload = ".print_r($payload, true));
         return $payload;
+    }
+
+    /**
+     * Dangerous goods narrow the rate request. FedEx answers RATE.LOCATION.NOSERVICE for the whole request when a listed carrier cannot
+     * carry the goods, instead of just leaving that carrier's services out, so ask only the carriers that can:
+     *   Ground Economy (FXSP) never takes batteries or DG; DOT (Ground) profiles rate FDXG only; IATA/ADR fully regulated rate FDXE only;
+     *   Section II excepted lithium rates Express and Ground.
+     * @param array $payload - rate request, modified
+     * @param array $pkg - rate request from the estimator, $pkg['hazmat'] set when a profile was chosen
+     */
+    private function limitCarriersDG(&$payload, $pkg)
+    {
+        if (empty($pkg['hazmat']['profile'])) { return; }
+        unset($payload['requestedShipment']['smartPostInfoDetail']);
+        $hz = $pkg['hazmat'];
+        if     (!empty($hz['section2']))                                  { $codes = ['FDXE', 'FDXG']; }
+        elseif (!empty($hz['regulation']) && $hz['regulation']=='DOT')    { $codes = ['FDXG']; }
+        else                                                              { $codes = ['FDXE']; }
+        $payload['carrierCodes'] = $codes;
+        msgDebug("\nHazmat profile {$hz['profile']} limited the rate request to carrierCodes = ".implode(',', $codes));
     }
 
     /**
