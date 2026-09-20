@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (DG detail: emergency phone falls back to the company phone, quantity falls back to the package weight; both are required by FedEx)
+ * @version    7.x Last Update: 2026-09-20 (DG detail: phone/offeror fall back to the ship-from branch then the company; quantity falls back to the package weight)
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -590,6 +590,9 @@ return '';
                 'specialServiceTypes'=> ['BATTERY'],
                 'batteryDetails'     => [['material'=>$hz['bat_material'], 'packing'=>$hz['bat_packing'], 'regulatorySubType'=>'IATA_SECTION_II']]];
             return;
+        }
+        foreach (['offeror'=>'primary_name', 'phone'=>'telephone1'] as $key => $src) { // required by FedEx, fall back to the ship-from branch
+            if (empty($hz[$key]) && !empty($pkg['origin'][$src])) { $hz[$key] = $pkg['origin'][$src]; }
         }
         if (empty($hz['qty']) && !empty($box['weight']['value'])) { // FedEx requires a commodity quantity, the profile leaves it 0 so use the package weight (gross)
             $hz['qty']      = $box['weight']['value'];

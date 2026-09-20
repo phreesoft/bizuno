@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (hazmatFromProfile(): carrier hazmat array from a profile id + dg_* settings, used by the rate estimator)
+ * @version    7.x Last Update: 2026-09-20 (dgDefaults(): DG offeror/phone/signatory from carrier dg_* settings, else the ship-from branch, else the company settings)
  * @filesource /controllers/shipping/common.php
  */
 
@@ -289,14 +289,44 @@ class shippingCommon
      * @param string $profileID - key into $shipper->options['HazmatProfiles']
      * @return array - hazmat array, or [] when the carrier does not offer that profile (caller decides whether to warn)
      */
-    protected function hazmatFromProfile($shipper, $profileID='')
+    protected function hazmatFromProfile($shipper, $profileID='', $origin=[])
     {
         if (empty($profileID) || empty($shipper->options['HazmatProfiles'][$profileID]['defaults'])) { return []; }
-        $hz = array_replace($shipper->options['HazmatProfiles'][$profileID]['defaults'], ['profile'=>$profileID]);
-        foreach (['offeror','phone','signatory','sig_title','sig_place'] as $key) { $hz[$key] = !empty($shipper->settings["dg_$key"]) ? $shipper->settings["dg_$key"] : ''; }
-        if (empty($hz['offeror'])) { $hz['offeror'] = getModuleCache('bizuno', 'settings', 'company', 'primary_name'); }
+        $hz = array_replace($shipper->options['HazmatProfiles'][$profileID]['defaults'], ['profile'=>$profileID], $this->dgDefaults($shipper, $origin));
         $hz['containers'] = max(1, intval($hz['containers'] ?? 1));
         return $hz;
+    }
+
+    /**
+     * Dangerous goods contact defaults (offeror, 24 hour emergency phone, signatory name/title/place). Chain, first non-blank wins:
+     * carrier settings dg_* -> the ship-from branch (Settings -> Stores) -> the company block in Bizuno settings.
+     * @param object $shipper - loaded carrier (for its dg_* settings)
+     * @param array $origin - ship-from address array (primary_name, contact, telephone1, city, state) or a store contact row
+     * @return array - keys offeror, phone, signatory, sig_title, sig_place
+     */
+    protected function dgDefaults($shipper=null, $origin=[])
+    {
+        $co  = getModuleCache('bizuno', 'settings', 'company');
+        $pick= function($keys, $arr) { foreach ((array)$keys as $k) { if (!empty($arr[$k])) { return trim($arr[$k]); } } return ''; };
+        $map = [ // dg key => [origin keys], [company keys]
+            'offeror'  => [['primary_name'], ['primary_name']],
+            'phone'    => [['telephone1'],   ['telephone1']],
+            'signatory'=> [['contact'],      ['contact']],
+            'sig_title'=> [[],               []],
+            'sig_place'=> [[],               []]];
+        $out = [];
+        foreach ($map as $key => $srcs) {
+            $val = !empty($shipper->settings["dg_$key"]) ? trim($shipper->settings["dg_$key"]) : '';
+            if ($val==='') { $val = $pick($srcs[0], $origin); }
+            if ($val==='') { $val = $pick($srcs[1], $co); }
+            $out[$key] = $val;
+        }
+        if ($out['sig_place']==='') { // city, state of whoever is signing
+            $src = !empty($origin['city']) ? $origin : $co;
+            $out['sig_place'] = trim(($src['city'] ?? '').(!empty($src['state']) ? ', '.$src['state'] : ''));
+        }
+        if ($out['phone']!=='') { $out['phone'] = preg_replace('/[^0-9]/', '', $out['phone']); } // FedEx wants digits
+        return $out;
     }
 
     protected function guessShipment($items=[])
