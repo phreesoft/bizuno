@@ -21,12 +21,13 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-05-19
+ * @version    7.x Last Update: 2026-09-20 (phreeform_pdf_attach_fail)
  * @filesource /controllers/phreeform/locale/en_US/language.php
  */
 
 $lang = [
     'title' => 'PhreeForm',
+    'phreeform_pdf_attach_fail' => 'The attachment %s could not be read, nothing was generated or sent.',
     'description' => 'The phreeform module contains all the tools needed to create and generate reports and forms.',
     // Settings
     'default_font_lbl' => 'Font',

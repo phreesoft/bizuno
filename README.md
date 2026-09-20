@@ -72,6 +72,8 @@ The commercial parser is **not** listed in Bizuno's `require` block — keeping 
 
    That persists `setasign/fpdi_pdf-parser` to your local `composer.json` so it survives future updates. FPDI auto-detects the parser via `class_exists()` at runtime — no further configuration needed.
 
+**Without composer access on the server (drop-in):** unzip the package you downloaded from Setasign so that its `src/` folder sits at `data/myExt/lib/fpdi_pdf-parser/src/` (i.e. `data/myExt/lib/fpdi_pdf-parser/src/PdfParser/PdfParser.php` exists), where `data/` is your `BIZUNO_DATA` folder. Bizuno registers the parser from there at start-up; composer installs, when present, take precedence. The license is per site, which is why the drop-in lives in the site's private data folder and not in the code tree.
+
 **Upgrading from a prior Bizuno version that had fpdi_pdf-parser in core:** on your next `composer update`, composer may remove `vendor/setasign/fpdi_pdf-parser/` as a now-orphan package. Re-add it with the `composer require` line above if you still want it.
 
 **WordPress Plugin Installation**
