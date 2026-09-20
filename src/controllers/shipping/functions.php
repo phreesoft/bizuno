@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2025-04-24
+ * @version    7.x Last Update: 2026-09-20 (shippingHazmatProfiles(): merged hazmat profile list from the installed carriers, for the inventory item edit)
  * @filesource /controllers/shipping/functions.php
  */
 
@@ -75,6 +75,29 @@ function shippingView($value, $format='')
             return lang('tracking_num').' '.implode(', ', $track);
         default:
     }
+}
+
+/**
+ * Hazmat (dangerous goods) profiles offered by every installed shipping carrier, as a dropdown list, for the inventory
+ * item's Hazmat Profile select. Profile ids are shared across carriers where the same goods apply (e.g. LI_ION_S2_PWE),
+ * the first carrier to define an id wins the text.
+ * @return array - [['id'=>profileID, 'text'=>description], ...] or [] when shipping is off or no carrier defines any
+ */
+function shippingHazmatProfiles()
+{
+    if (!getModuleCache('shipping', 'properties', 'status')) { return []; }
+    $output = [];
+    foreach ((array)getMetaMethod('carriers') as $carrier => $props) {
+        if (empty($props['path']) || !bizAutoLoad($props['path']."$carrier.php", $carrier)) { continue; }
+        $fqcn = "\\bizuno\\$carrier";
+        if (!class_exists($fqcn)) { continue; }
+        $shipper = new $fqcn();
+        if (empty($shipper->options['HazmatProfiles'])) { continue; }
+        foreach ($shipper->options['HazmatProfiles'] as $hzID => $profile) {
+            if (!isset($output[$hzID])) { $output[$hzID] = ['id'=>$hzID, 'text'=>$profile['text']]; }
+        }
+    }
+    return array_values($output);
 }
 
 function getCarrierText($encValue='')

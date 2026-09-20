@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (Sell Units panel on the General tab listing the SKU price sheet levels (unit, pieces, price, weight))
+ * @version    7.x Last Update: 2026-09-20 (manager: dropped the vendor/open-quote filters; item edit: Hazmat Profile select fed by the shipping carriers)
  * @filesource /controllers/inventory/main.php
  */
 
@@ -65,6 +65,7 @@ class inventoryMain
         $this->inventoryTypes = array_merge_recursive($inventoryTypes, getModuleCache('inventory', 'phreebooks'));
         $this->dbDefault = [
             'id'           => 0,
+            'hazmat_profile'=> '',
             'store_id'     => 0,
             'gl_sales'     => getModuleCache('inventory', 'settings', 'phreebooks', 'sales_si'),
             'gl_inv'       => getModuleCache('inventory', 'settings', 'phreebooks', 'inv_si'),
@@ -157,8 +158,6 @@ class inventoryMain
             ['index'=>'sort',  'clean'=>'text',   'default'=>BIZUNO_DB_PREFIX."inventory.sku"],
             ['index'=>'order', 'clean'=>'text',   'default'=>'ASC'],
             ['index'=>'f0',    'clean'=>'char',   'method'=>'request','default'=>'y'],
-            ['index'=>'f2',    'clean'=>'integer','method'=>'request','default'=>0],   // vendor
-            ['index'=>'f3',    'clean'=>'char',   'method'=>'request','default'=>'a'], // on open quotes
             ['index'=>'search','clean'=>'text',   'default'=>'']]];
         if ($clrSearch) { clearUserCache($data['path']); }
         $this->defaults = updateSelection($data);
@@ -273,6 +272,15 @@ class inventoryMain
         dbStructureFill($structure, $dbData);
         $inv_type    = $structure['inventory_type']['attr']['value'];
         $fldProp     = ['id','qty','dg_assy','store_id','sku','inactive','description_short','upc_code','item_weight','lead_time'];
+        // Hazmat profile: which dangerous goods profile the label generator preselects when this SKU is on the order; the choices come from the
+        // installed shipping carriers (FedEx hazmatProfiles etc.), so the select is hidden when the shipping module is off or no carrier has any
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/shipping/functions.php', 'shippingHazmatProfiles', 'function');
+        $hzProfiles = function_exists('\\bizuno\\shippingHazmatProfiles') ? shippingHazmatProfiles() : [];
+        if (!empty($hzProfiles) && isset($structure['hazmat_profile'])) { // column arrives with the 7.4.8 upgrade
+            $structure['hazmat_profile']['values'] = array_merge([['id'=>'', 'text'=>lang('none')]], $hzProfiles);
+            $structure['hazmat_profile']['attr']['type'] = 'select';
+            $fldProp[] = 'hazmat_profile';
+        } elseif (isset($structure['hazmat_profile'])) { $structure['hazmat_profile']['attr']['type'] = 'hidden'; }
         $fldStatus   = ['qty_min','qty_restock','qty_stock','qty_po','qty_so','qty_alloc'];
         $fldImage    = ['image_with_path'];
         $fldCust     = ['description_sales','full_price','sale_price','tax_rate_id_c','price_sheet_c', 'block_discount'];
@@ -872,15 +880,8 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
             case 'y': $f0_value = "inactive='0'"; break;
             case 'n': $f0_value = "inactive='1'"; break;
         }
-        // Qty on Quote: open sales quote demand per SKU (journal 9, not closed) via the invQtyQuote process (one aggregate query per request,
-        // same alias+process pattern as the multi-store stock column so the single-table query path is unchanged). Used with the vendor and
-        // open-quote filters to find items to add to a vendor PO to reach the free-freight minimum.
-        $onQuote = BIZUNO_DB_PREFIX."inventory.sku IN (SELECT ji.sku FROM ".BIZUNO_DB_PREFIX."journal_item ji JOIN ".BIZUNO_DB_PREFIX."journal_main jm ON jm.id=ji.ref_id"
-                 . " WHERE jm.journal_id=9 AND jm.closed='0' AND ji.gl_type='itm' AND ji.sku<>'')";
-        $vendors = [['id'=>0, 'text'=>lang('all')]];
-        foreach ((array)dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_v='1' AND inactive<>'1'", 'short_name', ['id','short_name']) as $row) { $vendors[] = ['id'=>$row['id'], 'text'=>$row['short_name']]; }
-        $f2 = intval($this->defaults['f2']);
-        $f3 = $this->defaults['f3'];
+        // Qty on Quote column: open sales quote demand per SKU (journal 9, not closed) via the invQtyQuote process (one aggregate query per
+        // request, same alias+process pattern as the multi-store stock column so the single-table query path is unchanged).
         $data = ['id'=> $name, 'rows'=>$this->defaults['rows'], 'page'=>$this->defaults['page'],
             'attr'     => ['idField'=>'id', 'toolbar'=>"#{$name}Toolbar", 'url'=>BIZUNO_URL_AJAX."&bizRt=inventory/main/managerRows"],
             'events'   => [
@@ -895,11 +896,9 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
                     'mergeInv'    =>['order'=>30,'icon'=>'merge',  'hidden'=>$security>4?false:true,'events'=>['onClick'=>"jsonAction('$this->moduleID/tools/merge', 0);"]],
                     'woDesign'    =>['order'=>50,'icon'=>'design', 'hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/design/manager');"]],
                     'woTasks'     =>['order'=>55,'icon'=>'inv-adj','hidden'=>$security>3?false:true,'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/tasks/manager');"]],
-                    'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizSelSet('f2', 0); bizSelSet('f3', 'a'); bizTextSet('search', ''); ".$name."Reload();"]]],
+                    'clrSearch'   =>['order'=>85,'icon'=>'clear',  'events'=>['onClick'=>"bizSelSet('f0', 'y'); bizTextSet('search', ''); ".$name."Reload();"]]],
                 'filters'=> [
                     'f0'     => ['order'=>10,'label'=>lang('status'),'break'=>true,'sql'=>$f0_value,'values'=> $yes_no_choices,'attr'=>['type'=>'select','value'=>$this->defaults['f0']]],
-                    'f2'     => ['order'=>20,'label'=>lang('vendors'),'sql'=>!empty($f2) ? BIZUNO_DB_PREFIX."inventory.vendor_id=$f2" : '','values'=>$vendors,'attr'=>['type'=>'select','value'=>$f2]],
-                    'f3'     => ['order'=>30,'label'=>lang('on_open_quotes'),'sql'=>$f3=='y' ? $onQuote : '','values'=>[['id'=>'a','text'=>lang('all')],['id'=>'y','text'=>lang('yes')]],'attr'=>['type'=>'select','value'=>$f3]],
                     'search' => ['order'=>90,'attr'=>['value'=>$this->defaults['search']]]],
                 'sort' => ['s0'=>  ['order'=>10, 'field'=>($this->defaults['sort'].' '.$this->defaults['order'])]]],
             'columns'  => [

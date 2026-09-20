@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (added 7.4.7 gate: contacts.stmt_email for the monthly statement cron)
+ * @version    7.x Last Update: 2026-09-20 (added 7.4.8 gate: inventory.hazmat_profile)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -275,6 +275,11 @@ function bizunoUpgrade()
     if (version_compare($dbVer, '7.4.7') < 0) {
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'contacts', 'stmt_email')) { // monthly statement email preference, drives portal/api/stmtCron
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."contacts` ADD `stmt_email` ENUM('0','1','2') NOT NULL DEFAULT '0' COMMENT 'type:select;order:22;tag:StatementEmail' AFTER `marketplace`");
+        }
+    }
+    if (version_compare($dbVer, '7.4.8') < 0) {
+        if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'hazmat_profile')) { // dangerous goods profile preselected by the shipping label generator
+            dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory` ADD `hazmat_profile` VARCHAR(24) NOT NULL DEFAULT '' COMMENT 'type:select;tag:HazmatProfile;order:62' AFTER `lead_time`");
         }
     }
     dbTransactionCommit();

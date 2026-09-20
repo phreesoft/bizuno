@@ -2,6 +2,19 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.8] — Unreleased
+
+### Added
+- **Hazmat profile on inventory items** — new *Hazmat Profile* select in the item Properties
+  panel (choices come from the installed shipping carriers, e.g. the FedEx lithium / lead acid
+  profiles). When a SKU with a profile is on an order, the label generator preselects it and opens
+  the dangerous goods panel with that profile's defaults. Blank means not hazmat, which is the
+  default for every existing item. DB: `inventory.hazmat_profile` (7.4.8 upgrade gate).
+
+### Changed
+- **Inventory Manager** — removed the Vendor and On Open Quotes filters added in 7.4.7; the
+  Qty on Quote column stays.
+
 ## [7.4.7] — Unreleased
 
 ### Added

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (contacts.stmt_email: monthly statement email preference, none / skip if no activity / always)
+ * @version    7.x Last Update: 2026-09-20 (inventory.hazmat_profile: dangerous goods profile preselected by the label generator)
  * @filesource /controllers/bizuno/install/tables.php
  */
 namespace bizuno;
@@ -207,6 +207,8 @@ $tables = [
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"UPC, EAN, JAN, or ISBN. Universal standard product code."],
             'lead_time'           => ['format'=>'INT(3)',       'attr'=>"DEFAULT '1'",             'comment'=>'tag:StockLeadTime;order:60',
                 'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Lead time (in days) to receive product from the vendor when an order is placed."],
+            'hazmat_profile'      => ['format'=>'VARCHAR(24)',  'attr'=>"DEFAULT ''",              'comment'=>'type:select;tag:HazmatProfile;order:62',
+                'import'=>true, 'export'=>true,'required'=>false,'desc'=>"Dangerous goods profile id (from the shipping carrier, e.g. LI_ION_S2_PWE) preselected in the label generator when this SKU is on the order. Blank = not hazmat."],
             'qty_stock'           => ['format'=>'FLOAT',        'attr'=>"DEFAULT '0'",             'comment'=>'tag:QtyStock;order:10',
                 'import'=>false,'export'=>true,'required'=>false,'desc'=>"Quantity in Stock (calculated by the system)"],
             'qty_so'              => ['format'=>'FLOAT',        'attr'=>"DEFAULT '0'",             'comment'=>'tag:QtyOrder;order:20',

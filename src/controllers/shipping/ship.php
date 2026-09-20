@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (hazmat / dangerous goods panel in the label generator, profiles supplied by the carrier module)
+ * @version    7.x Last Update: 2026-09-20 (label generator preselects the hazmat profile carried by the SKUs on the order (inventory.hazmat_profile))
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -161,6 +161,8 @@ class shippingShip extends shippingCommon
             foreach ($shipper->options['HazmatProfiles'] as $hzID => $profile) { $hzProfiles[] = ['id'=>$hzID, 'text'=>$profile['text']]; }
         }
         $hzLists = $this->hazmatLists();
+        $hzPreset= ''; // profile from the order's SKUs (inventory.hazmat_profile), only if this carrier offers it
+        if (!empty($data['hazmat_profile']) && !empty($shipper->options['HazmatProfiles'][$data['hazmat_profile']])) { $hzPreset = $data['hazmat_profile']; }
         $dg = ['offeror'=>'', 'phone'=>'', 'signatory'=>'', 'sig_title'=>'', 'sig_place'=>''];
         foreach ($dg as $key => $val) { if (!empty($shipper->settings["dg_$key"])) { $dg[$key] = $shipper->settings["dg_$key"]; } }
         if (empty($dg['offeror'])) { $dg['offeror'] = getModuleCache('bizuno', 'settings', 'company', 'primary_name'); }
@@ -191,7 +193,7 @@ class shippingShip extends shippingCommon
             'ship_cod_type'=> ['order'=>48,'label'=>lang('ship_cod_type', $this->moduleID),'break'=>true,'values'=>viewKeyDropdown($shipper->options['CODMap']),'attr'=>['type'=>'select','value'=>$shipper->ship_cod_type]],
             'extra1'       => ['order'=>70,'label'=>lang('extras', $this->moduleID),'values'=>viewKeyDropdown($this->options['extras'], true),'attr'=>['type'=>'select','name'=>'extra1[]','size'=>15,'multiple'=>'multiple','format'=>'array','value'=>[]]],
             // Hazmat - the select lives in the options panel, picking a profile reveals the hazmat panel and fills the defaults (see selHazmat in labelJS)
-            'ship_hazmat'    => ['order'=>11,'label'=>lang('hazardous', $this->moduleID),'break'=>true,'values'=>$hzProfiles,'attr'=>['type'=>empty($hzProfiles)?'hidden':'select','value'=>''],
+            'ship_hazmat'    => ['order'=>11,'label'=>lang('hazardous', $this->moduleID),'break'=>true,'values'=>$hzProfiles,'attr'=>['type'=>empty($hzProfiles)?'hidden':'select','value'=>$hzPreset],
                 'options' => ['onChange'=>"function (newVal, oldVal) { selHazmat(newVal); }"]],
             'hz_regulation'  => ['order'=>10,'label'=>lang('hz_regulation', $this->moduleID),  'values'=>$hzLists['regulation'],  'attr'=>['type'=>'select','value'=>'IATA']],
             'hz_option'      => ['order'=>12,'label'=>lang('hz_option', $this->moduleID),      'break'=>true,'values'=>$hzLists['option'],'attr'=>['type'=>'select','value'=>'BATTERY']],
@@ -363,7 +365,8 @@ function preSubmit() {
     }
     return true;
 }";
-        $js['jsReady']['init'] = "ajaxForm('frmLabel'); if (bizGridExists('dgPkg')) { jqBiz('#dgPkg').edatagrid('addRow'); }";
+        $js['jsReady']['init'] = "ajaxForm('frmLabel'); if (bizGridExists('dgPkg')) { jqBiz('#dgPkg').edatagrid('addRow'); }"
+            . " if (jqBiz('#ship_hazmat').length && jqBiz('#ship_hazmat').val()) { selHazmat(jqBiz('#ship_hazmat').val()); }"; // SKU carried a hazmat profile, open the panel with its defaults
         return $js;
     }
 
@@ -389,6 +392,7 @@ function preSubmit() {
             if ($row['gl_type']=='itm' && $row['sku']) {
                 $inv = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "sku='{$row['sku']}'");
                 if ($inv !== false) { $items[] = array_merge(['qty'=>$row['qty']], $inv); }
+                if (!empty($inv['hazmat_profile']) && empty($dbData['hazmat_profile'])) { $dbData['hazmat_profile'] = $inv['hazmat_profile']; } // first hazmat SKU on the order sets the profile
             }
         }
         $this->guessShipment($items);
