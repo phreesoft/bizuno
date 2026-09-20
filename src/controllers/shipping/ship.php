@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (label generator preselects the hazmat profile carried by the SKUs on the order (inventory.hazmat_profile))
+ * @version    7.x Last Update: 2026-09-20 (hazmat panel: hide after layout, not before, so easyUI sizes it; resize on show)
  * @filesource /controllers/shipping/ship.php
  */
 
@@ -81,7 +81,7 @@ class shippingShip extends shippingCommon
                     'details' => ['order'=>20,'type'=>'panel','key'=>'details','classes'=>['block33']],
                     'options' => ['order'=>30,'type'=>'panel','key'=>'options','classes'=>['block33']],
                     'pnlPkg'  => ['order'=>40,'type'=>'panel','key'=>'pnlPkg', 'classes'=>['block66']],
-                    'hazmat'  => ['order'=>50,'type'=>'panel','key'=>'hazmat','styles'=>['display'=>'none'],'classes'=>['block33'],'attr'=>['id'=>'divHazmat']]]],
+                    'hazmat'  => ['order'=>50,'type'=>'panel','key'=>'hazmat','classes'=>['block33'],'attr'=>['id'=>'divHazmat']]]], // hidden in jsReady, after easyUI has sized it
                 'formEOF' => ['order'=>90,'type'=>'html',     'html'=>"</form>"]],
             'panels' => [
                 'pnlPkg'  => ['label'=>lang('ship_pkg_detail', $this->moduleID),'type'=>'datagrid','key'   =>'dgPkg','attr'=>['id'=>'pnlPkg']],
@@ -345,6 +345,7 @@ var hzProfiles = $hzJSON;
 function selHazmat(profile) { // show the hazmat panel and load the profile defaults, blank profile hides it (nothing is sent to the carrier)
     if (!profile) { jqBiz('#divHazmat').hide(); return; }
     jqBiz('#divHazmat').show();
+    jqBiz('#divHazmat .easyui-panel').panel('resize'); // panel was laid out while visible, recompute after the wrapper toggles
     var p = hzProfiles[profile];
     if (typeof p == 'undefined') { return; }
     var sel = ['regulation','option','bat_material','bat_packing','pack_group','qty_units'];
@@ -366,7 +367,7 @@ function preSubmit() {
     return true;
 }";
         $js['jsReady']['init'] = "ajaxForm('frmLabel'); if (bizGridExists('dgPkg')) { jqBiz('#dgPkg').edatagrid('addRow'); }"
-            . " if (jqBiz('#ship_hazmat').length && jqBiz('#ship_hazmat').val()) { selHazmat(jqBiz('#ship_hazmat').val()); }"; // SKU carried a hazmat profile, open the panel with its defaults
+            . " selHazmat(jqBiz('#ship_hazmat').length ? jqBiz('#ship_hazmat').val() : '');"; // hides the (already laid out) hazmat panel, or opens it with the SKU's profile defaults
         return $js;
     }
 
