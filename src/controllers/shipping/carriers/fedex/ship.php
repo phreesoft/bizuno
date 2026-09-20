@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (hazmat: DG paperwork on parcel labels, declaration recorded in the shipping log notes)
+ * @version    7.x Last Update: 2026-09-20 (FedEx errors trap the debug trace; label error message said rate)
  * @filesource /controllers/shipping/carriers/fedex/ship.php
  *
  */
@@ -86,8 +86,9 @@ class fedexShip extends fedexCommon
         msgDebug("\njson encoded payload = ".print_r(json_encode($payload), true));
         $resp   = $this->queryREST($this->is_freight?'ship/v1/freight/shipments':'ship/v1/shipments', $payload);
         if (!empty($resp['errors'])) {
+            msgDebug("\nFedEx ship request returned errors, trapping the trace (request and response are logged above by queryREST)", 'trap');
             foreach ($resp['errors'] as $error) {
-                $msg = "FedEx rate request error!<br />Code: {$error['code']}";
+                $msg = "FedEx label request error!<br />Code: {$error['code']}";
                 if (!empty($error['parameterList'])) {
                     foreach ($error['parameterList'] as $issue) { $msg .= "<br />Message: ".print_r($issue['value'], true); }
                 } else { $msg .= "<br />FedEx Message: {$error['message']}"; }

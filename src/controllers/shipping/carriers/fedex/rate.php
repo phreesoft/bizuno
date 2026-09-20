@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (hazmat rate requests: drop Ground Economy and limit carrierCodes to the carriers that take the goods)
+ * @version    7.x Last Update: 2026-09-20 (hazmat rate carrierCodes limit; FedEx errors trap the debug trace)
  * @filesource /controllers/shipping/carriers/fedex/rate.php
  *
  * FedEx Developer Rate:
@@ -81,6 +81,7 @@ class fedexRate extends fedexCommon
         $arrRates= [];
         $resp    = $this->queryREST($path, $request);
         if (!empty($resp['errors'])) {
+            msgDebug("\nFedEx rate request returned errors, trapping the trace (request and response are logged above by queryREST)", 'trap');
             foreach ($resp['errors'] as $error) {
                 msgAdd("Error! FedEx rate request <br />Code: {$error['code']}<br />Message: {$error['message']}");
             }
