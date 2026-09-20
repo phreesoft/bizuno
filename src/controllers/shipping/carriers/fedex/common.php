@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (hazmat: DG/battery package services, DG paperwork, freight hazmat line items, hazmat profiles, dg_* settings)
+ * @version    7.x Last Update: 2026-09-20 (DG detail: emergency phone falls back to the company phone, quantity falls back to the package weight; both are required by FedEx)
  * @filesource /controllers/shipping/carriers/fedex/common.php
  */
 
@@ -591,6 +591,11 @@ return '';
                 'batteryDetails'     => [['material'=>$hz['bat_material'], 'packing'=>$hz['bat_packing'], 'regulatorySubType'=>'IATA_SECTION_II']]];
             return;
         }
+        if (empty($hz['qty']) && !empty($box['weight']['value'])) { // FedEx requires a commodity quantity, the profile leaves it 0 so use the package weight (gross)
+            $hz['qty']      = $box['weight']['value'];
+            $hz['qty_units']= $box['weight']['units'];
+            $hz['qty_type'] = 'GROSS';
+        }
         $box['packageSpecialServices'] = [
             'specialServiceTypes' => ['DANGEROUS_GOODS'],
             'dangerousGoodsDetail'=> $this->dgDetail($hz)];
@@ -604,7 +609,11 @@ return '';
     private function dgDetail($hz)
     {
         $notEmpty = function($v) { return $v !== '' && $v !== [] && $v !== null; };
-        $qty  = ['amount'=>floatval($hz['qty']), 'units'=>$hz['qty_units'], 'quantityType'=>'NET'];
+        $qty  = ['amount'=>floatval($hz['qty']), 'units'=>$hz['qty_units'], 'quantityType'=>!empty($hz['qty_type']) ? $hz['qty_type'] : 'NET'];
+        if (empty($hz['phone'])) { // emergency contact is required on every DG request, fall back to the company phone from Bizuno settings
+            $hz['phone'] = preg_replace('/[^0-9]/', '', (string)getModuleCache('bizuno', 'settings', 'company', 'telephone1'));
+            if (empty($hz['phone'])) { msgAdd('No emergency contact phone for dangerous goods. Set it in the FedEx carrier settings (Dangerous Goods) or the company telephone in Bizuno settings.', 'caution'); }
+        }
         $desc = array_filter([
             'sequenceNumber'    => 1,
             'id'                => $hz['un_id'],
