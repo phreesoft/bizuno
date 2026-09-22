@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-09-22
  * @filesource /portal/controller.php
  */
 
@@ -305,8 +305,17 @@ class portalCtl
         }
         $this->initUserCache();
         $this->initBusinessCache();
-        $this->cacheValidate();
+        // Upgrade BEFORE the registry reload, never after. The registry rescans the
+        // controllers/<module>/<folder>/ directories and rewrites methods_<folder>
+        // from what it finds on disk (initMethodList), so any renamed method arrives
+        // as a brand new entry - no status, no saved settings - and the old entry is
+        // dropped from the meta entirely. An upgrade gate that migrates that meta
+        // (e.g. the 7.4.6 api funnel rename) then finds nothing left to migrate and
+        // silently no-ops. Running the gate first lets it rekey the stored meta while
+        // the old keys still exist; bizunoUpgrade() ends with bizCacheExpClear(), so
+        // the cacheValidate() below still reloads the registry in this same request.
         $this->validateVersion();
+        $this->cacheValidate();
         return true;
     }
 
