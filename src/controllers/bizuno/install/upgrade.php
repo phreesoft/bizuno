@@ -340,6 +340,14 @@ function bizunoUpgrade()
     }
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
+    // Persist the version to the configuration table NOW, not at end of request.
+    // setModuleCache() only touches the in-memory $bizunoMod, and getCodex() reloads
+    // the registry immediately after this returns: initRegistry() reassigns $bizunoMod
+    // from initSettings(), which rebuilds it by reading the configuration table, then
+    // writes that back. Anything held only in memory is discarded - including the new
+    // version - so the stored version never advances and EVERY request re-runs
+    // bizunoUpgrade() and replays its gates and their messages.
+    dbWriteCache();
     bizCacheExpClear(); // clear cache to force reload 
 }
 
