@@ -313,8 +313,11 @@ function bizunoUpgrade()
             if ($changed) { dbMetaSet($role['_rID'], 'bizuno_role', $role); }
         }
         $fMeta = dbMetaGet(0, 'methods_funnels');
-        if (!empty($fMeta)) {
-            $fIdx   = metaIdxClean($fMeta);
+        $fIdx  = metaIdxClean($fMeta);
+        // A 0 rID makes dbMetaSet() insert a SECOND methods_funnels row instead of
+        // updating, and dbMetaGet() starts returning a list once a key has more than
+        // one row - which breaks every getMetaMethod() caller. Skip rather than risk it.
+        if (!empty($fMeta) && !empty($fIdx)) {
             $resAdd = [];
             foreach ($funnelMap as $oldID => $newID) {
                 if (!empty($fMeta[$oldID])) { // old entry survived (registry never rescanned) - carry it forward intact
