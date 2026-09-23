@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-27
+ * @version    7.x Last Update: 2026-09-22
  * @filesource /controllers/bizuno/settings.php
  */
 
@@ -140,10 +140,11 @@ class bizunoSettings
         $html .= '  <tr><th>&nbsp;</th><th>'.lang('method').'</th><th>'.lang('description').'</th><th>'.lang('action')."</th></tr>\n </thead>\n <tbody>\n";
         $props = getMetaMethod($folder);
         msgDebug("\nRead meta from folder $folder: ".print_r($props, true));
+        $orphans = [];
         foreach ($props as $method => $settings) {
             $fqcn = "\\bizuno\\$method";
             bizAutoLoad("{$settings['path']}$method.php", $fqcn);
-            if (!class_exists($fqcn)) { msgAdd("ERROR - Looking for a class ($fqcn) but it is not where it should be! It will be deleted from the cache. See trace.", 'trap'); continue; }
+            if (!class_exists($fqcn)) { $orphans[$method] = !empty($settings['path']) ? $settings['path'] : '?'; continue; }
             if (empty($settings['settings'])) { $settings['settings'] = []; }
             $clsMeth = new $fqcn($settings['settings']);
             if (!empty($clsMeth->hidden) || !empty($clsMeth->devStatus)) { continue; }
@@ -179,8 +180,43 @@ class bizunoSettings
             $html .= "  </tr>\n".'<tr><td colspan="5"><hr /></td></tr>'."\n";
         }
         $html .= " </tbody>\n</table>\n";
+        $this->methodPurgeOrphans($folder, $orphans);
         $data  = ['type'=>'divHTML', 'divs'=>['body'=>['order'=>50, 'type'=>'html', 'html'=>$html]]];
         $layout= array_replace_recursive($layout, $data);
+    }
+
+    /**
+     * Drops meta entries whose class file is no longer on disk. This used to just
+     * raise "it will be deleted from the cache" and then continue, so the dead rows
+     * came back on every visit - most visibly the pre-7.4.6 "if"-prefixed api funnels
+     * (ifAmazon, ifWooCommerce, ...) which the rename left behind on installs where
+     * the registry never rewrote methods_funnels. The registry drops orphans on a
+     * cache reload (initMethodList rebuilds from a disk scan), so removing them here
+     * is the same cleanup, just applied when the admin is looking at the page.
+     * @param string $folder - method folder id, e.g. 'funnels'
+     * @param array $orphans - [method id => stored path] of entries that would not load
+     */
+    private function methodPurgeOrphans($folder, $orphans=[])
+    {
+        if (empty($orphans)) { return; }
+        $meta = dbMetaGet(0, "methods_{$folder}");
+        $mIdx = metaIdxClean($meta);
+        // rID 0 would make dbMetaSet() INSERT a second methods_<folder> row rather than
+        // update, and dbMetaGet() hands back a list once a key has more than one row.
+        // Better to leave the orphan showing than to corrupt the meta.
+        if (empty($mIdx)) { return msgAdd("Cannot locate the methods_{$folder} meta record to clean up: ".implode(', ', array_keys($orphans)), 'caution'); }
+        $killed = [];
+        foreach ($orphans as $method => $path) {
+            if (!isset($meta[$method])) { continue; }
+            unset($meta[$method]);
+            $killed[] = $method;
+            msgDebug("\nRemoved orphaned method $method from methods_{$folder}, its class was not found at $path");
+        }
+        if (empty($killed)) { return; }
+        dbMetaSet($mIdx, "methods_{$folder}", $meta);
+        unset($GLOBALS["methods_{$folder}"]); // getMetaMethod() caches per request
+        msgAdd("Removed ".sizeof($killed)." obsolete ".lang($folder)." entries whose program files no longer exist: "
+            .implode(', ', $killed).". Any settings they held are gone with them.", 'caution');
     }
 
     /**
