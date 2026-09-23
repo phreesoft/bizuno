@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-20 (added 7.4.8 gate: inventory.hazmat_profile)
+ * @version    7.x Last Update: 2026-09-22 (added 7.4.9 gate to repair installs where the registry reload beat the 7.4.6 funnel-rename gate and blanked each funnel's status/settings)
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -282,8 +282,75 @@ function bizunoUpgrade()
             dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory` ADD `hazmat_profile` VARCHAR(24) NOT NULL DEFAULT '' COMMENT 'type:select;tag:HazmatProfile;order:62' AFTER `lead_time`");
         }
     }
+    if (version_compare($dbVer, '7.4.9') < 0) {
+        // Repair for installs that were clobbered by the 7.4.6 api funnel rename.
+        // getCodex() used to reload the registry BEFORE running the upgrade gates, so
+        // on the first hit after the new code landed, initMethodList() rescanned the
+        // renamed folders and rewrote methods_funnels from disk: each funnel came back
+        // under its new id with no 'status' and no 'settings', and the old "if"-prefixed
+        // entry was dropped. The 7.4.6 gate then had nothing left to rekey and no-opped,
+        // so the funnel looked uninstalled - apiAdmin skips channels with an empty
+        // status, which drops them from the Roles editor and from the Customers menu.
+        // The role ACL half of that gate did run, so each role still carries its grant
+        // under the NEW funnel id. Use that as the evidence of what was enabled and
+        // restore the status flag. Saved credentials cannot be recovered - they were
+        // overwritten - so tell the admin which channels need re-entering.
+        $funnelMap = ['ifAmazon'=>'amazon', 'ifBigCom'=>'bigCom', 'ifGoogle'=>'google',
+            'ifStripe'=>'stripe', 'ifWalmart'=>'walmart', 'ifWooCommerce'=>'wooCommerce'];
+        $roles = dbMetaGet('%', 'bizuno_role');
+        $granted = []; // funnel ids that at least one role has access to
+        foreach ($roles as $role) {
+            if (empty($role['security']) || !is_array($role['security'])) { continue; }
+            $changed = false;
+            foreach ($funnelMap as $oldID => $newID) { // idempotent - only fires if 7.4.6 never rekeyed this role
+                if (isset($role['security'][$oldID])) {
+                    $role['security'][$newID] = $role['security'][$oldID];
+                    unset($role['security'][$oldID]);
+                    $changed = true;
+                }
+                if (!empty($role['security'][$newID])) { $granted[$newID] = true; }
+            }
+            if ($changed) { dbMetaSet($role['_rID'], 'bizuno_role', $role); }
+        }
+        $fMeta = dbMetaGet(0, 'methods_funnels');
+        $fIdx  = metaIdxClean($fMeta);
+        // A 0 rID makes dbMetaSet() insert a SECOND methods_funnels row instead of
+        // updating, and dbMetaGet() starts returning a list once a key has more than
+        // one row - which breaks every getMetaMethod() caller. Skip rather than risk it.
+        if (!empty($fMeta) && !empty($fIdx)) {
+            $resAdd = [];
+            foreach ($funnelMap as $oldID => $newID) {
+                if (!empty($fMeta[$oldID])) { // old entry survived (registry never rescanned) - carry it forward intact
+                    $fMeta[$newID] = array_replace($fMeta[$oldID], ['id'=>$newID,
+                        'path'=> !empty($fMeta[$oldID]['path']) ? str_replace("/$oldID/", "/$newID/", $fMeta[$oldID]['path']) : '',
+                        'url' => !empty($fMeta[$oldID]['url'])  ? str_replace("/$oldID/", "/$newID/", $fMeta[$oldID]['url'])  : '']);
+                    unset($fMeta[$oldID]);
+                }
+                if (!isset($fMeta[$newID]) || !empty($fMeta[$newID]['status'])) { continue; }
+                if (empty($granted[$newID])) { continue; } // no role ever had it - genuinely not installed, leave alone
+                $fMeta[$newID]['status'] = 1;
+                if (empty($fMeta[$newID]['settings'])) {
+                    $fMeta[$newID]['settings'] = [];
+                    $resAdd[] = !empty($fMeta[$newID]['title']) ? $fMeta[$newID]['title'] : $newID;
+                }
+            }
+            dbMetaSet($fIdx, 'methods_funnels', $fMeta);
+            if (!empty($resAdd)) {
+                msgAdd("The following API channels were re-enabled after the funnel rename: ".implode(', ', $resAdd)
+                    ." - their saved connection settings were lost and must be re-entered at Settings -> API -> Funnels.", 'caution');
+            }
+        }
+    }
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
+    // Persist the version to the configuration table NOW, not at end of request.
+    // setModuleCache() only touches the in-memory $bizunoMod, and getCodex() reloads
+    // the registry immediately after this returns: initRegistry() reassigns $bizunoMod
+    // from initSettings(), which rebuilds it by reading the configuration table, then
+    // writes that back. Anything held only in memory is discarded - including the new
+    // version - so the stored version never advances and EVERY request re-runs
+    // bizunoUpgrade() and replays its gates and their messages.
+    dbWriteCache();
     bizCacheExpClear(); // clear cache to force reload 
 }
 
