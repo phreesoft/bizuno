@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-19 (price tiers carry the sell unit label and weight so the store can name them)
+ * @version    7.x Last Update: 2026-09-24
  * @filesource /controllers/api/funnels/wooCommerce/wooCommerce.php
  */
 
@@ -89,9 +89,9 @@ class wooCommerce extends apiExport
             'btnInv'    => ['order'=>80,'events'=>['onClick'=>"bulkUpload();"],             'attr'=>['type'=>'button',  'value'=>lang('go')]],
             'btnQkInv'  => ['order'=>10,'events'=>['onClick'=>"jqBiz('#btnQkInv').hide(); jsonAction('$this->moduleID/admin/invRefresh&modID=$this->code');"],'attr'=>['type'=>'button','value'=>$this->lang['inventory_refresh']]],
             'selSync'   => ['order'=>10,'break' =>true,'label'=>lang('sync_delete', $this->moduleID), 'attr'=>['type'=>'checkbox','value'=>1]],
-            'btnSync'   => ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartSync&modID=$this->code&syncDelete='+bizCheckBoxGet('selSync'));"],  'attr'=>['type'=>'button','value'=>lang('go')]],
+            'btnSync'   => ['order'=>80,'events'=>['onClick'=>"wooWait('$this->moduleID/admin/cartSync&modID=$this->code&syncDelete='+bizCheckBoxGet('selSync'), 'Synchronizing products with the store...');"],  'attr'=>['type'=>'button','value'=>lang('go')]],
             'calConfirm'=> ['order'=>10,'break' =>true,'label'=>lang('status_date', $this->moduleID), 'attr'=>['type'=>'date',    'value'=>biz_date('Y-m-d')]],
-            'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val());"],'attr'=>['type'=>'button','value'=>lang('confirm')]]];
+            'btnConfirm'=> ['order'=>80,'events'=>['onClick'=>"wooWait('$this->moduleID/admin/cartConfirm&modID=$this->code&dateShip='+jqBiz('#calConfirm').val(), 'Sending shipment confirmations to the store...');"],'attr'=>['type'=>'button','value'=>lang('confirm')]]];
         $data = ['title'=>$this->lang['title'],
             'divs'   => ['divIfWC'=>['classes'=>['areaView'],'type'=>'divs','divs'=>[
                 'head'   => ['order'=> 1,'type'=>'fields','keys'=>['imgLogo']],
@@ -134,7 +134,13 @@ class wooCommerce extends apiExport
      */
     private function getViewJS()
     {
-        return "var skuList = new Array();
+        return "function wooWait(route, msg) { // single long store request, show a busy dialog until the store answers
+    jqBiz.messager.progress({title:bizLangJS('PLEASE_WAIT'), msg:msg, interval:300});
+    jqBiz.ajax({ url:bizunoAjax+'&bizRt='+route,
+        success: function(json) { jqBiz.messager.progress('close'); processJson(json); },
+        error:   function()     { jqBiz.messager.progress('close'); } });
+}
+var skuList = new Array();
 var cnt     = 0;
 var cntTotal= 0;
 var cntCur  = 0;
@@ -183,10 +189,10 @@ function productUpload(rID) {
      * This method uploads a single inventory item to WooCommerce
      * @see apiImport::apiInventory()
      */
-    public function productToStore($invID=0)
+    public function productToStore(&$layout=[], $invID=0)
     {
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/functions.php', 'availableQty', 'function');
-        $rID    = !empty($invID) ? $invID : clean('rID', 'integer', 'get');
+        $rID    = !empty($invID) ? (int)$invID : clean('rID', 'integer', 'get');
         msgDebug("\nEntering productToStore with invID = $rID");
         if (empty($rID)) { return msgAdd('bad inventory ID passed!'); }
         $struc  = dbLoadStructure(BIZUNO_DB_PREFIX.'inventory'); // map array to table
@@ -194,6 +200,10 @@ function productUpload(rID) {
         $product= [];
         foreach ($result as $key => $value) { $product[$struc[$key]['tag']] = $value; }
         $product[$struc['qty_stock']['tag']] = availableQty($result); // adjust out so's and allocations.
+        // The store reads these by fixed names, the column tags differ between installs (woocommerceSlug vs WooCommerceSlug)
+        foreach (['category'=>'WooCommerceCategory', 'tags'=>'WooCommerceTags', 'slug'=>'WooCommerceSlug'] as $sfx => $tag) {
+            if (isset($result["{$this->metaPrefix}_$sfx"])) { $product[$tag] = $result["{$this->metaPrefix}_$sfx"]; }
+        }
         $product['SEO_URL']  = clean($result['description_short'], 'alpha_num'); // set the permalink url
         $product['sendMode'] = clean('optUpload','integer','get');
         $product['skuFilter']= clean('fltr',     'cmd',    'get');
@@ -313,7 +323,7 @@ function productUpload(rID) {
         $args = ['data'=>$data, 'class'=>'api_product', 'method'=>'productRefresh', // local
             'type'=>'put', 'endpoint'=>'product/refresh']; // RESTful
         $resp = $this->apiAction($args);
-        $cron['acted'] += $resp['acted'];
+        $cron['acted'] += !empty($resp['acted']) ? (int)$resp['acted'] : 0;
         msgDebug("\nresp = ".print_r($resp, true));
         if (sizeof($cron['rows']) == 0) {
             msgLog("Completed {$cron['total']} inventory items.)");
@@ -396,9 +406,9 @@ function productUpload(rID) {
     public function cartSync(&$layout=[])
     {
         msgDebug("\nWorking in cartSync with settings = ".print_r($this->settings, true));
-        $layout = ['data'=>['syncTag'=>'woocommerce_sync']];
-        compose('api', 'export', 'apiSync', $layout);
-        $args = ['data'=>$layout['data'], 'class'=>'api_product', 'method'=>'productSync', // local
+        $sync = ['data'=>['syncTag'=>'woocommerce_sync']]; // own array, don't clobber the response layout
+        compose('api', 'export', 'apiSync', $sync);
+        $args = ['data'=>$sync['data'], 'class'=>'api_product', 'method'=>'productSync', // local
             'type'=>'post', 'endpoint'=>'product/sync']; // RESTful
         $this->apiAction($args);
     }
@@ -413,18 +423,22 @@ function productUpload(rID) {
         $output  = ['head'=>[], 'body'=>[]];
         $shipDate= clean('dateShip', 'date', 'get');
         msgDebug("\nEntering cartConfirm with ship_date = $shipDate and settings = ".print_r($this->settings, true));
-        $stmt    = dbGetResult("SELECT journal_main.id, journal_meta.id, invoice_num, method_code, purch_order_id, meta_value
-            FROM ".BIZUNO_DB_PREFIX."journal_main JOIN journal_meta ON journal_main.id=journal_meta.ref_id 
-            WHERE meta_key='shipment' AND post_date='$shipDate'");
+        // Shipments are filtered by the label ship date (meta), not the invoice post date, and only those tied to a sale with an order number
+        $stmt    = dbGetResult("SELECT m.purch_order_id, x.meta_value FROM ".BIZUNO_DB_PREFIX."journal_main m
+            JOIN ".BIZUNO_DB_PREFIX."journal_meta x ON m.id=x.ref_id
+            WHERE x.meta_key='shipment' AND m.journal_id IN (12,13) AND m.purch_order_id<>'' AND x.meta_value LIKE '%\"ship_date\":\"$shipDate%'");
         $rows    = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         foreach ($rows as $row) {
             $meta = json_decode($row['meta_value'], true);
-            $meth = getCarrierText($row['method_code']);
-            $output['head'][$row['purch_order_id']] = 'Shipped '.viewFormat(substr($meta['ship_date'], 0, 10), 'date')." via $meth, tracking number(s):";
+            if (empty($meta['ship_date']) || substr($meta['ship_date'], 0, 10) <> $shipDate) { continue; }
+            $meth = getCarrierText(!empty($meta['method_code']) ? $meta['method_code'] : '');
             $trackNum = [];
-            foreach ((array)$meta['packages']['rows'] as $pkg) { $trackNum[] = $pkg['tracking_id']; }
-            $output['body'][$row['purch_order_id']] = implode(', ', $trackNum);
-        } 
+            foreach ((array)($meta['packages']['rows'] ?? []) as $pkg) { if (!empty($pkg['tracking_id'])) { $trackNum[] = $pkg['tracking_id']; } }
+            $poID = $row['purch_order_id'];
+            $output['head'][$poID] = 'Shipped '.viewFormat(substr($meta['ship_date'], 0, 10), 'date')." via $meth, tracking number(s):";
+            $output['body'][$poID] = !empty($output['body'][$poID]) ? $output['body'][$poID].', '.implode(', ', $trackNum) : implode(', ', $trackNum);
+        }
+        if (empty($output['head'])) { return msgAdd("No shipments were found with a ship date of ".viewFormat($shipDate, 'date'), 'info'); }
         msgDebug("\nReady to send cart confirmation with output = ".print_r($output, true));
         $args = ['data'=>$output, 'class'=>'api_order', 'method'=>'shipConfirm', // local
             'type'=>'post', 'endpoint'=>'order/confirm']; // RESTful
@@ -440,9 +454,13 @@ function productUpload(rID) {
     public function apiAction($args=[])
     {
         global $io;
+        if (empty($this->settings['rest_url'])) { return msgAdd("The WooCommerce store URL has not been set! Go to Settings -> API -> Funnels -> WooCommerce."); }
         $io->restHeaders = ['email'=>$this->settings['rest_user'], 'pass'=>$this->settings['rest_pass']];
-        $resp = $io->restRequest($args['type'], $this->settings['rest_url'], "wp-json/bizuno-api/v1/{$args['endpoint']}", ['data'=>$args['data']]);
+        // Send as a JSON body, a form encoded body is cut off by the store's PHP max_input_vars (default 1000), e.g. 100 refresh rows with price tiers
+        $body = json_encode(['data'=>$args['data']], JSON_INVALID_UTF8_SUBSTITUTE|JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $resp = $io->restRequest($args['type'], rtrim($this->settings['rest_url'], '/'), "wp-json/bizuno-api/v1/{$args['endpoint']}", $body, ['headers'=>['Content-Type'=>'application/json']]);
         msgDebug("\napiAction received back from REST: ".print_r($resp, true));
+        if (!is_array($resp)) { return []; }
         if (isset($resp['message'])) {
             if (is_string($resp['message'])) {
                 // Skip empty/whitespace-only strings. The WC product/refresh endpoint can
@@ -461,33 +479,31 @@ function productUpload(rID) {
     }
     public function install()
     {
-        $lbl = sprintf($this->lang['cart_sync'],$this->lang['acronym']);
-        $cat = sprintf($this->lang['cart_cat'], $this->lang['acronym']);
-        $tag = sprintf($this->lang['cart_tags'],$this->lang['acronym']);
-        $slug= sprintf($this->lang['cart_slug'],$this->lang['acronym']);
+        $lbl = sprintf(lang('cart_sync', $this->moduleID),$this->lang['acronym']);
+        $cat = sprintf(lang('cart_cat',  $this->moduleID),$this->lang['acronym']);
+        $tag = sprintf(lang('cart_tags', $this->moduleID),$this->lang['acronym']);
+        $slug= sprintf(lang('cart_slug', $this->moduleID),$this->lang['acronym']);
         $id  = validateTab('inventory', lang('estore'), 90);
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_sync")) {
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_sync ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;label:$lbl;tag:{$this->metaPrefix}Sync;tab:$id;order:25;group:{$this->metaPrefix}'");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_sync ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;label:$lbl;tag:WooCommerceSync;tab:$id;order:25;group:WooCommerce'");
         }
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_category")) {
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_category VARCHAR(255) DEFAULT NULL COMMENT 'label:$cat;tag:{$this->metaPrefix}Category;tab:$id;order:26;group:{$this->metaPrefix}'");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_category VARCHAR(255) DEFAULT NULL COMMENT 'label:$cat;tag:WooCommerceCategory;tab:$id;order:26;group:WooCommerce'");
         }
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_tags")) {
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_tags VARCHAR(255) DEFAULT NULL COMMENT 'label:$tag;tag:{$this->metaPrefix}Tags;tab:$id;order:27;group:{$this->metaPrefix}'");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_tags VARCHAR(255) DEFAULT NULL COMMENT 'label:$tag;tag:WooCommerceTags;tab:$id;order:27;group:WooCommerce'");
         }
         if (!dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_slug")) {
-            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_slug VARCHAR(128) DEFAULT NULL COMMENT 'label:$slug;tag:{$this->metaPrefix}Slug;tab:$id;order:28;group:{$this->metaPrefix}'");
+            dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory ADD {$this->metaPrefix}_slug VARCHAR(128) DEFAULT NULL COMMENT 'label:$slug;tag:WooCommerceSlug;tab:$id;order:28;group:WooCommerce'");
         }
         parent::installStoreFields();
         return true;
     }
     public function remove()
     {
-        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_sync"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_sync"); }
-        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_category")) { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_category"); }
-        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_tags"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_tags"); }
-        if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', "{$this->metaPrefix}_slug"))     { dbGetResult("ALTER TABLE ".BIZUNO_DB_PREFIX."inventory DROP {$this->metaPrefix}_slug"); }
-//        parent::removeStoreFields();
+        // Leave the woocommerce_* columns and their data in place. Removing the funnel (or a stale duplicate such as the
+        // pre-7.4.6 ifWooCommerce left on disk) used to DROP them, wiping every item's store flag, category and slug.
+        // Re-installing re-uses the existing columns. Drop them by hand if they really are no longer wanted.
         return true;
     }
 }

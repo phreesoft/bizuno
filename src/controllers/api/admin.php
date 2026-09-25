@@ -23,7 +23,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-09-25
  * @filesource /controllers/api/admin.php
  */
 
@@ -46,7 +46,9 @@ class apiAdmin extends apiCommon
         $this->structure= [
             'dirMethods'=> ['funnels'],
             'hooks'     => [
-                'inventory' =>['main'=>['manager'=>['order'=>80,'method'=>'invManager']]],
+                'inventory' =>['main'=>[
+                    'manager'    =>['order'=>80,'method'=>'invManager'],
+                    'managerRows'=>['order'=>80,'method'=>'invManager']]], // rows need the sync column too or the action icon never shows
                 'phreebooks'=>['main'=>['edit'   =>['order'=>80,'method'=>'pbEdit']]]]];
         $order = 60;
         $props = getMetaMethod($this->methodDir);
@@ -160,8 +162,8 @@ class apiAdmin extends apiCommon
     {
         $chan = $this->getMethod();
         $security = getUserCache('role', 'security');
-        $security['prices_c'] = 1;
-        $security['inv_mgr'] = 1;
+        $security['prices_c'] = max(1, (int)($security['prices_c'] ?? 0)); // raise only, a higher role level must survive for the funnel's own checks
+        $security['inv_mgr']  = max(1, (int)($security['inv_mgr']  ?? 0));
         setUserCache('role', 'security', $security);
         $chan->inventoryGo($layout);
     }
@@ -170,8 +172,8 @@ class apiAdmin extends apiCommon
     {
         $chan = $this->getMethod();
         $security = getUserCache('role', 'security');
-        $security['prices_c'] = 1;
-        $security['inv_mgr'] = 1;
+        $security['prices_c'] = max(1, (int)($security['prices_c'] ?? 0)); // raise only, a higher role level must survive for the funnel's own checks
+        $security['inv_mgr']  = max(1, (int)($security['inv_mgr']  ?? 0));
         setUserCache('role', 'security', $security);
         $chan->inventoryNew($layout);
     }
@@ -256,10 +258,13 @@ class apiAdmin extends apiCommon
      */
     public function invManager(&$layout=[])
     {
-
-        // foreach enabled module, see if they have to add anything to the edit screen
+        // Only when the WooCommerce funnel is enabled and its sync flag field is installed, else the grid SQL would fail on a missing column
+        $props = getMetaMethod($this->methodDir, 'wooCommerce');
+        if (empty($props['status']) || !dbFieldExists(BIZUNO_DB_PREFIX.'inventory', 'woocommerce_sync')) { return; }
+        if (!isset($layout['datagrid']['manager']['columns'])) { return; }
+        // Called for both manager (builds the action formatter) and managerRows (row data), both need the hidden sync column
         $layout['datagrid']['manager']['columns']['woocommerce_sync'] = ['order'=>0,'field'=>'woocommerce_sync','attr'=>['hidden'=>true]];
-        $layout['datagrid']['manager']['columns']['action']['actions']['woocommerce'] = ['icon'=>'wooCommerce','label'=>'Upload to WooComerce','size'=>'small','order'=>90,
+        $layout['datagrid']['manager']['columns']['action']['actions']['woocommerce'] = ['icon'=>'wooCommerce','label'=>'Upload to WooCommerce','size'=>'small','order'=>90,
             'display'=>"row.woocommerce_sync=='1'",'events'=>['onClick'=>"jsonAction('$this->moduleID/admin/productToStore&modID=wooCommerce', idTBD);"]];
     }
 

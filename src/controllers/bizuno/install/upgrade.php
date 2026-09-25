@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-09-22 (added 7.4.9 gate to repair installs where the registry reload beat the 7.4.6 funnel-rename gate and blanked each funnel's status/settings)
+ * @version    7.x Last Update: 2026-09-24
  * @filesource /controllers/bizuno/install/upgrade.php
  */
 
@@ -338,6 +338,33 @@ function bizunoUpgrade()
             if (!empty($resAdd)) {
                 msgAdd("The following API channels were re-enabled after the funnel rename: ".implode(', ', $resAdd)
                     ." - their saved connection settings were lost and must be re-entered at Settings -> API -> Funnels.", 'caution');
+            }
+        }
+    }
+    if (version_compare($dbVer, '7.5.1') < 0) {
+        // Restore the WooCommerce inventory fields. Where the pre-7.4.6 ifWooCommerce folder survived an upload next to the
+        // renamed wooCommerce funnel, removing the "duplicate" ran its remove() which DROPPED woocommerce_sync/_category/_tags/_slug.
+        // The funnel is still enabled but the upload icon, bulk tools and feeds that read those columns all break.
+        // Only the columns come back here, the values are gone and must be restored from a backup.
+        unset($GLOBALS['methods_funnels']); // the 7.4.9 gate may have just rewritten it this request
+        $wooMeth = getMetaMethod('funnels', 'wooCommerce');
+        if (!empty($wooMeth['status'])) {
+            $tabID  = validateTab('inventory', lang('estore'), 90);
+            $wooCols= [
+                'woocommerce_sync'    => "ENUM('0','1') NOT NULL DEFAULT '0' COMMENT 'type:checkbox;label:WooCommerce Product;tag:WooCommerceSync;tab:$tabID;order:25;group:WooCommerce'",
+                'woocommerce_category'=> "VARCHAR(255) DEFAULT NULL COMMENT 'label:WooCommerce Category Path;tag:WooCommerceCategory;tab:$tabID;order:26;group:WooCommerce'",
+                'woocommerce_tags'    => "VARCHAR(255) DEFAULT NULL COMMENT 'label:WooCommerce Tags;tag:WooCommerceTags;tab:$tabID;order:27;group:WooCommerce'",
+                'woocommerce_slug'    => "VARCHAR(128) DEFAULT NULL COMMENT 'label:WooCommerce Slug;tag:WooCommerceSlug;tab:$tabID;order:28;group:WooCommerce'"];
+            $wooAdd = [];
+            foreach ($wooCols as $field => $def) {
+                if (dbFieldExists(BIZUNO_DB_PREFIX.'inventory', $field)) { continue; }
+                dbGetResult("ALTER TABLE `".BIZUNO_DB_PREFIX."inventory` ADD `$field` $def");
+                $wooAdd[] = $field;
+            }
+            if (!empty($wooAdd)) {
+                msgLog("Upgrade 7.5.1: re-created missing WooCommerce inventory fields: ".implode(', ', $wooAdd));
+                msgAdd("The WooCommerce inventory fields (".implode(', ', $wooAdd).") were missing and have been re-created on the e-Store tab."
+                    ." Their previous values could not be recovered - restore them from a backup or re-flag the items to list on the store.", 'caution');
             }
         }
     }
