@@ -143,14 +143,35 @@ class portalCtl
         $guest = new portalViewAuth(); // Fall through to login screen
         $guest->login($this->layout);
     }
+    /**
+     * SECURITY: inside WordPress the install / migrate screens are reachable
+     * by anonymous visitors (front-end /bizuno page and nopriv AJAX) from the
+     * moment the plugin is activated until an admin completes setup. Whoever
+     * submits the form first becomes the Bizuno administrator. Restrict those
+     * screens to logged-in WordPress administrators. Standalone installs have
+     * no host auth to defer to and keep the original behaviour.
+     * @return bool true if the request may proceed
+     */
+    private function hostAllowsSetup()
+    {
+        if (!defined('ABSPATH') || !function_exists('current_user_can')) { return true; } // not running under WordPress
+        if (function_exists('is_user_logged_in') && is_user_logged_in() && current_user_can('manage_options')) { return true; }
+        msgDebug("\nInstall/migrate requested by a non-administrator, refusing.");
+        $login = function_exists('wp_login_url') ? wp_login_url(BIZUNO_URL_PORTAL) : BIZUNO_URL_PORTAL;
+        $this->layout = ['type'=>'raw', 'content'=>'<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bizuno</title></head><body style="font-family:Arial,Helvetica,sans-serif;text-align:center;padding-top:90px;">'
+            . '<h2>Bizuno has not been set up yet</h2><p>A WordPress administrator must <a href="'.htmlspecialchars($login, ENT_QUOTES).'">sign in</a> to complete the installation.</p></body></html>'];
+        return false;
+    }
     private function goInstall()
     {
+        if (!$this->hostAllowsSetup()) { return; }
         require(BIZUNO_FS_LIBRARY . 'portal/viewMaint.php');
         $view = new portalViewMaint();
         $view->install($this->layout);
     }
     private function goMigrate()
     {
+        if (!$this->hostAllowsSetup()) { return; }
         require(BIZUNO_FS_LIBRARY . 'portal/viewMaint.php');
         $view = new portalViewMaint();
         $view->migrate($this->layout);
@@ -411,8 +432,11 @@ class portalCtl
         $dbVer = getModuleCache('bizuno', 'properties', 'version');
         msgDebug("\nValidating installed Bizuno version ".MODULE_BIZUNO_VERSION." to db version: $dbVer");
         if (empty(getUserCache('business', 'bizID')) || empty(getUserCache('profile', 'email'))) { $this->cacheReload('guest'); return; } // not logged in
-        if (version_compare($dbVer, MODULE_BIZUNO_VERSION) < 0) {
-            msgDebug("\nDB is downlevel, upgrading!");
+        // != rather than <: a database stamped by a pre-release build (e.g. 7.5.1) running
+        // the released code (e.g. 7.4.6) is re-stamped, and its gates are carried into
+        // schema_version so none of them re-run when the release number passes them.
+        if (version_compare($dbVer, MODULE_BIZUNO_VERSION) != 0) {
+            msgDebug("\nDB version differs from code, running upgrade.");
             bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/upgrade.php');
             bizunoUpgrade();
         }

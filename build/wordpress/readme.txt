@@ -1,5 +1,5 @@
 === Bizuno Accounting – ERP/Accounting/CRM (for WordPress) ===
-Stable tag: 7.4.5
+Stable tag: 7.4.6
 Contributors: phreesoft
 Donate link: https://www.bizuno.com/donate/
 Tags: erp, accounting, bookkeeping, inventory, crm, woocommerce, double-entry, invoicing, purchase-orders, sales-tax, shipping, multi-store
@@ -83,6 +83,12 @@ WordPress's standard update channel. New versions are published to the WordPress
 9. Dashboard Widget Gallery
 
 == Changelog ==
+
+= 7.4.6 =
+* Security: **Unauthenticated account takeover via lost-password flow** — the password-reset link could be shown on the sign-in page instead of only being emailed, letting a visitor who knew a user's email reset that user's password. The link is now only ever sent by email, the response no longer reveals whether an address belongs to a user, and reset tokens are stored hashed. All users should update.
+* Security: **SQL injection in inventory lookups** — an inventory SKU passed in a request was not escaped before being used in a database query. It is now escaped, and the lookup checks inventory permissions first.
+* Security: **Missing permission check on journal notes** — saving a note on a journal entry now requires manager rights to that journal.
+* Security: **Install wizard reachable by anonymous visitors** — between activation and first setup, any visitor could complete the Bizuno installer and become its administrator. The install and migrate screens now require a logged-in WordPress administrator.
 
 = 7.4.5 =
 * Fix: **Shared-host "Database connection failed" (MySQL error 1203)** — the plugin opened a MySQL connection on *every* WordPress request (storefront page views, unrelated AJAX) and double-connected on Bizuno AJAX. On hosts with a low `max_user_connections` cap this exhausted the pool and could take the whole site down. The connection is now opened lazily — only when Bizuno actually handles the request.

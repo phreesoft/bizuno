@@ -37,6 +37,8 @@ class portalViewMaint
     private $bizKey;
     private $bizKeyGenerated = false; // memoization flag: ensures setConstant('BIZUNO_KEY') generates ONE random value per request even if the caller invokes it multiple times (e.g., the install loop iterating over multiple lines that mention the constant)
     private $dbCreds = [];
+    private $resetTTL      = 900; // seconds a password reset link stays valid
+    private $resetThrottle = 120; // minimum seconds between reset emails for one account
 
     function __construct()
     {
@@ -79,81 +81,57 @@ class portalViewMaint
             'forms' => ['frmLost'=>['attr'=>['type'=>'form','method'=>'post']]]];
     }
 
+    /**
+     * Handles a lost-password request from the public (unauthenticated) API.
+     *
+     * SECURITY: the reset secret is delivered by email ONLY. It must never be
+     * placed in the HTTP response, whatever the state of the mail transport -
+     * this endpoint is reachable by anyone, so anything rendered here is
+     * handed to the requester, who has not proven they own the mailbox.
+     * The response is also identical whether or not the address belongs to a
+     * user and whether or not the send worked, so it cannot be used to
+     * enumerate accounts. An administrator locked out because mail is broken
+     * resets from the shell: php bin/reset-bizuno-password.php <email> <pass>
+     */
     private function validateReset()
     {
         global $db;
         msgDebug("\nEntering validateReset.");
-        $userID = preg_replace("/[^a-zA-Z0-9\-\_\.\@]/", '', $_POST['bizUser']); // email address
-        if (!empty($userID) && $db->connected) { // if connected to the db, then find user
-            $cID = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$userID'");
-            if (!empty($cID)) {
-                // Always generate and store the token. Whether we email it or
-                // display it inline depends on the site's mail config.
-                $code  = format_uuidv4();
-                $exp   = strtotime('+15 minutes', time());
-                $exists= dbMetaGet(0, 'user_reset', 'contacts', $cID);
-                msgDebug("\nExists = ".print_r($exists, true));
-                $rID = metaIdxClean($exists);
-                dbMetaSet($rID, 'user_reset', "$exp:$code", 'contacts', $cID);
-                // Decide between three paths:
-                //   1. Mail not configured at all → render link inline
-                //      (fresh install, no SMTP set up yet).
-                //   2. Mail configured but send fails → render link
-                //      inline (post-restore BIZUNO_KEY mismatch garbles
-                //      the encrypted SMTP creds; postfix not installed;
-                //      etc.). Trade-off: this re-opens a side channel
-                //      where an attacker could trigger SMTP failures to
-                //      harvest reset links. The alternative is admins
-                //      permanently locked out after a cross-server
-                //      restore, which is strictly worse. Mitigated by
-                //      the existing 15-minute token TTL + single-use
-                //      semantics in validateAuth().
-                //   3. Mail configured and send returns truthy → show
-                //      the standard "check your email" message; never
-                //      reveal the link.
-                $resetUrl = BIZUNO_URL_PORTAL."?bizRt=portal/api/lostVal&userID=$cID&userCode=$code";
-                $safeUrl  = htmlspecialchars($resetUrl, ENT_QUOTES);
-                $renderInline = function ($titleKey) use ($safeUrl) {
-                    $this->errors = '<strong>'.$this->lang[$titleKey].'</strong><br>'
-                                  . $this->lang['msg_reset_link_inline_body'].'<br><br>'
-                                  . '<a href="'.$safeUrl.'">'.$safeUrl.'</a>';
-                };
-                if (!$this->isMailConfigured()) {
-                    $renderInline('msg_reset_link_inline_title');
-                    return;
-                }
-                if (!$this->sendResetEmail($cID, $code)) {
-                    msgLog("Lost-password mail send returned falsy for user $cID — falling back to inline link.");
-                    $renderInline('msg_reset_link_failed_title');
-                    return;
-                }
-                $this->errors = $this->lang['msg_reset_email_sent'];
-                return;
-            }
+        $this->errors = $this->lang['msg_reset_email_sent']; // same answer on every path
+        $userID = preg_replace("/[^a-zA-Z0-9\-\_\.\@]/", '', isset($_POST['bizUser']) && is_string($_POST['bizUser']) ? $_POST['bizUser'] : ''); // email address
+        if (empty($userID) || !$db->connected) { return; }
+        $cID = intval(dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'id', "ctype_u='1' AND email='$userID'"));
+        if (empty($cID)) { return; }
+        $exists= dbMetaGet(0, 'user_reset', 'contacts', $cID);
+        $rID   = metaIdxClean($exists);
+        // Throttle: one reset email per account per window, stops the form being used to mail-bomb a user
+        $prior = !empty($exists['value']) ? intval(explode(':', $exists['value'], 2)[0]) : 0; // expiry of the outstanding token
+        if ($prior - $this->resetTTL + $this->resetThrottle > time()) {
+            msgLog("Lost-password request for user $cID ignored, a reset was issued less than {$this->resetThrottle} seconds ago.");
+            return;
         }
-        $this->errors = $this->lang['err_invalid_creds'];
+        $code  = format_uuidv4();
+        $exp   = time() + $this->resetTTL;
+        // Only a hash of the secret is stored, a database read or backup cannot be replayed as a reset
+        dbMetaSet($rID, 'user_reset', "$exp:".hash('sha256', $code), 'contacts', $cID);
+        // The public API dispatcher does not load the business cache and the mailer reads its transport settings from it
+        loadBusinessCache();
+        $sent = false;
+        try { $sent = $this->sendResetEmail($cID, $code); }
+        catch (\Throwable $e) { msgDebug("\nLost-password mailer threw: ".$e->getMessage()); }
+        if (empty($sent)) {
+            msgLog("Lost-password email could not be sent for user $cID. Check Settings -> Mail, or reset from the shell with bin/reset-bizuno-password.php");
+        }
+        $this->scrubMailMessages(); // mailer messages name the recipient, keep them out of the public response
     }
 
     /**
-     * Detect whether the site has its mail transport configured.
-     *
-     * "Configured" means an administrator has explicitly chosen a mail
-     * mode (smtp / gmail / postfix) — not the fresh-install default of
-     * "no mode set". When unconfigured, getMailCreds() either returns
-     * an empty array (no module-cache entry) or — in the BIZUNO_KEY-
-     * mismatch case post-restore — returns null because the encrypted
-     * SMTP creds can't be decrypted.
-     *
-     * Either way: no mode set ⇒ we know mail will fail ⇒ fall back to
-     * an inline reset link. If a mode IS set we always commit to the
-     * email path, even if send fails, to avoid leaking reset links as
-     * a side channel during transient SMTP outages on real installs.
+     * Drops anything the mailer put on the message stack so the guest page shows the same thing on every path
      */
-    private function isMailConfigured()
+    private function scrubMailMessages()
     {
-        $creds = getMailCreds();
-        if (empty($creds) || !is_array($creds)) { return false; }
-        return !empty($creds['mail_mode'] ?? '');
+        global $msgStack;
+        if (is_object($msgStack) && isset($msgStack->error) && is_array($msgStack->error)) { $msgStack->error = []; }
     }
 
     private function sendResetEmail($cID, $code)
@@ -217,16 +195,20 @@ class portalViewMaint
         if (strlen($_POST['bizPass0'])<8 || $_POST['bizPass0']<>$_POST['bizPass1']) { $this->errors = $this->lang['err_invalid_creds']; return; }
         $cID = intval($_GET['userID']); // cID
         $code= preg_replace("/[^a-f0-9\-]/", '', $_GET['userCode']); // uuid code
-        msgDebug("\nEntering validateauth with cID = $cID and code = $code");
+        msgDebug("\nEntering validateAuth with cID = $cID"); // never trace the reset secret
         $val = dbMetaGet(0, 'user_reset', 'contacts', $cID);
         if (empty($val)) { $this->errors = $this->lang['err_invalid_creds']; return; }
-        msgDebug("\nFetched code from meta = ".print_r($val, true));
         $codeID = metaIdxClean($val);
-        $tmp = explode(':', $val['value']);
-        if (intval($tmp[0])>time() && $code==$tmp[1]) {
-            msgDebug("\nIn window, checking code.");
+        $tmp = explode(':', isset($val['value']) ? (string)$val['value'] : '', 2);
+        if (sizeof($tmp)<>2 || intval($tmp[0])<=time()) { // malformed or expired, remove it
+            if (!empty($codeID)) { dbMetaDelete($codeID, 'contacts'); }
+            $this->errors = $this->lang['err_invalid_creds'];
+            return;
+        }
+        // stored value is a hash of the emailed secret, compare in constant time
+        if (strlen($code)==36 && hash_equals($tmp[1], hash('sha256', $code))) {
+            msgDebug("\nIn window, code verified.");
             $exists= dbMetaGet(0, 'user_auth', 'contacts', $cID);
-            msgDebug("\nExists = ".print_r($exists, true));
             $rID = metaIdxClean($exists);
             dbMetaSet($rID, 'user_auth', encryptPassword($_POST['bizPass0'], $this->bizKey), 'contacts', $cID);
             dbMetaDelete($codeID, 'contacts');
