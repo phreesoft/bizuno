@@ -134,6 +134,7 @@ final class bizRegistry
         unset($modSettings['bizuno']['api']); // will clear list to be rebuilt later
         // get the Bizuno database version and retain for upgrade check
         $this->dbVersion = !empty($modSettings['bizuno']['properties']['version']) ? $modSettings['bizuno']['properties']['version'] : '4.1.0';
+        $this->dbSchema  = !empty($modSettings['bizuno']['properties']['schema_version']) ? $modSettings['bizuno']['properties']['schema_version'] : '';
         msgDebug("\ndbVersion has been stored for bizuno module with $this->dbVersion");
         return $modSettings;
     }
@@ -180,7 +181,10 @@ unset($bizunoMod[$module]['dashboards']);
         $bizunoMod[$module]['properties']= $admin->structure;
         $this->initLangDashboards($path);
         // Restore Bizuno database version for upgrade check. If the dbVersion is the same, then nothing is done
-        if ($module=='bizuno') { $bizunoMod['bizuno']['properties']['version'] = $this->dbVersion; }
+        if ($module=='bizuno') {
+            $bizunoMod['bizuno']['properties']['version'] = $this->dbVersion;
+            if (!empty($this->dbSchema)) { $bizunoMod['bizuno']['properties']['schema_version'] = $this->dbSchema; } // highest upgrade gate applied, see bizunoUpgrade()
+        }
         msgDebug("\nFinished initModule for module: $module, updating cache.");
         $GLOBALS['updateModuleCache'][$module] = true;
     }

@@ -2,6 +2,25 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.6] — Unreleased
+
+### Security
+- **Lost-password account takeover** (`src/portal/viewMaint.php`) — the reset link was rendered
+  in the HTTP response when mail was "not configured" or the send failed. The guest path never
+  loads the business cache, so that check always failed and every reset request for a valid
+  email returned a working link. The link is now only emailed, the response is identical for
+  known and unknown addresses, and the token is compared with `hash_equals()`.
+- **Install/migrate hijack under WordPress** (`src/portal/controller.php`) — the install and
+  migrate screens now require a logged-in user with `manage_options`; previously any visitor
+  could complete setup between plugin activation and first admin visit.
+
+### Changed
+- **Version set to 7.4.6 for the WordPress.org security release.** Upgrade gates are numbered by
+  development version and already go up to 7.5.1, so the highest gate applied is now stored in
+  `bizuno.properties.schema_version` and each gate runs once, whatever the release number. A
+  database stamped by a pre-release build (7.5.1) is re-stamped to the running version without
+  re-running gates. Number new gates above `BIZUNO_UPGRADE_GATE` (7.5.1) and bump it.
+
 ## [7.4.8] — Unreleased
 
 ### Added

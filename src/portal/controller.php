@@ -432,8 +432,11 @@ class portalCtl
         $dbVer = getModuleCache('bizuno', 'properties', 'version');
         msgDebug("\nValidating installed Bizuno version ".MODULE_BIZUNO_VERSION." to db version: $dbVer");
         if (empty(getUserCache('business', 'bizID')) || empty(getUserCache('profile', 'email'))) { $this->cacheReload('guest'); return; } // not logged in
-        if (version_compare($dbVer, MODULE_BIZUNO_VERSION) < 0) {
-            msgDebug("\nDB is downlevel, upgrading!");
+        // != rather than <: a database stamped by a pre-release build (e.g. 7.5.1) running
+        // the released code (e.g. 7.4.6) is re-stamped, and its gates are carried into
+        // schema_version so none of them re-run when the release number passes them.
+        if (version_compare($dbVer, MODULE_BIZUNO_VERSION) != 0) {
+            msgDebug("\nDB version differs from code, running upgrade.");
             bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/upgrade.php');
             bizunoUpgrade();
         }
