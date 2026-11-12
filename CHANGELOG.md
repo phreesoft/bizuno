@@ -8,8 +8,17 @@ All notable changes to Bizuno ERP are documented in this file.
 - **Lost-password account takeover** (`src/portal/viewMaint.php`) — the reset link was rendered
   in the HTTP response when mail was "not configured" or the send failed. The guest path never
   loads the business cache, so that check always failed and every reset request for a valid
-  email returned a working link. The link is now only emailed, the response is identical for
-  known and unknown addresses, and the token is compared with `hash_equals()`.
+  email returned a working link. The link is now only emailed; the response is identical for
+  known and unknown addresses and whether or not the send worked; only a SHA-256 hash of the
+  token is stored and it is compared with `hash_equals()`; one reset email per account per
+  2 minutes; the token is no longer written to the debug trace. A locked-out admin resets from
+  the shell with `bin/reset-bizuno-password.php`.
+- **SQL injection in inventory lookups** (`src/controllers/inventory/main.php`,
+  `src/controllers/inventory/tools.php`) — the request-supplied `sku` was put into the query
+  unescaped. It is now escaped, and `inventory/main/properties` checks `inv_mgr` access before
+  running any query.
+- **Missing authorization on journal notes** (`src/controllers/phreebooks/main.php`) —
+  `notesSave` now requires manager rights (level 2) on the journal of the record being updated.
 - **Install/migrate hijack under WordPress** (`src/portal/controller.php`) — the install and
   migrate screens now require a logged-in user with `manage_options`; previously any visitor
   could complete setup between plugin activation and first admin visit.

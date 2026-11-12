@@ -85,7 +85,9 @@ WordPress's standard update channel. New versions are published to the WordPress
 == Changelog ==
 
 = 7.4.6 =
-* Security: **Unauthenticated account takeover via lost-password flow** — the password-reset link could be shown on the sign-in page instead of only being emailed, letting a visitor who knew a user's email reset that user's password. The link is now only ever sent by email, and the response no longer reveals whether an address belongs to a user. All users should update.
+* Security: **Unauthenticated account takeover via lost-password flow** — the password-reset link could be shown on the sign-in page instead of only being emailed, letting a visitor who knew a user's email reset that user's password. The link is now only ever sent by email, the response no longer reveals whether an address belongs to a user, and reset tokens are stored hashed. All users should update.
+* Security: **SQL injection in inventory lookups** — an inventory SKU passed in a request was not escaped before being used in a database query. It is now escaped, and the lookup checks inventory permissions first.
+* Security: **Missing permission check on journal notes** — saving a note on a journal entry now requires manager rights to that journal.
 * Security: **Install wizard reachable by anonymous visitors** — between activation and first setup, any visitor could complete the Bizuno installer and become its administrator. The install and migrate screens now require a logged-in WordPress administrator.
 
 = 7.4.5 =

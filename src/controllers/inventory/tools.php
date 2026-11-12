@@ -412,7 +412,7 @@ class inventoryTools
     private function getAgingValue($sku)
     {
         if (!empty($this->skuDates[$sku])) { return $this->skuDates[$sku]; }
-        $numWeeks = $this->ageFld ? dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'shelf_life', "sku='$sku'") : $this->struc['defAge']['attr']['value'];
+        $numWeeks = $this->ageFld ? dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'shelf_life', "sku='".addslashes($sku)."'") : $this->struc['defAge']['attr']['value'];
         $this->skuDates[$sku] = localeCalculateDate(biz_date('Y-m-d'), -($numWeeks * 7));
         msgDebug("\n num weeks = $numWeeks and calculated date = {$this->skuDates[$sku]}");
         return $this->skuDates[$sku];
