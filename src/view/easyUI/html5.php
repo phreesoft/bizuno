@@ -566,7 +566,7 @@ final class html5 {
             $state = $curSec==$idx?'open':'closed';
             $event = !empty($branch['route']) ? $branch['route'] : '';
             $action= !empty($branch['action'])? $branch['action']: '';
-            if (empty($branch['child']) || $level>1) { // limit the menu to 2 levels
+            if (empty($branch['child']) || $level>2) { // limit the menu to 3 levels
                 $tree[] = ['text'=>$text, 'iconCls'=>$this->htmlIcon($branch['icon']), 'size'=>'large', 'state'=>$state, 'action'=>$action, 'route'=>$event];
             } else {
                 $branch['child'] = sortOrder($branch['child']);
