@@ -149,6 +149,23 @@ class paymentMain
         $desc = bizDecode($iID['description']);
         $desc['method']= $method;
         $desc['status']= 'cap';
+        if (!empty($r['code'])) { $desc['code'] = $r['code']; } // gateway approval code, read by report field bnkCode
+        // Store the card hint — refund() requires its last 4 to build an SDK refundTransaction
+        // (without it every in-app charge gets the "refund at the gateway portal" skip), and the
+        // edit view / bnkCard / bnkHint report fields display it. Format follows the e-store
+        // import map (bizuno/maps/journal.php): leading digit identifies the brand
+        // (3=Amex 4=Visa 5=MC 6=Disc), last 4 for display. Prefer the POSTed PAN (new-card
+        // sale); fall back to the gateway response's masked account number (stored-card sale).
+        if (empty($desc['hint'])) {
+            $ccNum = (string)clean("{$method}_number", 'numeric', 'post');
+            if (strlen($ccNum) >= 13) {
+                $desc['hint'] = substr($ccNum, 0, 4).'********'.substr($ccNum, -4);
+            } elseif (!empty($r['data']['accountNumber'])) {
+                $brands = ['AmericanExpress'=>'3', 'Visa'=>'4', 'MasterCard'=>'5', 'Discover'=>'6'];
+                $brand  = !empty($r['data']['accountType']) && isset($brands[$r['data']['accountType']]) ? $brands[$r['data']['accountType']] : 'X';
+                $desc['hint'] = $brand.'***********'.substr((string)$r['data']['accountNumber'], -4);
+            }
+        }
         $fields = ['description'=>bizEncode($desc), 'trans_code'=>!empty($r['txID']) ? $r['txID'] : ''];
         dbWrite(BIZUNO_DB_PREFIX.'journal_item', $fields, 'update', "id={$iID['id']}");
         return $r;
