@@ -520,13 +520,15 @@ function phreeformPages()
         ['id'=>'A3:297:420',     'text'=>'A3'],
         ['id'=>'A4:210:297',     'text'=>'A4'],
         ['id'=>'A5:148:210',     'text'=>'A5'],
-        ['id'=>'A0:841x1189',    'text'=>'A0'],
+        ['id'=>'A0:841:1189',    'text'=>'A0'],
         ['id'=>'A1:594:841',     'text'=>'A1'],
         ['id'=>'A2:420:594',     'text'=>'A2'],
         ['id'=>'A6:105:148',     'text'=>'A6'],
         ['id'=>'A7:74:105',      'text'=>'A7'],
         ['id'=>'A8:52:74',       'text'=>'A8'],
         ['id'=>'A9:37:52',       'text'=>'A9'],
+        ['id'=>'LBL4X6:102:152', 'text'=>'4x6 Label'],
+        ['id'=>'LBL2X1:25:51',   'text'=>'2x1 Label'],
         ['id'=>'TABLOID:279:432','text'=>lang('paper_tabloid', 'phreeform')]];
 }
 
