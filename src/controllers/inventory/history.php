@@ -202,7 +202,7 @@ class inventoryHistory
         // For yearly
         $stmt  = dbGetResult("SELECT DATE_FORMAT(m.post_date, '%Y') AS 'year', SUM(ABS(i.qty)) AS 'qty', SUM(i.credit_amount + i.debit_amount) AS 'total'
             FROM ".BIZUNO_DB_PREFIX."journal_main m JOIN ".BIZUNO_DB_PREFIX."journal_item i ON m.id=i.ref_id WHERE sku='".addslashes($sku)."' AND ((m.journal_id=12 AND i.gl_type='itm') OR (m.journal_id=14 AND i.gl_type='asi'))
-            GROUP BY DATE_FORMAT(m.post_date, '%Y') DESC");
+            GROUP BY DATE_FORMAT(m.post_date, '%Y') ORDER BY DATE_FORMAT(m.post_date, '%Y') DESC");
         // Get the data
         $rows  = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
         return $rows;
