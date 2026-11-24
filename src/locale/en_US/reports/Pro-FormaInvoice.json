@@ -27,13 +27,13 @@
         "rows": [
             {
                 "title": "Logo",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "type": "CImg",
                 "abscissa": "8",
                 "ordinate": "4",
                 "width": "32",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -1031,7 +1031,7 @@
     },
     "title": "Pro-Forma Invoice",
     "description": "Pro-Forma Invoice Form. Format: Letter, Portrait",
-    "emailmessage": "<p>Attached is your Pro-Forma Invoice from Battery Store Inc. Please direct any questions to sales@batterystore.com or your respective sales representative. <\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
+    "emailmessage": "<p>Attached is your Pro-Forma Invoice from %company%. Please direct any questions to us or your respective sales representative. <\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
     "pagesize": "Letter:216:282",
     "pageorient": "P",
     "margintop": 8,

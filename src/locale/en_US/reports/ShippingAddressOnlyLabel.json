@@ -27,9 +27,9 @@
                 "ordinate": "3",
                 "width": "25",
                 "type": "CImg",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -429,7 +429,7 @@
     },
     "title": "Shipping Address Only Label",
     "description": "Sales\/Invoice form with payments. Format: Letter, Portrait",
-    "emailmessage": "Attached is your Invoice from Portable Power Systems. Please direct all invoice related questions to accounting@portablepower.com. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your Invoice from %company%. Please direct all invoice related questions to us. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "pagesize": "A6:105:148",
     "pageorient": "P",
     "margintop": 8,

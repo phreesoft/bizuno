@@ -27,9 +27,9 @@
                 "ordinate": "4",
                 "width": "38",
                 "type": "CImg",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -1209,7 +1209,7 @@
     },
     "title": "Order Confirmation",
     "description": "Order Confirmation form with payments. Format: Letter, Portrait",
-    "emailmessage": "Attached is your order confirmation from Battery Store, Inc. Please direct all invoice related questions to sales@batterystore.com or you respective sales representative. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your order confirmation from %company%. Please direct all invoice related questions to us or your respective sales representative. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "pagesize": "Letter:216:282",
     "pageorient": "P",
     "margintop": 8,
