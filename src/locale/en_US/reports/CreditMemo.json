@@ -27,13 +27,13 @@
         "rows": [
             {
                 "title": "Logo",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "type": "CImg",
                 "abscissa": "8",
                 "ordinate": "4",
                 "width": "38",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",

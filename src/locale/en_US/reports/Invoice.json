@@ -28,7 +28,7 @@
                 "width": "38",
                 "type": "CImg",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -1212,7 +1212,7 @@
                 "height": "5",
                 "type": "Text",
                 "settings": {
-                    "text": "Account Name: Battery Store, Inc.\nBank Name: Chase Bank\nACH Routing: 111000614\nACH Account: 930305500\n",
+                    "text": "Account Name: \nBank Name: \nACH Routing: \nACH Account: \n",
                     "display": "0",
                     "font": "default",
                     "size": "10",
@@ -1406,7 +1406,7 @@
     },
     "title": "Invoice",
     "description": "Sales\/Invoice form with payments. Format: Letter, Portrait",
-    "emailmessage": "<p>Attached is your Invoice from Battery Store Inc. Please direct all invoice related questions to accounting@batterystore.com. Our preferred method of payment is ACH. You can find our ACH details on the bottom of your invoice. <\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
+    "emailmessage": "<p>Attached is your Invoice from %company%. Please direct all invoice related questions to us. Our preferred method of payment is ACH. You can find our ACH details on the bottom of your invoice. <\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
     "pagesize": "Letter:216:282",
     "pageorient": "P",
     "margintop": 8,

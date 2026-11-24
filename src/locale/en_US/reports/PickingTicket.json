@@ -28,7 +28,7 @@
                 "width": "38",
                 "type": "CImg",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",

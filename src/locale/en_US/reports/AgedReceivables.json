@@ -172,7 +172,7 @@
     },
     "title": "Aged Receivables",
     "description": "Lists Aged Receivables. Format: Landscape, Size: Letter",
-    "emailmessage": "<p>See Portable Power, <a title=\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Portable Power Website\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" href=\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"..\/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\">https:\/\/www.portablepower.com<\/a>&nbsp;for more details.<\/p>",
+    "emailmessage": "",
     "totals": {
         "font": "helvetica",
         "size": "10",

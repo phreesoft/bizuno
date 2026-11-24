@@ -49,9 +49,8 @@ BIZUNO_DATA/myExt/
 └── view/icons/<size>/                                  # custom icon assets
 ```
 
-A real example from a live client: `battery-store` adds a
-`phreebooks/totals/fee_battery/` method — a state battery-recycling fee — by
-dropping a class at that path. The registry discovers it exactly like a built-in
+For example, a client that must charge a state recycling fee can add a
+`phreebooks/totals/fee_battery/` method by dropping a class at that path. The registry discovers it exactly like a built-in
 total (subtotal, tax, shipping); the implementation just happens to live in
 `myExt/`. It implements the same method surface a core total would
 (`__construct`, `settingsStructure`, `glEntry`, `render`).
@@ -89,11 +88,10 @@ clients with more than one site — **one subfolder per domain**:
 
 ```
 bizuno-clients/
-├── battery-store/
-│   ├── biz.batterystore.com/myExt/      # the ERP customizations
-│   └── www.batterystore.com/plugins/    # the storefront WP plugins
-├── canada-scooters/Bizuno/myExt/
-├── keystone-tape/Bizuno/myExt/
+├── example-client/
+│   ├── biz.example.com/myExt/           # the ERP customizations
+│   └── www.example.com/plugins/         # the storefront WP plugins
+├── another-client/Bizuno/myExt/
 └── phreesoft/
     ├── biz.phreesoft.com/myExt/
     └── portals/                         # the PhreeSoft cloud entry code
