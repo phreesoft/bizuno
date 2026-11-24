@@ -8,7 +8,6 @@ last-updated: 2026-05-28
 related:
   - 01-getting-started/04-docker-install-walkthrough.md
   - 01-getting-started/05-lamp-install-walkthrough.md
-  - 01-getting-started/06-wordpress-install-walkthrough.md
 since: 7.3.0
 ---
 
@@ -28,7 +27,6 @@ its section.
 | Path | You manage | Best for | Walkthrough |
 |---|---|---|---|
 | **PhreeSoft Cloud** | Nothing — login and use | Anyone who wants zero ops | _(managed — see below)_ |
-| **WordPress plugin** | A WordPress site | Sites already on WP / WooCommerce | [WordPress walkthrough](./06-wordpress-install-walkthrough.md) |
 | **Standalone (LAMP/LEMP)** | A Linux + PHP + MySQL host | Full control, no WordPress | [LAMP walkthrough](./05-lamp-install-walkthrough.md) |
 | **Docker** | A Linux box with Docker | Dedicated server, repeatable deploys | [Docker walkthrough](./04-docker-install-walkthrough.md) |
 
@@ -40,14 +38,7 @@ and upgrades. Pick this unless you have a specific reason to self-host
 (data-residency rules, deep customization, an existing server you want
 to use).
 
-**Already run WordPress — especially WooCommerce?** → **WordPress
-plugin.** Bizuno shares WordPress's database, login, and admin. One
-set of users, one backup, and the
-[WooCommerce bridge](../07-integration/01-woocommerce-via-bizuno-api.md)
-syncs orders/inventory/customers both ways. Least-effort self-host
-path.
-
-**Want full control and don't use WordPress?** → **Standalone
+**Want full control on your own host?** → **Standalone
 LAMP/LEMP.** Bizuno runs on its own (sub)domain served directly by
 Apache or Nginx. Most flexibility for hardening (source + data outside
 the webroot) and for hosts where you already have a LAMP stack or
@@ -60,14 +51,14 @@ box is Bizuno's alone and you want clean, repeatable rebuilds.
 
 ## Hard requirements per path
 
-| | PhreeSoft Cloud | WordPress | Standalone | Docker |
-|---|---|---|---|---|
-| **PHP** | — (hosted) | 8.0+ (8.2 rec.) | 8.2+ (Composer floor) | bundled in image |
-| **Database** | — (hosted) | WP's MySQL/MariaDB | MySQL 5.6+ / MariaDB 10.2+ | bundled MariaDB 11 |
-| **Web server** | — (hosted) | WordPress's | Apache or Nginx | bundled (Caddy → Apache) |
-| **You provide** | a browser | a WP 6.5+ site | Linux host + shell | Linux host + Docker |
-| **TLS** | included | WordPress's cert | Let's Encrypt / your cert | Caddy auto or mounted cert |
-| **Ops burden** | none | low | medium | medium |
+| | PhreeSoft Cloud | Standalone | Docker |
+|---|---|---|---|
+| **PHP** | — (hosted) | 8.2+ (Composer floor) | bundled in image |
+| **Database** | — (hosted) | MySQL 5.6+ / MariaDB 10.2+ | bundled MariaDB 11 |
+| **Web server** | — (hosted) | Apache or Nginx | bundled (Caddy → Apache) |
+| **You provide** | a browser | Linux host + shell | Linux host + Docker |
+| **TLS** | included | Let's Encrypt / your cert | Caddy auto or mounted cert |
+| **Ops burden** | none | medium | medium |
 
 All self-host paths need the same PHP extensions — `mbstring`,
 `pdo_mysql`, `json`, `curl`, `openssl`, `zip`, `gd`. If any are
@@ -84,9 +75,9 @@ moving is mostly a database + files migration — not a re-implementation.
 
 - **Standalone ↔ Docker** — dump the database, copy the data
   directory, restore into the other. Identical schema.
-- **WordPress ↔ Standalone** — Bizuno's own tables are the same; the
-  WordPress install just prefixes them (`wp_bizuno_`) and shares WP's
-  database. Export the `*bizuno_*` tables and the
+- **WordPress → Standalone** — sites still running the retired
+  WordPress plugin: Bizuno's tables are the same, just prefixed
+  (`wp_bizuno_`). Export the `*bizuno_*` tables and the
   `wp-content/uploads/bizuno/` directory, import into a standalone DB +
   data dir.
 - **Cloud → self-host** — PhreeSoft can hand you a database dump + data
@@ -98,8 +89,8 @@ moving is mostly a database + files migration — not a re-implementation.
   the data directory) signs session cookies. Carry both to the new
   home or encrypted data won't decrypt and sessions reset. They travel
   with `portalCFG.php` + the data directory respectively.
-- **Table prefix** differs between WordPress (`wp_bizuno_`) and
-  standalone (none by default) — set `BIZUNO_DB_PREFIX` to match the
+- **Table prefix** differs between the retired WordPress plugin
+  (`wp_bizuno_`) and standalone (none by default) — set `BIZUNO_DB_PREFIX` to match the
   dump you're importing.
 
 **Not easy:** exporting *out* of Bizuno back into QuickBooks or
@@ -122,6 +113,5 @@ is skipped.
 - [What is Bizuno](./01-what-is-bizuno.md)
 - [Docker install walkthrough](./04-docker-install-walkthrough.md)
 - [LAMP / LEMP install walkthrough](./05-lamp-install-walkthrough.md)
-- [WordPress install walkthrough](./06-wordpress-install-walkthrough.md)
 - [First-hour walkthrough](./03-first-hour-walkthrough.md)
 - [Migration & Upgrade](../08-migration-and-upgrade/)

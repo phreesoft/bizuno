@@ -21,8 +21,8 @@ direction, and there is no two-way merge.
 `bizuno-api` is a WP plugin installed on the **WooCommerce** site. Bizuno itself
 may live:
 
-- **on the same site** (the `bizuno-accounting` plugin is active) — the bridge
-  short-circuits to an in-process call, or
+- **on the same site** (legacy installs of the retired `bizuno-accounting`
+  WordPress plugin) — the bridge short-circuits to an in-process call, or
 - **on a separate back-office host** — the bridge talks to it over HTTPS, using a
   configured Bizuno URL and API token (Settings → Bizuno → General).
 

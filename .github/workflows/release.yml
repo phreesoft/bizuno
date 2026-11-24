@@ -1,18 +1,13 @@
 name: Release Bizuno
 
 # Triggered when a `v*` tag is pushed (e.g. v7.4.0). Builds every release
-# variant in parallel, attaches artifacts to a GitHub Release, and pushes
-# the WordPress plugin to wordpress.org SVN.
+# variant in parallel and attaches artifacts to a GitHub Release.
 #
 # To release:
 #   git tag v7.4.0
 #   git push origin v7.4.0
 #
-# Secrets required:
-#   WP_SVN_USER  — WordPress.org account username (Plugin Author)
-#   WP_SVN_PASS  — WordPress.org account password (or app password)
-# Optional:
-#   (none — GITHUB_TOKEN is provided automatically by Actions for the release upload)
+# Secrets: none — GITHUB_TOKEN is provided automatically by Actions for the release upload.
 
 on:
   push:
@@ -23,11 +18,6 @@ on:
         description: 'Tag to (re-)release, e.g. v7.4.0. Must already exist as a git tag.'
         required: true
         type: string
-      skip_svn:
-        description: 'Skip the WordPress.org SVN push?'
-        required: false
-        default: true
-        type: boolean
 
 permissions:
   contents: write   # needed for the GitHub Release create/upload
@@ -49,14 +39,12 @@ jobs:
     outputs:
       version:   ${{ steps.resolve.outputs.version }}
       tag:       ${{ steps.resolve.outputs.tag }}
-      skip_svn:  ${{ steps.resolve.outputs.skip_svn }}
     steps:
       - name: Resolve
         id: resolve
         env:
           GH_REF: ${{ github.ref }}
           INPUT_TAG: ${{ github.event.inputs.tag }}
-          INPUT_SKIP_SVN: ${{ github.event.inputs.skip_svn }}
         run: |
           set -e
           if [ -n "$INPUT_TAG" ]; then
@@ -68,11 +56,9 @@ jobs:
             echo "::error::Tag '$TAG' doesn't match v<semver>" && exit 1
           fi
           VERSION="${TAG#v}"
-          SKIP_SVN="${INPUT_SKIP_SVN:-false}"
           echo "tag=$TAG"           >> "$GITHUB_OUTPUT"
           echo "version=$VERSION"   >> "$GITHUB_OUTPUT"
-          echo "skip_svn=$SKIP_SVN" >> "$GITHUB_OUTPUT"
-          echo "Resolved: tag=$TAG version=$VERSION skip_svn=$SKIP_SVN"
+          echo "Resolved: tag=$TAG version=$VERSION"
 
   # ─── Build each variant ──────────────────────────────────────────────────
   build:
@@ -82,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false   # produce as many artifacts as possible even if one breaks
       matrix:
-        variant: [zip, wordpress, nextcloud]
+        variant: [zip, nextcloud]
     steps:
       - name: Checkout tag
         uses: actions/checkout@v4
@@ -174,7 +160,6 @@ jobs:
             echo ""
             echo "## Artifacts"
             echo ""
-            echo "- **bizuno-accounting-${VERSION}.zip** — WordPress plugin. Upload via WP admin → Plugins → Add New → Upload Plugin, or wait for the automatic update from wordpress.org."
             echo "- **bizuno-${VERSION}-zip.zip** — LAMP/WAMP drop-in. Composer-free; unzip into your webroot."
             echo "- **bizuno-${VERSION}.tar.gz** — NextCloud launcher app. Upload via NextCloud Apps, or extract into \`<nextcloud>/apps/\`."
             echo ""
@@ -189,117 +174,9 @@ jobs:
             --notes-file release-notes.md \
             dist/*
 
-  # ─── Mirror the WordPress plugin to wordpress.org SVN ────────────────────
-  wp-svn:
-    name: Push to WordPress.org SVN
-    runs-on: ubuntu-latest
-    needs: [meta, release]
-    if: needs.meta.outputs.skip_svn != 'true'
-    env:
-      WP_SVN_REPO: https://plugins.svn.wordpress.org/bizuno-accounting
-      WP_SVN_USER: ${{ secrets.WP_SVN_USER }}
-      WP_SVN_PASS: ${{ secrets.WP_SVN_PASS }}
-      VERSION: ${{ needs.meta.outputs.version }}
-    steps:
-      - name: Validate SVN secrets
-        run: |
-          if [ -z "${WP_SVN_USER}" ] || [ -z "${WP_SVN_PASS}" ]; then
-            echo "::warning::WP_SVN_USER / WP_SVN_PASS not set — skipping wordpress.org push"
-            echo "WP_SVN_SKIP=true" >> "$GITHUB_ENV"
-          fi
-
-      - name: Install subversion
-        if: env.WP_SVN_SKIP != 'true'
-        run: sudo apt-get update && sudo apt-get install -y subversion
-
-      - name: Download WordPress plugin artifact
-        if: env.WP_SVN_SKIP != 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: bizuno-wordpress-${{ needs.meta.outputs.version }}
-          path: artifact
-
-      - name: Unzip plugin
-        if: env.WP_SVN_SKIP != 'true'
-        run: |
-          mkdir -p plugin
-          unzip -q artifact/bizuno-accounting-${VERSION}.zip -d plugin
-          ls plugin/bizuno-accounting/ | head
-
-      - name: SVN checkout WordPress.org trunk
-        if: env.WP_SVN_SKIP != 'true'
-        run: |
-          # Only check out trunk — we don't need assets/, branches/, or
-          # the existing tags/ for our commit pattern. Smaller checkout =
-          # faster, fewer files for SVN to track.
-          svn checkout --depth empty "$WP_SVN_REPO" svn-repo
-          svn update --set-depth infinity svn-repo/trunk
-
-      - name: Sync plugin → trunk
-        if: env.WP_SVN_SKIP != 'true'
-        run: |
-          set -e
-          # Replace trunk contents with the new build
-          rm -rf svn-repo/trunk/*
-          cp -a plugin/bizuno-accounting/. svn-repo/trunk/
-          # Stage adds + deletes for svn
-          cd svn-repo
-          svn add --force --quiet trunk
-          # Delete files that SVN tracks but no longer exist locally
-          svn status trunk | grep '^!' | sed -e 's/^! *//' | xargs -r svn delete --keep-local || true
-
-      - name: SVN commit trunk (with retry)
-        if: env.WP_SVN_SKIP != 'true'
-        run: |
-          # wp.org SVN is notoriously flaky for big commits — connection
-          # resets ("E000104: Connection reset by peer") happen mid-upload
-          # roughly 1 in 4 attempts for large plugins. Retry up to 3 times
-          # before giving up; each retry uses a fresh connection.
-          cd svn-repo
-          for attempt in 1 2 3; do
-              echo "→ trunk commit attempt $attempt of 3"
-              if svn commit trunk \
-                    --no-auth-cache \
-                    --non-interactive \
-                    --username "$WP_SVN_USER" \
-                    --password "$WP_SVN_PASS" \
-                    -m "Release ${VERSION}"; then
-                  echo "✓ trunk commit succeeded on attempt $attempt"
-                  exit 0
-              fi
-              echo "✗ attempt $attempt failed; sleeping 30s before retry"
-              sleep 30
-          done
-          echo "✗ All 3 attempts failed — wp.org SVN is having a bad day"
-          exit 1
-
-      - name: Tag the release (server-side svn copy)
-        if: env.WP_SVN_SKIP != 'true'
-        run: |
-          # URL-to-URL svn copy creates the tag as a cheap server-side
-          # reference rather than re-uploading every file. Completes in
-          # seconds even for a 14 MB plugin. This is how the wp.org
-          # plugin maintainers handbook recommends tagging.
-          for attempt in 1 2 3; do
-              echo "→ tag commit attempt $attempt of 3"
-              if svn copy "${WP_SVN_REPO}/trunk" "${WP_SVN_REPO}/tags/${VERSION}" \
-                    --no-auth-cache \
-                    --non-interactive \
-                    --username "$WP_SVN_USER" \
-                    --password "$WP_SVN_PASS" \
-                    -m "Tag ${VERSION}"; then
-                  echo "✓ tag commit succeeded on attempt $attempt"
-                  exit 0
-              fi
-              echo "✗ attempt $attempt failed; sleeping 30s before retry"
-              sleep 30
-          done
-          echo "✗ All 3 tag-commit attempts failed"
-          exit 1
-
   # ─── Build and push the Docker image to ghcr.io ─────────────────────────
   #
-  # Runs in parallel with the zip + wordpress builds (no `needs: build`).
+  # Runs in parallel with the zip + nextcloud builds (no `needs: build`).
   # Docker buildx builds for both amd64 and arm64 so the same image works
   # on Apple Silicon / Raspberry Pi servers and on standard x86 hosts.
   # Pushes to ghcr.io/<owner>/bizuno with three tags:
