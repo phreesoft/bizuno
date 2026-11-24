@@ -144,6 +144,8 @@ class bizInstall // Checking users:
         $locale['timezone'] = clean('biz_timezone', 'text', 'post');
         setModuleCache('bizuno', 'settings',  'locale',  $locale);
         setModuleCache('bizuno', 'properties','version', MODULE_BIZUNO_VERSION);
+        bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/upgrade.php', 'bizunoUpgrade', 'function'); // defines BIZUNO_UPGRADE_GATE
+        setModuleCache('bizuno', 'properties','schema_version', BIZUNO_UPGRADE_GATE); // fresh tables already include every gate's changes
         msgLog(lang('user_login')." ".getUserCache('profile', 'email'));
         bizCacheExpClear(); // clear the cache so the next reload sets everything up properly
         $GLOBALS['BIZUNO_INSTALL_CID'] = $cID; // Set some globals for followup installations
