@@ -27,9 +27,9 @@
                 "ordinate": "8",
                 "width": "40",
                 "type": "CImg",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "settings": {
-                    "img_file": "Ppslogo.jpg"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -788,7 +788,7 @@
     },
     "title": "Payment Receipt",
     "description": "Sales\/Invoice form with payments. Format: Letter, Portrait",
-    "emailmessage": "Attached is your Payment Receipt from Battery Store, Inc. Please direct all invoice related questions to accounting@batterystore.com. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your Payment Receipt from %company%. Please direct all invoice related questions to us. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "pagesize": "LETTER:216:279",
     "pageorient": "P",
     "margintop": 8,

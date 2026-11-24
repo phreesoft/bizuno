@@ -32,7 +32,7 @@
                 "ordinate": "4",
                 "width": "38",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -1034,7 +1034,7 @@
     },
     "title": "Sales Order",
     "description": "Sales Order Form. Format: Letter, Portrait",
-    "emailmessage": "<p>Attached is your Invoice from Battery Store Inc. Please direct all invoice related questions to sales@batterystore.com or your respective sales representative.<\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
+    "emailmessage": "<p>Attached is your Invoice from %company%. Please direct all invoice related questions to us or your respective sales representative.<\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>",
     "pagesize": "Letter:216:282",
     "pageorient": "P",
     "margintop": 8,

@@ -30,9 +30,9 @@
                 "ordinate": "9",
                 "width": "38",
                 "type": "CImg",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -46,7 +46,7 @@
                 "height": "5",
                 "type": "Text",
                 "settings": {
-                    "text": "Battery Store, Inc.\n2890 Market Loop\nSouthlake, TX 76092",
+                    "text": "",
                     "display": "0",
                     "font": "helvetica",
                     "size": "14",
