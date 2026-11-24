@@ -28,7 +28,7 @@
                 "width": "38",
                 "type": "CImg",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -1021,7 +1021,7 @@
     },
     "title": "Packing Slip",
     "description": "Packing Slip form. Format: Letter, Portrait",
-    "emailmessage": "<p>Attached is your Packing Slip from Battery Store Inc. Please direct all invoice related questions to sales@batterystore.com or your respective sales representative.<\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>\r\n<p>&nbsp;<\/p>",
+    "emailmessage": "<p>Attached is your Packing Slip from %company%. Please direct all invoice related questions to us or your respective sales representative.<\/p>\r\n<p>To view the attachment, you must have pdf reader software installed on your computer.<\/p>\r\n<p>&nbsp;<\/p>",
     "pagesize": "Letter:216:282",
     "pageorient": "P",
     "margintop": 8,

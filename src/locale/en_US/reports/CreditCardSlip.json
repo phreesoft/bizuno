@@ -334,7 +334,7 @@
                 "ordinate": "76",
                 "type": "Text",
                 "settings": {
-                    "text": "portablepower",
+                    "text": "",
                     "display": "0",
                     "font": "default",
                     "size": "8",
@@ -699,7 +699,7 @@
                 "type": "Text",
                 "abscissa": "37",
                 "settings": {
-                    "text": "portablepower",
+                    "text": "",
                     "display": "0",
                     "font": "default",
                     "size": "8",
@@ -785,7 +785,7 @@
     },
     "title": "Credit Card Slip",
     "description": "Sales\/Invoice form with payments. Format: Letter, Portrait",
-    "emailmessage": "Attached is your Credit Card Slip from Battery Store, Inc. Please direct all invoice related questions to accounting@batterystore.com. \n\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your Credit Card Slip from %company%. Please direct all invoice related questions to us. \n\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "datelist": [
         "a",
         "b",

@@ -504,7 +504,7 @@
     },
     "title": "Packing Slip - Blind Ship",
     "description": "Packing Slip form. Blind ship, no Title information. Format: Letter, Portrait",
-    "emailmessage": "Attached is your Packing Slip from Battery Store Inc. Please direct all invoice related questions to sales@batterystore.com or your respective sales representative.  \n\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your Packing Slip from %company%. Please direct all invoice related questions to us or your respective sales representative.  \n\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "datelist": [
         "a",
         "b",

@@ -27,9 +27,9 @@
                 "ordinate": "8",
                 "width": "40",
                 "type": "CImg",
-                "filename": "Ppslogo.png",
+                "filename": "",
                 "settings": {
-                    "img_file": "logos\/battery-store-logo.png"
+                    "img_file": ""
                 },
                 "_selected": true,
                 "height": "",
@@ -928,7 +928,7 @@
     },
     "title": "PackingSlip-Balance",
     "description": "Packing Slip form. Format: Letter, Portrait",
-    "emailmessage": "Attached is your Packing Slip from Portable Power Systems. Please direct all invoice related questions to accounting@portablepower.com. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
+    "emailmessage": "Attached is your Packing Slip from %company%. Please direct all invoice related questions to us. \r\n\r\nTo view the attachment, you must have pdf reader software installed on your computer.",
     "pagesize": "LETTER:216:279",
     "pageorient": "P",
     "margintop": 8,

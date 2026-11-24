@@ -370,9 +370,8 @@ class portalApi
      * Pass-through to a customer-supplied `myExt/controllers/api/myAPI.php` extension.
      *
      * **Unauthenticated by design.** This route exists so deployments can host their own
-     * cron/webhook endpoints (battery-store's `?bizRt=portal/api/myAPI&modID=mectronic`
-     * fetches inventory from a supplier; similar patterns exist for `digikey`,
-     * `netComponents`). The portal layer cannot know what auth the customer's extension
+     * cron/webhook endpoints, e.g. `?bizRt=portal/api/myAPI&modID=<supplier>` to pull
+     * inventory from a supplier feed. The portal layer cannot know what auth the customer's extension
      * needs, so it deliberately runs `goAction()` without a token check.
      *
      * **Contract for myExt authors:** the loaded `apiMyAPI::goAction()` MUST do its own
