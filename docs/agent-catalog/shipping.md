@@ -41,10 +41,6 @@ move are:
   instantiates `phreebooksMain` and calls its `save()` on the Purchase journal
   (jID 6). That delegated save **posts a GL journal and moves inventory**
   (goods received). Treat it as a phreebooks posting, not a shipping action.
-- **`shipping/admin/fundsBuy`** — delegates to the carrier's `fundsBuy()`
-  (e.g. Endicia) which **buys real postage with real money** from the carrier
-  account. It is currently **ungated** (no `validateAccess`). See Open
-  questions.
 
 Label generation itself (`shipping/ship/labelGet`) spends money at the carrier
 to mint a shipping label and contacts the carrier API, but creates **no Bizuno
@@ -80,7 +76,7 @@ carriers:
   registry: getMetaMethod('carriers')              # enabled carriers + path + settings.services
   classes:  controllers/shipping/carriers/<carrier>/<carrier>.php   (FQCN \bizuno\<carrier>)
   optional_methods: rateQuote, labelGet, labelDelete, validateAddress,
-                    trackBulk, reconcileInvoice, reconcileList, fundsBuy,
+                    trackBulk, reconcileInvoice, reconcileList,
                     manager/managerForm, pkgPanel, labelKeys
 inventory_ship_dims:
   table: inventory
@@ -97,8 +93,7 @@ sec_keys:
 > 1. `shipping/invReceiving/receivingSave` posts a GL journal and moves
 >    inventory via the delegated phreebooks save — it is **not**
 >    bookkeeping-neutral.
-> 2. `shipping/ship/labelGet` and `shipping/admin/fundsBuy` spend real money
->    at the carrier (mint a label / buy postage). `fundsBuy` is **ungated**.
+> 2. `shipping/ship/labelGet` spends real money at the carrier (mints a label).
 > 3. Everything else (rate quotes, address validation, manager grids, settings,
 >    tracking, reconcile toggles, label viewing/downloading) creates no GL or
 >    inventory movement.
@@ -258,7 +253,7 @@ inputs:
     - name: sID
       format: cmd
       source: get
-      notes: carrier code (e.g. fedex, usps, endicia, flat)
+      notes: carrier code (e.g. fedex, usps, flat)
   optional: []
   fixed: []
 effects:
@@ -1112,7 +1107,7 @@ auth:
   sec_id: shipping
   min_level: 1
 preconditions:
-  - at least one enabled carrier with validateAddress() (FedEx, UPS, USPS, Endicia)
+  - at least one enabled carrier with validateAddress() (FedEx, UPS, USPS)
 inputs:
   required:
     - name: data
@@ -1464,7 +1459,7 @@ errors:
 idempotency: safe (read-only render)
 related: [shipping.admin.save, shipping.admin.savePkg]
 confidence: high
-source: src/controllers/shipping/admin.php:288 (adminHome)
+source: src/controllers/shipping/admin.php:275 (adminHome)
 ```
 
 ## shipping.admin.save
@@ -1503,7 +1498,7 @@ errors:
 idempotency: idempotent — overwrites settings
 related: [shipping.admin.home]
 confidence: high
-source: src/controllers/shipping/admin.php:315 (adminSave)
+source: src/controllers/shipping/admin.php:302 (adminSave)
 ```
 
 ## shipping.admin.savePkg
@@ -1543,7 +1538,7 @@ errors:
 idempotency: idempotent — replaces the preset list
 related: [shipping.admin.home]
 confidence: high
-source: src/controllers/shipping/admin.php:375 (adminSavePkg)
+source: src/controllers/shipping/admin.php:362 (adminSavePkg)
 ```
 
 ## shipping.admin.shipDims.import
@@ -1586,51 +1581,7 @@ errors:
 idempotency: idempotent on sku — re-importing overwrites bizProShip
 related: [shipping.shpmtDetails.save, shipping.shpmtDetails.edit]
 confidence: high
-source: src/controllers/shipping/admin.php:177 (apiImport)
-```
-
-## shipping.admin.fundsBuy
-
-```yaml
-id: shipping.admin.fundsBuy
-title: Buy postage funds from a carrier account
-route: shipping/admin/fundsBuy
-http_method: GET
-ui_path: Tools ▸ Shipping ▸ Endicia (or other postage carrier) ▸ Buy Funds
-auth:
-  sec_id: NONE   # NO validateAccess guard — see Open questions (spends real money)
-  min_level: n/a
-preconditions:
-  - carrier (default endicia) has a fundsBuy() implementation and configured account
-inputs:
-  required: []
-  optional:
-    - name: carrier
-      format: cmd
-      source: get
-      notes: defaults to 'endicia' if empty
-    - name: "(carrier-specific amount/auth fields)"
-      format: per-carrier
-      source: get/post
-  fixed: []
-effects:
-  db_writes:
-    - table: (carrier-specific funds/log)
-      op: insert/update
-      notes: depends on the carrier
-  gl_journal: none
-  inventory: none
-  side_effects:
-    - LIVE carrier API call that PURCHASES POSTAGE (spends real money on the carrier account)
-returns:
-  success_signal: carrier confirmation
-  identifier: carrier transaction reference
-errors:
-  - carrier-specific failures
-idempotency: NOT idempotent — each call buys funds; retries duplicate the purchase
-related: []
-confidence: medium   # ungated and money-moving — see Open questions before automating
-source: src/controllers/shipping/admin.php:109 (fundsBuy)
+source: src/controllers/shipping/admin.php:164 (apiImport)
 ```
 
 ## shipping.admin.signup
@@ -1668,7 +1619,7 @@ errors:
 idempotency: safe (read-only)
 related: [shipping.getCarrier]
 confidence: high
-source: src/controllers/shipping/admin.php:271 (signup)
+source: src/controllers/shipping/admin.php:258 (signup)
 ```
 
 ## shipping.admin.extraAction
@@ -1678,7 +1629,7 @@ id: shipping.admin.extraAction
 title: Dispatch a carrier-specific extra action
 route: shipping/admin/extraAction
 http_method: GET
-ui_path: (carrier-specific buttons; see Endicia)
+ui_path: (carrier-specific buttons)
 auth:
   sec_id: shipping
   min_level: 2
@@ -1689,7 +1640,7 @@ inputs:
     - name: data
       format: text
       source: get
-      notes: "carrier:action" e.g. endicia:someAction
+      notes: "carrier:action" e.g. usps:someAction
   optional: []
   fixed: []
 effects:
@@ -1706,9 +1657,9 @@ errors:
   - BUG: the carrier-found guard is inverted (errors when the carrier IS found) — see Open questions
   - permission denied if user lacks shipping level 2
 idempotency: depends on the dispatched action — verify before automating
-related: [shipping.admin.fundsBuy]
-confidence: low   # inverted guard at admin.php:211 likely makes this path non-functional as written
-source: src/controllers/shipping/admin.php:211 (extraAction)
+related: []
+confidence: low   # inverted guard at admin.php:198 likely makes this path non-functional as written
+source: src/controllers/shipping/admin.php:198 (extraAction)
 ```
 
 ## shipping.tools.manager
@@ -1881,7 +1832,7 @@ errors: []
 idempotency: safe (read-only render)
 related: [shipping.contacts.fedExSave, shipping.contacts.fedExDelete]
 confidence: high
-source: src/controllers/shipping/admin.php:325 (fedExEdit)
+source: src/controllers/shipping/admin.php:312 (fedExEdit)
 ```
 
 ## shipping.contacts.fedExSave
@@ -1934,7 +1885,7 @@ errors:
 idempotency: idempotent — overwrites the fedex meta
 related: [shipping.contacts.fedExEdit, shipping.contacts.fedExDelete]
 confidence: high
-source: src/controllers/shipping/admin.php:345 (fedExSave)
+source: src/controllers/shipping/admin.php:332 (fedExSave)
 ```
 
 ## shipping.contacts.fedExDelete
@@ -1972,7 +1923,7 @@ errors: []
 idempotency: idempotent (deleting already-gone meta is a no-op)
 related: [shipping.contacts.fedExSave]
 confidence: high
-source: src/controllers/shipping/admin.php:363 (fedExDelete)
+source: src/controllers/shipping/admin.php:350 (fedExDelete)
 ```
 
 ## shipping.phreebooks.manager (hook)
@@ -2009,7 +1960,7 @@ errors:
 idempotency: safe (read-only render)
 related: [shipping.manager.shippingLog]
 confidence: high
-source: src/controllers/shipping/admin.php:123 (manager)
+source: src/controllers/shipping/admin.php:110 (manager)
 ```
 
 ## shipping.dashboard.unshippedOrders
@@ -2099,10 +2050,6 @@ recipe_void_a_label:
 
 ## Open questions / verify-before-automating
 
-- **`shipping/admin/fundsBuy` (admin.php:109) is ungated** — it calls
-  `validateAccess` nowhere yet delegates to the carrier `fundsBuy()`, which
-  **buys real postage with real money**. Do not expose or automate this route
-  without first adding an auth check; treat as high-risk.
 - **`shipping/rate/rateAPI` (rate.php:201) is ungated and money-relevant
   context** — it is a public method intended for the internal API/WooCommerce
   bridge. It only fetches rates (read-only at the carrier), but it bypasses
@@ -2112,10 +2059,10 @@ recipe_void_a_label:
   `shipping/ship/getPanelPkg` (common.php:265), `shipping/rate/rateList`
   (rate.php:149), `shipping/tools/mgrRows` (tools.php:95),
   `shipping/tools/syncShipments` (tools.php:147), and
-  `shipping/admin/signup` (admin.php:271) have no `validateAccess` guard.**
+  `shipping/admin/signup` (admin.php:258) have no `validateAccess` guard.**
   Most are render/list/no-op, but they are reachable as routes without a
   permission check — review before treating any as trusted.
-- **Inverted carrier guard in `shipping/admin/extraAction` (admin.php:211):**
+- **Inverted carrier guard in `shipping/admin/extraAction` (admin.php:198):**
   `if (!empty($meta)) { return msgAdd("Could not find carrier class…"); }` —
   the condition is backwards (it errors when the carrier registry entry IS
   found, and proceeds with an empty `$meta` when it is not). As written this
@@ -2134,7 +2081,7 @@ recipe_void_a_label:
   (`reconcile.php`, `track.php`) — the dispatchers post nothing, but the
   carrier `reconcileInvoice()/trackBulk()` implementations may. Verify the
   specific carrier method's effects (`confidence: medium`).
-- **`shipping/admin/adminSavePkg` (admin.php:375) is a write gated only at
+- **`shipping/admin/adminSavePkg` (admin.php:362) is a write gated only at
   admin level 1** (view), not 3 — note the mismatch if your agent enforces
   level-by-operation conventions.
 - **`shipping/manager/shpmtDetailsSave` (manager.php:520) `inventory: none`**

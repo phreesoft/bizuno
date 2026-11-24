@@ -110,9 +110,9 @@ class shippingCommon
         if (!is_string($carrier)) { msgAdd("carrier = ".print_r($carrier, true)); return; }
         $carriers = getMetaMethod('carriers');
         msgDebug("\nLoaded carriers = ".print_r($carriers, true));
-        if (!empty($carriers[$carrier])) {
-            bizAutoLoad($carriers[$carrier]['path']."$carrier.php", $carrier);
-            $fqcn    = "\\bizuno\\$carrier";
+        $fqcn = "\\bizuno\\$carrier";
+        if (!empty($carriers[$carrier])) { bizAutoLoad($carriers[$carrier]['path']."$carrier.php", $carrier); }
+        if (!empty($carriers[$carrier]) && class_exists($fqcn)) { // a carrier removed from the code base can linger in a stale cache
             msgDebug("\nCreating class $carrier");
             $shipper = new $fqcn();
         } else {

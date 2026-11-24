@@ -263,28 +263,70 @@ class portalApi
         $layout = array_replace_recursive($layout, ['content'=>['roles'=>$roles]]);
     }
 
+    /**
+     * Sales tax lookup for storefronts (e.g. the WooCommerce sales tax plugin). Unauthenticated:
+     * it only returns a rate, computed from the business's own PhreeBooks customer tax rates
+     * (PhreeBooks -> Sales Tax -> Customers). No external service is involved.
+     *
+     * A rate applies to an address when its title names it:
+     *   1. a 5-digit ZIP code anywhere in the title ("TX 76092 Southlake"), else
+     *   2. the 2-letter state code at the start of the title ("TX", "TX - Texas").
+     * A title that contains a 5-digit number is treated as ZIP-specific and never used statewide,
+     * so keep percentages and other long numbers out of statewide titles.
+     * Only active rates inside their effective/expiration dates are considered. When several
+     * rates match at the same level the lowest record ID wins. No match returns a 0 rate.
+     *
+     * POST: total, freight, city, state, zip, country
+     * Returns JSON {"sales_tax": <amount>, "rate": <decimal, e.g. 0.0825>, "msg": ""}
+     */
     public function getSalesTax(&$layout=[])
     {
         $args  = [
             'total'   => clean('total',  'float',    'post'),
             'shipping'=> clean('freight','float',    'post'),
             'city'    => clean('city',   'text',     'post'),
-            'state'   => clean('state',  'text',     'post'),
+            'state'   => strtoupper(preg_replace('/[^a-zA-Z]/', '', (string)clean('state', 'text', 'post'))),
             'zipCode' => clean('zip',    'text',     'post'),
             'country' => clean('country','alpha_num','post')];
-        // sanity check
         msgDebug("\nEntering getSalesTax with args = ".print_r($args, true));
         $this->cleanZip($args['zipCode'], $args['country']);
-        if (empty($args['zipCode'])) { return msgAdd('There are no rates to display, postal code was not provided!'); }
-        // see if shipping is taxable
-        $taxShip = in_array($args['state'], $this->ShipTaxSt) ? true : false;
-        // check for other state specific parameters
+        if (empty($args['zipCode']) && empty($args['state'])) { return msgAdd('There are no rates to display, postal code or state was not provided!'); }
+        $match = $this->matchSalesTaxRate($args['state'], $args['zipCode']);
+        $rate  = !empty($match) ? round(floatval($match['tax_rate']) / 100, 6) : 0; // PhreeBooks stores percent (8.25), storefronts expect a decimal (0.0825)
+        $msg   = !empty($match) ? '' : "No PhreeBooks customer tax rate matches state '{$args['state']}' or ZIP '{$args['zipCode']}'.";
+        msgDebug("\ngetSalesTax matched rate ".(!empty($match) ? "ID {$match['_rID']} ({$match['title']})" : 'none')." = $rate");
+        $taxShip = in_array($args['state'], $this->ShipTaxSt) ? true : false; // states that tax shipping
+        $tax   = $taxShip ? (floatval($args['total']) + floatval($args['shipping'])) * $rate : floatval($args['total']) * $rate;
+        $layout= ['type'=>'raw', 'content'=>json_encode(['sales_tax'=>round($tax, 2), 'rate'=>$rate, 'msg'=>$msg])];
+    }
 
-        // retrieve from the tax table
-        $rate  = dbGetValue('sales_tax_map', 'tax_rate', "zipcode='{$args['zipCode']}'");
-        msgDebug("\nresult of db query rate = ".print_r($rate, true));
-        $tax   = !$taxShip ? floatval($args['total']) * $rate : (floatval($args['total']) + floatval($args['shipping'])) * $rate;
-        $layout= ['type'=>'raw', 'content'=>json_encode(['sales_tax'=>round($tax, 2), 'rate'=>$rate, 'msg'=>''])];
+    /**
+     * Picks the PhreeBooks customer tax rate for a state/ZIP, see getSalesTax() for the title rules.
+     * Reads tax_rate_c from common_meta directly so a guest request never touches the module cache.
+     * @param string $state - 2-letter state code, upper case
+     * @param string $zip - cleaned postal code
+     * @return array - the matching rate meta row, or [] if none
+     */
+    private function matchSalesTaxRate($state, $zip)
+    {
+        $today = biz_date('Y-m-d');
+        $rows  = (array)dbMetaGet('%', 'tax_rate_c');
+        usort($rows, function($a, $b) { return intval($a['_rID']) <=> intval($b['_rID']); });
+        $byZip = $byState = [];
+        foreach ($rows as $row) {
+            if (!is_array($row) || !empty($row['inactive'])) { continue; }
+            $start = (string)($row['start_date'] ?? '');
+            $end   = (string)($row['end_date']   ?? '');
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $start) && $start > $today) { continue; } // not yet effective
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $end)   && $end   < $today) { continue; } // expired
+            $title = strtoupper(trim((string)($row['title'] ?? '')));
+            if (preg_match('/(?<!\d)\d{5}(?!\d)/', $title)) { // names a ZIP: applies to that ZIP only, never statewide
+                if (strlen($zip) == 5 && ctype_digit($zip) && preg_match('/(?<!\d)'.$zip.'(?!\d)/', $title)) { $byZip[] = $row; }
+            } elseif (strlen($state) == 2 && preg_match('/^'.$state.'(?![A-Z])/', $title)) { $byState[] = $row; }
+        }
+        if (!empty($byZip))   { return $byZip[0]; }
+        if (!empty($byState)) { return $byState[0]; }
+        return [];
     }
 
     private function cleanZip(&$zip, $country='USA')
@@ -399,7 +441,7 @@ class portalApi
 
     /************************ Support Methods **************************/
     /**
-     * IP-allowlist gate for the PhreeSoft mothership routes (`getBizRoles`, `getSalesTax`).
+     * IP-allowlist gate for the PhreeSoft mothership route (`getBizRoles`).
      *
      * Layered:
      *   1. `REMOTE_ADDR === PHREESOFT_IP`        — primary check, original behavior.

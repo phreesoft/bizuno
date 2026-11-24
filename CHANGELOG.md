@@ -2,6 +2,26 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.7] — Unreleased
+
+### Changed
+- **Storefront sales tax uses PhreeBooks tax rates** (`src/portal/api.php` `getSalesTax`). The
+  lookup used a `sales_tax_map` ZIP table that only existed on PhreeSoft's server, so it returned
+  no rate on every other install. It now matches the business's own active customer tax rates by
+  title: a 5-digit ZIP in the title applies to that ZIP, otherwise a title starting with the
+  2-letter state code applies statewide. Response shape is unchanged. See
+  *WooCommerce via bizuno-api → Sales tax for the storefront*.
+
+### Removed
+- **Endicia shipping carrier.** It fetched its credentials from phreesoft.com. The carrier, its
+  "buy postage" route (`shipping/admin/fundsBuy`, which had no permission check) and its docs are
+  gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
+  their `endicia` method code. Use the USPS carrier for postage.
+
+### Fixed
+- Loading a carrier that is still listed in a stale cache but no longer in the code base no
+  longer fatals; it falls back to the generic shipper.
+
 ## [7.4.6] — Unreleased
 
 ### Removed

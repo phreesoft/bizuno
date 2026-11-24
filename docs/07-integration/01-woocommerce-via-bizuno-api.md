@@ -138,6 +138,29 @@ it's eventually overwritten.
 
 ---
 
+## Sales tax for the storefront
+
+The Bizuno Sales Tax plugin asks your Bizuno site for a rate at
+`?bizRt=portal/api/getSalesTax` (POST `total`, `freight`, `city`, `state`, `zip`,
+`country`). Bizuno answers from its own **PhreeBooks → Sales Tax → Customers** rates;
+no outside service is involved. It returns
+`{"sales_tax": <amount>, "rate": <decimal, e.g. 0.0825>, "msg": ""}`.
+
+A rate applies to an address when its **title** names it:
+
+1. **ZIP code** — a 5-digit ZIP anywhere in the title (`TX 76092 Southlake`) applies
+   to that ZIP only. This match wins.
+2. **State** — otherwise, a title that starts with the 2-letter state code
+   (`TX`, `TX - Texas`) applies to the whole state.
+
+Only active rates within their effective and expiration dates count. If several
+rates match at the same level, the one created first wins. Keep 5-digit numbers out
+of statewide titles, since any title with one is treated as ZIP-specific. When no
+rate matches, the rate is 0 and `msg` says so. Shipping is added to the taxable
+amount for states that tax freight.
+
+---
+
 ## Related
 
 - [REST API surface](./03-rest-api-surface.md) — the `portal/api` endpoints this plugin calls, and the token model

@@ -27,7 +27,6 @@ Bizuno ships more than the headline three. Two tiers:
 | UPS          | REST API; account must be certified before live labels     |
 | USPS         | OAuth API (developer.usps.com) with an EPS payment account  |
 | FedEx        | REST API; optional separate Freight (LTL) account          |
-| Endicia      | USPS postage via Stamps.com/Endicia; buy/refund postage     |
 | Canada Post  | SOAP API; domestic + international rating                   |
 | XPO, ODFL    | LTL freight carriers                                        |
 
@@ -50,7 +49,6 @@ key fields by carrier:
 | UPS          | account number, REST API key, REST secret, test/prod toggle        |
 | USPS         | client ID + client secret (OAuth), EPS payment account, CRID, MID, price type |
 | FedEx        | account number, REST API key, REST secret, (optional) Freight account |
-| Endicia      | client key                                                         |
 | Canada Post  | customer number, test user/pass, production user/pass              |
 
 > **Test mode first.** Each live carrier has a test/sandbox toggle. Configure and
@@ -71,7 +69,7 @@ API keys.
 
 ## Address validation
 
-UPS, USPS, FedEx, and Endicia offer **address validation**; it runs when you check
+UPS, USPS, and FedEx offer **address validation**; it runs when you check
 **Verify Address** on the label form, and can correct the address before you buy the
 label. (Canada Post's validation is not currently working — treat it as
 rating/labeling only.)
