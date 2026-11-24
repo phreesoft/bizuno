@@ -22,9 +22,6 @@ own web server. This is the right path when:
   want Bizuno running on its own (sub)domain.
 - You're comfortable creating a database and pointing a vhost at a
   directory, or your host gives you cPanel/Plesk to do it.
-- You **don't** also run WordPress on the same site (if you do, the
-  [WordPress plugin path](./06-wordpress-install-walkthrough.md) is
-  less work — single login, shared DB).
 
 End state: `https://your.hostname/` serves Bizuno, PHP-FPM behind
 Apache or Nginx, schema created in MySQL/MariaDB, TLS terminated by
@@ -321,6 +318,5 @@ behind TLS and redirects break.
 
 - [Three Ways to Run It](./02-three-ways-to-run-it.md) — pick the right path
 - [Docker Install Walkthrough](./04-docker-install-walkthrough.md) — containerized alternative
-- [WordPress Install Walkthrough](./06-wordpress-install-walkthrough.md) — run inside WP admin instead
 - [First-hour walkthrough](./03-first-hour-walkthrough.md) — what to do once you're logged in
 - [Administration → Backup and Restore](../05-administration/03-backup-and-restore.md)

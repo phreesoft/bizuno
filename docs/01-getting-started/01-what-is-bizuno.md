@@ -92,7 +92,7 @@ A rough orientation, not a scorecard:
 - New to ERP/accounting? Read [Core Concepts](../02-core-concepts/) next — it's
   the section that prevents the common setup mistakes.
 - Ready to install? See [the ways to run it](./02-three-ways-to-run-it.md) and the
-  install walkthroughs (Docker, LAMP/LEMP, WordPress).
+  install walkthroughs (Docker, LAMP/LEMP).
 - Coming from PhreeBooks 5 or QuickBooks? Skim this, then go to
   [Migration & Upgrade](../08-migration-and-upgrade/).
 

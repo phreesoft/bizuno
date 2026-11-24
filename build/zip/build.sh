@@ -26,7 +26,7 @@ cd "$REPO_ROOT"
 
 VERSION="$(cat src/VERSION)"
 STAGING="$REPO_ROOT/build/output/zip-staging"
-# Per-variant output dir (matches the pattern used by build/wordpress/build.sh
+# Per-variant output dir (matches the pattern used by the other build/*/build.sh scripts
 # and build/nextcloud/build.sh). The release.yml workflow's upload-artifact
 # step expects each variant's artifacts under build/output/<variant>/* —
 # putting the zip directly in build/output/ made it invisible to upload.
