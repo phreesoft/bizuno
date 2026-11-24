@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-15
+ * @version    7.x Last Update: 2026-11-24
  * @filesource /controllers/bizuno/dashboards/ps_news/ps_news.php
  */
 
@@ -34,10 +34,9 @@ class ps_news
     public  $code      = 'ps_news';
     public  $category  = 'bizuno';
     public  $noSettings= true;
-    private $maxItems  = 4;
     public  $struc;
     public $lang = ['title'=>'PhreeSoft News',
-        'description'=> 'Displays the latest PhreeSoft news and press releases.'];
+        'description'=> 'PhreeSoft is no longer in business; this dashboard only shows that notice and can be removed.'];
 
     function __construct()
     {
@@ -45,23 +44,9 @@ class ps_news
 
     public function render(&$layout=[])
     {
-/*
-        global $io;
-        $strXML = $io->cURL("https://www.phreesoft.com/feed/");
-        $news   = parseXMLstring($strXML);
-        msgDebug("\nNews object = ".print_r($news, true));
-        $html   = '';
-        $newsCnt= 0;
-        if (!empty($news->channel->item)) {
-            foreach ($news->channel->item as $entry) {
-                $html .= '<a href="'.$entry->link.'" target="_blank"><h3>'.$entry->title."</h3></a><p>$entry->description</p>";
-                if ($newsCnt++ > $this->maxItems) { break; }
-            }s
-        } else {
-            $html .= "Sorry I cannot reach the PhreeSoft.com server. Please try again later.";
-        }
- */
-        $html = 'Coming soon!';
+        // PhreeSoft, Inc. has closed; there is no news feed to fetch.
+        $html = '<p><b>PhreeSoft is no longer in business.</b></p>'
+              . '<p>There is no PhreeSoft news to show. You can remove this dashboard from your home page.</p>';
         return ['html'=>$html];
     }
 }

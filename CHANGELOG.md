@@ -18,6 +18,9 @@ All notable changes to Bizuno ERP are documented in this file.
   gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
   their `endicia` method code. Use the USPS carrier for postage.
 
+- **PhreeSoft News dashboard** now shows that PhreeSoft is no longer in business instead of
+  "Coming soon!", and the dead phreesoft.com feed code is removed.
+
 ### Fixed
 - Loading a carrier that is still listed in a stale cache but no longer in the code base no
   longer fatals; it falls back to the generic shipper.
