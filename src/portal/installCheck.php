@@ -100,9 +100,6 @@ function preflightCheck()
                     . '<h3 style="margin-bottom:6px;">B. Use a pre-built release</h3>'
                     . '<p>Download a zip release from the <a href="https://github.com/phreesoft/bizuno/releases" target="_blank" rel="noopener">Bizuno releases page</a> '
                     . 'with dependencies already bundled. Unzip in place of this directory.</p>'
-                    . '<p>For WordPress users: install the '
-                    . '<a href="https://wordpress.org/plugins/bizuno-accounting/" target="_blank" rel="noopener">Bizuno Accounting plugin</a> '
-                    . 'instead — it bundles everything and integrates with WP admin.</p>'
                     . '<p>Full install guide: <a href="https://github.com/phreesoft/bizuno#installation" target="_blank" rel="noopener">github.com/phreesoft/bizuno</a></p>',
         ];
     }

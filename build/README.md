@@ -12,7 +12,6 @@ point* and the *delivery format*:
 | **Standalone** (current repo root) | `../index.php` | `git clone` or composer create-project |
 | **Composer** | `../index.php` | `composer create-project phreesoft/bizuno` |
 | **Zip** (LAMP/WAMP drop-in) | `../index.php` | release zip with vendor/ baked in |
-| **WordPress plugin** | `wordpress/bizuno-accounting.php` | wordpress.org plugin directory (slug `bizuno-accounting`); WP-admin upload also works |
 | **Docker** | container `ENTRYPOINT` | `ghcr.io/phreesoft/bizuno:VERSION` |
 | **NextCloud app** | `nextcloud/bizuno/` launcher | NextCloud app store (frames a separate Bizuno install) |
 
@@ -27,7 +26,6 @@ described per-subdirectory below.
 
 | Path | Status | Distribution channel |
 |---|---|---|
-| [`wordpress/`](./wordpress/) | **active** | GitHub Releases + WordPress.org SVN (auto-mirrored) |
 | [`zip/`](./zip/) | **active** | GitHub Releases |
 | [`docker/`](./docker/) | **active** | ghcr.io — multi-arch (linux/amd64, linux/arm64) |
 | [`nextcloud/`](./nextcloud/) | **active** | GitHub Releases + apps.nextcloud.com (manual upload until automated) |
@@ -40,12 +38,11 @@ in `.gitignore`. Each script is self-contained — run from anywhere:
 
 ```bash
 bash build/zip/build.sh        # → build/output/zip/bizuno-VERSION-zip.zip
-bash build/wordpress/build.sh  # → build/output/wordpress/bizuno-accounting-VERSION.zip
 bash build/docker/build.sh     # → local image ghcr.io/phreesoft/bizuno:VERSION + :latest
 bash build/nextcloud/build.sh  # → build/output/nextcloud/bizuno-VERSION.tar.gz
 ```
 
-The zip / wordpress scripts run `composer install --no-dev
+The zip script runs `composer install --no-dev
 --optimize-autoloader` against a fresh staging directory; nothing in your
 working tree is modified. The docker build runs entirely inside the
 Docker build context — the local working tree is the build context but
@@ -61,10 +58,9 @@ The workflow:
 
 1. Resolves the version from the pushed tag (strips the leading `v`)
 2. Verifies `src/VERSION` matches the tag (fails fast otherwise)
-3. Builds zip, wordpress, and nextcloud variants in parallel
+3. Builds zip and nextcloud variants in parallel
 4. Builds and pushes the multi-arch Docker image to `ghcr.io/phreesoft/bizuno` (tags: `VERSION`, `MAJOR.MINOR`, `MAJOR`, `latest`)
 5. Creates a GitHub Release with generated changelog notes, attaches the zip + tarball artifacts
-6. (Optional) Pushes the WordPress plugin to wordpress.org SVN if `WP_SVN_USER` / `WP_SVN_PASS` secrets are configured
 
 The NextCloud tarball is currently uploaded to apps.nextcloud.com by
 hand (manual step at <https://apps.nextcloud.com/developer/apps/releases/new>).
@@ -83,7 +79,7 @@ git push origin main
 git tag v7.4.0
 git push origin v7.4.0
 # … CI runs, ~3 minutes to zip artifacts, ~8 minutes to Docker image
-# (multi-arch builds are slower), ~5 minutes to wordpress.org if SVN push enabled
+# (multi-arch builds are slower)
 ```
 
 ## Adding a new variant
