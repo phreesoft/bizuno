@@ -493,11 +493,12 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
      */
     public function properties(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; } // gate before any query, same as the sibling methods
         $sku = clean('sku', 'text', 'get');
         if (empty($sku)) { return msgAdd("Bad sku passed!"); }
         $qty = clean('qty', 'float','get');
         if (empty($qty)) { $qty = 1; }
-        $_GET['rID'] = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='$sku'");
+        $_GET['rID'] = intval(dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($sku)."'")); // sku is request-supplied free text, must be escaped
         compose('inventory', 'main', 'edit', $layout);
         if (!empty($layout['fields']['assy_cost']['events']['onClick'])) {
             $event = str_replace('getCostAssy', "getCostAssy&qty=$qty", $layout['fields']['assy_cost']['events']['onClick']);
