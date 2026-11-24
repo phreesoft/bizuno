@@ -29,14 +29,24 @@ namespace bizuno;
 
 if (!defined('BIZUNO_DB_PREFIX')) { exit('Illegal Access!'); }
 
+/** Highest upgrade gate in bizunoUpgrade(). Keep in sync when adding a gate. */
+if (!defined('BIZUNO_UPGRADE_GATE')) { define('BIZUNO_UPGRADE_GATE', '7.5.1'); }
+
 /**
  * POST R7.0 - Handles the db upgrade for all versions of Bizuno to the current release level
  * @param string $cron - current cron data
  */
 function bizunoUpgrade()
 {
+    // Gates are numbered by development version, which can run ahead of the
+    // released version (7.4.6 shipped with gates up to 7.5.1 already in place).
+    // schema_version records the highest gate applied so a gate never runs twice
+    // when the released version later passes it. Bump BIZUNO_UPGRADE_GATE when
+    // adding a gate, and number new gates above the current value.
     $dbVer = getModuleCache('bizuno', 'properties', 'version');
-    msgDebug("\nEntering bizunoUpgrade with db version = $dbVer");
+    $schema= getModuleCache('bizuno', 'properties', 'schema_version');
+    if (!empty($schema) && version_compare($schema, (string)$dbVer) > 0) { $dbVer = $schema; }
+    msgDebug("\nEntering bizunoUpgrade with effective db version = $dbVer");
 
     dbTransactionStart();
     if (version_compare($dbVer, '7.1') < 0) {
@@ -370,6 +380,8 @@ function bizunoUpgrade()
     }
     dbTransactionCommit();
     setModuleCache('bizuno', 'properties', 'version', MODULE_BIZUNO_VERSION); // set newest version
+    $gate = version_compare((string)$dbVer, BIZUNO_UPGRADE_GATE) > 0 ? (string)$dbVer : BIZUNO_UPGRADE_GATE;
+    setModuleCache('bizuno', 'properties', 'schema_version', $gate); // every gate up to here has been applied
     // Persist the version to the configuration table NOW, not at end of request.
     // setModuleCache() only touches the in-memory $bizunoMod, and getCodex() reloads
     // the registry immediately after this returns: initRegistry() reassigns $bizunoMod
