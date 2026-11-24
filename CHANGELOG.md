@@ -4,6 +4,14 @@ All notable changes to Bizuno ERP are documented in this file.
 
 ## [7.4.6] — Unreleased
 
+### Removed
+- **WordPress plugin retired.** The `bizuno-accounting` plugin is withdrawn from WordPress.org
+  and will not be updated. Removed its build (`build/wordpress/`), the WordPress variant and
+  WordPress.org SVN push from `release.yml`, the WordPress install walkthrough, and the
+  WordPress install instructions in `README.md` and the installer's missing-dependency page.
+  Existing WordPress installs should move to a standalone or Docker install; see
+  *Four ways to run it* for migrating the `wp_bizuno_` tables.
+
 ### Security
 - **Lost-password account takeover** (`src/portal/viewMaint.php`) — the reset link was rendered
   in the HTTP response when mail was "not configured" or the send failed. The guest path never
