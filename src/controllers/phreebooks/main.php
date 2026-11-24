@@ -1101,6 +1101,9 @@ function bizUnitDiscDisc(newValue) {
     {
         $rID  = clean('rID', 'integer', 'get');
         if (empty($rID)) { return msgAdd(lang('illegal_access')); }
+        // the caller does not pass jID, so gate on the journal of the record being written
+        $jID  = intval(dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'journal_id', "id=$rID"));
+        if (empty($jID) || !validateAccess("j{$jID}_mgr", 2)) { return; }
         $notes= clean('data', 'text', 'get');
         dbWrite(BIZUNO_DB_PREFIX.'journal_main', ['notes'=>$notes], 'update', "id=$rID");
         msgAdd(lang('msg_record_saved'), 'success');
