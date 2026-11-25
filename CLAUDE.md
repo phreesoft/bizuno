@@ -28,7 +28,7 @@ Packagist), so everything committed here is visible to anyone.
 - `src/`: the application (controllers, model, view, locale, portal).
 - `build/`: release variants (`zip/`, `docker/`, `nextcloud/`), built by
   `.github/workflows/release.yml` on `v*` tags.
-- `docs/`: user and admin documentation, synced to the website.
+- `docs/`: user and admin documentation (Markdown, read on GitHub).
 - `src/VERSION`: the release version; the release workflow checks it
   against the tag.
 - Database upgrade steps are in `src/controllers/bizuno/install/upgrade.php`.

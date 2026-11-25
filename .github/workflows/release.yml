@@ -167,7 +167,7 @@ jobs:
             echo ""
             echo "For composer-create-project install: \`composer create-project phreesoft/bizuno --no-dev\` (pulls automatically from Packagist)."
             echo ""
-            echo "See [docs](https://bizuno.com/docs/) for full install instructions."
+            echo "See [docs](https://github.com/phreesoft/bizuno/tree/main/docs) for full install instructions."
           } > release-notes.md
           gh release create "$TAG" \
             --title "Bizuno $VERSION" \

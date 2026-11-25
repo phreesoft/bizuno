@@ -1,18 +1,16 @@
 # Contributing to the Bizuno Manual
 
 The manual is authored in Markdown here in `bizuno/docs/`, version-controlled
-alongside the code. Published pages are mirrored to BetterDocs at
-[bizuno.com/docs](https://bizuno.com/docs) via the WP REST API.
+alongside the code, and read on GitHub.
 
 ## Why we work this way
 
 - **Source-of-truth in git** — PRs, history, blame, code review for docs same
   as for code.
 - **Docs ship with code** — a feature PR can update the docs in the same diff.
-- **No vendor lock-in** — if BetterDocs ever falls behind, we render to MkDocs,
-  Docusaurus, or static HTML without rewriting content.
-- **Community contributions** — `Edit on GitHub` link at the bottom of each
-  published page points back to the Markdown source.
+- **No vendor lock-in** — the Markdown can be rendered to MkDocs, Docusaurus,
+  or static HTML later without rewriting content.
+- **Community contributions** — anyone can propose a change with a PR.
 
 ## Per-page front matter
 
@@ -57,40 +55,6 @@ deprecated-in: ~            # bump to a version if/when the page becomes wrong
 - Screenshots: store under the page's directory in an `img/` subfolder; commit
   PNG/WebP, not JPEG for UI captures. Filename: `<page-slug>-<short-desc>.png`.
 
-## Sync to BetterDocs
-
-The sync script lives at [`bin/docs-sync.php`](../bin/docs-sync.php) and is
-documented in detail at [`bin/README.md`](../bin/README.md). The short
-version:
-
-```bash
-# Preview what would happen — no API calls
-php bin/docs-sync.php --dry-run
-
-# First time on a new machine: build the slug → post-ID cache
-php bin/docs-sync.php --init-map --user=<user> --pass=<app-pass>
-
-# Routine use (or in CI via env vars BIZUNO_DOCS_{USER,PASS,SITE})
-php bin/docs-sync.php --user=<user> --pass=<app-pass>
-```
-
-Mapping:
-- Each `docs/NN-section/` directory becomes a BetterDocs **category** (created
-  automatically if missing)
-- Each `.md` file becomes a BetterDocs **doc**
-- Slug is derived from the file's basename (numeric prefix stripped), so a
-  file moved between sections keeps the same WP post — no duplicates
-- Front-matter `order` controls display order within the category
-- Front-matter `status` gates publishing: by default only `published` files
-  sync; `draft` and `stub` files stay in git only
-
-Credentials are a WP **Application Password** (WP admin → Users → Profile).
-Never commit them; use `BIZUNO_DOCS_PASS` in CI.
-
-Section `README.md` files are *not* synced as docs — they're for GitHub
-readers. BetterDocs shows its own auto-generated category archive page in
-their place.
-
 ## When to add a new page vs. edit existing
 
 Add a new page when:
@@ -106,7 +70,7 @@ Edit existing when:
 1. Open a PR — set `status: draft` in front matter.
 2. SME review for technical accuracy → `status: review`.
 3. Voice/edit pass → `status: published`, bump `last-updated`.
-4. Merge to `main` → sync job pushes to bizuno.com/docs.
+4. Merge to `main`; the page is live on GitHub.
 
 ## When you're stuck
 

@@ -20,6 +20,10 @@ All notable changes to Bizuno ERP are documented in this file.
   "buy postage" route (`shipping/admin/fundsBuy`, which had no permission check) and its docs are
   gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
   their `endicia` method code. Use the USPS carrier for postage.
+- **Docs sync to bizuno.com.** The `docs-sync` workflow, `bin/docs-sync.php`, its slug map and
+  the `erusev/parsedown` dev dependency are removed; the manual is read on GitHub. Links that
+  pointed at bizuno.com/docs (release notes, Docker image label, NextCloud settings, zip README,
+  install-check page) now point at the `docs/` folder on GitHub.
 - **PhreeSoft News dashboard** now shows that PhreeSoft is no longer in business instead of
   "Coming soon!", and the dead phreesoft.com feed code is removed.
 

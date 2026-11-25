@@ -3,16 +3,16 @@
 > Working note for whoever is drafting the manual. The repo is the source of
 > truth across machines: each section `README.md` shows per-page status, and
 > `git log` shows what's been published. This file is the quick "where we left
-> off" summary. Not synced to BetterDocs.
+> off" summary.
 
 **Last updated:** 2026-06-16
 
 ---
 
-## Done & published live (bizuno.com/docs)
+## Done & published
 
 **Chapter 4 — Modules in Depth is COMPLETE** (all 6 sections written, merged to
-`main`, and synced live):
+`main`, and published):
 
 - **01 PhreeBooks** — chart-of-accounts, journals (per-jID), register & reconcile,
   payroll, fiscal-year, and the `06-order-manager/` sub-section (entry fields, save
@@ -49,20 +49,8 @@ Chapters (all **merged to `main`**, all now `status: published`):
 - **09-troubleshooting** ✅
 
 **Deliberately left as `draft` (NOT for the public manual):** `agent-catalog/*`
-(internal machine-readable agent catalog) and `CONTRIBUTING-DOCS.md`. These are
-skipped by the sync on purpose — don't flip them.
-
-### The one remaining step: run the sync
-The `published` flag only gates *whether* a page syncs; it does **not** push
-anything live by itself. To publish to bizuno.com/docs, the site owner
-(`support@phreesoft.com`, who holds the WP app password) runs:
-```bash
-composer install            # first time on a machine (parsedown)
-php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>'
-```
-A full `--dry-run` currently reports **79 candidate pages, 0 failed** (12 skipped
-= the agent-catalog + CONTRIBUTING files above). Commit `docs/.sync-map.json`
-after the first real sync.
+(internal machine-readable agent catalog) and `CONTRIBUTING-DOCS.md`. Leave
+them as drafts.
 
 > **When drafting `08-migration/03-release-notes/`:** there is **no 7.3.9 release**
 > — rename the `7-3-9` stub to **`7-4-0`**. The features it was meant to cover
@@ -82,27 +70,17 @@ after the first real sync.
    correct any stub overstatements (this has happened in every section so far).
 4. Match house voice — see `docs/CONTRIBUTING-DOCS.md` and any already-drafted page.
    Frontmatter `status: draft` while writing.
-5. Verify cross-links, then `php bin/docs-sync.php --dry-run --only=<section>`.
+5. Verify cross-links.
 6. Commit, push, open a PR.
 
-### To publish a section live
-Flip frontmatter `status: draft` → `published` (and the section README table),
-merge the PR, then sync:
-```bash
-composer install            # first time on a machine (parsedown)
-php bin/docs-sync.php --user='support@phreesoft.com' --pass='<wp-app-password>' --only=<section>
-```
+### To publish a section
+Flip frontmatter `status: draft` → `published` (and the section README table), then
+merge the PR.
 
 ---
 
 ## Gotchas to remember
 
-- **Sync publishes immediately** — `docs-sync.php` always sets the WP post status to
-  `publish`; the `status:` frontmatter only gates *whether* a page syncs.
-- **The WP app password** is held by the site owner (`support@phreesoft.com`) — the
-  owner runs the sync.
-- **`docs/.sync-map.json`** caches slug→WP-post-ID; commit it after a sync. If it's
-  stale the sync falls back to slug lookup, so re-runs update rather than duplicate.
 - **Assembly labor cost:** labor/charge BOM lines are deliberately **not**
   capitalized into an assembly's GL inventory value (labor has its own GL→COGS path;
   capitalizing would double-count). See `03-inventory/03-assemblies.md`.
