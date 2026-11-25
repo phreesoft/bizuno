@@ -79,7 +79,7 @@ class qa_stop_work
             if (!in_array($entry['printed'], ['2'])) { continue; } // printed is db version of status
             $left   = viewDate($entry['post_date'])." - ".viewText($entry['description'], $opts['trim']);
             $right  = '';
-            $action = html5('', ['styles'=>['background'=>'red','color'=>'#fff'],'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/correctives/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+            $action = html5('', ['styles'=>['background'=>'red','color'=>'#fff'],'events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/tickets/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
             $rows[] = viewDashLink($left, $right, $action);
         }
         if (empty($rows)) { $rows[] = '<div><span>'.lang('no_results').'</span></div>'; }

@@ -82,7 +82,7 @@ class open_ca
         foreach ($result as $entry) { // build the list
             $left   = viewDate($entry['post_date'])." - ".viewText($entry['description'], $opts['trim']);
             $right  = '';
-            $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/correctives/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
+            $action = html5('', ['events'=>['onClick'=>"winHref(bizunoHome+'?bizRt=$this->moduleID/tickets/manager&rID={$entry['id']}');"],'attr'=>['type'=>'button','value'=>"#{$entry['invoice_num']}"]]);
             $rows[] = viewDashLink($left, $right, $action);
         }
         $total = dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'COUNT(*) AS total', $filter, false);

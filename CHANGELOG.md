@@ -28,6 +28,9 @@ All notable changes to Bizuno ERP are documented in this file.
   "Coming soon!", and the dead phreesoft.com feed code is removed.
 
 ### Fixed
+- **Quality dashboards linked to a page that no longer exists.** Clicking a ticket on *Quality
+  Tickets Pending Review* or *Current Stop Work* showed "could not find the method" instead of
+  opening it. Both now open the ticket in the Quality Tickets manager.
 - Loading a carrier that is still listed in a stale cache but no longer in the code base no
   longer fatals; it falls back to the generic shipper.
 
