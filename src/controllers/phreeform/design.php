@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-02-28
+ * @version    7.x Last Update: 2026-10-10
  * @filesource /controllers/phreeform/design.php
  */
 
@@ -107,11 +107,11 @@ final class phreeformDesign extends mgrJournal
             // Tab: filters - Panel:
             'dateperiod'    => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,                     'clean'=>'char', 'attr'=>['type'=>'radio', 'value'=>'d']],
             'datelist'      => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'position'=>'after', 'clean'=>'array','attr'=>['value'=>['a']]],
-            'datefield'     => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>lang('phreeform_date_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'datefield'     => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>lang('phreeform_date_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
             'datedefault'   => ['tab'=>'filters', 'panel'=>'date_range','order'=>25,'label'=>lang('date_default_selected', $this->moduleID),'values'=>viewDateChoices(),  'clean'=>'char', 'attr'=>['type'=>'select', 'value'=>'c']],
             // Tab: settings - Panel: options
-            'filenamefield' => ['tab'=>'settings','panel'=>'options',   'order'=>45,'label'=>lang('fieldname'), 'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'filenamefield' => ['tab'=>'settings','panel'=>'options',   'order'=>45,'label'=>lang('fieldname'), 'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'filename', 'attr'=> ['type'=>'select']],
             'filenameprefix'=> ['tab'=>'settings','panel'=>'options',   'order'=>50,'label'=>lang('prefix'),                 'clean'=>'filename', 'attr'=>['size'=>10]],
             // Tab: settings - Panel: advanced
@@ -151,13 +151,13 @@ final class phreeformDesign extends mgrJournal
         }
         if (in_array($type, ['frm'])) { $this->struc = array_merge($this->struc, [
             // Tab: Settings - Panel: settings
-            'formbreakfield'=> ['tab'=>'settings','panel'=>'options','order'=>10,'label'=>lang('page_break_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'formbreakfield'=> ['tab'=>'settings','panel'=>'options','order'=>10,'label'=>lang('page_break_field', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'skipnullfield' => ['tab'=>'settings','panel'=>'options','order'=>15,'label'=>lang('lbl_skip_null', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'skipnullfield' => ['tab'=>'settings','panel'=>'options','order'=>15,'label'=>lang('lbl_skip_null', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'contactlog'    => ['tab'=>'settings','panel'=>'options','order'=>20,'label'=>lang('lbl_phreeform_contact', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'contactlog'    => ['tab'=>'settings','panel'=>'options','order'=>20,'label'=>lang('lbl_phreeform_contact', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
-            'printedfield'  => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>lang('lbl_set_printed_flag', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+            'printedfield'  => ['tab'=>'settings','panel'=>'options','order'=>25,'label'=>lang('lbl_set_printed_flag', $this->moduleID),'options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                 'clean'=>'db_field', 'attr'=> ['type'=>'select']],
             'breakfield'    => ['tab'=>'settings','panel'=>'options','order'=>30,'label'=>lang('phreeform_field_break', $this->moduleID),'clean'=>'db_field', 'attr'=>['maxlength'=>64]],
             'serialform'    => ['tab'=>'settings','panel'=>'options','order'=>35,'label'=>lang('lbl_serial_form', $this->moduleID),      'clean'=>'boolean', 'attr'=>['type'=>'checkbox','checked'=>false]]]);
@@ -258,11 +258,14 @@ final class phreeformDesign extends mgrJournal
     if (jqBiz('#dgFilters').length) jqBiz('#filterlist').val(JSON.stringify(jqBiz('#dgFilters').datagrid('getData')));
     return true;
 }
+function pfTableList() {
+    var rows   = jqBiz('#dgTables').data('datagrid') ? jqBiz('#dgTables').datagrid('getRows') : ((typeof dataTables!='undefined' && dataTables.rows) ? dataTables.rows : []);
+    var tables = [];
+    for (var i=0; i<rows.length; i++) { if (rows[i].tablename) { tables.push(rows[i].tablename); } }
+    return tables.join(':');
+}
 function pfTableUpdate() {
-    var table  = '';
-    var rowData= jqBiz('#dgTables').edatagrid('getData');
-    for (var rowIndex=0; rowIndex<rowData.total; rowIndex++) table += rowData.rows[rowIndex].tablename + ':';
-    jsonAction('$this->moduleID/$this->pageID/getTablesSession', 0, table);
+    jsonAction('$this->moduleID/$this->pageID/getTablesSession', 0, pfTableList());
 }";
     }
 
@@ -505,7 +508,7 @@ function pfTableUpdate() {
                             'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                             'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                     'fieldname'  => ['order'=> 5, 'label'=>lang('fieldname'),          'attr'=>['width'=>200, 'resizable'=>true],
-                        'events'=> ['editor'=>"{type:'combobox',options:{editable:true,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
+                        'events'=> ['editor'=>$this->fieldEditor()]],
                     'title'      => ['order'=>10, 'label'=>lang('title'),              'attr'=>['width'=>150, 'resizable'=>true, 'editor'=>'text']],
                     'break'      => ['order'=>20, 'label'=>lang('column_break', $this->moduleID),'attr'=>['width'=> 80, 'resizable'=>true],
                         'events'=>  ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
@@ -534,17 +537,29 @@ function pfTableUpdate() {
      */
     public function getFields(&$layout=[])
     {
-        $output = [];
-        $output[] = '{"id":"","text":"'.lang('none').'"}';
-        $tables = getModuleCache('phreeform', 'designCache', 'tables');
-        foreach ($tables as $table) {
+        $list   = clean('tables', 'text', 'post'); // tables currently on the Database tab, sent by the combobox onBeforeLoad
+        if (empty($list)) { $list = clean('tables', 'text', 'get'); }
+        $tables = !empty($list) ? explode(':', $list) : (array)getModuleCache('phreeform', 'designCache', 'tables', false, []);
+        $output = [['id'=>'', 'text'=>lang('none')]];
+        foreach (array_unique($tables) as $table) {
+            $table = preg_replace('/[^a-zA-Z0-9_]/', '', (string)$table);
+            if (empty($table) || !dbTableExists(BIZUNO_DB_PREFIX.$table)) { continue; }
             $struct = dbLoadStructure(BIZUNO_DB_PREFIX.$table);
             foreach ($struct as $value) {
                 $label = isset($value['label']) ? $value['label'] : $value['tag'];
-                $output[] = '{"id":"'.$value['table'].'.'.$value['field'].'","text":"'.lang($table).'.'.$label.'"}';
+                $output[] = ['id'=>$value['table'].'.'.$value['field'], 'text'=>lang($table).'.'.$label];
             }
         }
-        $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>"[".implode(',',$output)."]"]);
+        $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);
+    }
+
+    /**
+     * Grid editor for picking a field from the tables listed on the Database tab
+     * @return string - combobox editor JSON
+     */
+    private function fieldEditor()
+    {
+        return "{type:'combobox',options:{editable:true,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text',onBeforeLoad:function(param){ param.tables=pfTableList(); }}}";
     }
 
     /**
@@ -579,7 +594,7 @@ function pfTableUpdate() {
                 'index'      => ['attr'   =>['type'=>'hidden','value'=>$index]],
                 'type'       => ['attr'   =>['type'=>'hidden','value'=>$fData->type]],
                 'boxField'   => ['attr'   =>['type'=>'hidden','value'=>'']],
-                'fieldname'  => ['options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
+                'fieldname'  => ['options'=>['url'=>"'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields'",'onBeforeLoad'=>"function(param){ param.tables=pfTableList(); }",'editable'=>'true','valueField'=>"'id'",'textField'=>"'text'",'mode'=>"'remote'",'width'=>300],
                     'attr'   => ['type'=>'select','value'=>isset($settings->fieldname)? $settings->fieldname:'']],
                 'barcodes'   => ['options'=>['data'=>'dataBarCodes','valueField'=>"'id'",'textField'=>"'text'"],
                     'attr'   => ['type'=>'select','value'=>isset($settings->barcode)? $settings->barcode:'']],
@@ -865,7 +880,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
             case 'Ttl':
                 if (!isset($data['columns']['fieldname'])) {
                     $data['columns']['fieldname'] = ['order'=>5, 'label'=>lang('fieldname'), 'attr'=>  ['width'=>200, 'resizable'=>true],
-                        'events' => ['editor'=>"{type:'combobox',options:{editable:true,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]];
+                        'events' => ['editor'=>$this->fieldEditor()]];
                 }
                 unset($data['columns']['title']);
                 unset($data['columns']['font']);
@@ -876,7 +891,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                 break;
             default:
                 $data['columns']['fieldname'] = ['order'=>5, 'label'=>lang('fieldname'), 'attr'=>  ['width'=>200, 'resizable'=>true],
-                    'events' => ['editor'=>"{type:'combobox',options:{mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]];
+                    'events' => ['editor'=>$this->fieldEditor()]];
                 break;
         }
         return $data;
@@ -901,7 +916,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                         'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                         'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'fieldname'=> ['order'=>10, 'label'=>lang('fieldname'), 'attr'=>  ['width'=>250, 'resizable'=>'true'],
-                    'events'=> ['editor'=>"{type:'combobox',options:{editable:false,mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
+                    'events'=> ['editor'=>$this->fieldEditor()]],
                 'title'    => ['order'=>20, 'label'=>lang('title'), 'attr' => ['width'=>150, 'resizable'=>'true', 'editor'=>'text']],
                 'default'  => ['order'=>30, 'label'=>lang('default'), 'attr'=>  ['width'=>120],
                     'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}", 'resizable'=>'true']]]];
@@ -926,7 +941,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                         'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                         'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'fieldname' => ['order'=>10, 'label' => lang('fieldname'), 'attr'=>['width'=>250,'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'combobox',options:{mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
+                    'events'=> ['editor'=>$this->fieldEditor()]],
                 'title'     => ['order'=>20, 'label' => lang('title'),     'attr'=>['width'=>150,'resizable'=>true, 'editor'=>'text']],
                 'default'   => ['order'=>30, 'label' => lang('default'),   'attr'=>['width'=>120,'resizable'=>true],
                     'events'=> ['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
@@ -956,7 +971,7 @@ jqBiz('#frmFieldSettings').submit(function (e) {
                         'fldEdit' => ['order'=>40,'icon'=>'edit', 'events'=>['onClick'=>"var row = jqBiz('#$name').datagrid('getSelected'); jqBiz('#$name').edatagrid('editRow', jqBiz('#$name').datagrid('getRowIndex', row));"]],
                         'fldTrash'=> ['order'=>80,'icon'=>'trash','events'=>['onClick'=>"jqBiz('#$name').edatagrid('destroyRow');"]]]],
                 'fieldname' => ['order'=>10,'label'=>lang('fieldname'), 'attr'=>  ['width'=>250, 'resizable'=>true],
-                    'events'=> ['editor'=>"{type:'combobox',options:{mode:'remote',url:'".BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/getFields',valueField:'id',textField:'text'}}"]],
+                    'events'=> ['editor'=>$this->fieldEditor()]],
                 'title'     => ['order'=>20,'label'=>lang('title'),'attr'=>['width'=>150, 'editor'=>'text', 'resizable'=>true]],
                 'visible'   => ['order'=>30,'label'=>lang('show'), 'attr'=>['width'=>120, 'resizable'=>true],'events'=>['editor'=>"{type:'checkbox',options:{on:'1',off:''}}"]],
                 'type'      => ['order'=>40,'label'=>lang('type'), 'attr'=>['width'=>200, 'resizable'=>true],'events'=>[
