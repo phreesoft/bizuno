@@ -30,7 +30,7 @@ namespace bizuno;
 if (!defined('BIZUNO_DB_PREFIX')) { exit('Illegal Access!'); }
 
 /** Highest upgrade gate in bizunoUpgrade(). Keep in sync when adding a gate. */
-if (!defined('BIZUNO_UPGRADE_GATE')) { define('BIZUNO_UPGRADE_GATE', '7.5.1'); }
+if (!defined('BIZUNO_UPGRADE_GATE')) { define('BIZUNO_UPGRADE_GATE', '7.5.2'); }
 
 /**
  * POST R7.0 - Handles the db upgrade for all versions of Bizuno to the current release level
@@ -376,6 +376,19 @@ function bizunoUpgrade()
                 msgAdd("The WooCommerce inventory fields (".implode(', ', $wooAdd).") were missing and have been re-created on the e-Store tab."
                     ." Their previous values could not be recovered - restore them from a backup or re-flag the items to list on the store.", 'caution');
             }
+        }
+    }
+    if (version_compare($dbVer, '7.5.2') < 0) {
+        // The Endicia carrier was removed (it fetched its credentials from phreesoft.com). Drop it
+        // from the stored carrier list so screens that instantiate every carrier don't try to load
+        // a class that no longer exists. Old shipment records keep their 'endicia' method code.
+        unset($GLOBALS['methods_carriers']);
+        $cMeta = dbMetaGet(0, 'methods_carriers');
+        $cIdx  = metaIdxClean($cMeta);
+        if (!empty($cIdx) && isset($cMeta['endicia'])) {
+            unset($cMeta['endicia']);
+            dbMetaSet($cIdx, 'methods_carriers', $cMeta);
+            msgLog("Upgrade 7.5.2: removed the Endicia shipping carrier.");
         }
     }
     dbTransactionCommit();

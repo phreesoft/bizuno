@@ -138,6 +138,42 @@ it's eventually overwritten.
 
 ---
 
+## Sales tax for the storefront
+
+The Bizuno Sales Tax plugin asks your Bizuno site for a rate at
+`?bizRt=portal/api/getSalesTax` (POST `total`, `freight`, `city`, `state`, `zip`,
+`country`). Bizuno answers from its own settings; no PhreeSoft service is involved. It
+returns `{"sales_tax": <amount>, "rate": <decimal, e.g. 0.0825>, "msg": "", "source": "…"}`.
+
+**1. Zip-Tax (preferred).** When a Zip-Tax key is set under **API Settings → Sales Tax
+APIs**, the lookup uses the same engine as the order screen's tax total:
+
+- Only states selected under **PhreeBooks settings → Nexus** are taxed; others return 0
+  (`source: nexus`). States with no sales tax return 0.
+- Rates are looked up by ZIP and cached until the next calendar quarter, so each ZIP
+  costs at most one Zip-Tax call per quarter (`source: ziptax`).
+- If an API token is set under **API Settings → PhreeSoft API**, the storefront must send
+  it (the plugin does, as `X-Bizuno-Token`). Without it, the Zip-Tax lookup is skipped.
+- If Zip-Tax doesn't answer, nothing is cached and the lookup falls back to step 2.
+
+**2. PhreeBooks tax rates (fallback).** Without a Zip-Tax key, or when Zip-Tax fails,
+Bizuno uses **PhreeBooks → Sales Tax → Customers**, matched by **title**
+(`source: phreebooks`):
+
+1. **ZIP code** — a 5-digit ZIP anywhere in the title (`TX 76092 Southlake`) applies
+   to that ZIP only. This match wins.
+2. **State** — otherwise, a title that starts with the 2-letter state code
+   (`TX`, `TX - Texas`) applies to the whole state.
+
+Only active rates within their effective and expiration dates count. If several
+rates match at the same level, the one created first wins. Keep 5-digit numbers out
+of statewide titles, since any title with one is treated as ZIP-specific. When nothing
+matches, the rate is 0 (`source: none`) and `msg` says so.
+
+Shipping is added to the taxable amount for states that tax freight.
+
+---
+
 ## Related
 
 - [REST API surface](./03-rest-api-surface.md) — the `portal/api` endpoints this plugin calls, and the token model

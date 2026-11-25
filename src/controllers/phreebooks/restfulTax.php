@@ -178,6 +178,35 @@ class phreebooksRestfulTax
     }
 
     /**
+     * Rate lookup for an unauthenticated storefront request (portal/api/getSalesTax). Same nexus,
+     * no-tax-state and cache rules as the order screen, but no user permission check, and the
+     * lookup is by ZIP only (no street address, so no Geocodio call): one Zip-Tax call per new
+     * ZIP per quarter at most.
+     * @param array $args - state (2-letter), zipCode, city, country
+     * @return float|null - decimal rate (0.0825), 0 when no tax is owed, null when the Zip-Tax
+     *                      lookup can't answer (no API key, no usable state/ZIP, or a hard error)
+     */
+    public function storefrontRate($args)
+    {
+        if ('' === (string)getModuleCache('api', 'settings', 'sales_tax_api', 'ziptax_key')) { return null; }
+        $state = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)($args['state'] ?? '')));
+        $zip5  = substr(preg_replace('/[^0-9]/', '', (string)($args['zipCode'] ?? '')), 0, 5);
+        if (strlen($state) !== 2 || strlen($zip5) !== 5) { return null; }
+        if (!$this->inNexus($state))                      { return 0.0; } // outside nexus, no tax owed
+        if (in_array($state, $this->statesNoTax))         { return 0.0; } // state has no sales tax
+        $country = strtoupper((string)($args['country'] ?? ''));
+        $lookup  = ['address1'=>'', 'address2'=>'', 'city'=>(string)($args['city'] ?? ''), 'state'=>$state,
+            'country'=>in_array($country, ['', 'US', 'USA']) ? 'USA' : $country, 'zipCode'=>$zip5];
+        return $this->lookupTaxRate($lookup);
+    }
+
+    /** True when the state is one the business collects tax in (PhreeBooks settings → Nexus). */
+    public function inNexus($state)
+    {
+        return in_array(strtoupper((string)$state), (array)($this->nexusMeta['states'] ?? []));
+    }
+
+    /**
      * Combined-rate lookup with quarterly cache. Returns a decimal rate
      * (e.g. 0.08125) or null on hard error. Geocodio is used to resolve a
      * 5-digit ZIP up to ZIP+4 when the API key is present — this gives
@@ -219,7 +248,8 @@ class phreebooksRestfulTax
      * Calls the Zip-Tax API for the given address and writes the result to
      * tax_rate_cache. If `$existingId` is non-zero, UPDATEs that row (preserves
      * the row's identity and any references to it); otherwise INSERTs a new
-     * row. Returns the decimal rate, or null when the API key isn't configured.
+     * row. Returns the decimal rate, or null when the API key isn't configured or the API gave no
+     * usable answer (nothing is cached in that case).
      *
      * Used both by lookupTaxRate (fresh-tax math at the order-edit screen)
      * and by the calcTaxCollected report path, which calls it on cache miss
@@ -241,6 +271,11 @@ class phreebooksRestfulTax
         msgDebug("\nzip-tax request: addr=$fullAddr");
         $resp = json_decode($io->cURL($this->zipTaxURL, $body, 'get', $opts), true);
         msgDebug("\nzip-tax response = ".print_r($resp, true));
+        if (!is_array($resp) || !isset($resp['taxSummaries']) || !is_array($resp['taxSummaries'])) {
+            // No usable answer (network error, outage, bad key, quota). Don't cache a 0 rate for the rest of the quarter.
+            msgAdd("The Zip-Tax lookup for ZIP $zip5 did not return a rate; nothing was cached.", 'caution');
+            return null;
+        }
         $rate = 0.0;
         if (isset($resp['taxSummaries']) && is_array($resp['taxSummaries'])) {
             foreach ($resp['taxSummaries'] as $summary) {

@@ -2,6 +2,31 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [7.4.7] — Unreleased
+
+### Changed
+- **Storefront sales tax no longer depends on PhreeSoft** (`src/portal/api.php` `getSalesTax`). The
+  lookup used a `sales_tax_map` ZIP table that only existed on PhreeSoft's server. It now uses the
+  same Zip-Tax engine as the order screen (`phreebooks/restfulTax`, new `storefrontRate()`):
+  nexus states only, per-ZIP quarterly cache, and the API token required when one is configured.
+  Without a Zip-Tax key, or if Zip-Tax fails, it falls back to the business's PhreeBooks customer
+  tax rates matched by title (5-digit ZIP, then leading 2-letter state code). The response adds a
+  `source` field. See *WooCommerce via bizuno-api → Sales tax for the storefront*.
+- **Zip-Tax failures are no longer cached** (`restfulTax::fetchAndCacheRate`). A network error or
+  bad response used to store a 0% rate for that ZIP until the next quarter.
+
+### Removed
+- **Endicia shipping carrier.** It fetched its credentials from phreesoft.com. The carrier, its
+  "buy postage" route (`shipping/admin/fundsBuy`, which had no permission check) and its docs are
+  gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
+  their `endicia` method code. Use the USPS carrier for postage.
+- **PhreeSoft News dashboard** now shows that PhreeSoft is no longer in business instead of
+  "Coming soon!", and the dead phreesoft.com feed code is removed.
+
+### Fixed
+- Loading a carrier that is still listed in a stale cache but no longer in the code base no
+  longer fatals; it falls back to the generic shipper.
+
 ## [7.4.6] — Unreleased
 
 ### Removed

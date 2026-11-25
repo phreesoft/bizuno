@@ -38,7 +38,6 @@ international.
 
 How you fund labels depends on the carrier:
 
-- **Endicia** — buy postage into the account from inside Bizuno (and refund).
 - **USPS** — funded through your EPS payment account at usps.com (not inside Bizuno).
 - **UPS / FedEx** — no prepaid balance; each label charges your carrier account.
 
@@ -70,7 +69,7 @@ format in the carrier's settings. USPS labels are produced at 4×6.
 
 - **Reprint** — the label file is on disk, so you can re-open the shipment and print
   it again without re-buying.
-- **Void / refund** — supported for **UPS, USPS, FedEx, and Endicia** via the
+- **Void / refund** — supported for **UPS, USPS, and FedEx** via the
   carrier's label-delete API. USPS, for example, reports back whether the label was
   *canceled* (never charged) or *disputed* (refund queued). Voiding removes the local
   label file and log entry. Mind each carrier's same-day/void-window rules.

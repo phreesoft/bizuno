@@ -103,19 +103,6 @@ class shippingAdmin extends shippingCommon
     }
 
     /**
-     *
-     * @param type $layout
-     */
-    public function fundsBuy(&$layout=[])
-    {
-        msgDebug("\nreached shipping/admin/fundsBuy");
-        $carrier= clean('carrier', 'cmd', 'get');
-        if (empty($carrier)) { $carrier = 'endicia'; }
-        $auth   = $this->loadCarrier($carrier);
-        $auth->fundsBuy();
-    }
-
-    /**
      * This method extends the PhreeBooks Sales manager to include a tracking popup in the action bar
      * @param type $layout
      * @return type
@@ -204,7 +191,7 @@ class shippingAdmin extends shippingCommon
 
     /**
      * This function handles extra actions that don't fall into the typical shipping process
-     * Actions are handled through the carrier method. See Endicia method for an example.
+     * Actions are handled through the carrier method.
      * @param type $layout
      * @return type
      */
