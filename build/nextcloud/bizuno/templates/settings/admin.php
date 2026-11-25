@@ -42,7 +42,7 @@ script(Application::APP_ID, 'admin');
     <p class="settings-hint">
         <?php print_unescaped($l->t(
             'See the %sBizuno docs%s for SSL / reverse-proxy guidance.',
-            ['<a href="https://bizuno.com/docs/" target="_blank" rel="noopener">', '</a>']
+            ['<a href="https://github.com/phreesoft/bizuno/tree/main/docs" target="_blank" rel="noopener">', '</a>']
         )); ?>
     </p>
 </section>

@@ -144,7 +144,7 @@ ARG VERSION
 LABEL org.opencontainers.image.title="Bizuno ERP" \
       org.opencontainers.image.description="Full-featured open-source ERP / accounting / CRM in PHP" \
       org.opencontainers.image.source="https://github.com/phreesoft/bizuno" \
-      org.opencontainers.image.documentation="https://bizuno.com/docs/" \
+      org.opencontainers.image.documentation="https://github.com/phreesoft/bizuno/tree/main/docs" \
       org.opencontainers.image.url="https://bizuno.com" \
       org.opencontainers.image.vendor="PhreeSoft, Inc." \
       org.opencontainers.image.licenses="AGPL-3.0-or-later" \

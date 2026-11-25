@@ -14,8 +14,7 @@ files without reading the PHP.
 
 > **Status:** draft — all modules catalogued. The [`contacts`](./contacts.md)
 > module was the pilot that validated the *format*; the remaining modules were
-> generated against it. Files here are `status: draft` so they are **not**
-> published to the human docs site by the BetterDocs sync until reviewed.
+> generated against it. Files here are `status: draft` until reviewed.
 
 ## How Bizuno actions are addressed
 

@@ -1,11 +1,8 @@
 # Bizuno User Manual — Source
 
-This is the Markdown source for the Bizuno user manual that ships at
-[bizuno.com/docs](https://bizuno.com/docs) (rendered via BetterDocs in WordPress).
-The source-of-truth is here in `bizuno/docs/`; the WP site is the output.
+This is the Bizuno user manual, written in Markdown and read here on GitHub.
 
-Contributors edit Markdown here, open PRs against the `bizuno` repo, and a sync
-step pushes published pages to BetterDocs via the WP REST API. See
+Contributors edit Markdown here and open PRs against the `bizuno` repo. See
 [CONTRIBUTING-DOCS.md](./CONTRIBUTING-DOCS.md) for the workflow.
 
 ---
@@ -33,7 +30,7 @@ without distinction usually serve none — split when in doubt.
 | `stub`      | Heading + intent bullets only. Not yet written.               |
 | `draft`     | First pass written. Needs review for accuracy + voice.        |
 | `review`    | Awaiting a second pair of eyes / SME validation.              |
-| `published` | Live at bizuno.com/docs. Edit cautiously; users land here.    |
+| `published` | Finished and reviewed. Edit cautiously; users rely on it.     |
 
 ---
 

@@ -50,9 +50,6 @@
     "suggest": {
         "setasign/fpdi_pdf-parser": "Commercial PDF parser from Setasign — enables FPDI to import modern PDFs (1.5+, object/xref streams). Without it, FPDI's free parser handles PDF up to 1.4. Install separately with valid Setasign credentials: `composer require setasign/fpdi_pdf-parser`. FPDI auto-detects via class_exists() at runtime; no code changes required."
     },
-    "require-dev": {
-        "erusev/parsedown": "^1.7"
-    },
     "scripts": {
         "post-install-cmd": [
             "@php -r \"if(file_exists(__DIR__.'/myExt/controllers/psTools/prune-vendor.php')){passthru('php '.escapeshellarg(__DIR__.'/myExt/controllers/psTools/prune-vendor.php').' --vendor='.escapeshellarg(__DIR__.'/vendor'));}\""

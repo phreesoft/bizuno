@@ -154,13 +154,13 @@ To keep the PHP source out of any directory Apache can serve directly:
      define('BIZUNO_DATA',       '/var/www/.../private/bizuno/data/');
 4. Run the installer as normal.
 
-See https://bizuno.com/docs/ for full installation, configuration, and
+See https://github.com/phreesoft/bizuno/tree/main/docs for full installation, configuration, and
 operation guides.
 
 SUPPORT
 -------
 
-  Documentation : https://bizuno.com/docs/
+  Documentation : https://github.com/phreesoft/bizuno/tree/main/docs
   Forum         : https://bizuno.com/forum/
   Issues / bugs : https://github.com/phreesoft/bizuno/issues
   Commercial    : https://phreesoft.com/support/

@@ -209,7 +209,7 @@ function renderSetupRequiredPage(array $problems)
   <footer>
     <p>PHP $phpVer · Bizuno ERP &copy; $year PhreeSoft, Inc. ·
        <a href="https://github.com/phreesoft/bizuno" target="_blank" rel="noopener">GitHub</a> ·
-       <a href="https://bizuno.com/docs/" target="_blank" rel="noopener">Documentation</a> ·
+       <a href="https://github.com/phreesoft/bizuno/tree/main/docs" target="_blank" rel="noopener">Documentation</a> ·
        <a href="https://phreesoft.com/support/" target="_blank" rel="noopener">Support</a>
     </p>
   </footer>
