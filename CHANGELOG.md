@@ -2,6 +2,14 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **Side menu arrow opened the manager instead of expanding.** In 7.4.8, clicking the arrow next to
+  *Sales Manager* / *Purchase Manager* opened the page like the label. The theme draws that arrow
+  with CSS at the right edge of the row, so the click reached the row's click handler. Clicks on the
+  right-most 30px of the row now expand or collapse the sub-items; the label still opens the page.
+
 ## [7.4.8] — 2026-11-26
 
 Upgrading from 7.4.7 runs upgrade gate 7.5.3, which deletes cached 0% sales tax rates left by
