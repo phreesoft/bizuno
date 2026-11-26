@@ -282,10 +282,17 @@ class phreebooksRestfulTax
             }
         }
         if ($rate === null) {
-            $why = is_array($resp) && !empty($resp['metadata']['response']['message'])
-                ? ' Zip-Tax said: '.$resp['metadata']['response']['message'].(isset($resp['metadata']['response']['code']) ? " (code {$resp['metadata']['response']['code']})" : '').'.'
-                : ' No response from Zip-Tax.';
-            msgAdd("The Zip-Tax lookup for ZIP $zip5 did not return a sales tax rate; nothing was cached.$why Check the key under API Settings -> Sales Tax APIs.", 'caution');
+            $code = is_array($resp) ? (string)($resp['metadata']['response']['code'] ?? '') : '';
+            $name = is_array($resp) ? (string)($resp['metadata']['response']['name'] ?? '') : '';
+            $text = is_array($resp) ? (string)($resp['metadata']['response']['message'] ?? '') : '';
+            if ('101' === $code || false !== stripos($name, 'KEY')) { // key rejected: expired, cancelled or mistyped
+                $msg = "Sales tax was NOT calculated: Zip-Tax rejected the API key (it may have expired). Renew the key in your zip-tax.com account and enter the new key under API Settings -> Sales Tax APIs.";
+                msgAdd($msg, 'error');
+                $this->logKeyProblem($msg." Zip-Tax said: $text (code $code).");
+            } else {
+                $why = $text !== '' ? " Zip-Tax said: $text".($code !== '' ? " (code $code)" : '').'.' : ' No response from Zip-Tax.';
+                msgAdd("The Zip-Tax lookup for ZIP $zip5 did not return a sales tax rate; nothing was cached.$why Check the key under API Settings -> Sales Tax APIs.", 'caution');
+            }
             return null;
         }
         $jurState = $jurCounty = $jurCity = '';
@@ -314,6 +321,22 @@ class phreebooksRestfulTax
             msgDebug("\ntax_rate_cache new row: zip_key=$cacheKey state={$args['state']} rate=$rate");
         }
         return $rate;
+    }
+
+    /**
+     * Writes a rejected-key problem to the Bizuno log at most once a day, so an administrator sees it
+     * even when the failing lookups come from the storefront (whose customers never see the message).
+     * @param string $msg
+     */
+    private function logKeyProblem($msg)
+    {
+        $flag = defined('BIZUNO_DATA') ? BIZUNO_DATA.'temp/ziptax_key_error.flag' : '';
+        if ($flag !== '' && is_file($flag) && (time() - (int)@filemtime($flag)) < 86400) { return; }
+        msgLog($msg);
+        if ($flag !== '') {
+            if (!is_dir(dirname($flag))) { @mkdir(dirname($flag), 0750, true); }
+            @touch($flag);
+        }
     }
 
     /**
