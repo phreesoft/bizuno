@@ -5,6 +5,11 @@ All notable changes to Bizuno ERP are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **Side menu items with sub-items open their page again.** Clicking *Customers → Sales Manager*
+  (or *Vendors → Purchase Manager*) only expanded its sub-items, because EasyUI's sidemenu won't
+  select a parent item. Clicking the label now opens the manager; clicking the arrow opens or
+  closes the sub-items. Groups without a page of their own still toggle on any click
+  (`bizSidemenuParentNav()` in `src/view/easyUI/common.js`).
 - **Update badge stayed on after updating.** The software-update check saved its "update
   available" answer for 24 hours, so after installing an update the gear badge, banner and
   *Update Now* button kept offering the release just installed. The saved answer is now compared

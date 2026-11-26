@@ -534,6 +534,7 @@ final class html5 {
         $options['onSelect'] = !empty($prop['options']['dom']) && $prop['options']['dom']=='div' ? "function (item) { bizPanelReload('bizBody', item.route); }" : "function (item) { item.action=='' ? hrefClick(item.route) : menuAction(item); }";
         msgDebug("\nSetting options = ".print_r($options, true));
         $output.= '<div id="'.$id.'" class="easyui-sidemenu" style="width:'.$divWid.'px" data-options="'.$this->addOptions($options).'"></div>'."\n";
+        $this->jsReady[] = "if (typeof bizSidemenuParentNav=='function') { bizSidemenuParentNav('$id'); }"; // label opens the page, arrow opens the sub-items
     }
     
     /**

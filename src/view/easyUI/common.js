@@ -1847,11 +1847,35 @@ function bizMenuResize() {
     }
 }
 
+/**
+ * Side menu items that have both a page (route) and sub-items, e.g. Customers -> Sales Manager:
+ * clicking the label opens the page, clicking the arrow opens/closes the sub-items. EasyUI's
+ * sidemenu refuses to select a parent item and makes any click on it toggle, so swap in our
+ * own click handler on each tree. Items without a route keep the default toggle.
+ * @param string id - DOM id of the sidemenu
+ */
+function bizSidemenuParentNav(id) {
+    var sm = jqBiz('#'+id);
+    if (!sm.length || !sm.data('sidemenu')) { return; }
+    sm.find('ul.sidemenu-tree').each(function() {
+        var tt = jqBiz(this);
+        if (!tt.data('tree')) { return; }
+        var opts = tt.tree('options');
+        if (opts.bizParentNav) { return; } // already patched
+        var origClick = opts.onClick;
+        opts.onClick = function(node) {
+            if (node && node.children && node.route) { sm.sidemenu('options').onSelect.call(sm[0], node); return; }
+            return origClick.call(this, node);
+        };
+        opts.bizParentNav = true;
+    });
+}
 function bizMenuToggle(id) {
     var opts = jqBiz('#'+id).sidemenu('options');
     var icnDir = opts.collapsed ? 'left' : 'right';
     jqBiz('#'+id+'Toggle').linkbutton({ iconCls: 'fa-sharp-duotone fa-solid fa-chevrons-'+icnDir });
     jqBiz('#'+id).sidemenu(opts.collapsed ? 'expand' : 'collapse');
+    bizSidemenuParentNav(id); // the trees may have been rebuilt
     opts = jqBiz('#'+id).sidemenu('options');
     jqBiz('#'+id).sidemenu('resize', { width: opts.collapsed ? 60 : 200 });
     jqBiz('body').layout('panel','west').panel('resize',{ width: opts.collapsed ? 60 : 200 });
