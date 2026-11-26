@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-03-09
+ * @version    7.x Last Update: 2026-10-10
  * @filesource /controllers/phreebooks/journals/common.php
  */
 
@@ -135,7 +135,10 @@ class jCommon
                     'debit_amount' => "debit_amount + ".$values['debit'],
                     'last_update'  => "'{$this->main['post_date']}'"];
                 $result = dbWrite(BIZUNO_DB_PREFIX."journal_history", $query_data, 'update', "gl_account='$gl_acct' AND period={$this->main['period']}", false);
-                if ($result <> 1) { return $this->msgPostError(sprintf(lang('err_gl_post_balance'), $values['debit']+$values['credit'], $gl_acct ? $gl_acct : lang('not_specified'))); }
+                if ($result <> 1) {
+                    msgDebug("\n  journal_history update for gl_account=$gl_acct, period={$this->main['period']}, post_date={$this->main['post_date']} affected ".var_export($result, true)." rows (expected 1)");
+                    return $this->msgPostError(sprintf(lang('err_gl_post_balance'), $values['debit']+$values['credit'], $gl_acct ? $gl_acct : lang('not_specified')));
+                }
             }
         }
         msgDebug("\n  end Posting Chart Balances.");
@@ -866,7 +869,7 @@ class jCommon
      */
     function msgPostError($message)
     {
-        msgDebug("\nReturning with fail message: $message");
+        msgDebug("\nReturning with fail message: $message", 'trap'); // always write trace.txt on a post failure
         msgAdd($message);
         return false; // for testing purposes, this needs to be here
     }
