@@ -259,9 +259,18 @@ final class phreeformDesign extends mgrJournal
     return true;
 }
 function pfTableList() {
-    var rows   = jqBiz('#dgTables').data('datagrid') ? jqBiz('#dgTables').datagrid('getRows') : ((typeof dataTables!='undefined' && dataTables.rows) ? dataTables.rows : []);
+    var dg     = jqBiz('#dgTables');
+    var isGrid = dg.data('datagrid') ? true : false;
+    var rows   = isGrid ? dg.datagrid('getRows') : ((typeof dataTables!='undefined' && dataTables.rows) ? dataTables.rows : []);
     var tables = [];
-    for (var i=0; i<rows.length; i++) { if (rows[i].tablename) { tables.push(rows[i].tablename); } }
+    for (var i=0; i<rows.length; i++) {
+        var name = rows[i].tablename;
+        if (isGrid) { // a row still in edit mode only has the new table in its editor, not in the row data
+            var ed = dg.datagrid('getEditor', {index:i, field:'tablename'});
+            if (ed) { name = jqBiz(ed.target).combobox('getValue'); }
+        }
+        if (name && tables.indexOf(name) < 0) { tables.push(name); }
+    }
     return tables.join(':');
 }
 function pfTableUpdate() {
