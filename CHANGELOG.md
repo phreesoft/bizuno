@@ -2,6 +2,14 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **Update badge stayed on after updating.** The software-update check saved its "update
+  available" answer for 24 hours, so after installing an update the gear badge, banner and
+  *Update Now* button kept offering the release just installed. The saved answer is now compared
+  with the installed version every time (`src/controllers/administrate/updater.php`).
+
 ## [7.4.7] — 2026-11-26
 
 First release since 7.4.5. There was no 7.4.6 release; its changes ship here. Development
