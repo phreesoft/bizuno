@@ -30,7 +30,7 @@ namespace bizuno;
 if (!defined('BIZUNO_DB_PREFIX')) { exit('Illegal Access!'); }
 
 /** Highest upgrade gate in bizunoUpgrade(). Keep in sync when adding a gate. */
-if (!defined('BIZUNO_UPGRADE_GATE')) { define('BIZUNO_UPGRADE_GATE', '7.5.2'); }
+if (!defined('BIZUNO_UPGRADE_GATE')) { define('BIZUNO_UPGRADE_GATE', '7.5.3'); }
 
 /**
  * POST R7.0 - Handles the db upgrade for all versions of Bizuno to the current release level
@@ -389,6 +389,18 @@ function bizunoUpgrade()
             unset($cMeta['endicia']);
             dbMetaSet($cIdx, 'methods_carriers', $cMeta);
             msgLog("Upgrade 7.5.2: removed the Endicia shipping carrier.");
+        }
+    }
+    if (version_compare($dbVer, '7.5.3') < 0) {
+        // Before 7.4.7 (and in 7.4.7 when Zip-Tax answered with an error and an empty taxSummaries
+        // list), a failed Zip-Tax lookup was cached as a 0% rate until the next quarter. Every
+        // state that gets looked up has a sales tax, so a cached 0 is always a failed lookup.
+        if (dbTableExists(BIZUNO_DB_PREFIX.'tax_rate_cache')) {
+            $zeros = (int)dbGetValue(BIZUNO_DB_PREFIX.'tax_rate_cache', 'COUNT(*) AS cnt', "combined_rate=0", false);
+            if ($zeros > 0) {
+                dbGetResult("DELETE FROM ".BIZUNO_DB_PREFIX."tax_rate_cache WHERE combined_rate=0");
+                msgLog("Upgrade 7.5.3: removed $zeros cached 0% sales tax rates left by failed Zip-Tax lookups.");
+            }
         }
     }
     dbTransactionCommit();

@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-04-26
+ * @version    7.x Last Update: 2026-11-26
  * @filesource /model/io.php
  */
 
@@ -136,7 +136,7 @@ final class io
     public function cURL($url, $data=[], $type='get', $opts=[]) {
         $useragent = 'Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0';
         $size = is_array($data) ? 'array('.sizeof($data).')' : strlen($data);
-        msgDebug("\nAt class portal, sending request of length $size to url: $url via $type with sizeof opts = ".sizeof($opts)); //  ." with opts = ".print_r($opts, true)
+        msgDebug("\nAt class portal, sending request of length $size to url: ".bizScrubUrl($url)." via $type with sizeof opts = ".sizeof($opts)); //  ." with opts = ".print_r($opts, true)
         $rData = is_array($data) ? http_build_query($data) : $data;
         if ($type == 'get') { $url = $url.'?'.$rData; }
         $headers = [];
@@ -144,7 +144,7 @@ final class io
         if (!empty($opts['cookies'])) { foreach ($opts['cookies'] as $key => $value) { $headers[] = "$key: $value"; } }
         unset($opts['headers'], $opts['cookies']);
         $ch = curl_init();
-        msgDebug("\nSetting cURL Options, sending to url: $url");
+        msgDebug("\nSetting cURL Options, sending to url: ".bizScrubUrl($url));
         // Hardcoded defaults FIRST so caller-supplied $opts can override below.
         curl_setopt($ch, CURLOPT_URL,            $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER,     $headers);

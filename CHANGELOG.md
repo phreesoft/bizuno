@@ -5,6 +5,14 @@ All notable changes to Bizuno ERP are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **Zip-Tax errors were still saved as a 0% rate.** Zip-Tax reports a bad key, quota or address
+  problem with an error code and an *empty* `taxSummaries` list, which 7.4.7 still accepted, so
+  tax silently stayed at 0 for that ZIP until the next quarter. A lookup now counts only when it
+  returns a sales tax rate; otherwise nothing is cached and the order screen shows Zip-Tax's own
+  message (e.g. "Key format is not valid or key not found. (code 101)"). The 7.5.3 upgrade gate
+  deletes cached 0% rates left by earlier failures.
+- **API keys no longer appear in `trace.txt`.** URLs logged by `io::cURL()` mask `api_key`, `key`,
+  `token`, password and similar query parameters (new `bizScrubUrl()`).
 - **Side menu items with sub-items open their page again.** Clicking *Customers → Sales Manager*
   (or *Vendors → Purchase Manager*) only expanded its sub-items, because EasyUI's sidemenu won't
   select a parent item. Clicking the label now opens the manager; clicking the arrow opens or
