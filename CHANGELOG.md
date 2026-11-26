@@ -2,7 +2,10 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.8] — 2026-11-26
+
+Upgrading from 7.4.7 runs upgrade gate 7.5.3, which deletes cached 0% sales tax rates left by
+failed Zip-Tax lookups.
 
 ### Fixed
 - **Status and code drop-downs saved the wrong numbers.** `dbMetaGet()` used `array_merge()`,
