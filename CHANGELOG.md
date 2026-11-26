@@ -5,6 +5,13 @@ All notable changes to Bizuno ERP are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **Status and code drop-downs saved the wrong numbers.** `dbMetaGet()` used `array_merge()`,
+  which renumbers integer keys, so option lists read with `getMetaCommon()` came back as 0..n.
+  Since 2026-05-15 the quality ticket/audit/objective status, return status and code, and the
+  *3-yearly* frequency were saved as positions, e.g. *Closed Successful* stored as 10 instead of
+  99. The lists now keep their real codes. Records saved with the shifted numbers are not
+  converted; check quality tickets (`journal_main.printed` 9/10 → 90/99 on journal 30) and returns
+  saved since that date.
 - **Current Stop Work dashboard listed In Process tickets.** It filtered on ticket status 2
   (*In Process*) instead of 8 (*Stop Work*). It now lists only open tickets with status Stop Work.
 - **PhreeForm field lists were empty right after adding a table.** On the Database tab, a newly

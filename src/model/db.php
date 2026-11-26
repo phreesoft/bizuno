@@ -961,7 +961,12 @@ function dbMetaGet($rID, $key, $table='common', $refID=0, $args=[])
             // `['value' => $scalar]` so the consumer key is consistent.
             $decoded = json_validate($row['meta_value']) ? json_decode($row['meta_value'], true) : $row['meta_value'];
             $val = is_array($decoded) ? $decoded : ['value'=>$decoded];
-            $val = array_merge($val, ['_rID'=>$row['id'], '_refID'=>isset($row['ref_id'])?$row['ref_id']:0, '_table'=>$table]);
+            // Assign, don't array_merge(): array_merge() renumbers integer keys, which turned option
+            // maps like options_qa_status [1,2,…,8,85,90,99] into [0…10], so screens saved the
+            // position instead of the real code (e.g. Closed Successful stored as 10, not 99).
+            $val['_rID']   = $row['id'];
+            $val['_refID'] = isset($row['ref_id']) ? $row['ref_id'] : 0;
+            $val['_table'] = $table;
         }
         $resp[]= $val;
     }
