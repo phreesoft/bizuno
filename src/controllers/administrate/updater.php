@@ -33,7 +33,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-20
+ * @version    7.x Last Update: 2026-11-26
  * @filesource /controllers/administrate/updater.php
  */
 
@@ -65,11 +65,11 @@ class administrateUpdater
         $now   = time();
         if (!$force && !empty($cache['checked_at']) && isset($cache['latest'])
             && ($now - $cache['checked_at']) < self::CHECK_TTL) {
-            return $cache; // still fresh, no network call
+            return $this->withInstalled($cache); // still fresh, no network call
         }
         $release = $this->fetchLatestRelease();
         if ($release === false) { // GitHub unreachable — keep last known good, flag the error
-            if (!empty($cache)) { $cache['error'] = true; return $cache; }
+            if (!empty($cache)) { $cache['error'] = true; return $this->withInstalled($cache); }
             return ['current'=>MODULE_BIZUNO_VERSION, 'latest'=>'', 'updateAvailable'=>false, 'checked_at'=>$now, 'error'=>true];
         }
         $latest = $release['version'];
@@ -84,6 +84,20 @@ class administrateUpdater
             'checked_at'     => $now];
         setModuleCache('bizuno', 'updates', false, $data);
         return $data;
+    }
+
+    /**
+     * The cached status records the installed version at the time of the check. After an update
+     * (or a manual VERSION change) that snapshot is stale, so compare the cached latest release
+     * against the version installed now.
+     * @param array $status - cached status
+     * @return array - status with 'current' and 'updateAvailable' for the running code
+     */
+    private function withInstalled($status)
+    {
+        $status['current']         = MODULE_BIZUNO_VERSION;
+        $status['updateAvailable'] = !empty($status['latest']) && version_compare($status['latest'], MODULE_BIZUNO_VERSION, '>');
+        return $status;
     }
 
     /**
