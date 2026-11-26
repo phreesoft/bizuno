@@ -5,6 +5,8 @@ All notable changes to Bizuno ERP are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **Current Stop Work dashboard listed In Process tickets.** It filtered on ticket status 2
+  (*In Process*) instead of 8 (*Stop Work*). It now lists only open tickets with status Stop Work.
 - **PhreeForm field lists were empty right after adding a table.** On the Database tab, a newly
   picked table stays in the row's editor until the row is saved, so going straight to the Fields
   tab left the field drop-downs with only *None*. `pfTableList()` now also reads tables from rows
