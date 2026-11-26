@@ -5,6 +5,10 @@ All notable changes to Bizuno ERP are documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- **PhreeForm field lists were empty right after adding a table.** On the Database tab, a newly
+  picked table stays in the row's editor until the row is saved, so going straight to the Fields
+  tab left the field drop-downs with only *None*. `pfTableList()` now also reads tables from rows
+  still being edited.
 - **Zip-Tax errors were still saved as a 0% rate.** Zip-Tax reports a bad key, quota or address
   problem with an error code and an *empty* `taxSummaries` list, which 7.4.7 still accepted, so
   tax silently stayed at 0 for that ZIP until the next quarter. A lookup now counts only when it
