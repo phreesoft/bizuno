@@ -21,7 +21,7 @@
  * @author     Dave Premo, PhreeSoft <support@phreesoft.com>
  * @copyright  2008-2026, PhreeSoft, Inc.
  * @license    https://www.gnu.org/licenses/agpl-3.0.txt
- * @version    7.x Last Update: 2026-06-06 (constructor: strip ONLY_FULL_GROUP_BY from SESSION sql_mode so report queries with GROUP BY + non-aggregated columns run on GoDaddy/managed hosts that ship that mode enabled)
+ * @version    7.x Last Update: 2026-11-26 (constructor: also strip NO_BACKSLASH_ESCAPES so addslashes() escaping holds; earlier: strip ONLY_FULL_GROUP_BY from SESSION sql_mode so report queries with GROUP BY + non-aggregated columns run on GoDaddy/managed hosts that ship that mode enabled)
  * @filesource /model/db.php
  */
 
@@ -97,7 +97,11 @@ class db extends \PDO
                 // protection intact and requiring no special privilege. Wrapped
                 // in try/catch so a host that blocks even this degrades to the
                 // original behavior rather than failing the connection.
-                try { $this->exec("SET SESSION sql_mode=(SELECT REPLACE(@@SESSION.sql_mode,'ONLY_FULL_GROUP_BY',''))"); }
+                // Also strip NO_BACKSLASH_ESCAPES: with it set, MySQL treats '\' as an
+                // ordinary character, so addslashes() — used to escape request values
+                // across the code base — no longer stops a quote from closing the string
+                // (x' OR id=2 -- becomes x\' OR id=2 -- and the quote terminates it).
+                try { $this->exec("SET SESSION sql_mode=(SELECT REPLACE(REPLACE(@@SESSION.sql_mode,'ONLY_FULL_GROUP_BY',''),'NO_BACKSLASH_ESCAPES',''))"); }
                 catch (\PDOException $e) { msgDebug("\nsql_mode adjust skipped (non-fatal): ".$e->getMessage()); }
                 break;
         }

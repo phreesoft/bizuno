@@ -2,7 +2,14 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.9] — 2026-11-26
+
+### Security
+- **Escaping no longer depends on the server's SQL mode.** Request values are escaped with
+  `addslashes()` throughout Bizuno. On a MySQL/MariaDB server with `NO_BACKSLASH_ESCAPES` in its
+  SQL mode, a backslash is an ordinary character, so an escaped quote still ended the string and
+  allowed SQL injection. The database connection now removes `NO_BACKSLASH_ESCAPES` from the
+  session SQL mode, alongside `ONLY_FULL_GROUP_BY` (`src/model/db.php`).
 
 ### Fixed
 - **Side menu arrow opened the manager instead of expanding.** In 7.4.8, clicking the arrow next to
