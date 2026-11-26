@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.9] — 2026-11-26
 
 ### Fixed
 - **Side menu arrow opened the manager instead of expanding.** In 7.4.8, clicking the arrow next to
