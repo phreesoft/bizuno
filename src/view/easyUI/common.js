@@ -1861,14 +1861,31 @@ function bizSidemenuParentNav(id) {
         var tt = jqBiz(this);
         if (!tt.data('tree')) { return; }
         var opts = tt.tree('options');
-        if (opts.bizParentNav) { return; } // already patched
+        if (opts.bizParentNav) { return; } // already patched (and the click listener already added)
+        // The visible arrow is drawn by the theme as .tree-node-nonleaf::after at the right edge of the
+        // row (the real .tree-hit is hidden), so a click on it reaches onClick like a label click.
+        // Remember where each click lands (capture phase, before EasyUI's handler) and treat the
+        // right end of the row as the arrow.
+        this.addEventListener('click', function(e) { tt.data('bizClickX', e.clientX); }, true);
         var origClick = opts.onClick;
         opts.onClick = function(node) {
-            if (node && node.children && node.route) { sm.sidemenu('options').onSelect.call(sm[0], node); return; }
+            if (node && node.children && node.route && !bizSidemenuOnArrow(node, tt.data('bizClickX'))) {
+                sm.sidemenu('options').onSelect.call(sm[0], node);
+                return;
+            }
             return origClick.call(this, node);
         };
         opts.bizParentNav = true;
     });
+}
+/**
+ * True when a click at clientX landed on the expand/collapse arrow of a side menu row: the
+ * right-most 30px, where the theme draws it (16px wide, 5px from the edge).
+ */
+function bizSidemenuOnArrow(node, clientX) {
+    if (typeof clientX !== 'number' || !node || !node.target) { return false; }
+    var rect = node.target.getBoundingClientRect();
+    return clientX >= rect.right - 30;
 }
 function bizMenuToggle(id) {
     var opts = jqBiz('#'+id).sidemenu('options');
