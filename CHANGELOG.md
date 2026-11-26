@@ -2,47 +2,11 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [7.4.7] — Unreleased
+## [7.4.7] — 2026-11-26
 
-### Changed
-- **Storefront sales tax no longer depends on PhreeSoft** (`src/portal/api.php` `getSalesTax`). The
-  lookup used a `sales_tax_map` ZIP table that only existed on PhreeSoft's server. It now uses the
-  same Zip-Tax engine as the order screen (`phreebooks/restfulTax`, new `storefrontRate()`):
-  nexus states only, per-ZIP quarterly cache, and the API token required when one is configured.
-  Without a Zip-Tax key, or if Zip-Tax fails, it falls back to the business's PhreeBooks customer
-  tax rates matched by title (5-digit ZIP, then leading 2-letter state code). The response adds a
-  `source` field. See *WooCommerce via bizuno-api → Sales tax for the storefront*.
-- **Zip-Tax failures are no longer cached** (`restfulTax::fetchAndCacheRate`). A network error or
-  bad response used to store a 0% rate for that ZIP until the next quarter.
-
-### Removed
-- **Endicia shipping carrier.** It fetched its credentials from phreesoft.com. The carrier, its
-  "buy postage" route (`shipping/admin/fundsBuy`, which had no permission check) and its docs are
-  gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
-  their `endicia` method code. Use the USPS carrier for postage.
-- **Docs sync to bizuno.com.** The `docs-sync` workflow, `bin/docs-sync.php`, its slug map and
-  the `erusev/parsedown` dev dependency are removed; the manual is read on GitHub. Links that
-  pointed at bizuno.com/docs (release notes, Docker image label, NextCloud settings, zip README,
-  install-check page) now point at the `docs/` folder on GitHub.
-- **PhreeSoft News dashboard** now shows that PhreeSoft is no longer in business instead of
-  "Coming soon!", and the dead phreesoft.com feed code is removed.
-
-### Fixed
-- **Quality dashboards linked to a page that no longer exists.** Clicking a ticket on *Quality
-  Tickets Pending Review* or *Current Stop Work* showed "could not find the method" instead of
-  opening it. Both now open the ticket in the Quality Tickets manager.
-- Loading a carrier that is still listed in a stale cache but no longer in the code base no
-  longer fatals; it falls back to the generic shipper.
-
-## [7.4.6] — Unreleased
-
-### Removed
-- **WordPress plugin retired.** The `bizuno-accounting` plugin is withdrawn from WordPress.org
-  and will not be updated. Removed its build (`build/wordpress/`), the WordPress variant and
-  WordPress.org SVN push from `release.yml`, the WordPress install walkthrough, and the
-  WordPress install instructions in `README.md` and the installer's missing-dependency page.
-  Existing WordPress installs should move to a standalone or Docker install; see
-  *Four ways to run it* for migrating the `wp_bizuno_` tables.
+First release since 7.4.5. There was no 7.4.6 release; its changes ship here. Development
+builds numbered 7.4.6 through 7.5.1 (and the upgrade gates named after them) are all part of
+this release.
 
 ### Security
 - **Lost-password account takeover** (`src/portal/viewMaint.php`) — the reset link was rendered
@@ -63,28 +27,6 @@ All notable changes to Bizuno ERP are documented in this file.
   migrate screens now require a logged-in user with `manage_options`; previously any visitor
   could complete setup between plugin activation and first admin visit.
 
-### Changed
-- **Version set to 7.4.6 for the WordPress.org security release.** Upgrade gates are numbered by
-  development version and already go up to 7.5.1, so the highest gate applied is now stored in
-  `bizuno.properties.schema_version` and each gate runs once, whatever the release number. A
-  database stamped by a pre-release build (7.5.1) is re-stamped to the running version without
-  re-running gates. Number new gates above `BIZUNO_UPGRADE_GATE` (7.5.1) and bump it.
-
-## [7.4.8] — Unreleased
-
-### Added
-- **Hazmat profile on inventory items** — new *Hazmat Profile* select in the item Properties
-  panel (choices come from the installed shipping carriers, e.g. the FedEx lithium / lead acid
-  profiles). When a SKU with a profile is on an order, the label generator preselects it and opens
-  the dangerous goods panel with that profile's defaults. Blank means not hazmat, which is the
-  default for every existing item. DB: `inventory.hazmat_profile` (7.4.8 upgrade gate).
-
-### Changed
-- **Inventory Manager** — removed the Vendor and On Open Quotes filters added in 7.4.7; the
-  Qty on Quote column stays.
-
-## [7.4.7] — Unreleased
-
 ### Added
 - **Monthly customer statements by cron** — new customer property *Monthly Statement*
   (None / Email, skip if no activity / Email, always) and PhreeBooks Settings → Customers
@@ -97,15 +39,66 @@ All notable changes to Bizuno ERP are documented in this file.
   label generator with battery/lead-acid/limited-quantity profiles, DG declaration or
   OP-900 requested with the label, freight line items flagged for the BOL. Replaces the
   FedEx Ship Manager workflow. Not yet verified against the FedEx sandbox.
+- **Hazmat profile on inventory items** — new *Hazmat Profile* select in the item Properties
+  panel (choices come from the installed shipping carriers, e.g. the FedEx lithium / lead acid
+  profiles). When a SKU with a profile is on an order, the label generator preselects it and opens
+  the dangerous goods panel with that profile's defaults. Blank means not hazmat, which is the
+  default for every existing item. DB: `inventory.hazmat_profile` (7.4.8 upgrade gate).
+- **Inventory Manager** shows a *Qty on Quote* column.
+
+### Changed
+- **Storefront sales tax no longer depends on PhreeSoft** (`src/portal/api.php` `getSalesTax`). The
+  lookup used a `sales_tax_map` ZIP table that only existed on PhreeSoft's server. It now uses the
+  same Zip-Tax engine as the order screen (`phreebooks/restfulTax`, new `storefrontRate()`):
+  nexus states only, per-ZIP quarterly cache, and the API token required when one is configured.
+  Without a Zip-Tax key, or if Zip-Tax fails, it falls back to the business's PhreeBooks customer
+  tax rates matched by title (5-digit ZIP, then leading 2-letter state code). The response adds a
+  `source` field. See *WooCommerce via bizuno-api → Sales tax for the storefront*.
+- **Zip-Tax failures are no longer cached** (`restfulTax::fetchAndCacheRate`). A network error or
+  bad response used to store a 0% rate for that ZIP until the next quarter.
+- **Upgrade gates run exactly once.** Gates are numbered by development version, which can run
+  ahead of the release number. The highest gate applied is stored in
+  `bizuno.properties.schema_version` and each gate runs once whatever the release number; a
+  database stamped by a pre-release build is re-stamped to the running version without re-running
+  gates. Number new gates above `BIZUNO_UPGRADE_GATE` (now 7.5.2) and bump it.
+- **PhreeForm designer field lists follow the Database tab** (`src/controllers/phreeform/design.php`).
+  Field pickers send the tables currently on the Database tab instead of a list cached in the
+  session, which could be stale; `getFields()` skips unknown tables and returns proper JSON.
+- **GL posting failures are easier to diagnose** (`src/controllers/phreebooks/journals/common.php`):
+  a failed `journal_history` update logs the account, period and row count, and every posting
+  failure writes `trace.txt`.
+
+### Removed
+- **WordPress plugin retired.** The `bizuno-accounting` plugin is withdrawn from WordPress.org
+  and will not be updated. Removed its build (`build/wordpress/`), the WordPress variant and
+  WordPress.org SVN push from `release.yml`, the WordPress install walkthrough, and the
+  WordPress install instructions in `README.md` and the installer's missing-dependency page.
+  Existing WordPress installs should move to a standalone or Docker install; see
+  *Four ways to run it* for migrating the `wp_bizuno_` tables.
+- **Endicia shipping carrier.** It fetched its credentials from phreesoft.com. The carrier, its
+  "buy postage" route (`shipping/admin/fundsBuy`, which had no permission check) and its docs are
+  gone. The 7.5.2 upgrade gate removes it from the stored carrier list; old shipment records keep
+  their `endicia` method code. Use the USPS carrier for postage.
+- **Docs sync to bizuno.com.** The `docs-sync` workflow, `bin/docs-sync.php`, its slug map and
+  the `erusev/parsedown` dev dependency are removed; the manual is read on GitHub. Links that
+  pointed at bizuno.com/docs (release notes, Docker image label, NextCloud settings, zip README,
+  install-check page) now point at the `docs/` folder on GitHub.
+- **PhreeSoft News dashboard** now shows that PhreeSoft is no longer in business instead of
+  "Coming soon!", and the dead phreesoft.com feed code is removed.
 
 ### Fixed
+- **Quality dashboards linked to a page that no longer exists.** Clicking a ticket on *Quality
+  Tickets Pending Review* or *Current Stop Work* showed "could not find the method" instead of
+  opening it. Both now open the ticket in the Quality Tickets manager.
+- Loading a carrier that is still listed in a stale cache but no longer in the code base no
+  longer fatals; it falls back to the generic shipper.
 - FedEx freight tracking links now go to fedexfreight.com for every freight service, not
   only Ground Priority/Economy.
 - EDI TD5 map: FEDEX INTL P/E FRT now map to IFP/IFE instead of the LTL codes GDF/ECF.
 - Shipping Manager saves log the shipment reference, order, method and tracking numbers
   under the title "Shipping Manager" (was a blank "Manager Manager - Save:" line).
 
-## [7.4.5] — Unreleased
+## [7.4.5] — 2026-06-18
 
 ## [7.4.4] — 2026-06-14
 
