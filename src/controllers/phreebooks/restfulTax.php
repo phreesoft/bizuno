@@ -271,19 +271,29 @@ class phreebooksRestfulTax
         msgDebug("\nzip-tax request: addr=$fullAddr");
         $resp = json_decode($io->cURL($this->zipTaxURL, $body, 'get', $opts), true);
         msgDebug("\nzip-tax response = ".print_r($resp, true));
-        if (!is_array($resp) || !isset($resp['taxSummaries']) || !is_array($resp['taxSummaries'])) {
-            // No usable answer (network error, outage, bad key, quota). Don't cache a 0 rate for the rest of the quarter.
-            msgAdd("The Zip-Tax lookup for ZIP $zip5 did not return a rate; nothing was cached.", 'caution');
-            return null;
-        }
-        $rate = 0.0;
-        if (isset($resp['taxSummaries']) && is_array($resp['taxSummaries'])) {
-            foreach ($resp['taxSummaries'] as $summary) {
-                if (($summary['taxType'] ?? '') === 'SALES_TAX') {
-                    $rate = (float)($summary['displayRates'][0]['rate'] ?? 0.0);
-                    break;
-                }
+        // Only a SALES_TAX summary with a rate counts as an answer. Zip-Tax reports errors (bad key,
+        // quota, unknown address) with response code != 100 and an EMPTY taxSummaries list, so a
+        // bare "taxSummaries is present" check would cache a 0 rate for the rest of the quarter.
+        $rate = null;
+        foreach ((array)($resp['taxSummaries'] ?? []) as $summary) {
+            if (($summary['taxType'] ?? '') === 'SALES_TAX' && isset($summary['displayRates'][0]['rate']) && is_numeric($summary['displayRates'][0]['rate'])) {
+                $rate = (float)$summary['displayRates'][0]['rate'];
+                break;
             }
+        }
+        if ($rate === null) {
+            $code = is_array($resp) ? (string)($resp['metadata']['response']['code'] ?? '') : '';
+            $name = is_array($resp) ? (string)($resp['metadata']['response']['name'] ?? '') : '';
+            $text = is_array($resp) ? (string)($resp['metadata']['response']['message'] ?? '') : '';
+            if ('101' === $code || false !== stripos($name, 'KEY')) { // key rejected: expired, cancelled or mistyped
+                $msg = "Sales tax was NOT calculated: Zip-Tax rejected the API key (it may have expired). Renew the key in your zip-tax.com account and enter the new key under API Settings -> Sales Tax APIs.";
+                msgAdd($msg, 'error');
+                $this->logKeyProblem($msg." Zip-Tax said: $text (code $code).");
+            } else {
+                $why = $text !== '' ? " Zip-Tax said: $text".($code !== '' ? " (code $code)" : '').'.' : ' No response from Zip-Tax.';
+                msgAdd("The Zip-Tax lookup for ZIP $zip5 did not return a sales tax rate; nothing was cached.$why Check the key under API Settings -> Sales Tax APIs.", 'caution');
+            }
+            return null;
         }
         $jurState = $jurCounty = $jurCity = '';
         if (isset($resp['baseRates']) && is_array($resp['baseRates'])) {
@@ -311,6 +321,22 @@ class phreebooksRestfulTax
             msgDebug("\ntax_rate_cache new row: zip_key=$cacheKey state={$args['state']} rate=$rate");
         }
         return $rate;
+    }
+
+    /**
+     * Writes a rejected-key problem to the Bizuno log at most once a day, so an administrator sees it
+     * even when the failing lookups come from the storefront (whose customers never see the message).
+     * @param string $msg
+     */
+    private function logKeyProblem($msg)
+    {
+        $flag = defined('BIZUNO_DATA') ? BIZUNO_DATA.'temp/ziptax_key_error.flag' : '';
+        if ($flag !== '' && is_file($flag) && (time() - (int)@filemtime($flag)) < 86400) { return; }
+        msgLog($msg);
+        if ($flag !== '') {
+            if (!is_dir(dirname($flag))) { @mkdir(dirname($flag), 0750, true); }
+            @touch($flag);
+        }
     }
 
     /**

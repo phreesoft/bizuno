@@ -240,6 +240,22 @@ function bizScrubSensitive($data)
     return $output;
 }
 
+/**
+ * Masks credential query parameters in a URL before it is written to the trace, e.g.
+ * ?api_key=abc&q=x -> ?api_key=***&q=x. Uses the same key pattern as bizScrubSensitive(),
+ * plus a bare `key` parameter.
+ * @param string $url
+ * @return string
+ */
+function bizScrubUrl($url)
+{
+    $pattern = '/pass|pwd|userpw|secret|token|api[_-]?key|txn[_-]?key|card|pan|cvv|cvc|card[_-]?code|otp|2fa|tfa|twofa/i';
+    return preg_replace_callback('/([?&])([^=&#]+)=([^&#]*)/', function($m) use ($pattern) {
+        $name = urldecode($m[2]);
+        return (preg_match($pattern, $name) || strtolower($name) === 'key') ? $m[1].$m[2].'=***' : $m[0];
+    }, (string)$url);
+}
+
 /*
  * Wrapper for print_r function which WordPress plugin checker doesn't like.
  * Auto-redacts sensitive keys (api_token, password, etc.) before stringifying so debug
