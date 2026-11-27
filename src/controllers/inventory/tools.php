@@ -657,6 +657,7 @@ class inventoryTools
      */
     public function invBalance(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         global $io;
         $fn    = 'temp/invAnalysis.csv';
         $result= dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", $this->inv_types)."')", 'sku', ['id']);
@@ -680,6 +681,7 @@ class inventoryTools
      */
     public function invBalanceNext(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         global $io;
         $output  = [];
         $blockCnt= 50;
@@ -741,6 +743,7 @@ class inventoryTools
      */
     public function recalcHistory(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         global $io;
         $result = dbGetMulti(BIZUNO_DB_PREFIX.'inventory', "inventory_type IN ('".implode("','", $this->inv_types)."') AND inactive='0'", 'sku', ['id']);
         if (sizeof($result) == 0) { return msgAdd('No inventory found to process!'); }
@@ -760,6 +763,7 @@ class inventoryTools
      */
     public function recalcHistoryNext(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         global $io;
         $output  = [];
         $blockCnt= 100;

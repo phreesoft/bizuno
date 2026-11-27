@@ -756,7 +756,8 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
      */
     public function glRepostBulk(&$layout=[])
     {
-        $jIDs     = array_keys(clean('jID', 'array', 'post'));
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
+        $jIDs     = array_values(array_filter(array_map('intval', array_keys(clean('jID', 'array', 'post'))))); // keys arrive from the request: integers only
         $dateStart= clean('repost_begin','date', 'post');
         $dateEnd  = clean('repost_end',  'date', 'post');
         if (sizeof($jIDs) == 0) { return msgAdd(lang('err_pb_repost_empty', $this->moduleID)); }
@@ -776,6 +777,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
      */
     public function glRepostBulkNext(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         $cron= getUserCron('glRepost');
         $id  = array_shift($cron['rows']);
         if (!empty($id)) { $this->glRepost($id); }
@@ -814,6 +816,7 @@ $cron['ttlBlk']++; $cron['ttlBlk']++; // Fudge Factor
      */
     public function glRepairNext(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         $cron      = getUserCron('repairGL');
         $fatalError= false;
         $nextPeriod= array_shift($cron['rows']);
@@ -1017,6 +1020,7 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
      */
     public function pruneCogs(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         $result = dbGetMulti(BIZUNO_DB_PREFIX."journal_cogs_owed");
         if (sizeof($result) == 0) { return msgAdd("No rows to process!"); }
         foreach ($result as $row) { $rows[$row['sku']] = $row['journal_main_id']; }
@@ -1031,6 +1035,7 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
      */
     public function pruneCogsNext(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // repair tool, every step re-checks (the cron steps are callable routes too)
         $cron = getUserCron('pruneCogs');
         $sku = array_shift($cron['rows']);
         // find the last inventory increase that included this SKU

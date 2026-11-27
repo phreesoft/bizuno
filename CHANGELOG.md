@@ -2,6 +2,22 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Security
+- **Permission checks on maintenance tools.** The general-ledger repost/repair and COGS prune tools
+  and the inventory balance/history recalculation tools checked permissions only on their first
+  step; every step (each is a routable action) now requires administrator level 3. The repost tool
+  also accepts only integer journal IDs.
+- **Attachment delete confined to the data folder.** `bizuno/main/fileDelete` now deletes a single
+  existing file inside the data folder: no wildcards, `..` or absolute paths, never PHP files,
+  `myExt/` or the instance key, and backups require administrator level 4. Downloading a database
+  backup through `bizuno/main/fileDownload` also requires administrator level 4.
+- **Bank register rows** (`phreebooks/register/managerRows`) now require the same *register* right as
+  the register page, and the GL account value is escaped.
+- **Monthly statement run** (`phreeform/render/cronStatements`) can only be started by the
+  token-checked `portal/api/stmtCron` route or by an administrator.
+
 ## [7.4.9] — 2026-11-26
 
 ### Security

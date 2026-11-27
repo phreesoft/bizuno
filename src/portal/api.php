@@ -442,6 +442,7 @@ class portalApi
         loadBusinessCache();
         if (!$this->loadApiUserContext()) { return; }
         msgDebug("\nstmtCron: user context set, composing phreeform/render/cronStatements");
+        $GLOBALS['bizApiCron'] = 'stmtCron'; // token verified above; lets cronStatements skip its interactive permission check
         compose('phreeform', 'render', 'cronStatements', $layout);
     }
 
