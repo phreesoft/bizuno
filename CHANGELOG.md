@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.10] — 2026-11-27
 
 ### Security
 - **Permission checks on maintenance tools.** The general-ledger repost/repair and COGS prune tools
