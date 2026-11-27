@@ -566,6 +566,9 @@ class phreeformRender
     public function cronStatements(&$layout=[])
     {
         global $io, $report;
+        // Sends statements to every flagged customer. Reached from the token-checked portal/api/stmtCron
+        // (which sets the flag) or interactively by an administrator; it is a routable method, so check.
+        if (($GLOBALS['bizApiCron'] ?? '') !== 'stmtCron' && !validateAccess('admin', 3)) { return; }
         $settings= getModuleCache('phreebooks', 'settings', 'customers');
         $formID  = intval($settings['stmt_form'] ?? 0);
         $fromName= getModuleCache('bizuno', 'settings', 'company', 'primary_name');

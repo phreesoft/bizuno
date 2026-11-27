@@ -56,8 +56,9 @@ class phreebooksRegister
         // add pagination, if page 1 list 19 plus beginning balance
         // if last page, list rest plus ending balance
         // sort by date, deposits first, then withdrawals (credits vs debits?)
+        if (!validateAccess('register', 1)) { return; } // same right as the register page itself
         $period = clean('period', ['format'=>'integer','default'=>getModuleCache('phreebooks', 'fy', 'period')], 'post');
-        $glAcct = clean('glAcct', ['format'=>'text',   'default'=>getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')], 'post');
+        $glAcct = addslashes(clean('glAcct', ['format'=>'text', 'default'=>getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash')], 'post')); // used in SQL below
         $balance= dbGetValue(BIZUNO_DB_PREFIX."journal_history", 'beginning_balance', "gl_account='$glAcct' AND period=$period");
         $entries= [['id'=>'0','post_date'=>'','reference'=>'','description'=>lang('beginning_balance'),'debit'=>'','credit'=>'','balance'=>$balance]];
         $sql    = "SELECT i.description, m.id, m.journal_id, m.post_date, m.total_amount, m.invoice_num, m.primary_name_b,

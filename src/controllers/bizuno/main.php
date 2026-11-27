@@ -157,9 +157,37 @@ bizFocus('pwEncrypt');";
             $dir  = $path;
             $file = $file;
         }
+        $real    = realpath(BIZUNO_DATA.$dir.$file);
+        $backups = realpath(BIZUNO_DATA.'backups');
+        if ($real && $backups && strpos($real, rtrim($backups, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR) === 0 && !validateAccess('admin', 4)) { return; } // database backups: full admin only
         msgLog(lang('download').' - '.$file);
         msgDebug("\n".lang('download').' - '.$file);
         $io->download('file', $dir, $file);
+    }
+
+    /**
+     * Resolves a request-supplied path (relative to BIZUNO_DATA) to a single deletable file, or messages
+     * and returns false. Rejects wildcards, '..', absolute paths, PHP/.htaccess files, anything under
+     * myExt/, the per-install key and anything outside BIZUNO_DATA; backups/ requires admin level 4.
+     * @param string $file
+     * @return string|false - real path of the file
+     */
+    private function safeDataFile($file)
+    {
+        $rel = ltrim(str_replace('\\', '/', (string)$file), '/');
+        if ($rel === '' || strpbrk($rel, "*?[]{}\0") !== false || preg_match('#(^|/)\.\.(/|$)#', $rel)) { msgAdd('Invalid path!'); return false; }
+        $lower = strtolower($rel);
+        if (preg_match('#\.(php\d?|phtml|phar)$|(^|/)\.htaccess$#', $lower) || strpos($lower, 'myext/') === 0 || $lower === 'biz-instance-key.php') {
+            msgAdd('This file cannot be deleted here.'); return false;
+        }
+        $base = realpath(BIZUNO_DATA);
+        $real = realpath(BIZUNO_DATA.$rel);
+        if ($base === false || $real === false || !is_file($real) || strpos($real, rtrim($base, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR) !== 0) { msgAdd('Invalid path!'); return false; }
+        $myExt = realpath(BIZUNO_DATA.'myExt');
+        if ($myExt && strpos($real, rtrim($myExt, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR) === 0) { msgAdd('This file cannot be deleted here.'); return false; } // also via symlinks
+        $backups = realpath(BIZUNO_DATA.'backups');
+        if ($backups && strpos($real, rtrim($backups, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR) === 0 && !validateAccess('admin', 4)) { return false; }
+        return $real;
     }
 
     /**
@@ -173,8 +201,12 @@ bizFocus('pwEncrypt');";
         $dgID = clean('rID',  'text','get');
         $file = clean('data', 'text','get');
         if (!validateAccess(!empty($secID)?$secID:'admin', 4)) { return; }
+        // SECURITY: secID and the path both come from the request, so the path is confined here: one
+        // existing regular file inside BIZUNO_DATA, no wildcards or '..', never code or the instance key,
+        // and backups need full admin rights. (io::fileDelete() globs, so it is not used directly.)
+        if (!$real = $this->safeDataFile($file)) { return; }
         msgDebug("\nDeleting dgID = $dgID and file = $file");
-        $io->fileDelete($file);
+        @unlink($real);
         msgLog(lang('delete').' - '.$file);
         msgDebug("\n".lang('delete').' - '.$file);
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval',
