@@ -128,6 +128,7 @@ class bizunoSettings
      */
     public function adminMethods(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // method settings forms carry stored credentials; saving them needs the same level
         $module = clean('module', 'db_field', 'get');
         $folder = clean('folder', 'db_field', 'get');
         msgDebug("\nEntering adminMethods for module $module, folder $folder");

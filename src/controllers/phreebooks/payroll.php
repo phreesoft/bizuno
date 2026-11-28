@@ -33,6 +33,7 @@ class phreebooksPayroll
 
     public function importForm(&$layout=[])
     {
+        if (!validateAccess('j2_mgr', 2)) { return; } // payroll imports post general journal entries
         msgDebug("\nreached phreebooks:payroll:importForm");
         $vendor= clean('payroll', 'alpha_num', 'get');
         if (empty($vendor)) { return; }
@@ -42,6 +43,7 @@ class phreebooksPayroll
     
     public function importGo(&$layout=[])
     {
+        if (!validateAccess('j2_mgr', 2)) { return; }
         msgDebug("\nreached phreebooks:payroll:importGo");
         $vendor= clean('modID', 'alpha_num', 'get');
         if (empty($vendor)) { return; }

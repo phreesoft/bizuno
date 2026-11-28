@@ -212,6 +212,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
     }
     public function getUnshippedOrders(&$layout=[])
     {
+        if (!validateAccess($this->secID, 1)) { return; }
         $output= [];
         $search= getSearch();
         $crit  = "waiting='1' && journal_id=12";

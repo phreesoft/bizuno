@@ -216,6 +216,7 @@ class inventoryTools
 
     public function chartForecastGo()
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         global $io;
         $skuID   = clean('rID', 'integer', 'get');
         $struc = $this->chartForecastData($skuID);
@@ -232,6 +233,7 @@ class inventoryTools
      */
     public function chartHistPurch(&$layout=[])
     {
+        if (!validateAccess('j6_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
@@ -248,6 +250,7 @@ class inventoryTools
      */
     public function chartHistSales(&$layout=[])
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
@@ -311,6 +314,7 @@ class inventoryTools
      */
     public function chartSales(&$layout=[])
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $sku   = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'sku', "id=$rID");
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
@@ -353,6 +357,7 @@ class inventoryTools
     }
     public function chartSalesGo()
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         global $io;
         $sku   = clean('sku', 'text', 'get');
         $struc = $this->chartSalesData($sku);
@@ -367,6 +372,7 @@ class inventoryTools
      */
     public function invDataGo()
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         global $io;
         $fqdn = "\\bizuno\\inv_stock";
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/inventory/dashboards/inv_stock/inv_stock.php', $fqdn);
@@ -383,6 +389,7 @@ class inventoryTools
      */
     public function stockAging()
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         global $io;
         $ttlQty = $ttlCost = 0;
         $output = [];

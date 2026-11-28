@@ -46,6 +46,7 @@ class phreebooksFulfillment {
      */
     public function fulfillMain(&$layout=[])
     {
+        if (!validateAccess($this->pageID, 1)) { return; } // before overrideSecurity() raises the journal rights
         $this->overrideSecurity();
         $_GET['jID'] = 12; // Sales Journal
         compose('phreebooks', 'main', 'manager', $layout);

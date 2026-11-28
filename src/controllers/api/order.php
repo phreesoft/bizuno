@@ -49,6 +49,7 @@ class apiOrder extends apiCommon
      */
     public function add(&$layout=[])
     {
+        if (!validateAccess('j10_mgr', 2, false) && !validateAccess('j12_mgr', 2)) { return; } // creates a sales order or invoice
         $postID = $this->apiJournalEntry();
         $output = ['result'=>!empty($postID)?'Success':'Fail', 'ID'=>$postID, 'messages'=>msgQueue()];
         $layout = array_replace_recursive($layout, ['type'=>'raw', 'content'=>json_encode($output)]);

@@ -340,6 +340,7 @@ function xfrResponse(json) {
      */
     public function sendMain(&$layout=[])
     {
+        if (!validateAccess($this->secID, 3)) { return; } // starts a bulk email to the customer list
         $sender= clean('senderName', 'text',   'post');
         $email = clean('senderEmail','email',  'post');
         $title = clean('selTitle',   'integer','post');
@@ -383,6 +384,7 @@ function xfrResponse(json) {
      */
     public function nextBlock(&$layout=[])
     {
+        if (!validateAccess($this->secID, 3)) { return; }
         $cron = getUserCron($this->moduleID);
         $mailer = new bizunoMailer('', '', $cron['subject'], $cron['body'], $cron['email'], $cron['sender']);
         msgDebug("\nStarting with cnt = ".$cron['cnt']);

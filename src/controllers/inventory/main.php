@@ -1118,6 +1118,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
      */
     public function getStockAssy()
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $sID = clean('rID', 'integer', 'get');
         $qty = clean('qty', ['format'=>'float','default'=>1], 'get');
         if (!$sID) { return msgAdd("Bad record ID!"); }

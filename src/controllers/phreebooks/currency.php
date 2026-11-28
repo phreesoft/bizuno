@@ -220,6 +220,7 @@ class phreebooksCurrency
 
     public function setExcRate(&$layout=[])
     {
+        if (!validateAccess('admin', 3)) { return; } // same level as the currency save
         $iso  = clean('excISO', 'text', 'post');
         $rate = clean('excRate','float','post');
         $currencies = getModuleCache('phreebooks', 'currency', 'iso');

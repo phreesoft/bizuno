@@ -215,6 +215,7 @@ function preSubmit() {
     }
     public function bulkChange(&$layout=[])
     {
+        if (!validateAccess($this->secID, 3)) { return; }
         $type  = clean('type', ['format'=>'char','default'=>'c'], 'get');
         $subjects = [['id'=>'c','text'=>lang('contacts')],['id'=>'i','text'=>lang('inventory')]];
         $icnGo = ['icon'=>'next', 'label'=>lang('go'),

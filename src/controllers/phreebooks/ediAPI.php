@@ -105,7 +105,8 @@ class phreebooksEdiAPI extends phreebooksEdiSegments
     }
     public function ediGet()
     {
-        // CAUTION - No security check here or cron will fail as no one is logged into Bizuno
+        // The unattended run comes through the token checked portal/api/ediCron, which sets bizApiCron; a signed in user needs sales rights
+        if (($GLOBALS['bizApiCron'] ?? '') !== 'ediCron' && !validateAccess('j10_mgr', 2, false) && !validateAccess('j12_mgr', 2)) { return; }
         $opt = clean('opt', 'cmd', 'get');
         setSecurityOverride('prices_c', 1);
         foreach ($this->creds as $creds) {
@@ -188,6 +189,7 @@ return msgAdd("EDI control num = $this->ediCntrlNum. This needs EDI control num 
     }
     public function ediTransmit()
     {
+        if (!validateAccess('j10_mgr', 2, false) && !validateAccess('j12_mgr', 2)) { return; } // sends the 855/810/856 for a sales order or invoice
         $mID = clean('rID', 'integer', 'get'); // mID is the SO ID for 855 and invoice ID for 810, 856
         $spec= clean('data','integer', 'get');
         if (empty($mID)) { return; }

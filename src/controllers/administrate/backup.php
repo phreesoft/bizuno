@@ -124,6 +124,7 @@ class administrateBackup
      */
     public function mgrRows(&$layout=[])
     {
+        if (!validateAccess($this->secID, 4)) { return; } // lists database backups, same level as downloading one
         global $io;
         $rows   = $io->fileReadGlob($this->dirBackup, $io->getValidExt('backup'));
         $totRows= sizeof($rows);
@@ -186,6 +187,7 @@ class administrateBackup
      */
     public function uploadRestore(&$layout)
     {
+        if (!validateAccess($this->secID, 4)) { return; } // writes into the backups folder used by restore
         global $io;
         $io->uploadSave('fldFile', $this->dirBackup);
         $layout = array_replace_recursive($layout, ['content'=>['action'=>'eval','actionData'=>"bizGridReload('dgRestore');"]]);

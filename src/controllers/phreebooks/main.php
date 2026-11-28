@@ -1174,6 +1174,7 @@ function bizUnitDiscDisc(newValue) {
      */
     public function detailStatus(&$layout=[], $rID=0)
     {
+        if (!validateAccess('mgr_c', 1, false) && !validateAccess('mgr_v', 1)) { return; }
         $cID    = !empty($rID) ? $rID : clean('rID', 'integer', 'get');
         if (empty($cID)) { return("Bad ID"); }
         $contact= dbGetRow(BIZUNO_DB_PREFIX.'contacts', "id=$cID");

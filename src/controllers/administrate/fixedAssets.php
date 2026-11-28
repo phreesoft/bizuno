@@ -206,6 +206,7 @@ class administrateFixedAssets extends mgrJournal
     }
     public function export()
     {
+        if (!validateAccess($this->secID, 2)) { return; }
         parent::export();
     }
 
@@ -308,6 +309,7 @@ class administrateFixedAssets extends mgrJournal
      */
     public function adminSchedLoad(&$layout=[])
     {
+        if (!validateAccess($this->secID, 1)) { return; }
         $title  = clean('rID', 'text', 'get');
         $titles = $this->getTitles();
         if (!$title && sizeof($titles) > 0) { $title = $titles[0]['id']; }
@@ -336,6 +338,7 @@ function faSchedSave() {
      */
     public function adminSchedSave(&$layout=[])
     {
+        if (!validateAccess($this->secID, 3)) { return; }
         $title = clean('rID', 'text', 'get');
         $rows  = clean('data','json', 'get');
         if (empty($title)) { return msgAdd("Category field is required!"); }

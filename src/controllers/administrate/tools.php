@@ -170,6 +170,7 @@ class administrateTools {
      */
     public function repairTables($verbose=true)
     {
+        if (is_array($verbose) && !validateAccess('admin', 4)) { return; } // routed (the router passes the layout array); internal callers pass a boolean
         $tables = [];
         include(BIZUNO_FS_LIBRARY.'controllers/bizuno/install/tables.php'); // loads $tables
         foreach ($tables as $table => $props) {

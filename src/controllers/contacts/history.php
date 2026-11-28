@@ -85,6 +85,7 @@ class contactsHistory
      */
     public function payment()
     {
+        if (!validateAccess('mgr_c', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $terms = viewFormat($rID, 'cTerms');
         $lYear = localeCalculateDate(biz_date('Y-m-d'), 0, 0, -1);
