@@ -331,6 +331,7 @@ function phreeformCriteria($report, $xOnly=false)
             case 'true':
             case 'inactive':
             case 'printed':
+            case 'paid':
                 $sc .= prefixTables($settings->fieldname)."='1'";
                 $fc .= $settings->title."=$settings->default";
                 break;
@@ -338,6 +339,7 @@ function phreeformCriteria($report, $xOnly=false)
             case 'false':
             case 'active':
             case 'unprinted':
+            case 'unpaid':
                 $sc .= prefixTables($settings->fieldname)."='0'";
                 $fc .= $settings->title."=$settings->default";
                 break;

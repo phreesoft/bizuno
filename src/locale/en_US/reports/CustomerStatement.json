@@ -862,7 +862,7 @@
         ]
     },
     "filterlist": {
-        "total": 4,
+        "total": 5,
         "rows": [
             {
                 "fieldname": "journal_main.primary_name_b",
@@ -886,6 +886,12 @@
                 "title": "Customer ID",
                 "visible": "1",
                 "type": "6"
+            },
+            {
+                "fieldname": "journal_main.closed",
+                "title": "Paid Status",
+                "visible": "1",
+                "type": "12"
             }
         ]
     },
