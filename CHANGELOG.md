@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.15] — 2026-11-28
 
 ### Changed
 - **PhreeForm filter type list:** *All:Paid:Unpaid* is listed with the other *All:…* types instead
