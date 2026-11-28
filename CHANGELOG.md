@@ -8,6 +8,12 @@ All notable changes to Bizuno ERP are documented in this file.
 - **PhreeForm filter type list:** *All:Paid:Unpaid* is listed with the other *All:…* types instead
   of at the end. Saved reports are unaffected; only the display order changed.
 
+### Fixed
+- **Monthly statements settings.** The Monthly Statement Form list now also finds forms saved with the
+  older `groupname` folder key, so existing statement forms appear. The **Run Now** button shows its
+  caption; it was blank because saved settings overwrote it. The "form is not set" message now says
+  to save the settings before Run Now.
+
 ## [7.4.14] — 2026-11-28
 
 ### Security

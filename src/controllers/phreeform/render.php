@@ -592,7 +592,7 @@ class phreeformRender
         $fromName= getModuleCache('bizuno', 'settings', 'company', 'primary_name');
         $from    = getModuleCache('bizuno', 'settings', 'company', 'email_ar');
         if (empty($from)) { $from = getModuleCache('bizuno', 'settings', 'company', 'email'); }
-        if (empty($formID)) { return $this->cronStmtDone($layout, [], 'The monthly statement form is not set (PhreeBooks Settings -> Customers), nothing sent.'); }
+        if (empty($formID)) { return $this->cronStmtDone($layout, [], 'The monthly statement form is not set: pick a Monthly Statement Form in Settings -> PhreeBooks -> Customers and Save before Run Now (it uses the saved settings). Nothing sent.'); }
         if (empty($from))   { return $this->cronStmtDone($layout, [], 'No company email address to send from (Settings -> Company), nothing sent.'); }
         $dates    = $this->cronStmtDates($settings['stmt_dates'] ?? 'lastmonth');
         $testTo   = trim($settings['stmt_test'] ?? ''); // test mode: everything goes to this address, nothing is logged on the customer
