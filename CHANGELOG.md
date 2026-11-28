@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.13] — 2026-11-28
 
 ### Security
 - **Internal helpers are not routes.** A `bizRt` route may only target a controller method that takes
