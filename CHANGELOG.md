@@ -2,6 +2,16 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Added
+- **Monthly statement test mode and Run Now.** PhreeBooks → Customers has a **Monthly Statement Test
+  Address**. While it is set, the statement run sends every statement to that address (subject
+  `[TEST for <customer email>]`), skips the CC and the customer log entry, and marks the summary
+  TEST. A **Run Now** button starts a run from the settings screen for administrators. A statement
+  PDF that cannot be built is reported as failed for that customer instead of stopping the run. New
+  page: *Administration → Monthly customer statements*.
+
 ## [7.4.13] — 2026-11-28
 
 ### Security

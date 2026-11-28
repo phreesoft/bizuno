@@ -594,6 +594,8 @@ class phreeformRender
         if (empty($formID)) { return $this->cronStmtDone($layout, [], 'The monthly statement form is not set (PhreeBooks Settings -> Customers), nothing sent.'); }
         if (empty($from))   { return $this->cronStmtDone($layout, [], 'No company email address to send from (Settings -> Company), nothing sent.'); }
         $dates    = $this->cronStmtDates($settings['stmt_dates'] ?? 'lastmonth');
+        $testTo   = trim($settings['stmt_test'] ?? ''); // test mode: everything goes to this address, nothing is logged on the customer
+        if (!empty($testTo) && !filter_var($testTo, FILTER_VALIDATE_EMAIL)) { return $this->cronStmtDone($layout, [], "The Monthly Statement Test Address ($testTo) is not a valid email address, nothing sent."); }
         $customers= dbGetMulti(BIZUNO_DB_PREFIX.'contacts', "ctype_c='1' AND inactive='0' AND stmt_email IN ('1','2')", 'primary_name', ['id','short_name','primary_name','email','email2','stmt_email']);
         msgDebug("\ncronStatements: form $formID, dates $dates, ".sizeof($customers)." flagged customers");
         $log = [];
@@ -601,6 +603,7 @@ class phreeformRender
             $entry = ['id'=>$cust['id'], 'customer'=>trim($cust['short_name'].' '.$cust['primary_name']), 'status'=>'failed', 'note'=>''];
             $email = !empty($cust['email2']) ? $cust['email2'] : $cust['email']; // A/R address first, then the general address
             if (empty($email)) { $entry['note'] = 'no email address on the customer record'; $log[] = $entry; continue; }
+            $sendTo= !empty($testTo) ? $testTo : $email;
             $report = $this->renderLoadReport($formID);
             if (empty($report->title)) { $entry['note'] = "statement form $formID was not found"; $log[] = $entry; break; }
             $strPDF = $this->cronStmtRender($report, $cust['id'], $dates);
@@ -614,24 +617,25 @@ class phreeformRender
                 $log[] = $entry; continue;
             }
             $output = $this->renderMerge([$strPDF]);
+            if (empty($output['data'])) { $entry['note'] = 'the statement PDF could not be built: '.$this->cronStmtErrors(); $log[] = $entry; continue; }
             $file   = 'temp/'.preg_replace('/[^A-Za-z0-9_.-]/', '_', $output['filename']);
             $io->fileWrite($output['data'], $file, true, false, true);
-            $subject= $report->title.' '.lang('from').' '.$fromName;
+            $subject= (!empty($testTo) ? "[TEST for $email] " : '').$report->title.' '.lang('from').' '.$fromName;
             $body   = !empty($report->emailmessage) ? TextReplace(stripslashes($report->emailmessage)) : sprintf(lang('email_body'), $report->title, $fromName);
-            $mail   = new bizunoMailer($email, $cust['primary_name'], $subject, str_replace("\n", "<br />", $body), $from, $fromName);
-            if (!empty($settings['stmt_cc'])) { $mail->addToCC($settings['stmt_cc']); }
+            $mail   = new bizunoMailer($sendTo, $cust['primary_name'], $subject, str_replace("\n", "<br />", $body), $from, $fromName);
+            if (!empty($settings['stmt_cc']) && empty($testTo)) { $mail->addToCC($settings['stmt_cc']); }
             $mail->attach(BIZUNO_DATA.$file);
             if ($mail->sendMail()) {
-                $entry['status'] = 'sent'; $entry['note'] = $email;
-                dbWrite(BIZUNO_DB_PREFIX.'contacts_log', ['contact_id'=>$cust['id'], 'entered_by'=>getUserCache('profile', 'userID', false, '0'), 'log_date'=>biz_date('Y-m-d H:i:s'),
-                    'action'=>lang('mail_out', $this->moduleID), 'notes'=>"Email: {$cust['primary_name']} ($email), $subject (statement cron)"]);
+                $entry['status'] = 'sent'; $entry['note'] = !empty($testTo) ? "$email (TEST, sent to $testTo)" : $email;
+                if (empty($testTo)) { dbWrite(BIZUNO_DB_PREFIX.'contacts_log', ['contact_id'=>$cust['id'], 'entered_by'=>getUserCache('profile', 'userID', false, '0'), 'log_date'=>biz_date('Y-m-d H:i:s'),
+                    'action'=>lang('mail_out', $this->moduleID), 'notes'=>"Email: {$cust['primary_name']} ($email), $subject (statement cron)"]); }
             } else {
                 $entry['note'] = 'mail send failed: '.$this->cronStmtErrors();
             }
             @unlink(BIZUNO_DATA.$file);
             $log[] = $entry;
         }
-        return $this->cronStmtDone($layout, $log);
+        return $this->cronStmtDone($layout, $log, '', !empty($testTo));
     }
 
     /**
@@ -678,12 +682,12 @@ class phreeformRender
     /**
      * Writes the run summary to the audit log, emails it to the company Manager address, and returns it as the response
      */
-    private function cronStmtDone(&$layout, $log=[], $fatal='')
+    private function cronStmtDone(&$layout, $log=[], $fatal='', $test=false)
     {
         $counts = ['sent'=>0, 'skipped'=>0, 'failed'=>0];
         $lines  = [];
         foreach ($log as $entry) { $counts[$entry['status']]++; $lines[] = strtoupper($entry['status']).": {$entry['customer']}".(!empty($entry['note']) ? " - {$entry['note']}" : ''); }
-        $title  = 'Monthly statements '.biz_date('Y-m-d').": {$counts['sent']} sent, {$counts['skipped']} skipped, {$counts['failed']} failed".(!empty($fatal) ? " - $fatal" : '');
+        $title  = ($test ? 'TEST - ' : '').'Monthly statements '.biz_date('Y-m-d').": {$counts['sent']} sent, {$counts['skipped']} skipped, {$counts['failed']} failed".(!empty($fatal) ? " - $fatal" : '');
         msgLog("PhreeForm - $title");
         $mgr = getModuleCache('bizuno', 'settings', 'company', 'email_mgr');
         if (!empty($mgr)) {
@@ -693,6 +697,7 @@ class phreeformRender
             if (!$mail->sendMail()) { msgDebug("\ncronStmtDone: summary email to $mgr failed"); }
         }
         if (!empty($fatal)) { msgAdd($fatal); }
+        elseif (empty($GLOBALS['bizApiCron'])) { msgAdd($title.(!empty($mgr) ? ". The details were emailed to $mgr." : ''), $counts['failed'] ? 'caution' : 'success'); } // run from the settings screen
         $layout = array_replace_recursive($layout, ['content'=>$counts + ['title'=>$title, 'log'=>$log]]);
         return true;
     }
