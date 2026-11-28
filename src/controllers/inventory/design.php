@@ -213,7 +213,7 @@ jqBiz('#sku_id').combogrid({ panelWidth: 550, delay:500, value:'', idField:'id',
     public function save(&$layout=[])
     {
         $rID  = clean('_rID',  'integer','post');
-        $skuID= clean('sku_id','text',   'post');
+        $skuID= clean('sku_id','integer','post'); // inventory record id, used unquoted as ref_id
         if (!$security = validateAccess($this->secID, $rID?3:2)) { return; }
         // Error check
         $exists = dbMetaGet('%', $this->metaPrefix, 'inventory', $skuID);

@@ -210,6 +210,7 @@ class portalCtl
         }
         if ($this->getCodex()) {
             if ($this->maintenanceGate()) { return; } // a software update is in progress — block everyone but the initiator
+            if ($this->lifecycleGate())   { return; } // install/remove style methods are internal, admins only when routed
             compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout);
         }
     }
@@ -468,6 +469,21 @@ class portalCtl
         $myLang = clean('bizunoLang', ['format'=>'cmd', 'default'=>'en_US'], 'get');
         if ($myLang<>'en_US') { $lang = $myLang; }
         $bizunoLang = loadBaseLang($lang);
+    }
+
+    /**
+     * Module and method lifecycle methods (install, remove, initialize, ...) are public so the settings screens and the
+     * installer can call them, which also makes them routable. Re-running one directly can drop columns or reset every
+     * method's settings to defaults, so a direct route to one needs administrator level 4.
+     * @return boolean - true when the request was refused
+     */
+    private function lifecycleGate()
+    {
+        $methods = ['install', 'installFirst', 'initialize', 'remove', 'adminInstMethods', 'installPhysicalFields'];
+        if (!in_array($this->route['method'], $methods)) { return false; }
+        if (validateAccess('admin', 4)) { return false; }
+        msgDebug("\nlifecycleGate: refused direct route to {$this->route['module']}/{$this->route['page']}/{$this->route['method']}");
+        return true;
     }
 
     private function cleanBizRt()

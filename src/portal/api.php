@@ -67,10 +67,17 @@ class portalApi
                 } else {
                     $base = BIZUNO_DATA;
                     $fn   = $base.$parts[1];
+                    // Only the logo/product image folder and myExt view assets are public (emails, storefronts and the
+                    // sign in page load them without a session). Anything else in the data folder (attachments,
+                    // shipping labels, exports) needs a signed in user, as this route is reachable without one.
+                    if (!$this->fsPublicData($fn) && empty(getUserCookie())) {
+                        msgDebug("\nfs(): refused data file outside the public folders for a guest: {$parts[1]}");
+                        $fBad = true;
+                    }
                 }
                 $ext  = strtolower(pathinfo($parts[1], PATHINFO_EXTENSION));
                 msgDebug("\nLooking for fn = $fn");
-                $fBad = !file_exists($fn) ? true : false;
+                if (!$fBad) { $fBad = !file_exists($fn) ? true : false; }
                 $validExts = array_merge($io->getValidExt('image'), $io->getValidExt('script'));
                 $eBad = !in_array($ext, $validExts) ? true : false;
                 // Path-traversal containment: resolve the requested file with realpath()
@@ -100,6 +107,18 @@ class portalApi
      * but parameterized by base so this method can guard both BIZUNO_DATA and
      * BIZUNO_FS_LIBRARY (the two roots `fs()` legitimately serves from).
      */
+    /**
+     * True when the requested data file really lives in one of the public folders (images/ or myExt/), resolved with
+     * realpath() so '..' segments or links cannot reach other data folders through a public prefix.
+     */
+    private function fsPublicData($fn)
+    {
+        foreach (['images', 'myExt'] as $folder) {
+            if (is_dir(BIZUNO_DATA.$folder) && $this->fsPathContained($fn, BIZUNO_DATA.$folder)) { return true; }
+        }
+        return false;
+    }
+
     private function fsPathContained($fn, $base)
     {
         $real     = realpath($fn);

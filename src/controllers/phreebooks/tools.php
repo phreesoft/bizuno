@@ -42,6 +42,7 @@ class phreebooksTools
     public function jrnlData(&$layout=[])
     {
         global $io;
+        if (!validateAccess('j2_mgr', 1)) { return; } // same right as the summary_6_12 dashboard
         $total_v= $total_c= 0;
         $output = [];
 //      $code   = clean('code', 'text', 'get'); // not used yet // 6_12 : dashbaord summary_6_12
@@ -65,6 +66,7 @@ class phreebooksTools
     public function agingData()
     {
         global $io;
+        if (!validateAccess('j18_mgr', 1)) { return; } // same right as the aged_receivables dashboard
         $fqdn  = "\\bizuno\\aged_receivables";
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/contacts/dashboards/aged_receivables/aged_receivables.php', $fqdn);
         $dash  = new $fqdn([]);
@@ -77,6 +79,7 @@ class phreebooksTools
     public function exportSales()
     {
         global $io;
+        if (!validateAccess('j12_mgr', 1)) { return; } // same right as the chart_j12 dashboard
         $output= [];
         $range = clean('range', 'char',   'get');
         $selRep= clean('selRep','integer','get');
@@ -1064,6 +1067,7 @@ if ($row['journal_id']=='1010-00') { $skips[] = ['mID'=>$row['id'], 'jID'=>$row[
     public function salesByRep()
     {
         global $io;
+        if (!validateAccess('j12_mgr', 1)) { return; } // sales totals, same right as the sales dashboards
         $fqdn  = "\\bizuno\\sales_by_rep";
         bizAutoLoad(BIZUNO_FS_LIBRARY.'controllers/phreebooks/dashboards/sales_by_rep/sales_by_rep.php', $fqdn);
         $dash  = new $fqdn([]);

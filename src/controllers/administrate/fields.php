@@ -67,7 +67,7 @@ class administrateFields extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['sort'] = clean('sort', ['format'=>'text','default'=>'label'], 'post');
+        $this->defaults['sort'] = clean('sort', ['format'=>'db_field','default'=>'label'], 'post');
     }
     public function manager(&$layout=[])
     {

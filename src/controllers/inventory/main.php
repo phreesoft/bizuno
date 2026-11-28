@@ -693,10 +693,13 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         if ('ms' <> $oldInv['inventory_type']) { return; }
         // rename just children as master was renamed in inventory module
         if (isset($layout['dbAction'])) { // then standard rename must have been ok
-            $layout['dbAction']['invOpt_inventory'] = "UPDATE ".BIZUNO_DB_PREFIX."inventory           SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
-            $layout['dbAction']['invOpt_history']   = "UPDATE ".BIZUNO_DB_PREFIX."inventory_history   SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
-            $layout['dbAction']['invOpt_cogs_owed'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_cogs_owed   SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%'";
-            $layout['dbAction']['invOpt_Jrnl_item'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_item        SET sku=REPLACE(sku, '$oldSKU-', '$newSKU-') WHERE sku LIKE '$oldSKU-%' AND gl_type='itm'";
+            $oSQL = addslashes($oldSKU); // values below are interpolated into raw SQL
+            $nSQL = addslashes($newSKU);
+            $oLike= addslashes(addcslashes($oldSKU, '%_'));
+            $layout['dbAction']['invOpt_inventory'] = "UPDATE ".BIZUNO_DB_PREFIX."inventory           SET sku=REPLACE(sku, '$oSQL-', '$nSQL-') WHERE sku LIKE '$oLike-%'";
+            $layout['dbAction']['invOpt_history']   = "UPDATE ".BIZUNO_DB_PREFIX."inventory_history   SET sku=REPLACE(sku, '$oSQL-', '$nSQL-') WHERE sku LIKE '$oLike-%'";
+            $layout['dbAction']['invOpt_cogs_owed'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_cogs_owed   SET sku=REPLACE(sku, '$oSQL-', '$nSQL-') WHERE sku LIKE '$oLike-%'";
+            $layout['dbAction']['invOpt_Jrnl_item'] = "UPDATE ".BIZUNO_DB_PREFIX."journal_item        SET sku=REPLACE(sku, '$oSQL-', '$nSQL-') WHERE sku LIKE '$oLike-%' AND gl_type='itm'";
         }
     }
 
@@ -714,7 +717,7 @@ function preSubmit() { bizGridSerializer('dgAssembly', 'dg_assy'); bizGridSerial
         $sku   = dbGetRow(BIZUNO_DB_PREFIX.'inventory', "id=$rID");
         $oldSKU= $sku['sku'];
         // check for duplicate skus
-        $found = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='$newSKU'");
+        $found = dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'id', "sku='".addslashes($newSKU)."'");
         if ($found) { return msgAdd(lang('error_duplicate_id')); }
         // clean up the fields (especially the system fields, retain the custom fields)
         foreach (array_keys($sku) as $key) {

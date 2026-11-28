@@ -64,7 +64,7 @@ class administrateTabs extends mgrJournal
     protected function managerSettings()
     {
         parent::managerDefaults();
-        $this->defaults['sort'] = clean('sort', ['format'=>'text',    'default'=>'title'], 'post');
+        $this->defaults['sort'] = clean('sort', ['format'=>'db_field',    'default'=>'title'], 'post');
         $this->defaults['order']= clean('order',['format'=>'db_field','default'=>'ASC'],   'post');
     }
     public function manager(&$layout=[])

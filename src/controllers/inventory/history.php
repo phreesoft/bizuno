@@ -445,8 +445,8 @@ class inventoryHistory
     {
         $rows = clean('rows', ['format'=>'integer','default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post');
         $page = clean('page', ['format'=>'integer','default'=>1], 'post');
-        $sort = clean('sort', ['format'=>'text',   'default'=>'post_date'],'post');
-        $order= clean('order',['format'=>'text',   'default'=>'desc'],     'post');
+        $sort = clean('sort', ['format'=>'db_field',   'default'=>'post_date'],'post');
+        $order= strtolower(clean('order',['format'=>'cmd',   'default'=>'desc'],     'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         $gID  = explode(":", getDefaultFormID($jID)); // used for printing from popup
         $name = "dgMvmt$jID";
         switch ($jID) {
@@ -462,7 +462,7 @@ class inventoryHistory
                     'journal_item'=>['table'=>BIZUNO_DB_PREFIX.'journal_item','join'=>'join','links'=>BIZUNO_DB_PREFIX."journal_main.id=".BIZUNO_DB_PREFIX."journal_item.ref_id"]],
                 'filters' => [
                     'jID'  => ['order'=>99, 'hidden'=>true, 'sql'=>BIZUNO_DB_PREFIX."journal_main.journal_id=$jID"],
-                    'rID'  => ['order'=>99, 'hidden'=>true, 'sql'=>BIZUNO_DB_PREFIX."journal_item.sku='$sku'"]],
+                    'rID'  => ['order'=>99, 'hidden'=>true, 'sql'=>BIZUNO_DB_PREFIX."journal_item.sku='".addslashes($sku)."'"]],
                 'sort' => ['s0'=>['order'=>10, 'field'=>("$sort $order")]]],
             'columns' => [
                 'id'        => ['order'=>0, 'field'=>BIZUNO_DB_PREFIX.'journal_main.id',        'attr'=>['hidden'=>true]],
@@ -502,8 +502,8 @@ class inventoryHistory
     {
         $rows  = clean('rows', ['format'=>'integer','default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post');
         $page  = clean('page', ['format'=>'integer','default'=>1],            'post');
-        $sort  = clean('sort', ['format'=>'text',   'default'=>'create_date'],'post');
-        $order = clean('order',['format'=>'text',   'default'=>'desc'],       'post');
+        $sort  = clean('sort', ['format'=>'db_field',   'default'=>'create_date'],'post');
+        $order = strtolower(clean('order',['format'=>'cmd',   'default'=>'desc'],       'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         $hide  = 1; //getUserCache('role', 'security', 'woProd') ? false : true;
         $data  = ['id'=>'dgWO', 'strict'=>true, 'rows'=>$rows, 'page'=>$page, 'title'=>'Open Work Orders',
             'attr'    => ['idField'=>'id','url'=>BIZUNO_URL_AJAX."&bizRt=inventory/history/buildRows&skuID=$skuID"],

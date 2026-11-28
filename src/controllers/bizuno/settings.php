@@ -99,7 +99,7 @@ class bizunoSettings
     public function moduleDelete(&$layout=[])
     {
         if (!$security = validateAccess('admin', 4)) { return; }
-        $module= clean('rID', 'text', 'get');
+        $module= clean('rID', 'cmd', 'get'); // module id, also used as a class name and in SQL
         if (empty($module)) { return; }
         $props = getModuleCache($module, 'properties');
         msgDebug("\nRemoving module: $module with properties = ".print_r($props, true));

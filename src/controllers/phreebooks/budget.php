@@ -179,7 +179,7 @@ function budgetDistribute() {
     {
         if (!$security = validateAccess('budget', 3)) { msgAdd("failed security"); return; }
         $fy = clean('fy', ['format'=>'integer','default'=>biz_date('Y')], 'post');
-        $gl = clean('glAcct','text', 'post');
+        $gl = addslashes(clean('glAcct','text', 'post')); // used in raw SQL below
         if (!$gl) {
             $opts = dbGLDropDown(false, [34]);
             $gl= array_shift($opts)['id'];
@@ -259,7 +259,7 @@ function budgetDistribute() {
         foreach ($output as $period => $rows) { foreach ($rows as $gl => $value) {
             if ($srcData == 'actuals') { $amt = $avgVal ? $actTotal[$gl]/12 : $value; }
             else                       { $amt = $avgVal ? $budTotal[$gl]/12 : $value; }
-            dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['budget'=>$amt], 'update', "period=$period AND gl_account='$gl'");
+            dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['budget'=>$amt], 'update', "period=".intval($period)." AND gl_account='".addslashes($gl)."'");
         } }
         msgDebug("\n Wrote to db data = ".print_r($output, true));
         msgLog(lang('phreebooks_budget').' - '.lang('wizard')." (Source FY:$srcFY TO $destFY)");
@@ -280,7 +280,7 @@ function budgetDistribute() {
         msgDebug("\n Working with data = ".print_r($data, true));
         if (!isset($data['dg']['rows'])) { return msgAdd(lang('err_no_data')); }
         foreach($data['dg']['rows'] as $row) { if ($row['period']) {
-            dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['budget'=>$row['cur_bud']], 'update', "period={$row['period']} AND gl_account={$data['gl']}");
+            dbWrite(BIZUNO_DB_PREFIX.'journal_history', ['budget'=>$row['cur_bud']], 'update', "period=".intval($row['period'])." AND gl_account='".addslashes($data['gl'])."'");
         } }
         msgLog(lang('phreebooks_budget').' - '.lang('save')." (FY: {$data['fy']}, GL: {$data['gl']})");
         msgAdd(lang('msg_settings_saved'), 'success');
