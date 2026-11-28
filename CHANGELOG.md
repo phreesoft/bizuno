@@ -2,6 +2,14 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Removed
+- **Leftover WordPress file manager and placeholder pages.** `controllers/office/files.php` and
+  `storage.php` (a WordPress-only file manager, reachable only through the retired plugin) and the
+  empty `artist`, `author`, `calendar`, `slides` and `tables` pages are gone. The Document Manager
+  (`office/docs`) is unchanged.
+
 ## [7.4.12] — 2026-11-28
 
 ### Security
