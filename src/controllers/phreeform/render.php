@@ -54,7 +54,8 @@ class phreeformRender
             8  => '1:not_equal',
             9  => '1:in_list',
             10 => '1:less_than',
-            11 => '1:greater_than'];
+            11 => '1:greater_than',
+            12 => '0:all:paid:unpaid']; // journal_main.closed: paid = closed, unpaid = open
     }
 
     /**

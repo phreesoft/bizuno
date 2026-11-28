@@ -11,6 +11,11 @@ All notable changes to Bizuno ERP are documented in this file.
   TEST. A **Run Now** button starts a run from the settings screen for administrators. A statement
   PDF that cannot be built is reported as failed for that customer instead of stopping the run. New
   page: *Administration → Monthly customer statements*.
+- **Paid/Unpaid report filter.** PhreeForm has a new filter type, *All : Paid : Unpaid*, for
+  `journal_main.closed` (Paid = closed, Unpaid = open). The default Customer Statement form has a
+  visible **Paid Status** filter using it. It defaults to All, so existing statements and the monthly
+  statement run are unchanged. To add it to an installed statement form, open the form in
+  PhreeForm and add a filter row: field `journal_main.closed`, type *All:Paid:Unpaid*, visible.
 
 ## [7.4.13] — 2026-11-28
 
