@@ -884,8 +884,8 @@ class contactsMain
     {
         $rows  = clean('rows', ['format'=>'integer',  'default'=>10],        'post');
         $page  = clean('page', ['format'=>'integer',  'default'=> 1],        'post');
-        $sort  = clean('sort', ['format'=>'text',     'default'=>'log_date'],'post');
-        $order = clean('order',['format'=>'text',     'default'=>'desc'],    'post');
+        $sort  = clean('sort', ['format'=>'db_field',     'default'=>'log_date'],'post');
+        $order = strtolower(clean('order',['format'=>'cmd',     'default'=>'desc'],    'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         $search= clean('search_log',['format'=>'text','default'=>''],        'post');
         return ['id'=>$name, 'rows'=>$rows, 'page'=>$page,
             'attr'   => ['nowrap'=>false, 'toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/$this->pageID/managerRowsLog&rID=$rID"],

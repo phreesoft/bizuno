@@ -368,7 +368,7 @@ jqBiz('#selInvoice').combogrid({width:150,panelWidth:750,delay:500,idField:'id',
         $table = clean('_table','db_field','post');
         $invNum= clean('invoice_num', 'text', 'post');
         if (empty($refID) && !empty($invNum)) { // manually added a new record, find the record to add
-            $mainID= dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "invoice_num LIKE '$invNum%' AND journal_id=12");
+            $mainID= dbGetValue(BIZUNO_DB_PREFIX.'journal_main', 'id', "invoice_num LIKE '".addslashes(addcslashes($invNum, '%_'))."%' AND journal_id=12");
             if (!empty($mainID)) {
                 $refID = $mainID;
                 $table = 'journal';

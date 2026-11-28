@@ -2,6 +2,27 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Security
+- **Data files need a sign-in.** `portal/api/fs` (reachable without a session) serves files from the data
+  folder only from `images/` (logos, product images) and `myExt/`, resolved with `realpath()`. Attachments,
+  shipping labels and other data files with an image extension now need a signed-in user.
+- **Lifecycle methods are not routable.** A direct route to a module's `install`, `installFirst`,
+  `initialize`, `remove`, `adminInstMethods` or `installPhysicalFields` needs administrator level 4.
+  Re-running one could drop columns or reset every carrier, gateway and funnel to its default settings.
+  The installer and the Settings screens call them internally and are unaffected.
+- **SQL escaping on role-gated screens.** Values from the request are escaped (or validated) before they
+  reach raw SQL in shipping manager save, inventory rename/copy, module delete, budget load/save,
+  currency save/delete (ISO codes must be three letters), bank reconciliation and the inventory design
+  save. The inventory history grid escapes the SKU read from the database.
+- **Grid sorting.** The contact history, promotions, contact log, inventory history/work-order and
+  custom field/tab grids accept only field names for the sort column and `asc`/`desc` for the
+  direction.
+- **Permission checks.** Saving the RESTful sales tax nexus settings needs administrator level 3. The
+  dashboard CSV downloads (`phreebooks/tools/jrnlData`, `agingData`, `exportSales`, `salesByRep`)
+  need the same journal right as their dashboard.
+
 ## [7.4.11] — 2026-11-28
 
 ### Security

@@ -118,8 +118,8 @@ class contactsHistory
     {
         $rows   = clean('rows', ['format'=>'integer','default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post');
         $page   = clean('page', ['format'=>'integer','default'=>1], 'post');
-        $sort   = clean('sort', ['format'=>'text',   'default'=>'post_date'],'post');
-        $order  = clean('order',['format'=>'text',   'default'=>'desc'],     'post');
+        $sort   = clean('sort', ['format'=>'db_field',   'default'=>'post_date'],'post');
+        $order  = strtolower(clean('order',['format'=>'cmd',   'default'=>'desc'],     'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         $gID    = explode(":", getDefaultFormID($jID));
         $jSearch= in_array($jID, [3,4,9,10]) ? $jID : ($jID==6 ? '6,7' : '12,13');
         $sec4_10= in_array($jID, [3,4,9,10]) ? getUserCache('role', 'security', "j{$jID}_mgr") : 0;

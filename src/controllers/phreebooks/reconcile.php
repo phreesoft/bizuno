@@ -77,7 +77,7 @@ class phreebooksReconcile
         $sort   = clean('sort',  'text',   'post');
         $order  = clean('order', 'text',   'post');
         $period = clean('period','integer','post');
-        $glAcct = clean('glAcct', 'text',  'post');
+        $glAcct = addslashes(clean('glAcct', 'text',  'post')); // used in raw SQL below
         if (!$period) { $period = max(1, getModuleCache('phreebooks', 'fy', 'period')-1); }
         if (!$glAcct) { $glAcct = getModuleCache('phreebooks', 'settings', 'customers', 'gl_cash'); }
         // load the payments and deposits that are open
@@ -168,7 +168,7 @@ msgDebug("\nRead not in period = ".print_r($not_in_period, true));
         $balance  = clean('stmt_balance', 'currency', 'post');
         $period   = clean('period', 'integer', 'post');
         $dates    = dbGetFiscalDates($period);
-        $glAcct   = clean('glAcct', 'text', 'post');
+        $glAcct   = addslashes(clean('glAcct', 'text', 'post')); // used in raw SQL below
         $cleared  = clean('item_array', 'json', 'post');
         $rowsChk  = [];
         $rowsUnchk= [];

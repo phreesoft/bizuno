@@ -122,7 +122,8 @@ class phreebooksCurrency
     {
         if (!validateAccess('admin', 3)) { return; }
         $is_def    = clean('is_def', 'boolean', 'post');
-        $iso       = clean('code', 'text', 'post');
+        $iso       = strtoupper(clean('code', 'text', 'post'));
+        if (!preg_match('/^[A-Z]{3}$/', $iso)) { return msgAdd("Bad data!"); } // ISO 4217 code, used in raw SQL below
         $currencies= getModuleCache('phreebooks', 'currency', 'iso', false, []);
         $defISO    = getModuleCache('phreebooks', 'currency', 'defISO');
         // clean out bad data
@@ -172,8 +173,8 @@ class phreebooksCurrency
     {
         if (!validateAccess('admin', 4)) { return; }
         $idx = clean('rID', 'integer', 'get');
-        $iso = clean('data', 'text', 'get');
-        if (!$iso) { return msgAdd("Bad data!"); }
+        $iso = strtoupper(clean('data', 'text', 'get'));
+        if (!preg_match('/^[A-Z]{3}$/', $iso)) { return msgAdd("Bad data!"); } // ISO 4217 code, used in raw SQL below
         // cannot delete default currency
         if ($iso == getDefaultCurrency()) { return msgAdd(lang('err_currency_delete_default', $this->moduleID)); }
         // Can't delete a currency or if it was used in ANY journal entry

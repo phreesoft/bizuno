@@ -198,8 +198,8 @@ function xfrResponse(json) {
      */
     private function dgPromos($name, $security=0)
     {
-        $sort  = clean('sort', ['format'=>'text', 'default'=>'title'], 'post');
-        $order = clean('order',['format'=>'text', 'default'=>'asc'], 'post');
+        $sort  = clean('sort', ['format'=>'db_field', 'default'=>'title'], 'post');
+        $order = strtolower(clean('order',['format'=>'cmd', 'default'=>'asc'], 'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         $search= getSearch();
         return ['id'=>$name, 'page'=>clean('page', ['format'=>'integer', 'default'=>1], 'post'), 'rows'=>clean('rows', ['format'=>'integer', 'default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post'),
             'attr'   => ['toolbar'=>"#{$name}Toolbar", 'idField'=>'id', 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/managerRows"],
@@ -238,8 +238,8 @@ function xfrResponse(json) {
      */
     private function dgHistory($name)
     {
-        $sort = clean('sort', ['format'=>'text', 'default'=>'send_date'], 'post');
-        $order= clean('order',['format'=>'text', 'default'=>'desc'], 'post');
+        $sort = clean('sort', ['format'=>'db_field', 'default'=>'send_date'], 'post');
+        $order= strtolower(clean('order',['format'=>'cmd', 'default'=>'desc'], 'post'))=='asc' ? 'asc' : 'desc'; // ORDER BY direction, only asc or desc
         return ['id'=>$name, 'page'=>clean('page', ['format'=>'integer', 'default'=>1], 'post'), 'rows'=>clean('rows', ['format'=>'integer', 'default'=>getModuleCache('bizuno', 'settings', 'general', 'max_rows')], 'post'),
             'attr'   => ['title'=>lang('history'), 'url'=>BIZUNO_URL_AJAX."&bizRt=$this->moduleID/promos/managerRowsHistory"],
             'source' => [

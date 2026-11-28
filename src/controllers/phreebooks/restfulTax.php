@@ -123,6 +123,7 @@ class phreebooksRestfulTax
 
     public function save()
     {
+        if (!validateAccess('admin', 3)) { return; } // same screen as manager(), which needs admin access
         $states = clean('nexusSt',    'array', 'post');
         $mkplcs = clean('contactIDs', 'json', 'post');
         $metaVal= dbMetaGet(0, $this->metaPrefix);
