@@ -4,6 +4,13 @@ All notable changes to Bizuno ERP are documented in this file.
 
 ## [Unreleased]
 
+### Security
+- **Report filter values are escaped.** The From/To values typed into a PhreeForm report's filters
+  (and the `xmin`/`xmax` values in report links) were placed into the SQL unescaped, so anyone
+  allowed to run a report could inject SQL. They are now escaped. A value is compared as a column
+  only when it is exactly `table.field` of a table in that report. Before, any value that merely
+  contained a table name followed by a dot was left unquoted.
+
 ### Added
 - **Monthly statement test mode and Run Now.** PhreeBooks → Customers has a **Monthly Statement Test
   Address**. While it is set, the statement run sends every statement to that address (subject

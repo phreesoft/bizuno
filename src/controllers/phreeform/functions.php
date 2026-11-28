@@ -315,15 +315,17 @@ function phreeformCriteria($report, $xOnly=false)
         }
         $sc = '';
         $fc = '';
+        $min = isset($settings->min) ? addslashes((string)$settings->min) : null; // filter values come from the report form (POST), escape for the SQL
+        $max = isset($settings->max) ? addslashes((string)$settings->max) : null;
         switch ($settings->default) {
             case 'range':
                 if (!empty($settings->min)) { // a from value entered, check
-                    $sc .= prefixTables($settings->fieldname).">='$settings->min'";
+                    $sc .= prefixTables($settings->fieldname).">='$min'";
                     $fc .= $settings->title." >= ".$settings->min;
                 }
                 if (!empty($settings->max)) { // a to value entered, check
                     if (strlen($sc)>0) { $sc .= ' AND '; $fc .= ' '.lang('and').' '; }
-                    $sc .= prefixTables($settings->fieldname)."<='$settings->max'";
+                    $sc .= prefixTables($settings->fieldname)."<='$max'";
                     $fc .= $settings->title." <= ".$settings->max;
                 }
                 break;
@@ -347,7 +349,8 @@ function phreeformCriteria($report, $xOnly=false)
             case 'greater_than': if (empty($sign)) { $sign = " > "; } // then continue
             case 'less_than':    if (empty($sign)) { $sign = " < "; }
                 if (isset($settings->min)) { // a from value entered, check
-                    $q_field = testTables($settings->min, $report) ? prefixTables($settings->min) : "'".prefixTables($settings->min)."'";
+                    $isCol   = preg_match('/^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$/', trim((string)$settings->min)) && testTables($settings->min, $report);
+                    $q_field = $isCol ? prefixTables(trim($settings->min)) : "'$min'"; // only an exact table.field of this report is compared as a column, anything else is a quoted value
                     $sc .= prefixTables($settings->fieldname).$sign.$q_field;
                     $fc .= (isset($settings->title) ? $settings->title : $settings->fieldname).$sign.$settings->min;
                 }
@@ -355,7 +358,7 @@ function phreeformCriteria($report, $xOnly=false)
             case 'in_list':
                 if (isset($settings->min)) { // a from value entered, check
                     $csv_values = explode(',', $settings->min);
-                    for ($i = 0; $i < sizeof($csv_values); $i++) { $csv_values[$i] = trim($csv_values[$i]); }
+                    for ($i = 0; $i < sizeof($csv_values); $i++) { $csv_values[$i] = addslashes(trim($csv_values[$i])); }
                     $sc .= prefixTables($settings->fieldname)." IN ('".implode("','", $csv_values)."')";
                     $fc .= isset($settings->title) ? "$settings->title IN ($settings->min)" : '';
                 }
