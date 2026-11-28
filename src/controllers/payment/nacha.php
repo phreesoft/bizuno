@@ -125,6 +125,7 @@ class paymentNacha
 
     public function closeACH()
     {
+        if (!validateAccess('j20_mgr', 2)) { return; } // writes the ACH file for a vendor payment run
         global $io;
         $this->addNachaRow('batch_ctl');
         $this->addNachaRow('file_ctl');

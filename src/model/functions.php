@@ -66,6 +66,22 @@ function loadBusinessCache()
 }
 
 /**
+ * Whether a controller method may be the target of a bizRt route. The router calls the method with the layout array
+ * as its first argument, so only methods that take no arguments or take the layout by reference are routes. Public
+ * helpers whose first parameter is a value (an address array, a SKU, a payment method, a chart file, ...) are internal
+ * and would otherwise run with the request's layout in place of their real argument.
+ * @param object $process - controller instance
+ * @param string $method - method name
+ * @return boolean - true if the method may be routed to
+ */
+function bizRoutableMethod($process, $method)
+{
+    if (!method_exists($process, $method)) { return true; } // compose() reports the missing method itself
+    $params = (new \ReflectionMethod($process, $method))->getParameters();
+    return empty($params) || $params[0]->isPassedByReference() || 'repairTables'==$method; // repairTables checks a routed call itself
+}
+
+/**
  * Composer gathers the module and mods, sorts them and executes in sequence.
  * @param string $module - Module ID
  * @param string $page - Page (filename) where the method is requested
@@ -76,6 +92,8 @@ function loadBusinessCache()
 function compose($module, $page, $method, &$layout=[])
 {
     global $io;
+    $routed = !empty($GLOBALS['bizunoRouteCheck']); // only the top level call made by the portal router for bizRt
+    $GLOBALS['bizunoRouteCheck'] = false;
     $processes = mergeHooks($module, $page, $method);
     foreach ($processes as $modID => $modProps) {
         if (empty($modProps['page'])) { $modProps['page'] = 'admin'; }
@@ -90,6 +108,10 @@ function compose($module, $page, $method, &$layout=[])
         if (!class_exists($fqdn)) { return msgAdd("Path = $controller - Method: {$modProps['method']} NOT FOUND! Module $modID and page {$modProps['page']} with controller: $fqdn but could not find the method. Ignoring!"); }
         $process = new $fqdn();
         if (!isset($modProps['method'])) { $modProps['method'] = $method; }
+        if ($routed && $modID==$module && !bizRoutableMethod($process, $modProps['method'])) { // the primary entry is keyed by the routed module
+            msgDebug("\ncompose: refused route to internal method $module/$page/{$modProps['method']}");
+            return msgAdd(lang('err_no_permission'));
+        }
         if (method_exists($process, $modProps['method'])) {
             $process->{$modProps['method']}($layout);
         } else {

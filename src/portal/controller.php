@@ -211,6 +211,7 @@ class portalCtl
         if ($this->getCodex()) {
             if ($this->maintenanceGate()) { return; } // a software update is in progress — block everyone but the initiator
             if ($this->lifecycleGate())   { return; } // install/remove style methods are internal, admins only when routed
+            $GLOBALS['bizunoRouteCheck'] = true; // compose() checks the routed method's signature, see bizRoutableMethod()
             compose($this->route['module'], $this->route['page'], $this->route['method'], $this->layout);
         }
     }

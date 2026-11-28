@@ -267,6 +267,7 @@ function docDel(){
      */
     public function rename()
     {
+        if (!validateAccess($this->secID, 3)) { return; }
         $rID  = clean('rID',   'integer','get');
         $title= clean('title', 'text',   'get');
         if (!$rID || !$title) { return msgAdd(); }

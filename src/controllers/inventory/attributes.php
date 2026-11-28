@@ -45,6 +45,7 @@ class inventoryAttributes
      */
     public function attrLoad(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $rID    = clean('rID', 'integer','get');
         $invAttr= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'bizProAttr', "id=$rID");
         $attrs  = empty($invAttr) ? ['category'=>'', 'attrs'=>[]] : json_decode($invAttr, true);
@@ -68,6 +69,7 @@ class inventoryAttributes
      */
     public function attrDetails(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $rID    = clean('rID', 'integer','get');
         $title  = clean('data','text',   'get');
         $invAttr= dbGetValue(BIZUNO_DB_PREFIX.'inventory', 'bizProAttr', "id=$rID");
@@ -92,6 +94,7 @@ class inventoryAttributes
      */
     public function adminAttrLoad(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $title  = clean('rID', 'text', 'get');
         $titles = $this->getTitles();
         if (!$title && sizeof($titles) > 0) { $title = $titles[0]['id']; }
@@ -121,6 +124,7 @@ class inventoryAttributes
      */
     public function adminRows(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $title = clean('attrCat', 'text', 'get');
         $output= [];
         $rows  = getModuleCache('inventory', 'attr', $title, false, []);

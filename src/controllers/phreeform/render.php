@@ -75,6 +75,7 @@ class phreeformRender
             $report = dbMetaGet($rID, $this->metaPrefix, 'common', 0, ['object'=>true]);
             msgDebug("\nRead report from meta = ".print_r($report, true));
             if (!is_object($report)) { return msgAdd("Mission Control ERROR, I cannot find the report referenced by id=$rID, this is bad!", 'trap'); }
+            if (!$this->reportAllowed($report)) { return msgAdd(lang('err_no_permission')); }
             msgDebug("\n Read date default before= ".$report->datedefault);
         } elseif (!empty($group)) {
             $report = new \stdClass();
@@ -326,7 +327,7 @@ class phreeformRender
         if (empty($meta)) { return msgAdd(sprintf(lang('err_group_empty', $this->moduleID), $group)); }
         $output = [];
         foreach ($meta as $value) { 
-            if ($group==$value['group_id'] && $value['mime_type']<>'dir') { $output[] = $value; } }
+            if ($group==$value['group_id'] && $value['mime_type']<>'dir' && $this->reportAllowed($value)) { $output[] = $value; } }
         if (sizeof($output) < 1) { return msgAdd(sprintf(lang('err_group_empty', $this->moduleID), $group)); }
         $this->addAttachments($output, $group); // Add attachemnts if invoice so they all can be printed together
         return $output;
@@ -425,8 +426,24 @@ class phreeformRender
         msgDebug("\nEntering renderLoadReport with report ID = $rID");
         if (empty($rID) || !empty(strpos(strtolower($rID), 'pdf'))) { return new \stdClass(); } // it's an attachment
         $report = dbMetaGet($rID, "phreeform", 'common', 0, ['object'=>true]);
+        if (!$this->reportAllowed($report)) { msgAdd(lang('err_no_permission')); return new \stdClass(); }
         $this->renderPrefs($report);
         return $report;
+    }
+
+    /**
+     * Applies the report's Users/Roles security (Report Settings -> Security) to a report loaded by id. The report lists
+     * already filter on it; this also covers opening, rendering or emailing a report by id. Reports without the
+     * settings, and the token checked statement cron, are not restricted.
+     * @param object|array $report - report meta or phreeform_cache row
+     * @return boolean - true if the current user may use the report
+     */
+    private function reportAllowed($report)
+    {
+        if (!empty($GLOBALS['bizApiCron'])) { return true; } // token checked cron routes run as the API user
+        $data  = is_object($report) ? get_object_vars($report) : (array)$report;
+        if (!isset($data['users']) && !isset($data['roles'])) { return true; } // older reports without access settings
+        return validateUsersRoles(['users'=>(array)($data['users'] ?? []), 'roles'=>(array)($data['roles'] ?? [])]);
     }
 
     private function pullAttachments(&$rIDs=[])
@@ -1266,6 +1283,7 @@ class phreeformRender
         if (empty($rID)) { return; } // no message if only an attachment is selected
         $report = dbMetaGet($rID, 'phreeform', 'common', 0, ['object'=>true]);
         if (empty($report)) { return; } // Report was deleted or cannot be found, return null
+        if (!$this->reportAllowed($report)) { return msgAdd(lang('err_no_permission')); }
         $report->xfilterlist           = new \stdClass();
         $report->xfilterlist->fieldname= clean('xfld', 'text', 'get');
         $report->xfilterlist->default  = clean('xcr',  'text', 'get');

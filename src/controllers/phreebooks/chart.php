@@ -436,6 +436,7 @@ jqBiz('#dgPopupGL').datagrid({ pagination:false,data:winChart,columns:[[{field:'
 
     public function export()
     {
+        if (!validateAccess($this->secID, 2)) { return; }
         global $io;
         $header= $output = [];
         foreach (array_values($this->chartMeta) as $idx =>$row) {

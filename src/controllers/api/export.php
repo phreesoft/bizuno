@@ -105,6 +105,7 @@ class apiExport
 
     public function apiSync(&$layout=[])
     {
+        if (!validateAccess('inv_mgr', 1)) { return; }
         $skus  = [];
         if (!isset($layout['data']['syncSkus'])) { $layout['data']['syncSkus'] = []; }
         $layout['data']['syncDelete'] = clean('syncDelete', 'integer', 'get');

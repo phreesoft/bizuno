@@ -254,6 +254,7 @@ class contactsTools
      */
     public function chartSales(&$layout=[])
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         $type  = clean('cType', 'char', 'get');
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
@@ -315,6 +316,7 @@ class contactsTools
      */
     public function chartSalesGo()
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         global $io;
         $rID   = clean('rID', 'integer','get');
         $type  = clean('type','char',   'get');
@@ -332,6 +334,7 @@ class contactsTools
      */
     public function chartHistPurch(&$layout=[])
     {
+        if (!validateAccess('j6_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $name  = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name', "id=$rID");
@@ -348,6 +351,7 @@ class contactsTools
      */
     public function chartHistSales(&$layout=[])
     {
+        if (!validateAccess('j12_mgr', 1)) { return; }
         $rID   = clean('rID', 'integer', 'get');
         if (!$rID) { return msgAdd(lang('err_bad_id')); }
         $name  = dbGetValue(BIZUNO_DB_PREFIX.'contacts', 'primary_name', "id=$rID");

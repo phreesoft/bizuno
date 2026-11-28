@@ -4,6 +4,39 @@ All notable changes to Bizuno ERP are documented in this file.
 
 ## [Unreleased]
 
+### Security
+- **Internal helpers are not routes.** A `bizRt` route may only target a controller method that takes
+  no arguments or takes the layout by reference. Public helpers whose first parameter is a value (an
+  address, a SKU, a payment method, a chart file, ...) used to run with the request's layout in its
+  place. One example is `contacts/main/addressUpdate`, which saved an address from the posted
+  fields. The rule applies to every module, `myExt` included. Internal `compose()` calls and hooks
+  are unaffected.
+- **Report security on direct access.** The Users/Roles settings of a PhreeForm report applied only
+  to the report lists. Opening, rendering or emailing a report by ID (`phreeform/render/open`,
+  `render`, `phreeformBody`) and the group list used by the print buttons now apply them too. Default
+  reports allow everyone and the token-checked statement cron is not restricted.
+- **Permission checks on the remaining routes that read or change business data:**
+  - backups: listing and restore upload need administrator level 4;
+  - fixed-asset schedules and export;
+  - tables repair, when routed, needs administrator level 4;
+  - payroll import: `j2_mgr`;
+  - tax bulk change;
+  - EDI fetch and transmit: sales rights, or the token-checked `ediCron`;
+  - chart of accounts export;
+  - exchange-rate update;
+  - customer payment history and contact status;
+  - promotion e-mail sending: `Promotions` 3;
+  - the inventory and contact chart/export downloads;
+  - assembly stock;
+  - inventory attributes;
+  - Document Manager rename;
+  - method settings: administrator level 3, since they carry stored credentials;
+  - API order add;
+  - API inventory sync;
+  - unshipped orders;
+  - fulfillment, checked before it raises the journal rights;
+  - ACH file close.
+
 ### Removed
 - **Leftover WordPress file manager and placeholder pages.** `controllers/office/files.php` and
   `storage.php` (a WordPress-only file manager, reachable only through the retired plugin) and the

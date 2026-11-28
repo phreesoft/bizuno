@@ -431,6 +431,7 @@ class portalApi
         loadBusinessCache();
         if (!$this->loadApiUserContext()) { return; }
         msgDebug("\nUser has been set, ready to compose");
+        $GLOBALS['bizApiCron'] = 'ediCron'; // token verified above; lets ediGet skip its interactive permission check
         compose('phreebooks', 'ediAPI', 'ediGet', $layout);
     }
 
