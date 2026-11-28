@@ -2,6 +2,24 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Security
+- **Module settings saves require administrator level 3.** The `adminSave` action of the bizuno,
+  api, inventory, payment, phreebooks and phreeform modules had no permission check, so any
+  signed-in user could rewrite that module's settings by calling the route directly. The PhreeBooks
+  order-totals save (`phreebooks/admin/orderTotals`) also requires administrator level 3, and the
+  fiscal-year panel and role-editor extensions require administrator access.
+- **Funnel routes check the funnel's permission.** Every `api/admin/*` route that hands off to a
+  sales funnel now checks the funnel's role permission first (level 1 to view, 2 to send orders or
+  products, 3 for bulk refreshes, feeds, payments and reconciliation). The key is the funnel's
+  public `$secID` property when it declares one, otherwise its ID, and administrators (level 3)
+  always pass. `cronGet` runs unattended only from the token-checked `portal/api/funnelCron`
+  route. The duplicate `api/admin/getRoles` requires administrator level 4; remote servers use
+  `portal/api/getRoles`.
+- **FedEx branch credentials** (shipping hooks on branch contacts) now require the customer
+  manager right: level 1 to view, 3 to save, 4 to delete.
+
 ## [7.4.10] — 2026-11-27
 
 ### Security

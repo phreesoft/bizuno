@@ -80,6 +80,7 @@ class phreeformAdmin
      */
     public function adminSave()
     {
+        if (!validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
 }

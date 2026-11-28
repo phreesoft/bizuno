@@ -245,6 +245,7 @@ class inventoryAdmin
 
     public function adminSave()
     {
+        if (!validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
 
@@ -255,6 +256,7 @@ class inventoryAdmin
      */
     public function rolesEdit(&$layout=[])
     {
+        if (!validateAccess('admin', 1, false)) { return; }
         $rID = clean('rID', 'integer', 'get');
         $role= dbMetaGet($rID, 'bizuno_role');
         $layout['fields']['group_mfg']= ['order'=>50,'label'=>lang('role_mfg', $this->moduleID),'tip'=>'',
