@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.14] — 2026-11-28
 
 ### Security
 - **Report filter values are escaped.** The From/To values typed into a PhreeForm report's filters
