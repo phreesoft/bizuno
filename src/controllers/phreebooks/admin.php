@@ -200,7 +200,10 @@ class phreebooksAdmin {
                 'ck_dup_po'      => ['attr'=>['type'=>'selNoYes', 'value'=>0]],
                 'stmt_form'      => ['values'=>$stmtForms,'attr'=>['type'=>'select', 'value'=>0]],
                 'stmt_dates'     => ['values'=>$stmtDates,'attr'=>['type'=>'select', 'value'=>'lastmonth']],
-                'stmt_cc'        => ['attr'=>['size'=>48, 'value'=>'']]]],
+                'stmt_cc'        => ['attr'=>['size'=>48, 'value'=>'']],
+                'stmt_test'      => ['attr'=>['size'=>48, 'value'=>'']],
+                'stmt_run'       => ['attr'=>['type'=>'button', 'value'=>lang('stmt_run_btn', $this->moduleID)],
+                    'events'=>['onClick'=>"if (confirm('".jsLang('stmt_run_confirm', $this->moduleID)."')) { jqBiz('body').addClass('loading'); jsonAction('phreeform/render/cronStatements'); }"]]]],
             'vendors'  => ['order'=>30,'label'=>lang('vendors'),'fields'=>[
                 'gl_payables'    => ['attr'=>['type'=>'ledger','id'=>'vendors_gl_payables',    'value'=>$glDefaults['payables']]],
                 'gl_purchases'   => ['attr'=>['type'=>'ledger','id'=>'vendors_gl_purchases',   'value'=>$glDefaults['inventory']]],

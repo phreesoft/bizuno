@@ -18,3 +18,4 @@ should still know it exists.
 | 04 | [Fiscal-year close](./04-fiscal-year-close.md)                        | published  | admin, bookkeeper |
 | 05 | [Override hooks and myExt/](./05-override-hooks-and-myext.md)         | published  | admin, developer |
 | 06 | [Cache mechanics](./06-cache-mechanics.md)                            | published  | admin, developer |
+| 07 | [Monthly customer statements](./07-monthly-statements.md)            | published  | admin, bookkeeper |
