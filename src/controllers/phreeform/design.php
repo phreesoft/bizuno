@@ -41,8 +41,9 @@ final class phreeformDesign extends mgrJournal
     {
         parent::__construct();
         $this->mgrTitle = lang('reports');
-        $this->critChoices = [0=>'2:all:range:equal', 1=>'0:yes:no', 2=>'0:all:yes:no', 3=>'0:all:active:inactive', 4=>'0:all:printed:unprinted', 5=>'', // unused
-            6=>'1:equal', 7=>'2:range', 8=>'1:not_equal', 9=>'1:in_list', 10=>'1:less_than', 11=>'1:greater_than', 12=>'0:all:paid:unpaid'];
+        // Keys are the stored filter type ids; the order here is the order of the designer's filter type list
+        $this->critChoices = [0=>'2:all:range:equal', 1=>'0:yes:no', 2=>'0:all:yes:no', 3=>'0:all:active:inactive', 4=>'0:all:printed:unprinted', 12=>'0:all:paid:unpaid',
+            5=>'', 6=>'1:equal', 7=>'2:range', 8=>'1:not_equal', 9=>'1:in_list', 10=>'1:less_than', 11=>'1:greater_than']; // 5 is unused
         $rID  = 'save'==$GLOBALS['bizunoMethod'] ? clean('_rID', 'integer', 'post') : clean('rID', 'integer', 'get'); // if save then post else get
         $type = clean('type','db_field','get');
         if (!empty($rID)) { 

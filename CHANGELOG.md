@@ -2,6 +2,12 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **PhreeForm filter type list:** *All:Paid:Unpaid* is listed with the other *All:…* types instead
+  of at the end. Saved reports are unaffected; only the display order changed.
+
 ## [7.4.14] — 2026-11-28
 
 ### Security
