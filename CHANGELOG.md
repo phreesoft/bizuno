@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.11] — 2026-11-28
 
 ### Security
 - **Module settings saves require administrator level 3.** The `adminSave` action of the bizuno,
