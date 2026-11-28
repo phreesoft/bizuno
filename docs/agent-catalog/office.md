@@ -23,26 +23,14 @@ manager.
 
 ## What is and is not routable in this module
 
-The directory `controllers/office/` contains eight PHP files, but most are not
-live agent surfaces:
+The directory `controllers/office/` contains one page:
 
-- **`docs.php`** — `officeDocs` (extends `mgrJournal`), namespace `bizuno`,
-  security key `mgr_docs`. **The only live, standard-routable page.** Every
-  action below is one of its public methods, addressed as
-  `office/docs/<method>`.
-- **`artist.php`, `author.php`, `calendar.php`, `slides.php`, `tables.php`** —
-  empty stubs. Each defines a class (`bizArtistAdmin`, `bizAuthorAdmin`,
-  `bizCalendarAdmin`, `bizImpressAdmin`, `bizTablesAdmin`) whose only member is
-  an empty `__construct()`. They carry no methods and produce **no actions**.
-  Treat them as placeholders for future PhreeSoft commercial modules; an agent
-  cannot do anything with them.
-- **`files.php` / `storage.php`** — a WordPress-only file manager
-  (`bizFiles` / `bizAdmin`) in namespace **`bizoffice`**, not `bizuno`. It is
-  addressed as `bizRt=bizStorage/<method>` (its own module slug), **not** as
-  `office/files/<method>` or `office/storage/<method>`, so it is *not*
-  reachable through the `office/<page>/<method>` dispatch this catalog covers.
-  It is summarized in the data-model section and flagged under open questions,
-  but is intentionally **not** given full per-action schema blocks here.
+- **`docs.php`**: `officeDocs` (extends `mgrJournal`), namespace `bizuno`,
+  security key `mgr_docs`. Every action below is one of its public methods,
+  addressed as `office/docs/<method>`.
+
+The empty placeholder pages and the WordPress-only file manager that used to
+sit beside it were removed when the WordPress plugin was retired.
 
 ## Data model summary
 
@@ -75,11 +63,6 @@ legacy_table: extDocs                 # pre-7.0 documents table — DROPPED duri
 sec_id: mgr_docs                      # the single security key for the whole Document Manager
 gl_impact: none                       # no action posts to the GL
 inventory_impact: none                # no action moves stock
-wordpress_file_manager:               # NOT covered by per-action blocks below
-  files:   controllers/office/files.php   → class bizFiles  (namespace bizoffice)
-  storage: controllers/office/storage.php → class bizAdmin  (namespace bizoffice)
-  route:   bizRt=bizStorage/<method>       # own module slug, NOT office/<page>/<method>
-  note:    WordPress-only; uses its own folder/share/thumbnail model, separate from officeDocs.
 ```
 
 > **Key safety fact for an acting agent:** the Document Manager never posts a
@@ -748,13 +731,3 @@ recipe_download_specific_revision:
   search returns nothing. To find documents programmatically, use
   `office.docs.tree` and filter client-side, not `office.docs.search`
   (`confidence: medium`).
-- **The WordPress file manager (`files.php` / `storage.php`) is a separate
-  surface.** Classes `bizFiles` / `bizAdmin` live in namespace `bizoffice` and
-  are addressed as `bizRt=bizStorage/<method>`, **not** `office/<page>/<method>`.
-  It has its own folder/share/star/thumbnail/revision model (e.g. `fileUpload`,
-  `folderAdd`, `setShareUsers`, `setRevision`, `fileTrash`). It is intentionally
-  not cataloged here; if an agent must drive it, document the `bizStorage`
-  module separately.
-- **The stub pages do nothing.** `artist.php`, `author.php`, `calendar.php`,
-  `slides.php`, and `tables.php` are empty placeholder classes. They expose no
-  routable methods; ignore them until PhreeSoft ships their implementations.
