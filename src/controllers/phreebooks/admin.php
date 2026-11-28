@@ -414,11 +414,13 @@ function getPurgeDates() {
      * Saves the user defined settings
      */
     public function adminSave() {
+        if (!validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
 
     public function managerFY(&$layout=[])
     {
+        if (!validateAccess('admin', 1)) { return; }
         $dbMaxFY= dbGetValue(BIZUNO_DB_PREFIX . "journal_periods", ["MAX(fiscal_year) AS fiscal_year", "MAX(period) AS period"], false, false);
         $maxFY  = $dbMaxFY['fiscal_year'] > 0 ? $dbMaxFY['fiscal_year'] : 0;
         $html   = $this->getViewFY();
@@ -580,6 +582,7 @@ function getPurgeDates() {
      */
     public function rolesEdit(&$layout=[])
     {
+        if (!validateAccess('admin', 1, false)) { return; }
         $rID = clean('rID', 'integer', 'get');
         $role= dbMetaGet($rID, 'bizuno_role');
         $layout['fields']['group_sales'] = ['order'=>20,'label'=>lang('pb_role_cust_users', $this->moduleID),'tip'=>lang('msg_pb_admin_roles', $this->moduleID),
@@ -616,6 +619,7 @@ function getPurgeDates() {
      */
     public function orderTotals()
     {
+        if (!validateAccess('admin', 3)) { return; }
         $data = clean('data', 'text', 'get');
         if (!$data) { return msgAdd("Bad values sent!"); }
         $vals = explode(';', $data);

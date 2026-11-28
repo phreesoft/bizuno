@@ -427,6 +427,7 @@ class portalApi
         loadBusinessCache();
         if (!$this->loadApiUserContext()) { return; }
         msgDebug("\nfunnelCron: user context set, composing api/admin/cronGet for modID = ".clean('modID', 'cmd', 'get'));
+        $GLOBALS['bizApiCron'] = 'funnelCron'; // token verified above; lets api/admin/cronGet skip its interactive permission check
         compose('api', 'admin', 'cronGet', $layout);
     }
 

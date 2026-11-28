@@ -332,6 +332,7 @@ class bizunoAdmin
      */
     public function adminSave()
     {
+        if (!validateAccess('admin', 3)) { return; }
         $newTitle = clean('company_primary_name', 'text', 'post');
         $timezone = clean('locale_timezone', 'text', 'post');
         readModuleSettings($this->moduleID, $this->settingsStructure());

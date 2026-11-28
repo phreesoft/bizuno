@@ -313,7 +313,7 @@ function myPkgSave() {
     {
         $rID   = clean('rID', 'integer','get');
         $type  = clean('type','char',   'get');
-        if ($type != 'b') { return; }
+        if ($type != 'b' || !validateAccess('mgr_c', 1, false)) { return; }
         $meta  = getMetaContact($rID, 'fedex');
         msgDebug("\nRead meta data = ".print_r($meta, true));
         $values= !empty($meta) ? $meta : ['acct_number'=>'','ltl_acct_num'=>'']; // ,'rest_api_key'=>'','rest_secret'=>'','meter_number'=>'','auth_key'=>'','auth_pw'=>'','sp_hub'=>''];
@@ -332,7 +332,7 @@ function myPkgSave() {
     public function fedExSave()
     {
         $type   = clean('type','char','get');
-        if ($type != 'b') { return; }
+        if ($type != 'b' || !validateAccess('mgr_c', 3)) { return; }
         $rID    = clean('id', 'integer', 'post');
         $meta   = dbMetaGet(0, 'fedex', 'contacts', $rID);
         $metaIdx= metaIdxClean($meta);
@@ -350,7 +350,7 @@ function myPkgSave() {
     public function fedExDelete()
     {
         $rID = clean('rID', 'integer', 'get');
-        if (!$rID) { return; }
+        if (!$rID || !validateAccess('mgr_c', 4, false)) { return; }
         $meta   = dbMetaGet(0, 'fedex', 'contacts', $rID);
         $metaIdx= metaIdxClean($meta);
         if (!empty($metaIdx)) { dbMetaDelete($metaIdx, 'contacts'); }

@@ -94,15 +94,25 @@ class apiAdmin extends apiCommon
      * Loads the method object and returns valid object
      * @return modID object
      */
-    private function getMethod()
+    private function getMethod($level=null)
     {
         $modID = clean('modID', 'cmd', 'get');
         $meta  = dbMetaGet(0, "methods_{$this->methodDir}");
-        if (empty($meta[$modID])) { return msgAdd('Bad channel ID!'); }
+        if (empty($meta[$modID])) { msgAdd('Bad channel ID!'); return false; }
         msgDebug("\nEntering getMetehod with search path = ".$meta[$modID]['path']."$modID.php");
         bizAutoLoad($meta[$modID]['path']."$modID.php");
         $fqdn = "\\bizuno\\$modID";
         $chan = new $fqdn();
+        // SECURITY: every route in this class is reachable directly by any signed-in user, so check the funnel's role
+        // permission before any funnel code runs. The key is the funnel's public $secID when it declares one, else its
+        // id. Administrators (admin 3+) always pass, as funnels without a menu entry have no key of their own.
+        if (null !== $level) {
+            $secID = !empty($chan->secID) && is_string($chan->secID) ? $chan->secID : $modID;
+            if (!validateAccess($secID, $level, false) && !validateAccess('admin', 3, false)) {
+                msgAdd(lang('err_no_permission')." [$secID]");
+                return false;
+            }
+        }
         return $chan;
     }
 
@@ -112,13 +122,13 @@ class apiAdmin extends apiCommon
      */
     public function home(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(1)) { return; }
         $chan->home($layout);
     }
 
     public function cartConfirm(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $chan->cartConfirm($layout);
     }
 
@@ -126,13 +136,13 @@ class apiAdmin extends apiCommon
     {
         // Make sure we are logged in
         if (!$security = validateAccess('admin', 1)) { return msgAdd('illegal_access'); }
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->validateCreds($layout);
     }
 
     public function apiInvCount(&$layout=[], $result=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(1)) { return; }
         $chan->apiInvCount($layout, $result);
     }
 
@@ -142,25 +152,25 @@ class apiAdmin extends apiCommon
      */
     public function productToStore(&$layout=[], $invID=0)
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $chan->productToStore($layout, $invID);
     }
 
     public function cartSync(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $chan->cartSync($layout);
     }
 
     public function confirmGo(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $chan->confirmGo($layout);
     }
 
     public function inventoryGo(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $security = getUserCache('role', 'security');
         $security['prices_c'] = max(1, (int)($security['prices_c'] ?? 0)); // raise only, a higher role level must survive for the funnel's own checks
         $security['inv_mgr']  = max(1, (int)($security['inv_mgr']  ?? 0));
@@ -170,7 +180,7 @@ class apiAdmin extends apiCommon
 
     public function inventoryNew(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $security = getUserCache('role', 'security');
         $security['prices_c'] = max(1, (int)($security['prices_c'] ?? 0)); // raise only, a higher role level must survive for the funnel's own checks
         $security['inv_mgr']  = max(1, (int)($security['inv_mgr']  ?? 0));
@@ -180,25 +190,25 @@ class apiAdmin extends apiCommon
 
     public function invRefresh(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->invRefresh($layout);
     }
 
     public function invRefreshNext(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->invRefreshNext($layout);
     }
 
     public function OAuthCallBack(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->OAuthCallBack($layout);
     }
 
     public function ordersGo(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(2)) { return; }
         $chan->ordersGo($layout);
     }
 
@@ -207,7 +217,8 @@ class apiAdmin extends apiCommon
      */
     public function cronGet(&$layout=[])
     {
-        $chan = $this->getMethod();
+        $level = (isset($GLOBALS['bizApiCron']) && 'funnelCron'===$GLOBALS['bizApiCron']) ? null : 2; // set by portal/api/funnelCron after its token check
+        if (!$chan = $this->getMethod($level)) { return; }
         $chan->cronGet($layout);
     }
 
@@ -216,7 +227,7 @@ class apiAdmin extends apiCommon
      */
     public function ordersData(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(1)) { return; }
         $chan->ordersData($layout);
     }
 
@@ -225,7 +236,7 @@ class apiAdmin extends apiCommon
      */
     public function itemFeed(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->itemFeed($layout);
     }
 
@@ -234,7 +245,7 @@ class apiAdmin extends apiCommon
      */
     public function feedStatus(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(1)) { return; }
         $chan->feedStatus($layout);
     }
 
@@ -275,7 +286,7 @@ class apiAdmin extends apiCommon
      */
     public function paymentFileForm(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->paymentFileForm($layout);
     }
 
@@ -285,7 +296,7 @@ class apiAdmin extends apiCommon
      */
     public function paymentProcess(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->paymentProcess($layout);
     }
 
@@ -295,7 +306,7 @@ class apiAdmin extends apiCommon
      */
     public function reconcileGo(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->reconcile($layout);
     }
 
@@ -305,7 +316,7 @@ class apiAdmin extends apiCommon
      */
     public function reconcileList(&$layout=[])
     {
-        $chan = $this->getMethod();
+        if (!$chan = $this->getMethod(3)) { return; }
         $chan->reconcileGrid($layout);
     }
 
@@ -316,6 +327,7 @@ class apiAdmin extends apiCommon
      */
     public function getRoles(&$layout=[])
     {
+        if (!validateAccess('admin', 4)) { return; } // the remote admin server uses the token-checked portal/api/getRoles
         $bizID = clean('bizID', 'alpha_num', 'get');
         msgDebug("\nEntering getRoles with bizID = $bizID");
         if (empty($bizID)) { return msgAdd('Illegal Access!'); }
@@ -345,6 +357,7 @@ class apiAdmin extends apiCommon
      */
     public function adminSave()
     {
+        if (!validateAccess('admin', 3)) { return; }
         readModuleSettings($this->moduleID, $this->settingsStructure());
     }
     public function initialize() 
