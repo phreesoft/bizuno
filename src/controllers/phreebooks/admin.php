@@ -172,8 +172,11 @@ class phreebooksAdmin {
             'receivables'  => getChartDefault(2),
             'sales'        => getChartDefault(30)];
         $stmtForms = [['id'=>'0', 'text'=>lang('select')]]; // PhreeForm forms in the customer statements folder, for the monthly statement cron
-        foreach ((array)dbMetaGet('%', 'phreeform') as $row) {
-            if (!empty($row['mime_type']) && $row['mime_type']=='frm' && !empty($row['group_id']) && $row['group_id']=='cust:stmt') { $stmtForms[] = ['id'=>$row['_rID'], 'text'=>$row['title']]; }
+        $rptCache  = getMetaCommon('phreeform_cache'); // normalized list, maps the legacy groupname key to group_id
+        if (empty($rptCache)) { $rptCache = dbReportsCache(); }
+        foreach ((array)$rptCache as $row) {
+            if (!is_array($row) || empty($row['id'])) { continue; }
+            if (($row['mime_type'] ?? '')=='frm' && ($row['group_id'] ?? '')=='cust:stmt') { $stmtForms[] = ['id'=>$row['id'], 'text'=>$row['title']]; }
         }
         $stmtDates = [['id'=>'lastmonth','text'=>lang('stmt_dates_lastmonth', $this->moduleID)], ['id'=>'period','text'=>lang('dates_this_period')], ['id'=>'all','text'=>lang('all')]];
         $data = [
@@ -220,6 +223,7 @@ class phreebooksAdmin {
                 'show_status'    => ['attr'=>['type'=>'selNoYes', 'value'=>1]],
                 'rm_item_ship'   => ['attr'=>['type'=>'selNoYes', 'value'=>0]]]]];
         settingsFill($data, $this->moduleID);
+        $data['customers']['fields']['stmt_run']['attr']['value'] = lang('stmt_run_lbl', $this->moduleID); // a button keeps its caption, settingsFill() replaced it with the (empty) saved value
         $data['customers']['fields']['terms_text']['attr']['value']= viewTerms($data['customers']['fields']['terms']['attr']['value'],true, 'c');
         $data['vendors']['fields']['terms_text']['attr']['value']  = viewTerms($data['vendors']['fields']['terms']['attr']['value'],  true, 'v');
         return $data;
