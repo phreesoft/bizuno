@@ -2,7 +2,7 @@
 
 All notable changes to Bizuno ERP are documented in this file.
 
-## [Unreleased]
+## [7.4.12] — 2026-11-28
 
 ### Security
 - **Data files need a sign-in.** `portal/api/fs` (reachable without a session) serves files from the data
